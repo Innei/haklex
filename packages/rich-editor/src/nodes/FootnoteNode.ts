@@ -11,6 +11,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { FootnoteRenderer } from '../components/renderers/FootnoteRenderer'
+import { RendererWrapper } from '../components/RendererWrapper'
 
 export type SerializedFootnoteNode = Spread<
   {
@@ -72,8 +73,12 @@ export class FootnoteNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(FootnoteRenderer, {
-      identifier: this.__identifier,
+    return createElement(RendererWrapper as any, {
+      rendererKey: 'Footnote',
+      defaultRenderer: FootnoteRenderer,
+      props: {
+        identifier: this.__identifier,
+      },
     })
   }
 }

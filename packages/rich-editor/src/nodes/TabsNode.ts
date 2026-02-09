@@ -11,6 +11,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { TabsRenderer } from '../components/renderers/TabsRenderer'
+import { RendererWrapper } from '../components/RendererWrapper'
 
 export interface TabItem {
   label: string
@@ -32,7 +33,10 @@ export class TabsNode extends DecoratorNode<ReactElement> {
   }
 
   static clone(node: TabsNode): TabsNode {
-    return new TabsNode(node.__tabs.map((t) => ({ ...t })), node.__key)
+    return new TabsNode(
+      node.__tabs.map((t) => ({ ...t })),
+      node.__key,
+    )
   }
 
   constructor(tabs: TabItem[], key?: NodeKey) {
@@ -77,8 +81,12 @@ export class TabsNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(TabsRenderer, {
-      tabs: this.__tabs,
+    return createElement(RendererWrapper as any, {
+      rendererKey: 'Tabs',
+      defaultRenderer: TabsRenderer,
+      props: {
+        tabs: this.__tabs,
+      },
     })
   }
 }

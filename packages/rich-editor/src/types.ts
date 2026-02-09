@@ -6,6 +6,8 @@ import type {
 } from 'lexical'
 import type { ReactNode } from 'react'
 
+import type { RendererConfig } from './types/renderer-config'
+
 export type RichEditorVariant = 'article' | 'comment'
 
 export interface RichEditorProps {
@@ -20,6 +22,7 @@ export interface RichEditorProps {
   actions?: ReactNode
   onEditorReady?: (editor: LexicalEditor | null) => void
   extraNodes?: Array<Klass<LexicalNode>>
+  rendererConfig?: RendererConfig
 }
 
 export interface RichRendererProps {
@@ -27,4 +30,5 @@ export interface RichRendererProps {
   variant?: RichEditorVariant
   className?: string
   as?: React.ElementType
+  rendererConfig?: RendererConfig
 }

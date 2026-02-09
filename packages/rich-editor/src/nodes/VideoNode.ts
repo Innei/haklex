@@ -11,6 +11,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { VideoRenderer } from '../components/renderers/VideoRenderer'
+import { RendererWrapper } from '../components/RendererWrapper'
 
 export type SerializedVideoNode = Spread<
   {
@@ -104,11 +105,15 @@ export class VideoNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(VideoRenderer, {
-      src: this.__src,
-      poster: this.__poster,
-      width: this.__width,
-      height: this.__height,
+    return createElement(RendererWrapper, {
+      rendererKey: 'Video',
+      defaultRenderer: VideoRenderer,
+      props: {
+        src: this.__src,
+        poster: this.__poster,
+        width: this.__width,
+        height: this.__height,
+      },
     })
   }
 }

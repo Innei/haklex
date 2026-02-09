@@ -11,6 +11,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { ImageRenderer } from '../components/renderers/ImageRenderer'
+import { RendererWrapper } from '../components/RendererWrapper'
 
 export type SerializedImageNode = Spread<
   {
@@ -102,12 +103,16 @@ export class ImageNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(ImageRenderer, {
-      src: this.__src,
-      altText: this.__altText,
-      width: this.__width,
-      height: this.__height,
-      caption: this.__caption,
+    return createElement(RendererWrapper as any, {
+      rendererKey: 'Image',
+      defaultRenderer: ImageRenderer,
+      props: {
+        src: this.__src,
+        altText: this.__altText,
+        width: this.__width,
+        height: this.__height,
+        caption: this.__caption,
+      },
     })
   }
 }

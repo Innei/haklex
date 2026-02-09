@@ -11,6 +11,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { LinkCardRenderer } from '../components/renderers/LinkCardRenderer'
+import { RendererWrapper } from '../components/RendererWrapper'
 
 export type SerializedLinkCardNode = Spread<
   {
@@ -111,12 +112,16 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(LinkCardRenderer, {
-      url: this.__url,
-      title: this.__title,
-      description: this.__description,
-      favicon: this.__favicon,
-      image: this.__image,
+    return createElement(RendererWrapper as any, {
+      rendererKey: 'LinkCard',
+      defaultRenderer: LinkCardRenderer,
+      props: {
+        url: this.__url,
+        title: this.__title,
+        description: this.__description,
+        favicon: this.__favicon,
+        image: this.__image,
+      },
     })
   }
 }

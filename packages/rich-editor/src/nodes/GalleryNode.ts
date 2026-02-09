@@ -11,6 +11,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { GalleryRenderer } from '../components/renderers/GalleryRenderer'
+import { RendererWrapper } from '../components/RendererWrapper'
 
 export interface GalleryImage {
   src: string
@@ -106,9 +107,13 @@ export class GalleryNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(GalleryRenderer, {
-      images: this.__images,
-      layout: this.__layout,
+    return createElement(RendererWrapper as any, {
+      rendererKey: 'Gallery',
+      defaultRenderer: GalleryRenderer,
+      props: {
+        images: this.__images,
+        layout: this.__layout,
+      },
     })
   }
 }

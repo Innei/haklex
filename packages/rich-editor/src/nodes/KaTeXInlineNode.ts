@@ -11,6 +11,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer'
+import { RendererWrapper } from '../components/RendererWrapper'
 
 export type SerializedKaTeXInlineNode = Spread<
   {
@@ -72,9 +73,13 @@ export class KaTeXInlineNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(KaTeXRenderer, {
-      equation: this.__equation,
-      displayMode: false,
+    return createElement(RendererWrapper as any, {
+      rendererKey: 'KaTeX',
+      defaultRenderer: KaTeXRenderer,
+      props: {
+        equation: this.__equation,
+        displayMode: false,
+      },
     })
   }
 }
