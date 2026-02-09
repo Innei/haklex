@@ -1,10 +1,11 @@
+import type { RichEditorVariant } from '@shiro/rich-editor'
+import { RichEditor } from '@shiro/rich-editor'
 import { useState } from 'react'
 
-import { RichRenderer } from '../../src/components/RichRenderer'
-import type { RichEditorVariant } from '../../src/types'
 import { JsonViewer } from '../components/JsonViewer'
 import { Panel } from '../components/Panel'
 import { presets } from '../fixtures'
+import { enhancedRendererConfig } from '../fixtures/enhanced-renderers'
 
 export function PresetsPage() {
   const [selectedKey, setSelectedKey] = useState(presets[0].key)
@@ -59,7 +60,12 @@ export function PresetsPage() {
 
           {/* Renderer */}
           <Panel title={selected.label} badge={variant}>
-            <RichRenderer value={selected.data} variant={variant} />
+            <RichEditor
+              key={selected.key}
+              initialValue={selected.data}
+              variant={variant}
+              rendererConfig={enhancedRendererConfig}
+            />
           </Panel>
 
           {/* JSON */}

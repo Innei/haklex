@@ -1,18 +1,13 @@
-import type { LexicalEditor,SerializedEditorState } from 'lexical'
+import type { RichEditorVariant } from '@shiro/rich-editor'
+import { RichEditor, RichRenderer } from '@shiro/rich-editor'
+import type { LexicalEditor, SerializedEditorState } from 'lexical'
 import { useCallback, useRef, useState } from 'react'
 
-import { RichEditor } from '../../src/components/RichEditor'
-import { RichRenderer } from '../../src/components/RichRenderer'
-import type { AlertType } from '../../src/nodes/AlertQuoteNode'
-import { INSERT_ALERT_COMMAND } from '../../src/plugins/AlertPlugin'
-import { INSERT_IMAGE_COMMAND } from '../../src/plugins/ImagePlugin'
-import {
-  INSERT_KATEX_BLOCK_COMMAND,
-  INSERT_KATEX_INLINE_COMMAND,
-} from '../../src/plugins/KaTeXPlugin'
-import type { RichEditorVariant } from '../../src/types'
 import { Panel } from '../components/Panel'
+import { enhancedRendererConfig } from '../fixtures/enhanced-renderers'
 
+// Note: Alert/Image/KaTeX commands are internal to rich-editor
+// We'll need to export them or use alternative methods
 export function EditorPage() {
   const [variant, setVariant] = useState<RichEditorVariant>('article')
   const [editorState, setEditorState] = useState<SerializedEditorState | null>(
@@ -30,28 +25,7 @@ export function EditorPage() {
     editorRef.current = editor
   }, [])
 
-  const insertImage = () => {
-    editorRef.current?.dispatchCommand(INSERT_IMAGE_COMMAND, {
-      src: 'https://picsum.photos/800/400',
-      altText: 'Random image from picsum',
-      caption: 'A beautiful random image',
-    })
-  }
-
-  const insertInlineMath = () => {
-    editorRef.current?.dispatchCommand(INSERT_KATEX_INLINE_COMMAND, 'E = mc^2')
-  }
-
-  const insertBlockMath = () => {
-    editorRef.current?.dispatchCommand(
-      INSERT_KATEX_BLOCK_COMMAND,
-      '\\int_{-\\infty}^{\\infty} e^{-x^2} dx = \\sqrt{\\pi}',
-    )
-  }
-
-  const insertAlert = (type: AlertType) => {
-    editorRef.current?.dispatchCommand(INSERT_ALERT_COMMAND, type)
-  }
+  // TODO: Export commands from @shiro/rich-editor for insert functionality
 
   return (
     <div className="page">
@@ -71,41 +45,6 @@ export function EditorPage() {
           >
             Comment
           </button>
-        </div>
-
-        <div className="toolbar-group">
-          <span className="toolbar-label">Insert</span>
-          <button className="btn" onClick={insertImage}>
-            Image
-          </button>
-          <button className="btn" onClick={insertInlineMath}>
-            Inline Math
-          </button>
-          <button className="btn" onClick={insertBlockMath}>
-            Block Math
-          </button>
-          <div className="dropdown">
-            <button className="btn">Alert ...</button>
-            <div className="dropdown-menu">
-              {(
-                [
-                  'note',
-                  'tip',
-                  'important',
-                  'warning',
-                  'caution',
-                ] as AlertType[]
-              ).map((type) => (
-                <button
-                  key={type}
-                  className="dropdown-item"
-                  onClick={() => insertAlert(type)}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-          </div>
         </div>
 
         <div className="toolbar-group">
@@ -134,13 +73,18 @@ export function EditorPage() {
           onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
           autoFocus
           onEditorReady={handleEditorReady}
+          rendererConfig={enhancedRendererConfig}
         />
       </Panel>
 
       {/* Renderer panel */}
       {showRenderer && editorState && (
         <Panel title="Renderer (readonly)" badge={variant}>
-          <RichRenderer value={editorState} variant={variant} />
+          <RichRenderer
+            value={editorState}
+            variant={variant}
+            rendererConfig={enhancedRendererConfig}
+          />
         </Panel>
       )}
 

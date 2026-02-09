@@ -25,7 +25,6 @@
   ],
   "scripts": {
     "build": "BUILD_LIB=1 vite build",
-    "dev": "vite",
     "dev:build": "BUILD_LIB=1 vite build --watch"
   },
   "devDependencies": {

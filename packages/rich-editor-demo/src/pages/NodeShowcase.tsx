@@ -1,7 +1,9 @@
-import { RichRenderer } from '../../src/components/RichRenderer'
+import { RichRenderer } from '@shiro/rich-editor'
+
 import { JsonViewer } from '../components/JsonViewer'
 import { Panel } from '../components/Panel'
 import { nodeSamples } from '../fixtures'
+import { enhancedRendererConfig } from '../fixtures/enhanced-renderers'
 
 export function NodeShowcase() {
   const inlineNodes = nodeSamples.filter((n) => n.category === 'inline')
@@ -30,7 +32,11 @@ export function NodeShowcase() {
             >
               <p className="node-description">{sample.description}</p>
               <div className="node-render">
-                <RichRenderer value={sample.data} variant="article" />
+                <RichRenderer
+                  value={sample.data}
+                  variant="article"
+                  rendererConfig={enhancedRendererConfig}
+                />
               </div>
               <JsonViewer data={sample.data} />
             </Panel>
@@ -50,7 +56,11 @@ export function NodeShowcase() {
             >
               <p className="node-description">{sample.description}</p>
               <div className="node-render">
-                <RichRenderer value={sample.data} variant="article" />
+                <RichRenderer
+                  value={sample.data}
+                  variant="article"
+                  rendererConfig={enhancedRendererConfig}
+                />
               </div>
               <JsonViewer data={sample.data} />
             </Panel>
@@ -70,7 +80,11 @@ export function NodeShowcase() {
             >
               <p className="node-description">{sample.description}</p>
               <div className="node-render">
-                <RichRenderer value={sample.data} variant="article" />
+                <RichRenderer
+                  value={sample.data}
+                  variant="article"
+                  rendererConfig={enhancedRendererConfig}
+                />
               </div>
               <JsonViewer data={sample.data} />
             </Panel>

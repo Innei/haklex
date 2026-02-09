@@ -1,12 +1,6 @@
 import type { SerializedEditorState } from 'lexical'
 
-import {
-  doc,
-  FORMAT_BOLD,
-  FORMAT_ITALIC,
-  paragraph,
-  text,
-} from './helpers'
+import { doc, FORMAT_BOLD, FORMAT_ITALIC, paragraph, text } from './helpers'
 
 export interface NodeSample {
   key: string

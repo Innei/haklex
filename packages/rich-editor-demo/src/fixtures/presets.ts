@@ -24,6 +24,214 @@ export interface Preset {
 
 export const presets: Preset[] = [
   {
+    key: 'enhanced-renderers',
+    label: 'Enhanced Renderers Showcase',
+    description:
+      'Demonstrates LinkCard with plugin system & Gallery with carousel/autoplay',
+    data: doc(
+      heading('h1', text('Enhanced Renderers Demo')),
+
+      paragraph(
+        text(
+          'This preset showcases the enhanced renderers from standalone packages: ',
+        ),
+        text('@shiro/rich-renderer-linkcard', FORMAT_CODE),
+        text(' and '),
+        text('@shiro/rich-renderer-gallery', FORMAT_CODE),
+        text('.'),
+      ),
+
+      heading('h2', text('LinkCard with Plugin System')),
+
+      paragraph(
+        text(
+          'The enhanced LinkCard renderer features a plugin system for dynamic fetching, spotlight hover effects, and platform-specific styling.',
+        ),
+      ),
+
+      // GitHub repo LinkCard - uses plugin
+      {
+        type: 'link-card',
+        url: 'https://github.com/facebook/react',
+        title: 'facebook/react',
+        description:
+          'A JavaScript library for building user interfaces (fallback)',
+        version: 1,
+      } as any,
+
+      paragraph(text('More LinkCard examples with different platforms:')),
+
+      {
+        type: 'link-card',
+        url: 'https://example.com/article',
+        title: 'Example Article Title',
+        description:
+          'This demonstrates the basic LinkCard renderer with static props.',
+        favicon: 'https://example.com/favicon.ico',
+        image: 'https://picsum.photos/400/200?random=linkcard1',
+        version: 1,
+      } as any,
+
+      {
+        type: 'link-card',
+        url: 'https://another-example.com',
+        title: 'Another Example with Image',
+        description:
+          'LinkCards support optional images and favicons for richer previews.',
+        image: 'https://picsum.photos/400/200?random=linkcard2',
+        version: 1,
+      } as any,
+
+      horizontalRule(),
+
+      heading('h2', text('Gallery Renderer')),
+
+      paragraph(
+        text(
+          'The enhanced Gallery renderer supports multiple layouts, carousel mode with autoplay, and photo zoom via ',
+        ),
+        text('react-photo-view', FORMAT_CODE),
+        text('.'),
+      ),
+
+      heading('h3', text('Grid Layout')),
+
+      {
+        type: 'gallery',
+        images: [
+          {
+            src: 'https://picsum.photos/400/300?random=1',
+            alt: 'Gallery image 1',
+          },
+          {
+            src: 'https://picsum.photos/400/300?random=2',
+            alt: 'Gallery image 2',
+          },
+          {
+            src: 'https://picsum.photos/400/300?random=3',
+            alt: 'Gallery image 3',
+          },
+          {
+            src: 'https://picsum.photos/400/300?random=4',
+            alt: 'Gallery image 4',
+          },
+        ],
+        layout: 'grid',
+        version: 1,
+      } as any,
+
+      heading('h3', text('Carousel Layout with Autoplay')),
+
+      paragraph(
+        text(
+          'Carousel mode features bi-directional autoplay, navigation buttons, and smooth scrolling.',
+        ),
+      ),
+
+      {
+        type: 'gallery',
+        images: [
+          {
+            src: 'https://picsum.photos/800/400?random=10',
+            alt: 'Carousel image 1',
+          },
+          {
+            src: 'https://picsum.photos/800/400?random=11',
+            alt: 'Carousel image 2',
+          },
+          {
+            src: 'https://picsum.photos/800/400?random=12',
+            alt: 'Carousel image 3',
+          },
+          {
+            src: 'https://picsum.photos/800/400?random=13',
+            alt: 'Carousel image 4',
+          },
+          {
+            src: 'https://picsum.photos/800/400?random=14',
+            alt: 'Carousel image 5',
+          },
+        ],
+        layout: 'carousel',
+        version: 1,
+      } as any,
+
+      heading('h3', text('Masonry Layout')),
+
+      {
+        type: 'gallery',
+        images: [
+          { src: 'https://picsum.photos/300/400?random=20', alt: 'Masonry 1' },
+          { src: 'https://picsum.photos/300/500?random=21', alt: 'Masonry 2' },
+          { src: 'https://picsum.photos/300/300?random=22', alt: 'Masonry 3' },
+          { src: 'https://picsum.photos/300/450?random=23', alt: 'Masonry 4' },
+          { src: 'https://picsum.photos/300/350?random=24', alt: 'Masonry 5' },
+          { src: 'https://picsum.photos/300/400?random=25', alt: 'Masonry 6' },
+        ],
+        layout: 'masonry',
+        version: 1,
+      } as any,
+
+      horizontalRule(),
+
+      heading('h2', text('Features Summary')),
+
+      list(
+        'bullet',
+        listItem(
+          paragraph(
+            text('LinkCard: '),
+            text('Plugin system for dynamic fetching', FORMAT_BOLD),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('LinkCard: '),
+            text('Spotlight hover effects', FORMAT_BOLD),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('LinkCard: '),
+            text('Platform-specific styling', FORMAT_BOLD),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Gallery: '),
+            text('Carousel with bi-directional autoplay', FORMAT_BOLD),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Gallery: '),
+            text('Photo zoom lightbox', FORMAT_BOLD),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Gallery: '),
+            text('Grid, Masonry, Carousel layouts', FORMAT_BOLD),
+          ),
+        ),
+      ),
+
+      {
+        type: 'alert-quote',
+        alertType: 'tip',
+        children: [
+          paragraph(
+            text('Click on any gallery image to open the photo viewer!'),
+          ),
+        ],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        version: 1,
+      } as any,
+    ),
+  },
+  {
     key: 'comprehensive-article',
     label: 'Comprehensive Article',
     description:

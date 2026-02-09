@@ -1,6 +1,7 @@
-import '../src/styles/index'
+import '@shiro/rich-editor/style.css'
 import './demo.css'
 
+import * as React from 'react'
 import { useEffect, useState } from 'react'
 
 import { EditorPage } from './pages/EditorPage'
