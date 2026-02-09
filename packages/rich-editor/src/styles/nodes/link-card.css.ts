@@ -1,4 +1,4 @@
-import { style } from '@vanilla-extract/css'
+import { globalStyle, style } from '@vanilla-extract/css'
 
 import { vars } from '../vars.css'
 
@@ -23,13 +23,12 @@ export const linkCardImage = style({
   width: '120px',
   flexShrink: 0,
   overflow: 'hidden',
-  selectors: {
-    [`& > img`]: {
-      width: '100%',
-      height: '100%',
-      objectFit: 'cover',
-    },
-  },
+})
+
+globalStyle(`${linkCardImage} img`, {
+  width: '100%',
+  height: '100%',
+  objectFit: 'cover',
 })
 
 export const linkCardContent = style({

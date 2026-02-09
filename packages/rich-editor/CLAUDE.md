@@ -48,6 +48,16 @@ pnpm dev:build    # Watch mode library build
 - Transformers: TextMatchTransformer with `importRegExp`, `regExp`, `trigger`
 - No imports from main project `src/` - must remain fully independent
 
+## Demo Update Protocol
+
+**CRITICAL**: Every time you implement a new component, node, renderer, or transformer, you MUST update the demo site:
+
+1. **Node samples** - Add to `packages/rich-editor-demo/src/fixtures/node-samples.ts` with example data
+2. **Presets** - Update `packages/rich-editor-demo/src/fixtures/presets.ts` to include the new feature
+
+
+This ensures all features are immediately visible and testable in the demo site.
+
 ## Two Variants
 
 - **article** - Prose-style, `65ch` max-width, larger typography
@@ -69,29 +79,30 @@ pnpm dev:build    # Watch mode library build
 - `src/components/ui/markdown/parsers/ins.tsx` - `++text++` 插入/下划线语法
 
 ### Renderers (Element Overrides)
-- `src/components/ui/markdown/renderers/heading.tsx` - 标题 + 锚点链接
-- `src/components/ui/markdown/renderers/image.tsx` - 图片 (blurhash, lazy load, zoom, video detection)
-- `src/components/ui/markdown/renderers/tabs.tsx` - Tabs/Tab 选项卡容器
-- `src/components/ui/markdown/renderers/spoiler.tsx` - 剧透组件 (hover reveal)
-- `src/components/ui/markdown/renderers/video.tsx` - 视频播放器
-- `src/components/ui/markdown/renderers/paragraph.tsx` - 段落 (block link detection, image unwrap)
-- `src/components/ui/markdown/renderers/blockqoute.tsx` - 引用 + Git-style alerts (`> [!NOTE]`)
-- `src/components/ui/markdown/renderers/alert.tsx` - Alert 类型 (NOTE/IMPORTANT/WARNING/TIP/CAUTION) + icons
-- `src/components/ui/markdown/renderers/collapse.tsx` - `<details>` 折叠块
-- `src/components/ui/markdown/renderers/footnotes.tsx` - 脚注引用 + 回链
-- `src/components/ui/markdown/renderers/table.tsx` - 表格 (overflow scroll)
-- `src/components/ui/markdown/renderers/LinkRenderer.tsx` - 链接卡片 (GitHub/Tweet/Bilibili/YouTube/arxiv 等 20+ 平台)
+- `apps/web/src/components/ui/markdown/renderers/heading.tsx` - 标题 + 锚点链接
+- `apps/web/src/components/ui/markdown/renderers/image.tsx` - 图片 (blurhash, lazy load, zoom, video detection)
+- `apps/web/src/components/ui/markdown/renderers/tabs.tsx` - Tabs/Tab 选项卡容器
+- `apps/web/src/components/ui/markdown/renderers/spoiler.tsx` - 剧透组件 (hover reveal)
+- `apps/web/src/components/ui/markdown/renderers/video.tsx` - 视频播放器
+- `apps/web/src/components/ui/markdown/renderers/paragraph.tsx` - 段落 (block link detection, image unwrap)
+- `apps/web/src/components/ui/markdown/renderers/blockqoute.tsx` - 引用 + Git-style alerts (`> [!NOTE]`)
+- `apps/web/src/components/ui/markdown/renderers/alert.tsx` - Alert 类型 (NOTE/IMPORTANT/WARNING/TIP/CAUTION) + icons
+- `apps/web/src/components/ui/markdown/renderers/collapse.tsx` - `<details>` 折叠块
+- `apps/web/src/components/ui/markdown/renderers/footnotes.tsx` - 脚注引用 + 回链
+- `apps/web/src/components/ui/markdown/renderers/table.tsx` - 表格 (overflow scroll)
+- `apps/web/src/components/ui/markdown/renderers/LinkRenderer.tsx` - 链接卡片 (GitHub/Tweet/Bilibili/YouTube/arxiv 等 20+ 平台)
 
 ### UI Components
-- `src/components/ui/gallery/Gallery.tsx` - 图片画廊 (carousel, responsive)
-- `src/components/ui/banner/Banner.tsx` - Banner/Callout (warning/error/success/info)
-- `src/components/ui/link-card/LinkCard.tsx` - 链接预览卡片
-- `src/components/ui/link-card/ShadowLinkCard.tsx` - Shadow DOM 隔离的链接卡片
-- `src/components/ui/link-card/plugins/` - 20+ 平台特定的 LinkCard 渲染插件
-- `src/components/ui/katex/index.tsx` - KaTeX 渲染组件
-- `src/components/ui/tabs/Tabs.tsx` - Radix UI Tabs
-- `src/components/ui/collapse/Collapse.tsx` - 折叠组件
-- `src/components/modules/shared/CodeBlock.tsx` - 代码块 (Shiki + Mermaid + Excalidraw + line numbers + copy)
+- `apps/web/src/components/ui/gallery/Gallery.tsx` - 图片画廊 (carousel, responsive)
+- `apps/web/src/components/ui/banner/Banner.tsx` - Banner/Callout (warning/error/success/info)
+- `apps/web/src/components/ui/link-card/LinkCard.tsx` - 链接预览卡片
+- `apps/web/src/components/ui/link-card/ShadowLinkCard.tsx` - Shadow DOM 隔离的链接卡片
+- `apps/web/src/components/ui/link-card/plugins/` - 20+ 平台特定的 LinkCard 渲染插件
+- `apps/web/src/components/ui/katex/index.tsx` - KaTeX 渲染组件
+- `apps/web/src/components/ui/tabs/Tabs.tsx` - Radix UI Tabs
+- `apps/web/src/components/ui/collapse/Collapse.tsx` - 折叠组件
+- `apps/web/src/components/ui/media/VideoPlayer.tsx` - 视频播放器 (完整UI控制)
+- `apps/web/src/components/modules/shared/CodeBlock.tsx` - 代码块 (Shiki + Mermaid + Excalidraw + line numbers + copy)
 
 ### Providers
 - `src/providers/article/MarkdownImageRecordProvider.tsx` - 图片元数据 (width/height/blurhash/accent)
@@ -180,17 +191,46 @@ pnpm dev:build    # Watch mode library build
 - [ ] **TabIndentPlugin** - Tab key indentation in code blocks and lists
 - [ ] **CollaborationPlugin** - (future) Real-time collaborative editing
 
-## Renderers - Missing
+## Renderers - Implementation Status
 
-- [ ] **VideoRenderer** - Video player component
-  - Ref: `src/components/ui/markdown/renderers/video.tsx`
-- [ ] **LinkCardRenderer** - Rich link preview with favicon, title, description
-  - Ref: `src/components/ui/link-card/LinkCard.tsx`
-  - Ref: `src/components/ui/link-card/plugins/`
-- [ ] **FootnoteRenderer** - Footnote reference with popover
-  - Ref: `src/components/ui/markdown/renderers/footnotes.tsx`
-- [ ] **GalleryRenderer** - Masonry/grid image gallery
-  - Ref: `src/components/ui/gallery/Gallery.tsx`
+### Basic Renderers (in rich-editor package)
+
+- [x] **VideoRenderer** - Simple HTML5 video with controls ✅
+  - Impl: `src/components/renderers/VideoRenderer.tsx`
+- [x] **FootnoteRenderer** - Basic anchor link with `[n]` format ✅
+  - Impl: `src/components/renderers/FootnoteRenderer.tsx`
+- [x] **ImageRenderer** - Simple img with caption ✅
+  - Impl: `src/components/renderers/ImageRenderer.tsx`
+- [x] **CodeBlockRenderer** - Plain pre+code with Shiki ✅
+  - Impl: `src/components/renderers/CodeBlockRenderer.tsx`
+- [x] **LinkCardRenderer** (basic) - Simple card with title/desc/image ✅
+  - Impl: `src/components/renderers/LinkCardRenderer.tsx`
+- [x] **GalleryRenderer** (basic) - CSS grid/masonry layout ✅
+  - Impl: `src/components/renderers/GalleryRenderer.tsx`
+
+### Enhanced Renderers (standalone packages)
+
+- [x] **@shiro/rich-renderer-linkcard** - 完整 LinkCard + plugin system ✅
+  - Location: `packages/rich-renderer-linkcard/`
+  - Features: 12 plugins, spotlight effect, dynamic fetch, lazy loading
+  - Status: 基础架构完成，GitHub repo plugin 实现，其余 11 个 plugins 待迁移
+  - See: `packages/RENDERER_PACKAGES.md`
+
+- [x] **@shiro/rich-renderer-gallery** - 完整 Gallery with carousel & autoplay ✅
+  - Location: `packages/rich-renderer-gallery/`
+  - Features: Carousel mode, autoplay, photo-view zoom, 3 layouts
+  - Status: 完成
+  - See: `packages/RENDERER_PACKAGES.md`
+
+### Main Project Adapters
+
+- [x] **apps/web 适配层** ✅
+  - Location: `apps/web/src/lib/rich-editor-renderers.tsx`
+  - 将主项目组件适配为 RendererConfig 接口
+  - VideoPlayer, LinkCard, Gallery
+
+**所有 renderer 已实现简易版本，通过 RendererConfig 可覆写。**
+**复杂实现已单列为独立子包：`@shiro/rich-renderer-*`。**
 
 ## Styling
 

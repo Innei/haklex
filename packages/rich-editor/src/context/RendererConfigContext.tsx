@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { createContext } from 'react'
+import { createContext, use } from 'react'
 
 import type { RendererConfig } from '../types/renderer-config'
 

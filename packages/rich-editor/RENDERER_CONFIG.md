@@ -144,23 +144,62 @@ If you don't provide a custom renderer, the default lightweight renderers are us
 - **Mention** - Plain text with `@username` format
 - **Tabs** - Simple tabbed interface
 
-## Migration from Main Project
+## Migration from Main Project (Shiroi apps/web)
 
-If you're migrating from the main Shiroi project and want to use the richer implementations:
+主项目提供了更丰富的 renderer 实现，通过适配层可直接注入。
+
+### 使用预配置的适配器
 
 ```tsx
-// Import your existing renderers
-import { VideoPlayer } from '~/components/media/VideoPlayer'
-import { LinkCard } from '~/components/ui/link-card/LinkCard'
-import { MFootNote } from '~/components/ui/markdown/renderers/footnotes'
+import { customRendererConfig } from '~/lib/rich-editor-renderers'
+import { RichEditor, RichRenderer } from '@shiro/rich-editor'
 
-const shioriRenderers: RendererConfig = {
-  Video: VideoPlayer,
-  LinkCard: LinkCard,
-  Footnote: MFootNote,
-  // ... map other renderers
+// 使用主项目的复杂实现
+<RichEditor
+  rendererConfig={customRendererConfig}
+  onChange={handleChange}
+/>
+
+<RichRenderer
+  value={editorState}
+  rendererConfig={customRendererConfig}
+/>
+```
+
+### 自定义适配器
+
+参考 `apps/web/src/lib/rich-editor-renderers.tsx`：
+
+```tsx
+import type { VideoRendererProps, RendererConfig } from '@shiro/rich-editor'
+import { VideoPlayer } from '~/components/ui/media/VideoPlayer'
+
+// 适配层：包装主项目组件以符合 RendererConfig 接口
+function VideoRendererAdapter({ src, poster }: VideoRendererProps) {
+  return (
+    <VideoPlayer
+      src={src}
+      poster={poster}
+      variant="player"
+      playsInline
+      muted={false}
+    />
+  )
+}
+
+const customConfig: RendererConfig = {
+  Video: VideoRendererAdapter,
+  // ... 其他适配器
 }
 ```
+
+### 已适配的组件
+
+- **VideoPlayer** - 完整视频播放器（进度条、音量、全屏、下载）
+- **LinkCard** - 动态 fetcher、plugin 系统、spotlight 效果
+- **Gallery** - autoplay、carousel、photo-view zoom
+
+**注意**: `MFootNote` 不兼容单个脚注引用模式，保持使用默认简单实现。
 
 ## Architecture
 
