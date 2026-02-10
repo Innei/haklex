@@ -7,6 +7,7 @@ import type { ImageRendererProps } from '../components/renderers/ImageRenderer'
 import type { KaTeXRendererProps } from '../components/renderers/KaTeXRenderer'
 import type { LinkCardRendererProps } from '../components/renderers/LinkCardRenderer'
 import type { MentionRendererProps } from '../components/renderers/MentionRenderer'
+import type { MermaidRendererProps } from '../components/renderers/MermaidRenderer'
 import type { TabsRendererProps } from '../components/renderers/TabsRenderer'
 import type { VideoRendererProps } from '../components/renderers/VideoRenderer'
 
@@ -27,6 +28,8 @@ export interface RendererConfig {
   KaTeX?: ComponentType<KaTeXRendererProps>
   /** Custom renderer for link preview cards */
   LinkCard?: ComponentType<LinkCardRendererProps>
+  /** Custom renderer for Mermaid diagrams */
+  Mermaid?: ComponentType<MermaidRendererProps>
   /** Custom renderer for social media mentions */
   Mention?: ComponentType<MentionRendererProps>
   /** Custom renderer for tabbed content */

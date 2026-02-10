@@ -18,6 +18,7 @@ import { KaTeXBlockNode } from './nodes/KaTeXBlockNode'
 import { KaTeXInlineNode } from './nodes/KaTeXInlineNode'
 import { LinkCardNode } from './nodes/LinkCardNode'
 import { MentionNode } from './nodes/MentionNode'
+import { MermaidNode } from './nodes/MermaidNode'
 import { SpoilerNode } from './nodes/SpoilerNode'
 import { TabsNode } from './nodes/TabsNode'
 import { TaskListItemNode } from './nodes/TaskListItemNode'
@@ -54,6 +55,7 @@ export const customNodes: Array<Klass<LexicalNode>> = [
   GalleryNode,
   GridContainerNode,
   BannerNode,
+  MermaidNode,
 ]
 
 export const allNodes: Array<Klass<LexicalNode>> = [

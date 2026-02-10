@@ -15,5 +15,6 @@ export {
   KaTeXPlugin,
 } from './KaTeXPlugin'
 export { MarkdownShortcutsPlugin } from './MarkdownShortcutsPlugin'
+export { INSERT_MERMAID_COMMAND, MermaidPlugin } from './MermaidPlugin'
 export { OnChangePlugin } from './OnChangePlugin'
 export { SubmitShortcutPlugin } from './SubmitShortcutPlugin'

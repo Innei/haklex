@@ -17,6 +17,7 @@ import { EditorRefPlugin } from '../plugins/EditorRefPlugin'
 import { ImagePlugin } from '../plugins/ImagePlugin'
 import { KaTeXPlugin } from '../plugins/KaTeXPlugin'
 import { MarkdownShortcutsPlugin } from '../plugins/MarkdownShortcutsPlugin'
+import { MermaidPlugin } from '../plugins/MermaidPlugin'
 import { OnChangePlugin } from '../plugins/OnChangePlugin'
 import { SubmitShortcutPlugin } from '../plugins/SubmitShortcutPlugin'
 import { editorTheme } from '../styles/theme'
@@ -79,6 +80,7 @@ export function RichEditor({
             <ImagePlugin />
             <KaTeXPlugin />
             <AlertPlugin />
+            <MermaidPlugin />
             <AutoLinkPlugin />
             <EditorRefPlugin onEditorReady={onEditorReady} />
             {autoFocus && <AutoFocusPlugin />}

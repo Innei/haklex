@@ -1,0 +1,5 @@
+export { getDefaultItems } from './defaultItems'
+export { SlashMenuItem } from './SlashMenuItem'
+export { SlashMenuList } from './SlashMenuList'
+export type { SlashMenuPluginProps } from './SlashMenuPlugin'
+export { SlashMenuPlugin } from './SlashMenuPlugin'

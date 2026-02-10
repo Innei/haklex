@@ -57,8 +57,10 @@ export {
 } from './LinkCardNode'
 export type { SerializedMentionNode } from './MentionNode'
 export { $createMentionNode, $isMentionNode, MentionNode } from './MentionNode'
+export type { SerializedMermaidNode } from './MermaidNode'
+export { $createMermaidNode, $isMermaidNode, MermaidNode } from './MermaidNode'
 export { $createSpoilerNode, $isSpoilerNode, SpoilerNode } from './SpoilerNode'
-export type { SerializedTabsNode,TabItem } from './TabsNode'
+export type { SerializedTabsNode, TabItem } from './TabsNode'
 export { $createTabsNode, $isTabsNode, TabsNode } from './TabsNode'
 export type { SerializedTaskListItemNode } from './TaskListItemNode'
 export {
@@ -66,5 +68,5 @@ export {
   $isTaskListItemNode,
   TaskListItemNode,
 } from './TaskListItemNode'
-export type { SerializedVideoNode,VideoNodePayload } from './VideoNode'
+export type { SerializedVideoNode, VideoNodePayload } from './VideoNode'
 export { $createVideoNode, $isVideoNode, VideoNode } from './VideoNode'
