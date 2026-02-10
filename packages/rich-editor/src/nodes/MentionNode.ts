@@ -17,6 +17,7 @@ export type SerializedMentionNode = Spread<
   {
     platform: string
     handle: string
+    displayName?: string
   },
   SerializedLexicalNode
 >
@@ -24,19 +25,31 @@ export type SerializedMentionNode = Spread<
 export class MentionNode extends DecoratorNode<ReactElement> {
   __platform: string
   __handle: string
+  __displayName?: string
 
   static getType(): string {
     return 'mention'
   }
 
   static clone(node: MentionNode): MentionNode {
-    return new MentionNode(node.__platform, node.__handle, node.__key)
+    return new MentionNode(
+      node.__platform,
+      node.__handle,
+      node.__displayName,
+      node.__key,
+    )
   }
 
-  constructor(platform: string, handle: string, key?: NodeKey) {
+  constructor(
+    platform: string,
+    handle: string,
+    displayName?: string,
+    key?: NodeKey,
+  ) {
     super(key)
     this.__platform = platform
     this.__handle = handle
+    this.__displayName = displayName
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
@@ -59,8 +72,16 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     return this.getLatest().__handle
   }
 
+  getDisplayName(): string | undefined {
+    return this.getLatest().__displayName
+  }
+
   static importJSON(serializedNode: SerializedMentionNode): MentionNode {
-    return $createMentionNode(serializedNode.platform, serializedNode.handle)
+    return $createMentionNode(
+      serializedNode.platform,
+      serializedNode.handle,
+      serializedNode.displayName,
+    )
   }
 
   exportJSON(): SerializedMentionNode {
@@ -69,6 +90,7 @@ export class MentionNode extends DecoratorNode<ReactElement> {
       type: 'mention',
       platform: this.__platform,
       handle: this.__handle,
+      ...(this.__displayName ? { displayName: this.__displayName } : {}),
       version: 1,
     }
   }
@@ -80,6 +102,7 @@ export class MentionNode extends DecoratorNode<ReactElement> {
       props: {
         platform: this.__platform,
         handle: this.__handle,
+        displayName: this.__displayName,
       },
     })
   }
@@ -88,8 +111,9 @@ export class MentionNode extends DecoratorNode<ReactElement> {
 export function $createMentionNode(
   platform: string,
   handle: string,
+  displayName?: string,
 ): MentionNode {
-  return new MentionNode(platform, handle)
+  return new MentionNode(platform, handle, displayName)
 }
 
 export function $isMentionNode(

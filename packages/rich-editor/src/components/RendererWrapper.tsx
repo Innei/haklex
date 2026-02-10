@@ -3,34 +3,48 @@ import type { ComponentType } from 'react'
 import { useRendererConfig } from '../context/RendererConfigContext'
 import type { RendererConfig } from '../types/renderer-config'
 
-interface RendererWrapperProps<
-  K extends keyof RendererConfig,
-  P extends object,
-> {
-  /** Name of the renderer in RendererConfig */
-  rendererKey: K
-  /** Default renderer component */
-  defaultRenderer: ComponentType<P>
-  /** Props to pass to the renderer */
-  props: P
+type RendererKey = keyof RendererConfig
+
+type RendererPropsByKey = {
+  [K in RendererKey]-?: NonNullable<RendererConfig[K]> extends ComponentType<
+    infer P extends object
+  >
+    ? P
+    : never
 }
+
+type RendererComponentByKey = {
+  [K in RendererKey]-?: NonNullable<
+    RendererConfig[K]
+  > extends ComponentType<any>
+    ? NonNullable<RendererConfig[K]>
+    : never
+}
+
+export type RendererWrapperProps = {
+  [K in RendererKey]-?: {
+    /** Name of the renderer in RendererConfig */
+    rendererKey: K
+    /** Default renderer component */
+    defaultRenderer: RendererComponentByKey[K]
+    /** Props to pass to the renderer */
+    props: RendererPropsByKey[K]
+  }
+}[RendererKey]
 
 /**
  * Wrapper component that allows overriding default renderers with custom ones.
  * Uses RendererConfig from context to determine which renderer to use.
  */
-export function RendererWrapper<
-  K extends keyof RendererConfig,
-  P extends object,
->({
+export function RendererWrapper({
   rendererKey,
   defaultRenderer: DefaultRenderer,
   props,
-}: RendererWrapperProps<K, P>) {
+}: RendererWrapperProps) {
   const config = useRendererConfig()
-  const CustomRenderer = config?.[rendererKey] as ComponentType<P> | undefined
+  const CustomRenderer = config?.[rendererKey] as ComponentType<any> | undefined
 
   const Renderer = CustomRenderer || DefaultRenderer
 
-  return <Renderer {...props} />
+  return <Renderer {...(props as any)} />
 }

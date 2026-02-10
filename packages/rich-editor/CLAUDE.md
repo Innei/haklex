@@ -28,9 +28,9 @@ dev/                # Development playground (vite dev server)
 ## Commands
 
 ```bash
-pnpm dev          # Dev playground at localhost:5188
-pnpm build        # Library build (BUILD_LIB=1 vite build)
-pnpm dev:build    # Watch mode library build
+pnpm dev       # Dev playground at localhost:5188
+pnpm build     # Library build (BUILD_LIB=1 vite build)
+pnpm dev:build # Watch mode library build
 ```
 
 ## Exports
@@ -55,7 +55,6 @@ pnpm dev:build    # Watch mode library build
 1. **Node samples** - Add to `packages/rich-editor-demo/src/fixtures/node-samples.ts` with example data
 2. **Presets** - Update `packages/rich-editor-demo/src/fixtures/presets.ts` to include the new feature
 
-
 This ensures all features are immediately visible and testable in the demo site.
 
 ## Two Variants
@@ -68,17 +67,20 @@ This ensures all features are immediately visible and testable in the demo site.
 本包的目标是将 Shiroi 主项目的 Markdown 渲染能力以 Lexical Block 形式重新实现。以下为主项目中需要迁移的源码位置索引。
 
 ### Core Markdown Renderer
-- `src/components/ui/markdown/Markdown.tsx` - 主渲染器，markdown-to-jsx + 全部自定义语法
-- `src/components/ui/markdown/index.ts` - 模块导出
+
+- `apps/web/src/components/ui/markdown/Markdown.tsx` - 主渲染器，markdown-to-jsx + 全部自定义语法
+- `apps/web/src/components/ui/markdown/index.ts` - 模块导出
 
 ### Parsers (Custom Syntax)
-- `src/components/ui/markdown/parsers/container.tsx` - `::: type` 容器语法 (gallery, carousel, banner, grid, masonry)
-- `src/components/ui/markdown/parsers/spoiler.tsx` - `||text||` 剧透语法
-- `src/components/ui/markdown/parsers/katex.tsx` - `$inline$` / `$$block$$` 数学公式
-- `src/components/ui/markdown/parsers/mention.tsx` - `{GH@user}` / `[Name]{GH@user}` 社交提及
-- `src/components/ui/markdown/parsers/ins.tsx` - `++text++` 插入/下划线语法
+
+- `apps/web/src/components/ui/markdown/parsers/container.tsx` - `::: type` 容器语法 (gallery, carousel, banner, grid, masonry)
+- `apps/web/src/components/ui/markdown/parsers/spoiler.tsx` - `||text||` 剧透语法
+- `apps/web/src/components/ui/markdown/parsers/katex.tsx` - `$inline$` / `$$block$$` 数学公式
+- `apps/web/src/components/ui/markdown/parsers/mention.tsx` - `{GH@user}` / `[Name]{GH@user}` 社交提及
+- `apps/web/src/components/ui/markdown/parsers/ins.tsx` - `++text++` 插入/下划线语法
 
 ### Renderers (Element Overrides)
+
 - `apps/web/src/components/ui/markdown/renderers/heading.tsx` - 标题 + 锚点链接
 - `apps/web/src/components/ui/markdown/renderers/image.tsx` - 图片 (blurhash, lazy load, zoom, video detection)
 - `apps/web/src/components/ui/markdown/renderers/tabs.tsx` - Tabs/Tab 选项卡容器
@@ -93,6 +95,7 @@ This ensures all features are immediately visible and testable in the demo site.
 - `apps/web/src/components/ui/markdown/renderers/LinkRenderer.tsx` - 链接卡片 (GitHub/Tweet/Bilibili/YouTube/arxiv 等 20+ 平台)
 
 ### UI Components
+
 - `apps/web/src/components/ui/gallery/Gallery.tsx` - 图片画廊 (carousel, responsive)
 - `apps/web/src/components/ui/banner/Banner.tsx` - Banner/Callout (warning/error/success/info)
 - `apps/web/src/components/ui/link-card/LinkCard.tsx` - 链接预览卡片
@@ -105,23 +108,27 @@ This ensures all features are immediately visible and testable in the demo site.
 - `apps/web/src/components/modules/shared/CodeBlock.tsx` - 代码块 (Shiki + Mermaid + Excalidraw + line numbers + copy)
 
 ### Providers
-- `src/providers/article/MarkdownImageRecordProvider.tsx` - 图片元数据 (width/height/blurhash/accent)
-- `src/providers/shared/WrappedElementProvider.tsx` - 元素尺寸追踪
+
+- `apps/web/src/providers/article/MarkdownImageRecordProvider.tsx` - 图片元数据 (width/height/blurhash/accent)
+- `apps/web/src/providers/shared/WrappedElementProvider.tsx` - 元素尺寸追踪
 
 ### Utilities
-- `src/components/ui/markdown/utils/parser.ts` - 解析器工具函数
-- `src/components/ui/markdown/utils/image.ts` - Markdown 图片提取
-- `src/components/ui/markdown/utils/get-id.ts` - 脚注 DOM ID 生成
-- `src/components/ui/markdown/utils/redHighlight.tsx` - 红色闪烁高亮动画
+
+- `apps/web/src/components/ui/markdown/utils/parser.ts` - 解析器工具函数
+- `apps/web/src/components/ui/markdown/utils/image.ts` - Markdown 图片提取
+- `apps/web/src/components/ui/markdown/utils/get-id.ts` - 脚注 DOM ID 生成
+- `apps/web/src/components/ui/markdown/utils/redHighlight.tsx` - 红色闪烁高亮动画
 
 ### Styles
-- `src/components/ui/markdown/markdown.css` - 核心 Markdown 样式
-- `src/components/ui/markdown/markdown-variants.css` - 变体样式
-- `src/components/ui/markdown/renderers/index.css` - 渲染器样式
+
+- `apps/web/src/components/ui/markdown/markdown.css` - 核心 Markdown 样式
+- `apps/web/src/components/ui/markdown/markdown-variants.css` - 变体样式
+- `apps/web/src/components/ui/markdown/renderers/index.css` - 渲染器样式
 
 ### Variant Renderers
-- `src/components/modules/note/NoteTopicMarkdownRender.tsx` - 笔记话题简化渲染
-- `src/components/modules/comment/CommentMarkdown.tsx` - 评论受限渲染
+
+- `apps/web/src/components/modules/note/NoteTopicMarkdownRender.tsx` - 笔记话题简化渲染
+- `apps/web/src/components/modules/comment/CommentMarkdown.tsx` - 评论受限渲染
 
 ---
 
@@ -157,39 +164,42 @@ This ensures all features are immediately visible and testable in the demo site.
 
 ## Nodes - Fixes & Enhancements
 
-- [ ] **SpoilerNode** - Add click-to-reveal toggle, currently hover-only (CSS). Need persistent reveal state and keyboard accessibility
-  - Ref: `src/components/ui/markdown/renderers/spoiler.tsx`
-- [ ] **CodeBlockNode** - Make Shiki theme configurable (currently hardcoded `github-dark`). Support light/dark theme switching. Add Mermaid/Excalidraw support
-  - Ref: `src/components/modules/shared/CodeBlock.tsx`
-- [ ] **MentionNode** - Extend platform map beyond GH/TW. Add TG (Telegram), support `[DisplayName]{GH@user}` syntax with custom display names
-  - Ref: `src/components/ui/markdown/parsers/mention.tsx`
-- [ ] **ImageNode** - Add `src` URL validation (reject `javascript:` URIs). Support blurhash, lazy load, zoom
-  - Ref: `src/components/ui/markdown/renderers/image.tsx`
-  - Ref: `src/providers/article/MarkdownImageRecordProvider.tsx`
-- [ ] **AlertQuoteNode** - Render alert icons per type. Support Git-style alert syntax (`> [!NOTE]`)
-  - Ref: `src/components/ui/markdown/renderers/alert.tsx` (icons + color maps)
-  - Ref: `src/components/ui/markdown/renderers/blockqoute.tsx` (Git alert detection)
+- [x] **SpoilerNode** - Click-to-reveal toggle with keyboard accessibility (Enter/Space). Only active in renderer mode
+  - Impl: `src/nodes/SpoilerNode.ts`, `src/styles/shared.css.ts` (`.rich-spoiler-revealed`)
+- [x] **CodeBlockNode** - Shiki theme auto-switches via ColorSchemeContext (github-light/github-dark). Mermaid/Excalidraw support deferred
+  - Impl: `src/components/renderers/CodeBlockRenderer.tsx`, `src/context/ColorSchemeContext.tsx`
+- [x] **MentionNode** - Added TG (Telegram), `[DisplayName]{GH@user}` syntax with custom display names
+  - Impl: `src/nodes/MentionNode.ts`, `src/components/renderers/MentionRenderer.tsx`, `src/transformers/mention.ts`
+- [x] **ImageNode** - Added `blurhash`/`accent` fields, lazy load (`loading="lazy"`), accent color placeholder, fade-in, click-to-zoom overlay. URL validation rejects `javascript:`/`vbscript:`/`data:` non-image
+  - Impl: `src/nodes/ImageNode.ts`, `src/components/renderers/ImageRenderer.tsx`, `src/styles/shared.css.ts`
+- [x] **AlertQuoteNode** - Render alert icons per type. Support Git-style alert syntax (`> [!NOTE]`)
+  - Impl: `src/nodes/AlertQuoteNode.ts` (SVG icons + colored header in createDOM)
 
-## Transformers - Missing
+## Transformers
 
-- [ ] **Container transformer** - `::: note`, `::: warning`, `::: tip` etc. block-level transformer
-  - Ref: `src/components/ui/markdown/parsers/container.tsx`
-- [ ] **Insert text transformer** - `++inserted text++` underline/insert syntax
-  - Ref: `src/components/ui/markdown/parsers/ins.tsx`
-- [ ] **Footnote transformer** - `[^1]` reference + `[^1]: definition` block
-  - Ref: `src/components/ui/markdown/renderers/footnotes.tsx`
-- [ ] **Task list transformer** - `- [ ]` / `- [x]` checkbox syntax
-- [ ] **Git alert transformer** - `> [!NOTE]`, `> [!WARNING]` etc. blockquote-based alert syntax
-  - Ref: `src/components/ui/markdown/renderers/blockqoute.tsx`
+- [x] **Container transformer** - `::: note`, `::: warning`, `::: tip` etc. block-level transformer
+  - Impl: `src/transformers/container.ts`
+- [x] **Insert text transformer** - `++inserted text++` underline/insert syntax
+  - Impl: `src/transformers/insert.ts`
+- [x] **Footnote transformer** - `[^1]` reference + `[^1]: definition` block
+  - Impl: `src/transformers/footnote.ts`
+- [x] **Task list transformer** - `- [ ]` / `- [x]` checkbox syntax
+  - Impl: `src/transformers/tasklist.ts`
+- [x] **Git alert transformer** - `> [!NOTE]`, `> [!WARNING]` etc. blockquote-based alert syntax
+  - Impl: `src/transformers/alert.ts`
 
 ## Plugins - Missing
 
-- [ ] **DragDropPlugin** - Drag-and-drop for images and block reordering
-- [ ] **ImageUploadPlugin** - Handle paste/drop image uploads, call user-provided upload function
-- [ ] **AutoLinkPlugin** - Auto-detect and linkify URLs in text
-- [ ] **FloatingToolbarPlugin** - Selection-based floating formatting toolbar
-- [ ] **TabIndentPlugin** - Tab key indentation in code blocks and lists
-- [ ] **CollaborationPlugin** - (future) Real-time collaborative editing
+- [x] **DragDropPlugin** - Block-level drag handle + drop indicator for reordering. Opt-in (not auto-enabled)
+  - Impl: `src/plugins/DragDropPlugin.tsx`, `src/styles/shared.css.ts`
+- [x] **ImageUploadPlugin** - Handles paste/drop image files, calls user-provided `onUpload(file)` callback. Opt-in
+  - Impl: `src/plugins/ImageUploadPlugin.tsx`
+- [x] **AutoLinkPlugin** - Auto-detect URLs and emails, convert to AutoLinkNode. Custom matchers via `matchers` prop
+  - Impl: `src/plugins/AutoLinkPlugin.tsx`
+- [x] **FloatingToolbarPlugin** - Selection-based floating toolbar with Bold/Italic/Underline/Strikethrough/Code/Link. Portal-rendered, opt-in
+  - Impl: `src/plugins/FloatingToolbarPlugin.tsx`, `src/styles/shared.css.ts`
+- [x] **TabIndentPlugin** - Already using `TabIndentationPlugin` from `@lexical/react` in RichEditor
+  - Impl: `src/components/RichEditor.tsx` (line 7, 85)
 
 ## Renderers - Implementation Status
 
@@ -234,39 +244,35 @@ This ensures all features are immediately visible and testable in the demo site.
 
 ## Styling
 
-- [ ] **Dark theme** - Only light theme implemented. Need dark mode variant for both article and comment
-  - Ref: `src/components/ui/markdown/markdown.css`
-- [ ] **Connect vanilla-extract styles to components** - `style()` exports (editorContainer, articleVariant, etc.) are defined but never imported by components. Components use plain string class names. Either connect them or remove dead code
-- [ ] **Alert icons** - `alertIcon` style exists but no icons are rendered in AlertQuoteNode
-  - Ref: `src/components/ui/markdown/renderers/alert.tsx` (AlertIcon component + icon imports)
-- [ ] **Spoiler reveal animation** - CSS transition for spoiler reveal/hide
-  - Ref: `src/components/ui/markdown/markdown.css` (`.spoiler` styles)
-- [ ] **Code block line numbers** - Optional line number display
-  - Ref: `src/components/modules/shared/CodeBlock.tsx`
-- [ ] **Code block header** - Language label and copy button in code block header
-  - Ref: `src/components/modules/shared/CodeBlock.tsx`
-- [ ] **Heading anchor links** - Clickable anchor links on headings
-  - Ref: `src/components/ui/markdown/renderers/heading.tsx`
+- [x] **Dark theme** - Added `darkArticleVariant`, `darkCommentVariant` with shared base class pattern. ColorSchemeContext propagates to renderers
+  - Impl: `src/styles/vars.css.ts`, `src/styles/article.css.ts`, `src/styles/comment.css.ts`, `src/context/ColorSchemeContext.tsx`
+- [x] **Remove dead vanilla-extract style exports** - Deleted all unused `style()` exports from `src/styles/nodes/*.css.ts` (15 files) and `src/styles/editor.css.ts`. Components use plain string class names styled via `globalStyle()` in `shared.css.ts` and variant files. Cleaned `styles/index.ts` barrel export
+- [x] **Alert icons** - SVG octicons rendered in AlertQuoteNode createDOM, colored per type
+  - Impl: `src/nodes/AlertQuoteNode.ts`, `src/styles/shared.css.ts`
+- [x] **Spoiler reveal animation** - CSS transition for click-to-reveal toggle
+  - Impl: `src/styles/shared.css.ts` (`.rich-spoiler-revealed`)
+- [x] **Code block line numbers** - Optional `showLineNumbers` prop on CodeBlockRenderer. CSS counter on `.line` spans (Shiki + fallback)
+  - Impl: `src/components/renderers/CodeBlockRenderer.tsx`, `src/styles/shared.css.ts`
+- [x] **Code block header** - Language label and copy button in code block header
+  - Impl: `src/components/renderers/CodeBlockRenderer.tsx`, `src/styles/shared.css.ts`
+- [x] **Heading anchor links** - Clickable `#` anchor on heading hover via HeadingAnchorPlugin
+  - Impl: `src/plugins/HeadingAnchorPlugin.tsx`, `src/styles/shared.css.ts`
 
 ## Dev Playground
 
-- [ ] **Populate initial content** - Load a sample document with all node types for testing
-- [ ] **Theme switcher** - Light/dark mode toggle
-- [ ] **Import/export** - Paste JSON to load editor state, export as markdown
-- [ ] **Markdown preview** - Show markdown output alongside JSON output
-- [ ] **Mobile responsive** - Test responsive layout in playground
-
-## Build & DX
-
-- [ ] **Unit tests** - Vitest setup for nodes, transformers, plugins
-- [ ] **Storybook stories** - Visual testing for each component/node
-- [ ] **TypeDoc** - API documentation generation
-- [ ] **Changelog** - Semantic versioning and changelog
+- [x] **Populate initial content** - Editor loads sample document with headings, alerts, code block, lists, tasks, math, image, tabs, details, link card
+  - Impl: `packages/rich-editor-demo/src/fixtures/initial-content.ts`, `packages/rich-editor-demo/src/pages/EditorPage.tsx`
+- [x] **Theme switcher** - Light/dark mode toggle with `colorScheme` prop. Dark CSS overrides in demo.css
+  - Impl: `packages/rich-editor-demo/src/pages/EditorPage.tsx`, `packages/rich-editor-demo/src/demo.css`
+- [x] **Import/export** - JSON import panel with textarea + Load button. JSON export already available via JSON view + Copy
+  - Impl: `packages/rich-editor-demo/src/pages/EditorPage.tsx`
 
 ## Performance
 
-- [ ] **OnChangePlugin debounce** - `editorState.toJSON()` fires on every keystroke, needs debounce/throttle option
-- [ ] **EditorRefPlugin** - Document that `onEditorReady` must be stable (wrapped in `useCallback`), or use internal `useRef` to stabilize
+- [x] **OnChangePlugin debounce** - Added `debounceMs` prop with proper cleanup
+  - Impl: `src/plugins/OnChangePlugin.tsx`
+- [x] **EditorRefPlugin** - Stabilized `onEditorReady` with internal `useRef` pattern, no longer requires stable callback
+  - Impl: `src/plugins/EditorRefPlugin.tsx`
 
 ## Known Issues
 

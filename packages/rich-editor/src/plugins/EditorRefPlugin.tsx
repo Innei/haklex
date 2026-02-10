@@ -1,6 +1,6 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import type { LexicalEditor } from 'lexical'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 interface EditorRefPluginProps {
   onEditorReady?: (editor: LexicalEditor | null) => void
@@ -8,11 +8,13 @@ interface EditorRefPluginProps {
 
 export function EditorRefPlugin({ onEditorReady }: EditorRefPluginProps) {
   const [editor] = useLexicalComposerContext()
+  const callbackRef = useRef(onEditorReady)
+  callbackRef.current = onEditorReady
 
   useEffect(() => {
-    onEditorReady?.(editor)
-    return () => onEditorReady?.(null)
-  }, [editor, onEditorReady])
+    callbackRef.current?.(editor)
+    return () => callbackRef.current?.(null)
+  }, [editor])
 
   return null
 }

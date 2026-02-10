@@ -10,6 +10,7 @@ import { DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
+import { LinkCardEditDecorator } from '../components/decorators/LinkCardEditDecorator'
 import { LinkCardRenderer } from '../components/renderers/LinkCardRenderer'
 import { RendererWrapper } from '../components/RendererWrapper'
 
@@ -112,16 +113,22 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(RendererWrapper as any, {
+    const payload = {
+      url: this.__url,
+      title: this.__title,
+      description: this.__description,
+      favicon: this.__favicon,
+      image: this.__image,
+    }
+    const rendererEl = createElement(RendererWrapper as any, {
       rendererKey: 'LinkCard',
       defaultRenderer: LinkCardRenderer,
-      props: {
-        url: this.__url,
-        title: this.__title,
-        description: this.__description,
-        favicon: this.__favicon,
-        image: this.__image,
-      },
+      props: payload,
+    })
+    return createElement(LinkCardEditDecorator, {
+      nodeKey: this.__key,
+      payload,
+      children: rendererEl,
     })
   }
 }

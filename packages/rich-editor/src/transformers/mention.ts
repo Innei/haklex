@@ -10,12 +10,15 @@ export const MENTION_TRANSFORMER: TextMatchTransformer = {
   dependencies: [MentionNode],
   export: (node) => {
     if (!$isMentionNode(node)) return null
-    return `{${node.getPlatform()}@${node.getHandle()}}`
+    const displayName = node.getDisplayName()
+    const base = `{${node.getPlatform()}@${node.getHandle()}}`
+    return displayName ? `[${displayName}]${base}` : base
   },
-  importRegExp: /\{(\w+)@(\w[\w.-]*)\}/,
-  regExp: /\{(\w+)@(\w[\w.-]*)\}$/,
+  importRegExp: /(?:\[([^\]]+)\])?\{(\w+)@(\w[\w.-]*)\}/,
+  regExp: /(?:\[([^\]]+)\])?\{(\w+)@(\w[\w.-]*)\}$/,
   replace: (textNode, match) => {
-    const mentionNode = $createMentionNode(match[1], match[2])
+    const displayName = match[1] || undefined
+    const mentionNode = $createMentionNode(match[2], match[3], displayName)
     textNode.replace(mentionNode)
   },
   trigger: '}',

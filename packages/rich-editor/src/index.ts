@@ -1,6 +1,7 @@
 export { RichEditor } from './components/RichEditor'
 export { RichRenderer } from './components/RichRenderer'
 export { allNodes, builtinNodes, customNodes } from './config'
+export type { ColorScheme } from './context/ColorSchemeContext'
 export * from './styles'
 export type {
   RichEditorProps,

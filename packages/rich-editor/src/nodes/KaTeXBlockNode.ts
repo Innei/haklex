@@ -10,6 +10,7 @@ import { DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
+import { KaTeXEditDecorator } from '../components/decorators/KaTeXEditDecorator'
 import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer'
 import { RendererWrapper } from '../components/RendererWrapper'
 
@@ -73,13 +74,19 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(RendererWrapper as any, {
+    const rendererEl = createElement(RendererWrapper as any, {
       rendererKey: 'KaTeX',
       defaultRenderer: KaTeXRenderer,
       props: {
         equation: this.__equation,
         displayMode: true,
       },
+    })
+    return createElement(KaTeXEditDecorator, {
+      nodeKey: this.__key,
+      equation: this.__equation,
+      displayMode: true,
+      children: rendererEl,
     })
   }
 }

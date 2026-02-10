@@ -22,6 +22,27 @@ export class SpoilerNode extends ElementNode {
   createDOM(_config: EditorConfig): HTMLElement {
     const span = document.createElement('span')
     span.className = 'rich-spoiler'
+    span.setAttribute('role', 'button')
+    span.setAttribute('tabindex', '0')
+    span.setAttribute('aria-label', 'Spoiler (click to reveal)')
+
+    const toggle = () => {
+      if (span.isContentEditable) return
+      const revealed = span.classList.toggle('rich-spoiler-revealed')
+      span.setAttribute(
+        'aria-label',
+        revealed ? 'Spoiler (revealed)' : 'Spoiler (click to reveal)',
+      )
+    }
+
+    span.addEventListener('click', toggle)
+    span.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        toggle()
+      }
+    })
+
     return span
   }
 

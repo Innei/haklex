@@ -8,26 +8,27 @@ import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin'
 
 import { allNodes } from '../config'
+import { ColorSchemeProvider } from '../context/ColorSchemeContext'
 import { RendererConfigProvider } from '../context/RendererConfigContext'
 import { AlertPlugin } from '../plugins/AlertPlugin'
 import { AutoFocusPlugin } from '../plugins/AutoFocusPlugin'
+import { AutoLinkPlugin } from '../plugins/AutoLinkPlugin'
 import { EditorRefPlugin } from '../plugins/EditorRefPlugin'
 import { ImagePlugin } from '../plugins/ImagePlugin'
 import { KaTeXPlugin } from '../plugins/KaTeXPlugin'
 import { MarkdownShortcutsPlugin } from '../plugins/MarkdownShortcutsPlugin'
 import { OnChangePlugin } from '../plugins/OnChangePlugin'
 import { SubmitShortcutPlugin } from '../plugins/SubmitShortcutPlugin'
-import { articleVariant } from '../styles/article.css'
-import { commentVariant } from '../styles/comment.css'
 import { editorTheme } from '../styles/theme'
 import type { RichEditorProps } from '../types'
 import { ContentEditable } from './ContentEditable'
-import { clsx } from './utils'
+import { clsx, getVariantClass } from './utils'
 
 export function RichEditor({
   initialValue,
   onChange,
   variant = 'article',
+  colorScheme = 'light',
   placeholder = 'Write something...',
   onSubmit,
   autoFocus = false,
@@ -37,6 +38,7 @@ export function RichEditor({
   onEditorReady,
   extraNodes,
   rendererConfig,
+  debounceMs,
 }: RichEditorProps) {
   const nodes = extraNodes ? [...allNodes, ...extraNodes] : allNodes
   const initialConfig = {
@@ -50,37 +52,40 @@ export function RichEditor({
     ...(initialValue ? { editorState: JSON.stringify(initialValue) } : {}),
   }
 
-  const variantClass = variant === 'article' ? articleVariant : commentVariant
+  const variantClass = getVariantClass(variant, colorScheme)
 
   return (
-    <RendererConfigProvider config={rendererConfig}>
-      <LexicalComposer initialConfig={initialConfig}>
-        <div className={clsx('rich-editor', variantClass, className)}>
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                className={contentClassName}
-                placeholder={placeholder}
-              />
-            }
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-          <HistoryPlugin />
-          <ListPlugin />
-          <LinkPlugin />
-          <TabIndentationPlugin />
-          <TablePlugin />
-          <MarkdownShortcutsPlugin />
-          <OnChangePlugin onChange={onChange} />
-          <SubmitShortcutPlugin onSubmit={onSubmit} />
-          <ImagePlugin />
-          <KaTeXPlugin />
-          <AlertPlugin />
-          <EditorRefPlugin onEditorReady={onEditorReady} />
-          {autoFocus && <AutoFocusPlugin />}
-          {actions && <div className="rich-editor__actions">{actions}</div>}
-        </div>
-      </LexicalComposer>
-    </RendererConfigProvider>
+    <ColorSchemeProvider colorScheme={colorScheme}>
+      <RendererConfigProvider config={rendererConfig}>
+        <LexicalComposer initialConfig={initialConfig}>
+          <div className={clsx('rich-editor', variantClass, className)}>
+            <RichTextPlugin
+              contentEditable={
+                <ContentEditable
+                  className={contentClassName}
+                  placeholder={placeholder}
+                />
+              }
+              ErrorBoundary={LexicalErrorBoundary}
+            />
+            <HistoryPlugin />
+            <ListPlugin />
+            <LinkPlugin />
+            <TabIndentationPlugin />
+            <TablePlugin />
+            <MarkdownShortcutsPlugin />
+            <OnChangePlugin onChange={onChange} debounceMs={debounceMs} />
+            <SubmitShortcutPlugin onSubmit={onSubmit} />
+            <ImagePlugin />
+            <KaTeXPlugin />
+            <AlertPlugin />
+            <AutoLinkPlugin />
+            <EditorRefPlugin onEditorReady={onEditorReady} />
+            {autoFocus && <AutoFocusPlugin />}
+            {actions && <div className="rich-editor__actions">{actions}</div>}
+          </div>
+        </LexicalComposer>
+      </RendererConfigProvider>
+    </ColorSchemeProvider>
   )
 }
