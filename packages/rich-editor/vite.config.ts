@@ -36,6 +36,9 @@ export default defineConfig({
         /^@lexical\//,
         'katex',
         /^shiki/,
+        /^@radix-ui\//,
+        /^motion/,
+        /^lucide/,
       ],
       output: {
         preserveModules: false,

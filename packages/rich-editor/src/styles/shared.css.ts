@@ -663,6 +663,67 @@ globalStyle(`.rich-link-card-edit-delete:hover`, {
   backgroundColor: `${vars.color.alertCaution}15`,
 })
 
+// ─── Tabs ───────────────────────────────────────────────
+globalStyle(`${richContent} .rich-tabs`, {
+  display: 'flex',
+  flexDirection: 'column',
+  margin: `${vars.spacing.md} 0`,
+})
+
+globalStyle(`${richContent} .rich-tabs-list`, {
+  display: 'inline-flex',
+  gap: vars.spacing.md,
+  borderBottom: `1px solid ${vars.color.border}`,
+  paddingBottom: '1px',
+})
+
+globalStyle(`${richContent} .rich-tabs-trigger`, {
+  position: 'relative',
+  display: 'flex',
+  padding: `${vars.spacing.xs} ${vars.spacing.sm}`,
+  fontSize: vars.typography.fontSizeSmall,
+  fontWeight: 700,
+  color: vars.color.textSecondary,
+  background: 'none',
+  border: 'none',
+  cursor: 'pointer',
+  transition: 'color 0.3s',
+  outline: 'none',
+})
+
+globalStyle(`${richContent} .rich-tabs-trigger-active`, {
+  color: vars.color.accent,
+})
+
+globalStyle(`${richContent} .rich-tabs-trigger-text`, {
+  position: 'relative',
+  zIndex: 1,
+})
+
+globalStyle(`${richContent} .rich-tabs-underline`, {
+  position: 'absolute',
+  bottom: '-1px',
+  left: vars.spacing.sm,
+  right: vars.spacing.sm,
+  height: '2px',
+  borderRadius: '1px',
+  backgroundColor: vars.color.accent,
+})
+
+globalStyle(`${richContent} .rich-tabs-content`, {
+  padding: `${vars.spacing.md} 0`,
+  animation: 'rich-tabs-fade-in 0.3s ease',
+})
+
+const tabsFadeIn = keyframes({
+  from: { opacity: 0 },
+  to: { opacity: 1 },
+})
+
+globalStyle(`${richContent} .rich-tabs-content[data-state="active"]`, {
+  animation: `${tabsFadeIn} 0.3s ease`,
+})
+
 // ─── KaTeX Edit Decorator ────────────────────────────────
 globalStyle(`.rich-katex-edit-wrapper`, {
   cursor: 'pointer',
@@ -728,4 +789,116 @@ globalStyle(`.rich-katex-edit-textarea`, {
   outline: 'none',
   resize: 'vertical',
   boxSizing: 'border-box',
+})
+
+// ─── Details / Collapse ─────────────────────────────────
+globalStyle(`${richContent} .rich-details`, {
+  margin: `${vars.spacing.md} 0`,
+  border: 'none',
+})
+
+globalStyle(`${richContent} .rich-details-summary`, {
+  display: 'flex',
+  width: '100%',
+  cursor: 'pointer',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  listStyle: 'none',
+  userSelect: 'none',
+  fontWeight: 600,
+  padding: `${vars.spacing.sm} 0`,
+})
+
+globalStyle(`${richContent} .rich-details-summary::-webkit-details-marker`, {
+  display: 'none',
+})
+
+globalStyle(`${richContent} .rich-details-summary::marker`, {
+  display: 'none',
+  content: '""',
+})
+
+globalStyle(`${richContent} .rich-details-summary-text`, {
+  flex: '1 1 0',
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+})
+
+globalStyle(`${richContent} .rich-details-chevron`, {
+  display: 'inline-flex',
+  flexShrink: 0,
+  color: vars.color.textSecondary,
+  transition: 'transform 0.2s ease',
+})
+
+globalStyle(`${richContent} .rich-details[open] .rich-details-chevron`, {
+  transform: 'rotate(180deg)',
+})
+
+globalStyle(`${richContent} .rich-details-content`, {
+  padding: `${vars.spacing.sm} 0`,
+})
+
+// ─── Banner ─────────────────────────────────────────────
+globalStyle(`${richContent} .rich-banner`, {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: vars.spacing.md,
+  borderRadius: vars.borderRadius.md,
+  border: '1px solid',
+  padding: vars.spacing.lg,
+  margin: `${vars.spacing.md} 0`,
+  color: vars.color.text,
+  lineHeight: '1.8',
+})
+
+globalStyle(`${richContent} .rich-banner-icon`, {
+  display: 'inline-flex',
+  flexShrink: 0,
+  fontSize: '1.5em',
+  alignSelf: 'flex-start',
+})
+
+globalStyle(`${richContent} .rich-banner-content`, {
+  flex: 1,
+  minWidth: 0,
+})
+
+globalStyle(`${richContent} .rich-banner-info`, {
+  backgroundColor: 'rgba(59, 130, 246, 0.08)',
+  borderColor: 'rgba(59, 130, 246, 0.3)',
+})
+
+globalStyle(`${richContent} .rich-banner-icon-info`, {
+  color: '#3b82f6',
+})
+
+globalStyle(`${richContent} .rich-banner-warning`, {
+  backgroundColor: 'rgba(245, 158, 11, 0.08)',
+  borderColor: 'rgba(245, 158, 11, 0.3)',
+})
+
+globalStyle(`${richContent} .rich-banner-icon-warning`, {
+  color: '#f59e0b',
+})
+
+globalStyle(`${richContent} .rich-banner-error`, {
+  backgroundColor: 'rgba(239, 68, 68, 0.08)',
+  borderColor: 'rgba(239, 68, 68, 0.3)',
+})
+
+globalStyle(`${richContent} .rich-banner-icon-error`, {
+  color: '#ef4444',
+})
+
+globalStyle(`${richContent} .rich-banner-success`, {
+  backgroundColor: 'rgba(34, 197, 94, 0.08)',
+  borderColor: 'rgba(34, 197, 94, 0.3)',
+})
+
+globalStyle(`${richContent} .rich-banner-icon-success`, {
+  color: '#22c55e',
 })

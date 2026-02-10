@@ -16,6 +16,7 @@ import { RendererWrapper } from '../components/RendererWrapper'
 export interface TabItem {
   label: string
   content: string
+  language?: string
 }
 
 export type SerializedTabsNode = Spread<

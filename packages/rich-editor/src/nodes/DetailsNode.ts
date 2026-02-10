@@ -6,6 +6,9 @@ import type {
   Spread,
 } from 'lexical'
 import { ElementNode } from 'lexical'
+import { __iconNode as ChevronDown } from 'lucide-react/dist/esm/icons/chevron-down'
+
+import { createLucideSvg } from '../utils/lucide-dom'
 
 export type SerializedDetailsNode = Spread<
   {
@@ -42,12 +45,22 @@ export class DetailsNode extends ElementNode {
 
     const summary = document.createElement('summary')
     summary.className = 'rich-details-summary'
-    summary.textContent = this.__summary
-    details.append(summary)
+
+    const label = document.createElement('span')
+    label.className = 'rich-details-summary-text'
+    label.textContent = this.__summary
+    summary.append(label)
+
+    const chevron = document.createElement('span')
+    chevron.className = 'rich-details-chevron'
+    chevron.append(
+      createLucideSvg(ChevronDown, { width: '1em', height: '1em' }),
+    )
+    summary.append(chevron)
 
     const content = document.createElement('div')
     content.className = 'rich-details-content'
-    details.append(content)
+    details.append(summary, content)
 
     return details
   }
@@ -58,9 +71,9 @@ export class DetailsNode extends ElementNode {
       details.open = this.__open
     }
     if (prevNode.__summary !== this.__summary) {
-      const summary = dom.querySelector('.rich-details-summary')
-      if (summary) {
-        summary.textContent = this.__summary
+      const label = dom.querySelector('.rich-details-summary-text')
+      if (label) {
+        label.textContent = this.__summary
       }
     }
     return false
@@ -102,15 +115,19 @@ export class DetailsNode extends ElementNode {
     this.setOpen(!this.getOpen())
   }
 
+  getDOMSlot(element: HTMLElement) {
+    const content = element.querySelector(
+      '.rich-details-content',
+    ) as HTMLElement
+    return super.getDOMSlot(element).withElement(content)
+  }
+
   isInline(): boolean {
     return false
   }
 }
 
-export function $createDetailsNode(
-  summary: string,
-  open = false,
-): DetailsNode {
+export function $createDetailsNode(summary: string, open = false): DetailsNode {
   return new DetailsNode(summary, open)
 }
 

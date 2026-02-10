@@ -6,8 +6,21 @@ import type {
   Spread,
 } from 'lexical'
 import { ElementNode } from 'lexical'
+import { __iconNode as CircleCheck } from 'lucide-react/dist/esm/icons/circle-check'
+import { __iconNode as InfoIcon } from 'lucide-react/dist/esm/icons/info'
+import { __iconNode as ShieldAlert } from 'lucide-react/dist/esm/icons/shield-alert'
+import { __iconNode as TriangleAlert } from 'lucide-react/dist/esm/icons/triangle-alert'
+
+import { createLucideSvg } from '../utils/lucide-dom'
 
 export type BannerType = 'info' | 'success' | 'warning' | 'error'
+
+const BANNER_ICON_DATA: Record<BannerType, any[]> = {
+  info: InfoIcon,
+  warning: TriangleAlert,
+  error: ShieldAlert,
+  success: CircleCheck,
+}
 
 export type SerializedBannerNode = Spread<
   {
@@ -42,12 +55,31 @@ export class BannerNode extends ElementNode {
     if (this.__bgColor) {
       div.style.backgroundColor = this.__bgColor
     }
+
+    const icon = document.createElement('span')
+    icon.className = `rich-banner-icon rich-banner-icon-${this.__bannerType}`
+    const iconData =
+      BANNER_ICON_DATA[this.__bannerType] || BANNER_ICON_DATA.info
+    icon.append(createLucideSvg(iconData, { width: '1em', height: '1em' }))
+
+    const content = document.createElement('div')
+    content.className = 'rich-banner-content'
+
+    div.append(icon, content)
     return div
   }
 
   updateDOM(prevNode: BannerNode, dom: HTMLElement): boolean {
     if (prevNode.__bannerType !== this.__bannerType) {
       dom.className = `rich-banner rich-banner-${this.__bannerType}`
+      const icon = dom.querySelector('.rich-banner-icon')
+      if (icon) {
+        icon.className = `rich-banner-icon rich-banner-icon-${this.__bannerType}`
+        icon.replaceChildren()
+        const iconData =
+          BANNER_ICON_DATA[this.__bannerType] || BANNER_ICON_DATA.info
+        icon.append(createLucideSvg(iconData, { width: '1em', height: '1em' }))
+      }
     }
     if (prevNode.__bgColor !== this.__bgColor) {
       dom.style.backgroundColor = this.__bgColor || ''
@@ -85,6 +117,11 @@ export class BannerNode extends ElementNode {
   setBgColor(bgColor: string | undefined): void {
     const writable = this.getWritable()
     writable.__bgColor = bgColor
+  }
+
+  getDOMSlot(element: HTMLElement) {
+    const content = element.querySelector('.rich-banner-content') as HTMLElement
+    return super.getDOMSlot(element).withElement(content)
   }
 
   isInline(): boolean {
