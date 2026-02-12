@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 
+import type { AlertRendererProps } from '../components/renderers/AlertRenderer'
 import type { CodeBlockRendererProps } from '../components/renderers/CodeBlockRenderer'
 import type { FootnoteRendererProps } from '../components/renderers/FootnoteRenderer'
 import type { GalleryRendererProps } from '../components/renderers/GalleryRenderer'
@@ -16,6 +17,8 @@ import type { VideoRendererProps } from '../components/renderers/VideoRenderer'
  * Allows overriding default renderers with custom implementations.
  */
 export interface RendererConfig {
+  /** Custom renderer for alert/callout headers */
+  Alert?: ComponentType<AlertRendererProps>
   /** Custom renderer for code blocks with syntax highlighting */
   CodeBlock?: ComponentType<CodeBlockRendererProps>
   /** Custom renderer for footnote references */

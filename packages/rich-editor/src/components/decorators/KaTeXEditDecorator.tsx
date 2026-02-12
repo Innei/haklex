@@ -1,4 +1,10 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import {
+  Popover,
+  PopoverArrow,
+  PopoverPanel,
+  PopoverTrigger,
+} from '@shiro/rich-editor-ui'
 import { $getNodeByKey } from 'lexical'
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -22,7 +28,7 @@ export function KaTeXEditDecorator({
   const [editor] = useLexicalComposerContext()
   const editable = editor.isEditable()
 
-  const [editing, setEditing] = useState(false)
+  const [open, setOpen] = useState(false)
   const [value, setValue] = useState(equation)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -31,11 +37,11 @@ export function KaTeXEditDecorator({
   }, [equation])
 
   useEffect(() => {
-    if (editing && inputRef.current) {
+    if (open && inputRef.current) {
       inputRef.current.focus()
       inputRef.current.select()
     }
-  }, [editing])
+  }, [open])
 
   const commit = useCallback(() => {
     const trimmed = value.trim()
@@ -48,12 +54,12 @@ export function KaTeXEditDecorator({
         node.setEquation(trimmed)
       }
     })
-    setEditing(false)
+    setOpen(false)
   }, [editor, nodeKey, value])
 
   const cancel = useCallback(() => {
     setValue(equation)
-    setEditing(false)
+    setOpen(false)
   }, [equation])
 
   const handleDelete = useCallback(() => {
@@ -83,13 +89,21 @@ export function KaTeXEditDecorator({
     return children
   }
 
-  if (editing) {
-    const wrapperClass = displayMode
-      ? 'rich-katex-edit-block'
-      : 'rich-katex-edit-inline'
-
-    return (
-      <span className={wrapperClass}>
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger
+        render={
+          <span className="rich-katex-edit-wrapper" title="Click to edit" />
+        }
+      >
+        {children}
+      </PopoverTrigger>
+      <PopoverPanel
+        side="bottom"
+        sideOffset={8}
+        className="rich-katex-popover-panel"
+      >
+        <PopoverArrow />
         <span className="rich-katex-edit-header">
           <span className="rich-katex-edit-label">
             {displayMode ? 'Block KaTeX' : 'Inline KaTeX'}
@@ -124,26 +138,11 @@ export function KaTeXEditDecorator({
           className="rich-katex-edit-textarea"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          onBlur={commit}
           onKeyDown={handleKeyDown}
           rows={displayMode ? 4 : 1}
           spellCheck={false}
         />
-      </span>
-    )
-  }
-
-  return (
-    <span
-      className="rich-katex-edit-wrapper"
-      onClick={(e) => {
-        e.preventDefault()
-        e.stopPropagation()
-        setEditing(true)
-      }}
-      title="Click to edit"
-    >
-      {children}
-    </span>
+      </PopoverPanel>
+    </Popover>
   )
 }

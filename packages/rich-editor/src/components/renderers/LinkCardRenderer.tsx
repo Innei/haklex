@@ -36,6 +36,9 @@ export function LinkCardRenderer({
               alt=""
               width={16}
               height={16}
+              onError={(e) => {
+                ;(e.target as HTMLImageElement).style.display = 'none'
+              }}
             />
           )}
           {displayTitle}

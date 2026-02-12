@@ -1,5 +1,6 @@
 export interface MermaidRendererProps {
   content: string
+  onContentChange?: (content: string) => void
 }
 
 export function MermaidRenderer({ content }: MermaidRendererProps) {

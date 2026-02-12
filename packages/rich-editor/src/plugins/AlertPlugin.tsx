@@ -14,8 +14,7 @@ export function AlertPlugin() {
     return editor.registerCommand(
       INSERT_ALERT_COMMAND,
       (alertType) => {
-        const node = $createAlertQuoteNode(alertType)
-        $insertNodes([node])
+        $insertNodes([$createAlertQuoteNode(alertType)])
         return true
       },
       COMMAND_PRIORITY_EDITOR,

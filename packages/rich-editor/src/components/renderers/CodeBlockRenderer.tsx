@@ -8,6 +8,8 @@ export interface CodeBlockRendererProps {
   code: string
   language: string
   showLineNumbers?: boolean
+  editable?: boolean
+  onCodeChange?: (code: string) => void
 }
 
 export function CodeBlockRenderer({

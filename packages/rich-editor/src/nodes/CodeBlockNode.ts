@@ -10,8 +10,7 @@ import { DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
-import { CodeBlockRenderer } from '../components/renderers/CodeBlockRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { CodeBlockEditDecorator } from '../components/decorators/CodeBlockEditDecorator'
 
 export type SerializedCodeBlockNode = Spread<
   {
@@ -86,13 +85,10 @@ export class CodeBlockNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(RendererWrapper as any, {
-      rendererKey: 'CodeBlock',
-      defaultRenderer: CodeBlockRenderer,
-      props: {
-        code: this.__code,
-        language: this.__language,
-      },
+    return createElement(CodeBlockEditDecorator, {
+      nodeKey: this.__key,
+      code: this.__code,
+      language: this.__language,
     })
   }
 }

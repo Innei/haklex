@@ -1,6 +1,6 @@
 import type { ElementTransformer } from '@lexical/markdown'
 import { $isQuoteNode } from '@lexical/rich-text'
-import type { LexicalNode } from 'lexical'
+import type { LexicalNode, SerializedEditorState } from 'lexical'
 
 import {
   $createAlertQuoteNode,
@@ -63,10 +63,32 @@ export const GIT_ALERT_TRANSFORMER: ElementTransformer = {
 
     const alertNode = $createAlertQuoteNode(alertType)
 
-    // Append children to alert quote
-    children.forEach((child) => {
-      alertNode.append(child)
-    })
+    // Serialize children into nested editor content
+    const serializedChildren = children.map((child) => child.exportJSON())
+    const content = {
+      root: {
+        children: [
+          {
+            type: 'paragraph',
+            children: serializedChildren,
+            direction: null,
+            format: '',
+            indent: 0,
+            textFormat: 0,
+            textStyle: '',
+            version: 1,
+          },
+        ],
+        direction: null,
+        format: '',
+        indent: 0,
+        type: 'root',
+        version: 1,
+      },
+    } as unknown as SerializedEditorState
+
+    const editorState = alertNode.getContentEditor().parseEditorState(content)
+    alertNode.getContentEditor().setEditorState(editorState)
 
     parentNode.replace(alertNode)
   },

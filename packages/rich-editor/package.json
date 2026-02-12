@@ -27,6 +27,9 @@
     "build": "BUILD_LIB=1 vite build",
     "dev:build": "BUILD_LIB=1 vite build --watch"
   },
+  "dependencies": {
+    "@shiro/rich-editor-ui": "workspace:*"
+  },
   "devDependencies": {
     "@lexical/code": "^0.39.0",
     "@lexical/link": "^0.39.0",

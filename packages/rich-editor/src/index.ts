@@ -19,6 +19,10 @@ export {
   MermaidNode,
 } from './nodes/MermaidNode'
 
+// Re-export alert node utilities
+export type { AlertType } from './nodes/AlertQuoteNode'
+export { ALERT_LABELS, ALERT_TYPES } from './nodes/AlertQuoteNode'
+
 // Re-export plugin commands
 export { INSERT_ALERT_COMMAND } from './plugins/AlertPlugin'
 export { INSERT_IMAGE_COMMAND } from './plugins/ImagePlugin'
@@ -29,6 +33,7 @@ export {
 export { INSERT_MERMAID_COMMAND } from './plugins/MermaidPlugin'
 
 // Re-export renderer prop types for convenience when creating custom renderers
+export type { AlertRendererProps } from './components/renderers/AlertRenderer'
 export type { CodeBlockRendererProps } from './components/renderers/CodeBlockRenderer'
 export type { FootnoteRendererProps } from './components/renderers/FootnoteRenderer'
 export type { GalleryRendererProps } from './components/renderers/GalleryRenderer'

@@ -6,7 +6,7 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $getNodeByKey, DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
@@ -72,12 +72,21 @@ export class MermaidNode extends DecoratorNode<ReactElement> {
     writable.__diagram = diagram
   }
 
-  decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
+  decorate(editor: LexicalEditor, _config: EditorConfig): ReactElement {
+    const nodeKey = this.__key
     return createElement(RendererWrapper as any, {
       rendererKey: 'Mermaid',
       defaultRenderer: MermaidRenderer,
       props: {
         content: this.__diagram,
+        onContentChange: (newDiagram: string) => {
+          editor.update(() => {
+            const node = $getNodeByKey(nodeKey) as MermaidNode | null
+            if (node) {
+              node.setDiagram(newDiagram)
+            }
+          })
+        },
       },
     })
   }

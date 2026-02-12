@@ -3,6 +3,7 @@ import type {
   LexicalEditor,
   LexicalNode,
   NodeKey,
+  SerializedEditorState,
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
@@ -15,8 +16,7 @@ import { RendererWrapper } from '../components/RendererWrapper'
 
 export interface TabItem {
   label: string
-  content: string
-  language?: string
+  content: SerializedEditorState
 }
 
 export type SerializedTabsNode = Spread<

@@ -328,28 +328,76 @@ globalStyle(`${richContent} .rich-spoiler-revealed`, {
 })
 
 // ─── Mention ─────────────────────────────────────────────
-globalStyle(`${richContent} .rich-mention`, {
+globalStyle(`${richContent} .rich-footnote`, {
+  verticalAlign: 'super',
+  fontSize: '0.8em',
+})
+
+globalStyle(`${richContent} .rich-footnote-ref`, {
   display: 'inline-flex',
   alignItems: 'center',
-  gap: '4px',
-  color: vars.color.accent,
-  fontWeight: 500,
+  justifyContent: 'center',
+  minWidth: '1.5em',
   textDecoration: 'none',
-  cursor: 'pointer',
-  transition: 'opacity 0.2s ease',
+  color: vars.color.accent,
+  backgroundColor: vars.color.accentLight,
+  borderRadius: '999px',
+  padding: '0 0.35em',
+  lineHeight: 1.45,
+  fontWeight: 600,
+  fontSize: '0.82em',
+  transition: 'filter 0.15s ease',
 })
 
-globalStyle(`${richContent} .rich-mention:hover`, {
-  textDecoration: 'underline',
+globalStyle(`${richContent} .rich-footnote-ref:hover`, {
+  filter: 'brightness(0.96)',
 })
 
-globalStyle(`${richContent} .rich-mention-platform`, {
-  fontSize: '0.85em',
-  opacity: 0.7,
+const footnoteFlash = keyframes({
+  '0%': { backgroundColor: 'rgba(239, 68, 68, 0.24)' },
+  '100%': { backgroundColor: 'transparent' },
+})
+
+globalStyle(`${richContent} .rich-footnote-highlight`, {
+  animation: `${footnoteFlash} 1.2s ease-out`,
+})
+
+globalStyle(`${richContent} .rich-mention`, {
+  display: 'inline',
+  margin: '0 0.25em',
+  verticalAlign: 'text-bottom',
+  whiteSpace: 'nowrap',
+})
+
+globalStyle(`${richContent} .rich-mention-icon`, {
+  display: 'inline-flex',
+  alignItems: 'center',
+  marginRight: '0.25em',
+  verticalAlign: 'middle',
+})
+
+globalStyle(`${richContent} .rich-mention-icon svg`, {
+  display: 'inline',
+  height: '0.9em',
+  width: '0.9em',
+})
+
+globalStyle(`${richContent} .rich-mention-icon-gh`, {
+  fill: vars.color.text,
 })
 
 globalStyle(`${richContent} .rich-mention-handle`, {
-  fontWeight: 600,
+  textDecorationLine: 'underline',
+  textUnderlineOffset: '2px',
+  color: 'inherit',
+})
+
+globalStyle(`${richContent} .rich-mention-handle:hover`, {
+  color: vars.color.accent,
+})
+
+globalStyle(`${richContent} .rich-mention-plain`, {
+  color: vars.color.textSecondary,
 })
 
 // ─── KaTeX ───────────────────────────────────────────────
@@ -406,6 +454,7 @@ globalStyle(`${richContent} .rich-alert-caution`, {
 })
 
 globalStyle(`${richContent} .rich-alert-header`, {
+  position: 'relative',
   display: 'flex',
   alignItems: 'center',
   gap: vars.spacing.sm,
@@ -442,6 +491,23 @@ globalStyle(`${richContent} .rich-alert-header-warning`, {
 
 globalStyle(`${richContent} .rich-alert-header-caution`, {
   color: vars.color.alertCaution,
+})
+
+globalStyle(`${richContent} .rich-alert-content`, {
+  minHeight: '1em',
+})
+
+globalStyle(`${richContent} .rich-alert-content-editable`, {
+  outline: 'none',
+})
+
+globalStyle(`${richContent} .rich-alert-content .rich-paragraph`, {
+  margin: 0,
+  marginBottom: '0.5em',
+})
+
+globalStyle(`${richContent} .rich-alert-content .rich-paragraph:last-child`, {
+  marginBottom: 0,
 })
 
 // ─── Code block header ──────────────────────────────────
@@ -589,23 +655,27 @@ globalStyle(`.rich-link-card-edit-wrapper`, {
 globalStyle(`.rich-link-card-edit-toolbar`, {
   display: 'flex',
   alignItems: 'center',
-  gap: '4px',
-  padding: '4px 8px',
-  fontSize: vars.typography.fontSizeSmall,
-  backgroundColor: vars.color.bgSecondary,
+  gap: '6px',
+  padding: '6px 10px',
+  fontSize: '13px',
+  backgroundColor: vars.color.bg,
   border: `1px solid ${vars.color.border}`,
-  borderBottom: 'none',
-  borderRadius: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
+  borderRadius: vars.borderRadius.md,
+  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
+  marginBottom: '6px',
   opacity: 0,
+  pointerEvents: 'none',
   transition: 'opacity 0.15s ease',
 })
 
 globalStyle(`.rich-link-card-edit-wrapper:hover .rich-link-card-edit-toolbar`, {
   opacity: 1,
+  pointerEvents: 'auto',
 })
 
 globalStyle(`.rich-link-card-edit-toolbar:focus-within`, {
   opacity: 1,
+  pointerEvents: 'auto',
 })
 
 globalStyle(`.rich-link-card-edit-url`, {
@@ -613,34 +683,43 @@ globalStyle(`.rich-link-card-edit-url`, {
   appearance: 'none',
   border: 'none',
   background: 'none',
-  color: vars.color.link,
+  color: vars.color.textSecondary,
   fontFamily: vars.typography.fontMono,
-  fontSize: vars.typography.fontSizeSmall,
+  fontSize: '13px',
   cursor: 'pointer',
-  padding: '2px 4px',
+  padding: '3px 6px',
   borderRadius: vars.borderRadius.sm,
   textAlign: 'left',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  transition: 'background-color 0.1s ease',
+  transition: 'color 0.15s ease, background-color 0.15s ease',
+  minWidth: 0,
 })
 
 globalStyle(`.rich-link-card-edit-url:hover`, {
-  backgroundColor: vars.color.accentLight,
+  color: vars.color.text,
+  backgroundColor: vars.color.bgSecondary,
 })
 
 globalStyle(`.rich-link-card-edit-input`, {
   flex: 1,
   appearance: 'none',
-  border: `1px solid ${vars.color.accent}`,
+  border: `1px solid ${vars.color.border}`,
   backgroundColor: vars.color.bg,
   color: vars.color.text,
   fontFamily: vars.typography.fontMono,
-  fontSize: vars.typography.fontSizeSmall,
-  padding: '2px 6px',
+  fontSize: '13px',
+  padding: '3px 8px',
   borderRadius: vars.borderRadius.sm,
   outline: 'none',
+  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+  minWidth: 0,
+})
+
+globalStyle(`.rich-link-card-edit-input:focus`, {
+  borderColor: vars.color.accent,
+  boxShadow: `0 0 0 2px ${vars.color.accentLight}`,
 })
 
 globalStyle(`.rich-link-card-edit-delete`, {
@@ -654,13 +733,15 @@ globalStyle(`.rich-link-card-edit-delete`, {
   cursor: 'pointer',
   padding: '4px',
   borderRadius: vars.borderRadius.sm,
-  transition: 'color 0.1s ease, background-color 0.1s ease',
+  transition: 'color 0.15s ease, background-color 0.15s ease',
   flexShrink: 0,
+  opacity: 0.5,
 })
 
 globalStyle(`.rich-link-card-edit-delete:hover`, {
   color: vars.color.alertCaution,
-  backgroundColor: `${vars.color.alertCaution}15`,
+  backgroundColor: `${vars.color.alertCaution}10`,
+  opacity: 1,
 })
 
 // ─── Tabs ───────────────────────────────────────────────
@@ -672,9 +753,10 @@ globalStyle(`${richContent} .rich-tabs`, {
 
 globalStyle(`${richContent} .rich-tabs-list`, {
   display: 'inline-flex',
-  gap: vars.spacing.md,
+  gap: vars.spacing.sm,
   borderBottom: `1px solid ${vars.color.border}`,
   paddingBottom: '1px',
+  flexWrap: 'wrap',
 })
 
 globalStyle(`${richContent} .rich-tabs-trigger`, {
@@ -687,11 +769,12 @@ globalStyle(`${richContent} .rich-tabs-trigger`, {
   background: 'none',
   border: 'none',
   cursor: 'pointer',
-  transition: 'color 0.3s',
+  transition: 'color 0.3s, background-color 0.2s',
   outline: 'none',
+  borderRadius: vars.borderRadius.sm,
 })
 
-globalStyle(`${richContent} .rich-tabs-trigger-active`, {
+globalStyle(`${richContent} .rich-tabs-trigger[data-state="active"]`, {
   color: vars.color.accent,
 })
 
@@ -713,6 +796,15 @@ globalStyle(`${richContent} .rich-tabs-underline`, {
 globalStyle(`${richContent} .rich-tabs-content`, {
   padding: `${vars.spacing.md} 0`,
   animation: 'rich-tabs-fade-in 0.3s ease',
+})
+
+globalStyle(`${richContent} .rich-tabs-plain`, {
+  margin: 0,
+  whiteSpace: 'pre-wrap',
+  lineHeight: 1.6,
+  fontFamily: vars.typography.fontMono,
+  fontSize: vars.typography.fontSizeSmall,
+  color: vars.color.textSecondary,
 })
 
 const tabsFadeIn = keyframes({

@@ -37,6 +37,8 @@ export default defineConfig({
         'katex',
         /^shiki/,
         /^@radix-ui\//,
+        /^@shiro\/rich-editor-ui/,
+        /^@base-ui\//,
         /^motion/,
         /^lucide/,
       ],
