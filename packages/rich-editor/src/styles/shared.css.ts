@@ -188,11 +188,20 @@ globalStyle(`${richContent} .rich-quote`, {
   borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
 })
 
-// ─── Horizontal rule ─────────────────────────────────────
+globalStyle(`${richContent} .rich-quote > .rich-paragraph:first-child`, {
+  marginTop: 0,
+})
+
+globalStyle(`${richContent} .rich-quote > .rich-paragraph:last-child`, {
+  marginBottom: 0,
+})
+
+// ─── Horizontal rule (match markdown: 60px centered line) ─
 globalStyle(`${richContent} .rich-hr`, {
   border: 'none',
   borderTop: `1px solid ${vars.color.border}`,
-  margin: `${vars.spacing.lg} 0`,
+  margin: `${vars.spacing.lg} auto`,
+  width: 60,
 })
 
 // ─── Code block ──────────────────────────────────────────
@@ -224,23 +233,68 @@ globalStyle(`${richContent} .rich-code-block code`, {
 // ─── Table ───────────────────────────────────────────────
 globalStyle(`${richContent} .rich-table`, {
   width: '100%',
-  borderCollapse: 'collapse',
-  margin: `${vars.spacing.md} 0`,
+  borderCollapse: 'separate',
+  borderSpacing: 0,
+  margin: `${vars.spacing.lg} 0`,
   fontSize: vars.typography.fontSizeSmall,
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: vars.borderRadius.md,
+  overflow: 'hidden',
 })
 
 globalStyle(`${richContent} .rich-table-cell`, {
-  border: `1px solid ${vars.color.border}`,
-  padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  border: 'none',
+  borderBottom: `1px solid ${vars.color.border}`,
+  padding: `1.25em ${vars.spacing.lg}`,
   textAlign: 'left',
+  verticalAlign: 'middle',
+  lineHeight: '1.5',
+})
+
+globalStyle(`${richContent} .rich-table tbody tr:last-child .rich-table-cell`, {
+  borderBottom: 'none',
+})
+
+globalStyle(`${richContent} .rich-table-cell .rich-paragraph`, {
+  margin: 0,
+  padding: 0,
+  lineHeight: 'inherit',
+})
+
+globalStyle(`${richContent} .rich-table-cell > :first-child`, {
+  marginTop: 0,
+})
+
+globalStyle(`${richContent} .rich-table-cell > :last-child`, {
+  marginBottom: 0,
 })
 
 globalStyle(`${richContent} .rich-table-cell-header`, {
-  border: `1px solid ${vars.color.border}`,
-  padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  border: 'none',
+  padding: `${vars.spacing.md} ${vars.spacing.lg}`,
   textAlign: 'left',
   fontWeight: 600,
+  fontSize: '0.75em',
+  textTransform: 'uppercase',
+  letterSpacing: '0.05em',
+  color: vars.color.textSecondary,
   backgroundColor: vars.color.bgSecondary,
+  verticalAlign: 'middle',
+  lineHeight: '1.5',
+})
+
+globalStyle(`${richContent} .rich-table-cell-header .rich-paragraph`, {
+  margin: 0,
+  padding: 0,
+  lineHeight: 'inherit',
+})
+
+globalStyle(`${richContent} .rich-table-cell-header > :first-child`, {
+  marginTop: 0,
+})
+
+globalStyle(`${richContent} .rich-table-cell-header > :last-child`, {
+  marginBottom: 0,
 })
 
 // ─── Images ──────────────────────────────────────────────
@@ -315,6 +369,13 @@ globalStyle(`${richContent} .rich-spoiler`, {
   userSelect: 'none',
 })
 
+globalStyle(`[contenteditable="true"] .rich-spoiler`, {
+  backgroundColor: `color-mix(in srgb, ${vars.color.text} 30%, transparent)`,
+  color: 'inherit',
+  userSelect: 'auto',
+  cursor: 'text',
+})
+
 globalStyle(`${richContent} .rich-spoiler:hover`, {
   backgroundColor: 'transparent',
   color: 'inherit',
@@ -327,7 +388,7 @@ globalStyle(`${richContent} .rich-spoiler-revealed`, {
   userSelect: 'auto',
 })
 
-// ─── Mention ─────────────────────────────────────────────
+// ─── Footnote ───────────────────────────────────────────
 globalStyle(`${richContent} .rich-footnote`, {
   verticalAlign: 'super',
   fontSize: '0.8em',
@@ -360,44 +421,6 @@ const footnoteFlash = keyframes({
 
 globalStyle(`${richContent} .rich-footnote-highlight`, {
   animation: `${footnoteFlash} 1.2s ease-out`,
-})
-
-globalStyle(`${richContent} .rich-mention`, {
-  display: 'inline',
-  margin: '0 0.25em',
-  verticalAlign: 'text-bottom',
-  whiteSpace: 'nowrap',
-})
-
-globalStyle(`${richContent} .rich-mention-icon`, {
-  display: 'inline-flex',
-  alignItems: 'center',
-  marginRight: '0.25em',
-  verticalAlign: 'middle',
-})
-
-globalStyle(`${richContent} .rich-mention-icon svg`, {
-  display: 'inline',
-  height: '0.9em',
-  width: '0.9em',
-})
-
-globalStyle(`${richContent} .rich-mention-icon-gh`, {
-  fill: vars.color.text,
-})
-
-globalStyle(`${richContent} .rich-mention-handle`, {
-  textDecorationLine: 'underline',
-  textUnderlineOffset: '2px',
-  color: 'inherit',
-})
-
-globalStyle(`${richContent} .rich-mention-handle:hover`, {
-  color: vars.color.accent,
-})
-
-globalStyle(`${richContent} .rich-mention-plain`, {
-  color: vars.color.textSecondary,
 })
 
 // ─── KaTeX ───────────────────────────────────────────────
@@ -459,7 +482,7 @@ globalStyle(`${richContent} .rich-alert-header`, {
   alignItems: 'center',
   gap: vars.spacing.sm,
   fontWeight: 600,
-  marginBottom: vars.spacing.sm,
+  marginBottom: vars.spacing.md,
   fontSize: vars.typography.fontSizeSmall,
   textTransform: 'uppercase',
   letterSpacing: '0.02em',
@@ -495,6 +518,17 @@ globalStyle(`${richContent} .rich-alert-header-caution`, {
 
 globalStyle(`${richContent} .rich-alert-content`, {
   minHeight: '1em',
+})
+
+globalStyle(
+  `${richContent} .rich-alert-content > .rich-paragraph:first-child`,
+  {
+    marginTop: 0,
+  },
+)
+
+globalStyle(`${richContent} .rich-alert-content > .rich-paragraph:last-child`, {
+  marginBottom: 0,
 })
 
 globalStyle(`${richContent} .rich-alert-content-editable`, {
@@ -649,99 +683,89 @@ globalStyle(`.rich-toolbar-btn-active:hover`, {
 
 // ─── LinkCard Edit Decorator ─────────────────────────────
 globalStyle(`.rich-link-card-edit-wrapper`, {
-  position: 'relative',
+  display: 'inline',
 })
 
-globalStyle(`.rich-link-card-edit-toolbar`, {
+globalStyle(`.rich-link-card-edit-panel`, {
   display: 'flex',
-  alignItems: 'center',
-  gap: '6px',
-  padding: '6px 10px',
+  flexDirection: 'column',
+  gap: '8px',
+  width: '340px',
+  padding: '12px',
   fontSize: '13px',
   backgroundColor: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
+  borderColor: vars.color.border,
+  color: vars.color.text,
+})
+
+globalStyle(`.rich-link-card-edit-url-row`, {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  padding: '8px 12px',
+  backgroundColor: vars.color.bgSecondary,
   borderRadius: vars.borderRadius.md,
-  boxShadow: '0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)',
-  marginBottom: '6px',
-  opacity: 0,
-  pointerEvents: 'none',
-  transition: 'opacity 0.15s ease',
-})
-
-globalStyle(`.rich-link-card-edit-wrapper:hover .rich-link-card-edit-toolbar`, {
-  opacity: 1,
-  pointerEvents: 'auto',
-})
-
-globalStyle(`.rich-link-card-edit-toolbar:focus-within`, {
-  opacity: 1,
-  pointerEvents: 'auto',
-})
-
-globalStyle(`.rich-link-card-edit-url`, {
-  flex: 1,
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  color: vars.color.textSecondary,
-  fontFamily: vars.typography.fontMono,
-  fontSize: '13px',
-  cursor: 'pointer',
-  padding: '3px 6px',
-  borderRadius: vars.borderRadius.sm,
-  textAlign: 'left',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  transition: 'color 0.15s ease, background-color 0.15s ease',
   minWidth: 0,
 })
 
-globalStyle(`.rich-link-card-edit-url:hover`, {
+globalStyle(`.rich-link-card-edit-link-icon`, {
+  flexShrink: 0,
+  color: vars.color.textSecondary,
+})
+
+globalStyle(`.rich-link-card-edit-url-text`, {
+  flex: 1,
   color: vars.color.text,
-  backgroundColor: vars.color.bgSecondary,
+  fontFamily: vars.typography.fontMono,
+  fontSize: '13px',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  minWidth: 0,
 })
 
 globalStyle(`.rich-link-card-edit-input`, {
   flex: 1,
   appearance: 'none',
-  border: `1px solid ${vars.color.border}`,
-  backgroundColor: vars.color.bg,
+  border: 'none',
+  backgroundColor: 'transparent',
   color: vars.color.text,
   fontFamily: vars.typography.fontMono,
   fontSize: '13px',
-  padding: '3px 8px',
-  borderRadius: vars.borderRadius.sm,
+  padding: 0,
   outline: 'none',
-  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
   minWidth: 0,
 })
 
-globalStyle(`.rich-link-card-edit-input:focus`, {
-  borderColor: vars.color.accent,
-  boxShadow: `0 0 0 2px ${vars.color.accentLight}`,
-})
-
-globalStyle(`.rich-link-card-edit-delete`, {
+globalStyle(`.rich-link-card-edit-actions`, {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
+  gap: '4px',
+})
+
+globalStyle(`.rich-link-card-edit-action-btn`, {
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '6px',
   appearance: 'none',
   border: 'none',
   background: 'none',
-  color: vars.color.textSecondary,
+  color: vars.color.text,
+  fontSize: '13px',
+  fontWeight: 500,
   cursor: 'pointer',
-  padding: '4px',
+  padding: '4px 8px',
   borderRadius: vars.borderRadius.sm,
   transition: 'color 0.15s ease, background-color 0.15s ease',
-  flexShrink: 0,
-  opacity: 0.5,
+  whiteSpace: 'nowrap',
 })
 
-globalStyle(`.rich-link-card-edit-delete:hover`, {
-  color: vars.color.alertCaution,
-  backgroundColor: `${vars.color.alertCaution}10`,
-  opacity: 1,
+globalStyle(`.rich-link-card-edit-action-btn:hover`, {
+  backgroundColor: vars.color.bgSecondary,
+})
+
+globalStyle(`.rich-link-card-edit-action-btn--end`, {
+  marginLeft: 'auto',
 })
 
 // ─── Tabs ───────────────────────────────────────────────
@@ -798,6 +822,14 @@ globalStyle(`${richContent} .rich-tabs-content`, {
   animation: 'rich-tabs-fade-in 0.3s ease',
 })
 
+globalStyle(`${richContent} .rich-tabs-content > .rich-paragraph:first-child`, {
+  marginTop: 0,
+})
+
+globalStyle(`${richContent} .rich-tabs-content > .rich-paragraph:last-child`, {
+  marginBottom: 0,
+})
+
 globalStyle(`${richContent} .rich-tabs-plain`, {
   margin: 0,
   whiteSpace: 'pre-wrap',
@@ -827,60 +859,298 @@ globalStyle(`.rich-katex-edit-wrapper:hover`, {
   backgroundColor: vars.color.accentLight,
 })
 
-globalStyle(`.rich-katex-edit-block`, {
-  display: 'block',
-  border: `1px solid ${vars.color.accent}`,
-  borderRadius: vars.borderRadius.md,
+// Panel
+globalStyle(`.rich-katex-editor-panel`, {
+  width: 'min(420px, 90vw)',
+  padding: 0,
   overflow: 'hidden',
-  margin: `${vars.spacing.md} 0`,
+  boxShadow: '0 25px 50px -12px rgba(0,0,0,0.2)',
+  fontFamily:
+    'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
 })
 
-globalStyle(`.rich-katex-edit-inline`, {
-  display: 'inline-flex',
-  flexDirection: 'column',
-  border: `1px solid ${vars.color.accent}`,
-  borderRadius: vars.borderRadius.sm,
-  overflow: 'hidden',
-  verticalAlign: 'middle',
-})
-
-globalStyle(`.rich-katex-edit-header`, {
+// Header
+globalStyle(`.rich-katex-editor-header`, {
   display: 'flex',
   alignItems: 'center',
-  gap: '6px',
-  padding: '4px 8px',
-  backgroundColor: vars.color.bgSecondary,
-  borderBottom: `1px solid ${vars.color.border}`,
-  fontSize: vars.typography.fontSizeSmall,
+  justifyContent: 'space-between',
+  padding: '10px 16px',
+  borderBottom: `1px solid color-mix(in srgb, ${vars.color.border} 60%, transparent)`,
 })
 
-globalStyle(`.rich-katex-edit-label`, {
-  fontWeight: 600,
+globalStyle(`.rich-katex-editor-header-left`, {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+})
+
+globalStyle(`.rich-katex-editor-icon-wrap`, {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '20px',
+  height: '20px',
+  borderRadius: vars.borderRadius.sm,
+  backgroundColor: vars.color.accentLight,
   color: vars.color.accent,
-  fontSize: '11px',
+})
+
+globalStyle(`.rich-katex-editor-title`, {
+  fontWeight: 600,
+  fontSize: vars.typography.fontSizeSmall,
+  color: vars.color.text,
+})
+
+globalStyle(`.rich-katex-editor-header-right`, {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '4px',
+})
+
+globalStyle(`.rich-katex-editor-mode`, {
+  fontSize: '10px',
+  fontWeight: 500,
   textTransform: 'uppercase',
   letterSpacing: '0.04em',
-})
-
-globalStyle(`.rich-katex-edit-hint`, {
   color: vars.color.textSecondary,
-  fontSize: '11px',
-  marginLeft: 'auto',
+  padding: '1px 6px',
+  borderRadius: vars.borderRadius.sm,
+  backgroundColor: vars.color.bgSecondary,
 })
 
-globalStyle(`.rich-katex-edit-textarea`, {
+globalStyle(`.rich-katex-editor-delete`, {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  appearance: 'none',
+  border: 'none',
+  background: 'none',
+  color: vars.color.textSecondary,
+  cursor: 'pointer',
+  width: '28px',
+  height: '28px',
+  borderRadius: vars.borderRadius.sm,
+  transition: 'color 0.15s ease, background-color 0.15s ease',
+  flexShrink: 0,
+})
+
+globalStyle(`.rich-katex-editor-delete:hover`, {
+  color: vars.color.alertCaution,
+  backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
+})
+
+// Tabs
+globalStyle(`.rich-katex-editor-tabs`, {
+  display: 'flex',
+  padding: '0 16px',
+  borderBottom: `1px solid color-mix(in srgb, ${vars.color.border} 60%, transparent)`,
+  gap: 0,
+})
+
+globalStyle(`.rich-katex-editor-tab`, {
+  position: 'relative',
+  appearance: 'none',
+  border: 'none',
+  borderBottom: '2px solid transparent',
+  background: 'none',
+  color: vars.color.textSecondary,
+  cursor: 'pointer',
+  padding: '0 12px',
+  height: '36px',
+  fontSize: '12px',
+  fontWeight: 500,
+  transition: 'color 0.15s ease',
+})
+
+globalStyle(`.rich-katex-editor-tab:hover`, {
+  color: vars.color.text,
+})
+
+globalStyle(`.rich-katex-editor-tab-active`, {
+  color: vars.color.accent,
+  borderBottomColor: vars.color.accent,
+})
+
+// Body
+globalStyle(`.rich-katex-editor-body`, {
+  padding: '12px',
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+})
+
+// Field
+globalStyle(`.rich-katex-editor-field`, {
+  display: 'flex',
+  flexDirection: 'column',
+})
+
+globalStyle(`.rich-katex-editor-label`, {
+  fontSize: '10px',
+  fontWeight: 500,
+  textTransform: 'uppercase',
+  letterSpacing: '0.06em',
+  color: vars.color.textSecondary,
+  marginBottom: '6px',
+  paddingLeft: '2px',
+})
+
+// Input wrap
+globalStyle(`.rich-katex-editor-input-wrap`, {
+  position: 'relative',
+})
+
+globalStyle(`.rich-katex-editor-textarea`, {
   display: 'block',
   width: '100%',
-  padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  padding: '10px 12px',
+  paddingRight: '56px',
   fontFamily: vars.typography.fontMono,
   fontSize: vars.typography.fontSizeSmall,
   lineHeight: '1.5',
-  backgroundColor: vars.color.bg,
+  backgroundColor: `color-mix(in srgb, ${vars.color.bgSecondary} 30%, transparent)`,
   color: vars.color.text,
-  border: 'none',
+  border: `1px solid color-mix(in srgb, ${vars.color.border} 60%, transparent)`,
+  borderRadius: vars.borderRadius.md,
   outline: 'none',
-  resize: 'vertical',
+  resize: 'none',
   boxSizing: 'border-box',
+  transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
+})
+
+globalStyle(`.rich-katex-editor-textarea::placeholder`, {
+  color: `color-mix(in srgb, ${vars.color.textSecondary} 50%, transparent)`,
+})
+
+globalStyle(`.rich-katex-editor-textarea:focus`, {
+  borderColor: `color-mix(in srgb, ${vars.color.accent} 50%, transparent)`,
+  boxShadow: `0 0 0 2px color-mix(in srgb, ${vars.color.accent} 25%, transparent)`,
+})
+
+// Input action buttons
+globalStyle(`.rich-katex-editor-input-actions`, {
+  position: 'absolute',
+  right: '6px',
+  top: '6px',
+  display: 'flex',
+  gap: '2px',
+})
+
+globalStyle(`.rich-katex-editor-action-btn`, {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  appearance: 'none',
+  border: 'none',
+  background: 'none',
+  color: `color-mix(in srgb, ${vars.color.textSecondary} 60%, transparent)`,
+  cursor: 'pointer',
+  width: '24px',
+  height: '24px',
+  borderRadius: vars.borderRadius.sm,
+  transition: 'color 0.15s ease, background-color 0.15s ease',
+})
+
+globalStyle(`.rich-katex-editor-action-btn:hover`, {
+  color: vars.color.text,
+  backgroundColor: vars.color.bgSecondary,
+})
+
+globalStyle(`.rich-katex-editor-action-btn:disabled`, {
+  opacity: 0.3,
+  cursor: 'default',
+  pointerEvents: 'none',
+})
+
+// Preview
+globalStyle(`.rich-katex-editor-preview`, {
+  border: `1px solid color-mix(in srgb, ${vars.color.border} 60%, transparent)`,
+  borderRadius: vars.borderRadius.md,
+  padding: vars.spacing.md,
+  minHeight: '60px',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  overflowX: 'auto',
+  backgroundColor: vars.color.bg,
+})
+
+globalStyle(`.rich-katex-editor-preview-empty`, {
+  color: `color-mix(in srgb, ${vars.color.textSecondary} 50%, transparent)`,
+  fontSize: vars.typography.fontSizeSmall,
+})
+
+// Snippets placeholder
+globalStyle(`.rich-katex-editor-snippets-placeholder`, {
+  color: vars.color.textSecondary,
+  fontSize: vars.typography.fontSizeSmall,
+  textAlign: 'center',
+  padding: `${vars.spacing.lg} 0`,
+})
+
+// Footer
+globalStyle(`.rich-katex-editor-footer`, {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '10px 16px',
+  borderTop: `1px solid color-mix(in srgb, ${vars.color.border} 60%, transparent)`,
+  backgroundColor: `color-mix(in srgb, ${vars.color.bgSecondary} 20%, transparent)`,
+})
+
+globalStyle(`.rich-katex-editor-charcount`, {
+  color: vars.color.textSecondary,
+  fontSize: '10px',
+  fontFamily: vars.typography.fontMono,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  maxWidth: '200px',
+})
+
+globalStyle(`.rich-katex-editor-footer-actions`, {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+})
+
+globalStyle(`.rich-katex-editor-btn`, {
+  appearance: 'none',
+  border: 'none',
+  background: 'none',
+  color: vars.color.textSecondary,
+  cursor: 'pointer',
+  padding: '4px 10px',
+  borderRadius: vars.borderRadius.sm,
+  fontSize: '12px',
+  fontWeight: 500,
+  lineHeight: 1.4,
+  height: '28px',
+  display: 'inline-flex',
+  alignItems: 'center',
+  transition: 'color 0.15s ease, background-color 0.15s ease',
+})
+
+globalStyle(`.rich-katex-editor-btn:hover`, {
+  color: vars.color.text,
+  backgroundColor: vars.color.bgSecondary,
+})
+
+globalStyle(`.rich-katex-editor-btn-primary`, {
+  backgroundColor: vars.color.accent,
+  color: '#fff',
+})
+
+globalStyle(`.rich-katex-editor-btn-primary:hover`, {
+  backgroundColor: vars.color.accent,
+  filter: 'brightness(0.9)',
+  color: '#fff',
+})
+
+globalStyle(`.rich-katex-editor-btn-primary:disabled`, {
+  opacity: 0.5,
+  cursor: 'default',
+  pointerEvents: 'none',
 })
 
 // ─── Details / Collapse ─────────────────────────────────
@@ -933,6 +1203,20 @@ globalStyle(`${richContent} .rich-details-content`, {
   padding: `${vars.spacing.sm} 0`,
 })
 
+globalStyle(
+  `${richContent} .rich-details-content > .rich-paragraph:first-child`,
+  {
+    marginTop: 0,
+  },
+)
+
+globalStyle(
+  `${richContent} .rich-details-content > .rich-paragraph:last-child`,
+  {
+    marginBottom: 0,
+  },
+)
+
 // ─── Banner ─────────────────────────────────────────────
 globalStyle(`${richContent} .rich-banner`, {
   display: 'flex',
@@ -958,6 +1242,20 @@ globalStyle(`${richContent} .rich-banner-content`, {
   flex: 1,
   minWidth: 0,
 })
+
+globalStyle(
+  `${richContent} .rich-banner-content > .rich-paragraph:first-child`,
+  {
+    marginTop: 0,
+  },
+)
+
+globalStyle(
+  `${richContent} .rich-banner-content > .rich-paragraph:last-child`,
+  {
+    marginBottom: 0,
+  },
+)
 
 globalStyle(`${richContent} .rich-banner-info`, {
   backgroundColor: 'rgba(59, 130, 246, 0.08)',
@@ -993,4 +1291,13 @@ globalStyle(`${richContent} .rich-banner-success`, {
 
 globalStyle(`${richContent} .rich-banner-icon-success`, {
   color: '#22c55e',
+})
+
+// ─── First-child reset ──────────────────────────────────
+globalStyle(`${richContent} > *:first-child`, {
+  marginTop: 0,
+})
+
+globalStyle(`${richContent} > *:last-child`, {
+  marginBottom: 0,
 })

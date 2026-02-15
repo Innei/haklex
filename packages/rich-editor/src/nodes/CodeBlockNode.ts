@@ -6,11 +6,14 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $insertNodes, DecoratorNode } from 'lexical'
+import { Code } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
-import { CodeBlockEditDecorator } from '../components/decorators/CodeBlockEditDecorator'
+import { CodeBlockRenderer } from '../components/renderers/CodeBlockRenderer'
+import { createRendererDecoration } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedCodeBlockNode = Spread<
   {
@@ -23,6 +26,21 @@ export type SerializedCodeBlockNode = Spread<
 export class CodeBlockNode extends DecoratorNode<ReactElement> {
   __code: string
   __language: string
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Code Block',
+      icon: createElement(Code, { size: 20 }),
+      description: 'Syntax-highlighted code',
+      keywords: ['code', 'snippet', 'codeblock'],
+      section: 'MEDIA',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createCodeBlockNode('', 'text')])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'code-block'
@@ -85,8 +103,7 @@ export class CodeBlockNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(CodeBlockEditDecorator, {
-      nodeKey: this.__key,
+    return createRendererDecoration('CodeBlock', CodeBlockRenderer, {
       code: this.__code,
       language: this.__language,
     })

@@ -5,12 +5,15 @@ import type {
   SerializedElementNode,
   Spread,
 } from 'lexical'
-import { ElementNode } from 'lexical'
+import { $insertNodes, ElementNode } from 'lexical'
+import { Flag } from 'lucide-react'
 import { __iconNode as CircleCheck } from 'lucide-react/dist/esm/icons/circle-check'
 import { __iconNode as InfoIcon } from 'lucide-react/dist/esm/icons/info'
 import { __iconNode as ShieldAlert } from 'lucide-react/dist/esm/icons/shield-alert'
 import { __iconNode as TriangleAlert } from 'lucide-react/dist/esm/icons/triangle-alert'
+import { createElement } from 'react'
 
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 import { createLucideSvg } from '../utils/lucide-dom'
 
 export type BannerType = 'info' | 'success' | 'warning' | 'error'
@@ -33,6 +36,21 @@ export type SerializedBannerNode = Spread<
 export class BannerNode extends ElementNode {
   __bannerType: BannerType
   __bgColor?: string
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Banner',
+      icon: createElement(Flag, { size: 20 }),
+      description: 'Highlighted banner block',
+      keywords: ['banner', 'notice', 'announcement'],
+      section: 'ADVANCED',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createBannerNode('info')])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'banner'

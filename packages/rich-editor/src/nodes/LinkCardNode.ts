@@ -6,13 +6,14 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $insertNodes, DecoratorNode } from 'lexical'
+import { Link } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
-import { LinkCardEditDecorator } from '../components/decorators/LinkCardEditDecorator'
 import { LinkCardRenderer } from '../components/renderers/LinkCardRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { createRendererDecoration } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedLinkCardNode = Spread<
   {
@@ -39,6 +40,21 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
   __description?: string
   __favicon?: string
   __image?: string
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Link Card',
+      icon: createElement(Link, { size: 20 }),
+      description: 'Link preview card',
+      keywords: ['link', 'card', 'bookmark', 'embed'],
+      section: 'MEDIA',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createLinkCardNode({ url: '' })])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'link-card'
@@ -113,22 +129,12 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    const payload = {
+    return createRendererDecoration('LinkCard', LinkCardRenderer, {
       url: this.__url,
       title: this.__title,
       description: this.__description,
       favicon: this.__favicon,
       image: this.__image,
-    }
-    const rendererEl = createElement(RendererWrapper as any, {
-      rendererKey: 'LinkCard',
-      defaultRenderer: LinkCardRenderer,
-      props: payload,
-    })
-    return createElement(LinkCardEditDecorator, {
-      nodeKey: this.__key,
-      payload,
-      children: rendererEl,
     })
   }
 }

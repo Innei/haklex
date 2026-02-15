@@ -3,10 +3,17 @@ import { globalStyle, style } from '@vanilla-extract/css'
 import { richContent } from './shared.css'
 import { articleTheme, darkArticleTheme, vars } from './vars.css'
 
+// Helper for em calculation (based on 18px base)
+const em = (target: number, context = 18) => `${target / context}em`
+const round = (num: number) => num.toFixed(7).replace(/(\.\d+?)0+$/, '$1')
+
+// Prose LG values from Tailwind Typography
+// Base font size: 18px
+
 const articleBase = style({
   maxWidth: '65ch',
-  fontSize: vars.typography.fontSizeLarge,
-  lineHeight: '1.75',
+  fontSize: vars.typography.fontSizeLarge, // 18px
+  lineHeight: round(32 / 18), // 1.7777778
   color: vars.color.text,
 })
 
@@ -17,332 +24,233 @@ export const darkArticleVariant = style([
   articleBase,
 ])
 
-// ─── Paragraphs (prose-style spacing) ───────────────────
+// ─── Tailwind Prose LG Styles ───────────────────────────
+// Reference: https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
+
 globalStyle(`${articleBase} .rich-paragraph`, {
-  marginTop: '1.25em',
-  marginBottom: '1.25em',
-  lineHeight: '1.75',
+  marginTop: em(24, 18),
+  marginBottom: em(24, 18),
 })
 
-globalStyle(`${articleBase} .rich-paragraph:first-child`, {
-  marginTop: 0,
-})
-
-globalStyle(`${articleBase} .rich-paragraph:last-child`, {
-  marginBottom: 0,
-})
-
-// ─── Headings (prose-style hierarchy) ───────────────────
-// H1: Article title level - most prominent
 globalStyle(`${articleBase} .rich-heading-h1`, {
-  fontSize: '2.25em',
+  color: vars.color.text,
   fontWeight: 800,
-  lineHeight: '1.1111111',
-  marginTop: 0,
-  marginBottom: '0.8888889em',
-  letterSpacing: '-0.025em',
-  color: vars.color.text,
+  fontSize: em(48, 18), // 2.6666667em
+  marginTop: '0',
+  marginBottom: em(40, 48), // 0.8333333em
+  lineHeight: 1,
 })
 
-// H2: Major sections - clear hierarchy
 globalStyle(`${articleBase} .rich-heading-h2`, {
-  fontSize: '1.5em',
+  color: vars.color.text,
   fontWeight: 700,
-  lineHeight: '1.3333333',
-  marginTop: '2em',
-  marginBottom: '1em',
-  letterSpacing: '-0.025em',
-  color: vars.color.text,
+  fontSize: em(30, 18), // 1.6666667em
+  marginTop: em(56, 30), // 1.8666667em
+  marginBottom: em(32, 30), // 1.0666667em
+  lineHeight: round(40 / 30), // 1.3333333
 })
 
-globalStyle(`${articleBase} .rich-heading-h2 + *`, {
-  marginTop: 0,
-})
-
-// H3: Subsections
 globalStyle(`${articleBase} .rich-heading-h3`, {
-  fontSize: '1.25em',
-  fontWeight: 600,
-  lineHeight: '1.6',
-  marginTop: '1.6em',
-  marginBottom: '0.6em',
-  letterSpacing: '-0.025em',
   color: vars.color.text,
+  fontWeight: 600,
+  fontSize: em(24, 18), // 1.3333333em
+  marginTop: em(40, 24), // 1.6666667em
+  marginBottom: em(16, 24), // 0.6666667em
+  lineHeight: round(36 / 24), // 1.5
 })
 
-globalStyle(`${articleBase} .rich-heading-h3 + *`, {
-  marginTop: 0,
-})
-
-// H4-H6: Minor headings with decreasing prominence
 globalStyle(`${articleBase} .rich-heading-h4`, {
-  fontSize: '1.125em',
-  fontWeight: 600,
-  lineHeight: '1.5',
-  marginTop: '1.5em',
-  marginBottom: '0.5em',
-  letterSpacing: '-0.025em',
   color: vars.color.text,
-})
-
-globalStyle(`${articleBase} .rich-heading-h4 + *`, {
-  marginTop: 0,
-})
-
-globalStyle(`${articleBase} .rich-heading-h5`, {
-  fontSize: '1em',
   fontWeight: 600,
-  lineHeight: '1.5',
-  marginTop: '1.5em',
-  marginBottom: '0.5em',
-  letterSpacing: '-0.025em',
-  color: vars.color.text,
+  marginTop: em(32, 18), // 1.7777778em
+  marginBottom: em(8, 18), // 0.4444444em
+  lineHeight: round(28 / 18), // 1.5555556
 })
 
-globalStyle(`${articleBase} .rich-heading-h5 + *`, {
-  marginTop: 0,
-})
-
-globalStyle(`${articleBase} .rich-heading-h6`, {
-  fontSize: '0.875em',
-  fontWeight: 600,
-  lineHeight: '1.5',
-  marginTop: '1.5em',
-  marginBottom: '0.5em',
-  letterSpacing: '-0.025em',
-  color: vars.color.textSecondary,
-  textTransform: 'uppercase',
-})
-
-globalStyle(`${articleBase} .rich-heading-h6 + *`, {
-  marginTop: 0,
-})
-
-// ─── Inline elements ────────────────────────────────────
-globalStyle(`${articleBase} .rich-link`, {
-  fontWeight: 500,
-  textDecoration: 'underline',
-  textDecorationThickness: '1px',
-  textUnderlineOffset: '2px',
-  transition: 'color 0.15s ease',
-})
-
-globalStyle(`${articleBase} .rich-link:hover`, {
-  textDecorationThickness: '2px',
-})
-
-globalStyle(`${articleBase} .rich-text-bold`, {
-  fontWeight: 600,
-  color: vars.color.text,
-})
-
-globalStyle(`${articleBase} .rich-text-code`, {
-  fontSize: '0.875em',
-  fontWeight: 500,
-  padding: '0.2em 0.4em',
-  borderRadius: vars.borderRadius.sm,
-  backgroundColor: vars.color.codeBg,
-})
-
-// ─── Blockquote (prose-style) ───────────────────────────
-globalStyle(`${articleBase} .rich-quote`, {
-  fontStyle: 'italic',
-  fontSize: '1.125em',
-  lineHeight: '1.75',
-  color: vars.color.textSecondary,
-  borderLeftWidth: '0.25rem',
-  borderLeftStyle: 'solid',
-  borderLeftColor: vars.color.quoteBorder,
-  backgroundColor: 'transparent',
-  marginTop: '1.6em',
-  marginBottom: '1.6em',
-  paddingLeft: '1em',
-  paddingTop: 0,
-  paddingRight: 0,
-  paddingBottom: 0,
-  borderRadius: 0,
-})
-
-globalStyle(`${articleBase} .rich-quote p:first-of-type`, {
-  marginTop: 0,
-})
-
-globalStyle(`${articleBase} .rich-quote p:last-of-type`, {
-  marginBottom: 0,
-})
-
-// ─── Lists (prose-style) ────────────────────────────────
-globalStyle(`${articleBase} .rich-list-ol, ${articleBase} .rich-list-ul`, {
-  marginTop: '1.25em',
-  marginBottom: '1.25em',
-  paddingLeft: '1.625em',
-})
-
-globalStyle(`${articleBase} .rich-list-ol`, {
-  listStyleType: 'decimal',
-})
-
-globalStyle(`${articleBase} .rich-list-ul`, {
-  listStyleType: 'disc',
-})
-
-globalStyle(`${articleBase} .rich-list-item`, {
-  marginTop: '0.5em',
-  marginBottom: '0.5em',
-  paddingLeft: '0.375em',
-})
-
-globalStyle(`${articleBase} .rich-list-item::marker`, {
-  color: vars.color.textSecondary,
-})
-
-globalStyle(`${articleBase} .rich-list-ol > .rich-list-item::marker`, {
-  fontWeight: 400,
-  color: vars.color.textSecondary,
-})
-
+// Heading + * resets
 globalStyle(
-  `${articleBase} .rich-list-item > .rich-list-ol, ${articleBase} .rich-list-item > .rich-list-ul`,
+  `${articleBase} .rich-heading-h2 + *, ${articleBase} .rich-heading-h3 + *, ${articleBase} .rich-heading-h4 + *`,
   {
-    marginTop: '0.75em',
-    marginBottom: '0.75em',
+    marginTop: '0',
   },
 )
 
-globalStyle(`${articleBase} .rich-list-nested-item > .rich-list-ol`, {
-  listStyleType: 'lower-alpha',
-})
-
-globalStyle(`${articleBase} .rich-list-nested-item > .rich-list-ul`, {
-  listStyleType: 'circle',
-})
-
-// ─── Code blocks (prose-style) ──────────────────────────
-globalStyle(`${articleBase} .rich-code-block`, {
-  fontSize: '0.875em',
-  lineHeight: '1.7142857',
-  marginTop: '1.7142857em',
-  marginBottom: '1.7142857em',
-  borderRadius: vars.borderRadius.md,
-  overflowX: 'auto',
-})
-
-globalStyle(`${articleBase} .rich-code-block pre`, {
-  padding: '0.8571429em 1.1428571em',
-  margin: 0,
-})
-
-globalStyle(`${articleBase} .rich-code-block code`, {
-  fontSize: 'inherit',
-  lineHeight: 'inherit',
-})
-
-// ─── Tables (prose-style) ───────────────────────────────
-globalStyle(`${articleBase} .rich-table`, {
-  width: '100%',
-  tableLayout: 'auto',
-  textAlign: 'left',
-  marginTop: '2em',
-  marginBottom: '2em',
-  fontSize: '0.875em',
-  lineHeight: '1.7142857',
-})
-
-globalStyle(`${articleBase} .rich-table thead`, {
-  borderBottomWidth: '1px',
-  borderBottomStyle: 'solid',
-  borderBottomColor: vars.color.border,
-})
-
-globalStyle(`${articleBase} .rich-table tbody tr`, {
-  borderBottomWidth: '1px',
-  borderBottomStyle: 'solid',
-  borderBottomColor: vars.color.border,
-})
-
-globalStyle(`${articleBase} .rich-table tbody tr:last-child`, {
-  borderBottomWidth: 0,
-})
-
-globalStyle(`${articleBase} .rich-table-cell-header`, {
-  fontWeight: 600,
-  padding: '0.5714286em 0.75em',
-  verticalAlign: 'bottom',
+globalStyle(`${articleBase} .rich-quote`, {
+  fontWeight: 500,
+  fontStyle: 'italic',
   color: vars.color.text,
-})
-
-globalStyle(`${articleBase} .rich-table-cell`, {
-  padding: '0.5714286em 0.75em',
-  verticalAlign: 'baseline',
-})
-
-// ─── Images (prose-style) ───────────────────────────────
-globalStyle(`${articleBase} .rich-image`, {
-  marginTop: '2em',
-  marginBottom: '2em',
-})
-
-globalStyle(`${articleBase} .rich-image img`, {
-  borderRadius: vars.borderRadius.md,
-})
-
-globalStyle(`${articleBase} .rich-image figcaption`, {
-  fontSize: '0.875em',
-  lineHeight: '1.4285714',
-  marginTop: '0.8571429em',
-  color: vars.color.textSecondary,
-  textAlign: 'center',
-})
-
-// ─── Horizontal rule ────────────────────────────────────
-globalStyle(`${articleBase} .rich-hr`, {
-  borderColor: vars.color.border,
-  borderTopWidth: '1px',
-  marginTop: '3em',
-  marginBottom: '3em',
-})
-
-// ─── Alerts/Callouts (prose-style) ──────────────────────
-globalStyle(`${articleBase} .rich-alert`, {
-  padding: '1em 1.5em',
-  marginTop: '1.6em',
-  marginBottom: '1.6em',
   borderLeftWidth: '0.25rem',
   borderLeftStyle: 'solid',
-  borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
-  backgroundColor: vars.color.bgSecondary,
+  borderLeftColor: vars.color.quoteBorder,
+  marginTop: em(40, 18),
+  marginBottom: em(40, 18),
+  paddingLeft: em(24, 18),
+  backgroundColor: 'transparent',
+  borderRadius: 0,
+  quotes: '"\\201C""\\201D""\\2018""\\2019"',
 })
 
-globalStyle(`${articleBase} .rich-alert-header`, {
-  marginBottom: '0.5em',
-  fontSize: '0.875em',
+globalStyle(
+  `${articleBase} .rich-quote .rich-paragraph:first-of-type::before`,
+  {
+    content: 'open-quote',
+  },
+)
+
+globalStyle(`${articleBase} .rich-quote .rich-paragraph:last-of-type::after`, {
+  content: 'close-quote',
 })
 
-globalStyle(`${articleBase} .rich-alert p:first-of-type`, {
+globalStyle(`${articleBase} .rich-quote .rich-paragraph:first-child`, {
   marginTop: 0,
 })
 
-globalStyle(`${articleBase} .rich-alert p:last-child`, {
+globalStyle(`${articleBase} .rich-quote .rich-paragraph:last-child`, {
   marginBottom: 0,
 })
 
-// ─── KaTeX (prose-style) ────────────────────────────────
-globalStyle(`${articleBase} .rich-katex-block`, {
-  marginTop: '1.6em',
-  marginBottom: '1.6em',
-  overflowX: 'auto',
-  padding: '1em 0',
-})
-
-// ─── Spoiler (prose-style) ──────────────────────────────
-globalStyle(`${articleBase} .rich-spoiler`, {
+globalStyle(`${articleBase} .rich-text-code`, {
+  color: vars.color.text,
+  fontWeight: 600,
+  fontSize: em(16, 18), // 0.8888889em
+  backgroundColor: vars.color.codeBg,
+  padding: '0.2em 0.4em',
   borderRadius: vars.borderRadius.sm,
-  paddingInline: '0.25em',
+  fontFamily: vars.typography.fontMono,
 })
 
-// ─── Mentions (prose-style) ─────────────────────────────
-globalStyle(`${articleBase} .rich-mention`, {
+globalStyle(
+  `${articleBase} .rich-text-code::before, ${articleBase} .rich-text-code::after`,
+  {
+    content: '"`"',
+    color: vars.color.textSecondary,
+    opacity: 0.5,
+  },
+)
+
+globalStyle(`${articleBase} .rich-code-block`, {
+  color: vars.color.text,
+  backgroundColor: vars.color.codeBg,
+  borderRadius: '0.375rem', // rem(6)
+  marginTop: em(32, 16), // 2em (relative to code font size 16px)
+  marginBottom: em(32, 16),
+  fontSize: em(16, 18), // 0.8888889em
+  lineHeight: round(28 / 16), // 1.75
+})
+
+globalStyle(`${articleBase} .rich-code-block pre`, {
+  paddingTop: em(16, 16), // 1em
+  paddingRight: em(24, 16), // 1.5em
+  paddingBottom: em(16, 16),
+  paddingLeft: em(24, 16),
+  margin: 0, // Reset default pre margin
+})
+
+globalStyle(`${articleBase} .rich-list-ul, ${articleBase} .rich-list-ol`, {
+  marginTop: em(24, 18),
+  marginBottom: em(24, 18),
+  paddingLeft: em(28, 18), // 1.5555556em
+})
+
+globalStyle(`${articleBase} .rich-list-item`, {
+  marginTop: em(12, 18),
+  marginBottom: em(12, 18),
+  paddingLeft: em(8, 18), // LG padding inline start for li
+})
+
+globalStyle(`${articleBase} .rich-list-item .rich-paragraph`, {
+  marginTop: em(16, 18),
+  marginBottom: em(16, 18),
+})
+
+globalStyle(`${articleBase} .rich-list-item > .rich-paragraph:first-child`, {
+  marginTop: em(24, 18),
+})
+
+globalStyle(`${articleBase} .rich-list-item > .rich-paragraph:last-child`, {
+  marginBottom: em(24, 18),
+})
+
+// Nested lists
+globalStyle(
+  `${articleBase} .rich-list-ul .rich-list-ul, ${articleBase} .rich-list-ul .rich-list-ol, ${articleBase} .rich-list-ol .rich-list-ul, ${articleBase} .rich-list-ol .rich-list-ol`,
+  {
+    marginTop: em(16, 18),
+    marginBottom: em(16, 18),
+  },
+)
+
+globalStyle(`${articleBase} .rich-table`, {
+  marginTop: em(32, 18),
+  marginBottom: em(32, 18),
+  fontSize: em(16, 18),
+  lineHeight: round(24 / 16),
+})
+
+globalStyle(`${articleBase} .rich-table .rich-paragraph`, {
+  margin: 0,
+  padding: 0,
+  lineHeight: 'inherit',
+})
+
+globalStyle(`${articleBase} .rich-image`, {
+  marginTop: em(32, 18),
+  marginBottom: em(32, 18),
+})
+
+globalStyle(`${articleBase} .rich-image > *`, {
+  marginTop: '0',
+  marginBottom: '0',
+})
+
+globalStyle(`${articleBase} .rich-image figcaption`, {
+  color: vars.color.textSecondary,
+  fontSize: em(16, 18),
+  lineHeight: round(24 / 16), // 1.5
+  marginTop: em(16, 16),
+})
+
+globalStyle(`${articleBase} .rich-hr`, {
+  borderColor: vars.color.border,
+  borderTopWidth: '1px',
+  marginTop: em(56, 18),
+  marginBottom: em(56, 18),
+  width: 60,
+  marginLeft: 'auto',
+  marginRight: 'auto',
+})
+
+globalStyle(`${articleBase} .rich-hr + *`, {
+  marginTop: '0',
+})
+
+globalStyle(`${articleBase} .rich-link`, {
   fontWeight: 500,
+  textDecoration: 'underline',
+})
+
+// ─── Banner ─────────────────────────────────────────────
+globalStyle(`${articleBase} .rich-banner`, {
+  margin: `${em(32, 18)} 0`,
+})
+
+// ─── Alert ──────────────────────────────────────────────
+globalStyle(`${articleBase} .rich-alert`, {
+  margin: `${em(32, 18)} 0`,
+  padding: `0 ${em(16, 18)}`,
+  backgroundColor: 'transparent',
+  borderLeftWidth: '0.25rem',
+  borderRadius: 0,
+})
+
+// ─── Details ────────────────────────────────────────────
+globalStyle(`${articleBase} .rich-details`, {
+  margin: `${em(32, 18)} 0`,
+})
+
+// ─── Tabs ───────────────────────────────────────────────
+globalStyle(`${articleBase} .rich-tabs`, {
+  margin: `${em(32, 18)} 0`,
 })
 
 // ─── First-child reset ──────────────────────────────────

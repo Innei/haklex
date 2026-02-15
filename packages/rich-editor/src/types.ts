@@ -9,13 +9,13 @@ import type { ReactNode } from 'react'
 import type { ColorScheme } from './context/ColorSchemeContext'
 import type { RendererConfig } from './types/renderer-config'
 
-export type RichEditorVariant = 'article' | 'comment'
+export type RichEditorVariant = 'article' | 'comment' | 'note'
 
 export interface RichEditorProps {
   initialValue?: SerializedEditorState
   onChange?: (value: SerializedEditorState) => void
   variant?: RichEditorVariant
-  colorScheme?: ColorScheme
+  theme?: ColorScheme
   placeholder?: string
   onSubmit?: () => void
   autoFocus?: boolean
@@ -26,13 +26,15 @@ export interface RichEditorProps {
   extraNodes?: Array<Klass<LexicalNode>>
   rendererConfig?: RendererConfig
   debounceMs?: number
+  children?: ReactNode
 }
 
 export interface RichRendererProps {
   value: SerializedEditorState
   variant?: RichEditorVariant
-  colorScheme?: ColorScheme
+  theme?: ColorScheme
   className?: string
   as?: React.ElementType
   rendererConfig?: RendererConfig
+  extraNodes?: Array<Klass<LexicalNode>>
 }

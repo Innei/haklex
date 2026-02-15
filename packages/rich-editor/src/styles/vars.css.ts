@@ -50,6 +50,12 @@ const sharedFonts = {
     '"SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace',
 }
 
+const serifFonts = {
+  fontFamily:
+    '"Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif", "source-han-serif-sc", "Songti SC", STSong, "华文宋体", serif',
+  fontMono: sharedFonts.fontMono,
+}
+
 const articleLayout = {
   spacing: { xs: '4px', sm: '8px', md: '16px', lg: '24px', xl: '32px' },
   typography: {
@@ -61,6 +67,19 @@ const articleLayout = {
     lineHeightTight: '1.4',
   },
   borderRadius: { sm: '4px', md: '8px', lg: '12px' },
+}
+
+const noteLayout = {
+  spacing: articleLayout.spacing,
+  typography: {
+    ...serifFonts,
+    fontSizeBase: '16px',
+    fontSizeSmall: '14px',
+    fontSizeLarge: '18px',
+    lineHeight: '1.8',
+    lineHeightTight: '1.4',
+  },
+  borderRadius: articleLayout.borderRadius,
 }
 
 const commentLayout = {
@@ -103,18 +122,18 @@ const lightCommentColors = {
 }
 
 const darkColors = {
-  text: '#e5e7eb',
-  textSecondary: '#9ca3af',
-  bg: '#111827',
-  bgSecondary: '#1f2937',
-  border: '#374151',
+  text: '#e5e5e5',
+  textSecondary: '#a3a3a3',
+  bg: '#171717',
+  bgSecondary: '#262626',
+  border: '#404040',
   accent: '#F596AA',
   accentLight: '#F596AA33',
   link: '#F596AA',
   codeText: '#f472b6',
-  codeBg: '#1e293b',
+  codeBg: '#262626',
   quoteBorder: '#F596AA',
-  quoteBg: '#1e293b',
+  quoteBg: '#262626',
   alertInfo: '#60a5fa',
   alertWarning: '#fbbf24',
   alertTip: '#4ade80',
@@ -140,4 +159,14 @@ export const darkArticleTheme = createTheme(vars, {
 export const darkCommentTheme = createTheme(vars, {
   color: darkColors,
   ...commentLayout,
+})
+
+export const noteTheme = createTheme(vars, {
+  color: lightArticleColors,
+  ...noteLayout,
+})
+
+export const darkNoteTheme = createTheme(vars, {
+  color: darkColors,
+  ...noteLayout,
 })

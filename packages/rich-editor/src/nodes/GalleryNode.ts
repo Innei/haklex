@@ -6,12 +6,14 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $insertNodes, DecoratorNode } from 'lexical'
+import { Images } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { GalleryRenderer } from '../components/renderers/GalleryRenderer'
 import { RendererWrapper } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export interface GalleryImage {
   src: string
@@ -36,6 +38,21 @@ export interface GalleryNodePayload {
 export class GalleryNode extends DecoratorNode<ReactElement> {
   __images: GalleryImage[]
   __layout: 'grid' | 'masonry' | 'carousel'
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Gallery',
+      icon: createElement(Images, { size: 20 }),
+      description: 'Image gallery grid',
+      keywords: ['gallery', 'images', 'grid'],
+      section: 'MEDIA',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createGalleryNode({ images: [] })])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'gallery'

@@ -7,12 +7,14 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $insertNodes, DecoratorNode } from 'lexical'
+import { PanelTop } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { TabsRenderer } from '../components/renderers/TabsRenderer'
 import { RendererWrapper } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export interface TabItem {
   label: string
@@ -28,6 +30,29 @@ export type SerializedTabsNode = Spread<
 
 export class TabsNode extends DecoratorNode<ReactElement> {
   __tabs: TabItem[]
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Tabs',
+      icon: createElement(PanelTop, { size: 20 }),
+      description: 'Tabbed content panels',
+      keywords: ['tabs', 'panel', 'switch'],
+      section: 'ADVANCED',
+      onSelect: (editor) => {
+        editor.update(() => {
+          const emptyState = editor.parseEditorState(
+            '{"root":{"children":[{"children":[],"direction":null,"format":"","indent":0,"type":"paragraph","version":1}],"direction":null,"format":"","indent":0,"type":"root","version":1}}',
+          )
+          $insertNodes([
+            $createTabsNode([
+              { label: 'Tab 1', content: emptyState.toJSON() },
+              { label: 'Tab 2', content: emptyState.toJSON() },
+            ]),
+          ])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'tabs'

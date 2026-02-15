@@ -5,9 +5,12 @@ import type {
   SerializedElementNode,
   Spread,
 } from 'lexical'
-import { ElementNode } from 'lexical'
+import { $insertNodes, ElementNode } from 'lexical'
+import { ChevronRight } from 'lucide-react'
 import { __iconNode as ChevronDown } from 'lucide-react/dist/esm/icons/chevron-down'
+import { createElement } from 'react'
 
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 import { createLucideSvg } from '../utils/lucide-dom'
 
 export type SerializedDetailsNode = Spread<
@@ -21,6 +24,21 @@ export type SerializedDetailsNode = Spread<
 export class DetailsNode extends ElementNode {
   __summary: string
   __open: boolean
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Details',
+      icon: createElement(ChevronRight, { size: 20 }),
+      description: 'Collapsible content block',
+      keywords: ['details', 'toggle', 'collapse', 'accordion'],
+      section: 'ADVANCED',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createDetailsNode('Details')])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'details'

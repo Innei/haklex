@@ -1,5 +1,7 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { Popover, PopoverPanel, PopoverTrigger } from '@shiro/rich-editor-ui'
 import { $getNodeByKey } from 'lexical'
+import { ExternalLink, Link, Unlink } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
@@ -22,7 +24,8 @@ export function LinkCardEditDecorator({
   const [editor] = useLexicalComposerContext()
   const editable = editor.isEditable()
 
-  const [editing, setEditing] = useState(false)
+  const [open, setOpen] = useState(false)
+
   const [url, setUrl] = useState(payload.url)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -31,11 +34,9 @@ export function LinkCardEditDecorator({
   }, [payload.url])
 
   useEffect(() => {
-    if (editing) {
-      inputRef.current?.focus()
-      inputRef.current?.select()
-    }
-  }, [editing])
+    inputRef.current?.focus()
+    inputRef.current?.select()
+  }, [])
 
   const commitUrl = useCallback(() => {
     const trimmed = url.trim()
@@ -46,7 +47,6 @@ export function LinkCardEditDecorator({
         node.setUrl(trimmed)
       }
     })
-    setEditing(false)
   }, [editor, nodeKey, url])
 
   const handleDelete = useCallback(() => {
@@ -54,6 +54,7 @@ export function LinkCardEditDecorator({
       const node = $getNodeByKey(nodeKey)
       if (node) node.remove()
     })
+    setOpen(false)
   }, [editor, nodeKey])
 
   const handleKeyDown = useCallback(
@@ -64,20 +65,47 @@ export function LinkCardEditDecorator({
       } else if (e.key === 'Escape') {
         e.preventDefault()
         setUrl(payload.url)
-        setEditing(false)
       }
     },
     [commitUrl, payload.url],
   )
+
+  const handleOpen = useCallback(() => {
+    window.open(payload.url, '_blank', 'noopener,noreferrer')
+  }, [payload.url])
 
   if (!editable) {
     return children
   }
 
   return (
-    <div className="rich-link-card-edit-wrapper">
-      <div className="rich-link-card-edit-toolbar">
-        {editing ? (
+    <Popover
+      open={open}
+      onOpenChange={(nextOpen: boolean) => {
+        setOpen(nextOpen)
+        if (!nextOpen) {
+          setUrl(payload.url)
+        }
+      }}
+    >
+      <PopoverTrigger
+        delay={200}
+        closeDelay={300}
+        openOnHover
+        render={
+          <span className="rich-link-card-edit-wrapper" title="Click to edit" />
+        }
+      >
+        {children}
+      </PopoverTrigger>
+      <PopoverPanel
+        side="bottom"
+        sideOffset={8}
+        className="rich-link-card-edit-panel"
+      >
+        <div className="rich-link-card-edit-url-row">
+          <Link className="rich-link-card-edit-link-icon" size={16} />
+
           <input
             ref={inputRef}
             className="rich-link-card-edit-input"
@@ -88,48 +116,26 @@ export function LinkCardEditDecorator({
             onKeyDown={handleKeyDown}
             placeholder="https://..."
           />
-        ) : (
+        </div>
+        <div className="rich-link-card-edit-actions">
           <button
-            className="rich-link-card-edit-url"
+            className="rich-link-card-edit-action-btn"
             type="button"
-            onClick={() => setEditing(true)}
-            title={payload.url}
+            onClick={handleOpen}
           >
-            {payload.url}
+            <ExternalLink size={14} />
+            Open
           </button>
-        )}
-        <button
-          className="rich-link-card-edit-delete"
-          type="button"
-          onClick={handleDelete}
-          title="Delete"
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
+          <button
+            className="rich-link-card-edit-action-btn rich-link-card-edit-action-btn--end"
+            type="button"
+            onClick={handleDelete}
           >
-            <path d="M3 6h18" />
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-          </svg>
-        </button>
-      </div>
-      <div
-        onClick={(e) => {
-          if (!editing) {
-            e.preventDefault()
-            e.stopPropagation()
-          }
-        }}
-      >
-        {children}
-      </div>
-    </div>
+            <Unlink size={14} />
+            Remove
+          </button>
+        </div>
+      </PopoverPanel>
+    </Popover>
   )
 }

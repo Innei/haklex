@@ -114,9 +114,12 @@ globalStyle(`${commentBase} .rich-image figcaption`, {
   fontSize: vars.typography.fontSizeSmall,
 })
 
-// ─── HR (compact) ──────────────────────────────────────
+// ─── HR (compact, match markdown short centered line) ───
 globalStyle(`${commentBase} .rich-hr`, {
-  margin: `${vars.spacing.md} 0`,
+  border: 'none',
+  borderTop: `1px solid ${vars.color.border}`,
+  margin: `${vars.spacing.lg} auto`,
+  width: 60,
 })
 
 // ─── Alert (compact) ───────────────────────────────────

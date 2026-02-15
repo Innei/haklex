@@ -6,12 +6,14 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { $getNodeByKey, DecoratorNode } from 'lexical'
+import { $getNodeByKey, $insertNodes, DecoratorNode } from 'lexical'
+import { Workflow } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { MermaidRenderer } from '../components/renderers/MermaidRenderer'
 import { RendererWrapper } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedMermaidNode = Spread<
   {
@@ -22,6 +24,23 @@ export type SerializedMermaidNode = Spread<
 
 export class MermaidNode extends DecoratorNode<ReactElement> {
   __diagram: string
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Mermaid Diagram',
+      icon: createElement(Workflow, { size: 20 }),
+      description: 'Flowchart, sequence diagram',
+      keywords: ['mermaid', 'diagram', 'chart', 'flowchart'],
+      section: 'MEDIA',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([
+            $createMermaidNode('graph TD\n    A[Start] --> B[End]'),
+          ])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'mermaid'

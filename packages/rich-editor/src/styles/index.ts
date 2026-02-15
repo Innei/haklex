@@ -1,5 +1,6 @@
 export { articleVariant, darkArticleVariant } from './article.css'
 export { commentVariant, darkCommentVariant } from './comment.css'
+export { darkNoteVariant,noteVariant } from './note.css'
 export { richContent } from './shared.css'
 export { editorTheme } from './theme'
 export {
@@ -7,5 +8,7 @@ export {
   commentTheme,
   darkArticleTheme,
   darkCommentTheme,
+  darkNoteTheme,
+  noteTheme,
   vars,
 } from './vars.css'

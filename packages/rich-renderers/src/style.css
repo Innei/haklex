@@ -1,0 +1,10 @@
+@import '@shiro/rich-renderer-alert/style.css';
+@import '@shiro/rich-renderer-codeblock/style.css';
+@import '@shiro/rich-renderer-gallery/style.css';
+@import '@shiro/rich-renderer-image/style.css';
+@import '@shiro/rich-renderer-linkcard/style.css';
+@import '@shiro/rich-renderer-mention/style.css';
+@import '@shiro/rich-renderer-mermaid/style.css';
+@import '@shiro/rich-renderer-video/style.css';
+@import '@shiro/rich-editor-tldraw/style.css';
+@import '@shiro/rich-plugin-slash-menu/style.css';

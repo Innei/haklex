@@ -1,7 +1,7 @@
 import { CodeNode } from '@lexical/code'
+import { HorizontalRuleNode } from '@lexical/extension'
 import { AutoLinkNode, LinkNode } from '@lexical/link'
 import { ListItemNode, ListNode } from '@lexical/list'
-import { HorizontalRuleNode } from '@lexical/react/LexicalHorizontalRuleNode'
 import { HeadingNode, QuoteNode } from '@lexical/rich-text'
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
 import type {
@@ -13,12 +13,18 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { $getRoot, createEditor, DecoratorNode } from 'lexical'
+import { $getRoot, $insertNodes, createEditor, DecoratorNode } from 'lexical'
+import {
+  Info,
+  Lightbulb,
+  TriangleAlert as TriangleAlertIcon,
+} from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
-import { AlertEditDecorator } from '../components/decorators/AlertEditDecorator'
+import { AlertReadOnlyDecorator } from '../components/renderers/AlertReadOnlyDecorator'
 import { editorTheme } from '../styles/theme'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 import { FootnoteNode } from './FootnoteNode'
 import { KaTeXInlineNode } from './KaTeXInlineNode'
 import { MentionNode } from './MentionNode'
@@ -84,6 +90,45 @@ export type SerializedAlertQuoteNode = Spread<
 export class AlertQuoteNode extends DecoratorNode<ReactElement> {
   __alertType: AlertType
   __contentEditor: LexicalEditor
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Callout',
+      icon: createElement(Info, { size: 20 }),
+      description: 'Info callout block',
+      keywords: ['alert', 'note', 'info', 'callout'],
+      section: 'ADVANCED',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createAlertQuoteNode('note')])
+        })
+      },
+    },
+    {
+      title: 'Tip',
+      icon: createElement(Lightbulb, { size: 20 }),
+      description: 'Highlight a useful tip',
+      keywords: ['alert', 'tip', 'hint'],
+      section: 'ADVANCED',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createAlertQuoteNode('tip')])
+        })
+      },
+    },
+    {
+      title: 'Warning',
+      icon: createElement(TriangleAlertIcon, { size: 20 }),
+      description: 'Warn about something',
+      keywords: ['alert', 'warning', 'caution'],
+      section: 'ADVANCED',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createAlertQuoteNode('warning')])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'alert-quote'
@@ -165,8 +210,7 @@ export class AlertQuoteNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(AlertEditDecorator, {
-      nodeKey: this.__key,
+    return createElement(AlertReadOnlyDecorator, {
       alertType: this.__alertType,
       contentEditor: this.__contentEditor,
     })

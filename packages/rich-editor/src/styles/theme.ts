@@ -32,5 +32,6 @@ export const editorTheme: EditorThemeClasses = {
   table: 'rich-table',
   tableCell: 'rich-table-cell',
   tableCellHeader: 'rich-table-cell-header',
-  horizontalRule: 'rich-hr',
+  /** Used by @lexical/extension HorizontalRuleNode */
+  hr: 'rich-hr',
 }

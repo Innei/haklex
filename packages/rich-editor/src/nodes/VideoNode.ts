@@ -6,12 +6,14 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $insertNodes, DecoratorNode } from 'lexical'
+import { Video } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { VideoRenderer } from '../components/renderers/VideoRenderer'
 import { RendererWrapper } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedVideoNode = Spread<
   {
@@ -35,6 +37,21 @@ export class VideoNode extends DecoratorNode<ReactElement> {
   __poster?: string
   __width?: number
   __height?: number
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Video',
+      icon: createElement(Video, { size: 20 }),
+      description: 'Embed a video',
+      keywords: ['video', 'media', 'mp4'],
+      section: 'MEDIA',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createVideoNode({ src: '' })])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'video'

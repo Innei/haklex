@@ -2,6 +2,7 @@ import type { ComponentType } from 'react'
 
 import type { AlertRendererProps } from '../components/renderers/AlertRenderer'
 import type { CodeBlockRendererProps } from '../components/renderers/CodeBlockRenderer'
+import type { ComponentRendererProps } from '../components/renderers/ComponentRenderer'
 import type { FootnoteRendererProps } from '../components/renderers/FootnoteRenderer'
 import type { GalleryRendererProps } from '../components/renderers/GalleryRenderer'
 import type { ImageRendererProps } from '../components/renderers/ImageRenderer'
@@ -21,6 +22,8 @@ export interface RendererConfig {
   Alert?: ComponentType<AlertRendererProps>
   /** Custom renderer for code blocks with syntax highlighting */
   CodeBlock?: ComponentType<CodeBlockRendererProps>
+  /** Custom renderer for remote React components */
+  Component?: ComponentType<ComponentRendererProps>
   /** Custom renderer for footnote references */
   Footnote?: ComponentType<FootnoteRendererProps>
   /** Custom renderer for image galleries */

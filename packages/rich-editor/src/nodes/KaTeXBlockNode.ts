@@ -6,13 +6,14 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $insertNodes, DecoratorNode } from 'lexical'
+import { Sigma } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
-import { KaTeXEditDecorator } from '../components/decorators/KaTeXEditDecorator'
 import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { createRendererDecoration } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedKaTeXBlockNode = Spread<
   {
@@ -23,6 +24,21 @@ export type SerializedKaTeXBlockNode = Spread<
 
 export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
   __equation: string
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Math Equation',
+      icon: createElement(Sigma, { size: 20 }),
+      description: 'KaTeX block formula',
+      keywords: ['math', 'equation', 'latex', 'katex'],
+      section: 'ADVANCED',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createKaTeXBlockNode('')])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'katex-block'
@@ -74,19 +90,9 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    const rendererEl = createElement(RendererWrapper as any, {
-      rendererKey: 'KaTeX',
-      defaultRenderer: KaTeXRenderer,
-      props: {
-        equation: this.__equation,
-        displayMode: true,
-      },
-    })
-    return createElement(KaTeXEditDecorator, {
-      nodeKey: this.__key,
+    return createRendererDecoration('KaTeX', KaTeXRenderer, {
       equation: this.__equation,
       displayMode: true,
-      children: rendererEl,
     })
   }
 }

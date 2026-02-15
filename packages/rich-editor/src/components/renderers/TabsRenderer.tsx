@@ -58,7 +58,7 @@ export function TabsRenderer({ tabs }: TabsRendererProps) {
         >
           <RichRenderer
             value={tab.content}
-            colorScheme={colorScheme}
+            theme={colorScheme}
             rendererConfig={rendererConfig}
           />
         </TabsPrimitive.Content>

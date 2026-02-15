@@ -6,12 +6,14 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $insertNodes, DecoratorNode } from 'lexical'
+import { ImageIcon } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { ImageRenderer } from '../components/renderers/ImageRenderer'
 import { RendererWrapper } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedImageNode = Spread<
   {
@@ -61,6 +63,21 @@ export class ImageNode extends DecoratorNode<ReactElement> {
   __caption?: string
   __blurhash?: string
   __accent?: string
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Image',
+      icon: createElement(ImageIcon, { size: 20 }),
+      description: 'Upload or embed an image',
+      keywords: ['image', 'picture', 'photo'],
+      section: 'MEDIA',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createImageNode({ src: '', altText: '' })])
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'image'
