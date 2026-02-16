@@ -20,11 +20,20 @@ export default defineConfig({
       fileName: () => 'index.mjs',
     },
     rollupOptions: {
-      external: (id) =>
-        ['react', 'react-dom', 'react/jsx-runtime'].includes(id) ||
-        id.startsWith('@base-ui/') ||
-        id.startsWith('motion') ||
-        id.startsWith('lucide-react'),
+      external: [
+        'react',
+        'react-dom',
+        'react/jsx-runtime',
+        '@shiro/rich-editor-ui',
+        '@lexical/react',
+        '@lexical/react/LexicalComposerContext',
+        '@lexical/link',
+        '@lexical/selection',
+        'lexical',
+        /^@lexical\/.*/,
+        /^lucide-react/,
+        /^@base-ui\//,
+      ],
       output: {
         preserveModules: false,
       },

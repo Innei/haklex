@@ -1,0 +1,1 @@
+export { FloatingToolbarPlugin } from './FloatingToolbarPlugin'

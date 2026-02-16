@@ -1,8 +1,9 @@
+export type { ColorPickerProps } from './components/color-picker'
+export { ColorPicker } from './components/color-picker'
 export type {
   DialogBackdropProps,
   DialogCloseProps,
   DialogDescriptionProps,
-  DialogFlipDirection,
   DialogFooterProps,
   DialogHeaderProps,
   DialogPopupProps,
@@ -22,7 +23,6 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-  useDialog,
 } from './components/dialog'
 export { DialogStackProvider } from './components/dialog/stack'
 export type {
@@ -84,3 +84,4 @@ export {
   PopoverTrigger,
   usePopover,
 } from './components/popover'
+export { PortalThemeProvider, usePortalTheme } from './context/portal-theme'

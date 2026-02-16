@@ -1,6 +1,8 @@
 import { Menu as MenuPrimitive } from '@base-ui/react/menu'
+import { Check } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
 
+import { usePortalTheme } from '../../context/portal-theme'
 import * as css from './styles.css'
 
 // -- Root --
@@ -17,6 +19,17 @@ type DropdownMenuTriggerProps = ComponentProps<typeof MenuPrimitive.Trigger>
 
 export function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
   return <MenuPrimitive.Trigger {...props} />
+}
+
+// -- Portal --
+
+function DropdownMenuPortal({ children }: { children: ReactNode }) {
+  const { className } = usePortalTheme()
+  return (
+    <MenuPrimitive.Portal>
+      {className ? <div className={className}>{children}</div> : children}
+    </MenuPrimitive.Portal>
+  )
 }
 
 // -- Content (Portal + Positioner + Popup) --
@@ -43,7 +56,7 @@ export function DropdownMenuContent({
   ...popupProps
 }: DropdownMenuContentProps) {
   return (
-    <MenuPrimitive.Portal>
+    <DropdownMenuPortal>
       <MenuPrimitive.Positioner
         align={align}
         alignOffset={alignOffset}
@@ -57,7 +70,7 @@ export function DropdownMenuContent({
           {children}
         </MenuPrimitive.Popup>
       </MenuPrimitive.Positioner>
-    </MenuPrimitive.Portal>
+    </DropdownMenuPortal>
   )
 }
 
@@ -184,20 +197,7 @@ export function DropdownMenuCheckboxItem({
 // -- CheckIcon (internal) --
 
 function CheckIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 16 16"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <polyline points="3.5 8.5 6.5 11.5 12.5 4.5" />
-    </svg>
-  )
+  return <Check size={16} />
 }
 
 // -- Type exports --

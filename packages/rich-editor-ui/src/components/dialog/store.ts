@@ -1,13 +1,10 @@
 import type { FC, ReactNode } from 'react'
 
-import type { DialogFlipDirection } from './index'
-
 export interface DialogStackItemProps {
   title: ReactNode
   description?: ReactNode
   content: FC<{ dismiss: () => void }>
   className?: string
-  from?: DialogFlipDirection
   showCloseButton?: boolean
   clickOutsideToDismiss?: boolean
 }

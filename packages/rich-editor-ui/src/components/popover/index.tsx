@@ -1,8 +1,8 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover'
-import { AnimatePresence, motion } from 'motion/react'
 import type { ComponentProps, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
+import { usePortalTheme } from '../../context/portal-theme'
 import { getStrictContext } from '../../lib/get-strict-context'
 import * as css from './styles.css'
 
@@ -50,17 +50,14 @@ export function PopoverTrigger(props: PopoverTriggerProps) {
 
 // -- Portal --
 
-type PopoverPortalProps = Omit<
-  ComponentProps<typeof PopoverPrimitive.Portal>,
-  'keepMounted'
->
+type PopoverPortalProps = ComponentProps<typeof PopoverPrimitive.Portal>
 
-export function PopoverPortal(props: PopoverPortalProps) {
-  const { isOpen } = usePopover()
+export function PopoverPortal({ children, ...props }: PopoverPortalProps) {
+  const { className } = usePortalTheme()
   return (
-    <AnimatePresence>
-      {isOpen && <PopoverPrimitive.Portal keepMounted {...props} />}
-    </AnimatePresence>
+    <PopoverPrimitive.Portal {...props}>
+      {className ? <div className={className}>{children}</div> : children}
+    </PopoverPrimitive.Portal>
   )
 }
 
@@ -89,16 +86,7 @@ export function PopoverPopup({
 }: PopoverPopupProps) {
   return (
     <PopoverPrimitive.Popup
-      render={
-        <motion.div
-          key="popover-popup"
-          className={`${css.popup}${className ? ` ${className}` : ''}`}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.5 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-        />
-      }
+      className={`${css.popup}${className ? ` ${className}` : ''}`}
       {...props}
     >
       {children}

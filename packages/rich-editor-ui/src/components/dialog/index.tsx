@@ -1,43 +1,16 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
-import { AnimatePresence, motion } from 'motion/react'
+import { X } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
-import { useEffect, useState } from 'react'
 
-import { getStrictContext } from '../../lib/get-strict-context'
+import { usePortalTheme } from '../../context/portal-theme'
 import * as css from './styles.css'
-
-// -- Context --
-
-type DialogContextType = {
-  isOpen: boolean
-}
-
-const [DialogProvider, useDialog] =
-  getStrictContext<DialogContextType>('DialogContext')
-
-export { useDialog }
 
 // -- Dialog Root --
 
 type DialogProps = ComponentProps<typeof DialogPrimitive.Root>
 
 export function Dialog(props: DialogProps) {
-  const [isOpen, setIsOpen] = useState(props?.defaultOpen ?? false)
-
-  useEffect(() => {
-    if (props.open !== undefined) setIsOpen(props.open)
-  }, [props.open])
-
-  const handleOpenChange: DialogProps['onOpenChange'] = (open, details) => {
-    setIsOpen(open)
-    props.onOpenChange?.(open, details)
-  }
-
-  return (
-    <DialogProvider value={{ isOpen }}>
-      <DialogPrimitive.Root {...props} onOpenChange={handleOpenChange} />
-    </DialogProvider>
-  )
+  return <DialogPrimitive.Root {...props} />
 }
 
 // -- Trigger --
@@ -48,42 +21,27 @@ export function DialogTrigger(props: DialogTriggerProps) {
   return <DialogPrimitive.Trigger {...props} />
 }
 
-// -- Portal + AnimatePresence --
+// -- Portal --
 
-type DialogPortalProps = Omit<
-  ComponentProps<typeof DialogPrimitive.Portal>,
-  'keepMounted'
->
+type DialogPortalProps = ComponentProps<typeof DialogPrimitive.Portal>
 
-export function DialogPortal(props: DialogPortalProps) {
-  const { isOpen } = useDialog()
+export function DialogPortal({ children, ...props }: DialogPortalProps) {
+  const { className } = usePortalTheme()
   return (
-    <AnimatePresence>
-      {isOpen && <DialogPrimitive.Portal keepMounted {...props} />}
-    </AnimatePresence>
+    <DialogPrimitive.Portal {...props}>
+      {className ? <div className={className}>{children}</div> : children}
+    </DialogPrimitive.Portal>
   )
 }
 
 // -- Backdrop --
 
-type DialogBackdropProps = Omit<
-  ComponentProps<typeof DialogPrimitive.Backdrop>,
-  'render'
->
+type DialogBackdropProps = ComponentProps<typeof DialogPrimitive.Backdrop>
 
 export function DialogBackdrop({ className, ...props }: DialogBackdropProps) {
   return (
     <DialogPrimitive.Backdrop
-      render={
-        <motion.div
-          key="dialog-backdrop"
-          className={`${css.backdrop}${className ? ` ${className}` : ''}`}
-          initial={{ opacity: 0, filter: 'blur(4px)' }}
-          animate={{ opacity: 1, filter: 'blur(0px)' }}
-          exit={{ opacity: 0, filter: 'blur(4px)' }}
-          transition={{ duration: 0.2, ease: 'easeInOut' }}
-        />
-      }
+      className={`${css.backdrop}${className ? ` ${className}` : ''}`}
       {...props}
     />
   )
@@ -91,79 +49,29 @@ export function DialogBackdrop({ className, ...props }: DialogBackdropProps) {
 
 // -- Popup --
 
-type DialogFlipDirection = 'top' | 'bottom' | 'left' | 'right'
-
-type DialogPopupProps = Omit<
-  ComponentProps<typeof DialogPrimitive.Popup>,
-  'render'
-> & {
-  from?: DialogFlipDirection
+type DialogPopupProps = ComponentProps<typeof DialogPrimitive.Popup> & {
   showCloseButton?: boolean
   className?: string
   children?: ReactNode
 }
 
 export function DialogPopup({
-  from = 'top',
   showCloseButton = true,
   className,
   children,
   ...props
 }: DialogPopupProps) {
-  const initialRotation =
-    from === 'bottom' || from === 'left' ? '20deg' : '-20deg'
-  const isVertical = from === 'top' || from === 'bottom'
-  const rotateAxis = isVertical ? 'rotateX' : 'rotateY'
-
   return (
     <DialogPortal>
       <DialogBackdrop />
       <DialogPrimitive.Popup
-        render={
-          <motion.div
-            key="dialog-popup"
-            className={`${css.popup}${className ? ` ${className}` : ''}`}
-            initial={{
-              opacity: 0,
-              filter: 'blur(4px)',
-              transform: `perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)`,
-              x: '-50%',
-              y: '-50%',
-            }}
-            animate={{
-              opacity: 1,
-              filter: 'blur(0px)',
-              transform: `perspective(500px) ${rotateAxis}(0deg) scale(1)`,
-              x: '-50%',
-              y: '-50%',
-            }}
-            exit={{
-              opacity: 0,
-              filter: 'blur(4px)',
-              transform: `perspective(500px) ${rotateAxis}(${initialRotation}) scale(0.8)`,
-              x: '-50%',
-              y: '-50%',
-            }}
-            transition={{ type: 'spring', stiffness: 150, damping: 25 }}
-          />
-        }
+        className={`${css.popup}${className ? ` ${className}` : ''}`}
         {...props}
       >
         {children}
         {showCloseButton && (
           <DialogPrimitive.Close className={css.closeButton}>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M18 6 6 18" />
-              <path d="m6 6 12 12" />
-            </svg>
+            <X />
           </DialogPrimitive.Close>
         )}
       </DialogPrimitive.Popup>
@@ -232,7 +140,6 @@ export type {
   DialogBackdropProps,
   DialogCloseProps,
   DialogDescriptionProps,
-  DialogFlipDirection,
   DialogFooterProps,
   DialogHeaderProps,
   DialogPopupProps,

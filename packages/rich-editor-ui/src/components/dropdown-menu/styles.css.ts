@@ -15,8 +15,8 @@ export const popup = style({
   transition: 'opacity 100ms, transform 100ms',
   '@media': {
     '(prefers-color-scheme: dark)': {
-      backgroundColor: 'rgb(9, 9, 11)',
-      border: '1px solid rgba(39, 39, 42, 1)',
+      backgroundColor: '#171717',
+      border: '1px solid #262626',
     },
   },
   selectors: {
@@ -45,7 +45,7 @@ export const item = style({
   color: 'rgb(9, 9, 11)',
   '@media': {
     '(prefers-color-scheme: dark)': {
-      color: 'rgb(250, 250, 250)',
+      color: '#fafafa',
     },
   },
   selectors: {
@@ -80,7 +80,7 @@ export const separator = style({
   margin: '0.25rem -0.25rem',
   '@media': {
     '(prefers-color-scheme: dark)': {
-      backgroundColor: 'rgba(39, 39, 42, 1)',
+      backgroundColor: '#262626',
     },
   },
 })
@@ -92,7 +92,7 @@ export const label = style({
   padding: '0.25rem 0.375rem',
   '@media': {
     '(prefers-color-scheme: dark)': {
-      color: 'rgb(161, 161, 170)',
+      color: '#a3a3a3',
     },
   },
 })
