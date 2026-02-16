@@ -1,0 +1,266 @@
+.rich-embed-link-wrapper {
+  margin: 8px 0;
+}
+
+.embed-static-ratio-container {
+  margin: 8px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.embed-static-ratio-inner {
+  position: relative;
+  height: 0;
+  width: 100%;
+}
+
+.embed-static-iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+}
+
+/* Gist */
+.embed-static-gist {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.embed-static-gist__iframe {
+  width: 100%;
+  height: 300px;
+  border: none;
+  overflow: auto;
+}
+
+/* Source link */
+.embed-static-source-link {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  color: #737373;
+  font-size: 14px;
+  line-height: 1.4;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.embed-static-source-link svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.embed-static-source-link:hover {
+  color: #a3a3a3;
+}
+
+/* GitHub File */
+.embed-static-github-file {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.embed-static-github-file__code {
+  width: 100%;
+  overflow: auto;
+}
+
+.embed-static-github-file__code--long {
+  max-height: 50vh;
+}
+
+/* Plain fallback (no Shiki) */
+.embed-static-github-file__code pre {
+  margin: 0;
+  padding: 16px;
+  background: #1e1e1e;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  color: #d4d4d4;
+}
+
+.embed-static-github-file__line {
+  display: block;
+}
+
+.embed-static-github-file__line-num {
+  display: inline-block;
+  width: 4ch;
+  text-align: right;
+  margin-right: 16px;
+  color: #525252;
+  user-select: none;
+}
+
+/* Shiki highlighted code */
+.embed-static-shiki {
+  counter-reset: shiki-line var(--start-line, 0);
+}
+
+.embed-static-shiki pre {
+  margin: 0;
+  padding: 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  overflow-x: auto;
+}
+
+.embed-static-shiki code {
+  font-family: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+.embed-static-shiki .line {
+  display: flex;
+  line-height: 1.5;
+}
+
+.embed-static-shiki .line::before {
+  counter-increment: shiki-line;
+  content: counter(shiki-line);
+  flex-shrink: 0;
+  width: 4ch;
+  text-align: right;
+  margin-right: 16px;
+  color: #525252;
+  user-select: none;
+}
+
+.embed-static-shiki .shiki,
+.embed-static-shiki .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+
+/* Fallback link */
+.embed-static-fallback {
+  --embed-accent: 115, 115, 115;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  padding: 0 14px;
+  height: 48px;
+  border: 1px solid rgba(var(--embed-accent), 0.25);
+  border-radius: 12px;
+  background-color: rgba(var(--embed-accent), 0.08);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 14px;
+  margin: 8px 0;
+}
+
+.embed-static-fallback--tweet { --embed-accent: 29, 155, 240; }
+.embed-static-fallback--youtube { --embed-accent: 255, 0, 0; }
+.embed-static-fallback--codesandbox { --embed-accent: 163, 163, 163; }
+.embed-static-fallback--bilibili { --embed-accent: 0, 161, 214; }
+.embed-static-fallback--github-file { --embed-accent: 110, 84, 148; }
+.embed-static-fallback--github-gist { --embed-accent: 110, 84, 148; }
+.embed-static-fallback--thinking { --embed-accent: 139, 92, 246; }
+
+.embed-static-fallback__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  font-weight: 500;
+  font-size: 14px;
+  color: #a3a3a3;
+  white-space: nowrap;
+  user-select: none;
+  padding-right: 14px;
+}
+
+.embed-static-fallback__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background-color: rgb(var(--embed-accent));
+}
+
+.embed-static-fallback__link {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  color: #737373;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.embed-static-fallback__link:hover {
+  color: #a3a3a3;
+  text-decoration: underline;
+}
+
+/* Tweet */
+.embed-static-tweet {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
+}
+
+/* Loading */
+.embed-static-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: #737373;
+  font-size: 14px;
+}
+
+/* Light mode */
+@media (prefers-color-scheme: light) {
+  .embed-static-source-link {
+    color: #737373;
+  }
+
+  .embed-static-source-link:hover {
+    color: #525252;
+  }
+
+  .embed-static-github-file__code pre {
+    background: #f5f5f5;
+    color: #404040;
+  }
+
+  .embed-static-github-file__line-num {
+    color: #a3a3a3;
+  }
+
+  .embed-static-shiki .shiki,
+  .embed-static-shiki .shiki span {
+    color: var(--shiki-light) !important;
+    background-color: var(--shiki-light-bg) !important;
+  }
+
+  .embed-static-shiki .line::before {
+    color: #a3a3a3;
+  }
+
+  .embed-static-fallback__badge {
+    color: #737373;
+  }
+
+  .embed-static-fallback__link {
+    color: #525252;
+  }
+
+  .embed-static-fallback__link:hover {
+    color: #404040;
+  }
+}

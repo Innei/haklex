@@ -1,5 +1,6 @@
 // Renderers
 export { AlertEditRenderer, AlertRenderer } from '@shiro/rich-renderer-alert'
+export { BannerEditRenderer, BannerRenderer } from '@shiro/rich-renderer-banner'
 export { CodeBlockRenderer } from '@shiro/rich-renderer-codeblock'
 export { GalleryRenderer } from '@shiro/rich-renderer-gallery'
 export { ImageRenderer } from '@shiro/rich-renderer-image'
@@ -18,7 +19,7 @@ export { VideoRenderer } from '@shiro/rich-renderer-video'
 export type {
   SerializedTldrawNode,
   TldrawRendererProps,
-} from '@shiro/rich-editor-tldraw'
+} from '@shiro/rich-ext-tldraw'
 export {
   $createTldrawNode,
   $isTldrawNode,
@@ -26,7 +27,7 @@ export {
   TldrawNode,
   TldrawPlugin,
   TldrawRenderer,
-} from '@shiro/rich-editor-tldraw'
+} from '@shiro/rich-ext-tldraw'
 
 // Slash Menu
 export type { SlashMenuPluginProps } from '@shiro/rich-plugin-slash-menu'
@@ -74,21 +75,57 @@ export {
 
 // Embed
 export type {
+  EmbedLinkRendererProps,
   EmbedPluginProps,
+  EmbedRendererComponent,
+  EmbedRendererMap,
+  EmbedStaticRendererProps,
   EmbedType,
   SerializedEmbedNode,
-} from '@shiro/rich-renderer-embed'
+} from '@shiro/rich-ext-embed'
 export {
+  $createEmbedEditNode,
   $createEmbedNode,
+  $isEmbedEditNode,
   $isEmbedNode,
   createSelfThinkingMatcher,
+  EmbedEditNode,
+  embedEditNodes,
   EmbedLinkRenderer,
   EmbedNode,
   embedNodes,
   EmbedPlugin,
+  EmbedRendererProvider,
+  EmbedStaticRenderer,
   INSERT_EMBED_COMMAND,
+  isBilibiliVideoUrl,
+  isCodesandboxUrl,
+  isGistUrl,
+  isGithubFilePreviewUrl,
+  isTweetUrl,
+  isYoutubeUrl,
   matchEmbedUrl,
-} from '@shiro/rich-renderer-embed'
+  useEmbedRenderers,
+} from '@shiro/rich-ext-embed'
+
+// Tabs
+export type {
+  SerializedTabsNode,
+  TabsEditRendererProps,
+  TabsRendererProps,
+} from '@shiro/rich-ext-tabs'
+export {
+  $createTabsEditNode,
+  $createTabsNode,
+  $isTabsEditNode,
+  $isTabsNode,
+  TabsEditNode,
+  tabsEditNodes,
+  TabsEditRenderer,
+  TabsNode,
+  tabsNodes,
+  TabsRenderer,
+} from '@shiro/rich-ext-tabs'
 
 // Pre-built config
 export { enhancedRendererConfig } from './config'

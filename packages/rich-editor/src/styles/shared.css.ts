@@ -655,50 +655,6 @@ globalStyle(`.rich-drop-indicator`, {
   zIndex: 10,
 })
 
-// ─── Floating Toolbar ──────────────────────────────────────
-globalStyle(`.rich-floating-toolbar`, {
-  display: 'flex',
-  alignItems: 'center',
-  gap: '2px',
-  padding: '4px',
-  backgroundColor: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: vars.borderRadius.md,
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.12)',
-})
-
-globalStyle(`.rich-toolbar-btn`, {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '28px',
-  height: '28px',
-  border: 'none',
-  background: 'none',
-  borderRadius: vars.borderRadius.sm,
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  fontSize: '13px',
-  fontWeight: 600,
-  lineHeight: 1,
-  transition: 'color 0.1s, background-color 0.1s',
-})
-
-globalStyle(`.rich-toolbar-btn:hover`, {
-  color: vars.color.text,
-  backgroundColor: vars.color.bgSecondary,
-})
-
-globalStyle(`.rich-toolbar-btn-active`, {
-  color: vars.color.accent,
-  backgroundColor: vars.color.accentLight,
-})
-
-globalStyle(`.rich-toolbar-btn-active:hover`, {
-  color: vars.color.accent,
-  backgroundColor: vars.color.accentLight,
-})
-
 // ─── LinkCard Edit Decorator ─────────────────────────────
 globalStyle(`.rich-link-card-edit-wrapper`, {
   display: 'inline',
@@ -793,51 +749,64 @@ globalStyle(`${richContent} .rich-tabs`, {
   margin: `${vars.spacing.md} 0`,
 })
 
+globalStyle(`${richContent} .rich-tabs-list-wrapper`, {
+  position: 'relative',
+})
+
 globalStyle(`${richContent} .rich-tabs-list`, {
-  display: 'inline-flex',
-  gap: vars.spacing.sm,
-  borderBottom: `1px solid ${vars.color.border}`,
-  paddingBottom: '1px',
-  flexWrap: 'wrap',
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '1.5em',
 })
 
 globalStyle(`${richContent} .rich-tabs-trigger`, {
   position: 'relative',
   display: 'flex',
-  padding: `${vars.spacing.xs} ${vars.spacing.sm}`,
+  paddingBottom: '0.625em',
   fontSize: vars.typography.fontSizeSmall,
-  fontWeight: 700,
+  fontWeight: 500,
   color: vars.color.textSecondary,
   background: 'none',
   border: 'none',
   cursor: 'pointer',
-  transition: 'color 0.3s, background-color 0.2s',
+  transition: 'color 0.2s',
   outline: 'none',
-  borderRadius: vars.borderRadius.sm,
 })
 
-globalStyle(`${richContent} .rich-tabs-trigger[data-state="active"]`, {
+globalStyle(`${richContent} .rich-tabs-trigger:hover`, {
+  color: vars.color.text,
+})
+
+globalStyle(`${richContent} .rich-tabs-trigger[data-selected]`, {
   color: vars.color.accent,
 })
 
-globalStyle(`${richContent} .rich-tabs-trigger-text`, {
-  position: 'relative',
-  zIndex: 1,
-})
-
-globalStyle(`${richContent} .rich-tabs-underline`, {
+globalStyle(`${richContent} .rich-tabs-indicator`, {
   position: 'absolute',
-  bottom: '-1px',
-  left: vars.spacing.sm,
-  right: vars.spacing.sm,
+  bottom: 0,
   height: '2px',
   borderRadius: '1px',
   backgroundColor: vars.color.accent,
+  transition: 'left 0.3s ease, width 0.3s ease',
+})
+
+globalStyle(`${richContent} .rich-tabs-separator`, {
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  height: '1px',
+  backgroundColor: vars.color.border,
+})
+
+globalStyle(`${richContent} .rich-tabs-content-wrapper`, {
+  overflow: 'clip',
+  transition: 'height 0.3s ease',
 })
 
 globalStyle(`${richContent} .rich-tabs-content`, {
   padding: `${vars.spacing.md} 0`,
-  animation: 'rich-tabs-fade-in 0.3s ease',
 })
 
 globalStyle(`${richContent} .rich-tabs-content > .rich-paragraph:first-child`, {
@@ -855,15 +824,6 @@ globalStyle(`${richContent} .rich-tabs-plain`, {
   fontFamily: vars.typography.fontMono,
   fontSize: vars.typography.fontSizeSmall,
   color: vars.color.textSecondary,
-})
-
-const tabsFadeIn = keyframes({
-  from: { opacity: 0 },
-  to: { opacity: 1 },
-})
-
-globalStyle(`${richContent} .rich-tabs-content[data-state="active"]`, {
-  animation: `${tabsFadeIn} 0.3s ease`,
 })
 
 // ─── KaTeX Edit Decorator ────────────────────────────────
@@ -1335,6 +1295,121 @@ globalStyle(`${richContent} .rich-banner-warning`, {
 globalStyle(`${richContent} .rich-banner-caution`, {
   backgroundColor: 'rgba(239, 68, 68, 0.08)',
   borderColor: 'rgba(239, 68, 68, 0.3)',
+})
+
+// ─── Grid Container ─────────────────────────────────────
+globalStyle(`${richContent} .rich-grid-container`, {
+  position: 'relative',
+  margin: `${vars.spacing.md} 0`,
+})
+
+globalStyle(`${richContent} .rich-grid-toolbar`, {
+  position: 'absolute',
+  top: -36,
+  left: '50%',
+  transform: 'translateX(-50%)',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '2px',
+  padding: '4px 6px',
+  borderRadius: vars.borderRadius.md,
+  pointerEvents: 'none',
+  background: vars.color.bg,
+  border: `1px solid ${vars.color.border}`,
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+  zIndex: 10,
+  userSelect: 'none',
+  whiteSpace: 'nowrap',
+  opacity: 0,
+  transition: 'opacity 0.15s ease',
+})
+
+globalStyle(
+  `${richContent} .rich-grid-container:hover .rich-grid-toolbar, ${richContent} .rich-grid-container:focus-within .rich-grid-toolbar`,
+  {
+    opacity: 1,
+    pointerEvents: 'auto',
+  },
+)
+
+globalStyle(`${richContent} .rich-grid-toolbar-icon`, {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 24,
+  height: 24,
+  color: vars.color.textSecondary,
+  flexShrink: 0,
+})
+
+globalStyle(`${richContent} .rich-grid-col-btn`, {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minWidth: 24,
+  height: 24,
+  padding: '0 6px',
+  borderRadius: vars.borderRadius.sm,
+  border: 'none',
+  background: 'transparent',
+  cursor: 'pointer',
+  fontSize: '12px',
+  fontWeight: 500,
+  color: vars.color.textSecondary,
+  lineHeight: 1,
+  transition: 'color 0.15s ease, background-color 0.15s ease',
+})
+
+globalStyle(`${richContent} .rich-grid-col-btn:hover`, {
+  backgroundColor: vars.color.bgSecondary,
+  color: vars.color.text,
+})
+
+globalStyle(`${richContent} .rich-grid-col-btn-active`, {
+  background: vars.color.bgSecondary,
+  fontWeight: 600,
+  color: vars.color.text,
+})
+
+globalStyle(`${richContent} .rich-grid-toolbar-divider`, {
+  width: 1,
+  height: 16,
+  background: vars.color.border,
+  margin: '0 2px',
+  flexShrink: 0,
+})
+
+globalStyle(`${richContent} .rich-grid-action-btn`, {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  minWidth: 24,
+  height: 24,
+  padding: '0 6px',
+  borderRadius: vars.borderRadius.sm,
+  border: 'none',
+  background: 'transparent',
+  cursor: 'pointer',
+  color: vars.color.textSecondary,
+  transition: 'color 0.15s ease, background-color 0.15s ease',
+})
+
+globalStyle(`${richContent} .rich-grid-action-btn:hover`, {
+  backgroundColor: vars.color.bgSecondary,
+  color: vars.color.text,
+})
+
+globalStyle(`${richContent} .rich-grid-inner`, {
+  display: 'grid',
+  gap: vars.spacing.md,
+})
+
+globalStyle(`${richContent} .rich-grid-cell`, {
+  minWidth: 0,
+})
+
+globalStyle(`${richContent} .rich-grid-cell-editable`, {
+  outline: 'none',
 })
 
 // ─── First-child reset ──────────────────────────────────

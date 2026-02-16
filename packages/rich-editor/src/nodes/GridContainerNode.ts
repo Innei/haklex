@@ -26,8 +26,12 @@ export type SerializedGridContainerNode = Spread<
   SerializedLexicalNode
 >
 
-interface LegacySerializedGridNode extends SerializedGridContainerNode {
+interface LegacySerializedGridNode {
+  type?: string
+  version?: number
+  cols?: number
   gap?: string | number
+  cells?: SerializedEditorState[]
   children?: SerializedLexicalNode[]
 }
 
@@ -169,13 +173,13 @@ export class GridContainerNode extends DecoratorNode<ReactElement> {
     serializedNode: SerializedGridContainerNode,
   ): GridContainerNode {
     const legacy = serializedNode as LegacySerializedGridNode
-    const cols = serializedNode.cols || 2
+    const cols = legacy.cols || 2
     const rawGap = legacy.gap
     const gap = typeof rawGap === 'number' ? `${rawGap}px` : rawGap
     const node = new GridContainerNode(cols, gap)
 
-    if (serializedNode.cells && serializedNode.cells.length > 0) {
-      const editors: LexicalEditor[] = serializedNode.cells.map((cellState) => {
+    if (legacy.cells && legacy.cells.length > 0) {
+      const editors: LexicalEditor[] = legacy.cells.map((cellState) => {
         const editor = createCellEditor()
         const editorState = editor.parseEditorState(cellState)
         editor.setEditorState(editorState)
@@ -184,7 +188,7 @@ export class GridContainerNode extends DecoratorNode<ReactElement> {
       node.__cellEditors = editors
     } else if (legacy.children) {
       // Legacy ElementNode format: each child becomes a cell
-      const {children} = legacy
+      const { children } = legacy
       const editors: LexicalEditor[] = children.map((child) => {
         const editor = createCellEditor()
         const content = {

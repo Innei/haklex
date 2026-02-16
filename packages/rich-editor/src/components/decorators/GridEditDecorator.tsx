@@ -7,6 +7,7 @@ import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import type { LexicalEditor } from 'lexical'
 import { $getNodeByKey, $getRoot } from 'lexical'
+import { LayoutGrid, Minus, Plus } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { $isGridContainerNode } from '../../nodes/GridContainerNode'
@@ -81,169 +82,46 @@ export function GridEditDecorator({
   }, [editor, nodeKey])
 
   return (
-    <div style={{ position: 'relative' }}>
+    <>
       <div
         className="rich-grid-toolbar"
-        style={{
-          position: 'absolute',
-          top: -36,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 2,
-          padding: '4px 6px',
-          borderRadius: 6,
-          pointerEvents: 'auto',
-          background: 'var(--rich-grid-toolbar-bg, rgba(255, 255, 255, 0.95))',
-          border: '1px solid var(--rich-grid-toolbar-border, #e0e0e0)',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-          zIndex: 10,
-          userSelect: 'none',
-          whiteSpace: 'nowrap',
-        }}
         onMouseDown={(e) => e.preventDefault()}
       >
-        <span
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: 24,
-            height: 24,
-            color: '#737373',
-            flexShrink: 0,
-          }}
-        >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-            <line x1="3" x2="21" y1="9" y2="9" />
-            <line x1="3" x2="21" y1="15" y2="15" />
-            <line x1="9" x2="9" y1="3" y2="21" />
-            <line x1="15" x2="15" y1="3" y2="21" />
-          </svg>
+        <span className="rich-grid-toolbar-icon">
+          <LayoutGrid size={14} />
         </span>
         {COL_OPTIONS.map((n) => (
           <button
             key={n}
             type="button"
             className={`rich-grid-col-btn${n === currentCols ? ' rich-grid-col-btn-active' : ''}`}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              minWidth: 24,
-              height: 24,
-              padding: '0 6px',
-              borderRadius: 4,
-              border: 'none',
-              background:
-                n === currentCols
-                  ? 'var(--rich-grid-btn-active-bg, rgba(0, 0, 0, 0.1))'
-                  : 'transparent',
-              cursor: 'pointer',
-              fontSize: 12,
-              fontWeight: n === currentCols ? 600 : 500,
-              color:
-                n === currentCols
-                  ? 'var(--rich-grid-btn-active-color, #171717)'
-                  : 'var(--rich-grid-btn-color, #525252)',
-              lineHeight: 1,
-            }}
             onClick={() => handleSetCols(n)}
             aria-label={`${n} columns`}
           >
             {n}
           </button>
         ))}
-        <div
-          style={{
-            width: 1,
-            height: 16,
-            background: 'var(--rich-grid-toolbar-border, #e0e0e0)',
-            margin: '0 2px',
-            flexShrink: 0,
-          }}
-        />
+        <div className="rich-grid-toolbar-divider" />
         <button
           type="button"
           className="rich-grid-action-btn"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: 24,
-            height: 24,
-            padding: '0 6px',
-            borderRadius: 4,
-            border: 'none',
-            background: 'transparent',
-            cursor: 'pointer',
-            color: 'var(--rich-grid-btn-color, #525252)',
-          }}
           onClick={handleAddRow}
           aria-label="Add row"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="12" x2="12" y1="5" y2="19" />
-            <line x1="5" x2="19" y1="12" y2="12" />
-          </svg>
+          <Plus size={14} />
         </button>
         <button
           type="button"
           className="rich-grid-action-btn"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minWidth: 24,
-            height: 24,
-            padding: '0 6px',
-            borderRadius: 4,
-            border: 'none',
-            background: 'transparent',
-            cursor: 'pointer',
-            color: 'var(--rich-grid-btn-color, #525252)',
-          }}
           onClick={handleRemoveRow}
           aria-label="Remove row"
         >
-          <svg
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <line x1="5" x2="19" y1="12" y2="12" />
-          </svg>
+          <Minus size={14} />
         </button>
       </div>
       <div
         className="rich-grid-inner"
         style={{
-          display: 'grid',
           gridTemplateColumns: `repeat(${currentCols}, 1fr)`,
           gap,
         }}
@@ -255,7 +133,6 @@ export function GridEditDecorator({
                 contentEditable={
                   <ContentEditable
                     className="rich-grid-cell-editable"
-                    style={{ outline: 'none' }}
                     aria-placeholder=""
                     placeholder={<span style={{ display: 'none' }} />}
                   />
@@ -268,6 +145,6 @@ export function GridEditDecorator({
           </div>
         ))}
       </div>
-    </div>
+    </>
   )
 }

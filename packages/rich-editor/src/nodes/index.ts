@@ -60,8 +60,6 @@ export { $createMentionNode, $isMentionNode, MentionNode } from './MentionNode'
 export type { SerializedMermaidNode } from './MermaidNode'
 export { $createMermaidNode, $isMermaidNode, MermaidNode } from './MermaidNode'
 export { $createSpoilerNode, $isSpoilerNode, SpoilerNode } from './SpoilerNode'
-export type { SerializedTabsNode, TabItem } from './TabsNode'
-export { $createTabsNode, $isTabsNode, TabsNode } from './TabsNode'
 export type { SerializedTaskListItemNode } from './TaskListItemNode'
 export {
   $createTaskListItemNode,

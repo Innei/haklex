@@ -1,5 +1,7 @@
 export interface LinkCardRendererProps {
   url: string
+  source?: string
+  id?: string
   title?: string
   description?: string
   favicon?: string

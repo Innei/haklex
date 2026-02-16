@@ -1,7 +1,7 @@
 export type {
   SerializedTldrawNode,
   TldrawRendererProps,
-} from '@shiro/rich-editor-tldraw'
+} from '@shiro/rich-ext-tldraw'
 export {
   $createTldrawNode,
   $isTldrawNode,
@@ -9,4 +9,4 @@ export {
   TldrawNode,
   TldrawPlugin,
   TldrawRenderer,
-} from '@shiro/rich-editor-tldraw'
+} from '@shiro/rich-ext-tldraw'

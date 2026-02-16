@@ -18,6 +18,8 @@ import type { SlashMenuItemConfig } from '../types/slash-menu'
 export type SerializedLinkCardNode = Spread<
   {
     url: string
+    source?: string
+    id?: string
     title?: string
     description?: string
     favicon?: string
@@ -28,6 +30,8 @@ export type SerializedLinkCardNode = Spread<
 
 export interface LinkCardNodePayload {
   url: string
+  source?: string
+  id?: string
   title?: string
   description?: string
   favicon?: string
@@ -36,6 +40,8 @@ export interface LinkCardNodePayload {
 
 export class LinkCardNode extends DecoratorNode<ReactElement> {
   __url: string
+  __source?: string
+  __id?: string
   __title?: string
   __description?: string
   __favicon?: string
@@ -64,6 +70,8 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
     return new LinkCardNode(
       {
         url: node.__url,
+        source: node.__source,
+        id: node.__id,
         title: node.__title,
         description: node.__description,
         favicon: node.__favicon,
@@ -76,6 +84,8 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
   constructor(payload: LinkCardNodePayload, key?: NodeKey) {
     super(key)
     this.__url = payload.url
+    this.__source = payload.source
+    this.__id = payload.id
     this.__title = payload.title
     this.__description = payload.description
     this.__favicon = payload.favicon
@@ -99,6 +109,8 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
   static importJSON(serializedNode: SerializedLinkCardNode): LinkCardNode {
     return $createLinkCardNode({
       url: serializedNode.url,
+      source: serializedNode.source,
+      id: serializedNode.id,
       title: serializedNode.title,
       description: serializedNode.description,
       favicon: serializedNode.favicon,
@@ -111,6 +123,8 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
       ...super.exportJSON(),
       type: 'link-card',
       url: this.__url,
+      source: this.__source,
+      id: this.__id,
       title: this.__title,
       description: this.__description,
       favicon: this.__favicon,
@@ -128,9 +142,29 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
     writable.__url = url
   }
 
+  getSource(): string | undefined {
+    return this.getLatest().__source
+  }
+
+  setSource(source: string | undefined): void {
+    const writable = this.getWritable()
+    writable.__source = source
+  }
+
+  getId(): string | undefined {
+    return this.getLatest().__id
+  }
+
+  setId(id: string | undefined): void {
+    const writable = this.getWritable()
+    writable.__id = id
+  }
+
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createRendererDecoration('LinkCard', LinkCardRenderer, {
       url: this.__url,
+      source: this.__source,
+      id: this.__id,
       title: this.__title,
       description: this.__description,
       favicon: this.__favicon,

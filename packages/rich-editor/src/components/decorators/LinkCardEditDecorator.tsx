@@ -92,9 +92,7 @@ export function LinkCardEditDecorator({
         delay={200}
         closeDelay={300}
         openOnHover
-        render={
-          <span className="rich-link-card-edit-wrapper" title="Click to edit" />
-        }
+        render={<span className="rich-link-card-edit-wrapper" />}
       >
         {children}
       </PopoverTrigger>

@@ -12,8 +12,16 @@ export type {
   RichEditorVariant,
   RichRendererProps,
 } from './types'
-export type { RendererConfig } from './types/renderer-config'
+export type {
+  RendererConfig,
+  TabItem,
+  TabsRendererProps,
+} from './types/renderer-config'
 export type { SlashMenuItemConfig } from './types/slash-menu'
+
+// Re-export renderer utilities for external renderer packages
+export { createRendererDecoration } from './components/RendererWrapper'
+export { useRendererConfig } from './context/RendererConfigContext'
 
 // Re-export component node
 export type { SerializedComponentNode } from './nodes/ComponentNode'
@@ -69,5 +77,4 @@ export type { KaTeXRendererProps } from './components/renderers/KaTeXRenderer'
 export type { LinkCardRendererProps } from './components/renderers/LinkCardRenderer'
 export type { MentionRendererProps } from './components/renderers/MentionRenderer'
 export type { MermaidRendererProps } from './components/renderers/MermaidRenderer'
-export type { TabsRendererProps } from './components/renderers/TabsRenderer'
 export type { VideoRendererProps } from './components/renderers/VideoRenderer'

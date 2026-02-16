@@ -1,3 +1,4 @@
+import type { SerializedEditorState } from 'lexical'
 import type { ComponentType } from 'react'
 
 import type { AlertRendererProps } from '../components/renderers/AlertRenderer'
@@ -11,8 +12,16 @@ import type { KaTeXRendererProps } from '../components/renderers/KaTeXRenderer'
 import type { LinkCardRendererProps } from '../components/renderers/LinkCardRenderer'
 import type { MentionRendererProps } from '../components/renderers/MentionRenderer'
 import type { MermaidRendererProps } from '../components/renderers/MermaidRenderer'
-import type { TabsRendererProps } from '../components/renderers/TabsRenderer'
 import type { VideoRendererProps } from '../components/renderers/VideoRenderer'
+
+export interface TabItem {
+  label: string
+  content: SerializedEditorState
+}
+
+export interface TabsRendererProps {
+  tabs: TabItem[]
+}
 
 /**
  * Configuration for custom renderers.

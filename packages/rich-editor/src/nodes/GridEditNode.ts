@@ -1,7 +1,8 @@
 import type {
   EditorConfig,
   LexicalEditor,
-  SerializedEditorState, SerializedLexicalNode 
+  SerializedEditorState,
+  SerializedLexicalNode,
 } from 'lexical'
 import { createEditor } from 'lexical'
 import type { ReactElement } from 'react'
@@ -15,8 +16,12 @@ import {
 } from './GridContainerNode'
 import { NESTED_EDITOR_NODES } from './shared'
 
-interface LegacySerializedGridEditNode extends SerializedGridContainerNode {
+interface LegacySerializedGridEditNode {
+  type?: string
+  version?: number
+  cols?: number
   gap?: string | number
+  cells?: SerializedEditorState[]
   children?: SerializedLexicalNode[]
 }
 
@@ -43,13 +48,13 @@ export class GridEditNode extends GridContainerNode {
 
   static importJSON(serializedNode: SerializedGridContainerNode): GridEditNode {
     const legacy = serializedNode as LegacySerializedGridEditNode
-    const cols = serializedNode.cols || 2
+    const cols = legacy.cols || 2
     const rawGap = legacy.gap
     const gap = typeof rawGap === 'number' ? `${rawGap}px` : rawGap
     const node = new GridEditNode(cols, gap)
 
-    if (serializedNode.cells && serializedNode.cells.length > 0) {
-      const editors: LexicalEditor[] = serializedNode.cells.map((cellState) => {
+    if (legacy.cells && legacy.cells.length > 0) {
+      const editors: LexicalEditor[] = legacy.cells.map((cellState) => {
         const editor = createCellEditor()
         const editorState = editor.parseEditorState(cellState)
         editor.setEditorState(editorState)
@@ -57,7 +62,7 @@ export class GridEditNode extends GridContainerNode {
       })
       node.__cellEditors = editors
     } else if (legacy.children) {
-      const {children} = legacy
+      const { children } = legacy
       const editors: LexicalEditor[] = children.map((child) => {
         const editor = createCellEditor()
         const content = {

@@ -6,12 +6,20 @@ import type {
   Spread,
 } from 'lexical'
 import { $insertNodes, ElementNode } from 'lexical'
-import { ChevronRight } from 'lucide-react'
-import { __iconNode as ChevronDown } from 'lucide-react/dist/esm/icons/chevron-down'
+import { ChevronDown, ChevronRight } from 'lucide-react'
 import { createElement } from 'react'
 
 import type { SlashMenuItemConfig } from '../types/slash-menu'
 import { createLucideSvg } from '../utils/lucide-dom'
+
+type IconNode = [string, Record<string, string>][]
+
+const ChevronDownIconNode: IconNode =
+  (ChevronDown as unknown as { iconNode?: IconNode; __iconNode?: IconNode })
+    .iconNode ??
+  (ChevronDown as unknown as { iconNode?: IconNode; __iconNode?: IconNode })
+    .__iconNode ??
+  []
 
 export type SerializedDetailsNode = Spread<
   {
@@ -72,7 +80,7 @@ export class DetailsNode extends ElementNode {
     const chevron = document.createElement('span')
     chevron.className = 'rich-details-chevron'
     chevron.append(
-      createLucideSvg(ChevronDown, { width: '1em', height: '1em' }),
+      createLucideSvg(ChevronDownIconNode, { width: '1em', height: '1em' }),
     )
     summary.append(chevron)
 

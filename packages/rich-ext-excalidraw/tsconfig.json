@@ -22,7 +22,8 @@
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx"
+    "src/**/*.tsx",
+    "../rich-editor/src/types/lucide-icons.d.ts"
   ],
   "exclude": [
     "node_modules",

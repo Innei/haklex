@@ -6,6 +6,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./alert": "./src/alert.ts",
+    "./banner": "./src/banner.ts",
     "./codeblock": "./src/codeblock.ts",
     "./embed": "./src/embed.ts",
     "./gallery": "./src/gallery.ts",
@@ -15,6 +16,7 @@
     "./mermaid": "./src/mermaid.ts",
     "./slash-menu": "./src/slash-menu.ts",
     "./style.css": "./src/style.css",
+    "./tabs": "./src/tabs.ts",
     "./tldraw": "./src/tldraw.ts",
     "./video": "./src/video.ts"
   },
@@ -28,11 +30,13 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@shiro/rich-editor-tldraw": "workspace:*",
+    "@shiro/rich-ext-embed": "workspace:*",
+    "@shiro/rich-ext-tabs": "workspace:*",
+    "@shiro/rich-ext-tldraw": "workspace:*",
     "@shiro/rich-plugin-slash-menu": "workspace:*",
     "@shiro/rich-renderer-alert": "workspace:*",
+    "@shiro/rich-renderer-banner": "workspace:*",
     "@shiro/rich-renderer-codeblock": "workspace:*",
-    "@shiro/rich-renderer-embed": "workspace:*",
     "@shiro/rich-renderer-gallery": "workspace:*",
     "@shiro/rich-renderer-image": "workspace:*",
     "@shiro/rich-renderer-linkcard": "workspace:*",
@@ -68,6 +72,10 @@
       "./alert": {
         "import": "./dist/alert.mjs",
         "types": "./dist/alert.d.ts"
+      },
+      "./banner": {
+        "import": "./dist/banner.mjs",
+        "types": "./dist/banner.d.ts"
       },
       "./codeblock": {
         "import": "./dist/codeblock.mjs",
@@ -109,6 +117,10 @@
       "./embed": {
         "import": "./dist/embed.mjs",
         "types": "./dist/embed.d.ts"
+      },
+      "./tabs": {
+        "import": "./dist/tabs.mjs",
+        "types": "./dist/tabs.d.ts"
       }
     },
     "main": "./dist/index.mjs",

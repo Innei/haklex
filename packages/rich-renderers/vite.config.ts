@@ -18,6 +18,7 @@ export default defineConfig({
         config: resolve(__dirname, 'src/config.ts'),
         'config-edit': resolve(__dirname, 'src/config-edit.ts'),
         alert: resolve(__dirname, 'src/alert.ts'),
+        banner: resolve(__dirname, 'src/banner.ts'),
         codeblock: resolve(__dirname, 'src/codeblock.ts'),
         gallery: resolve(__dirname, 'src/gallery.ts'),
         image: resolve(__dirname, 'src/image.ts'),
@@ -27,6 +28,7 @@ export default defineConfig({
         video: resolve(__dirname, 'src/video.ts'),
         tldraw: resolve(__dirname, 'src/tldraw.ts'),
         embed: resolve(__dirname, 'src/embed.ts'),
+        tabs: resolve(__dirname, 'src/tabs.ts'),
         'slash-menu': resolve(__dirname, 'src/slash-menu.ts'),
       },
       formats: ['es'],
@@ -41,6 +43,7 @@ export default defineConfig({
           '@shiro/rich-editor',
         ].includes(id) ||
         id.startsWith('@shiro/rich-renderer-') ||
+        id.startsWith('@shiro/rich-ext-') ||
         id.startsWith('@shiro/rich-editor-') ||
         id.startsWith('@shiro/rich-plugin-') ||
         id.startsWith('@base-ui/') ||
