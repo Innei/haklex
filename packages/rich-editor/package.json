@@ -21,6 +21,7 @@
     "@shiro/rich-editor-ui": "workspace:*"
   },
   "devDependencies": {
+    "@base-ui/react": "^1.1.0",
     "@lexical/code": "^0.39.0",
     "@lexical/extension": "0.39.0",
     "@lexical/link": "^0.39.0",
@@ -29,9 +30,8 @@
     "@lexical/react": "^0.39.0",
     "@lexical/rich-text": "^0.39.0",
     "@lexical/table": "^0.39.0",
-    "@radix-ui/react-tabs": "1.1.13",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
+    "@types/react": "^19.2.9",
+    "@types/react-dom": "^19.2.3",
     "@vanilla-extract/css": "^1.17.1",
     "@vanilla-extract/vite-plugin": "^4.0.20",
     "katex": ">=0.16.0",
@@ -46,6 +46,7 @@
     "vite-plugin-dts": "^4.5.0"
   },
   "peerDependencies": {
+    "@base-ui/react": "^1.1.0",
     "@lexical/code": "^0.39.0",
     "@lexical/extension": "^0.39.0",
     "@lexical/link": "^0.39.0",
@@ -54,7 +55,6 @@
     "@lexical/react": "^0.39.0",
     "@lexical/rich-text": "^0.39.0",
     "@lexical/table": "^0.39.0",
-    "@radix-ui/react-tabs": "^1.0.0",
     "katex": ">=0.16.0",
     "lexical": "^0.39.0",
     "lucide-react": ">=0.400.0",

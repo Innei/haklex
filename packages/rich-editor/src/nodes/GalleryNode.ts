@@ -12,7 +12,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { GalleryRenderer } from '../components/renderers/GalleryRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { createRendererDecoration } from '../components/RendererWrapper'
 import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export interface GalleryImage {
@@ -124,13 +124,9 @@ export class GalleryNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(RendererWrapper as any, {
-      rendererKey: 'Gallery',
-      defaultRenderer: GalleryRenderer,
-      props: {
-        images: this.__images,
-        layout: this.__layout,
-      },
+    return createRendererDecoration('Gallery', GalleryRenderer, {
+      images: this.__images,
+      layout: this.__layout,
     })
   }
 }

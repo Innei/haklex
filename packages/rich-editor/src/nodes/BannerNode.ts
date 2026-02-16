@@ -1,41 +1,77 @@
 import type {
   EditorConfig,
+  LexicalEditor,
   LexicalNode,
   NodeKey,
-  SerializedElementNode,
+  SerializedEditorState,
+  SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { $insertNodes, ElementNode } from 'lexical'
+import { $getRoot, $insertNodes, createEditor, DecoratorNode } from 'lexical'
 import { Flag } from 'lucide-react'
-import { __iconNode as CircleCheck } from 'lucide-react/dist/esm/icons/circle-check'
-import { __iconNode as InfoIcon } from 'lucide-react/dist/esm/icons/info'
-import { __iconNode as ShieldAlert } from 'lucide-react/dist/esm/icons/shield-alert'
-import { __iconNode as TriangleAlert } from 'lucide-react/dist/esm/icons/triangle-alert'
+import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
+import { BannerReadOnlyDecorator } from '../components/renderers/BannerReadOnlyDecorator'
+import { editorTheme } from '../styles/theme'
 import type { SlashMenuItemConfig } from '../types/slash-menu'
-import { createLucideSvg } from '../utils/lucide-dom'
+import { NESTED_EDITOR_NODES } from './shared'
 
-export type BannerType = 'info' | 'success' | 'warning' | 'error'
+export type BannerType = 'note' | 'tip' | 'important' | 'warning' | 'caution'
 
-const BANNER_ICON_DATA: Record<BannerType, any[]> = {
-  info: InfoIcon,
-  warning: TriangleAlert,
-  error: ShieldAlert,
-  success: CircleCheck,
+const LEGACY_TYPE_MAP: Record<string, BannerType> = {
+  info: 'note',
+  success: 'tip',
+  error: 'caution',
+}
+
+export function normalizeBannerType(type: string): BannerType {
+  if (type in LEGACY_TYPE_MAP) return LEGACY_TYPE_MAP[type]
+  return (type as BannerType) || 'note'
+}
+
+export const BANNER_TYPES: BannerType[] = [
+  'note',
+  'tip',
+  'important',
+  'warning',
+  'caution',
+]
+
+export const BANNER_LABELS: Record<BannerType, string> = {
+  note: 'Note',
+  tip: 'Tip',
+  important: 'Important',
+  warning: 'Warning',
+  caution: 'Caution',
+}
+
+function createContentEditor(): LexicalEditor {
+  return createEditor({
+    namespace: 'BannerContent',
+    nodes: NESTED_EDITOR_NODES,
+    theme: editorTheme,
+    onError: (error: Error) => {
+      console.error('[BannerContent]', error)
+    },
+  })
 }
 
 export type SerializedBannerNode = Spread<
   {
     bannerType: BannerType
-    bgColor?: string
+    content: SerializedEditorState
   },
-  SerializedElementNode
+  SerializedLexicalNode
 >
 
-export class BannerNode extends ElementNode {
+interface LegacySerializedBannerNode extends SerializedBannerNode {
+  children?: SerializedLexicalNode[]
+}
+
+export class BannerNode extends DecoratorNode<ReactElement> {
   __bannerType: BannerType
-  __bgColor?: string
+  __contentEditor: LexicalEditor
 
   static slashMenuItems: SlashMenuItemConfig[] = [
     {
@@ -46,7 +82,7 @@ export class BannerNode extends ElementNode {
       section: 'ADVANCED',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createBannerNode('info')])
+          $insertNodes([$createBannerNode('note')])
         })
       },
     },
@@ -57,70 +93,38 @@ export class BannerNode extends ElementNode {
   }
 
   static clone(node: BannerNode): BannerNode {
-    return new BannerNode(node.__bannerType, node.__bgColor, node.__key)
+    return new BannerNode(node.__bannerType, node.__contentEditor, node.__key)
   }
 
-  constructor(bannerType: BannerType, bgColor?: string, key?: NodeKey) {
+  constructor(
+    bannerType: BannerType,
+    contentEditor?: LexicalEditor,
+    key?: NodeKey,
+  ) {
     super(key)
     this.__bannerType = bannerType
-    this.__bgColor = bgColor
+    this.__contentEditor = contentEditor || createContentEditor()
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
     div.className = `rich-banner rich-banner-${this.__bannerType}`
-    div.setAttribute('role', 'alert')
-    if (this.__bgColor) {
-      div.style.backgroundColor = this.__bgColor
-    }
-
-    const icon = document.createElement('span')
-    icon.className = `rich-banner-icon rich-banner-icon-${this.__bannerType}`
-    const iconData =
-      BANNER_ICON_DATA[this.__bannerType] || BANNER_ICON_DATA.info
-    icon.append(createLucideSvg(iconData, { width: '1em', height: '1em' }))
-
-    const content = document.createElement('div')
-    content.className = 'rich-banner-content'
-
-    div.append(icon, content)
     return div
   }
 
   updateDOM(prevNode: BannerNode, dom: HTMLElement): boolean {
     if (prevNode.__bannerType !== this.__bannerType) {
       dom.className = `rich-banner rich-banner-${this.__bannerType}`
-      const icon = dom.querySelector('.rich-banner-icon')
-      if (icon) {
-        icon.className = `rich-banner-icon rich-banner-icon-${this.__bannerType}`
-        icon.replaceChildren()
-        const iconData =
-          BANNER_ICON_DATA[this.__bannerType] || BANNER_ICON_DATA.info
-        icon.append(createLucideSvg(iconData, { width: '1em', height: '1em' }))
-      }
-    }
-    if (prevNode.__bgColor !== this.__bgColor) {
-      dom.style.backgroundColor = this.__bgColor || ''
     }
     return false
   }
 
-  static importJSON(serializedNode: SerializedBannerNode): BannerNode {
-    return $createBannerNode(serializedNode.bannerType, serializedNode.bgColor)
-  }
-
-  exportJSON(): SerializedBannerNode {
-    return {
-      ...super.exportJSON(),
-      type: 'banner',
-      bannerType: this.__bannerType,
-      bgColor: this.__bgColor,
-      version: 1,
-    }
+  isInline(): boolean {
+    return false
   }
 
   getBannerType(): BannerType {
-    return this.getLatest().__bannerType
+    return this.__bannerType
   }
 
   setBannerType(bannerType: BannerType): void {
@@ -128,30 +132,65 @@ export class BannerNode extends ElementNode {
     writable.__bannerType = bannerType
   }
 
-  getBgColor(): string | undefined {
-    return this.getLatest().__bgColor
+  getContentEditor(): LexicalEditor {
+    return this.__contentEditor
   }
 
-  setBgColor(bgColor: string | undefined): void {
-    const writable = this.getWritable()
-    writable.__bgColor = bgColor
+  getTextContent(): string {
+    return this.__contentEditor.getEditorState().read(() => {
+      return $getRoot().getTextContent()
+    })
   }
 
-  getDOMSlot(element: HTMLElement) {
-    const content = element.querySelector('.rich-banner-content') as HTMLElement
-    return super.getDOMSlot(element).withElement(content)
+  static importJSON(serializedNode: SerializedBannerNode): BannerNode {
+    const legacy = serializedNode as LegacySerializedBannerNode
+    const bannerType = normalizeBannerType(serializedNode.bannerType)
+    const node = new BannerNode(bannerType)
+
+    if (serializedNode.content) {
+      const editorState = node.__contentEditor.parseEditorState(
+        serializedNode.content,
+      )
+      node.__contentEditor.setEditorState(editorState)
+    } else if (legacy.children) {
+      // Legacy ElementNode format: wrap children into editor state
+      const content = {
+        root: {
+          children: legacy.children,
+          direction: null,
+          format: '',
+          indent: 0,
+          type: 'root',
+          version: 1,
+        },
+      } as unknown as SerializedEditorState
+      const editorState = node.__contentEditor.parseEditorState(content)
+      node.__contentEditor.setEditorState(editorState)
+    }
+
+    return node
   }
 
-  isInline(): boolean {
-    return false
+  exportJSON(): SerializedBannerNode {
+    return {
+      ...super.exportJSON(),
+      type: 'banner',
+      bannerType: this.__bannerType,
+      content: this.__contentEditor.getEditorState().toJSON(),
+      version: 1,
+    }
+  }
+
+  decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
+    return createElement(BannerReadOnlyDecorator, {
+      bannerType: this.__bannerType,
+      contentEditor: this.__contentEditor,
+    })
   }
 }
 
-export function $createBannerNode(
-  bannerType: BannerType,
-  bgColor?: string,
-): BannerNode {
-  return new BannerNode(bannerType, bgColor)
+export function $createBannerNode(bannerType: BannerType): BannerNode {
+  return new BannerNode(bannerType)
 }
 
 export function $isBannerNode(

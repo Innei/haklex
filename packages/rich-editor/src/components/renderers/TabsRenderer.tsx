@@ -1,4 +1,4 @@
-import * as TabsPrimitive from '@radix-ui/react-tabs'
+import { Tabs } from '@base-ui/react/tabs'
 import { m } from 'motion/react'
 import { useEffect, useId, useState } from 'react'
 
@@ -26,14 +26,14 @@ export function TabsRenderer({ tabs }: TabsRendererProps) {
   if (tabs.length === 0) return null
 
   return (
-    <TabsPrimitive.Root
+    <Tabs.Root
       className="rich-tabs"
       value={activeTab}
       onValueChange={setActiveTab}
     >
-      <TabsPrimitive.List className="rich-tabs-list">
+      <Tabs.List className="rich-tabs-list">
         {tabs.map((tab) => (
-          <TabsPrimitive.Trigger
+          <Tabs.Tab
             key={tab.label}
             value={tab.label}
             className="rich-tabs-trigger"
@@ -46,12 +46,12 @@ export function TabsRenderer({ tabs }: TabsRendererProps) {
                 className="rich-tabs-underline"
               />
             )}
-          </TabsPrimitive.Trigger>
+          </Tabs.Tab>
         ))}
-      </TabsPrimitive.List>
+      </Tabs.List>
 
       {tabs.map((tab) => (
-        <TabsPrimitive.Content
+        <Tabs.Panel
           key={tab.label}
           value={tab.label}
           className="rich-tabs-content"
@@ -61,8 +61,8 @@ export function TabsRenderer({ tabs }: TabsRendererProps) {
             theme={colorScheme}
             rendererConfig={rendererConfig}
           />
-        </TabsPrimitive.Content>
+        </Tabs.Panel>
       ))}
-    </TabsPrimitive.Root>
+    </Tabs.Root>
   )
 }

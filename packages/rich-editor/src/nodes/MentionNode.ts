@@ -8,10 +8,9 @@ import type {
 } from 'lexical'
 import { DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
-import { createElement } from 'react'
 
 import { MentionRenderer } from '../components/renderers/MentionRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { createRendererDecoration } from '../components/RendererWrapper'
 
 export type SerializedMentionNode = Spread<
   {
@@ -96,14 +95,10 @@ export class MentionNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(RendererWrapper as any, {
-      rendererKey: 'Mention',
-      defaultRenderer: MentionRenderer,
-      props: {
-        platform: this.__platform,
-        handle: this.__handle,
-        displayName: this.__displayName,
-      },
+    return createRendererDecoration('Mention', MentionRenderer, {
+      platform: this.__platform,
+      handle: this.__handle,
+      displayName: this.__displayName,
     })
   }
 }

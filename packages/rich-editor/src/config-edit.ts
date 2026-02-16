@@ -2,13 +2,13 @@ import type { Klass, LexicalNode } from 'lexical'
 
 import { builtinNodes } from './config'
 import { AlertQuoteEditNode } from './nodes/AlertQuoteEditNode'
-import { BannerNode } from './nodes/BannerNode'
+import { BannerEditNode } from './nodes/BannerEditNode'
 import { CodeBlockEditNode } from './nodes/CodeBlockEditNode'
 import { ComponentNode } from './nodes/ComponentNode'
 import { DetailsNode } from './nodes/DetailsNode'
 import { FootnoteNode } from './nodes/FootnoteNode'
 import { GalleryNode } from './nodes/GalleryNode'
-import { GridContainerNode } from './nodes/GridContainerNode'
+import { GridEditNode } from './nodes/GridEditNode'
 import { ImageNode } from './nodes/ImageNode'
 import { KaTeXBlockEditNode } from './nodes/KaTeXBlockEditNode'
 import { KaTeXInlineEditNode } from './nodes/KaTeXInlineEditNode'
@@ -35,8 +35,8 @@ export const customEditNodes: Array<Klass<LexicalNode>> = [
   TabsNode,
   DetailsNode,
   GalleryNode,
-  GridContainerNode,
-  BannerNode,
+  GridEditNode,
+  BannerEditNode,
   MermaidNode,
   ComponentNode,
 ]

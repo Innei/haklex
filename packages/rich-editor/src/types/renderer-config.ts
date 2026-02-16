@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react'
 
 import type { AlertRendererProps } from '../components/renderers/AlertRenderer'
+import type { BannerRendererProps } from '../components/renderers/BannerRenderer'
 import type { CodeBlockRendererProps } from '../components/renderers/CodeBlockRenderer'
 import type { ComponentRendererProps } from '../components/renderers/ComponentRenderer'
 import type { FootnoteRendererProps } from '../components/renderers/FootnoteRenderer'
@@ -20,6 +21,8 @@ import type { VideoRendererProps } from '../components/renderers/VideoRenderer'
 export interface RendererConfig {
   /** Custom renderer for alert/callout headers */
   Alert?: ComponentType<AlertRendererProps>
+  /** Custom renderer for banner blocks */
+  Banner?: ComponentType<BannerRendererProps>
   /** Custom renderer for code blocks with syntax highlighting */
   CodeBlock?: ComponentType<CodeBlockRendererProps>
   /** Custom renderer for remote React components */

@@ -12,7 +12,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { MermaidRenderer } from '../components/renderers/MermaidRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { createRendererDecoration } from '../components/RendererWrapper'
 import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedMermaidNode = Spread<
@@ -93,19 +93,15 @@ export class MermaidNode extends DecoratorNode<ReactElement> {
 
   decorate(editor: LexicalEditor, _config: EditorConfig): ReactElement {
     const nodeKey = this.__key
-    return createElement(RendererWrapper as any, {
-      rendererKey: 'Mermaid',
-      defaultRenderer: MermaidRenderer,
-      props: {
-        content: this.__diagram,
-        onContentChange: (newDiagram: string) => {
-          editor.update(() => {
-            const node = $getNodeByKey(nodeKey) as MermaidNode | null
-            if (node) {
-              node.setDiagram(newDiagram)
-            }
-          })
-        },
+    return createRendererDecoration('Mermaid', MermaidRenderer, {
+      content: this.__diagram,
+      onContentChange: (newDiagram: string) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey) as MermaidNode | null
+          if (node) {
+            node.setDiagram(newDiagram)
+          }
+        })
       },
     })
   }

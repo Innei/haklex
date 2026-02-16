@@ -13,33 +13,24 @@ export default defineConfig({
       tsconfigPath: './tsconfig.json',
     }),
   ],
-  esbuild: {
-    jsx: 'automatic',
-    jsxImportSource: 'react',
-  },
   build: {
     lib: {
-      entry: {
-        index: resolve(__dirname, 'src/index.ts'),
-        editor: resolve(__dirname, 'src/editor.ts'),
-        renderer: resolve(__dirname, 'src/renderer.ts'),
-      },
+      entry: resolve(__dirname, 'src/index.ts'),
       formats: ['es'],
-      fileName: (_: string, entryName: string) => `${entryName}.mjs`,
+      fileName: () => 'index.mjs',
     },
     rollupOptions: {
       external: [
         'react',
         'react-dom',
         'react/jsx-runtime',
+        '@shiro/rich-editor-ui',
+        '@lexical/react',
+        '@lexical/react/LexicalComposerContext',
         'lexical',
-        /^@lexical\//,
-        'katex',
-        /^shiki/,
-        /^@shiro\/rich-editor-ui/,
+        /^@lexical\/.*/,
+        /^lucide-react/,
         /^@base-ui\//,
-        /^motion/,
-        /^lucide/,
       ],
       output: {
         preserveModules: false,

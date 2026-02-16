@@ -12,7 +12,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { ImageRenderer } from '../components/renderers/ImageRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { createRendererDecoration } from '../components/RendererWrapper'
 import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedImageNode = Spread<
@@ -151,18 +151,14 @@ export class ImageNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(RendererWrapper as any, {
-      rendererKey: 'Image',
-      defaultRenderer: ImageRenderer,
-      props: {
-        src: this.__src,
-        altText: this.__altText,
-        width: this.__width,
-        height: this.__height,
-        caption: this.__caption,
-        blurhash: this.__blurhash,
-        accent: this.__accent,
-      },
+    return createRendererDecoration('Image', ImageRenderer, {
+      src: this.__src,
+      altText: this.__altText,
+      width: this.__width,
+      height: this.__height,
+      caption: this.__caption,
+      blurhash: this.__blurhash,
+      accent: this.__accent,
     })
   }
 }

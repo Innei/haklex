@@ -8,10 +8,9 @@ import type {
 } from 'lexical'
 import { $getNodeByKey, DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
-import { createElement } from 'react'
 
 import { ComponentRenderer } from '../components/renderers/ComponentRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { createRendererDecoration } from '../components/RendererWrapper'
 
 export type SerializedComponentNode = Spread<
   {
@@ -114,21 +113,17 @@ export class ComponentNode extends DecoratorNode<ReactElement> {
 
   decorate(editor: LexicalEditor, _config: EditorConfig): ReactElement {
     const nodeKey = this.__key
-    return createElement(RendererWrapper as any, {
-      rendererKey: 'Component',
-      defaultRenderer: ComponentRenderer,
-      props: {
-        dls: this.__dls,
-        shadow: this.__shadow,
-        injectHostStyles: this.__injectHostStyles,
-        onDlsChange: (newDls: string) => {
-          editor.update(() => {
-            const node = $getNodeByKey(nodeKey) as ComponentNode | null
-            if (node) {
-              node.setDls(newDls)
-            }
-          })
-        },
+    return createRendererDecoration('Component', ComponentRenderer, {
+      dls: this.__dls,
+      shadow: this.__shadow,
+      injectHostStyles: this.__injectHostStyles,
+      onDlsChange: (newDls: string) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey) as ComponentNode | null
+          if (node) {
+            node.setDls(newDls)
+          }
+        })
       },
     })
   }

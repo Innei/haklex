@@ -231,6 +231,10 @@ globalStyle(`${richContent} .rich-code-block code`, {
 })
 
 // ─── Table ───────────────────────────────────────────────
+globalStyle(`${richContent} .rich-table-scrollable-wrapper`, {
+  overflowX: 'auto',
+})
+
 globalStyle(`${richContent} .rich-table`, {
   width: '100%',
   borderCollapse: 'separate',
@@ -245,10 +249,15 @@ globalStyle(`${richContent} .rich-table`, {
 globalStyle(`${richContent} .rich-table-cell`, {
   border: 'none',
   borderBottom: `1px solid ${vars.color.border}`,
+  borderRight: `1px solid ${vars.color.border}`,
   padding: `1.25em ${vars.spacing.lg}`,
   textAlign: 'left',
   verticalAlign: 'middle',
   lineHeight: '1.5',
+})
+
+globalStyle(`${richContent} .rich-table-cell:last-child`, {
+  borderRight: 'none',
 })
 
 globalStyle(`${richContent} .rich-table tbody tr:last-child .rich-table-cell`, {
@@ -271,6 +280,8 @@ globalStyle(`${richContent} .rich-table-cell > :last-child`, {
 
 globalStyle(`${richContent} .rich-table-cell-header`, {
   border: 'none',
+  borderBottom: `1px solid ${vars.color.border}`,
+  borderRight: `1px solid ${vars.color.border}`,
   padding: `${vars.spacing.md} ${vars.spacing.lg}`,
   textAlign: 'left',
   fontWeight: 600,
@@ -281,6 +292,13 @@ globalStyle(`${richContent} .rich-table-cell-header`, {
   backgroundColor: vars.color.bgSecondary,
   verticalAlign: 'middle',
   lineHeight: '1.5',
+  position: 'sticky',
+  top: 0,
+  zIndex: 1,
+})
+
+globalStyle(`${richContent} .rich-table-cell-header:last-child`, {
+  borderRight: 'none',
 })
 
 globalStyle(`${richContent} .rich-table-cell-header .rich-paragraph`, {
@@ -1219,16 +1237,19 @@ globalStyle(
 
 // ─── Banner ─────────────────────────────────────────────
 globalStyle(`${richContent} .rich-banner`, {
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  gap: vars.spacing.md,
   borderRadius: vars.borderRadius.md,
   border: '1px solid',
   padding: vars.spacing.lg,
   margin: `${vars.spacing.md} 0`,
   color: vars.color.text,
   lineHeight: '1.8',
+})
+
+globalStyle(`${richContent} .rich-banner-inner`, {
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: vars.spacing.md,
 })
 
 globalStyle(`${richContent} .rich-banner-icon`, {
@@ -1241,6 +1262,7 @@ globalStyle(`${richContent} .rich-banner-icon`, {
 globalStyle(`${richContent} .rich-banner-content`, {
   flex: 1,
   minWidth: 0,
+  minHeight: '1em',
 })
 
 globalStyle(
@@ -1257,13 +1279,52 @@ globalStyle(
   },
 )
 
-globalStyle(`${richContent} .rich-banner-info`, {
+globalStyle(`${richContent} .rich-banner-content-editable`, {
+  outline: 'none',
+})
+
+globalStyle(`${richContent} .rich-banner-content .rich-paragraph`, {
+  margin: 0,
+  marginBottom: '0.5em',
+})
+
+globalStyle(`${richContent} .rich-banner-content .rich-paragraph:last-child`, {
+  marginBottom: 0,
+})
+
+globalStyle(`${richContent} .rich-banner-icon-note`, {
+  color: '#3b82f6',
+})
+
+globalStyle(`${richContent} .rich-banner-icon-tip`, {
+  color: '#22c55e',
+})
+
+globalStyle(`${richContent} .rich-banner-icon-important`, {
+  color: '#a855f7',
+})
+
+globalStyle(`${richContent} .rich-banner-icon-warning`, {
+  color: '#f59e0b',
+})
+
+globalStyle(`${richContent} .rich-banner-icon-caution`, {
+  color: '#ef4444',
+})
+
+globalStyle(`${richContent} .rich-banner-note`, {
   backgroundColor: 'rgba(59, 130, 246, 0.08)',
   borderColor: 'rgba(59, 130, 246, 0.3)',
 })
 
-globalStyle(`${richContent} .rich-banner-icon-info`, {
-  color: '#3b82f6',
+globalStyle(`${richContent} .rich-banner-tip`, {
+  backgroundColor: 'rgba(34, 197, 94, 0.08)',
+  borderColor: 'rgba(34, 197, 94, 0.3)',
+})
+
+globalStyle(`${richContent} .rich-banner-important`, {
+  backgroundColor: 'rgba(168, 85, 247, 0.08)',
+  borderColor: 'rgba(168, 85, 247, 0.3)',
 })
 
 globalStyle(`${richContent} .rich-banner-warning`, {
@@ -1271,26 +1332,9 @@ globalStyle(`${richContent} .rich-banner-warning`, {
   borderColor: 'rgba(245, 158, 11, 0.3)',
 })
 
-globalStyle(`${richContent} .rich-banner-icon-warning`, {
-  color: '#f59e0b',
-})
-
-globalStyle(`${richContent} .rich-banner-error`, {
+globalStyle(`${richContent} .rich-banner-caution`, {
   backgroundColor: 'rgba(239, 68, 68, 0.08)',
   borderColor: 'rgba(239, 68, 68, 0.3)',
-})
-
-globalStyle(`${richContent} .rich-banner-icon-error`, {
-  color: '#ef4444',
-})
-
-globalStyle(`${richContent} .rich-banner-success`, {
-  backgroundColor: 'rgba(34, 197, 94, 0.08)',
-  borderColor: 'rgba(34, 197, 94, 0.3)',
-})
-
-globalStyle(`${richContent} .rich-banner-icon-success`, {
-  color: '#22c55e',
 })
 
 // ─── First-child reset ──────────────────────────────────

@@ -1,7 +1,8 @@
 import type { ElementTransformer } from '@lexical/markdown'
-import type { LexicalNode } from 'lexical'
+import type { LexicalNode, SerializedEditorState } from 'lexical'
 import { $createParagraphNode, $createTextNode } from 'lexical'
 
+import type { BannerType } from '../nodes/BannerNode'
 import {
   $createBannerNode,
   $isBannerNode,
@@ -17,28 +18,21 @@ import {
  * Container transformer: ::: type {params}\ncontent\n::: → Container nodes
  *
  * Supported types:
- * - ::: note / info / success / warning / error → BannerNode
+ * - ::: note / tip / important / warning / caution → BannerNode
  * - ::: details → DetailsNode
- *
- * Note: Gallery and Grid containers are more complex and may require
- * separate handling or plugin-based transformation.
- *
- * Example:
- * ::: warning
- * This is a warning message
- * :::
  */
 
-type BannerType = 'info' | 'success' | 'warning' | 'error'
-
 const BANNER_TYPE_MAP: Record<string, BannerType> = {
-  note: 'info',
-  info: 'info',
-  success: 'success',
+  note: 'note',
+  info: 'note',
+  tip: 'tip',
+  success: 'tip',
+  important: 'important',
   warning: 'warning',
   warn: 'warning',
-  error: 'error',
-  danger: 'error',
+  error: 'caution',
+  danger: 'caution',
+  caution: 'caution',
 }
 
 export const CONTAINER_TRANSFORMER: ElementTransformer = {
@@ -46,11 +40,8 @@ export const CONTAINER_TRANSFORMER: ElementTransformer = {
   export: (node: LexicalNode) => {
     if ($isBannerNode(node)) {
       const type = node.getBannerType()
-      const typeKey = Object.keys(BANNER_TYPE_MAP).find(
-        (key) => BANNER_TYPE_MAP[key] === type,
-      )
       const content = node.getTextContent()
-      return `::: ${typeKey || 'info'}\n${content}\n:::`
+      return `::: ${type}\n${content}\n:::`
     }
 
     if ($isDetailsNode(node)) {
@@ -66,23 +57,43 @@ export const CONTAINER_TRANSFORMER: ElementTransformer = {
     const type = match[1]
     const params = match[2]
 
-    // Banner types
     if (type in BANNER_TYPE_MAP) {
       const bannerType = BANNER_TYPE_MAP[type]
       const banner = $createBannerNode(bannerType)
 
-      // Append children
-      children.forEach((child) => {
-        banner.append(child)
-      })
+      const serializedChildren = children.map((child: LexicalNode) =>
+        child.exportJSON(),
+      )
+      const content = {
+        root: {
+          children: [
+            {
+              type: 'paragraph',
+              children: serializedChildren,
+              direction: null,
+              format: '',
+              indent: 0,
+              textFormat: 0,
+              textStyle: '',
+              version: 1,
+            },
+          ],
+          direction: null,
+          format: '',
+          indent: 0,
+          type: 'root',
+          version: 1,
+        },
+      } as unknown as SerializedEditorState
+
+      const editorState = banner.getContentEditor().parseEditorState(content)
+      banner.getContentEditor().setEditorState(editorState)
 
       parentNode.replace(banner)
       return
     }
 
-    // Details/collapse
     if (type === 'details') {
-      // Parse summary from params
       const summaryMatch = params?.match(/summary="([^"]*)"/)
       const summary = summaryMatch ? summaryMatch[1] : 'Details'
 
@@ -96,7 +107,6 @@ export const CONTAINER_TRANSFORMER: ElementTransformer = {
       return
     }
 
-    // Unknown container type - keep as paragraph
     const paragraph = $createParagraphNode()
     paragraph.append($createTextNode(`::: ${type}`))
     children.forEach((child) => {

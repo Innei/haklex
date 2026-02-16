@@ -4,12 +4,11 @@
     "lib": [
       "dom",
       "dom.iterable",
-      "esnext",
-      "es2022"
+      "esnext"
     ],
     "module": "esnext",
     "moduleResolution": "bundler",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -17,15 +16,13 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "declaration": true,
-    "preserveSymlinks": true,
     "declarationMap": true,
     "outDir": "./dist",
     "baseUrl": "./src"
   },
   "include": [
     "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.d.ts"
+    "src/**/*.tsx"
   ],
   "exclude": [
     "node_modules",

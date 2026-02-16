@@ -8,6 +8,7 @@ import {
   FORMAT_TEXT_COMMAND,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical'
+import { Link as LinkIcon } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -235,10 +236,7 @@ export function FloatingToolbarPlugin() {
         aria-label="Link"
         aria-pressed={state.isLink}
       >
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9.874a2 2 0 0 1-1.874 3H5a2 2 0 1 1 0-4h1.354z" />
-          <path d="M9.646 10.5H12a3 3 0 0 0 0-6H9a3 3 0 0 0-2.83 4H6.126a2 2 0 0 1 1.874-3H11a2 2 0 1 1 0 4H9.646z" />
-        </svg>
+        <LinkIcon size={14} />
       </button>
     </div>,
     document.body,

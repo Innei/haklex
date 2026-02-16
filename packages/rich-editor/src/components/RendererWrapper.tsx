@@ -43,12 +43,9 @@ export function RendererWrapper({
   props,
 }: RendererWrapperProps) {
   const config = useRendererConfig()
-  const CustomRenderer = config?.[rendererKey] as ComponentType<any> | undefined
+  const Renderer: ComponentType<any> = config?.[rendererKey] ?? DefaultRenderer
 
-  const Renderer = CustomRenderer || DefaultRenderer
-
-   
-  return <Renderer {...(props as any)} />
+  return <Renderer {...props} />
 }
 
 /**

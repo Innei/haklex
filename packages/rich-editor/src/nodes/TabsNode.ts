@@ -13,7 +13,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { TabsRenderer } from '../components/renderers/TabsRenderer'
-import { RendererWrapper } from '../components/RendererWrapper'
+import { createRendererDecoration } from '../components/RendererWrapper'
 import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export interface TabItem {
@@ -107,12 +107,8 @@ export class TabsNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(RendererWrapper as any, {
-      rendererKey: 'Tabs',
-      defaultRenderer: TabsRenderer,
-      props: {
-        tabs: this.__tabs,
-      },
+    return createRendererDecoration('Tabs', TabsRenderer, {
+      tabs: this.__tabs,
     })
   }
 }

@@ -45,8 +45,21 @@ export {
 } from './plugins/KaTeXPlugin'
 export { INSERT_MERMAID_COMMAND } from './plugins/MermaidPlugin'
 
+// Re-export banner node utilities
+export type { BannerType } from './nodes/BannerNode'
+export { BANNER_LABELS, BANNER_TYPES } from './nodes/BannerNode'
+
+// Re-export grid container node
+export type { SerializedGridContainerNode } from './nodes/GridContainerNode'
+export {
+  $createGridContainerNode,
+  $isGridContainerNode,
+  GridContainerNode,
+} from './nodes/GridContainerNode'
+
 // Re-export renderer prop types for convenience when creating custom renderers
 export type { AlertRendererProps } from './components/renderers/AlertRenderer'
+export type { BannerRendererProps } from './components/renderers/BannerRenderer'
 export type { CodeBlockRendererProps } from './components/renderers/CodeBlockRenderer'
 export type { ComponentRendererProps } from './components/renderers/ComponentRenderer'
 export type { FootnoteRendererProps } from './components/renderers/FootnoteRenderer'
