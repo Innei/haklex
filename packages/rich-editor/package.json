@@ -18,6 +18,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
+    "@shiro/rich-editor-ui": "workspace:*",
     "@shiro/rich-style-token": "workspace:*",
     "thumbhash": "^0.1.1"
   },

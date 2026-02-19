@@ -1,16 +1,18 @@
 import type { FC, ReactNode } from 'react'
 
 export interface DialogStackItemProps {
-  title: ReactNode
+  title?: ReactNode
   description?: ReactNode
   content: FC<{ dismiss: () => void }>
   className?: string
+  portalClassName?: string
   showCloseButton?: boolean
   clickOutsideToDismiss?: boolean
 }
 
 export interface DialogStackItem extends DialogStackItemProps {
   id: string
+  open: boolean
 }
 
 let stack: DialogStackItem[] = []
@@ -34,22 +36,33 @@ export function getSnapshot(): DialogStackItem[] {
 
 export function presentDialog(props: DialogStackItemProps): () => void {
   const id = `dialog-${++idCounter}`
-  stack = [...stack, { ...props, id }]
+  stack = [...stack, { ...props, id, open: true }]
   emit()
   return () => dismissDialog(id)
 }
 
-export function dismissDialog(id: string) {
+export function removeDialog(id: string) {
   stack = stack.filter((item) => item.id !== id)
   emit()
 }
 
-export function dismissTopDialog() {
-  stack = stack.slice(0, -1)
+export function dismissDialog(id: string) {
+  stack = stack.map((item) =>
+    item.id === id ? { ...item, open: false } : item,
+  )
   emit()
 }
 
+export function dismissTopDialog() {
+  for (let i = stack.length - 1; i >= 0; i--) {
+    if (stack[i].open) {
+      dismissDialog(stack[i].id)
+      return
+    }
+  }
+}
+
 export function dismissAllDialogs() {
-  stack = []
+  stack = stack.map((item) => ({ ...item, open: false }))
   emit()
 }

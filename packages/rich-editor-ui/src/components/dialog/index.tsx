@@ -1,8 +1,8 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
+import { PortalThemeWrapper } from '@shiro/rich-style-token'
 import { X } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
 
-import { usePortalTheme } from '../../context/portal-theme'
 import * as css from './styles.css'
 
 // -- Dialog Root --
@@ -26,10 +26,9 @@ export function DialogTrigger(props: DialogTriggerProps) {
 type DialogPortalProps = ComponentProps<typeof DialogPrimitive.Portal>
 
 export function DialogPortal({ children, ...props }: DialogPortalProps) {
-  const { className } = usePortalTheme()
   return (
     <DialogPrimitive.Portal {...props}>
-      {className ? <div className={className}>{children}</div> : children}
+      <PortalThemeWrapper>{children}</PortalThemeWrapper>
     </DialogPrimitive.Portal>
   )
 }

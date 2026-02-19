@@ -1,8 +1,8 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover'
+import { PortalThemeWrapper } from '@shiro/rich-style-token'
 import type { ComponentProps, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 
-import { usePortalTheme } from '../../context/portal-theme'
 import { getStrictContext } from '../../lib/get-strict-context'
 import * as css from './styles.css'
 
@@ -53,10 +53,9 @@ export function PopoverTrigger(props: PopoverTriggerProps) {
 type PopoverPortalProps = ComponentProps<typeof PopoverPrimitive.Portal>
 
 export function PopoverPortal({ children, ...props }: PopoverPortalProps) {
-  const { className } = usePortalTheme()
   return (
     <PopoverPrimitive.Portal {...props}>
-      {className ? <div className={className}>{children}</div> : children}
+      <PortalThemeWrapper>{children}</PortalThemeWrapper>
     </PopoverPrimitive.Portal>
   )
 }

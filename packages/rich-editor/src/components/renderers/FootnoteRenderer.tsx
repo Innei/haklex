@@ -1,5 +1,10 @@
-import type { MouseEvent } from 'react'
-import { useCallback, useState } from 'react'
+import {
+  TooltipContent,
+  TooltipRoot,
+  TooltipTrigger,
+} from '@shiro/rich-editor-ui'
+import type { HTMLAttributes, MouseEvent } from 'react'
+import { useCallback } from 'react'
 
 import {
   useFootnoteContent,
@@ -13,7 +18,6 @@ export interface FootnoteRendererProps {
 export function FootnoteRenderer({ identifier }: FootnoteRendererProps) {
   const content = useFootnoteContent(identifier)
   const displayNumber = useFootnoteDisplayNumber(identifier)
-  const [showTooltip, setShowTooltip] = useState(false)
 
   const referenceId = `footnote-ref-${identifier}`
   const targetId = `footnote-${identifier}`
@@ -39,26 +43,28 @@ export function FootnoteRenderer({ identifier }: FootnoteRendererProps) {
   const label = displayNumber ?? identifier
 
   return (
-    <span
-      className="rich-footnote-ref-wrapper"
-      onMouseEnter={() => setShowTooltip(true)}
-      onMouseLeave={() => setShowTooltip(false)}
-    >
-      <a
-        className="rich-footnote-ref"
-        href={`#${targetId}`}
-        id={referenceId}
-        role="doc-noteref"
-        onClick={handleClick}
-        data-footnote-ref={identifier}
-      >
-        {label}
-      </a>
-      {showTooltip && content && (
-        <span className="rich-footnote-tooltip" role="tooltip">
-          {content}
-        </span>
-      )}
+    <span className="rich-footnote-ref-wrapper">
+      <TooltipRoot>
+        <TooltipTrigger
+          render={(props: HTMLAttributes<HTMLElement>) => (
+            <a
+              {...props}
+              className="rich-footnote-ref"
+              href={`#${targetId}`}
+              id={referenceId}
+              role="doc-noteref"
+              aria-label={
+                content ? `Footnote ${label}: ${content}` : `Footnote ${label}`
+              }
+              onClick={handleClick}
+              data-footnote-ref={identifier}
+            >
+              {label}
+            </a>
+          )}
+        />
+        {content ? <TooltipContent>{content}</TooltipContent> : null}
+      </TooltipRoot>
     </span>
   )
 }

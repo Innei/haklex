@@ -84,4 +84,31 @@ export {
   PopoverTrigger,
   usePopover,
 } from './components/popover'
-export { PortalThemeProvider, usePortalTheme } from './context/portal-theme'
+export type {
+  SegmentedControlItem,
+  SegmentedControlProps,
+} from './components/segmented-control'
+export { SegmentedControl } from './components/segmented-control'
+export type {
+  TooltipContentProps,
+  TooltipPopupProps,
+  TooltipPortalProps,
+  TooltipPositionerProps,
+  TooltipProviderProps,
+  TooltipRootProps,
+  TooltipTriggerProps,
+} from './components/tooltip'
+export {
+  TooltipContent,
+  TooltipPopup,
+  TooltipPortal,
+  TooltipPositioner,
+  TooltipProvider,
+  TooltipRoot,
+  TooltipTrigger,
+} from './components/tooltip'
+export {
+  PortalThemeProvider,
+  PortalThemeWrapper,
+  usePortalTheme,
+} from '@shiro/rich-style-token'

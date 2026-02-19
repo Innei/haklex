@@ -1,3 +1,4 @@
+import { vars } from '@shiro/rich-style-token'
 import { globalStyle, keyframes, style } from '@vanilla-extract/css'
 
 const fadeIn = keyframes({
@@ -15,22 +16,11 @@ export const trigger = style({
   background: 'none',
   borderRadius: 8,
   cursor: 'pointer',
-  color: 'rgb(113, 113, 122)',
+  color: vars.color.textSecondary,
   transition: 'color 0.1s, background-color 0.1s',
   ':hover': {
-    color: 'rgb(9, 9, 11)',
-    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-  },
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      color: '#a3a3a3',
-      selectors: {
-        '&:hover': {
-          color: '#fafafa',
-          backgroundColor: 'rgba(255, 255, 255, 0.06)',
-        },
-      },
-    },
+    color: vars.color.text,
+    backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
   },
 })
 
@@ -88,16 +78,7 @@ export const swatch = style({
   padding: 0,
   transition: 'background-color 0.1s',
   ':hover': {
-    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-  },
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      selectors: {
-        '&:hover': {
-          backgroundColor: 'rgba(255, 255, 255, 0.06)',
-        },
-      },
-    },
+    backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
   },
 })
 
@@ -105,17 +86,12 @@ export const swatchDot = style({
   width: 16,
   height: 16,
   borderRadius: '50%',
-  border: '1px solid rgba(0, 0, 0, 0.1)',
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      borderColor: 'rgba(255, 255, 255, 0.15)',
-    },
-  },
+  border: `1px solid color-mix(in srgb, ${vars.color.text} 10%, transparent)`,
 })
 
 export const swatchCheck = style({
   position: 'absolute',
   width: 10,
   height: 10,
-  color: '#fff',
+  color: vars.color.bg,
 })

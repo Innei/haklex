@@ -1,8 +1,8 @@
 import { Menu as MenuPrimitive } from '@base-ui/react/menu'
+import { PortalThemeWrapper } from '@shiro/rich-style-token'
 import { Check } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
 
-import { usePortalTheme } from '../../context/portal-theme'
 import * as css from './styles.css'
 
 // -- Root --
@@ -24,10 +24,9 @@ export function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
 // -- Portal --
 
 function DropdownMenuPortal({ children }: { children: ReactNode }) {
-  const { className } = usePortalTheme()
   return (
     <MenuPrimitive.Portal>
-      {className ? <div className={className}>{children}</div> : children}
+      <PortalThemeWrapper>{children}</PortalThemeWrapper>
     </MenuPrimitive.Portal>
   )
 }

@@ -1,24 +1,19 @@
+import { vars } from '@shiro/rich-style-token'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 export const popup = style({
   minWidth: '8rem',
   borderRadius: '0.5rem',
   padding: '0.25rem',
-  backgroundColor: '#fff',
+  backgroundColor: vars.color.bg,
   boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
   outline: 'none',
-  border: '1px solid rgba(228, 228, 231, 1)',
+  border: `1px solid ${vars.color.border}`,
   zIndex: 50,
   maxHeight: 'var(--available-height)',
   overflowY: 'auto',
   transformOrigin: 'var(--transform-origin)',
   transition: 'opacity 100ms, transform 100ms',
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      backgroundColor: '#171717',
-      border: '1px solid #262626',
-    },
-  },
   selectors: {
     '&[data-open]': {
       opacity: 1,
@@ -42,27 +37,14 @@ export const item = style({
   outline: 'none',
   userSelect: 'none',
   cursor: 'default',
-  color: 'rgb(9, 9, 11)',
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      color: '#fafafa',
-    },
-  },
+  color: vars.color.text,
   selectors: {
     '&[data-highlighted]': {
-      backgroundColor: 'rgba(0, 0, 0, 0.04)',
+      backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
     },
     '&[data-disabled]': {
       opacity: 0.5,
       pointerEvents: 'none',
-    },
-  },
-})
-
-globalStyle(`${item}[data-highlighted]`, {
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      backgroundColor: 'rgba(255, 255, 255, 0.06)',
     },
   },
 })
@@ -76,25 +58,15 @@ globalStyle(`${item} svg`, {
 
 export const separator = style({
   height: '1px',
-  backgroundColor: 'rgba(228, 228, 231, 1)',
+  backgroundColor: vars.color.border,
   margin: '0.25rem -0.25rem',
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      backgroundColor: '#262626',
-    },
-  },
 })
 
 export const label = style({
   fontSize: '0.75rem',
   fontWeight: 500,
-  color: 'rgb(113, 113, 122)',
+  color: vars.color.textSecondary,
   padding: '0.25rem 0.375rem',
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      color: '#a3a3a3',
-    },
-  },
 })
 
 export const checkboxIndicator = style({
