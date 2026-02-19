@@ -6,6 +6,7 @@ import { BannerEditNode } from './nodes/BannerEditNode'
 import { CodeBlockEditNode } from './nodes/CodeBlockEditNode'
 import { DetailsNode } from './nodes/DetailsNode'
 import { FootnoteNode } from './nodes/FootnoteNode'
+import { FootnoteSectionEditNode } from './nodes/FootnoteSectionEditNode'
 import { GridEditNode } from './nodes/GridEditNode'
 import { ImageNode } from './nodes/ImageNode'
 import { KaTeXBlockNode } from './nodes/KaTeXBlockNode'
@@ -26,6 +27,7 @@ export const customEditNodes: Array<Klass<LexicalNode>> = [
   AlertQuoteEditNode,
   CodeBlockEditNode,
   FootnoteNode,
+  FootnoteSectionEditNode,
   TaskListItemNode,
   VideoNode,
   LinkCardNode,

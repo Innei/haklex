@@ -7,6 +7,7 @@ import { PortalThemeProvider } from '@shiro/rich-style-token'
 import { allNodes } from '../config'
 import { ColorSchemeProvider } from '../context/ColorSchemeContext'
 import { RendererConfigProvider } from '../context/RendererConfigContext'
+import { FootnotePlugin } from '../plugins/FootnotePlugin'
 import { HeadingAnchorPlugin } from '../plugins/HeadingAnchorPlugin'
 import { editorTheme } from '../styles/theme'
 import type { RichRendererProps } from '../types'
@@ -42,18 +43,20 @@ export function RichRenderer({
         <RendererConfigProvider config={rendererConfig} mode="renderer">
           <Component className={clsx('rich-content', variantClass, className)}>
             <LexicalComposer initialConfig={initialConfig}>
-              <RichTextPlugin
-                contentEditable={
-                  <ContentEditable
-                    className="rich-content__body"
-                    style={{ outline: 'none' }}
-                    aria-placeholder=""
-                    placeholder={<span style={{ display: 'none' }} />}
-                  />
-                }
-                ErrorBoundary={LexicalErrorBoundary}
-              />
-              <HeadingAnchorPlugin />
+              <FootnotePlugin>
+                <RichTextPlugin
+                  contentEditable={
+                    <ContentEditable
+                      className="rich-content__body"
+                      style={{ outline: 'none' }}
+                      aria-placeholder=""
+                      placeholder={<span style={{ display: 'none' }} />}
+                    />
+                  }
+                  ErrorBoundary={LexicalErrorBoundary}
+                />
+                <HeadingAnchorPlugin />
+              </FootnotePlugin>
             </LexicalComposer>
           </Component>
         </RendererConfigProvider>

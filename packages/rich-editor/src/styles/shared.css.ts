@@ -426,6 +426,59 @@ globalStyle(`${richContent} .rich-footnote-back-ref:hover`, {
   opacity: 0.7,
 })
 
+// ─── Footnote Section Edit ─────────────────────────────
+globalStyle(`${richContent} .rich-footnote-section-item-edit`, {
+  display: 'flex',
+  alignItems: 'center',
+  gap: vars.spacing.sm,
+  listStyleType: 'none',
+})
+
+globalStyle(`${richContent} .rich-footnote-section-item-num`, {
+  flexShrink: 0,
+  color: vars.color.textSecondary,
+  fontSize: vars.typography.fontSizeSmall,
+  fontWeight: 600,
+  minWidth: '1.5em',
+})
+
+globalStyle(`${richContent} .rich-footnote-section-item-input`, {
+  flex: 1,
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: vars.borderRadius.sm,
+  padding: `${vars.spacing.xs} ${vars.spacing.sm}`,
+  fontSize: vars.typography.fontSizeSmall,
+  color: vars.color.text,
+  backgroundColor: 'transparent',
+  outline: 'none',
+  transition: 'border-color 0.15s ease',
+})
+
+globalStyle(`${richContent} .rich-footnote-section-item-input:focus`, {
+  borderColor: vars.color.accent,
+})
+
+globalStyle(`${richContent} .rich-footnote-section-item-remove`, {
+  flexShrink: 0,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '20px',
+  height: '20px',
+  border: 'none',
+  background: 'none',
+  color: vars.color.textSecondary,
+  cursor: 'pointer',
+  borderRadius: vars.borderRadius.sm,
+  fontSize: '14px',
+  transition: 'color 0.15s ease, background-color 0.15s ease',
+})
+
+globalStyle(`${richContent} .rich-footnote-section-item-remove:hover`, {
+  color: '#ef4444',
+  backgroundColor: 'rgba(239, 68, 68, 0.1)',
+})
+
 // ─── Drag & Drop ──────────────────────────────────────────
 globalStyle(`.rich-drag-handle`, {
   position: 'absolute',

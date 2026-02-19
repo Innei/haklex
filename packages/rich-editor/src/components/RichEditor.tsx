@@ -16,6 +16,7 @@ import { AlertPlugin } from '../plugins/AlertPlugin'
 import { AutoFocusPlugin } from '../plugins/AutoFocusPlugin'
 import { AutoLinkPlugin } from '../plugins/AutoLinkPlugin'
 import { EditorRefPlugin } from '../plugins/EditorRefPlugin'
+import { FootnotePlugin } from '../plugins/FootnotePlugin'
 import { ImagePlugin } from '../plugins/ImagePlugin'
 import { KaTeXPlugin } from '../plugins/KaTeXPlugin'
 import { MarkdownShortcutsPlugin } from '../plugins/MarkdownShortcutsPlugin'
@@ -64,34 +65,38 @@ export function RichEditor({
       <ColorSchemeProvider colorScheme={theme}>
         <RendererConfigProvider config={rendererConfig} mode="editor">
           <LexicalComposer initialConfig={initialConfig}>
-            <div className={clsx('rich-editor', variantClass, className)}>
-              <RichTextPlugin
-                contentEditable={
-                  <ContentEditable
-                    className={contentClassName}
-                    placeholder={placeholder}
-                  />
-                }
-                ErrorBoundary={LexicalErrorBoundary}
-              />
-              <HistoryPlugin />
-              <ListPlugin />
-              <LinkPlugin />
-              <TabIndentationPlugin />
-              <TablePlugin />
-              <MarkdownShortcutsPlugin />
-              <OnChangePlugin onChange={onChange} debounceMs={debounceMs} />
-              <SubmitShortcutPlugin onSubmit={onSubmit} />
-              <ImagePlugin />
-              <KaTeXPlugin />
-              <AlertPlugin />
-              <MermaidPlugin />
-              <AutoLinkPlugin />
-              <EditorRefPlugin onEditorReady={onEditorReady} />
-              {autoFocus && <AutoFocusPlugin />}
-              {children}
-              {actions && <div className="rich-editor__actions">{actions}</div>}
-            </div>
+            <FootnotePlugin>
+              <div className={clsx('rich-editor', variantClass, className)}>
+                <RichTextPlugin
+                  contentEditable={
+                    <ContentEditable
+                      className={contentClassName}
+                      placeholder={placeholder}
+                    />
+                  }
+                  ErrorBoundary={LexicalErrorBoundary}
+                />
+                <HistoryPlugin />
+                <ListPlugin />
+                <LinkPlugin />
+                <TabIndentationPlugin />
+                <TablePlugin />
+                <MarkdownShortcutsPlugin />
+                <OnChangePlugin onChange={onChange} debounceMs={debounceMs} />
+                <SubmitShortcutPlugin onSubmit={onSubmit} />
+                <ImagePlugin />
+                <KaTeXPlugin />
+                <AlertPlugin />
+                <MermaidPlugin />
+                <AutoLinkPlugin />
+                <EditorRefPlugin onEditorReady={onEditorReady} />
+                {autoFocus && <AutoFocusPlugin />}
+                {children}
+                {actions && (
+                  <div className="rich-editor__actions">{actions}</div>
+                )}
+              </div>
+            </FootnotePlugin>
           </LexicalComposer>
         </RendererConfigProvider>
       </ColorSchemeProvider>

@@ -69,6 +69,7 @@ export {
 } from './nodes/GridContainerNode'
 
 // Re-export footnote section node
+export { FootnoteSectionEditNode } from './nodes/FootnoteSectionEditNode'
 export type { SerializedFootnoteSectionNode } from './nodes/FootnoteSectionNode'
 export {
   $createFootnoteSectionNode,
