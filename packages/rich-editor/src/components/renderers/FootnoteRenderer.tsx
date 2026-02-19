@@ -1,11 +1,20 @@
 import type { MouseEvent } from 'react'
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
+
+import {
+  useFootnoteContent,
+  useFootnoteDisplayNumber,
+} from '../../context/FootnoteDefinitionsContext'
 
 export interface FootnoteRendererProps {
   identifier: string
 }
 
 export function FootnoteRenderer({ identifier }: FootnoteRendererProps) {
+  const content = useFootnoteContent(identifier)
+  const displayNumber = useFootnoteDisplayNumber(identifier)
+  const [showTooltip, setShowTooltip] = useState(false)
+
   const referenceId = `footnote-ref-${identifier}`
   const targetId = `footnote-${identifier}`
 
@@ -27,16 +36,29 @@ export function FootnoteRenderer({ identifier }: FootnoteRendererProps) {
     [identifier, targetId],
   )
 
+  const label = displayNumber ?? identifier
+
   return (
-    <a
-      className="rich-footnote-ref"
-      href={`#${targetId}`}
-      id={referenceId}
-      role="doc-noteref"
-      onClick={handleClick}
-      data-footnote-ref={identifier}
+    <span
+      className="rich-footnote-ref-wrapper"
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
     >
-      [{identifier}]
-    </a>
+      <a
+        className="rich-footnote-ref"
+        href={`#${targetId}`}
+        id={referenceId}
+        role="doc-noteref"
+        onClick={handleClick}
+        data-footnote-ref={identifier}
+      >
+        {label}
+      </a>
+      {showTooltip && content && (
+        <span className="rich-footnote-tooltip" role="tooltip">
+          {content}
+        </span>
+      )}
+    </span>
   )
 }

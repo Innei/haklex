@@ -48,6 +48,7 @@ export { ALERT_LABELS, ALERT_TYPES } from './nodes/AlertQuoteNode'
 
 // Re-export plugin commands
 export { INSERT_ALERT_COMMAND } from './plugins/AlertPlugin'
+export { FootnotePlugin } from './plugins/FootnotePlugin'
 export { INSERT_IMAGE_COMMAND } from './plugins/ImagePlugin'
 export {
   INSERT_KATEX_BLOCK_COMMAND,

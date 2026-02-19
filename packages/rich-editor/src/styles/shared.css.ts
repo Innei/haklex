@@ -361,6 +361,33 @@ globalStyle(`${richContent} .rich-footnote-highlight`, {
   animation: `${footnoteFlash} 1.2s ease-out`,
 })
 
+globalStyle(`${richContent} .rich-footnote-ref-wrapper`, {
+  position: 'relative',
+  display: 'inline',
+})
+
+globalStyle(`${richContent} .rich-footnote-tooltip`, {
+  position: 'absolute',
+  bottom: '100%',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  marginBottom: '6px',
+  padding: '6px 10px',
+  fontSize: vars.typography.fontSizeSmall,
+  lineHeight: '1.4',
+  color: vars.color.text,
+  backgroundColor: vars.color.bgSecondary,
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: vars.borderRadius.md,
+  whiteSpace: 'nowrap',
+  maxWidth: '300px',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  zIndex: 50,
+  pointerEvents: 'none',
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+})
+
 // ─── Footnote Section ──────────────────────────────────
 globalStyle(`${richContent} .rich-footnote-section`, {
   marginTop: vars.spacing.lg,
