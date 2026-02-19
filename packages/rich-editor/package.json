@@ -18,7 +18,8 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@shiro/rich-editor-ui": "workspace:*"
+    "@shiro/rich-style-token": "workspace:*",
+    "thumbhash": "^0.1.1"
   },
   "devDependencies": {
     "@base-ui/react": "^1.1.0",
@@ -36,12 +37,12 @@
     "@vanilla-extract/vite-plugin": "^4.0.20",
     "katex": ">=0.16.0",
     "lexical": "^0.39.0",
-    "lucide-react": "^0.563.0",
+    "lucide-react": "^0.574.0",
     "react": ">=19",
     "react-dom": ">=19",
     "shiki": "^3.21.0",
     "typescript": "^5.9.0",
-    "vite": "^6.3.0",
+    "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.0"
   },
   "peerDependencies": {
@@ -56,7 +57,7 @@
     "@lexical/table": "^0.39.0",
     "katex": ">=0.16.0",
     "lexical": "^0.39.0",
-    "lucide-react": ">=0.400.0",
+    "lucide-react": "^0.574.0",
     "react": ">=19",
     "react-dom": ">=19",
     "shiki": "^3.0.0"

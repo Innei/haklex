@@ -22,7 +22,7 @@ export type SerializedImageNode = Spread<
     width?: number
     height?: number
     caption?: string
-    blurhash?: string
+    thumbhash?: string
     accent?: string
   },
   SerializedLexicalNode
@@ -51,7 +51,7 @@ export interface ImageNodePayload {
   width?: number
   height?: number
   caption?: string
-  blurhash?: string
+  thumbhash?: string
   accent?: string
 }
 
@@ -61,7 +61,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
   __width?: number
   __height?: number
   __caption?: string
-  __blurhash?: string
+  __thumbhash?: string
   __accent?: string
 
   static slashMenuItems: SlashMenuItemConfig[] = [
@@ -91,7 +91,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
         width: node.__width,
         height: node.__height,
         caption: node.__caption,
-        blurhash: node.__blurhash,
+        thumbhash: node.__thumbhash,
         accent: node.__accent,
       },
       node.__key,
@@ -105,7 +105,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
     this.__width = payload.width
     this.__height = payload.height
     this.__caption = payload.caption
-    this.__blurhash = payload.blurhash
+    this.__thumbhash = payload.thumbhash
     this.__accent = sanitizeColor(payload.accent)
   }
 
@@ -130,7 +130,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       width: serializedNode.width,
       height: serializedNode.height,
       caption: serializedNode.caption,
-      blurhash: serializedNode.blurhash,
+      thumbhash: serializedNode.thumbhash,
       accent: serializedNode.accent,
     })
   }
@@ -144,7 +144,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       width: this.__width,
       height: this.__height,
       caption: this.__caption,
-      blurhash: this.__blurhash,
+      thumbhash: this.__thumbhash,
       accent: this.__accent,
       version: 1,
     }
@@ -157,7 +157,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       width: this.__width,
       height: this.__height,
       caption: this.__caption,
-      blurhash: this.__blurhash,
+      thumbhash: this.__thumbhash,
       accent: this.__accent,
     })
   }

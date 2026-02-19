@@ -6,15 +6,15 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin'
-import { PortalThemeProvider } from '@shiro/rich-editor-ui'
+import { PortalThemeProvider } from '@shiro/rich-style-token'
 
 import { allEditNodes } from '../config-edit'
 import { ColorSchemeProvider } from '../context/ColorSchemeContext'
 import { RendererConfigProvider } from '../context/RendererConfigContext'
+import { setResolvedEditNodes } from '../node-registry'
 import { AlertPlugin } from '../plugins/AlertPlugin'
 import { AutoFocusPlugin } from '../plugins/AutoFocusPlugin'
 import { AutoLinkPlugin } from '../plugins/AutoLinkPlugin'
-import { ComponentPlugin } from '../plugins/ComponentPlugin'
 import { EditorRefPlugin } from '../plugins/EditorRefPlugin'
 import { ImagePlugin } from '../plugins/ImagePlugin'
 import { KaTeXPlugin } from '../plugins/KaTeXPlugin'
@@ -45,6 +45,7 @@ export function RichEditor({
   children,
 }: RichEditorProps) {
   const nodes = extraNodes ? [...allEditNodes, ...extraNodes] : allEditNodes
+  setResolvedEditNodes(nodes)
   const initialConfig = {
     namespace: 'RichEditor',
     theme: editorTheme,
@@ -85,7 +86,6 @@ export function RichEditor({
               <KaTeXPlugin />
               <AlertPlugin />
               <MermaidPlugin />
-              <ComponentPlugin />
               <AutoLinkPlugin />
               <EditorRefPlugin onEditorReady={onEditorReady} />
               {autoFocus && <AutoFocusPlugin />}

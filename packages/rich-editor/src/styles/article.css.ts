@@ -243,13 +243,13 @@ globalStyle(`${articleBase} .rich-alert`, {
   borderRadius: 0,
 })
 
-// ─── Details ────────────────────────────────────────────
-globalStyle(`${articleBase} .rich-details`, {
+// ─── Code Snippet ───────────────────────────────────────
+globalStyle(`${articleBase} .rich-code-snippet`, {
   margin: `${em(32, 18)} 0`,
 })
 
-// ─── Tabs ───────────────────────────────────────────────
-globalStyle(`${articleBase} .rich-tabs`, {
+// ─── Details ────────────────────────────────────────────
+globalStyle(`${articleBase} .rich-details`, {
   margin: `${em(32, 18)} 0`,
 })
 

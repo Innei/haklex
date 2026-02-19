@@ -20,12 +20,6 @@ export {
   $isFootnoteNode,
   FootnoteNode,
 } from './FootnoteNode'
-export type {
-  GalleryImage,
-  GalleryNodePayload,
-  SerializedGalleryNode,
-} from './GalleryNode'
-export { $createGalleryNode, $isGalleryNode, GalleryNode } from './GalleryNode'
 export type { SerializedGridContainerNode } from './GridContainerNode'
 export {
   $createGridContainerNode,

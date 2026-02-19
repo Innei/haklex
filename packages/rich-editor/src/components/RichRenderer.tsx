@@ -2,7 +2,7 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { ContentEditable } from '@lexical/react/LexicalContentEditable'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { PortalThemeProvider } from '@shiro/rich-editor-ui'
+import { PortalThemeProvider } from '@shiro/rich-style-token'
 
 import { allNodes } from '../config'
 import { ColorSchemeProvider } from '../context/ColorSchemeContext'

@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+
+import { decodeThumbHash } from '../../utils/thumbhash'
 
 export interface ImageRendererProps {
   src: string
@@ -6,8 +8,7 @@ export interface ImageRendererProps {
   width?: number
   height?: number
   caption?: string
-  /** Blurhash string — available for custom renderer overrides. Default renderer uses `accent` as placeholder. */
-  blurhash?: string
+  thumbhash?: string
   accent?: string
 }
 
@@ -17,6 +18,7 @@ export function ImageRenderer({
   width,
   height,
   caption,
+  thumbhash,
   accent,
 }: ImageRendererProps) {
   const [loaded, setLoaded] = useState(false)
@@ -31,7 +33,6 @@ export function ImageRenderer({
 
   const handleZoomClose = useCallback(() => setZoomed(false), [])
 
-  // Global Escape key listener
   useEffect(() => {
     if (!zoomed) return
     const onKeyDown = (e: KeyboardEvent) => {
@@ -41,7 +42,6 @@ export function ImageRenderer({
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [zoomed])
 
-  // Lock body scroll when zoomed
   useEffect(() => {
     if (!zoomed) return
     const prev = document.body.style.overflow
@@ -61,6 +61,11 @@ export function ImageRenderer({
     [loaded],
   )
 
+  const placeholderUrl = useMemo(
+    () => (thumbhash ? decodeThumbHash(thumbhash) : undefined),
+    [thumbhash],
+  )
+
   const aspectStyle: React.CSSProperties =
     width && height
       ? { aspectRatio: `${width} / ${height}`, maxWidth: '100%', width }
@@ -72,7 +77,10 @@ export function ImageRenderer({
         className={`rich-image-container${loaded ? ' rich-image-loaded' : ''}`}
         style={{
           ...aspectStyle,
-          backgroundColor: !loaded ? accent : undefined,
+          backgroundColor: !loaded && !placeholderUrl ? accent : undefined,
+          backgroundImage:
+            !loaded && placeholderUrl ? `url(${placeholderUrl})` : undefined,
+          backgroundSize: 'cover',
           cursor: loaded ? 'zoom-in' : undefined,
         }}
         onClick={handleZoomOpen}

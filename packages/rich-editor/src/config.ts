@@ -9,10 +9,9 @@ import type { Klass, LexicalNode } from 'lexical'
 import { AlertQuoteNode } from './nodes/AlertQuoteNode'
 import { BannerNode } from './nodes/BannerNode'
 import { CodeBlockNode } from './nodes/CodeBlockNode'
-import { ComponentNode } from './nodes/ComponentNode'
 import { DetailsNode } from './nodes/DetailsNode'
 import { FootnoteNode } from './nodes/FootnoteNode'
-import { GalleryNode } from './nodes/GalleryNode'
+import { FootnoteSectionNode } from './nodes/FootnoteSectionNode'
 import { GridContainerNode } from './nodes/GridContainerNode'
 import { ImageNode } from './nodes/ImageNode'
 import { KaTeXBlockNode } from './nodes/KaTeXBlockNode'
@@ -47,15 +46,14 @@ export const customNodes: Array<Klass<LexicalNode>> = [
   AlertQuoteNode,
   CodeBlockNode,
   FootnoteNode,
+  FootnoteSectionNode,
   TaskListItemNode,
   VideoNode,
   LinkCardNode,
   DetailsNode,
-  GalleryNode,
   GridContainerNode,
   BannerNode,
   MermaidNode,
-  ComponentNode,
 ]
 
 export const allNodes: Array<Klass<LexicalNode>> = [

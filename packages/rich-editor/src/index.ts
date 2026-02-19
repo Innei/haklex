@@ -3,7 +3,17 @@ export { RichRenderer } from './components/RichRenderer'
 export { allNodes, builtinNodes, customNodes } from './config'
 export { allEditNodes, customEditNodes } from './config-edit'
 export type { ColorScheme } from './context/ColorSchemeContext'
-export { useColorScheme } from './context/ColorSchemeContext'
+export {
+  ColorSchemeProvider,
+  useColorScheme,
+} from './context/ColorSchemeContext'
+export type { FootnoteDefinitionsContextValue } from './context/FootnoteDefinitionsContext'
+export {
+  FootnoteDefinitionsProvider,
+  useFootnoteContent,
+  useFootnoteDefinitions,
+  useFootnoteDisplayNumber,
+} from './context/FootnoteDefinitionsContext'
 export type { RendererMode } from './context/RendererConfigContext'
 export { useRendererMode } from './context/RendererConfigContext'
 export * from './styles'
@@ -12,24 +22,17 @@ export type {
   RichEditorVariant,
   RichRendererProps,
 } from './types'
-export type {
-  RendererConfig,
-  TabItem,
-  TabsRendererProps,
-} from './types/renderer-config'
+export type { RendererConfig } from './types/renderer-config'
 export type { SlashMenuItemConfig } from './types/slash-menu'
 
 // Re-export renderer utilities for external renderer packages
 export { createRendererDecoration } from './components/RendererWrapper'
+export { getVariantClass } from './components/utils'
 export { useRendererConfig } from './context/RendererConfigContext'
 
-// Re-export component node
-export type { SerializedComponentNode } from './nodes/ComponentNode'
-export {
-  $createComponentNode,
-  $isComponentNode,
-  ComponentNode,
-} from './nodes/ComponentNode'
+// Re-export nested editor utilities for external extension packages
+export { getResolvedEditNodes, setResolvedEditNodes } from './node-registry'
+export { NESTED_EDITOR_NODES } from './nodes/shared'
 
 // Re-export nodes for external use
 export type { SerializedMermaidNode } from './nodes/MermaidNode'
@@ -45,7 +48,6 @@ export { ALERT_LABELS, ALERT_TYPES } from './nodes/AlertQuoteNode'
 
 // Re-export plugin commands
 export { INSERT_ALERT_COMMAND } from './plugins/AlertPlugin'
-export { INSERT_COMPONENT_COMMAND } from './plugins/ComponentPlugin'
 export { INSERT_IMAGE_COMMAND } from './plugins/ImagePlugin'
 export {
   INSERT_KATEX_BLOCK_COMMAND,
@@ -65,16 +67,51 @@ export {
   GridContainerNode,
 } from './nodes/GridContainerNode'
 
+// Re-export footnote section node
+export type { SerializedFootnoteSectionNode } from './nodes/FootnoteSectionNode'
+export {
+  $createFootnoteSectionNode,
+  $isFootnoteSectionNode,
+  FootnoteSectionNode,
+} from './nodes/FootnoteSectionNode'
+
 // Re-export renderer prop types for convenience when creating custom renderers
 export type { AlertRendererProps } from './components/renderers/AlertRenderer'
 export type { BannerRendererProps } from './components/renderers/BannerRenderer'
 export type { CodeBlockRendererProps } from './components/renderers/CodeBlockRenderer'
-export type { ComponentRendererProps } from './components/renderers/ComponentRenderer'
 export type { FootnoteRendererProps } from './components/renderers/FootnoteRenderer'
-export type { GalleryRendererProps } from './components/renderers/GalleryRenderer'
+export type { FootnoteSectionRendererProps } from './components/renderers/FootnoteSectionRenderer'
 export type { ImageRendererProps } from './components/renderers/ImageRenderer'
 export type { KaTeXRendererProps } from './components/renderers/KaTeXRenderer'
 export type { LinkCardRendererProps } from './components/renderers/LinkCardRenderer'
 export type { MentionRendererProps } from './components/renderers/MentionRenderer'
 export type { MermaidRendererProps } from './components/renderers/MermaidRenderer'
 export type { VideoRendererProps } from './components/renderers/VideoRenderer'
+export type { GalleryRendererProps } from './types/renderer-config'
+export type { GalleryImage } from './types/renderer-config'
+export type {
+  CodeFile,
+  CodeSnippetRendererProps,
+} from './types/renderer-config'
+
+// Re-export LinkCard node for external edit node packages
+export { LinkCardRenderer } from './components/renderers/LinkCardRenderer'
+export type {
+  LinkCardNodePayload,
+  SerializedLinkCardNode,
+} from './nodes/LinkCardNode'
+export {
+  $createLinkCardNode,
+  $isLinkCardNode,
+  LinkCardNode,
+} from './nodes/LinkCardNode'
+
+// Re-export KaTeX nodes for external edit node packages
+export { KaTeXRenderer } from './components/renderers/KaTeXRenderer'
+export type { SerializedKaTeXBlockNode } from './nodes/KaTeXBlockNode'
+export { $isKaTeXBlockNode, KaTeXBlockNode } from './nodes/KaTeXBlockNode'
+export type { SerializedKaTeXInlineNode } from './nodes/KaTeXInlineNode'
+export { $isKaTeXInlineNode, KaTeXInlineNode } from './nodes/KaTeXInlineNode'
+
+// Re-export thumbhash utilities
+export { computeImageMeta, decodeThumbHash } from './utils/thumbhash'

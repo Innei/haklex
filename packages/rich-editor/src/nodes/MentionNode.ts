@@ -52,7 +52,11 @@ export class MentionNode extends DecoratorNode<ReactElement> {
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    return document.createElement('span')
+    const el = document.createElement('span')
+    el.style.display = 'inline-flex'
+    el.style.alignItems = 'center'
+    el.style.height = '1lh'
+    return el
   }
 
   updateDOM(): boolean {

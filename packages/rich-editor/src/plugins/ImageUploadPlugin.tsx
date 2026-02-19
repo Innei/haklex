@@ -4,12 +4,14 @@ import { $insertNodes, COMMAND_PRIORITY_HIGH, PASTE_COMMAND } from 'lexical'
 import { useEffect, useRef } from 'react'
 
 import { $createImageNode } from '../nodes/ImageNode'
+import { computeImageMeta } from '../utils/thumbhash'
 
 export interface ImageUploadResult {
   src: string
   altText?: string
   width?: number
   height?: number
+  thumbhash?: string
 }
 
 export type ImageUploadFn = (file: File) => Promise<ImageUploadResult>
@@ -35,16 +37,16 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
       if (images.length === 0) return false
 
       for (const file of images) {
-        uploadRef
-          .current(file)
-          .then((result) => {
+        Promise.all([uploadRef.current(file), computeImageMeta(file)])
+          .then(([result, meta]) => {
             if (!isActive) return
             editor.update(() => {
               const node = $createImageNode({
                 src: result.src,
                 altText: result.altText ?? file.name,
-                width: result.width,
-                height: result.height,
+                width: result.width ?? meta.width,
+                height: result.height ?? meta.height,
+                thumbhash: result.thumbhash ?? meta.thumbhash,
               })
               $insertNodes([node])
             })

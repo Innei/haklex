@@ -1,12 +1,10 @@
-import type { SerializedEditorState } from 'lexical'
 import type { ComponentType } from 'react'
 
 import type { AlertRendererProps } from '../components/renderers/AlertRenderer'
 import type { BannerRendererProps } from '../components/renderers/BannerRenderer'
 import type { CodeBlockRendererProps } from '../components/renderers/CodeBlockRenderer'
-import type { ComponentRendererProps } from '../components/renderers/ComponentRenderer'
 import type { FootnoteRendererProps } from '../components/renderers/FootnoteRenderer'
-import type { GalleryRendererProps } from '../components/renderers/GalleryRenderer'
+import type { FootnoteSectionRendererProps } from '../components/renderers/FootnoteSectionRenderer'
 import type { ImageRendererProps } from '../components/renderers/ImageRenderer'
 import type { KaTeXRendererProps } from '../components/renderers/KaTeXRenderer'
 import type { LinkCardRendererProps } from '../components/renderers/LinkCardRenderer'
@@ -14,13 +12,30 @@ import type { MentionRendererProps } from '../components/renderers/MentionRender
 import type { MermaidRendererProps } from '../components/renderers/MermaidRenderer'
 import type { VideoRendererProps } from '../components/renderers/VideoRenderer'
 
-export interface TabItem {
-  label: string
-  content: SerializedEditorState
+export interface CodeFile {
+  filename: string
+  code: string
+  language?: string
+  highlightLines?: number[]
 }
 
-export interface TabsRendererProps {
-  tabs: TabItem[]
+export interface CodeSnippetRendererProps {
+  files: CodeFile[]
+}
+
+export interface GalleryImage {
+  src: string
+  alt?: string
+  width?: number
+  height?: number
+  thumbhash?: string
+}
+
+export interface GalleryRendererProps {
+  images: GalleryImage[]
+  layout: 'grid' | 'masonry' | 'carousel'
+  onImagesChange?: (images: GalleryImage[]) => void
+  onLayoutChange?: (layout: 'grid' | 'masonry' | 'carousel') => void
 }
 
 /**
@@ -34,10 +49,12 @@ export interface RendererConfig {
   Banner?: ComponentType<BannerRendererProps>
   /** Custom renderer for code blocks with syntax highlighting */
   CodeBlock?: ComponentType<CodeBlockRendererProps>
-  /** Custom renderer for remote React components */
-  Component?: ComponentType<ComponentRendererProps>
+  /** Custom renderer for multi-file code snippets with tabs */
+  CodeSnippet?: ComponentType<CodeSnippetRendererProps>
   /** Custom renderer for footnote references */
   Footnote?: ComponentType<FootnoteRendererProps>
+  /** Custom renderer for footnote definition section */
+  FootnoteSection?: ComponentType<FootnoteSectionRendererProps>
   /** Custom renderer for image galleries */
   Gallery?: ComponentType<GalleryRendererProps>
   /** Custom renderer for images with captions */
@@ -50,8 +67,6 @@ export interface RendererConfig {
   Mermaid?: ComponentType<MermaidRendererProps>
   /** Custom renderer for social media mentions */
   Mention?: ComponentType<MentionRendererProps>
-  /** Custom renderer for tabbed content */
-  Tabs?: ComponentType<TabsRendererProps>
   /** Custom renderer for video embeds */
   Video?: ComponentType<VideoRendererProps>
 }
