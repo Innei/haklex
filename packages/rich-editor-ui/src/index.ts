@@ -1,3 +1,10 @@
+export type {
+  AnimatedTabsProps,
+  Tab as AnimatedTabsTab,
+} from './components/animated-tabs'
+export { AnimatedTabs } from './components/animated-tabs'
+export type { AnimatedCheckboxProps } from './components/checkbox'
+export { AnimatedCheckbox } from './components/checkbox'
 export type { ColorPickerProps } from './components/color-picker'
 export { ColorPicker } from './components/color-picker'
 export type {
@@ -111,4 +118,4 @@ export {
   PortalThemeProvider,
   PortalThemeWrapper,
   usePortalTheme,
-} from '@shiro/rich-style-token'
+} from '@haklex/rich-style-token'
