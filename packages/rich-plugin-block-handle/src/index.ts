@@ -1,0 +1,1 @@
+export { BlockHandlePlugin } from './BlockHandlePlugin'
