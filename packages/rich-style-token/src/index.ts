@@ -1,3 +1,10 @@
+export type { ThemeTokens } from './create-theme-style'
+export { createThemeStyle } from './create-theme-style'
+export {
+  PortalThemeProvider,
+  PortalThemeWrapper,
+  usePortalTheme,
+} from './portal-theme'
 export {
   articleLayout,
   commentLayout,
