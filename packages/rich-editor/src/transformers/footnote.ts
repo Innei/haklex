@@ -1,50 +1,31 @@
+import {
+  FOOTNOTE_SECTION_TRANSFORMER as SECTION_BASE,
+  FOOTNOTE_TRANSFORMER as BASE,
+} from '@haklex/rich-headless/transformers'
 import type {
   ElementTransformer,
   TextMatchTransformer,
 } from '@lexical/markdown'
 
-import {
-  $createFootnoteNode,
-  $isFootnoteNode,
-  FootnoteNode,
-} from '../nodes/FootnoteNode'
+import { $createFootnoteNode, FootnoteNode } from '../nodes/FootnoteNode'
 import {
   $createFootnoteSectionNode,
   $isFootnoteSectionNode,
   FootnoteSectionNode,
 } from '../nodes/FootnoteSectionNode'
 
-/**
- * Footnote reference transformer: [^1] → FootnoteNode
- */
 export const FOOTNOTE_TRANSFORMER: TextMatchTransformer = {
+  ...BASE,
   dependencies: [FootnoteNode],
-  export: (node) => {
-    if (!$isFootnoteNode(node)) return null
-    return `[^${node.getIdentifier()}]`
-  },
-  importRegExp: /\[\^(\w+)\]/,
-  regExp: /\[\^(\w+)\]$/,
   replace: (textNode, match) => {
     const footnoteNode = $createFootnoteNode(match[1])
     textNode.replace(footnoteNode)
   },
-  trigger: ']',
-  type: 'text-match',
 }
 
-/**
- * Footnote section transformer: [^id]: content → FootnoteSectionNode
- */
 export const FOOTNOTE_SECTION_TRANSFORMER: ElementTransformer = {
+  ...SECTION_BASE,
   dependencies: [FootnoteSectionNode],
-  export: (node) => {
-    if (!$isFootnoteSectionNode(node)) return null
-    const definitions = node.getDefinitions()
-    return Object.entries(definitions)
-      .map(([id, content]) => `[^${id}]: ${content}`)
-      .join('\n')
-  },
   regExp: /^\[\^(\w+)\]:\s+(.+)$/,
   replace: (parentNode, _children, match) => {
     const identifier = match[1]
@@ -65,5 +46,4 @@ export const FOOTNOTE_SECTION_TRANSFORMER: ElementTransformer = {
     const sectionNode = $createFootnoteSectionNode({ [identifier]: content })
     parentNode.replace(sectionNode)
   },
-  type: 'element',
 }

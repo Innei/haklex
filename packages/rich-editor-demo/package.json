@@ -1,6 +1,5 @@
 {
-  "name": "@shiro/rich-editor-demo",
-  "version": "0.0.1",
+  "name": "@haklex/rich-editor-demo",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,28 +8,35 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@emotion/is-prop-valid": "^1.2.1",
-    "@lexical/code": "^0.39.0",
-    "@lexical/link": "^0.39.0",
-    "@lexical/list": "^0.39.0",
-    "@lexical/markdown": "^0.39.0",
-    "@lexical/react": "^0.39.0",
-    "@lexical/rich-text": "^0.39.0",
-    "@lexical/table": "^0.39.0",
-    "@shiro/rich-editor": "workspace:*",
-    "@shiro/rich-renderer-gallery": "workspace:*",
-    "@shiro/rich-renderer-linkcard": "workspace:*",
-    "lexical": "^0.39.0",
-    "motion": "^11.18.2",
+    "@haklex/rich-diff": "workspace:*",
+    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-kit-shiro": "workspace:*",
+    "@haklex/rich-renderers": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*",
+    "@lexical/code": "^0.40.0",
+    "@lexical/link": "^0.40.0",
+    "@lexical/list": "^0.40.0",
+    "@lexical/markdown": "^0.40.0",
+    "@lexical/react": "^0.40.0",
+    "@lexical/rich-text": "^0.40.0",
+    "@lexical/table": "^0.40.0",
+    "lexical": "^0.40.0",
+    "lucide-react": "^0.574.0",
+    "modern-normalize": "^3.0.1",
     "react": ">=19",
     "react-dom": ">=19",
     "react-intersection-observer": "^9.15.1",
-    "react-photo-view": "^1.2.6"
+    "react-photo-view": "^1.2.6",
+    "tldraw": "^3.12.0"
   },
   "devDependencies": {
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@vanilla-extract/css": "^1.18.0",
+    "@vanilla-extract/vite-plugin": "^5.1.4",
     "@vitejs/plugin-react": "^5.1.3",
+    "code-inspector-plugin": "1.4.1",
     "typescript": "^5.9.0",
     "vite": "^6.3.0"
   }

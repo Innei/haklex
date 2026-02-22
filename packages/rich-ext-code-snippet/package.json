@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-code-snippet",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Multi-file code snippet extension",
   "license": "MIT",
   "type": "module",
@@ -22,6 +22,7 @@
     "@dnd-kit/utilities": "^3.2.2",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "lucide-react": "^0.574.0",

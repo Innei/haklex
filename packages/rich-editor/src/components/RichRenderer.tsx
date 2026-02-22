@@ -18,6 +18,7 @@ export function RichRenderer({
   variant = 'article',
   theme = 'light',
   className,
+  style,
   as: Component = 'div',
   rendererConfig,
   extraNodes,
@@ -41,7 +42,10 @@ export function RichRenderer({
     <PortalThemeProvider className={variantClass}>
       <ColorSchemeProvider colorScheme={theme}>
         <RendererConfigProvider config={rendererConfig} mode="renderer">
-          <Component className={clsx('rich-content', variantClass, className)}>
+          <Component
+            className={clsx('rich-content', variantClass, className)}
+            style={style}
+          >
             <LexicalComposer initialConfig={initialConfig}>
               <FootnotePlugin>
                 <RichTextPlugin

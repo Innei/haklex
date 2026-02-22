@@ -21,6 +21,7 @@ export interface RichEditorProps {
   autoFocus?: boolean
   className?: string
   contentClassName?: string
+  style?: React.CSSProperties
   actions?: ReactNode
   onEditorReady?: (editor: LexicalEditor | null) => void
   extraNodes?: Array<Klass<LexicalNode>>
@@ -34,6 +35,7 @@ export interface RichRendererProps {
   variant?: RichEditorVariant
   theme?: ColorScheme
   className?: string
+  style?: React.CSSProperties
   as?: React.ElementType
   rendererConfig?: RendererConfig
   extraNodes?: Array<Klass<LexicalNode>>

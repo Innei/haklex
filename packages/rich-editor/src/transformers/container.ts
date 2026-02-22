@@ -1,26 +1,11 @@
+import { CONTAINER_TRANSFORMER as BASE } from '@haklex/rich-headless/transformers'
 import type { ElementTransformer } from '@lexical/markdown'
 import type { LexicalNode, SerializedEditorState } from 'lexical'
 import { $createParagraphNode, $createTextNode } from 'lexical'
 
 import type { BannerType } from '../nodes/BannerNode'
-import {
-  $createBannerNode,
-  $isBannerNode,
-  BannerNode,
-} from '../nodes/BannerNode'
-import {
-  $createDetailsNode,
-  $isDetailsNode,
-  DetailsNode,
-} from '../nodes/DetailsNode'
-
-/**
- * Container transformer: ::: type {params}\ncontent\n::: → Container nodes
- *
- * Supported types:
- * - ::: note / tip / important / warning / caution → BannerNode
- * - ::: details → DetailsNode
- */
+import { $createBannerNode, BannerNode } from '../nodes/BannerNode'
+import { $createDetailsNode, DetailsNode } from '../nodes/DetailsNode'
 
 const BANNER_TYPE_MAP: Record<string, BannerType> = {
   note: 'note',
@@ -36,22 +21,8 @@ const BANNER_TYPE_MAP: Record<string, BannerType> = {
 }
 
 export const CONTAINER_TRANSFORMER: ElementTransformer = {
+  ...BASE,
   dependencies: [BannerNode, DetailsNode],
-  export: (node: LexicalNode) => {
-    if ($isBannerNode(node)) {
-      const type = node.getBannerType()
-      const content = node.getTextContent()
-      return `::: ${type}\n${content}\n:::`
-    }
-
-    if ($isDetailsNode(node)) {
-      const summary = node.getSummary()
-      const content = node.getTextContent()
-      return `::: details{summary="${summary}"}\n${content}\n:::`
-    }
-
-    return null
-  },
   regExp: /^:::\s*(\w+)(?:\{([^}]*)\})?\s*$/,
   replace: (parentNode, children, match) => {
     const type = match[1]
@@ -114,5 +85,4 @@ export const CONTAINER_TRANSFORMER: ElementTransformer = {
     })
     parentNode.replace(paragraph)
   },
-  type: 'element',
 }

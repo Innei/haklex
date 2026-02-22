@@ -40,6 +40,7 @@ export function RichEditor({
   autoFocus = false,
   className,
   contentClassName,
+  style,
   actions,
   onEditorReady,
   extraNodes,
@@ -68,7 +69,10 @@ export function RichEditor({
         <RendererConfigProvider config={rendererConfig} mode="editor">
           <LexicalComposer initialConfig={initialConfig}>
             <FootnotePlugin>
-              <div className={clsx('rich-editor', variantClass, className)}>
+              <div
+                className={clsx('rich-editor', variantClass, className)}
+                style={style}
+              >
                 <RichTextPlugin
                   contentEditable={
                     <ContentEditable

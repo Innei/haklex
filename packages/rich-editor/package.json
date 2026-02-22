@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-editor",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Core rich text editor based on Lexical",
   "license": "MIT",
   "type": "module",
@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "thumbhash": "^0.1.1"
   },
