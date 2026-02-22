@@ -1,0 +1,52 @@
+{
+  "name": "@haklex/rich-headless",
+  "version": "0.0.11",
+  "description": "Headless Lexical node registry for server-side parsing (no React)",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./transformers": "./src/transformers.ts"
+  },
+  "main": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev:build": "vite build --watch"
+  },
+  "dependencies": {
+    "@lexical/code": "^0.40.0",
+    "@lexical/extension": "^0.40.0",
+    "@lexical/link": "^0.40.0",
+    "@lexical/list": "^0.40.0",
+    "@lexical/markdown": "^0.40.0",
+    "@lexical/rich-text": "^0.40.0",
+    "@lexical/table": "^0.40.0"
+  },
+  "devDependencies": {
+    "lexical": "^0.40.0",
+    "typescript": "^5.9.0",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.0"
+  },
+  "peerDependencies": {
+    "lexical": "^0.40.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "import": "./dist/index.mjs",
+        "types": "./dist/index.d.ts"
+      },
+      "./transformers": {
+        "import": "./dist/transformers.mjs",
+        "types": "./dist/transformers.d.ts"
+      }
+    },
+    "main": "./dist/index.mjs",
+    "types": "./dist/index.d.ts"
+  }
+}
