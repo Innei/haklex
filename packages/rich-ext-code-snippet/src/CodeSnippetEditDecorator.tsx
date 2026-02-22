@@ -1,5 +1,5 @@
+import type { CodeFile } from '@haklex/rich-editor'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import type { CodeFile } from '@shiro/rich-editor'
 import type { NodeKey } from 'lexical'
 import { $getNodeByKey } from 'lexical'
 import type { FC } from 'react'

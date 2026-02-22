@@ -54,11 +54,5 @@ export { $createMentionNode, $isMentionNode, MentionNode } from './MentionNode'
 export type { SerializedMermaidNode } from './MermaidNode'
 export { $createMermaidNode, $isMermaidNode, MermaidNode } from './MermaidNode'
 export { $createSpoilerNode, $isSpoilerNode, SpoilerNode } from './SpoilerNode'
-export type { SerializedTaskListItemNode } from './TaskListItemNode'
-export {
-  $createTaskListItemNode,
-  $isTaskListItemNode,
-  TaskListItemNode,
-} from './TaskListItemNode'
 export type { SerializedVideoNode, VideoNodePayload } from './VideoNode'
 export { $createVideoNode, $isVideoNode, VideoNode } from './VideoNode'

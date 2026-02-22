@@ -2,7 +2,7 @@ import {
   TooltipContent,
   TooltipRoot,
   TooltipTrigger,
-} from '@shiro/rich-editor-ui'
+} from '@haklex/rich-editor-ui'
 import type { HTMLAttributes, MouseEvent } from 'react'
 import { useCallback } from 'react'
 

@@ -15,7 +15,6 @@ import { LinkCardNode } from './nodes/LinkCardNode'
 import { MentionNode } from './nodes/MentionNode'
 import { MermaidNode } from './nodes/MermaidNode'
 import { SpoilerNode } from './nodes/SpoilerNode'
-import { TaskListItemNode } from './nodes/TaskListItemNode'
 import { VideoNode } from './nodes/VideoNode'
 
 export const customEditNodes: Array<Klass<LexicalNode>> = [
@@ -28,7 +27,6 @@ export const customEditNodes: Array<Klass<LexicalNode>> = [
   CodeBlockEditNode,
   FootnoteNode,
   FootnoteSectionEditNode,
-  TaskListItemNode,
   VideoNode,
   LinkCardNode,
   DetailsNode,

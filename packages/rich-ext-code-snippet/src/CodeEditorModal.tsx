@@ -14,19 +14,20 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import type { CodeFile, ColorScheme } from '@shiro/rich-editor'
-import { normalizeLanguage } from '@shiro/rich-renderer-codeblock/constants'
+import type { CodeFile, ColorScheme } from '@haklex/rich-editor'
+import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants'
+import { FileIcon } from '@haklex/rich-renderer-codeblock/icons'
 import {
   getHighlighterWithLang,
   SHIKI_THEMES,
-} from '@shiro/rich-renderer-codeblock/shiki'
-import { usePortalTheme } from '@shiro/rich-style-token'
+} from '@haklex/rich-renderer-codeblock/shiki'
+import { usePortalTheme } from '@haklex/rich-style-token'
 import { GripVertical, Plus, Trash2, X } from 'lucide-react'
 import type { CSSProperties, FC } from 'react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import { FileIcon } from './FileIcon'
+import * as styles from './styles.css'
 import { getLanguageFromFilename } from './utils'
 
 export interface CodeEditorModalProps {
@@ -80,22 +81,26 @@ const SortableFileItem: FC<{
     <div
       ref={setNodeRef}
       style={style}
-      className={`rcs-file-item ${isActive ? 'rcs-file-item-active' : ''} ${isDragging ? 'rcs-file-item-dragging' : ''}`}
+      className={`${styles.fileItem({ active: isActive, dragging: isDragging })} ${styles.semanticClassNames.fileItem} ${isActive ? styles.semanticClassNames.fileItemActive : ''} ${isDragging ? styles.semanticClassNames.fileItemDragging : ''}`.trim()}
       onClick={onSelect}
       onDoubleClick={onStartRename}
     >
       <span
-        className="rcs-file-drag-handle"
+        className={`${styles.fileDragHandle} ${styles.semanticClassNames.fileDragHandle}`}
         {...attributes}
         {...listeners}
         onClick={(e) => e.stopPropagation()}
       >
         <GripVertical size={12} />
       </span>
-      <FileIcon filename={file.filename} size={14} />
+      <FileIcon
+        filename={file.filename}
+        size={14}
+        className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
+      />
       {isEditing ? (
         <input
-          className="rcs-rename-input"
+          className={`${styles.renameInput} ${styles.semanticClassNames.renameInput}`}
           value={editValue}
           onChange={(e) => onEditChange(e.target.value)}
           onBlur={onCommitRename}
@@ -107,12 +112,16 @@ const SortableFileItem: FC<{
           onClick={(e) => e.stopPropagation()}
         />
       ) : (
-        <span className="rcs-file-name">{file.filename}</span>
+        <span
+          className={`${styles.fileName} ${styles.semanticClassNames.fileName}`}
+        >
+          {file.filename}
+        </span>
       )}
       {canDelete && (
         <button
           type="button"
-          className="rcs-file-delete"
+          className={`${styles.fileDelete} ${styles.semanticClassNames.fileDelete}`}
           onClick={(e) => {
             e.stopPropagation()
             onDelete()
@@ -308,13 +317,19 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
     : ''
 
   return (
-    <div className="rcs-modal">
+    <div className={`${styles.modal} ${styles.semanticClassNames.modal}`}>
       {/* Title bar */}
-      <div className="rcs-modal-titlebar">
-        <span className="rcs-modal-title">Code Snippet</span>
+      <div
+        className={`${styles.modalTitlebar} ${styles.semanticClassNames.modalTitlebar}`}
+      >
+        <span
+          className={`${styles.modalTitle} ${styles.semanticClassNames.modalTitle}`}
+        >
+          Code Snippet
+        </span>
         <button
           type="button"
-          className="rcs-modal-icon-btn"
+          className={`${styles.modalIconButton} ${styles.semanticClassNames.modalIconButton}`}
           onClick={handleDismiss}
         >
           <X size={14} />
@@ -322,21 +337,29 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
       </div>
 
       {/* Body */}
-      <div className="rcs-modal-body">
+      <div
+        className={`${styles.modalBody} ${styles.semanticClassNames.modalBody}`}
+      >
         {/* Sidebar */}
-        <div className="rcs-modal-sidebar">
-          <div className="rcs-sidebar-header">
+        <div
+          className={`${styles.modalSidebar} ${styles.semanticClassNames.modalSidebar}`}
+        >
+          <div
+            className={`${styles.sidebarHeader} ${styles.semanticClassNames.sidebarHeader}`}
+          >
             <span>Files</span>
             <button
               type="button"
-              className="rcs-sidebar-add-btn"
+              className={`${styles.sidebarAddButton} ${styles.semanticClassNames.sidebarAddButton}`}
               onClick={handleAddFile}
               aria-label="Add file"
             >
               <Plus size={14} />
             </button>
           </div>
-          <div className="rcs-file-list">
+          <div
+            className={`${styles.fileList} ${styles.semanticClassNames.fileList}`}
+          >
             <DndContext
               sensors={sensors}
               collisionDetection={closestCenter}
@@ -381,12 +404,17 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
                         style={{ display: 'contents' }}
                       >
                         {dragActiveFile ? (
-                          <div className="rcs-file-item rcs-drag-overlay">
+                          <div
+                            className={`${styles.fileItem()} ${styles.semanticClassNames.fileItem} ${styles.dragOverlay} ${styles.semanticClassNames.dragOverlay}`}
+                          >
                             <FileIcon
                               filename={dragActiveFile.filename}
                               size={14}
+                              className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
                             />
-                            <span className="rcs-file-name">
+                            <span
+                              className={`${styles.fileName} ${styles.semanticClassNames.fileName}`}
+                            >
                               {dragActiveFile.filename}
                             </span>
                           </div>
@@ -401,18 +429,34 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
         </div>
 
         {/* Code panel */}
-        <div className="rcs-modal-editor">
+        <div
+          className={`${styles.modalEditor} ${styles.semanticClassNames.modalEditor}`}
+        >
           {/* Breadcrumb bar */}
-          <div className="rcs-breadcrumb">
-            <div className="rcs-breadcrumb-left">
+          <div
+            className={`${styles.breadcrumb} ${styles.semanticClassNames.breadcrumb}`}
+          >
+            <div
+              className={`${styles.breadcrumbLeft} ${styles.semanticClassNames.breadcrumbLeft}`}
+            >
               {activeFile && (
                 <>
-                  <FileIcon filename={activeFile.filename} size={14} />
-                  <span className="rcs-breadcrumb-name">
+                  <FileIcon
+                    filename={activeFile.filename}
+                    size={14}
+                    className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
+                  />
+                  <span
+                    className={`${styles.breadcrumbName} ${styles.semanticClassNames.breadcrumbName}`}
+                  >
                     {activeFile.filename}
                   </span>
                   {language && (
-                    <span className="rcs-breadcrumb-lang">{language}</span>
+                    <span
+                      className={`${styles.breadcrumbLang} ${styles.semanticClassNames.breadcrumbLang}`}
+                    >
+                      {language}
+                    </span>
                   )}
                 </>
               )}
@@ -420,7 +464,10 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
           </div>
 
           {/* Editor container */}
-          <div ref={containerRef} className="rcs-editor-container" />
+          <div
+            ref={containerRef}
+            className={`${styles.editorContainer} ${styles.semanticClassNames.editorContainer}`}
+          />
         </div>
       </div>
     </div>

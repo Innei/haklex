@@ -1,7 +1,8 @@
 {
-  "name": "@shiro/rich-ext-code-snippet",
-  "version": "0.0.1",
-  "private": true,
+  "name": "@haklex/rich-ext-code-snippet",
+  "version": "0.0.10",
+  "description": "Multi-file code snippet extension",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -19,22 +20,21 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@iconify-json/material-icon-theme": "^1.2.22",
-    "@iconify/utils": "^2.3.0",
-    "@shiro/rich-renderer-codeblock": "workspace:*",
+    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-renderer-codeblock": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*",
     "lucide-react": "^0.574.0",
     "shikicode": "*"
   },
   "devDependencies": {
-    "@lexical/react": "^0.39.0",
-    "@shiro/rich-editor": "workspace:*",
-    "@shiro/rich-editor-ui": "workspace:*",
-    "@shiro/rich-style-token": "workspace:*",
+    "@lexical/react": "^0.40.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vanilla-extract/css": "^1.17.1",
+    "@vanilla-extract/recipes": "^0.5.7",
     "@vanilla-extract/vite-plugin": "^4.0.20",
-    "lexical": "^0.39.0",
+    "lexical": "^0.40.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "typescript": "^5.9.0",
@@ -42,12 +42,11 @@
     "vite-plugin-dts": "^4.5.0"
   },
   "peerDependencies": {
-    "@shiro/rich-editor": "workspace:*",
-    "@shiro/rich-editor-ui": "workspace:*",
-    "lexical": "^0.39.0",
+    "lexical": "^0.40.0",
     "react": ">=19"
   },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": {
         "import": "./dist/index.mjs",

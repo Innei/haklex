@@ -1,14 +1,20 @@
-import type { CodeFile } from '@shiro/rich-editor'
-import { useColorScheme } from '@shiro/rich-editor'
-import { presentDialog } from '@shiro/rich-editor-ui'
-import { usePortalTheme } from '@shiro/rich-style-token'
+import type { CodeFile } from '@haklex/rich-editor'
+import { useColorScheme } from '@haklex/rich-editor'
+import { presentDialog } from '@haklex/rich-editor-ui'
+import { usePortalTheme } from '@haklex/rich-style-token'
 import { Pencil } from 'lucide-react'
 import type { FC } from 'react'
 import { useCallback } from 'react'
 
 import { CodeEditorModal } from './CodeEditorModal'
 import { CodeSnippetRenderer } from './CodeSnippetRenderer'
-import { codeSnippetDialogPopup } from './styles.css'
+import {
+  codeSnippetDialogPopup,
+  editContainer,
+  editLabel,
+  editOverlay,
+  semanticClassNames,
+} from './styles.css'
 
 export interface CodeSnippetEditRendererProps {
   files: CodeFile[]
@@ -40,15 +46,15 @@ export const CodeSnippetEditRenderer: FC<CodeSnippetEditRendererProps> = ({
   }, [files, onFilesChange, portalClassName, colorScheme])
 
   return (
-    <div className="rcs-edit-container">
+    <div className={`${editContainer} ${semanticClassNames.editContainer}`}>
       <CodeSnippetRenderer files={files} />
       <button
         type="button"
-        className="rcs-edit-overlay"
+        className={`${editOverlay} ${semanticClassNames.editOverlay}`}
         onClick={handleEdit}
         aria-label="Edit code snippet"
       >
-        <span className="rcs-edit-label">
+        <span className={`${editLabel} ${semanticClassNames.editLabel}`}>
           <Pencil size={14} />
           Edit
         </span>

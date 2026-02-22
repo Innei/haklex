@@ -6,7 +6,7 @@ import {
   lightCommentColors,
   noteLayout,
   vars,
-} from '@shiro/rich-style-token'
+} from '@haklex/rich-style-token'
 import { createGlobalTheme, createTheme } from '@vanilla-extract/css'
 
 // Fallback defaults on :root (light article theme)
@@ -46,4 +46,4 @@ export const darkNoteTheme = createTheme(vars, {
 })
 
 // Re-export for backward compatibility
-export { vars } from '@shiro/rich-style-token'
+export { vars } from '@haklex/rich-style-token'

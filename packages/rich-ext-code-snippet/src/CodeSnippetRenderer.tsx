@@ -1,15 +1,16 @@
-import type { CodeSnippetRendererProps } from '@shiro/rich-editor'
-import { useColorScheme } from '@shiro/rich-editor'
-import { normalizeLanguage } from '@shiro/rich-renderer-codeblock/constants'
+import type { CodeSnippetRendererProps } from '@haklex/rich-editor'
+import { useColorScheme } from '@haklex/rich-editor'
+import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants'
+import { FileIcon } from '@haklex/rich-renderer-codeblock/icons'
 import {
   getHighlighterWithLang,
   SHIKI_THEMES,
-} from '@shiro/rich-renderer-codeblock/shiki'
+} from '@haklex/rich-renderer-codeblock/shiki'
 import { Check, Copy } from 'lucide-react'
 import type { ComponentType, FC } from 'react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import { FileIcon } from './FileIcon'
+import * as styles from './styles.css'
 import { getLanguageFromFilename } from './utils'
 
 const CopyButton: FC<{ text: string }> = ({ text }) => {
@@ -26,7 +27,7 @@ const CopyButton: FC<{ text: string }> = ({ text }) => {
   return (
     <button
       type="button"
-      className="rcs-copy-btn"
+      className={`${styles.copyButton} ${styles.semanticClassNames.copyButton}`}
       onClick={handleCopy}
       aria-label={copied ? 'Copied' : 'Copy code'}
     >
@@ -79,11 +80,19 @@ export const CodeSnippetRenderer: ComponentType<CodeSnippetRendererProps> = ({
   if (!activeFile) return null
 
   return (
-    <div className="rcs-container" role="region" aria-label="Code snippet">
+    <div
+      className={`${styles.container} ${styles.semanticClassNames.container}`}
+      role="region"
+      aria-label="Code snippet"
+    >
       {/* Header */}
-      <div className="rcs-header">
+      <div className={`${styles.header} ${styles.semanticClassNames.header}`}>
         {isMultiFile ? (
-          <div className="rcs-tabs" role="tablist" aria-label="Code file tabs">
+          <div
+            className={`${styles.tabs} ${styles.semanticClassNames.tabs}`}
+            role="tablist"
+            aria-label="Code file tabs"
+          >
             {files.map((file, index) => (
               <button
                 key={file.filename}
@@ -91,27 +100,41 @@ export const CodeSnippetRenderer: ComponentType<CodeSnippetRendererProps> = ({
                 role="tab"
                 aria-selected={index === activeIndex}
                 onClick={() => setActiveIndex(index)}
-                className={`rcs-tab ${index === activeIndex ? 'rcs-tab-active' : ''}`}
+                className={`${styles.tab({ active: index === activeIndex })} ${styles.semanticClassNames.tab} ${index === activeIndex ? styles.semanticClassNames.tabActive : ''}`.trim()}
               >
-                <FileIcon filename={file.filename} size={14} />
+                <FileIcon
+                  filename={file.filename}
+                  size={14}
+                  className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
+                />
                 <span>{file.filename}</span>
               </button>
             ))}
           </div>
         ) : (
-          <div className="rcs-title-bar">
-            <FileIcon filename={activeFile.filename} size={14} />
+          <div
+            className={`${styles.titleBar} ${styles.semanticClassNames.titleBar}`}
+          >
+            <FileIcon
+              filename={activeFile.filename}
+              size={14}
+              className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
+            />
             <span>{activeFile.filename}</span>
           </div>
         )}
 
-        <div className="rcs-header-actions">
+        <div
+          className={`${styles.headerActions} ${styles.semanticClassNames.headerActions}`}
+        >
           <CopyButton text={activeFile.code} />
         </div>
       </div>
 
       {/* Separator */}
-      <div className="rcs-separator" />
+      <div
+        className={`${styles.separator} ${styles.semanticClassNames.separator}`}
+      />
 
       {/* Code panels */}
       {files.map((file, index) => {
@@ -120,17 +143,21 @@ export const CodeSnippetRenderer: ComponentType<CodeSnippetRendererProps> = ({
           <div
             key={file.filename}
             role={isMultiFile ? 'tabpanel' : undefined}
-            className="rcs-code-panel"
+            className={styles.semanticClassNames.codePanel}
             style={{ display: index === activeIndex ? 'block' : 'none' }}
           >
-            <div className="rcs-code-scroll">
+            <div
+              className={`${styles.codeScroll} ${styles.semanticClassNames.codeScroll}`}
+            >
               {html ? (
                 <div
-                  className="rcs-code-body"
+                  className={`${styles.codeBody} ${styles.semanticClassNames.codeBody}`}
                   dangerouslySetInnerHTML={{ __html: html }}
                 />
               ) : (
-                <pre className="rcs-code-body">
+                <pre
+                  className={`${styles.codeBody} ${styles.semanticClassNames.codeBody}`}
+                >
                   <code>
                     {file.code.split('\n').map((line, i) => (
                       <span key={i} className="line">

@@ -1,10 +1,10 @@
 import { createViteConfig } from '../vite.shared'
 
 export default createViteConfig({
-  esbuild: { jsx: 'automatic', jsxImportSource: 'react' },
+  vanillaExtract: false,
   entry: {
     index: 'src/index.ts',
-    editor: 'src/editor.ts',
-    renderer: 'src/renderer.ts',
+    editor: 'src/ShiroEditor.tsx',
+    renderer: 'src/ShiroRenderer.tsx',
   },
 })

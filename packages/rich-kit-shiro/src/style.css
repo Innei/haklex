@@ -1,0 +1,9 @@
+@import '@haklex/rich-editor/style.css';
+@import '@haklex/rich-editor-ui/style.css';
+@import '@haklex/rich-plugin-block-handle/style.css';
+@import '@haklex/rich-plugin-floating-toolbar/style.css';
+@import '@haklex/rich-plugin-link-edit/style.css';
+@import '@haklex/rich-plugin-slash-menu/style.css';
+@import '@haklex/rich-plugin-table/style.css';
+@import '@haklex/rich-renderers/style.css';
+@import '@haklex/rich-ext-tldraw/style.css';

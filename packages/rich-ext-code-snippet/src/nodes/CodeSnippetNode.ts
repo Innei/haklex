@@ -1,5 +1,5 @@
-import type { CodeFile } from '@shiro/rich-editor'
-import { createRendererDecoration } from '@shiro/rich-editor'
+import type { CodeFile } from '@haklex/rich-editor'
+import { createRendererDecoration } from '@haklex/rich-editor'
 import type {
   EditorConfig,
   LexicalEditor,

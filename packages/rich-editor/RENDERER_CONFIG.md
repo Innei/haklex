@@ -5,7 +5,7 @@ The rich-editor package provides a flexible architecture for customizing how nod
 ## Basic Usage
 
 ```tsx
-import { RichEditor, RichRenderer, type RendererConfig } from '@shiro/rich-editor'
+import { RichEditor, RichRenderer, type RendererConfig } from '@haklex/rich-editor'
 
 // Define your custom renderers
 const customRenderers: RendererConfig = {
@@ -54,7 +54,7 @@ import type {
   ImageRendererProps,
   CodeBlockRendererProps,
   // ... other types
-} from '@shiro/rich-editor'
+} from '@haklex/rich-editor'
 
 function MyCustomImageRenderer({
   src,
@@ -77,7 +77,7 @@ function MyCustomImageRenderer({
 
 ```tsx
 import type { ComponentType } from 'react'
-import type { ImageRendererProps, RendererConfig } from '@shiro/rich-editor'
+import type { ImageRendererProps, RendererConfig } from '@haklex/rich-editor'
 
 // Custom image renderer with zoom, blurhash, lazy loading
 const EnhancedImageRenderer: ComponentType<ImageRendererProps> = ({
@@ -105,7 +105,7 @@ const config: RendererConfig = {
 ## Example: Custom Link Card with Fetch
 
 ```tsx
-import type { LinkCardRendererProps } from '@shiro/rich-editor'
+import type { LinkCardRendererProps } from '@haklex/rich-editor'
 
 const DynamicLinkCard: ComponentType<LinkCardRendererProps> = ({
   url,
@@ -152,7 +152,7 @@ If you don't provide a custom renderer, the default lightweight renderers are us
 
 ```tsx
 import { customRendererConfig } from '~/lib/rich-editor-renderers'
-import { RichEditor, RichRenderer } from '@shiro/rich-editor'
+import { RichEditor, RichRenderer } from '@haklex/rich-editor'
 
 // 使用主项目的复杂实现
 <RichEditor
@@ -171,7 +171,7 @@ import { RichEditor, RichRenderer } from '@shiro/rich-editor'
 参考 `apps/web/src/lib/rich-editor-renderers.tsx`：
 
 ```tsx
-import type { VideoRendererProps, RendererConfig } from '@shiro/rich-editor'
+import type { VideoRendererProps, RendererConfig } from '@haklex/rich-editor'
 import { VideoPlayer } from '~/components/ui/media/VideoPlayer'
 
 // 适配层：包装主项目组件以符合 RendererConfig 接口

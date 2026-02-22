@@ -177,6 +177,60 @@ globalStyle(`${richContent} .rich-list-nested-item .rich-list-ul`, {
   listStyleType: 'circle',
 })
 
+// ─── Check List ─────────────────────────────────────────
+globalStyle(`${richContent} .rich-checklist`, {
+  listStyleType: 'none',
+  paddingLeft: 0,
+})
+
+globalStyle(
+  `${richContent} .rich-list-item.rich-list-item-checked, ${richContent} .rich-list-item.rich-list-item-unchecked`,
+  {
+    position: 'relative',
+    paddingLeft: '1.9em',
+    listStyleType: 'none',
+    outline: 'none',
+  },
+)
+
+globalStyle(
+  `${richContent} .rich-list-item.rich-list-item-unchecked::before, ${richContent} .rich-list-item.rich-list-item-checked::before`,
+  {
+    content: '""',
+    width: 16,
+    height: 16,
+    border: `1px solid ${vars.color.border}`,
+    borderRadius: vars.borderRadius.sm,
+    position: 'absolute',
+    left: 0,
+    top: 'calc((1lh - 16px) / 2)',
+    boxSizing: 'border-box',
+  },
+)
+
+globalStyle(`${richContent} .rich-list-item.rich-list-item-checked::before`, {
+  backgroundColor: vars.color.accent,
+  borderColor: vars.color.accent,
+})
+
+globalStyle(`${richContent} .rich-list-item.rich-list-item-checked::after`, {
+  content: '""',
+  position: 'absolute',
+  left: 5,
+  top: 'calc((1lh - 16px) / 2 + 5px)',
+  width: 6,
+  height: 3,
+  borderLeft: '2px solid #fff',
+  borderBottom: '2px solid #fff',
+  transform: 'rotate(-45deg)',
+  boxSizing: 'border-box',
+})
+
+globalStyle(`${richContent} .rich-list-item-checked`, {
+  textDecoration: 'line-through',
+  color: vars.color.textSecondary,
+})
+
 // ─── Blockquote ──────────────────────────────────────────
 globalStyle(`${richContent} .rich-quote`, {
   borderLeft: `4px solid ${vars.color.quoteBorder}`,
@@ -492,10 +546,18 @@ globalStyle(`.rich-drop-indicator`, {
 })
 
 // ─── First-child reset ──────────────────────────────────
-globalStyle(`${richContent} > *:first-child`, {
-  marginTop: 0,
-})
+// Editor mode adds a `.rich-editor__content-wrapper` between variant root and blocks.
+// Keep first/last child margin reset working for both renderer and editor trees.
+globalStyle(
+  `${richContent} > *:first-child, ${richContent} .rich-editor__content > *:first-child`,
+  {
+    marginTop: 0,
+  },
+)
 
-globalStyle(`${richContent} > *:last-child`, {
-  marginBottom: 0,
-})
+globalStyle(
+  `${richContent} > *:last-child, ${richContent} .rich-editor__content > *:last-child`,
+  {
+    marginBottom: 0,
+  },
+)

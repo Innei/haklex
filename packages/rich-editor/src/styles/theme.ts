@@ -21,6 +21,9 @@ export const editorTheme: EditorThemeClasses = {
     ol: 'rich-list-ol',
     ul: 'rich-list-ul',
     listitem: 'rich-list-item',
+    listitemChecked: 'rich-list-item-checked',
+    listitemUnchecked: 'rich-list-item-unchecked',
+    checklist: 'rich-checklist',
     nested: {
       listitem: 'rich-list-nested-item',
     },

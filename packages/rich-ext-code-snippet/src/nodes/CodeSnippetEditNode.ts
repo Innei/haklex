@@ -1,4 +1,4 @@
-import type { CodeFile, SlashMenuItemConfig } from '@shiro/rich-editor'
+import type { CodeFile, SlashMenuItemConfig } from '@haklex/rich-editor'
 import type { EditorConfig, LexicalEditor, LexicalNode } from 'lexical'
 import { $insertNodes } from 'lexical'
 import { FileCode } from 'lucide-react'

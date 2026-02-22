@@ -17,6 +17,7 @@ export {
 export type { RendererMode } from './context/RendererConfigContext'
 export { useRendererMode } from './context/RendererConfigContext'
 export * from './styles'
+export { ALL_TRANSFORMERS } from './transformers'
 export type {
   RichEditorProps,
   RichEditorVariant,

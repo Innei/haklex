@@ -1,8 +1,50 @@
-import { vars } from '@shiro/rich-style-token'
+import { vars } from '@haklex/rich-style-token'
 import { globalStyle, style } from '@vanilla-extract/css'
+import { recipe } from '@vanilla-extract/recipes'
 
-// ─── Container ──────────────────────────────────────────
-globalStyle('.rcs-container', {
+export const semanticClassNames = {
+  container: 'rcs-container',
+  header: 'rcs-header',
+  tabs: 'rcs-tabs',
+  tab: 'rcs-tab',
+  tabActive: 'rcs-tab-active',
+  titleBar: 'rcs-title-bar',
+  headerActions: 'rcs-header-actions',
+  copyButton: 'rcs-copy-btn',
+  separator: 'rcs-separator',
+  codePanel: 'rcs-code-panel',
+  codeScroll: 'rcs-code-scroll',
+  codeBody: 'rcs-code-body',
+  fileIcon: 'rcs-file-icon',
+  editContainer: 'rcs-edit-container',
+  editOverlay: 'rcs-edit-overlay',
+  editLabel: 'rcs-edit-label',
+  modal: 'rcs-modal',
+  modalTitlebar: 'rcs-modal-titlebar',
+  modalTitle: 'rcs-modal-title',
+  modalIconButton: 'rcs-modal-icon-btn',
+  modalBody: 'rcs-modal-body',
+  modalSidebar: 'rcs-modal-sidebar',
+  sidebarHeader: 'rcs-sidebar-header',
+  sidebarAddButton: 'rcs-sidebar-add-btn',
+  fileList: 'rcs-file-list',
+  fileItem: 'rcs-file-item',
+  fileItemActive: 'rcs-file-item-active',
+  fileItemDragging: 'rcs-file-item-dragging',
+  fileDragHandle: 'rcs-file-drag-handle',
+  fileName: 'rcs-file-name',
+  fileDelete: 'rcs-file-delete',
+  renameInput: 'rcs-rename-input',
+  modalEditor: 'rcs-modal-editor',
+  breadcrumb: 'rcs-breadcrumb',
+  breadcrumbLeft: 'rcs-breadcrumb-left',
+  breadcrumbName: 'rcs-breadcrumb-name',
+  breadcrumbLang: 'rcs-breadcrumb-lang',
+  editorContainer: 'rcs-editor-container',
+  dragOverlay: 'rcs-drag-overlay',
+} as const
+
+export const container = style({
   position: 'relative',
   borderRadius: '0.5rem',
   overflow: 'hidden',
@@ -11,8 +53,7 @@ globalStyle('.rcs-container', {
   fontSize: '0.875rem',
 })
 
-// ─── Header ─────────────────────────────────────────────
-globalStyle('.rcs-header', {
+export const header = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -20,19 +61,20 @@ globalStyle('.rcs-header', {
   minHeight: 40,
 })
 
-globalStyle('.rcs-tabs', {
+export const tabs = style({
   display: 'flex',
   alignItems: 'center',
   gap: 2,
   overflowX: 'auto',
   scrollbarWidth: 'none',
+  selectors: {
+    '&::-webkit-scrollbar': {
+      display: 'none',
+    },
+  },
 })
 
-globalStyle('.rcs-tabs::-webkit-scrollbar', {
-  display: 'none',
-})
-
-globalStyle('.rcs-tab', {
+const tabBase = style({
   display: 'flex',
   alignItems: 'center',
   gap: 6,
@@ -48,19 +90,31 @@ globalStyle('.rcs-tab', {
   whiteSpace: 'nowrap',
   flexShrink: 0,
   transition: 'color 0.15s, background 0.15s',
+  selectors: {
+    '&:hover': {
+      color: vars.color.text,
+      background: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
+    },
+  },
 })
 
-globalStyle('.rcs-tab:hover', {
-  color: vars.color.text,
-  background: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
+export const tab = recipe({
+  base: tabBase,
+  variants: {
+    active: {
+      true: {
+        color: vars.color.text,
+        background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+      },
+      false: {},
+    },
+  },
+  defaultVariants: {
+    active: false,
+  },
 })
 
-globalStyle('.rcs-tab-active', {
-  color: vars.color.text,
-  background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-})
-
-globalStyle('.rcs-title-bar', {
+export const titleBar = style({
   display: 'flex',
   alignItems: 'center',
   gap: 6,
@@ -71,18 +125,19 @@ globalStyle('.rcs-title-bar', {
   color: vars.color.textSecondary,
 })
 
-globalStyle('.rcs-header-actions', {
+export const headerActions = style({
   display: 'flex',
   alignItems: 'center',
   opacity: 0,
   transition: 'opacity 0.15s',
+  selectors: {
+    [`${container}:hover &`]: {
+      opacity: 1,
+    },
+  },
 })
 
-globalStyle('.rcs-container:hover .rcs-header-actions', {
-  opacity: 1,
-})
-
-globalStyle('.rcs-copy-btn', {
+export const copyButton = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -94,26 +149,25 @@ globalStyle('.rcs-copy-btn', {
   color: vars.color.textSecondary,
   cursor: 'pointer',
   transition: 'background 0.15s, color 0.15s',
+  selectors: {
+    '&:hover': {
+      background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+      color: vars.color.text,
+    },
+  },
 })
 
-globalStyle('.rcs-copy-btn:hover', {
-  background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-  color: vars.color.text,
-})
-
-// ─── Separator ──────────────────────────────────────────
-globalStyle('.rcs-separator', {
+export const separator = style({
   height: 1,
   background: vars.color.border,
   opacity: 0.6,
 })
 
-// ─── Code panel ─────────────────────────────────────────
-globalStyle('.rcs-code-scroll', {
+export const codeScroll = style({
   overflowX: 'auto',
 })
 
-globalStyle('.rcs-code-body', {
+export const codeBody = style({
   padding: '12px 16px',
   margin: 0,
   fontSize: '0.8125rem',
@@ -121,32 +175,30 @@ globalStyle('.rcs-code-body', {
   fontFamily: 'var(--font-mono, ui-monospace, monospace)',
 })
 
-globalStyle('.rcs-code-body pre', {
+globalStyle(`${codeBody} pre`, {
   margin: 0,
   background: 'transparent !important',
 })
 
-globalStyle('.rcs-code-body code', {
+globalStyle(`${codeBody} code`, {
   fontFamily: 'inherit',
 })
 
-globalStyle('.rcs-editor-container pre code', {
-  display: 'flex',
-  flexDirection: 'column',
+export const fileIcon = style({
+  display: 'inline-flex',
+  flexShrink: 0,
 })
 
-// ─── FileIcon ───────────────────────────────────────────
-globalStyle('.rcs-file-icon svg', {
+globalStyle(`${fileIcon} svg`, {
   width: '100%',
   height: '100%',
 })
 
-// ─── Edit overlay ───────────────────────────────────────
-globalStyle('.rcs-edit-container', {
+export const editContainer = style({
   position: 'relative',
 })
 
-globalStyle('.rcs-edit-overlay', {
+export const editOverlay = style({
   position: 'absolute',
   inset: 0,
   zIndex: 5,
@@ -156,13 +208,14 @@ globalStyle('.rcs-edit-overlay', {
   cursor: 'pointer',
   background: 'transparent',
   border: 'none',
+  selectors: {
+    '&:hover': {
+      background: 'color-mix(in srgb, currentColor 6%, transparent)',
+    },
+  },
 })
 
-globalStyle('.rcs-edit-overlay:hover', {
-  background: 'color-mix(in srgb, currentColor 6%, transparent)',
-})
-
-globalStyle('.rcs-edit-label', {
+export const editLabel = style({
   display: 'flex',
   alignItems: 'center',
   gap: 6,
@@ -175,13 +228,13 @@ globalStyle('.rcs-edit-label', {
   fontWeight: 500,
   opacity: 0,
   transition: 'opacity 0.2s',
+  selectors: {
+    [`${editContainer}:hover &`]: {
+      opacity: 1,
+    },
+  },
 })
 
-globalStyle('.rcs-edit-container:hover .rcs-edit-label', {
-  opacity: 1,
-})
-
-// ─── Dialog popup override ──────────────────────────────
 const _codeSnippetDialogPopup = style({})
 globalStyle(`${_codeSnippetDialogPopup}${_codeSnippetDialogPopup}`, {
   padding: 0,
@@ -209,8 +262,7 @@ globalStyle(
 )
 export { _codeSnippetDialogPopup as codeSnippetDialogPopup }
 
-// ─── Modal ──────────────────────────────────────────────
-globalStyle('.rcs-modal', {
+export const modal = style({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
@@ -218,8 +270,7 @@ globalStyle('.rcs-modal', {
   overflow: 'hidden',
 })
 
-// ─── Title bar ──────────────────────────────────────────
-globalStyle('.rcs-modal-titlebar', {
+export const modalTitlebar = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -229,13 +280,13 @@ globalStyle('.rcs-modal-titlebar', {
   flexShrink: 0,
 })
 
-globalStyle('.rcs-modal-title', {
+export const modalTitle = style({
   fontSize: '0.75rem',
   fontFamily: 'var(--font-mono, ui-monospace, monospace)',
   color: vars.color.textSecondary,
 })
 
-globalStyle('.rcs-modal-icon-btn', {
+export const modalIconButton = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -247,22 +298,21 @@ globalStyle('.rcs-modal-icon-btn', {
   color: vars.color.textSecondary,
   cursor: 'pointer',
   transition: 'background 0.15s, color 0.15s',
+  selectors: {
+    '&:hover': {
+      background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+      color: vars.color.text,
+    },
+  },
 })
 
-globalStyle('.rcs-modal-icon-btn:hover', {
-  background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-  color: vars.color.text,
-})
-
-// ─── Body ───────────────────────────────────────────────
-globalStyle('.rcs-modal-body', {
+export const modalBody = style({
   display: 'flex',
   flex: 1,
   minHeight: 0,
 })
 
-// ─── Sidebar ────────────────────────────────────────────
-globalStyle('.rcs-modal-sidebar', {
+export const modalSidebar = style({
   width: 224,
   flexShrink: 0,
   borderRight: `1px solid ${vars.color.border}`,
@@ -271,7 +321,7 @@ globalStyle('.rcs-modal-sidebar', {
   overflow: 'hidden',
 })
 
-globalStyle('.rcs-sidebar-header', {
+export const sidebarHeader = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -283,7 +333,7 @@ globalStyle('.rcs-sidebar-header', {
   color: `color-mix(in srgb, ${vars.color.textSecondary} 60%, transparent)`,
 })
 
-globalStyle('.rcs-sidebar-add-btn', {
+export const sidebarAddButton = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -295,20 +345,21 @@ globalStyle('.rcs-sidebar-add-btn', {
   color: vars.color.textSecondary,
   cursor: 'pointer',
   transition: 'background 0.15s, color 0.15s',
+  selectors: {
+    '&:hover': {
+      background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+      color: vars.color.text,
+    },
+  },
 })
 
-globalStyle('.rcs-sidebar-add-btn:hover', {
-  background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-  color: vars.color.text,
-})
-
-globalStyle('.rcs-file-list', {
+export const fileList = style({
   flex: 1,
   overflowY: 'auto',
   padding: '0 6px 8px',
 })
 
-globalStyle('.rcs-file-item', {
+const fileItemBase = style({
   display: 'flex',
   alignItems: 'center',
   gap: 4,
@@ -320,39 +371,59 @@ globalStyle('.rcs-file-item', {
   fontFamily: 'var(--font-mono, ui-monospace, monospace)',
   color: vars.color.textSecondary,
   transition: 'background 0.15s, color 0.15s',
+  selectors: {
+    '&:hover': {
+      background: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
+      color: vars.color.text,
+    },
+  },
 })
 
-globalStyle('.rcs-file-drag-handle', {
+export const fileItem = recipe({
+  base: fileItemBase,
+  variants: {
+    active: {
+      true: {
+        background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+        color: vars.color.text,
+      },
+      false: {},
+    },
+    dragging: {
+      true: {
+        opacity: 0.4,
+      },
+      false: {},
+    },
+  },
+  defaultVariants: {
+    active: false,
+    dragging: false,
+  },
+})
+
+export const fileDragHandle = style({
   display: 'inline-flex',
   alignItems: 'center',
   cursor: 'grab',
   color: `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent)`,
   flexShrink: 0,
   touchAction: 'none',
+  selectors: {
+    '&:active': {
+      cursor: 'grabbing',
+    },
+  },
 })
 
-globalStyle('.rcs-file-drag-handle:active', {
-  cursor: 'grabbing',
-})
-
-globalStyle('.rcs-file-item:hover', {
-  background: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
-  color: vars.color.text,
-})
-
-globalStyle('.rcs-file-item-active', {
-  background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-  color: vars.color.text,
-})
-
-globalStyle('.rcs-file-name', {
+export const fileName = style({
   flex: 1,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 })
 
-globalStyle('.rcs-file-delete', {
+export const fileDelete = style({
   display: 'none',
   alignItems: 'center',
   justifyContent: 'center',
@@ -364,18 +435,18 @@ globalStyle('.rcs-file-delete', {
   color: vars.color.textSecondary,
   cursor: 'pointer',
   flexShrink: 0,
+  selectors: {
+    [`${fileItemBase}:hover &`]: {
+      display: 'inline-flex',
+    },
+    '&:hover': {
+      color: vars.color.alertCaution,
+      background: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
+    },
+  },
 })
 
-globalStyle('.rcs-file-item:hover .rcs-file-delete', {
-  display: 'inline-flex',
-})
-
-globalStyle('.rcs-file-delete:hover', {
-  color: vars.color.alertCaution,
-  background: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
-})
-
-globalStyle('.rcs-rename-input', {
+export const renameInput = style({
   flex: 1,
   minWidth: 0,
   padding: '1px 4px',
@@ -386,21 +457,21 @@ globalStyle('.rcs-rename-input', {
   background: vars.color.bg,
   color: vars.color.text,
   outline: 'none',
+  selectors: {
+    '&:focus': {
+      borderColor: `color-mix(in srgb, ${vars.color.text} 30%, transparent)`,
+    },
+  },
 })
 
-globalStyle('.rcs-rename-input:focus', {
-  borderColor: `color-mix(in srgb, ${vars.color.text} 30%, transparent)`,
-})
-
-// ─── Editor panel ───────────────────────────────────────
-globalStyle('.rcs-modal-editor', {
+export const modalEditor = style({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
   minWidth: 0,
 })
 
-globalStyle('.rcs-breadcrumb', {
+export const breadcrumb = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -410,7 +481,7 @@ globalStyle('.rcs-breadcrumb', {
   flexShrink: 0,
 })
 
-globalStyle('.rcs-breadcrumb-left', {
+export const breadcrumbLeft = style({
   display: 'flex',
   alignItems: 'center',
   gap: 6,
@@ -420,18 +491,18 @@ globalStyle('.rcs-breadcrumb-left', {
   overflow: 'hidden',
 })
 
-globalStyle('.rcs-breadcrumb-name', {
+export const breadcrumbName = style({
   color: vars.color.text,
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
 })
 
-globalStyle('.rcs-breadcrumb-lang', {
+export const breadcrumbLang = style({
   opacity: 0.5,
 })
 
-globalStyle('.rcs-editor-container', {
+export const editorContainer = style({
   flex: 1,
   minHeight: 0,
   position: 'relative',
@@ -439,59 +510,62 @@ globalStyle('.rcs-editor-container', {
   backgroundColor: 'transparent !important' as any,
 })
 
-// shikicode overrides — keep output static so input textarea overlaps correctly
-globalStyle('.rcs-editor-container > .shikicode.output', {
+globalStyle(`${editorContainer} pre code`, {
+  display: 'flex',
+  flexDirection: 'column',
+})
+
+globalStyle(`${editorContainer} > .shikicode.output`, {
   position: 'static !important' as any,
   inset: 'auto !important' as any,
 })
 
-globalStyle('.rcs-editor-container .shikicode', {
+globalStyle(`${editorContainer} .shikicode`, {
   height: '100%',
   fontSize: '0.8125rem',
   lineHeight: 1.7,
 })
 
 globalStyle(
-  '.rcs-editor-container .shiki, .rcs-editor-container code, .rcs-editor-container pre',
+  `${editorContainer} .shiki, ${editorContainer} code, ${editorContainer} pre`,
   {
     background: 'transparent !important' as any,
   },
 )
 
-globalStyle('.rcs-editor-container pre', {
+globalStyle(`${editorContainer} pre`, {
   margin: '0 !important' as any,
   padding: '0 !important' as any,
 })
 
-globalStyle('.rcs-editor-container .shikicode.output .line::before', {
+globalStyle(`${editorContainer} .shikicode.output .line::before`, {
   backgroundColor: 'transparent !important' as any,
+  color:
+    `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent) !important` as any,
 })
 
-globalStyle('.rcs-editor-container .line', {
+globalStyle(`${editorContainer} .line`, {
   display: 'block',
   padding: '0 1rem',
 })
 
-globalStyle('.rcs-editor-container .shikicode.input.line-numbers', {
+globalStyle(`${editorContainer} .shikicode.input.line-numbers`, {
   paddingLeft: 'calc(5em + 1rem)',
 })
 
-globalStyle('.rcs-editor-container .shikicode.input:not(.line-numbers)', {
+globalStyle(`${editorContainer} .shikicode.input:not(.line-numbers)`, {
   paddingLeft: '1rem',
 })
 
-globalStyle('.rcs-editor-container .line > span:last-child', {
+globalStyle(`${editorContainer} .line > span:last-child`, {
   marginRight: '1rem',
 })
 
-globalStyle('.rcs-editor-container .line::after', { content: "' '" })
-
-// ─── DnD file item ─────────────────────────────────────
-globalStyle('.rcs-file-item-dragging', {
-  opacity: 0.4,
+globalStyle(`${editorContainer} .line::after`, {
+  content: "' '",
 })
 
-globalStyle('.rcs-drag-overlay', {
+export const dragOverlay = style({
   background: vars.color.bgSecondary,
   borderRadius: 6,
   boxShadow: '0 4px 16px rgba(0,0,0,0.15)',

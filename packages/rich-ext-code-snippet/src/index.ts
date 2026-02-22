@@ -15,3 +15,4 @@ export {
   $isCodeSnippetNode,
   CodeSnippetNode,
 } from './nodes/CodeSnippetNode'
+export { CODE_SNIPPET_BLOCK_TRANSFORMER } from './transformer'

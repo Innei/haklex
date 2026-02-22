@@ -1,3 +1,5 @@
+import { PortalThemeProvider } from '@haklex/rich-style-token'
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
 import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
@@ -6,7 +8,6 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin'
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
 import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
 import { TablePlugin } from '@lexical/react/LexicalTablePlugin'
-import { PortalThemeProvider } from '@shiro/rich-style-token'
 
 import { allEditNodes } from '../config-edit'
 import { ColorSchemeProvider } from '../context/ColorSchemeContext'
@@ -17,6 +18,7 @@ import { AutoFocusPlugin } from '../plugins/AutoFocusPlugin'
 import { AutoLinkPlugin } from '../plugins/AutoLinkPlugin'
 import { EditorRefPlugin } from '../plugins/EditorRefPlugin'
 import { FootnotePlugin } from '../plugins/FootnotePlugin'
+import { HorizontalRulePlugin } from '../plugins/HorizontalRulePlugin'
 import { ImagePlugin } from '../plugins/ImagePlugin'
 import { KaTeXPlugin } from '../plugins/KaTeXPlugin'
 import { MarkdownShortcutsPlugin } from '../plugins/MarkdownShortcutsPlugin'
@@ -88,6 +90,8 @@ export function RichEditor({
                 <KaTeXPlugin />
                 <AlertPlugin />
                 <MermaidPlugin />
+                <HorizontalRulePlugin />
+                <CheckListPlugin />
                 <AutoLinkPlugin />
                 <EditorRefPlugin onEditorReady={onEditorReady} />
                 {autoFocus && <AutoFocusPlugin />}
