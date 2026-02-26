@@ -1,14 +1,14 @@
-import type { RendererConfig } from '@shiro/rich-editor'
-import { TabsRenderer } from '@shiro/rich-ext-tabs'
-import { AlertRenderer } from '@shiro/rich-renderer-alert'
-import { BannerRenderer } from '@shiro/rich-renderer-banner'
-import { CodeBlockRenderer } from '@shiro/rich-renderer-codeblock'
-import { GalleryRenderer } from '@shiro/rich-renderer-gallery'
-import { ImageRenderer } from '@shiro/rich-renderer-image'
-import { LinkCardRenderer } from '@shiro/rich-renderer-linkcard'
-import { MentionRenderer } from '@shiro/rich-renderer-mention'
-import { MermaidRenderer } from '@shiro/rich-renderer-mermaid'
-import { VideoRenderer } from '@shiro/rich-renderer-video'
+import type { RendererConfig } from '@haklex/rich-editor'
+import { CodeSnippetRenderer } from '@haklex/rich-ext-code-snippet'
+import { GalleryRenderer } from '@haklex/rich-ext-gallery'
+import { AlertRenderer } from '@haklex/rich-renderer-alert'
+import { BannerRenderer } from '@haklex/rich-renderer-banner'
+import { CodeBlockRenderer } from '@haklex/rich-renderer-codeblock'
+import { ImageRenderer } from '@haklex/rich-renderer-image'
+import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard'
+import { MentionRenderer } from '@haklex/rich-renderer-mention'
+import { MermaidRenderer } from '@haklex/rich-renderer-mermaid'
+import { VideoRenderer } from '@haklex/rich-renderer-video'
 
 export const enhancedRendererConfig: RendererConfig = {
   Alert: AlertRenderer,
@@ -19,6 +19,6 @@ export const enhancedRendererConfig: RendererConfig = {
   Mention: MentionRenderer,
   Gallery: GalleryRenderer,
   Mermaid: MermaidRenderer,
-  Tabs: TabsRenderer,
   Video: VideoRenderer,
+  CodeSnippet: CodeSnippetRenderer,
 }

@@ -1,12 +1,14 @@
 {
-  "name": "@shiro/rich-renderers",
-  "version": "0.0.1",
-  "private": true,
+  "name": "@haklex/rich-renderers",
+  "version": "0.0.38",
+  "description": "Static renderers aggregator for haklex rich editor",
+  "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./alert": "./src/alert.ts",
     "./banner": "./src/banner.ts",
+    "./code-snippet": "./src/code-snippet.ts",
     "./codeblock": "./src/codeblock.ts",
     "./embed": "./src/embed.ts",
     "./gallery": "./src/gallery.ts",
@@ -14,9 +16,7 @@
     "./linkcard": "./src/linkcard.ts",
     "./mention": "./src/mention.ts",
     "./mermaid": "./src/mermaid.ts",
-    "./slash-menu": "./src/slash-menu.ts",
     "./style.css": "./src/style.css",
-    "./tabs": "./src/tabs.ts",
     "./tldraw": "./src/tldraw.ts",
     "./video": "./src/video.ts"
   },
@@ -30,40 +30,39 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@shiro/rich-ext-embed": "workspace:*",
-    "@shiro/rich-ext-tabs": "workspace:*",
-    "@shiro/rich-ext-tldraw": "workspace:*",
-    "@shiro/rich-plugin-slash-menu": "workspace:*",
-    "@shiro/rich-renderer-alert": "workspace:*",
-    "@shiro/rich-renderer-banner": "workspace:*",
-    "@shiro/rich-renderer-codeblock": "workspace:*",
-    "@shiro/rich-renderer-gallery": "workspace:*",
-    "@shiro/rich-renderer-image": "workspace:*",
-    "@shiro/rich-renderer-linkcard": "workspace:*",
-    "@shiro/rich-renderer-mention": "workspace:*",
-    "@shiro/rich-renderer-mermaid": "workspace:*",
-    "@shiro/rich-renderer-video": "workspace:*"
+    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-ext-code-snippet": "workspace:*",
+    "@haklex/rich-ext-embed": "workspace:*",
+    "@haklex/rich-ext-gallery": "workspace:*",
+    "@haklex/rich-ext-tldraw": "workspace:*",
+    "@haklex/rich-renderer-alert": "workspace:*",
+    "@haklex/rich-renderer-banner": "workspace:*",
+    "@haklex/rich-renderer-codeblock": "workspace:*",
+    "@haklex/rich-renderer-image": "workspace:*",
+    "@haklex/rich-renderer-linkcard": "workspace:*",
+    "@haklex/rich-renderer-mention": "workspace:*",
+    "@haklex/rich-renderer-mermaid": "workspace:*",
+    "@haklex/rich-renderer-video": "workspace:*"
   },
   "devDependencies": {
-    "@lexical/react": "^0.39.0",
-    "@shiro/rich-editor": "workspace:*",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "lexical": "^0.39.0",
+    "@lexical/react": "^0.41.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "lexical": "^0.41.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "typescript": "^5.9.0",
-    "vite": "^6.3.0",
-    "vite-plugin-dts": "^4.5.0"
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "@lexical/react": "^0.39.0",
-    "@shiro/rich-editor": "workspace:*",
-    "lexical": "^0.39.0",
+    "@lexical/react": "^0.41.0",
+    "lexical": "^0.41.0",
     "react": ">=19",
     "react-dom": ">=19"
   },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": {
         "import": "./dist/index.mjs",
@@ -101,10 +100,6 @@
         "import": "./dist/mermaid.mjs",
         "types": "./dist/mermaid.d.ts"
       },
-      "./slash-menu": {
-        "import": "./dist/slash-menu.mjs",
-        "types": "./dist/slash-menu.d.ts"
-      },
       "./style.css": "./src/style.css",
       "./tldraw": {
         "import": "./dist/tldraw.mjs",
@@ -118,9 +113,9 @@
         "import": "./dist/embed.mjs",
         "types": "./dist/embed.d.ts"
       },
-      "./tabs": {
-        "import": "./dist/tabs.mjs",
-        "types": "./dist/tabs.d.ts"
+      "./code-snippet": {
+        "import": "./dist/code-snippet.mjs",
+        "types": "./dist/code-snippet.d.ts"
       }
     },
     "main": "./dist/index.mjs",

@@ -1,5 +1,1 @@
-export {
-  default,
-  MermaidEditRenderer,
-  MermaidRenderer,
-} from '@shiro/rich-renderer-mermaid'
+export { default, MermaidRenderer } from '@haklex/rich-renderer-mermaid'

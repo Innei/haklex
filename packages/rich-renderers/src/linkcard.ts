@@ -1,12 +1,14 @@
 export type {
   EnhancedLinkCardProps,
+  LinkCardApiAdapter,
   LinkCardData,
+  LinkCardFetchContext,
   LinkCardPlugin,
   LinkCardTypeClass,
   PluginRegistry,
   UrlMatchInfo,
   UrlMatchResult,
-} from '@shiro/rich-renderer-linkcard'
+} from '@haklex/rich-renderer-linkcard'
 export {
   arxivPlugin,
   bangumiPlugin,
@@ -22,6 +24,7 @@ export {
   githubRepoPlugin,
   LanguageToColorMap,
   leetcodePlugin,
+  LinkCardFetchProvider,
   LinkCardRenderer,
   LinkCardSkeleton,
   mxSpacePlugin,
@@ -31,4 +34,4 @@ export {
   qqMusicPlugin,
   tmdbPlugin,
   useUrlMatcher,
-} from '@shiro/rich-renderer-linkcard'
+} from '@haklex/rich-renderer-linkcard'

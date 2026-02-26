@@ -1,12 +1,13 @@
 export type {
   SerializedTldrawNode,
   TldrawRendererProps,
-} from '@shiro/rich-ext-tldraw'
+  TldrawStaticRendererProps,
+} from '@haklex/rich-ext-tldraw'
 export {
   $createTldrawNode,
   $isTldrawNode,
-  INSERT_TLDRAW_COMMAND,
+  TldrawConfigProvider,
   TldrawNode,
-  TldrawPlugin,
   TldrawRenderer,
-} from '@shiro/rich-ext-tldraw'
+  TldrawStaticRenderer,
+} from '@haklex/rich-ext-tldraw'

@@ -1,5 +1,1 @@
-export {
-  default,
-  MentionEditRenderer,
-  MentionRenderer,
-} from '@shiro/rich-renderer-mention'
+export { default, MentionRenderer } from '@haklex/rich-renderer-mention'

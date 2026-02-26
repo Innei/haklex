@@ -1,1 +1,1 @@
-export { default,VideoRenderer } from '@shiro/rich-renderer-video'
+export { default, VideoRenderer } from '@haklex/rich-renderer-video'

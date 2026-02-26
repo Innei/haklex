@@ -1,1 +1,1 @@
-export { default,ImageRenderer } from '@shiro/rich-renderer-image'
+export { default, ImageRenderer } from '@haklex/rich-renderer-image'

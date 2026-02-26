@@ -1,1 +1,1 @@
-export { default,GalleryRenderer } from '@shiro/rich-renderer-gallery'
+export { default, GalleryRenderer } from '@haklex/rich-ext-gallery'

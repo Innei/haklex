@@ -1,1 +1,1 @@
-export { CodeBlockRenderer, default } from '@shiro/rich-renderer-codeblock'
+export { CodeBlockRenderer, default } from '@haklex/rich-renderer-codeblock'

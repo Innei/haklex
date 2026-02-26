@@ -1,5 +1,1 @@
-export {
-  BannerEditRenderer,
-  BannerRenderer,
-  default,
-} from '@shiro/rich-renderer-banner'
+export { BannerRenderer, default } from '@haklex/rich-renderer-banner'

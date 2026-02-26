@@ -1,53 +1,75 @@
+// Code Snippet
+export type { SerializedCodeSnippetNode } from '@haklex/rich-ext-code-snippet'
+export {
+  $createCodeSnippetNode,
+  $isCodeSnippetNode,
+  CodeSnippetNode,
+  codeSnippetNodes,
+  CodeSnippetRenderer,
+} from '@haklex/rich-ext-code-snippet'
+
 // Renderers
-export { AlertEditRenderer, AlertRenderer } from '@shiro/rich-renderer-alert'
-export { BannerEditRenderer, BannerRenderer } from '@shiro/rich-renderer-banner'
-export { CodeBlockRenderer } from '@shiro/rich-renderer-codeblock'
-export { GalleryRenderer } from '@shiro/rich-renderer-gallery'
-export { ImageRenderer } from '@shiro/rich-renderer-image'
-export { LinkCardRenderer } from '@shiro/rich-renderer-linkcard'
+export { GalleryRenderer } from '@haklex/rich-ext-gallery'
+export { AlertRenderer } from '@haklex/rich-renderer-alert'
+export { BannerRenderer } from '@haklex/rich-renderer-banner'
+export { CodeBlockRenderer } from '@haklex/rich-renderer-codeblock'
+
+// Gallery
+export type {
+  GalleryNodePayload,
+  SerializedGalleryNode,
+} from '@haklex/rich-ext-gallery'
 export {
-  MentionEditRenderer,
+  $createGalleryEditNode,
+  $createGalleryNode,
+  $isGalleryEditNode,
+  $isGalleryNode,
+  GalleryEditNode,
+  galleryEditNodes,
+  GalleryNode,
+  galleryNodes,
+} from '@haklex/rich-ext-gallery'
+export { ImageRenderer } from '@haklex/rich-renderer-image'
+export { LinkCardRenderer } from '@haklex/rich-renderer-linkcard'
+export type { MentionPlatformMeta } from '@haklex/rich-renderer-mention'
+export {
+  MentionPlatformProvider,
   MentionRenderer,
-} from '@shiro/rich-renderer-mention'
-export {
-  MermaidEditRenderer,
-  MermaidRenderer,
-} from '@shiro/rich-renderer-mermaid'
-export { VideoRenderer } from '@shiro/rich-renderer-video'
+} from '@haklex/rich-renderer-mention'
+export { MermaidRenderer } from '@haklex/rich-renderer-mermaid'
+export { VideoRenderer } from '@haklex/rich-renderer-video'
 
 // Tldraw
 export type {
   SerializedTldrawNode,
   TldrawRendererProps,
-} from '@shiro/rich-ext-tldraw'
+  TldrawStaticRendererProps,
+} from '@haklex/rich-ext-tldraw'
 export {
+  $createTldrawEditNode,
   $createTldrawNode,
+  $isTldrawEditNode,
   $isTldrawNode,
-  INSERT_TLDRAW_COMMAND,
+  TldrawConfigProvider,
+  TldrawDisplayRenderer,
+  TldrawEditNode,
   TldrawNode,
-  TldrawPlugin,
   TldrawRenderer,
-} from '@shiro/rich-ext-tldraw'
-
-// Slash Menu
-export type { SlashMenuPluginProps } from '@shiro/rich-plugin-slash-menu'
-export {
-  getBuiltinItems,
-  SlashMenuItem,
-  SlashMenuList,
-  SlashMenuPlugin,
-} from '@shiro/rich-plugin-slash-menu'
+  TldrawStaticRenderer,
+} from '@haklex/rich-ext-tldraw'
 
 // LinkCard types & utilities
 export type {
   EnhancedLinkCardProps,
+  LinkCardApiAdapter,
   LinkCardData,
+  LinkCardFetchContext,
   LinkCardPlugin,
   LinkCardTypeClass,
   PluginRegistry,
   UrlMatchInfo,
   UrlMatchResult,
-} from '@shiro/rich-renderer-linkcard'
+} from '@haklex/rich-renderer-linkcard'
 export {
   arxivPlugin,
   bangumiPlugin,
@@ -63,6 +85,7 @@ export {
   githubRepoPlugin,
   LanguageToColorMap,
   leetcodePlugin,
+  LinkCardFetchProvider,
   LinkCardSkeleton,
   mxSpacePlugin,
   neteaseMusicPlugin,
@@ -71,33 +94,26 @@ export {
   qqMusicPlugin,
   tmdbPlugin,
   useUrlMatcher,
-} from '@shiro/rich-renderer-linkcard'
+} from '@haklex/rich-renderer-linkcard'
 
 // Embed
 export type {
   EmbedLinkRendererProps,
-  EmbedPluginProps,
   EmbedRendererComponent,
   EmbedRendererMap,
   EmbedStaticRendererProps,
   EmbedType,
   SerializedEmbedNode,
-} from '@shiro/rich-ext-embed'
+} from '@haklex/rich-ext-embed'
 export {
-  $createEmbedEditNode,
   $createEmbedNode,
-  $isEmbedEditNode,
   $isEmbedNode,
   createSelfThinkingMatcher,
-  EmbedEditNode,
-  embedEditNodes,
   EmbedLinkRenderer,
   EmbedNode,
   embedNodes,
-  EmbedPlugin,
   EmbedRendererProvider,
   EmbedStaticRenderer,
-  INSERT_EMBED_COMMAND,
   isBilibiliVideoUrl,
   isCodesandboxUrl,
   isGistUrl,
@@ -106,27 +122,7 @@ export {
   isYoutubeUrl,
   matchEmbedUrl,
   useEmbedRenderers,
-} from '@shiro/rich-ext-embed'
-
-// Tabs
-export type {
-  SerializedTabsNode,
-  TabsEditRendererProps,
-  TabsRendererProps,
-} from '@shiro/rich-ext-tabs'
-export {
-  $createTabsEditNode,
-  $createTabsNode,
-  $isTabsEditNode,
-  $isTabsNode,
-  TabsEditNode,
-  tabsEditNodes,
-  TabsEditRenderer,
-  TabsNode,
-  tabsNodes,
-  TabsRenderer,
-} from '@shiro/rich-ext-tabs'
+} from '@haklex/rich-ext-embed'
 
 // Pre-built config
 export { enhancedRendererConfig } from './config'
-export { enhancedEditRendererConfig } from './config-edit'

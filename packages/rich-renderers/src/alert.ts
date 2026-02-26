@@ -1,5 +1,1 @@
-export {
-  AlertEditRenderer,
-  AlertRenderer,
-  default,
-} from '@shiro/rich-renderer-alert'
+export { AlertRenderer, default } from '@haklex/rich-renderer-alert'
