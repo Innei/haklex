@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useColorScheme } from '../../context/ColorSchemeContext'
+import { useVariant } from '../../context/RendererConfigContext'
 import type { CodeToHtmlFn } from '../../utils/shiki'
 import { loadCodeToHtml } from '../../utils/shiki'
 
@@ -9,14 +10,21 @@ export interface CodeBlockRendererProps {
   language: string
   showLineNumbers?: boolean
   editable?: boolean
+  selected?: boolean
+  cursorPlacement?: 'start' | 'end'
   onCodeChange?: (code: string) => void
+  onLanguageChange?: (language: string) => void
+  onDelete?: () => void
+  onExitBlock?: (direction: 'before' | 'after') => void
 }
 
 export function CodeBlockRenderer({
   code,
   language,
-  showLineNumbers,
+  showLineNumbers: showLineNumbersProp,
 }: CodeBlockRendererProps) {
+  const variant = useVariant()
+  const showLineNumbers = showLineNumbersProp ?? variant !== 'comment'
   const colorScheme = useColorScheme()
   const shikiTheme = colorScheme === 'dark' ? 'github-dark' : 'github-light'
   const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null)

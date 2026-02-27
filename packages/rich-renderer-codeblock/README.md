@@ -1,25 +1,48 @@
-# @shiro/rich-renderer-codeblock
+# @haklex/rich-renderer-codeblock
 
-Enhanced CodeBlock renderer for `@shiro/rich-editor`.
+基于 Shiki 的代码块渲染器。
 
-## Features
+## 安装
 
-- Shiki highlighting
-- Language badge + accent color
-- Copy button with feedback
-- Optional line numbers
-- Long-code collapse
+```bash
+pnpm add @haklex/rich-renderer-codeblock @haklex/rich-editor shiki
+```
 
-## Usage
+## 导出
+
+```ts
+export { CodeBlockRenderer } from './CodeBlockRenderer'
+export { CodeBlockEditRenderer } from './CodeBlockEditRenderer'
+```
+
+## 功能
+
+- Shiki 语法高亮
+- 自动检测语言
+- 行号显示
+- 复制按钮
+- 自动适配深浅主题
+
+## 使用
 
 ```tsx
-import { CodeBlockRenderer } from '@shiro/rich-renderer-codeblock'
-import '@shiro/rich-renderer-codeblock/style.css'
+import { CodeBlockRenderer } from '@haklex/rich-renderer-codeblock'
+import type { RendererConfig } from '@haklex/rich-editor'
 
-<RichRenderer
-  value={state}
-  rendererConfig={{
-    CodeBlock: CodeBlockRenderer,
-  }}
-/>
+const config: RendererConfig = {
+  CodeBlock: CodeBlockRenderer,
+}
 ```
+
+## 依赖
+
+```json
+{
+  "@haklex/rich-editor": "workspace:*",
+  "shiki": "^3.0.0"
+}
+```
+
+## License
+
+MIT

@@ -29,7 +29,7 @@ export async function getHighlighterWithLang(language: string) {
   return highlighter
 }
 
-export const SHIKI_THEMES = {
+export const SHIKI_DUAL_THEMES = {
   light: 'github-light',
   dark: 'github-dark',
 } as const
