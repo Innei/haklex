@@ -1,4 +1,12 @@
 import {
+  defaultKeymap,
+  history,
+  historyKeymap,
+  indentWithTab,
+} from '@codemirror/commands'
+import { Compartment, EditorState } from '@codemirror/state'
+import { EditorView, keymap, lineNumbers } from '@codemirror/view'
+import {
   closestCenter,
   DndContext,
   type DragEndEvent,
@@ -14,13 +22,10 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import { getThemeExtensions, loadLanguageExtension } from '@haklex/cm-editor'
 import type { CodeFile, ColorScheme } from '@haklex/rich-editor'
 import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants'
 import { FileIcon } from '@haklex/rich-renderer-codeblock/icons'
-import {
-  getHighlighterWithLang,
-  SHIKI_THEMES,
-} from '@haklex/rich-renderer-codeblock/shiki'
 import { usePortalTheme } from '@haklex/rich-style-token'
 import { GripVertical, Plus, Trash2, X } from 'lucide-react'
 import type { CSSProperties, FC } from 'react'
@@ -154,7 +159,14 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
   const [dragActiveId, setDragActiveId] = useState<string | null>(null)
 
   const containerRef = useRef<HTMLDivElement>(null)
-  const editorRef = useRef<any>(null)
+  const editorRef = useRef<EditorView | null>(null)
+  const languageCompartmentRef = useRef<Compartment>(null!)
+  const themeCompartmentRef = useRef<Compartment>(null!)
+  if (!languageCompartmentRef.current)
+    languageCompartmentRef.current = new Compartment()
+  if (!themeCompartmentRef.current)
+    themeCompartmentRef.current = new Compartment()
+
   const onCodeChangeRef = useRef<(code: string) => void>(undefined)
   const editFilesRef = useRef(editFiles)
   editFilesRef.current = editFiles
@@ -168,7 +180,7 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
     )
   }
 
-  // Only recreate editor when switching files
+  // Recreate editor when switching files
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
@@ -176,59 +188,54 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
     const file = editFilesRef.current.find((f) => f.filename === activeFilename)
     if (!file) return
 
-    let disposed = false
-    let inputCleanup: (() => void) | null = null
+    let cancelled = false
 
+    const lang = normalizeLanguage(
+      file.language ?? getLanguageFromFilename(file.filename),
+    )
+
+    const editor = new EditorView({
+      parent: container,
+      state: EditorState.create({
+        doc: file.code,
+        extensions: [
+          history(),
+          keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
+          EditorView.updateListener.of((update) => {
+            if (!update.docChanged) return
+            onCodeChangeRef.current?.(update.state.doc.toString())
+          }),
+          lineNumbers(),
+          themeCompartmentRef.current.of(getThemeExtensions(colorScheme)),
+          languageCompartmentRef.current.of([]),
+        ],
+      }),
+    })
+
+    editorRef.current = editor
     ;(async () => {
-      const lang = normalizeLanguage(
-        file.language ?? getLanguageFromFilename(file.filename),
-      )
-      const [highlighter, { shikiCode }] = await Promise.all([
-        getHighlighterWithLang(lang),
-        import('shikicode'),
-      ])
-
-      if (disposed) return
-
-      const theme = SHIKI_THEMES[colorScheme]
-      const loaded: string[] = highlighter.getLoadedLanguages()
-      const resolvedLang = loaded.includes(lang) ? lang : 'text'
-
-      const editor = shikiCode()
-        .withOptions({
-          readOnly: false,
-          lineNumbers: 'on',
-        })
-        .create(container, highlighter, {
-          value: file.code,
-          language: resolvedLang as any,
-          theme,
-        })
-
-      const handleInput = () => {
-        onCodeChangeRef.current?.(editor.input.value)
-      }
-      editor.input.addEventListener('input', handleInput)
-      inputCleanup = () =>
-        editor.input.removeEventListener('input', handleInput)
-      editorRef.current = editor
+      const extension = await loadLanguageExtension(lang)
+      if (cancelled) return
+      editor.dispatch({
+        effects: languageCompartmentRef.current.reconfigure(extension),
+      })
     })()
 
     return () => {
-      disposed = true
-      inputCleanup?.()
-      editorRef.current?.dispose()
+      cancelled = true
+      editor.destroy()
       editorRef.current = null
     }
   }, [activeFilename]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Update theme without recreating editor
+  // Sync theme when colorScheme changes
   useEffect(() => {
     const editor = editorRef.current
     if (!editor) return
-
-    editor.updateOptions({
-      theme: SHIKI_THEMES[colorScheme],
+    editor.dispatch({
+      effects: themeCompartmentRef.current.reconfigure(
+        getThemeExtensions(colorScheme),
+      ),
     })
   }, [colorScheme])
 

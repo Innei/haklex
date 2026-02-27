@@ -48,9 +48,9 @@ export const container = style({
   position: 'relative',
   borderRadius: '0.5rem',
   overflow: 'hidden',
-  border: `1px solid ${vars.color.border}`,
+  border: `1px solid color-mix(in srgb, ${vars.color.border} 60%, transparent)`,
   background: vars.color.codeBg,
-  fontSize: '0.875rem',
+  fontSize: vars.typography.fontSizeMd,
 })
 
 export const header = style({
@@ -79,8 +79,8 @@ const tabBase = style({
   alignItems: 'center',
   gap: 6,
   padding: '6px 10px',
-  fontSize: '0.75rem',
-  fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+  fontSize: vars.typography.fontSizeXs,
+  fontFamily: vars.typography.fontMono,
   fontWeight: 500,
   color: vars.color.textSecondary,
   background: 'transparent',
@@ -104,7 +104,7 @@ export const tab = recipe({
     active: {
       true: {
         color: vars.color.text,
-        background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+        background: vars.color.bgTertiary,
       },
       false: {},
     },
@@ -119,8 +119,8 @@ export const titleBar = style({
   alignItems: 'center',
   gap: 6,
   padding: '6px 0',
-  fontSize: '0.75rem',
-  fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+  fontSize: vars.typography.fontSizeXs,
+  fontFamily: vars.typography.fontMono,
   fontWeight: 500,
   color: vars.color.textSecondary,
 })
@@ -170,9 +170,9 @@ export const codeScroll = style({
 export const codeBody = style({
   padding: '12px 16px',
   margin: 0,
-  fontSize: '0.8125rem',
+  fontSize: vars.typography.fontSizeSm,
   lineHeight: 1.7,
-  fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+  fontFamily: vars.typography.fontMono,
 })
 
 globalStyle(`${codeBody} pre`, {
@@ -183,6 +183,17 @@ globalStyle(`${codeBody} pre`, {
 globalStyle(`${codeBody} code`, {
   fontFamily: 'inherit',
 })
+
+/* ---- Shiki dual-theme: dark mode variable switch ---- */
+globalStyle(
+  `[data-theme='dark'] ${codeBody} .shiki-themes, [data-theme='dark'] ${codeBody} .shiki-themes span`,
+  {
+    color: 'var(--shiki-dark) !important' as any,
+    fontStyle: 'var(--shiki-dark-font-style) !important' as any,
+    fontWeight: 'var(--shiki-dark-font-weight) !important' as any,
+    textDecoration: 'var(--shiki-dark-text-decoration) !important' as any,
+  },
+)
 
 export const fileIcon = style({
   display: 'inline-flex',
@@ -224,7 +235,7 @@ export const editLabel = style({
   background: vars.color.bg,
   border: `1px solid ${vars.color.border}`,
   color: vars.color.text,
-  fontSize: '0.8125rem',
+  fontSize: vars.typography.fontSizeSm,
   fontWeight: 500,
   opacity: 0,
   transition: 'opacity 0.2s',
@@ -281,8 +292,8 @@ export const modalTitlebar = style({
 })
 
 export const modalTitle = style({
-  fontSize: '0.75rem',
-  fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+  fontSize: vars.typography.fontSizeXs,
+  fontFamily: vars.typography.fontMono,
   color: vars.color.textSecondary,
 })
 
@@ -326,7 +337,7 @@ export const sidebarHeader = style({
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: '12px 12px 8px',
-  fontSize: '0.625rem',
+  fontSize: vars.typography.fontSize2xs,
   fontWeight: 600,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
@@ -367,8 +378,8 @@ const fileItemBase = style({
   borderRadius: 6,
   height: 24,
   cursor: 'pointer',
-  fontSize: '0.75rem',
-  fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+  fontSize: vars.typography.fontSizeXs,
+  fontFamily: vars.typography.fontMono,
   color: vars.color.textSecondary,
   transition: 'background 0.15s, color 0.15s',
   selectors: {
@@ -450,8 +461,8 @@ export const renameInput = style({
   flex: 1,
   minWidth: 0,
   padding: '1px 4px',
-  fontSize: '0.75rem',
-  fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+  fontSize: vars.typography.fontSizeXs,
+  fontFamily: vars.typography.fontMono,
   borderRadius: 3,
   border: `1px solid ${vars.color.border}`,
   background: vars.color.bg,
@@ -485,8 +496,8 @@ export const breadcrumbLeft = style({
   display: 'flex',
   alignItems: 'center',
   gap: 6,
-  fontSize: '0.75rem',
-  fontFamily: 'var(--font-mono, ui-monospace, monospace)',
+  fontSize: vars.typography.fontSizeXs,
+  fontFamily: vars.typography.fontMono,
   color: vars.color.textSecondary,
   overflow: 'hidden',
 })
@@ -510,63 +521,48 @@ export const editorContainer = style({
   backgroundColor: 'transparent !important' as any,
 })
 
-globalStyle(`${editorContainer} pre code`, {
-  display: 'flex',
-  flexDirection: 'column',
-})
-
-globalStyle(`${editorContainer} > .shikicode.output`, {
-  position: 'static !important' as any,
-  inset: 'auto !important' as any,
-})
-
-globalStyle(`${editorContainer} .shikicode`, {
+/* ---- CodeMirror editor styling ---- */
+globalStyle(`${editorContainer} .cm-editor`, {
   height: '100%',
-  fontSize: '0.8125rem',
+  background: 'transparent',
+  color: vars.color.text,
+  fontFamily: vars.typography.fontMono,
+  fontSize: vars.typography.fontSizeSm,
+})
+
+globalStyle(`${editorContainer} .cm-scroller`, {
+  fontFamily: `${vars.typography.fontMono} !important` as any,
   lineHeight: 1.7,
 })
 
-globalStyle(
-  `${editorContainer} .shiki, ${editorContainer} code, ${editorContainer} pre`,
-  {
-    background: 'transparent !important' as any,
-  },
-)
-
-globalStyle(`${editorContainer} pre`, {
-  margin: '0 !important' as any,
-  padding: '0 !important' as any,
+globalStyle(`${editorContainer} .cm-content`, {
+  paddingTop: 0,
+  paddingBottom: 0,
+  paddingLeft: '0.5rem',
+  paddingRight: '1rem',
+  minHeight: '1.6em',
 })
 
-globalStyle(`${editorContainer} .shikicode.output .line::before`, {
-  backgroundColor: 'transparent !important' as any,
-  color:
-    `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent) !important` as any,
+globalStyle(`${editorContainer} .cm-line`, {
+  padding: 0,
 })
 
-globalStyle(`${editorContainer} .line`, {
-  display: 'block',
-  padding: '0 1rem',
-})
-
-globalStyle(`${editorContainer} .shikicode.input.line-numbers`, {
-  paddingLeft: 'calc(5em + 1rem)',
-})
-
-globalStyle(`${editorContainer} .shikicode.input:not(.line-numbers)`, {
+globalStyle(`${editorContainer} .cm-gutters`, {
+  background: 'transparent',
+  borderRight: 'none',
   paddingLeft: '1rem',
 })
 
-globalStyle(`${editorContainer} .line > span:last-child`, {
-  marginRight: '1rem',
-})
-
-globalStyle(`${editorContainer} .line::after`, {
-  content: "' '",
+globalStyle(`${editorContainer} .cm-lineNumbers .cm-gutterElement`, {
+  minWidth: '3em',
+  textAlign: 'right',
+  paddingRight: '2em',
+  color:
+    `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent) !important` as any,
 })
 
 export const dragOverlay = style({
   background: vars.color.bgSecondary,
   borderRadius: 6,
-  boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+  boxShadow: vars.boxShadow.modal,
 })

@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-code-snippet",
-  "version": "0.0.11",
+  "version": "0.0.38",
   "description": "Multi-file code snippet extension",
   "license": "MIT",
   "type": "module",
@@ -17,33 +17,37 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
+    "@codemirror/commands": "^6.10.2",
+    "@codemirror/state": "^6.5.4",
+    "@codemirror/view": "^6.39.15",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@haklex/cm-editor": "workspace:*",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "lucide-react": "^0.574.0",
-    "shikicode": "*"
+    "shiki": "^3.22.0"
   },
   "devDependencies": {
-    "@lexical/react": "^0.40.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vanilla-extract/css": "^1.17.1",
+    "@lexical/react": "^0.41.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vanilla-extract/css": "^1.18.0",
     "@vanilla-extract/recipes": "^0.5.7",
     "@vanilla-extract/vite-plugin": "^4.0.20",
-    "lexical": "^0.40.0",
+    "lexical": "^0.41.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "typescript": "^5.9.0",
+    "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.0"
+    "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "lexical": "^0.40.0",
+    "lexical": "^0.41.0",
     "react": ">=19"
   },
   "publishConfig": {
