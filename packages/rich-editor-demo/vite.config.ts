@@ -46,12 +46,32 @@ function workspaceCssPlugin(): Plugin {
   const scopes = new Set(['@haklex', '@shiro'])
   const EMPTY_PREFIX = '\0empty-css:'
   const VE_PREFIX = '\0ve-css:'
+  const RENDERER_STYLE_PREFIX = '\0renderer-style:'
 
   return {
     name: 'workspace-css-dev',
     apply: 'serve',
     enforce: 'pre',
     resolveId(id, importer) {
+      // style-renderer.css: plain CSS @import breaks HMR for upstream VE packages.
+      // Resolve to style-renderer.ts so each pkg/style.css gets proper VE resolution.
+      const rendererStyleMatch = id.match(
+        /^@([\w-]+)\/([\w-]+)\/style-renderer\.css$/,
+      )
+      if (rendererStyleMatch) {
+        const scope = `@${rendererStyleMatch[1]}`
+        const pkgDir = rendererStyleMatch[2]
+        if (scopes.has(scope)) {
+          const srcRendererTs = resolve(
+            __dirname,
+            `../${pkgDir}/src/style-renderer.ts`,
+          )
+          if (existsSync(srcRendererTs)) {
+            return `${RENDERER_STYLE_PREFIX}${srcRendererTs}`
+          }
+        }
+      }
+
       const m = id.match(/^@([\w-]+)\/([\w-]+)\/style\.css$/)
       if (!m) return null
 
@@ -91,6 +111,10 @@ function workspaceCssPlugin(): Plugin {
       if (id.startsWith(EMPTY_PREFIX)) return ''
       if (id.startsWith(VE_PREFIX)) {
         const sourcePath = id.slice(VE_PREFIX.length)
+        return `import ${JSON.stringify(sourcePath)}`
+      }
+      if (id.startsWith(RENDERER_STYLE_PREFIX)) {
+        const sourcePath = id.slice(RENDERER_STYLE_PREFIX.length)
         return `import ${JSON.stringify(sourcePath)}`
       }
     },

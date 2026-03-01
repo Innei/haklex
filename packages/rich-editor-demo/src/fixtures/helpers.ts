@@ -75,6 +75,9 @@ export const FORMAT_ITALIC = 1 << 1
 export const FORMAT_STRIKETHROUGH = 1 << 2
 export const FORMAT_UNDERLINE = 1 << 3
 export const FORMAT_CODE = 1 << 4
+export const FORMAT_SUBSCRIPT = 1 << 5
+export const FORMAT_SUPERSCRIPT = 1 << 6
+export const FORMAT_HIGHLIGHT = 1 << 7
 
 export function text(content: string, format = 0): SerializedTextNode {
   return {
@@ -190,6 +193,219 @@ export function horizontalRule() {
 export function lineBreak() {
   return {
     type: 'linebreak',
+    version: 1,
+  }
+}
+
+export function table(...children: SerializedLexicalNode[]) {
+  return {
+    children,
+    direction: 'ltr' as const,
+    format: '',
+    indent: 0,
+    type: 'table',
+    version: 1,
+  }
+}
+
+export function tableRow(...children: SerializedLexicalNode[]) {
+  return {
+    children,
+    direction: 'ltr' as const,
+    format: '',
+    indent: 0,
+    type: 'tablerow',
+    version: 1,
+  }
+}
+
+export function tableCell(
+  headerState: number,
+  ...children: SerializedLexicalNode[]
+) {
+  return {
+    children,
+    colSpan: 1,
+    direction: 'ltr' as const,
+    format: '',
+    headerState,
+    indent: 0,
+    type: 'tablecell',
+    version: 1,
+    width: null,
+  }
+}
+
+export function alertQuote(
+  alertType: string,
+  ...children: SerializedLexicalNode[]
+) {
+  return {
+    type: 'alert-quote',
+    alertType,
+    content: {
+      root: {
+        children,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        type: 'root' as const,
+        version: 1,
+      },
+    },
+    version: 1,
+  }
+}
+
+export function image(payload: {
+  src: string
+  altText: string
+  width?: number
+  height?: number
+  caption?: string
+  thumbhash?: string
+  accent?: string
+}) {
+  return {
+    type: 'image',
+    src: payload.src,
+    altText: payload.altText,
+    width: payload.width,
+    height: payload.height,
+    caption: payload.caption,
+    thumbhash: payload.thumbhash,
+    accent: payload.accent,
+    version: 1,
+  }
+}
+
+export function video(payload: {
+  src: string
+  poster?: string
+  width?: number
+  height?: number
+}) {
+  return {
+    type: 'video',
+    src: payload.src,
+    poster: payload.poster,
+    width: payload.width,
+    height: payload.height,
+    version: 1,
+  }
+}
+
+export function mermaid(diagram: string) {
+  return {
+    type: 'mermaid',
+    diagram,
+    version: 1,
+  }
+}
+
+export function katexBlock(equation: string) {
+  return {
+    type: 'katex-block',
+    equation,
+    version: 1,
+  }
+}
+
+export function katexInline(equation: string) {
+  return {
+    type: 'katex-inline',
+    equation,
+    version: 1,
+  }
+}
+
+export function details(
+  summary: string,
+  open: boolean,
+  ...children: SerializedLexicalNode[]
+) {
+  return {
+    type: 'details',
+    summary,
+    open,
+    children,
+    direction: 'ltr' as const,
+    format: '',
+    indent: 0,
+    version: 1,
+  }
+}
+
+export function spoiler(...children: SerializedLexicalNode[]) {
+  return {
+    type: 'spoiler',
+    children,
+    direction: 'ltr' as const,
+    format: '',
+    indent: 0,
+    version: 1,
+  }
+}
+
+export function ruby(base: string, reading: string) {
+  return {
+    type: 'ruby',
+    reading,
+    children: [text(base)],
+    direction: 'ltr' as const,
+    format: '',
+    indent: 0,
+    version: 1,
+  }
+}
+
+export function footnote(identifier: string) {
+  return {
+    type: 'footnote',
+    identifier,
+    version: 1,
+  }
+}
+
+export function footnoteSection(definitions: Record<string, string>) {
+  return {
+    type: 'footnote-section',
+    definitions,
+    version: 1,
+  }
+}
+
+export function mention(
+  platform: string,
+  handle: string,
+  displayName?: string,
+) {
+  return {
+    type: 'mention',
+    platform,
+    handle,
+    ...(displayName ? { displayName } : {}),
+    version: 1,
+  }
+}
+
+export function banner(
+  bannerType: 'note' | 'tip' | 'important' | 'warning' | 'caution',
+  ...children: SerializedLexicalNode[]
+) {
+  return {
+    type: 'banner',
+    bannerType,
+    content: {
+      root: {
+        children,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        type: 'root' as const,
+        version: 1,
+      },
+    },
     version: 1,
   }
 }

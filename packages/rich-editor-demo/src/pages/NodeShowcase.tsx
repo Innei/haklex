@@ -1,11 +1,28 @@
-import { RichRenderer } from '@shiro/rich-editor'
+import type { RichEditorVariant } from '@haklex/rich-editor'
+import { ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro'
+import type { SerializedEditorState } from 'lexical'
+import { useCallback, useState } from 'react'
 
 import { JsonViewer } from '../components/JsonViewer'
 import { Panel } from '../components/Panel'
+import { useTheme } from '../context/ThemeContext'
 import { nodeSamples } from '../fixtures'
-import { enhancedRendererConfig } from '../fixtures/enhanced-renderers'
 
 export function NodeShowcase() {
+  const theme = useTheme()
+  const [variant, setVariant] = useState<RichEditorVariant>('article')
+  const [mode, setMode] = useState<'edit' | 'readonly'>('readonly')
+  const [liveStateByKey, setLiveStateByKey] = useState<
+    Record<string, SerializedEditorState>
+  >({})
+
+  const handleEditorChange = useCallback(
+    (key: string, state: SerializedEditorState) => {
+      setLiveStateByKey((prev) => ({ ...prev, [key]: state }))
+    },
+    [],
+  )
+
   const inlineNodes = nodeSamples.filter((n) => n.category === 'inline')
   const blockNodes = nodeSamples.filter((n) => n.category === 'block')
   const containerNodes = nodeSamples.filter((n) => n.category === 'container')
@@ -16,8 +33,47 @@ export function NodeShowcase() {
         <h2>Node Showcase</h2>
         <p>
           All custom node types rendered individually with their DSL
-          definitions.
+          definitions, including Ruby annotations for Japanese furigana.
         </p>
+      </div>
+
+      <div className="toolbar">
+        <div className="toolbar-group">
+          <span className="toolbar-label">Mode</span>
+          <button
+            className={mode === 'readonly' ? 'btn btn-active' : 'btn'}
+            onClick={() => setMode('readonly')}
+          >
+            Readonly
+          </button>
+          <button
+            className={mode === 'edit' ? 'btn btn-active' : 'btn'}
+            onClick={() => setMode('edit')}
+          >
+            Edit
+          </button>
+        </div>
+        <div className="toolbar-group">
+          <span className="toolbar-label">Variant</span>
+          <button
+            className={variant === 'article' ? 'btn btn-active' : 'btn'}
+            onClick={() => setVariant('article')}
+          >
+            Article
+          </button>
+          <button
+            className={variant === 'comment' ? 'btn btn-active' : 'btn'}
+            onClick={() => setVariant('comment')}
+          >
+            Comment
+          </button>
+          <button
+            className={variant === 'note' ? 'btn btn-active' : 'btn'}
+            onClick={() => setVariant('note')}
+          >
+            Note
+          </button>
+        </div>
       </div>
 
       {/* Inline Nodes */}
@@ -32,13 +88,29 @@ export function NodeShowcase() {
             >
               <p className="node-description">{sample.description}</p>
               <div className="node-render">
-                <RichRenderer
-                  value={sample.data}
-                  variant="article"
-                  rendererConfig={enhancedRendererConfig}
-                />
+                {mode === 'edit' ? (
+                  <ShiroEditor
+                    key={`${sample.key}-edit`}
+                    initialValue={sample.data}
+                    variant={variant}
+                    theme={theme}
+                    onChange={(state) => handleEditorChange(sample.key, state)}
+                  />
+                ) : (
+                  <ShiroRenderer
+                    value={sample.data}
+                    variant={variant}
+                    theme={theme}
+                  />
+                )}
               </div>
-              <JsonViewer data={sample.data} />
+              <JsonViewer
+                data={
+                  mode === 'edit'
+                    ? (liveStateByKey[sample.key] ?? sample.data)
+                    : sample.data
+                }
+              />
             </Panel>
           ))}
         </div>
@@ -56,13 +128,29 @@ export function NodeShowcase() {
             >
               <p className="node-description">{sample.description}</p>
               <div className="node-render">
-                <RichRenderer
-                  value={sample.data}
-                  variant="article"
-                  rendererConfig={enhancedRendererConfig}
-                />
+                {mode === 'edit' ? (
+                  <ShiroEditor
+                    key={`${sample.key}-edit`}
+                    initialValue={sample.data}
+                    variant={variant}
+                    theme={theme}
+                    onChange={(state) => handleEditorChange(sample.key, state)}
+                  />
+                ) : (
+                  <ShiroRenderer
+                    value={sample.data}
+                    variant={variant}
+                    theme={theme}
+                  />
+                )}
               </div>
-              <JsonViewer data={sample.data} />
+              <JsonViewer
+                data={
+                  mode === 'edit'
+                    ? (liveStateByKey[sample.key] ?? sample.data)
+                    : sample.data
+                }
+              />
             </Panel>
           ))}
         </div>
@@ -80,13 +168,29 @@ export function NodeShowcase() {
             >
               <p className="node-description">{sample.description}</p>
               <div className="node-render">
-                <RichRenderer
-                  value={sample.data}
-                  variant="article"
-                  rendererConfig={enhancedRendererConfig}
-                />
+                {mode === 'edit' ? (
+                  <ShiroEditor
+                    key={`${sample.key}-edit`}
+                    initialValue={sample.data}
+                    variant={variant}
+                    theme={theme}
+                    onChange={(state) => handleEditorChange(sample.key, state)}
+                  />
+                ) : (
+                  <ShiroRenderer
+                    value={sample.data}
+                    variant={variant}
+                    theme={theme}
+                  />
+                )}
               </div>
-              <JsonViewer data={sample.data} />
+              <JsonViewer
+                data={
+                  mode === 'edit'
+                    ? (liveStateByKey[sample.key] ?? sample.data)
+                    : sample.data
+                }
+              />
             </Panel>
           ))}
         </div>

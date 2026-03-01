@@ -1,25 +1,90 @@
-import '@shiro/rich-editor/style.css'
+import 'modern-normalize/modern-normalize.css'
+import '@haklex/rich-kit-shiro/style.css'
+import '@haklex/rich-kit-shiro/style-renderer.css'
+import 'tldraw/tldraw.css'
 import './demo.css'
 
-import * as React from 'react'
-import { useEffect, useState } from 'react'
+import type { ColorScheme } from '@haklex/rich-editor'
+import { DialogStackProvider } from '@haklex/rich-editor-ui'
+import { TldrawConfigProvider } from '@haklex/rich-renderers/tldraw'
+import { Monitor, Moon, Sun } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import { ThemeContext } from './context/ThemeContext'
+import { CommentsPage } from './pages/CommentsPage'
+import { DiffPage } from './pages/DiffPage'
 import { EditorPage } from './pages/EditorPage'
+import { LinkCardPluginsPage } from './pages/LinkCardPluginsPage'
 import { NodeShowcase } from './pages/NodeShowcase'
 import { PresetsPage } from './pages/PresetsPage'
 
-type Page = 'editor' | 'nodes' | 'presets'
+type Page = 'editor' | 'comments' | 'nodes' | 'presets' | 'diff' | 'linkcard'
+type ThemeMode = 'system' | 'light' | 'dark'
+
+function useSystemColorScheme(): ColorScheme {
+  const [scheme, setScheme] = useState<ColorScheme>(() =>
+    window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light',
+  )
+
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-color-scheme: dark)')
+    const handler = (e: MediaQueryListEvent) =>
+      setScheme(e.matches ? 'dark' : 'light')
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  return scheme
+}
 
 export function App() {
   const [currentPage, setCurrentPage] = useState<Page>(() => {
     const hash = window.location.hash.slice(1) as Page
-    return hash === 'nodes' || hash === 'presets' ? hash : 'editor'
+    return hash === 'comments' ||
+      hash === 'nodes' ||
+      hash === 'presets' ||
+      hash === 'diff' ||
+      hash === 'linkcard'
+      ? hash
+      : 'editor'
   })
+  const [themeMode, setThemeMode] = useState<ThemeMode>('system')
+  const systemScheme = useSystemColorScheme()
+
+  const resolved: ColorScheme =
+    themeMode === 'system' ? systemScheme : themeMode
+
+  const dataTheme = useMemo(
+    () => (themeMode === 'system' ? systemScheme : themeMode),
+    [systemScheme, themeMode],
+  )
+
+  const cycleTheme = useCallback(() => {
+    setThemeMode((m) => {
+      if (m === 'system') return 'light'
+      if (m === 'light') return 'dark'
+      return 'system'
+    })
+  }, [])
+
+  const themeLabel =
+    themeMode === 'system' ? 'System' : themeMode === 'light' ? 'Light' : 'Dark'
+  const ThemeIcon =
+    themeMode === 'system' ? Monitor : themeMode === 'light' ? Sun : Moon
 
   useEffect(() => {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1) as Page
-      const validPage = hash === 'nodes' || hash === 'presets' ? hash : 'editor'
+      const validPage =
+        hash === 'comments' ||
+        hash === 'nodes' ||
+        hash === 'presets' ||
+        hash === 'diff' ||
+        hash === 'linkcard'
+          ? hash
+          : 'editor'
       setCurrentPage(validPage)
     }
 
@@ -31,50 +96,111 @@ export function App() {
     window.location.hash = page
   }
 
-  return (
-    <div className="app">
-      <header className="app-header">
-        <div className="app-header-content">
-          <div>
-            <h1 className="app-title">@shiro/rich-editor</h1>
-            <p className="app-subtitle">
-              Lexical-based rich text editor & renderer
-            </p>
-          </div>
-          <nav className="app-nav">
-            <button
-              className={
-                currentPage === 'editor' ? 'nav-tab nav-tab-active' : 'nav-tab'
-              }
-              onClick={() => navigate('editor')}
-            >
-              Editor
-            </button>
-            <button
-              className={
-                currentPage === 'nodes' ? 'nav-tab nav-tab-active' : 'nav-tab'
-              }
-              onClick={() => navigate('nodes')}
-            >
-              Node Showcase
-            </button>
-            <button
-              className={
-                currentPage === 'presets' ? 'nav-tab nav-tab-active' : 'nav-tab'
-              }
-              onClick={() => navigate('presets')}
-            >
-              Presets
-            </button>
-          </nav>
-        </div>
-      </header>
+  const mockSaveSnapshot = useCallback(async (snapshot: object) => {
+    const json = JSON.stringify(snapshot)
+    const blob = new Blob([json], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    console.log('[TldrawConfig] saveSnapshot → blob URL:', url)
+    return url
+  }, [])
 
-      <main className="app-main">
-        {currentPage === 'editor' && <EditorPage />}
-        {currentPage === 'nodes' && <NodeShowcase />}
-        {currentPage === 'presets' && <PresetsPage />}
-      </main>
-    </div>
+  return (
+    <ThemeContext value={resolved}>
+      <TldrawConfigProvider saveSnapshot={mockSaveSnapshot}>
+        <DialogStackProvider>
+          <div className="app" data-theme={dataTheme}>
+            <header className="app-header">
+              <div className="app-header-content">
+                <div>
+                  <h1 className="app-title">@haklex/rich-editor</h1>
+                  <p className="app-subtitle">
+                    Lexical-based rich text editor & renderer
+                  </p>
+                </div>
+                <nav className="app-nav">
+                  <button
+                    className={
+                      currentPage === 'editor'
+                        ? 'nav-tab nav-tab-active'
+                        : 'nav-tab'
+                    }
+                    onClick={() => navigate('editor')}
+                  >
+                    Editor
+                  </button>
+                  <button
+                    className={
+                      currentPage === 'comments'
+                        ? 'nav-tab nav-tab-active'
+                        : 'nav-tab'
+                    }
+                    onClick={() => navigate('comments')}
+                  >
+                    Comments
+                  </button>
+                  <button
+                    className={
+                      currentPage === 'nodes'
+                        ? 'nav-tab nav-tab-active'
+                        : 'nav-tab'
+                    }
+                    onClick={() => navigate('nodes')}
+                  >
+                    Node Showcase
+                  </button>
+                  <button
+                    className={
+                      currentPage === 'presets'
+                        ? 'nav-tab nav-tab-active'
+                        : 'nav-tab'
+                    }
+                    onClick={() => navigate('presets')}
+                  >
+                    Presets
+                  </button>
+                  <button
+                    className={
+                      currentPage === 'diff'
+                        ? 'nav-tab nav-tab-active'
+                        : 'nav-tab'
+                    }
+                    onClick={() => navigate('diff')}
+                  >
+                    Diff
+                  </button>
+                  <button
+                    className={
+                      currentPage === 'linkcard'
+                        ? 'nav-tab nav-tab-active'
+                        : 'nav-tab'
+                    }
+                    onClick={() => navigate('linkcard')}
+                  >
+                    LinkCard
+                  </button>
+                  <div className="nav-divider" />
+                  <button
+                    className="nav-theme-toggle"
+                    onClick={cycleTheme}
+                    title={themeLabel}
+                  >
+                    <ThemeIcon size={18} />
+                  </button>
+                </nav>
+              </div>
+            </header>
+
+            <main className="app-main">
+              {currentPage === 'editor' && <EditorPage />}
+              {currentPage === 'comments' && <CommentsPage />}
+              {currentPage === 'nodes' && <NodeShowcase />}
+              {currentPage === 'presets' && <PresetsPage />}
+              {currentPage === 'diff' && <DiffPage />}
+              {currentPage === 'linkcard' && <LinkCardPluginsPage />}
+            </main>
+          </div>
+        </DialogStackProvider>
+      </TldrawConfigProvider>
+    </ThemeContext>
   )
 }

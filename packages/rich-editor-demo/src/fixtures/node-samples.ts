@@ -1,6 +1,17 @@
 import type { SerializedEditorState } from 'lexical'
 
-import { doc, FORMAT_BOLD, FORMAT_ITALIC, paragraph, text } from './helpers'
+import {
+  alertQuote,
+  doc,
+  FORMAT_BOLD,
+  FORMAT_ITALIC,
+  paragraph,
+  ruby,
+  table,
+  tableCell,
+  tableRow,
+  text,
+} from './helpers'
 
 export interface NodeSample {
   key: string
@@ -47,6 +58,21 @@ export const nodeSamples: NodeSample[] = [
     ),
   },
   {
+    key: 'ruby',
+    label: 'Ruby Annotation',
+    description: 'Japanese furigana annotation with base text + reading',
+    category: 'inline',
+    data: doc(
+      paragraph(
+        text('日文注音示例：'),
+        ruby('漢字', 'かんじ'),
+        text(' 与 '),
+        ruby('東京', 'とうきょう'),
+        text('。'),
+      ),
+    ),
+  },
+  {
     key: 'mention',
     label: 'Mention',
     description: 'Social media mention syntax',
@@ -74,7 +100,7 @@ export const nodeSamples: NodeSample[] = [
   {
     key: 'footnote',
     label: 'Footnote Reference',
-    description: 'Footnote marker [^1]',
+    description: 'Footnote marker [^1] with definitions section',
     category: 'inline',
     data: doc(
       paragraph(
@@ -84,8 +110,22 @@ export const nodeSamples: NodeSample[] = [
           identifier: '1',
           version: 1,
         } as any,
-        text(' reference marker.'),
+        text(' and another reference'),
+        {
+          type: 'footnote',
+          identifier: '2',
+          version: 1,
+        } as any,
+        text('.'),
       ),
+      {
+        type: 'footnote-section',
+        definitions: {
+          '1': 'First footnote with detailed explanation.',
+          '2': 'Second footnote referencing additional sources.',
+        },
+        version: 1,
+      } as any,
     ),
   },
 
@@ -93,41 +133,170 @@ export const nodeSamples: NodeSample[] = [
   {
     key: 'image',
     label: 'Image',
-    description: 'Image with caption',
+    description: 'Image with thumbhash placeholder and zoom viewer',
     category: 'block',
     data: doc({
       type: 'image',
-      src: 'https://picsum.photos/800/400',
+      src: 'https://picsum.photos/1200/720?random=301',
       altText: 'Beautiful landscape',
-      caption: 'A stunning mountain landscape at sunset',
+      caption: 'A stunning mountain landscape with loading placeholder',
+      width: 1200,
+      height: 720,
+      thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+      accent: '#7ba8c4',
       version: 1,
     } as any),
   },
   {
     key: 'video',
     label: 'Video',
-    description: 'Video embed',
+    description: 'Custom player with seek, volume, fullscreen and download',
     category: 'block',
     data: doc({
       type: 'video',
-      src: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-      poster: 'https://picsum.photos/800/450',
+      src: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+      poster: 'https://picsum.photos/1280/720?random=302',
+      width: 1280,
+      height: 720,
       version: 1,
     } as any),
   },
   {
     key: 'codeblock',
     label: 'Code Block',
-    description: 'Syntax-highlighted code block',
+    description: 'Code card with language badge, copy button and collapse',
     category: 'block',
     data: doc({
       type: 'code-block',
       language: 'typescript',
-      code: `function greet(name: string): string {
-  return \`Hello, \${name}!\`
+      code: `type User = {
+  id: string
+  name: string
+  role: 'admin' | 'editor' | 'viewer'
 }
 
-console.log(greet('World'))`,
+type ApiResult<T> = {
+  data: T
+  status: number
+}
+
+function assertOk<T>(result: ApiResult<T>): T {
+  if (result.status >= 400) {
+    throw new Error(\`Request failed: \${result.status}\`)
+  }
+  return result.data
+}
+
+async function fetchUsers(): Promise<User[]> {
+  const response = await fetch('/api/users')
+  const result = (await response.json()) as ApiResult<User[]>
+  return assertOk(result)
+}
+
+async function bootstrap() {
+  const users = await fetchUsers()
+  const visible = users.filter((user) => user.role !== 'viewer')
+  console.table(visible)
+}
+
+void bootstrap()`,
+      version: 1,
+    } as any),
+  },
+  {
+    key: 'code-snippet',
+    label: 'Code Snippet',
+    description: 'Multi-file code snippet with tabbed file display',
+    category: 'block',
+    data: doc({
+      type: 'code-snippet',
+      files: [
+        {
+          filename: 'index.ts',
+          code: `export function hello(name: string): string {\n  return \`Hello, \${name}!\`\n}`,
+          language: 'typescript',
+        },
+        {
+          filename: 'test.ts',
+          code: `import { hello } from './index'\n\nconsole.log(hello('World'))`,
+          language: 'typescript',
+        },
+      ],
+      version: 1,
+    } as any),
+  },
+  {
+    key: 'mermaid',
+    label: 'Mermaid Diagram',
+    description: 'Independent Mermaid diagram node',
+    category: 'block',
+    data: doc({
+      type: 'mermaid',
+      diagram: `graph TD
+    A[Start] --> B{Decision}
+    B -->|Yes| C[OK]
+    B -->|No| D[Cancel]
+    C --> E[End]
+    D --> E`,
+      version: 1,
+    } as any),
+  },
+  {
+    key: 'mermaid-sequence',
+    label: 'Mermaid - Sequence Diagram',
+    description: 'Sequence diagram showing interactions',
+    category: 'block',
+    data: doc({
+      type: 'mermaid',
+      diagram: `sequenceDiagram
+    participant Client
+    participant Server
+    participant DB
+    Client->>Server: POST /api/login
+    Server->>DB: Query user
+    DB-->>Server: User record
+    Server-->>Client: JWT token`,
+      version: 1,
+    } as any),
+  },
+  {
+    key: 'mermaid-pie',
+    label: 'Mermaid - Pie Chart',
+    description: 'Pie chart for data visualization',
+    category: 'block',
+    data: doc({
+      type: 'mermaid',
+      diagram: `pie title Tech Stack Usage
+    "React" : 45
+    "Vue" : 25
+    "Angular" : 15
+    "Svelte" : 10
+    "Other" : 5`,
+      version: 1,
+    } as any),
+  },
+  {
+    key: 'mermaid-classDiagram',
+    label: 'Mermaid - Class Diagram',
+    description: 'UML class diagram',
+    category: 'block',
+    data: doc({
+      type: 'mermaid',
+      diagram: `classDiagram
+    class Node {
+      +String type
+      +getType() String
+      +clone() Node
+    }
+    class DecoratorNode {
+      +decorate() ReactElement
+    }
+    class MermaidNode {
+      -String diagram
+      +getDiagram() String
+    }
+    Node <|-- DecoratorNode
+    DecoratorNode <|-- MermaidNode`,
       version: 1,
     } as any),
   },
@@ -158,6 +327,37 @@ console.log(greet('World'))`,
     } as any),
   },
   {
+    key: 'table',
+    label: 'Table',
+    description:
+      'Table with header row, action menu, hover add, and column resize',
+    category: 'block',
+    data: doc(
+      table(
+        tableRow(
+          tableCell(1, paragraph(text('Feature'))),
+          tableCell(1, paragraph(text('Status'))),
+          tableCell(1, paragraph(text('Notes'))),
+        ),
+        tableRow(
+          tableCell(0, paragraph(text('Action Menu'))),
+          tableCell(0, paragraph(text('Done', FORMAT_BOLD))),
+          tableCell(0, paragraph(text('Chevron dropdown on active cell'))),
+        ),
+        tableRow(
+          tableCell(0, paragraph(text('Hover Actions'))),
+          tableCell(0, paragraph(text('Done', FORMAT_BOLD))),
+          tableCell(0, paragraph(text('+ buttons on edges'))),
+        ),
+        tableRow(
+          tableCell(0, paragraph(text('Column Resize'))),
+          tableCell(0, paragraph(text('Done', FORMAT_BOLD))),
+          tableCell(0, paragraph(text('Drag cell borders'))),
+        ),
+      ) as any,
+    ),
+  },
+  {
     key: 'tasklist',
     label: 'Task List',
     description: 'Checkbox task list items',
@@ -169,7 +369,7 @@ console.log(greet('World'))`,
       start: 1,
       children: [
         {
-          type: 'task-listitem',
+          type: 'listitem',
           checked: true,
           value: 1,
           children: [paragraph(text('Completed task'))],
@@ -179,7 +379,7 @@ console.log(greet('World'))`,
           version: 1,
         },
         {
-          type: 'task-listitem',
+          type: 'listitem',
           checked: false,
           value: 2,
           children: [paragraph(text('Pending task'))],
@@ -202,91 +402,66 @@ console.log(greet('World'))`,
     label: 'Alert - Note',
     description: 'Note alert type',
     category: 'container',
-    data: doc({
-      type: 'alert-quote',
-      alertType: 'note',
-      children: [
+    data: doc(
+      alertQuote(
+        'note',
         paragraph(
           text('This is a note alert. Use it for additional information.'),
         ),
-      ],
-      direction: 'ltr',
-      format: '',
-      indent: 0,
-      version: 1,
-    } as any),
+      ) as any,
+    ),
   },
   {
     key: 'alert-tip',
     label: 'Alert - Tip',
     description: 'Tip alert type',
     category: 'container',
-    data: doc({
-      type: 'alert-quote',
-      alertType: 'tip',
-      children: [
+    data: doc(
+      alertQuote(
+        'tip',
         paragraph(text('💡 Pro tip: Always test your code before deploying!')),
-      ],
-      direction: 'ltr',
-      format: '',
-      indent: 0,
-      version: 1,
-    } as any),
+      ) as any,
+    ),
   },
   {
     key: 'alert-important',
     label: 'Alert - Important',
     description: 'Important alert type',
     category: 'container',
-    data: doc({
-      type: 'alert-quote',
-      alertType: 'important',
-      children: [
+    data: doc(
+      alertQuote(
+        'important',
         paragraph(text('⚠️ Important: This feature requires authentication.')),
-      ],
-      direction: 'ltr',
-      format: '',
-      indent: 0,
-      version: 1,
-    } as any),
+      ) as any,
+    ),
   },
   {
     key: 'alert-warning',
     label: 'Alert - Warning',
     description: 'Warning alert type',
     category: 'container',
-    data: doc({
-      type: 'alert-quote',
-      alertType: 'warning',
-      children: [
+    data: doc(
+      alertQuote(
+        'warning',
         paragraph(text('⚡ Warning: This operation cannot be undone!')),
-      ],
-      direction: 'ltr',
-      format: '',
-      indent: 0,
-      version: 1,
-    } as any),
+      ) as any,
+    ),
   },
   {
     key: 'alert-caution',
     label: 'Alert - Caution',
     description: 'Caution alert type',
     category: 'container',
-    data: doc({
-      type: 'alert-quote',
-      alertType: 'caution',
-      children: [
+    data: doc(
+      alertQuote(
+        'caution',
         paragraph(
           text(
             '🚨 Caution: Modifying this configuration may break your system.',
           ),
         ),
-      ],
-      direction: 'ltr',
-      format: '',
-      indent: 0,
-      version: 1,
-    } as any),
+      ) as any,
+    ),
   },
 
   // Banner Types
@@ -382,30 +557,6 @@ console.log(greet('World'))`,
     } as any),
   },
   {
-    key: 'tabs',
-    label: 'Tabs',
-    description: 'Multi-tab container',
-    category: 'container',
-    data: doc({
-      type: 'tabs',
-      tabs: [
-        {
-          label: 'JavaScript',
-          content: 'console.log("Hello from JavaScript!")',
-        },
-        {
-          label: 'TypeScript',
-          content: 'const message: string = "Hello from TypeScript!"',
-        },
-        {
-          label: 'Python',
-          content: 'print("Hello from Python!")',
-        },
-      ],
-      version: 1,
-    } as any),
-  },
-  {
     key: 'gallery-grid',
     label: 'Gallery - Grid',
     description: 'Image gallery with grid layout',
@@ -414,10 +565,34 @@ console.log(greet('World'))`,
       type: 'gallery',
       layout: 'grid',
       images: [
-        { src: 'https://picsum.photos/400/300?random=1', alt: 'Image 1' },
-        { src: 'https://picsum.photos/400/300?random=2', alt: 'Image 2' },
-        { src: 'https://picsum.photos/400/300?random=3', alt: 'Image 3' },
-        { src: 'https://picsum.photos/400/300?random=4', alt: 'Image 4' },
+        {
+          src: 'https://picsum.photos/400/300?random=1',
+          alt: 'Image 1',
+          width: 400,
+          height: 300,
+          thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        },
+        {
+          src: 'https://picsum.photos/400/300?random=2',
+          alt: 'Image 2',
+          width: 400,
+          height: 300,
+          thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        },
+        {
+          src: 'https://picsum.photos/400/300?random=3',
+          alt: 'Image 3',
+          width: 400,
+          height: 300,
+          thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        },
+        {
+          src: 'https://picsum.photos/400/300?random=4',
+          alt: 'Image 4',
+          width: 400,
+          height: 300,
+          thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        },
       ],
       version: 1,
     } as any),
@@ -431,10 +606,121 @@ console.log(greet('World'))`,
       type: 'gallery',
       layout: 'carousel',
       images: [
-        { src: 'https://picsum.photos/800/400?random=5', alt: 'Slide 1' },
-        { src: 'https://picsum.photos/800/400?random=6', alt: 'Slide 2' },
-        { src: 'https://picsum.photos/800/400?random=7', alt: 'Slide 3' },
+        {
+          src: 'https://picsum.photos/800/400?random=5',
+          alt: 'Slide 1',
+          width: 800,
+          height: 400,
+          thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        },
+        {
+          src: 'https://picsum.photos/800/400?random=6',
+          alt: 'Slide 2',
+          width: 800,
+          height: 400,
+          thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        },
+        {
+          src: 'https://picsum.photos/800/400?random=7',
+          alt: 'Slide 3',
+          width: 800,
+          height: 400,
+          thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        },
       ],
+      version: 1,
+    } as any),
+  },
+  {
+    key: 'tldraw',
+    label: 'Tldraw Canvas',
+    description:
+      'Interactive tldraw whiteboard (extension node via extraNodes)',
+    category: 'block',
+    data: doc({
+      type: 'tldraw',
+      snapshot: JSON.stringify({
+        store: {
+          'document:document': {
+            gridSize: 10,
+            name: '',
+            meta: {},
+            id: 'document:document',
+            typeName: 'document',
+          },
+          'page:page': {
+            meta: {},
+            id: 'page:page',
+            name: 'Page 1',
+            index: 'a1',
+            typeName: 'page',
+          },
+          'shape:rect1': {
+            x: 100,
+            y: 100,
+            rotation: 0,
+            isLocked: false,
+            opacity: 1,
+            meta: {},
+            id: 'shape:rect1',
+            type: 'geo',
+            props: {
+              w: 200,
+              h: 120,
+              geo: 'rectangle',
+              color: 'blue',
+              labelColor: 'black',
+              fill: 'solid',
+              dash: 'draw',
+              size: 'm',
+              font: 'draw',
+              text: 'Hello Tldraw',
+              align: 'middle',
+              verticalAlign: 'middle',
+              growY: 0,
+              url: '',
+              scale: 1,
+            },
+            parentId: 'page:page',
+            index: 'a1',
+            typeName: 'shape',
+          },
+          'shape:arrow1': {
+            x: 350,
+            y: 140,
+            rotation: 0,
+            isLocked: false,
+            opacity: 1,
+            meta: {},
+            id: 'shape:arrow1',
+            type: 'geo',
+            props: {
+              w: 160,
+              h: 80,
+              geo: 'ellipse',
+              color: 'orange',
+              labelColor: 'black',
+              fill: 'semi',
+              dash: 'draw',
+              size: 'm',
+              font: 'draw',
+              text: 'Demo',
+              align: 'middle',
+              verticalAlign: 'middle',
+              growY: 0,
+              url: '',
+              scale: 1,
+            },
+            parentId: 'page:page',
+            index: 'a2',
+            typeName: 'shape',
+          },
+        },
+        schema: {
+          schemaVersion: 2,
+          sequences: {},
+        },
+      }),
       version: 1,
     } as any),
   },
@@ -446,17 +732,38 @@ console.log(greet('World'))`,
     data: doc({
       type: 'grid-container',
       cols: 2,
-      gap: 16,
-      children: [
-        paragraph(text('Left column content with some text', FORMAT_BOLD)),
-        paragraph(
-          text('Right column content with ', 0),
-          text('italic text', FORMAT_ITALIC),
-        ),
+      gap: '16px',
+      cells: [
+        {
+          root: {
+            children: [
+              paragraph(
+                text('Left column content with some text', FORMAT_BOLD),
+              ),
+            ],
+            direction: null,
+            format: '',
+            indent: 0,
+            type: 'root',
+            version: 1,
+          },
+        },
+        {
+          root: {
+            children: [
+              paragraph(
+                text('Right column content with ', 0),
+                text('italic text', FORMAT_ITALIC),
+              ),
+            ],
+            direction: null,
+            format: '',
+            indent: 0,
+            type: 'root',
+            version: 1,
+          },
+        },
       ],
-      direction: 'ltr',
-      format: '',
-      indent: 0,
       version: 1,
     } as any),
   },
