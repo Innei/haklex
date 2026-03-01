@@ -1,64 +1,136 @@
-import './styles.css'
-
-import type { LinkCardRendererProps } from '@shiro/rich-editor'
-import { m, useMotionTemplate, useMotionValue } from 'motion/react'
+import type { LinkCardRendererProps } from '@haklex/rich-editor'
+import { Globe } from 'lucide-react'
 import type { ComponentType } from 'react'
-import { useCallback } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
+import { useLinkCardFetchContext } from './FetchContext'
 import { useCardFetcher } from './hooks/useCardFetcher'
+import { useUrlMatcher } from './hooks/useUrlMatcher'
 import { LinkCardSkeleton } from './LinkCardSkeleton'
-import { pluginMap } from './plugins'
+import { plugins as builtinPlugins } from './plugins'
+import * as styles from './styles.css'
+import type { LinkCardFetchContext, PluginRegistry } from './types'
 
 export interface EnhancedLinkCardProps extends LinkCardRendererProps {
-  /** Plugin source (e.g., 'github-repo', 'arxiv') */
   source?: string
-  /** ID for plugin-based fetch (e.g., 'owner/repo') */
   id?: string
+  className?: string
+  /**
+   * 额外插件，与内置插件合并（同名覆盖内置，按 priority 排序）
+   */
+  plugins?: PluginRegistry
+  fetchContext?: LinkCardFetchContext
 }
 
-/**
- * Enhanced LinkCard Renderer for @shiro/rich-editor
- * Supports plugin-based dynamic fetching and spotlight effects
- */
+function FallbackIcon({ favicon }: { favicon?: string }) {
+  const [faviconFailed, setFaviconFailed] = useState(false)
+
+  return (
+    <span className={`${styles.icon} ${styles.semanticClassNames.icon}`}>
+      {favicon && !faviconFailed ? (
+        <img src={favicon} alt="" onError={() => setFaviconFailed(true)} />
+      ) : (
+        <Globe aria-hidden="true" />
+      )}
+    </span>
+  )
+}
+
+function mapSemanticClasses(classNames?: string): string {
+  if (!classNames) return ''
+  return classNames
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((cls) =>
+      styles.semanticClassToStyle[cls]
+        ? `${styles.semanticClassToStyle[cls]} ${cls}`
+        : cls,
+    )
+    .join(' ')
+}
+
 export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (
   props,
 ) => {
-  const { url, title, description, favicon, image, source, id } = props
+  const {
+    url,
+    title,
+    description,
+    favicon,
+    image,
+    source: explicitSource,
+    id: explicitId,
+    className,
+    plugins: extraPlugins,
+    fetchContext: fetchContextProp,
+  } = props
 
-  // If source + id provided, use plugin system for dynamic fetch
-  const useDynamicFetch = !!source && !!id
-  const { loading, isError, cardInfo, fullUrl, isValid } = useCardFetcher({
-    source: source || '',
-    id: id || '',
-    fallbackUrl: url,
-    enabled: useDynamicFetch,
-  })
+  const contextValue = useLinkCardFetchContext()
+  const fetchContext = fetchContextProp ?? contextValue
 
-  const plugin = source ? pluginMap.get(source) : undefined
-  const typeClass = plugin?.typeClass ? `link-card--${plugin.typeClass}` : ''
+  const mergedPlugins = useMemo(() => {
+    if (!extraPlugins || extraPlugins.length === 0) return builtinPlugins
+    const map = new Map(builtinPlugins.map((p) => [p.name, p]))
+    for (const plugin of extraPlugins) {
+      map.set(plugin.name, plugin)
+    }
+    return [...map.values()].sort(
+      (a, b) => (b.priority ?? 0) - (a.priority ?? 0),
+    )
+  }, [extraPlugins])
 
-  const mouseX = useMotionValue(0)
-  const mouseY = useMotionValue(0)
-  const radius = useMotionValue(0)
-
-  const handleMouseMove = useCallback(
-    ({ clientX, clientY, currentTarget }: React.MouseEvent) => {
-      const bounds = currentTarget.getBoundingClientRect()
-      mouseX.set(clientX - bounds.left)
-      mouseY.set(clientY - bounds.top)
-      radius.set(Math.hypot(bounds.width, bounds.height) * 1.3)
-    },
-    [mouseX, mouseY, radius],
+  const pluginMap = useMemo(
+    () => new Map(mergedPlugins.map((plugin) => [plugin.name, plugin])),
+    [mergedPlugins],
   )
 
-  const background = useMotionTemplate`radial-gradient(${radius}px circle at ${mouseX}px ${mouseY}px, var(--spotlight-color) 0%, transparent 65%)`
+  const urlMatch = useUrlMatcher(
+    !explicitSource || !explicitId ? url : undefined,
+    mergedPlugins,
+  )
+  const source = explicitSource || urlMatch?.plugin.name
+  const id = explicitId || urlMatch?.match.id
+  const matchedFullUrl = urlMatch?.match.fullUrl
 
-  // Use plugin data if available, otherwise use props
+  const useDynamicFetch = !!source && !!id
+  const selectedPlugin = source ? pluginMap.get(source) : undefined
+  const { loading, isError, cardInfo, fullUrl, isValid, ref } = useCardFetcher({
+    source,
+    plugin: selectedPlugin,
+    id: id || '',
+    fallbackUrl: matchedFullUrl || url,
+    enabled: useDynamicFetch,
+    context: fetchContext,
+  })
+
+  const typeClass = selectedPlugin?.typeClass
+  const typeStyleClass = typeClass ? styles.typeCardModifier[typeClass] : ''
+  const typeSemanticClass = typeClass
+    ? styles.semanticTypeClassNames[typeClass]
+    : ''
+
   const finalTitle = cardInfo?.title || title || url
   const finalDesc = cardInfo?.desc || description
   const finalImage = cardInfo?.image || image
   const finalColor = cardInfo?.color
   const classNames = cardInfo?.classNames || {}
+  const mappedCardRootClass = mapSemanticClasses(classNames.cardRoot)
+  const mappedImageClass = mapSemanticClasses(classNames.image)
+
+  const [shortDesc, setShortDesc] = useState(false)
+  const descRef = useRef<HTMLSpanElement | null>(null)
+
+  useEffect(() => {
+    const el = descRef.current
+    if (!el || !finalDesc) {
+      setShortDesc(false)
+      return
+    }
+    const style = getComputedStyle(el)
+    const lineHeight = Number.parseFloat(style.lineHeight) || 1.5 * 14
+    const maxTwoLines = lineHeight * 2
+    setShortDesc(el.scrollHeight <= maxTwoLines + 1)
+  }, [finalDesc, finalTitle])
 
   if (useDynamicFetch && !isValid) {
     return null
@@ -67,71 +139,96 @@ export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (
   if (useDynamicFetch && loading) {
     return (
       <a
-        className="link-card"
+        data-hide-print
+        ref={ref}
         href={fullUrl}
         target="_blank"
         rel="noopener noreferrer"
       >
-        <LinkCardSkeleton />
+        <LinkCardSkeleton source={source} />
       </a>
     )
   }
 
+  const hasImage = !!finalImage
+  const showImagePlaceholder = useDynamicFetch && isError && !hasImage
+
   return (
     <a
-      className={`link-card ${typeClass} ${isError ? 'link-card--error' : ''} ${classNames.cardRoot || ''}`}
+      data-hide-print
+      ref={useDynamicFetch ? ref : undefined}
+      className={[
+        styles.card,
+        styles.semanticClassNames.card,
+        typeStyleClass,
+        typeSemanticClass,
+        shortDesc && styles.cardShortDesc,
+        shortDesc && styles.semanticClassNames.cardShortDesc,
+        useDynamicFetch && (loading || isError) && styles.cardSkeleton,
+        useDynamicFetch &&
+          (loading || isError) &&
+          styles.semanticClassNames.cardSkeleton,
+        useDynamicFetch && isError && styles.cardError,
+        useDynamicFetch && isError && styles.semanticClassNames.cardError,
+        'not-prose',
+        className,
+        mappedCardRootClass,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      data-source={source || undefined}
       href={useDynamicFetch ? fullUrl : url}
       target="_blank"
       rel="noopener noreferrer"
       style={{
         borderColor: finalColor ? `${finalColor}30` : undefined,
       }}
-      onMouseMove={handleMouseMove}
     >
       {finalColor && (
-        <>
-          <div
-            className="link-card__bg"
-            style={{
-              backgroundColor: finalColor,
-              opacity: 0.06,
-            }}
-          />
-          <m.div
-            className="link-card__spotlight"
-            style={
-              {
-                '--spotlight-color': `${finalColor}50`,
-                background,
-              } as any
-            }
-          />
-        </>
-      )}
-      <span className="link-card__content">
-        <span className="link-card__title">
-          {favicon && (
-            <img
-              className="link-card__favicon"
-              src={favicon}
-              alt=""
-              width={16}
-              height={16}
-            />
-          )}
-          {finalTitle}
-        </span>
-        {finalDesc && <span className="link-card__desc">{finalDesc}</span>}
-        <span className="link-card__url">{url}</span>
-      </span>
-      {finalImage && (
-        <span
-          className={`link-card__image ${classNames.image || ''}`}
+        <div
+          className={`${styles.bg} ${styles.semanticClassNames.bg}`}
           style={{
-            backgroundImage: `url(${finalImage})`,
+            backgroundColor: finalColor,
+            opacity: 0.04,
           }}
         />
       )}
+      {hasImage || showImagePlaceholder ? (
+        <span
+          className={[
+            styles.image,
+            styles.semanticClassNames.image,
+            mappedImageClass,
+          ]
+            .filter(Boolean)
+            .join(' ')}
+          data-image={finalImage || ''}
+          style={{
+            backgroundImage: finalImage ? `url(${finalImage})` : undefined,
+          }}
+        />
+      ) : (
+        <FallbackIcon favicon={favicon} />
+      )}
+      <span
+        className={`${styles.content} ${styles.semanticClassNames.content}`}
+      >
+        <span className={`${styles.title} ${styles.semanticClassNames.title}`}>
+          <span
+            className={`${styles.titleText} ${styles.semanticClassNames.titleText}`}
+          >
+            {finalTitle}
+          </span>
+        </span>
+        {finalDesc && (
+          <span
+            ref={descRef}
+            className={`${styles.desc} ${styles.semanticClassNames.desc}`}
+          >
+            {finalDesc}
+          </span>
+        )}
+      </span>
     </a>
   )
 }

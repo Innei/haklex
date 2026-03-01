@@ -31,6 +31,28 @@ export interface UrlMatchResult {
   meta?: Record<string, unknown>
 }
 
+/**
+ * 请求适配器：由业务方注入具体请求策略（鉴权、代理、限流兜底、重试等）
+ */
+export interface LinkCardApiAdapter {
+  request<T = unknown>(input: string, init?: RequestInit): Promise<T>
+}
+
+/**
+ * LinkCard fetch 运行时上下文
+ */
+export interface LinkCardFetchContext {
+  /**
+   * 全局默认 fetcher（当 provider 适配器不存在时使用）
+   */
+  fetchJson?<T = unknown>(input: string, init?: RequestInit): Promise<T>
+  /**
+   * 按 provider 注入请求适配器
+   * 例如: { github: { request: ... }, tmdb: { request: ... } }
+   */
+  adapters?: Record<string, LinkCardApiAdapter>
+}
+
 /** 卡片类型样式 */
 export type LinkCardTypeClass =
   | 'media'
@@ -54,6 +76,8 @@ export interface LinkCardPlugin<TMeta = Record<string, unknown>> {
 
   /** 卡片样式类型 */
   readonly typeClass?: LinkCardTypeClass
+  /** 插件依赖的 provider 名称，用于路由到对应请求适配器 */
+  readonly provider?: string
 
   /**
    * 匹配 URL
@@ -70,8 +94,13 @@ export interface LinkCardPlugin<TMeta = Record<string, unknown>> {
    * 获取卡片数据
    * @param id - 解析后的标识符
    * @param meta - URL 匹配时的元数据
+   * @param context - 运行时上下文（请求适配器、全局 fetcher 等）
    */
-  fetch(id: string, meta?: TMeta): Promise<LinkCardData>
+  fetch(
+    id: string,
+    meta?: TMeta,
+    context?: LinkCardFetchContext,
+  ): Promise<LinkCardData>
 }
 
 /**

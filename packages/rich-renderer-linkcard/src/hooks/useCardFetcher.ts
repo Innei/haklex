@@ -1,14 +1,19 @@
 import { useCallback, useMemo, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 
-import { pluginMap } from '../plugins'
-import type { LinkCardData } from '../types'
+import type {
+  LinkCardData,
+  LinkCardFetchContext,
+  LinkCardPlugin,
+} from '../types'
 
 export interface UseCardFetcherOptions {
-  source: string
+  source?: string
+  plugin?: LinkCardPlugin
   id: string
   fallbackUrl?: string
   enabled?: boolean
+  context?: LinkCardFetchContext
 }
 
 export interface UseCardFetcherResult {
@@ -17,23 +22,18 @@ export interface UseCardFetcherResult {
   cardInfo: LinkCardData | undefined
   fullUrl: string
   isValid: boolean
+  ref: (node?: Element | null) => void
 }
 
-/**
- * Hook to fetch card data using plugin system
- */
 export function useCardFetcher(
   options: UseCardFetcherOptions,
 ): UseCardFetcherResult {
-  const { source, id, fallbackUrl, enabled = true } = options
+  const { source, plugin, id, fallbackUrl, enabled = true, context } = options
 
   const [loading, setLoading] = useState(true)
   const [isError, setIsError] = useState(false)
   const [fullUrl] = useState(fallbackUrl || 'javascript:;')
   const [cardInfo, setCardInfo] = useState<LinkCardData>()
-
-  // Get plugin
-  const plugin = pluginMap.get(source)
 
   const isValid = useMemo(() => {
     if (!enabled || !plugin) return false
@@ -47,15 +47,18 @@ export function useCardFetcher(
     setIsError(false)
 
     try {
-      const data = await plugin.fetch(id)
+      const data = await plugin.fetch(id, undefined, context)
       setCardInfo(data)
     } catch (err) {
-      console.error(`[LinkCard] Error fetching ${source} data:`, err)
+      console.error(
+        `[LinkCard] Error fetching ${source || plugin.name} data:`,
+        err,
+      )
       setIsError(true)
     } finally {
       setLoading(false)
     }
-  }, [plugin, isValid, id, source])
+  }, [context, plugin, isValid, id, source])
 
   const { ref } = useInView({
     triggerOnce: true,
@@ -65,15 +68,12 @@ export function useCardFetcher(
     },
   })
 
-  // Expose ref for lazy loading
-   
-  const _ref = ref
-
   return {
     loading,
     isError,
     cardInfo,
     fullUrl,
     isValid,
+    ref,
   }
 }

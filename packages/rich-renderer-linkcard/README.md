@@ -1,111 +1,64 @@
-# @shiro/rich-renderer-linkcard
+# @haklex/rich-renderer-linkcard
 
-Enhanced LinkCard renderer for `@shiro/rich-editor` with plugin-based dynamic fetching and spotlight effects.
+链接卡片渲染器，支持多平台元数据获取。
 
-## Features
-
-- 🔌 **Plugin System** - Extensible architecture for supporting multiple link types
-- ✨ **Spotlight Effect** - Dynamic hover spotlight with accent colors
-- 🎨 **Type Classes** - Themed styles for different link types (GitHub, Media, Academic)
-- 🔄 **Lazy Loading** - Fetch card data only when visible
-- 📦 **12 Built-in Plugins** (TODO: migrate from main project)
-
-## Installation
+## 安装
 
 ```bash
-pnpm add @shiro/rich-renderer-linkcard
+pnpm add @haklex/rich-renderer-linkcard @haklex/rich-editor
 ```
 
-## Usage
-
-### With RendererConfig
-
-```tsx
-import { RichEditor } from '@shiro/rich-editor'
-import { LinkCardRenderer } from '@shiro/rich-renderer-linkcard'
-import '@shiro/rich-renderer-linkcard/style.css'
-
-<RichEditor
-  rendererConfig={{
-    LinkCard: LinkCardRenderer,
-  }}
-/>
-```
-
-### Plugin-based Dynamic Fetch
-
-```tsx
-import { LinkCardRenderer } from '@shiro/rich-renderer-linkcard'
-
-// Auto-detect GitHub repo and fetch metadata
-<LinkCardRenderer
-  url="https://github.com/facebook/react"
-  source="github-repo"
-  id="facebook/react"
-/>
-```
-
-### Static Props
-
-```tsx
-<LinkCardRenderer
-  url="https://example.com"
-  title="Example Site"
-  description="A great example website"
-  image="https://example.com/og-image.jpg"
-  favicon="https://example.com/favicon.ico"
-/>
-```
-
-## Available Plugins
-
-Currently implemented:
-- ✅ **github-repo** - GitHub repositories
-
-TODO (migrate from main project):
-- [ ] **github-commit** - GitHub commits
-- [ ] **github-pr** - GitHub pull requests
-- [ ] **github-issue** - GitHub issues
-- [ ] **github-discussion** - GitHub discussions
-- [ ] **arxiv** - arXiv papers
-- [ ] **tmdb** - TMDB movies/TV shows
-- [ ] **bangumi** - Bangumi anime/manga
-- [ ] **qq-music** - QQ Music songs
-- [ ] **netease-music** - NetEase Cloud Music
-- [ ] **leetcode** - LeetCode problems
-- [ ] **mx-space** - MX-Space internal links
-
-## Creating Custom Plugins
+## 导出
 
 ```ts
-import type { LinkCardPlugin } from '@shiro/rich-renderer-linkcard'
+// 渲染器
+export { LinkCardRenderer } from './LinkCardRenderer'
+export { LinkCardEditNode, linkCardEditNodes } from './LinkCardEditNode'
+export { LinkCardSkeleton } from './LinkCardSkeleton'
 
-export const myPlugin: LinkCardPlugin = {
-  name: 'my-plugin',
-  displayName: 'My Custom Plugin',
-  priority: 50,
-  typeClass: 'media',
+// Hooks
+export { useUrlMatcher } from './hooks/useUrlMatcher'
 
-  matchUrl(url: URL) {
-    if (url.hostname !== 'example.com') return null
-    return { id: url.pathname, fullUrl: url.href }
-  },
+// 插件
+export { plugins, pluginMap, getPluginByName } from './plugins'
+export { 
+  githubRepoPlugin, githubPrPlugin, githubIssuePlugin,
+  githubCommitPlugin, githubDiscussionPlugin,
+  arxivPlugin, tmdbPlugin, bangumiPlugin,
+  leetcodePlugin, mxSpacePlugin, createMxSpacePlugin,
+  neteaseMusicPlugin, qqMusicPlugin 
+} from './plugins'
 
-  isValidId(id: string) {
-    return id.length > 0
-  },
+// 工具
+export { 
+  fetchGitHubApi, fetchJsonWithContext,
+  camelcaseKeys, generateColor, LanguageToColorMap 
+} from './utils'
 
-  async fetch(id: string) {
-    const response = await fetch(`https://api.example.com${id}`)
-    const data = await response.json()
+// 类型
+export type { 
+  LinkCardData, LinkCardPlugin, LinkCardTypeClass,
+  LinkCardApiAdapter, LinkCardFetchContext,
+  PluginRegistry, UrlMatchResult, UrlMatchInfo,
+  EnhancedLinkCardProps, MxSpacePluginConfig 
+} from './types'
+```
 
-    return {
-      title: data.title,
-      desc: data.description,
-      image: data.thumbnail,
-      color: '#3b82f6',
-    }
-  },
+## 内置插件
+
+- GitHub: repo, pr, issue, commit, discussion
+- 学术: arxiv, leetcode
+- 媒体: tmdb, bangumi, netease-music, qq-music
+- 自定义: mx-space
+
+## 使用
+
+```tsx
+import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard'
+import type { RendererConfig } from '@haklex/rich-editor'
+
+const config: RendererConfig = {
+  LinkCard: LinkCardRenderer,
 }
 ```
 
