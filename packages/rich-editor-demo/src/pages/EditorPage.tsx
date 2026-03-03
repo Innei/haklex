@@ -4,6 +4,7 @@ import {
   ShiroEditor,
   ShiroRenderer,
 } from '@haklex/rich-kit-shiro'
+import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar'
 import { createThemeStyle } from '@haklex/rich-style-token'
 import type { SerializedEditorState } from 'lexical'
 import { useCallback, useMemo, useState } from 'react'
@@ -250,7 +251,7 @@ export function EditorPage() {
         </div>
 
         {/* Editor panel */}
-        <Panel title="Editor" badge={variant}>
+        <Panel title="Editor" badge={variant} bodyStyle={{ padding: 0 }}>
           <ShiroEditor
             initialValue={initialContent}
             onChange={handleChange}
@@ -259,6 +260,7 @@ export function EditorPage() {
             style={themeOverrideStyle}
             placeholder="Start typing... Try markdown shortcuts like # heading, **bold**, *italic*, > quote, ||spoiler||"
             onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
+            header={<ToolbarPlugin />}
             autoFocus
             extraMentionPlatforms={
               activePlatforms.length > 0 ? activePlatforms : undefined

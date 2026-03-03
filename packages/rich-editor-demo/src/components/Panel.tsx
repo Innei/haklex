@@ -5,9 +5,16 @@ interface PanelProps {
   badge?: string
   headerExtra?: ReactNode
   children: ReactNode
+  bodyStyle?: React.CSSProperties
 }
 
-export function Panel({ title, badge, headerExtra, children }: PanelProps) {
+export function Panel({
+  title,
+  badge,
+  headerExtra,
+  children,
+  bodyStyle,
+}: PanelProps) {
   return (
     <div className="panel">
       <div className="panel-header">
@@ -17,7 +24,9 @@ export function Panel({ title, badge, headerExtra, children }: PanelProps) {
         </div>
         {headerExtra && <div className="panel-header-right">{headerExtra}</div>}
       </div>
-      <div className="panel-body">{children}</div>
+      <div className="panel-body" style={bodyStyle}>
+        {children}
+      </div>
     </div>
   )
 }

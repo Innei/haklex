@@ -1,5 +1,5 @@
 import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip'
-import { PortalThemeWrapper } from '@shiro/rich-style-token'
+import { PortalThemeWrapper } from '@haklex/rich-style-token'
 import type { ComponentProps, ReactNode } from 'react'
 
 import * as css from './styles.css'
@@ -99,6 +99,11 @@ export function TooltipContent({
     </TooltipPortal>
   )
 }
+
+// -- Shared handle (single tooltip instance across multiple triggers) --
+
+export const createTooltipHandle: typeof TooltipPrimitive.createHandle =
+  TooltipPrimitive.createHandle
 
 export type {
   TooltipContentProps,

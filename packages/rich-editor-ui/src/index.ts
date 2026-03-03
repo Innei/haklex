@@ -106,6 +106,7 @@ export type {
   TooltipTriggerProps,
 } from './components/tooltip'
 export {
+  createTooltipHandle,
   TooltipContent,
   TooltipPopup,
   TooltipPortal,
