@@ -114,6 +114,8 @@ export {
   TooltipRoot,
   TooltipTrigger,
 } from './components/tooltip'
+export type { ViewportGateProps } from './components/viewport-gate'
+export { ViewportGate } from './components/viewport-gate'
 export {
   PortalThemeProvider,
   PortalThemeWrapper,

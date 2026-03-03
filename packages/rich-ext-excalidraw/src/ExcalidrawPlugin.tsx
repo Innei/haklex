@@ -2,18 +2,19 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical'
 import { useEffect } from 'react'
 
-import { $createTldrawNode } from './TldrawNode'
+import { $createExcalidrawEditNode } from './ExcalidrawEditNode'
 
-export const INSERT_TLDRAW_COMMAND = createCommand<string>('INSERT_TLDRAW')
+export const INSERT_EXCALIDRAW_COMMAND =
+  createCommand<string>('INSERT_EXCALIDRAW')
 
-export function TldrawPlugin() {
+export function ExcalidrawPlugin() {
   const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
     return editor.registerCommand(
-      INSERT_TLDRAW_COMMAND,
+      INSERT_EXCALIDRAW_COMMAND,
       (snapshot) => {
-        const node = $createTldrawNode(snapshot)
+        const node = $createExcalidrawEditNode(snapshot)
         $insertNodes([node])
         return true
       },

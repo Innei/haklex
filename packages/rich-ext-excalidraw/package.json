@@ -1,12 +1,13 @@
 {
-  "name": "@haklex/rich-ext-tldraw",
-  "version": "0.0.11",
-  "description": "Tldraw whiteboard extension",
+  "name": "@haklex/rich-ext-excalidraw",
+  "version": "0.0.54",
+  "description": "Excalidraw whiteboard extension",
   "license": "MIT",
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./style.css": "./dist/rich-ext-tldraw.css"
+    "./static": "./src/static.ts",
+    "./style.css": "./dist/rich-ext-excalidraw.css"
   },
   "main": "./src/index.ts",
   "files": [
@@ -17,29 +18,30 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "0.17.0",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "tldraw": "^3.12.0"
+    "jsondiffpatch": "^0.7.3"
   },
   "devDependencies": {
-    "@lexical/react": "^0.40.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vanilla-extract/css": "^1.17.1",
-    "@vanilla-extract/vite-plugin": "^4.0.20",
-    "lexical": "^0.40.0",
-    "lucide-react": "^0.574.0",
+    "@lexical/react": "^0.41.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vanilla-extract/css": "^1.18.0",
+    "@vanilla-extract/vite-plugin": "^5.1.4",
+    "lexical": "^0.41.0",
+    "lucide-react": "^0.575.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "typescript": "^5.9.0",
+    "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.0"
+    "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "@lexical/react": "^0.40.0",
-    "lexical": "^0.40.0",
+    "@lexical/react": "^0.41.0",
+    "lexical": "^0.41.0",
     "lucide-react": "^0.574.0",
     "react": ">=19",
     "react-dom": ">=19"
@@ -51,7 +53,11 @@
         "import": "./dist/index.mjs",
         "types": "./dist/index.d.ts"
       },
-      "./style.css": "./dist/rich-ext-tldraw.css"
+      "./static": {
+        "import": "./dist/static.mjs",
+        "types": "./dist/static.d.ts"
+      },
+      "./style.css": "./dist/rich-ext-excalidraw.css"
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
