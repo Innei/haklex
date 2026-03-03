@@ -1,4 +1,4 @@
-import type { SlashMenuItemConfig } from '@shiro/rich-editor'
+import type { CommandItemConfig } from '@haklex/rich-editor'
 import type { EditorConfig, LexicalEditor, LexicalNode } from 'lexical'
 import { $insertNodes } from 'lexical'
 import { Code } from 'lucide-react'
@@ -10,7 +10,7 @@ import type { EmbedType } from '../url-matchers'
 import { EmbedNode, type SerializedEmbedNode } from './EmbedNode'
 
 export class EmbedEditNode extends EmbedNode {
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Embed',
       icon: createElement(Code, { size: 20 }),
@@ -24,6 +24,8 @@ export class EmbedEditNode extends EmbedNode {
         'thinking',
       ],
       section: 'EMBED',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
           $insertNodes([$createEmbedEditNode('', null)])

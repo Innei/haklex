@@ -1,4 +1,4 @@
-import type { SlashMenuItemConfig } from '@haklex/rich-editor'
+import type { CommandItemConfig } from '@haklex/rich-editor'
 import { ViewportGate } from '@haklex/rich-editor-ui'
 import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical'
 import { $getNodeByKey, $insertNodes } from 'lexical'
@@ -17,13 +17,15 @@ const LazyEditRenderer = lazy(() =>
 )
 
 export class ExcalidrawEditNode extends ExcalidrawNode {
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Whiteboard',
       icon: createElement(PenTool, { size: 20 }),
       description: 'Excalidraw whiteboard canvas',
       keywords: ['excalidraw', 'whiteboard', 'draw', 'canvas'],
       section: 'MEDIA',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
           $insertNodes([$createExcalidrawEditNode('{}')])

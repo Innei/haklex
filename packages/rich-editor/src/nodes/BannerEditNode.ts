@@ -4,40 +4,93 @@ import type {
   SerializedEditorState,
   SerializedLexicalNode,
 } from 'lexical'
+import { $insertNodes, createEditor } from 'lexical'
+import { Flag } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { BannerEditDecorator } from '../components/decorators/BannerEditDecorator'
+import { editorTheme } from '../styles/theme'
+import type { CommandItemConfig } from '../types/slash-menu'
 import {
   BannerNode,
+  type BannerType,
   normalizeBannerType,
   type SerializedBannerNode,
 } from './BannerNode'
+import { NESTED_EDITOR_NODES } from './shared'
 
 interface LegacySerializedBannerEditNode extends SerializedBannerNode {
   children?: SerializedLexicalNode[]
 }
 
+function createContentEditor(): LexicalEditor {
+  return createEditor({
+    namespace: 'BannerContent',
+    nodes: NESTED_EDITOR_NODES,
+    theme: editorTheme,
+    onError: (error: Error) => {
+      console.error('[BannerContent]', error)
+    },
+  })
+}
+
 export class BannerEditNode extends BannerNode {
+  __contentEditor: LexicalEditor
+
+  static commandItems: CommandItemConfig[] = [
+    {
+      title: 'Banner',
+      icon: createElement(Flag, { size: 20 }),
+      description: 'Highlighted banner block',
+      keywords: ['banner', 'notice', 'announcement'],
+      section: 'ADVANCED',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createBannerEditNode('note')])
+        })
+      },
+    },
+  ]
+
   static clone(node: BannerEditNode): BannerEditNode {
-    return new BannerEditNode(
+    const cloned = new BannerEditNode(
       node.__bannerType,
-      node.__contentEditor,
+      node.__contentState,
       node.__key,
     )
+    cloned.__contentEditor = node.__contentEditor
+    return cloned
+  }
+
+  constructor(
+    bannerType: BannerType,
+    contentState?: SerializedEditorState,
+    key?: string,
+  ) {
+    super(bannerType, contentState, key)
+    this.__contentEditor = createContentEditor()
+    if (contentState) {
+      const editorState = this.__contentEditor.parseEditorState(contentState)
+      this.__contentEditor.setEditorState(editorState)
+    }
+  }
+
+  getContentEditor(): LexicalEditor {
+    return this.__contentEditor
   }
 
   static importJSON(serializedNode: SerializedBannerNode): BannerEditNode {
     const legacy = serializedNode as LegacySerializedBannerEditNode
     const bannerType = normalizeBannerType(serializedNode.bannerType)
-    const node = new BannerEditNode(bannerType)
 
     if (serializedNode.content) {
-      const editorState = node.__contentEditor.parseEditorState(
-        serializedNode.content,
-      )
-      node.__contentEditor.setEditorState(editorState)
-    } else if (legacy.children) {
+      return new BannerEditNode(bannerType, serializedNode.content)
+    }
+
+    if (legacy.children) {
       const content = {
         root: {
           children: legacy.children,
@@ -48,11 +101,20 @@ export class BannerEditNode extends BannerNode {
           version: 1,
         },
       } as unknown as SerializedEditorState
-      const editorState = node.__contentEditor.parseEditorState(content)
-      node.__contentEditor.setEditorState(editorState)
+      return new BannerEditNode(bannerType, content)
     }
 
-    return node
+    return new BannerEditNode(bannerType)
+  }
+
+  exportJSON(): SerializedBannerNode {
+    return {
+      ...super.exportJSON(),
+      type: 'banner',
+      bannerType: this.__bannerType,
+      content: this.__contentEditor.getEditorState().toJSON(),
+      version: 1,
+    }
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -62,4 +124,11 @@ export class BannerEditNode extends BannerNode {
       contentEditor: this.__contentEditor,
     })
   }
+}
+
+export function $createBannerEditNode(
+  bannerType: BannerType,
+  contentState?: SerializedEditorState,
+): BannerEditNode {
+  return new BannerEditNode(bannerType, contentState)
 }

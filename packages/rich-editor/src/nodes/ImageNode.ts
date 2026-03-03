@@ -13,7 +13,8 @@ import { createElement } from 'react'
 
 import { ImageRenderer } from '../components/renderers/ImageRenderer'
 import { createRendererDecoration } from '../components/RendererWrapper'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
+import { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from '../plugins/image-upload-command'
+import type { CommandItemConfig } from '../types/slash-menu'
 
 export type SerializedImageNode = Spread<
   {
@@ -64,14 +65,22 @@ export class ImageNode extends DecoratorNode<ReactElement> {
   __thumbhash?: string
   __accent?: string
 
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Image',
       icon: createElement(ImageIcon, { size: 20 }),
       description: 'Upload or embed an image',
       keywords: ['image', 'picture', 'photo'],
       section: 'MEDIA',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
       onSelect: (editor) => {
+        const opened = editor.dispatchCommand(
+          OPEN_IMAGE_UPLOAD_DIALOG_COMMAND,
+          void 0,
+        )
+        if (opened) return
+
         editor.update(() => {
           $insertNodes([$createImageNode({ src: '', altText: '' })])
         })
@@ -148,6 +157,65 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       accent: this.__accent,
       version: 1,
     }
+  }
+
+  setSrc(src: string): void {
+    const writable = this.getWritable()
+    writable.__src = sanitizeImageSrc(src)
+  }
+
+  setAltText(altText: string): void {
+    const writable = this.getWritable()
+    writable.__altText = altText
+  }
+
+  setCaption(caption?: string): void {
+    const writable = this.getWritable()
+    writable.__caption = caption
+  }
+
+  setDimensions(width?: number, height?: number): void {
+    const writable = this.getWritable()
+    writable.__width = width
+    writable.__height = height
+  }
+
+  setThumbhash(thumbhash?: string): void {
+    const writable = this.getWritable()
+    writable.__thumbhash = thumbhash
+  }
+
+  setAccent(accent?: string): void {
+    const writable = this.getWritable()
+    writable.__accent = sanitizeColor(accent)
+  }
+
+  getSrc(): string {
+    return this.__src
+  }
+
+  getAltText(): string {
+    return this.__altText
+  }
+
+  getCaption(): string | undefined {
+    return this.__caption
+  }
+
+  getWidth(): number | undefined {
+    return this.__width
+  }
+
+  getHeight(): number | undefined {
+    return this.__height
+  }
+
+  getThumbhash(): string | undefined {
+    return this.__thumbhash
+  }
+
+  getAccent(): string | undefined {
+    return this.__accent
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

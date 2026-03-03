@@ -11,16 +11,25 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin'
 
 import { allEditNodes } from '../config-edit'
 import { ColorSchemeProvider } from '../context/ColorSchemeContext'
+import { ImageUploadProvider } from '../context/ImageUploadContext'
 import { RendererConfigProvider } from '../context/RendererConfigContext'
 import { setResolvedEditNodes } from '../node-registry'
 import { AlertPlugin } from '../plugins/AlertPlugin'
 import { AutoFocusPlugin } from '../plugins/AutoFocusPlugin'
 import { AutoLinkPlugin } from '../plugins/AutoLinkPlugin'
+import { BlockExitPlugin } from '../plugins/BlockExitPlugin'
+import { BlockIdPlugin } from '../plugins/BlockIdPlugin'
 import { EditorRefPlugin } from '../plugins/EditorRefPlugin'
 import { FootnotePlugin } from '../plugins/FootnotePlugin'
 import { HorizontalRulePlugin } from '../plugins/HorizontalRulePlugin'
 import { ImagePlugin } from '../plugins/ImagePlugin'
+import {
+  defaultImageUpload,
+  ImageUploadPlugin,
+} from '../plugins/ImageUploadPlugin'
 import { KaTeXPlugin } from '../plugins/KaTeXPlugin'
+import { LinkFaviconPlugin } from '../plugins/LinkFaviconPlugin'
+import { MarkdownPastePlugin } from '../plugins/MarkdownPastePlugin'
 import { MarkdownShortcutsPlugin } from '../plugins/MarkdownShortcutsPlugin'
 import { MermaidPlugin } from '../plugins/MermaidPlugin'
 import { OnChangePlugin } from '../plugins/OnChangePlugin'
@@ -42,9 +51,11 @@ export function RichEditor({
   contentClassName,
   style,
   actions,
+  header,
   onEditorReady,
   extraNodes,
   rendererConfig,
+  imageUpload,
   debounceMs,
   children,
 }: RichEditorProps) {
@@ -61,51 +72,67 @@ export function RichEditor({
     ...(initialValue ? { editorState: JSON.stringify(initialValue) } : {}),
   }
 
-  const variantClass = getVariantClass(variant, theme)
+  const variantClass = getVariantClass(variant)
+  const resolvedImageUpload = imageUpload ?? defaultImageUpload
 
   return (
-    <PortalThemeProvider className={variantClass}>
+    <PortalThemeProvider className={variantClass} theme={theme}>
       <ColorSchemeProvider colorScheme={theme}>
-        <RendererConfigProvider config={rendererConfig} mode="editor">
-          <LexicalComposer initialConfig={initialConfig}>
-            <FootnotePlugin>
-              <div
-                className={clsx('rich-editor', variantClass, className)}
-                style={style}
-              >
-                <RichTextPlugin
-                  contentEditable={
-                    <ContentEditable
-                      className={contentClassName}
-                      placeholder={placeholder}
-                    />
-                  }
-                  ErrorBoundary={LexicalErrorBoundary}
-                />
-                <HistoryPlugin />
-                <ListPlugin />
-                <LinkPlugin />
-                <TabIndentationPlugin />
-                <TablePlugin />
-                <MarkdownShortcutsPlugin />
-                <OnChangePlugin onChange={onChange} debounceMs={debounceMs} />
-                <SubmitShortcutPlugin onSubmit={onSubmit} />
-                <ImagePlugin />
-                <KaTeXPlugin />
-                <AlertPlugin />
-                <MermaidPlugin />
-                <HorizontalRulePlugin />
-                <CheckListPlugin />
-                <AutoLinkPlugin />
-                <EditorRefPlugin onEditorReady={onEditorReady} />
-                {autoFocus && <AutoFocusPlugin />}
-                {children}
-                {actions && (
-                  <div className="rich-editor__actions">{actions}</div>
-                )}
-              </div>
-            </FootnotePlugin>
-          </LexicalComposer>
+        <RendererConfigProvider
+          config={rendererConfig}
+          mode="editor"
+          variant={variant}
+        >
+          <ImageUploadProvider upload={resolvedImageUpload}>
+            <LexicalComposer initialConfig={initialConfig}>
+              <FootnotePlugin>
+                <div
+                  className={clsx('rich-editor', variantClass, className)}
+                  style={{ ...style, maxWidth: 'none' }}
+                  data-theme={theme}
+                  suppressHydrationWarning
+                >
+                  {header}
+                  <RichTextPlugin
+                    contentEditable={
+                      <ContentEditable
+                        className={contentClassName}
+                        placeholder={placeholder}
+                        hasHeader={!!header}
+                      />
+                    }
+                    ErrorBoundary={LexicalErrorBoundary}
+                  />
+                  <HistoryPlugin />
+                  <ListPlugin />
+                  <LinkPlugin />
+                  <TabIndentationPlugin />
+                  <TablePlugin />
+                  <MarkdownShortcutsPlugin />
+                  <MarkdownPastePlugin />
+                  <OnChangePlugin onChange={onChange} debounceMs={debounceMs} />
+                  <SubmitShortcutPlugin onSubmit={onSubmit} />
+                  <ImagePlugin />
+                  <ImageUploadPlugin onUpload={resolvedImageUpload} />
+                  <KaTeXPlugin />
+                  <AlertPlugin />
+                  <MermaidPlugin />
+                  <HorizontalRulePlugin />
+                  <CheckListPlugin />
+                  <BlockExitPlugin />
+                  <AutoLinkPlugin />
+                  <LinkFaviconPlugin />
+                  <BlockIdPlugin />
+                  <EditorRefPlugin onEditorReady={onEditorReady} />
+                  {autoFocus && <AutoFocusPlugin />}
+                  {children}
+                  {actions && (
+                    <div className="rich-editor__actions">{actions}</div>
+                  )}
+                </div>
+              </FootnotePlugin>
+            </LexicalComposer>
+          </ImageUploadProvider>
         </RendererConfigProvider>
       </ColorSchemeProvider>
     </PortalThemeProvider>

@@ -5,23 +5,30 @@ import { clsx } from './utils'
 interface ContentEditableProps {
   className?: string
   placeholder?: string
+  hasHeader?: boolean
 }
 
 export function ContentEditable({
   className,
   placeholder,
+  hasHeader,
 }: ContentEditableProps) {
+  const paddingTop = hasHeader ? 48 : 12
   return (
     <div
       className="rich-editor__content-wrapper"
-      style={{ position: 'relative' }}
+      style={{
+        position: 'relative',
+        maxWidth: 'var(--rc-max-width, none)',
+        margin: '0 auto',
+      }}
     >
       <LexicalContentEditable
         className={clsx('rich-editor__content', className)}
         style={{
           outline: 'none',
           minHeight: '100px',
-          padding: '12px 16px',
+          padding: `${paddingTop}px 16px 12px`,
         }}
         aria-placeholder={placeholder ?? ''}
         placeholder={
@@ -29,8 +36,8 @@ export function ContentEditable({
             className="rich-editor__placeholder"
             style={{
               position: 'absolute',
-              top: '12px',
-              left: '16px',
+              top: paddingTop,
+              left: 16,
               color: 'var(--rich-editor-text-secondary, #999)',
               pointerEvents: 'none',
               userSelect: 'none',

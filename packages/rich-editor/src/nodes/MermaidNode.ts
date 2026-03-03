@@ -13,7 +13,7 @@ import { createElement } from 'react'
 
 import { MermaidRenderer } from '../components/renderers/MermaidRenderer'
 import { createRendererDecoration } from '../components/RendererWrapper'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
+import type { CommandItemConfig } from '../types/slash-menu'
 
 export type SerializedMermaidNode = Spread<
   {
@@ -25,13 +25,15 @@ export type SerializedMermaidNode = Spread<
 export class MermaidNode extends DecoratorNode<ReactElement> {
   __diagram: string
 
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Mermaid Diagram',
       icon: createElement(Workflow, { size: 20 }),
       description: 'Flowchart, sequence diagram',
       keywords: ['mermaid', 'diagram', 'chart', 'flowchart'],
       section: 'MEDIA',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
           $insertNodes([

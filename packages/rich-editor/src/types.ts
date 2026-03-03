@@ -7,6 +7,7 @@ import type {
 import type { ReactNode } from 'react'
 
 import type { ColorScheme } from './context/ColorSchemeContext'
+import type { ImageUploadFn } from './plugins/ImageUploadPlugin'
 import type { RendererConfig } from './types/renderer-config'
 
 export type RichEditorVariant = 'article' | 'comment' | 'note'
@@ -23,20 +24,11 @@ export interface RichEditorProps {
   contentClassName?: string
   style?: React.CSSProperties
   actions?: ReactNode
+  header?: ReactNode
   onEditorReady?: (editor: LexicalEditor | null) => void
   extraNodes?: Array<Klass<LexicalNode>>
   rendererConfig?: RendererConfig
+  imageUpload?: ImageUploadFn
   debounceMs?: number
   children?: ReactNode
-}
-
-export interface RichRendererProps {
-  value: SerializedEditorState
-  variant?: RichEditorVariant
-  theme?: ColorScheme
-  className?: string
-  style?: React.CSSProperties
-  as?: React.ElementType
-  rendererConfig?: RendererConfig
-  extraNodes?: Array<Klass<LexicalNode>>
 }

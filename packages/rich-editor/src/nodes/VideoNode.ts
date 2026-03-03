@@ -13,7 +13,7 @@ import { createElement } from 'react'
 
 import { VideoRenderer } from '../components/renderers/VideoRenderer'
 import { createRendererDecoration } from '../components/RendererWrapper'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
+import type { CommandItemConfig } from '../types/slash-menu'
 
 export type SerializedVideoNode = Spread<
   {
@@ -38,13 +38,15 @@ export class VideoNode extends DecoratorNode<ReactElement> {
   __width?: number
   __height?: number
 
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Video',
       icon: createElement(Video, { size: 20 }),
       description: 'Embed a video',
       keywords: ['video', 'media', 'mp4'],
       section: 'MEDIA',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
           $insertNodes([$createVideoNode({ src: '' })])

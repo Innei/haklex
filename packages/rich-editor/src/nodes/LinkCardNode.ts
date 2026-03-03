@@ -13,7 +13,7 @@ import { createElement } from 'react'
 
 import { LinkCardRenderer } from '../components/renderers/LinkCardRenderer'
 import { createRendererDecoration } from '../components/RendererWrapper'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
+import type { CommandItemConfig } from '../types/slash-menu'
 
 export type SerializedLinkCardNode = Spread<
   {
@@ -47,13 +47,15 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
   __favicon?: string
   __image?: string
 
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Link Card',
       icon: createElement(Link, { size: 20 }),
       description: 'Link preview card',
       keywords: ['link', 'card', 'bookmark', 'embed'],
       section: 'MEDIA',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
           $insertNodes([$createLinkCardNode({ url: '' })])

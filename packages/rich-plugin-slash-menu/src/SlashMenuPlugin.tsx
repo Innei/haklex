@@ -1,21 +1,31 @@
+import { collectCommandItems } from '@haklex/rich-editor'
+import { PortalThemeWrapper } from '@haklex/rich-style-token'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import {
   LexicalTypeaheadMenuPlugin,
   useBasicTypeaheadTriggerMatch,
 } from '@lexical/react/LexicalTypeaheadMenuPlugin'
-import type { TextNode } from 'lexical';
+import type { LexicalEditor, TextNode } from 'lexical'
 import { $getSelection, $isRangeSelection } from 'lexical'
 import { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 
-import { getDefaultItems } from './defaultItems'
+import { getBuiltinItems } from './builtinItems'
 import type { SlashMenuItem } from './SlashMenuItem'
+import { SlashMenuItem as SlashMenuItemClass } from './SlashMenuItem'
 import { SlashMenuList } from './SlashMenuList'
 
 export interface SlashMenuPluginProps {
   items?: SlashMenuItem[]
   extraItems?: SlashMenuItem[]
   triggerChar?: string
+}
+
+export function collectNodeSlashItems(editor: LexicalEditor): SlashMenuItem[] {
+  const configs = collectCommandItems(editor)
+  return configs
+    .filter((c) => !c.placement || c.placement.includes('slash'))
+    .map((c) => new SlashMenuItemClass(c.title, c))
 }
 
 function filterItems(query: string, items: SlashMenuItem[]): SlashMenuItem[] {
@@ -37,9 +47,11 @@ export function SlashMenuPlugin({
 
   const allItems = useMemo(() => {
     if (items) return items
-    const defaults = getDefaultItems()
-    return extraItems ? [...defaults, ...extraItems] : defaults
-  }, [items, extraItems])
+    const builtins = getBuiltinItems()
+    const nodeItems = collectNodeSlashItems(editor)
+    const combined = [...builtins, ...nodeItems]
+    return extraItems ? [...combined, ...extraItems] : combined
+  }, [items, extraItems, editor])
 
   const filteredItems = useMemo(
     () => filterItems(queryString ?? '', allItems),
@@ -81,17 +93,21 @@ export function SlashMenuPlugin({
         anchorElementRef,
         { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
       ) => {
-        if (!anchorElementRef.current || filteredItems.length === 0) {
+        const anchorElement = anchorElementRef.current
+        if (!anchorElement || filteredItems.length === 0) {
           return null
         }
         return createPortal(
-          <SlashMenuList
-            options={filteredItems}
-            selectedIndex={selectedIndex}
-            selectOptionAndCleanUp={selectOptionAndCleanUp}
-            setHighlightedIndex={setHighlightedIndex}
-          />,
-          anchorElementRef.current,
+          <PortalThemeWrapper>
+            <SlashMenuList
+              anchorElement={anchorElement}
+              options={filteredItems}
+              selectedIndex={selectedIndex}
+              selectOptionAndCleanUp={selectOptionAndCleanUp}
+              setHighlightedIndex={setHighlightedIndex}
+            />
+          </PortalThemeWrapper>,
+          anchorElement,
         )
       }}
     />

@@ -1,4 +1,5 @@
 import type { EditorConfig, LexicalEditor } from 'lexical'
+import { $insertNodes } from 'lexical'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
@@ -6,6 +7,15 @@ import { CodeBlockEditDecorator } from '../components/decorators/CodeBlockEditDe
 import { CodeBlockNode, type SerializedCodeBlockNode } from './CodeBlockNode'
 
 export class CodeBlockEditNode extends CodeBlockNode {
+  static commandItems = CodeBlockNode.commandItems.map((item) => ({
+    ...item,
+    onSelect: (editor: LexicalEditor) => {
+      editor.update(() => {
+        $insertNodes([new CodeBlockEditNode('', 'text')])
+      })
+    },
+  }))
+
   static clone(node: CodeBlockEditNode): CodeBlockEditNode {
     return new CodeBlockEditNode(node.__code, node.__language, node.__key)
   }
@@ -23,4 +33,11 @@ export class CodeBlockEditNode extends CodeBlockNode {
       language: this.__language,
     })
   }
+}
+
+export function $createCodeBlockEditNode(
+  code: string,
+  language: string,
+): CodeBlockEditNode {
+  return new CodeBlockEditNode(code, language)
 }

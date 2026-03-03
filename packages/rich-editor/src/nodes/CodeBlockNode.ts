@@ -13,7 +13,7 @@ import { createElement } from 'react'
 
 import { CodeBlockRenderer } from '../components/renderers/CodeBlockRenderer'
 import { createRendererDecoration } from '../components/RendererWrapper'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
+import type { CommandItemConfig } from '../types/slash-menu'
 
 export type SerializedCodeBlockNode = Spread<
   {
@@ -27,13 +27,15 @@ export class CodeBlockNode extends DecoratorNode<ReactElement> {
   __code: string
   __language: string
 
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Code Block',
       icon: createElement(Code, { size: 20 }),
       description: 'Syntax-highlighted code',
       keywords: ['code', 'snippet', 'codeblock'],
       section: 'MEDIA',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
           $insertNodes([$createCodeBlockNode('', 'text')])
@@ -68,6 +70,10 @@ export class CodeBlockNode extends DecoratorNode<ReactElement> {
 
   isInline(): boolean {
     return false
+  }
+
+  isKeyboardSelectable(): boolean {
+    return true
   }
 
   static importJSON(serializedNode: SerializedCodeBlockNode): CodeBlockNode {

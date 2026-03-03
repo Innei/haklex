@@ -1,4 +1,4 @@
-import type { CodeFile, SlashMenuItemConfig } from '@haklex/rich-editor'
+import type { CodeFile, CommandItemConfig } from '@haklex/rich-editor'
 import type { EditorConfig, LexicalEditor, LexicalNode } from 'lexical'
 import { $insertNodes } from 'lexical'
 import { FileCode } from 'lucide-react'
@@ -12,13 +12,15 @@ import {
 } from './CodeSnippetNode'
 
 export class CodeSnippetEditNode extends CodeSnippetNode {
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Code Snippet',
       icon: createElement(FileCode, { size: 20 }),
       description: 'Multi-file code snippet with tabs',
       keywords: ['code', 'snippet', 'files', 'tabs'],
       section: 'MEDIA',
+      placement: ['slash', 'toolbar'],
+      group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
           $insertNodes([
