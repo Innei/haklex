@@ -1,5 +1,5 @@
-import type { CommandItemConfig } from '@haklex/rich-editor'
 import { collectCommandItems } from '@haklex/rich-editor'
+import type { TooltipRootProps } from '@haklex/rich-editor-ui'
 import {
   createTooltipHandle,
   TooltipContent,
@@ -20,10 +20,11 @@ import {
   $setBlocksType,
 } from '@lexical/selection'
 import { $findMatchingParent } from '@lexical/utils'
-import type { ElementNode } from 'lexical'
+import type { ElementFormatType, ElementNode } from 'lexical'
 import {
   $createParagraphNode,
   $getSelection,
+  $isElementNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
   CAN_REDO_COMMAND,
@@ -56,7 +57,7 @@ import {
   Undo,
 } from 'lucide-react'
 import type { CSSProperties, ReactElement } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import * as css from './styles.css'
 import { ToolbarButton } from './ToolbarButton'
@@ -132,6 +133,7 @@ interface ToolbarState {
   canRedo: boolean
   blockType: BlockType
   fontFamily: string
+  elementFormat: ElementFormatType
   isBold: boolean
   isItalic: boolean
   isUnderline: boolean
@@ -145,6 +147,7 @@ const INITIAL_STATE: ToolbarState = {
   canRedo: false,
   blockType: 'paragraph',
   fontFamily: '',
+  elementFormat: 'left',
   isBold: false,
   isItalic: false,
   isUnderline: false,
@@ -180,17 +183,18 @@ export interface ToolbarPluginProps {
 export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
   const [editor] = useLexicalComposerContext()
   const [state, setState] = useState<ToolbarState>(INITIAL_STATE)
-  const [toolbarItems, setToolbarItems] = useState<CommandItemConfig[]>([])
   const [tooltipHandle] = useState(() =>
     createTooltipHandle<ToolbarTooltipPayload>(),
   )
 
-  useEffect(() => {
-    const items = collectCommandItems(editor).filter(
-      (item) => item.placement?.includes('toolbar') && item.group === 'insert',
-    )
-    setToolbarItems(items)
-  }, [editor])
+  const toolbarItems = useMemo(
+    () =>
+      collectCommandItems(editor).filter(
+        (item) =>
+          item.placement?.includes('toolbar') && item.group === 'insert',
+      ),
+    [editor],
+  )
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection()
@@ -220,11 +224,15 @@ export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
       'font-family',
       '',
     )
+    const elementFormat: ElementFormatType = $isElementNode(element)
+      ? element.getFormatType()
+      : 'left'
 
     setState((prev) => ({
       ...prev,
       blockType,
       fontFamily,
+      elementFormat,
       isBold: selection.hasFormat('bold'),
       isItalic: selection.hasFormat('italic'),
       isUnderline: selection.hasFormat('underline'),
@@ -356,19 +364,22 @@ export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
 
   return (
     <TooltipProvider delay={300}>
-      <TooltipRoot handle={tooltipHandle as any} disableHoverablePopup>
+      <TooltipRoot
+        handle={tooltipHandle as TooltipRootProps['handle']}
+        disableHoverablePopup
+      >
         {
-          (({ payload }: { payload: ToolbarTooltipPayload | undefined }) =>
-            payload !== undefined ? (
+          ((props: { payload?: ToolbarTooltipPayload }) =>
+            props.payload !== undefined ? (
               <TooltipContent side="bottom" sideOffset={4}>
-                {payload.title}
-                {payload.shortcut && (
+                {props.payload.title}
+                {props.payload.shortcut && (
                   <span className={css.tooltipShortcut}>
-                    {payload.shortcut}
+                    {props.payload.shortcut}
                   </span>
                 )}
               </TooltipContent>
-            ) : null) as any
+            ) : null) as TooltipRootProps['children']
         }
       </TooltipRoot>
 
@@ -516,6 +527,9 @@ export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
           <ToolbarButton
             icon={<AlignLeft size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Align Left"
+            active={
+              state.elementFormat === 'left' || state.elementFormat === ''
+            }
             onClick={() =>
               editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')
             }
@@ -524,6 +538,7 @@ export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
           <ToolbarButton
             icon={<AlignCenter size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Align Center"
+            active={state.elementFormat === 'center'}
             onClick={() =>
               editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')
             }
@@ -532,6 +547,7 @@ export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
           <ToolbarButton
             icon={<AlignRight size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Align Right"
+            active={state.elementFormat === 'right'}
             onClick={() =>
               editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')
             }
@@ -540,6 +556,7 @@ export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
           <ToolbarButton
             icon={<AlignJustify size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Justify"
+            active={state.elementFormat === 'justify'}
             onClick={() =>
               editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')
             }

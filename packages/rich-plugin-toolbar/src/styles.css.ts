@@ -5,8 +5,17 @@ export const toolbarContainer = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 4,
-  borderBottom: `1px solid ${vars.color.border}`,
-  backgroundColor: vars.color.bg,
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: 12,
+  backgroundColor: `color-mix(in srgb, ${vars.color.bg} 90%, transparent)`,
+  backdropFilter: 'blur(8px)',
+  boxShadow: vars.boxShadow.topBar,
+  fontFamily: vars.typography.fontFamilySans,
+  position: 'sticky',
+  top: 0,
+  zIndex: 2,
+  margin: '12px auto 0',
+  maxWidth: vars.layout.maxWidth,
 })
 
 export const toolbarRow = style({
@@ -16,8 +25,6 @@ export const toolbarRow = style({
   gap: 4,
   flexWrap: 'wrap',
   minHeight: 36,
-  maxWidth: vars.layout.maxWidth,
-  margin: '0 auto',
   padding: '6px 16px',
 })
 
@@ -59,10 +66,10 @@ globalStyle(`${toolbarButton} svg`, {
 })
 
 export const toolbarButtonActive = style({
-  color: vars.color.accent,
+  color: vars.color.text,
   backgroundColor: vars.color.fillTertiary,
   ':hover': {
-    color: vars.color.accent,
+    color: vars.color.text,
     backgroundColor: vars.color.fillTertiary,
   },
 })
@@ -104,7 +111,7 @@ export const toolbarSeparator = style({
 
 export const toolbarDropdownItemActive = style({
   backgroundColor: vars.color.fillTertiary,
-  color: vars.color.accent,
+  color: vars.color.text,
 })
 
 export const tooltipShortcut = style({
