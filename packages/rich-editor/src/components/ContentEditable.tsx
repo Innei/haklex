@@ -21,6 +21,10 @@ export function ContentEditable({
         position: 'relative',
         maxWidth: 'var(--rc-max-width, none)',
         margin: '0 auto',
+        flex: 1,
+        minHeight: 0,
+        padding: '0 16px',
+        overflowY: 'auto',
       }}
     >
       <LexicalContentEditable
