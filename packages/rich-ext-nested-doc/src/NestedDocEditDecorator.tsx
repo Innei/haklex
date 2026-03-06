@@ -1,45 +1,13 @@
-import {
-  AutoLinkPlugin,
-  BlockExitPlugin,
-  editorTheme,
-  FootnotePlugin,
-  getResolvedEditNodes,
-  HorizontalRulePlugin,
-  ImagePlugin,
-  ImageUploadPlugin,
-  KaTeXPlugin,
-  LinkFaviconPlugin,
-  MarkdownShortcutsPlugin,
-  MermaidPlugin,
-  useColorScheme,
-  useImageUpload,
-} from '@haklex/rich-editor'
-import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar'
+import { useColorScheme } from '@haklex/rich-editor'
 import { usePortalTheme } from '@haklex/rich-style-token'
-import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
-import { LexicalComposer } from '@lexical/react/LexicalComposer'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { ContentEditable } from '@lexical/react/LexicalContentEditable'
-import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
-import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
-import { ListPlugin } from '@lexical/react/LexicalListPlugin'
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
-import { TablePlugin } from '@lexical/react/LexicalTablePlugin'
 import type { LexicalEditor, SerializedEditorState } from 'lexical'
 import { $getNodeByKey } from 'lexical'
 import { FileText, Pencil, Save, X } from 'lucide-react'
-import {
-  type KeyboardEvent,
-  type RefObject,
-  useCallback,
-  useMemo,
-  useRef,
-} from 'react'
+import { type KeyboardEvent, useCallback, useMemo, useRef } from 'react'
 
+import { useNestedDocDialogEditor } from './NestedDocDialogEditorContext'
 import { $isNestedDocNode } from './NestedDocNode'
-import { NestedDocPlugin } from './NestedDocPlugin'
 import { NestedDocRenderer } from './NestedDocRenderer'
 import * as css from './styles.css'
 import { hasRenderableEditorState, truncateEditorState } from './utils'
@@ -82,6 +50,7 @@ export function NestedDocEditDecorator({
   const [editor] = useLexicalComposerContext()
   const colorScheme = useColorScheme()
   const { className: portalClassName } = usePortalTheme()
+  const DialogEditor = useNestedDocDialogEditor()
 
   const previewState = useMemo(
     () => truncateEditorState(contentState, PREVIEW_NODE_LIMIT),
@@ -90,6 +59,8 @@ export function NestedDocEditDecorator({
   const hasPreview = hasRenderableEditorState(previewState)
 
   const handleOpenDialog = useCallback(async () => {
+    if (!DialogEditor) return
+
     const { presentDialog } = await import('@haklex/rich-editor-ui')
 
     presentDialog({
@@ -100,6 +71,7 @@ export function NestedDocEditDecorator({
           nodeKey={nodeKey}
           contentEditor={contentEditor}
           onDismiss={dismiss}
+          DialogEditor={DialogEditor}
         />
       ),
       className: css.dialogPopup,
@@ -108,7 +80,14 @@ export function NestedDocEditDecorator({
       showCloseButton: true,
       clickOutsideToDismiss: false,
     })
-  }, [colorScheme, contentEditor, editor, nodeKey, portalClassName])
+  }, [
+    DialogEditor,
+    colorScheme,
+    contentEditor,
+    editor,
+    nodeKey,
+    portalClassName,
+  ])
 
   return (
     <div
@@ -148,29 +127,22 @@ function NestedDocDialogContent({
   nodeKey,
   contentEditor,
   onDismiss,
+  DialogEditor,
 }: {
   initialState: SerializedEditorState
   parentEditor: LexicalEditor
   nodeKey: string
   contentEditor: LexicalEditor
   onDismiss: () => void
+  DialogEditor: React.ComponentType<{
+    initialValue: SerializedEditorState
+    onEditorReady: (editor: LexicalEditor | null) => void
+  }>
 }) {
   const dialogEditorRef = useRef<LexicalEditor | null>(null)
-  const imageUpload = useImageUpload()
 
   const safeInitialState =
     initialState?.root?.children?.length > 0 ? initialState : EMPTY_EDITOR_STATE
-
-  const initialConfig = {
-    namespace: 'NestedDocDialog',
-    nodes: getResolvedEditNodes(),
-    theme: editorTheme,
-    editable: true,
-    editorState: JSON.stringify(safeInitialState),
-    onError: (error: Error) => {
-      console.error('[NestedDocDialog]', error)
-    },
-  }
 
   const handleDone = useCallback(() => {
     const dialogEditor = dialogEditorRef.current
@@ -201,95 +173,50 @@ function NestedDocDialogContent({
     [handleDone],
   )
 
+  const handleEditorReady = useCallback((editor: LexicalEditor | null) => {
+    dialogEditorRef.current = editor
+  }, [])
+
   return (
-    <LexicalComposer initialConfig={initialConfig}>
-      <EditorRefCapture editorRef={dialogEditorRef} />
-      <FootnotePlugin>
-        <div
-          className={css.dialogShell}
-          onKeyDownCapture={handleKeyDownCapture}
-        >
-          <div className={css.dialogHeader}>
-            <div className={css.dialogHeaderMain}>
-              <span className={css.dialogHeaderIcon}>
-                <FileText size={18} />
-              </span>
-              <div className={css.dialogHeaderText}>
-                <h3 className={css.dialogTitle}>Nested document</h3>
-              </div>
-            </div>
-          </div>
-
-          <div className={css.dialogToolbarSection}>
-            <ToolbarPlugin className={css.dialogToolbar} />
-          </div>
-
-          <div className={css.editorArea}>
-            <div className={css.editorScrollContainer}>
-              <div className={css.editorCard}>
-                <RichTextPlugin
-                  contentEditable={
-                    <ContentEditable
-                      className={css.editorEditable}
-                      aria-placeholder=""
-                      placeholder={<span style={{ display: 'none' }} />}
-                    />
-                  }
-                  ErrorBoundary={LexicalErrorBoundary}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className={css.dialogFooter}>
-            <div className={css.dialogActions}>
-              <button
-                type="button"
-                className={css.secondaryButton}
-                onClick={onDismiss}
-              >
-                <X size={15} />
-                Cancel
-              </button>
-              <button
-                type="button"
-                className={css.primaryButton}
-                onClick={handleDone}
-              >
-                <Save size={15} />
-                Save
-              </button>
-            </div>
+    <div className={css.dialogShell} onKeyDownCapture={handleKeyDownCapture}>
+      <div className={css.dialogHeader}>
+        <div className={css.dialogHeaderMain}>
+          <span className={css.dialogHeaderIcon}>
+            <FileText size={18} />
+          </span>
+          <div className={css.dialogHeaderText}>
+            <h3 className={css.dialogTitle}>Nested document</h3>
           </div>
         </div>
-      </FootnotePlugin>
+      </div>
 
-      <HistoryPlugin />
-      <ListPlugin />
-      <LinkPlugin />
-      <CheckListPlugin />
-      <TabIndentationPlugin />
-      <TablePlugin />
-      <MarkdownShortcutsPlugin />
-      <AutoLinkPlugin />
-      <HorizontalRulePlugin />
-      <ImagePlugin />
-      {imageUpload ? <ImageUploadPlugin onUpload={imageUpload} /> : null}
-      <KaTeXPlugin />
-      <MermaidPlugin />
-      <NestedDocPlugin />
-      <LinkFaviconPlugin />
-      <BlockExitPlugin />
-    </LexicalComposer>
+      <div className={css.editorArea}>
+        <DialogEditor
+          initialValue={safeInitialState}
+          onEditorReady={handleEditorReady}
+        />
+      </div>
+
+      <div className={css.dialogFooter}>
+        <div className={css.dialogActions}>
+          <button
+            type="button"
+            className={css.secondaryButton}
+            onClick={onDismiss}
+          >
+            <X size={15} />
+            Cancel
+          </button>
+          <button
+            type="button"
+            className={css.primaryButton}
+            onClick={handleDone}
+          >
+            <Save size={15} />
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
   )
-}
-
-function EditorRefCapture({
-  editorRef,
-}: {
-  editorRef: RefObject<LexicalEditor | null>
-}) {
-  const [editor] = useLexicalComposerContext()
-  editorRef.current = editor
-  return null
 }

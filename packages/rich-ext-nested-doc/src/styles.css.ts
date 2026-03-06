@@ -49,7 +49,7 @@ globalStyle(`${dialogPopup}${dialogPopup}`, {
 
 export const dialogShell = style({
   display: 'grid',
-  gridTemplateRows: 'auto auto minmax(0, 1fr) auto',
+  gridTemplateRows: 'auto minmax(0, 1fr) auto',
   height: 'min(800px, calc(100vh - 1rem))',
   background: vars.color.bg,
 })
@@ -122,6 +122,24 @@ export const editorArea = style({
 
   overflow: 'hidden',
   background: `linear-gradient(180deg, color-mix(in srgb, ${vars.color.text} 2%, transparent), transparent)`,
+})
+
+globalStyle(`${editorArea} .rich-editor`, {
+  display: 'flex',
+  flexDirection: 'column',
+  height: '100%',
+})
+
+globalStyle(`${editorArea} ${richContent} > *:first-child`, {
+  borderTop: 'none',
+  borderLeft: 'none',
+  borderRight: 'none',
+  boxShadow: 'none',
+  borderRadius: 0,
+  margin: 0,
+  maxWidth: 'none',
+  backdropFilter: 'none',
+  backgroundColor: 'transparent',
 })
 
 export const editorScrollContainer = style({

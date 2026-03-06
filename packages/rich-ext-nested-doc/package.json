@@ -27,7 +27,6 @@
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-plugin-toolbar": "workspace:*",
     "@haklex/rich-static-renderer": "workspace:*",
     "@haklex/rich-style-token": "workspace:*"
   },
