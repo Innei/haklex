@@ -1,7 +1,6 @@
-import type { ColorScheme } from '../context/ColorSchemeContext'
-import { articleVariant, darkArticleVariant } from '../styles/article.css'
-import { commentVariant, darkCommentVariant } from '../styles/comment.css'
-import { darkNoteVariant, noteVariant } from '../styles/note.css'
+import { articleVariant } from '../styles/article.css'
+import { commentVariant } from '../styles/comment.css'
+import { noteVariant } from '../styles/note.css'
 import type { RichEditorVariant } from '../types'
 
 export function clsx(
@@ -10,15 +9,8 @@ export function clsx(
   return args.filter(Boolean).join(' ')
 }
 
-export function getVariantClass(
-  variant: RichEditorVariant,
-  colorScheme: ColorScheme,
-): string {
-  if (variant === 'comment') {
-    return colorScheme === 'dark' ? darkCommentVariant : commentVariant
-  }
-  if (variant === 'note') {
-    return colorScheme === 'dark' ? darkNoteVariant : noteVariant
-  }
-  return colorScheme === 'dark' ? darkArticleVariant : articleVariant
+export function getVariantClass(variant: RichEditorVariant): string {
+  if (variant === 'comment') return commentVariant
+  if (variant === 'note') return noteVariant
+  return articleVariant
 }

@@ -1,5 +1,3 @@
-import 'katex/dist/katex.min.css'
-
 import { useEffect, useState } from 'react'
 
 export interface KaTeXRendererProps {

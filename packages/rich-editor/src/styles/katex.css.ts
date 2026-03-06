@@ -1,7 +1,7 @@
+import { vars } from '@haklex/rich-style-token'
 import { globalStyle } from '@vanilla-extract/css'
 
 import { richContent } from './shared.css'
-import { vars } from './vars.css'
 
 // ─── KaTeX Display ──────────────────────────────────────
 globalStyle(`${richContent} .rich-katex-inline`, {

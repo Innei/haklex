@@ -6,11 +6,13 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { DecoratorNode } from 'lexical'
+import { $getSelection, $isRangeSelection, DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
+import { createElement } from 'react'
 
 import { MentionRenderer } from '../components/renderers/MentionRenderer'
 import { createRendererDecoration } from '../components/RendererWrapper'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 
 export type SerializedMentionNode = Spread<
   {
@@ -25,6 +27,28 @@ export class MentionNode extends DecoratorNode<ReactElement> {
   __platform: string
   __handle: string
   __displayName?: string
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Mention',
+      icon: createElement(
+        'span',
+        { style: { fontSize: 16, fontWeight: 700 } },
+        '@',
+      ),
+      description: 'Mention a social account',
+      keywords: ['mention', 'at', '@', 'github', 'twitter'],
+      section: 'INLINE',
+      onSelect: (editor: LexicalEditor) => {
+        editor.update(() => {
+          const selection = $getSelection()
+          if ($isRangeSelection(selection)) {
+            selection.insertText('@')
+          }
+        })
+      },
+    },
+  ]
 
   static getType(): string {
     return 'mention'

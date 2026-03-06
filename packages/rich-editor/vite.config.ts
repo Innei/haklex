@@ -5,6 +5,7 @@ export default createViteConfig({
   entry: {
     index: 'src/index.ts',
     editor: 'src/editor.ts',
-    renderer: 'src/renderer.ts',
+    'static-entry': 'src/static-entry.ts',
+    'styles-entry': 'src/styles-entry.ts',
   },
 })

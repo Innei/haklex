@@ -1,50 +1,76 @@
+import { noteTheme, vars } from '@haklex/rich-style-token'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 import { richContent } from './shared.css'
-import { darkNoteTheme, noteTheme, vars } from './vars.css'
 
 const noteBase = style({
-  maxWidth: '65ch',
-  fontSize: vars.typography.fontSizeLarge,
+  maxWidth: vars.layout.maxWidth,
+  fontSize: vars.typography.fontSizeBase,
   lineHeight: '1.8',
   color: vars.color.text,
 })
 
 export const noteVariant = style([richContent, noteTheme, noteBase])
-export const darkNoteVariant = style([richContent, darkNoteTheme, noteBase])
 
 // ─── Paragraphs (prose-style with text-indent) ──────────
-globalStyle(`${noteBase} .rich-paragraph`, {
+// Use direct-child selectors so text-indent / drop-cap only affect
+// top-level paragraphs, not paragraphs nested inside alerts, quotes, tables, etc.
+const topParagraph = `${noteBase} > .rich-paragraph`
+const editorTopParagraph = `${noteBase} .rich-editor__content > .rich-paragraph`
+const rendererTopParagraph = `${noteBase} .rich-content__body > .rich-paragraph`
+
+globalStyle(`${topParagraph}, ${editorTopParagraph}, ${rendererTopParagraph}`, {
   marginTop: '1.25em',
   marginBottom: '1.25em',
   lineHeight: '1.8',
 })
 
-globalStyle(`${noteBase} .rich-paragraph:first-child`, {
-  marginTop: 0,
-  marginBottom: '2rem',
+globalStyle(
+  `${topParagraph}:first-of-type, ${editorTopParagraph}:first-of-type, ${rendererTopParagraph}:first-of-type`,
+  {
+    marginTop: 0,
+    marginBottom: '2rem',
+  },
+)
+
+// Instead of text-indent (which indents the entire first line including
+// inline decorators like mention/katex), apply margin on the first text
+// child only. If the paragraph starts with a decorator, no indent is added.
+globalStyle(
+  `${topParagraph}:not(:first-of-type) > [data-lexical-text]:first-child, ${editorTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child, ${rendererTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child`,
+  {
+    marginInlineStart: '2rem',
+  },
+)
+
+// Drop cap on first paragraph — renderer only (float disrupts editing)
+globalStyle(
+  `${topParagraph}:first-of-type::first-letter, ${rendererTopParagraph}:first-of-type::first-letter`,
+  {
+    float: 'left',
+    fontSize: '2.4em',
+    marginRight: '0.2em',
+    lineHeight: '1',
+  },
+)
+
+// Editor: subtle first-letter accent without float
+globalStyle(`${editorTopParagraph}:first-of-type::first-letter`, {
+  fontSize: '1.5em',
+  fontWeight: 700,
+  color: vars.color.accent,
 })
 
-globalStyle(`${noteBase} .rich-paragraph:not(:first-child)`, {
-  textIndent: '2rem',
-})
-
-// Drop cap on first paragraph
-globalStyle(`${noteBase} .rich-paragraph:first-child::first-letter`, {
-  float: 'left',
-  fontSize: '2.4em',
-  marginRight: '0.2em',
-  lineHeight: '1',
-})
-
-globalStyle(`${noteBase} .rich-paragraph:last-child`, {
-  marginBottom: 0,
-})
+globalStyle(
+  `${topParagraph}:last-child, ${editorTopParagraph}:last-child, ${rendererTopParagraph}:last-child`,
+  {
+    marginBottom: 0,
+  },
+)
 
 // ─── Bold uses sans-serif ────────────────────────────────
 globalStyle(`${noteBase} .rich-text-bold`, {
-  fontFamily:
-    'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontFamily: vars.typography.fontFamily,
   fontWeight: 600,
   color: vars.color.text,
 })
@@ -120,7 +146,7 @@ globalStyle(`${noteBase} .rich-heading-h6`, {
   lineHeight: '1.5',
   marginTop: '1.5em',
   marginBottom: '0.5em',
-  color: vars.color.textSecondary,
+  color: vars.color.text,
   textTransform: 'uppercase',
 })
 
@@ -144,14 +170,6 @@ globalStyle(`${noteBase} .rich-quote`, {
   paddingLeft: '2em',
   paddingRight: '2em',
   borderRadius: 0,
-})
-
-globalStyle(`${noteBase} .rich-quote p:first-of-type`, {
-  textIndent: 0,
-})
-
-globalStyle(`${noteBase} .rich-quote .rich-paragraph`, {
-  textIndent: 0,
 })
 
 globalStyle(
@@ -239,6 +257,15 @@ globalStyle(`${noteBase} .rich-table .rich-paragraph`, {
   lineHeight: 'inherit',
 })
 
+globalStyle(
+  `${noteBase} .rich-table .rich-paragraph:first-child::first-letter`,
+  {
+    float: 'none',
+    fontSize: 'inherit',
+    marginRight: 0,
+  },
+)
+
 // ─── Images ─────────────────────────────────────────────
 globalStyle(`${noteBase} .rich-image`, {
   marginTop: '2em',
@@ -260,38 +287,13 @@ globalStyle(`${noteBase} .rich-image figcaption`, {
 // ─── HR (match markdown--note: border + opacity 20%) ───────
 globalStyle(`${noteBase} .rich-hr`, {
   border: 'none',
-  borderTop: `1px solid ${vars.color.border}`,
+  borderTop: `1px solid ${vars.color.hrBorder}`,
   opacity: 0.2,
   marginTop: '0.5rem',
   marginBottom: '0.5rem',
   width: 60,
   marginLeft: 'auto',
   marginRight: 'auto',
-})
-
-// ─── Alerts ─────────────────────────────────────────────
-globalStyle(`${noteBase} .rich-alert`, {
-  padding: '1em 1.5em',
-  marginTop: '1.6em',
-  marginBottom: '1.6em',
-  borderLeftWidth: '0.25rem',
-  borderLeftStyle: 'solid',
-  borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
-  backgroundColor: vars.color.bgSecondary,
-})
-
-globalStyle(
-  `${noteBase} .rich-alert .rich-paragraph:first-child::first-letter`,
-  {
-    float: 'none',
-    fontSize: 'inherit',
-    marginRight: 0,
-  },
-)
-
-globalStyle(`${noteBase} .rich-alert-header`, {
-  marginBottom: '0.75em',
-  fontSize: '0.875em',
 })
 
 // ─── KaTeX ──────────────────────────────────────────────

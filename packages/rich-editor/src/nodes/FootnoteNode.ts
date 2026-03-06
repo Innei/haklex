@@ -9,7 +9,7 @@ import type {
 import { DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
 
-import { FootnoteRenderer } from '../components/renderers/FootnoteRenderer'
+import { FootnoteStaticRenderer } from '../components/renderers/FootnoteStaticRenderer'
 import { createRendererDecoration } from '../components/RendererWrapper'
 
 export type SerializedFootnoteNode = Spread<
@@ -72,7 +72,7 @@ export class FootnoteNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('Footnote', FootnoteRenderer, {
+    return createRendererDecoration('Footnote', FootnoteStaticRenderer, {
       identifier: this.__identifier,
     })
   }

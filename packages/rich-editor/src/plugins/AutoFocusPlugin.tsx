@@ -5,7 +5,12 @@ export function AutoFocusPlugin() {
   const [editor] = useLexicalComposerContext()
 
   useEffect(() => {
-    editor.focus()
+    const root = editor.getRootElement()
+    if (root) {
+      root.focus({ preventScroll: true })
+    } else {
+      editor.focus()
+    }
   }, [editor])
 
   return null

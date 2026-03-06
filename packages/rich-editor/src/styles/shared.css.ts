@@ -1,6 +1,5 @@
+import { vars } from '@haklex/rich-style-token'
 import { globalStyle, keyframes, style } from '@vanilla-extract/css'
-
-import { vars } from './vars.css'
 
 export const richContent = style({
   fontFamily: vars.typography.fontFamily,
@@ -35,10 +34,14 @@ globalStyle(`${richContent} .rich-text-strikethrough`, {
   textDecoration: 'line-through',
 })
 
-globalStyle(`${richContent} .rich-text-highlight`, {
-  backgroundColor: vars.color.accentLight,
-  borderRadius: vars.borderRadius.sm,
-  padding: '1px 4px',
+globalStyle(`${richContent} .rich-text-superscript`, {
+  verticalAlign: 'super',
+  fontSize: '0.8em',
+})
+
+globalStyle(`${richContent} .rich-text-subscript`, {
+  verticalAlign: 'sub',
+  fontSize: '0.8em',
 })
 
 globalStyle(`${richContent} .rich-text-code`, {
@@ -51,6 +54,50 @@ globalStyle(`${richContent} .rich-text-code`, {
   border: `1px solid ${vars.color.border}`,
 })
 
+// ─── Highlight (mark-style) ─────────────────────────────
+globalStyle(`${richContent} mark`, {
+  background: 'transparent',
+})
+
+const highlightKf = keyframes({
+  to: { '--rc-hl-highlighted': '1' } as Record<string, string>,
+})
+
+globalStyle(`${richContent} .rich-text-highlight`, {
+  vars: {
+    '--rc-hl-lightness': '0.3',
+    '--rc-hl-highlighted': '1',
+    '--rc-hl-color': `oklch(from ${vars.color.accent} l c h / var(--rc-hl-lightness))`,
+  },
+  background: `linear-gradient(120deg, var(--rc-hl-color, lightblue) 50%, transparent 50%) 110% 0 / 200% 100% no-repeat`,
+  backgroundPosition: 'calc((1 - var(--rc-hl-highlighted)) * 110%) 0',
+  color: vars.color.text,
+  transition: 'background-position 1s',
+  '@supports': {
+    '(animation-timeline: view())': {
+      vars: {
+        '--rc-hl-highlighted': '0',
+      },
+      animation: `${highlightKf} steps(1) both`,
+      animationTimeline: 'view()',
+      animationRange: 'entry 100% cover 10%',
+    } as any,
+  },
+})
+
+globalStyle(`[contenteditable="true"] .rich-text-highlight`, {
+  vars: {
+    '--rc-hl-highlighted': '1',
+  },
+  animation: 'none',
+})
+
+globalStyle(`[data-theme='dark'] ${richContent} .rich-text-highlight`, {
+  vars: {
+    '--rc-hl-lightness': '0.35',
+  },
+})
+
 // ─── Headings (base) ─────────────────────────────────────
 
 const headingSelector = `:is(.rich-heading-h1, .rich-heading-h2, .rich-heading-h3, .rich-heading-h4, .rich-heading-h5, .rich-heading-h6)`
@@ -61,7 +108,7 @@ globalStyle(`${richContent} ${headingSelector}`, {
 
 globalStyle(`${richContent} .rich-heading-anchor`, {
   position: 'absolute',
-  left: '-1.25em',
+  left: '-1.25rem',
   top: 0,
   bottom: 0,
   display: 'flex',
@@ -70,11 +117,11 @@ globalStyle(`${richContent} .rich-heading-anchor`, {
   color: vars.color.textSecondary,
   opacity: 0,
   transition: 'opacity 0.15s ease',
-  fontSize: '0.8em',
+  fontSize: '0.8rem',
 })
 
-globalStyle(`${richContent} .rich-heading-anchor::before`, {
-  content: '"#"',
+globalStyle(`${richContent} .rich-heading-anchor svg`, {
+  flexShrink: 0,
 })
 
 globalStyle(`${richContent} ${headingSelector}:hover .rich-heading-anchor`, {
@@ -87,6 +134,46 @@ globalStyle(
     opacity: 1,
   },
 )
+
+// Heading level badge (editor only): show H1–H6 for hierarchy awareness
+const headingLevelBadge = `
+  [contenteditable="true"] .rich-heading-h1::before,
+  [contenteditable="true"] .rich-heading-h2::before,
+  [contenteditable="true"] .rich-heading-h3::before,
+  [contenteditable="true"] .rich-heading-h4::before,
+  [contenteditable="true"] .rich-heading-h5::before,
+  [contenteditable="true"] .rich-heading-h6::before
+`
+globalStyle(headingLevelBadge, {
+  position: 'absolute',
+  left: '-1.5rem',
+  bottom: '0.5rem',
+  display: 'flex',
+  fontSize: '0.5rem',
+  fontWeight: 600,
+  color: vars.color.textSecondary,
+  opacity: 0.6,
+  pointerEvents: 'none',
+  fontFamily: vars.typography.fontMono,
+})
+globalStyle(`[contenteditable="true"] .rich-heading-h1::before`, {
+  content: '"H1"',
+})
+globalStyle(`[contenteditable="true"] .rich-heading-h2::before`, {
+  content: '"H2"',
+})
+globalStyle(`[contenteditable="true"] .rich-heading-h3::before`, {
+  content: '"H3"',
+})
+globalStyle(`[contenteditable="true"] .rich-heading-h4::before`, {
+  content: '"H4"',
+})
+globalStyle(`[contenteditable="true"] .rich-heading-h5::before`, {
+  content: '"H5"',
+})
+globalStyle(`[contenteditable="true"] .rich-heading-h6::before`, {
+  content: '"H6"',
+})
 
 globalStyle(`${richContent} .rich-heading-h1`, {
   fontSize: '2em',
@@ -134,7 +221,7 @@ globalStyle(`${richContent} .rich-heading-h6`, {
   lineHeight: vars.typography.lineHeightTight,
   marginTop: '1em',
   marginBottom: '0.25em',
-  color: vars.color.textSecondary,
+  color: vars.color.text,
 })
 
 // ─── Links ───────────────────────────────────────────────
@@ -146,6 +233,39 @@ globalStyle(`${richContent} .rich-link`, {
 
 globalStyle(`${richContent} .rich-link:hover`, {
   textDecoration: 'underline',
+})
+
+// Link favicon (editor: CSS custom property via plugin)
+globalStyle(`${richContent} .rich-link[data-favicon="loaded"]::before`, {
+  content: '""',
+  display: 'inline-block',
+  width: '1em',
+  height: '1em',
+  marginRight: '0.2em',
+  verticalAlign: '-0.125em',
+  backgroundImage: 'var(--rc-link-favicon)',
+  backgroundSize: 'contain',
+  backgroundRepeat: 'no-repeat',
+  backgroundPosition: 'center',
+  borderRadius: '2px',
+})
+
+// Link favicon (wrapper for img, platform icon, or Globe fallback)
+globalStyle(`${richContent} .rich-link-favicon`, {
+  display: 'inline-flex',
+  alignItems: 'center',
+  marginRight: '0.15em',
+  verticalAlign: '-0.125em',
+})
+globalStyle(`${richContent} .rich-link-favicon img`, {
+  width: '1em',
+  height: '1em',
+  borderRadius: '2px',
+  objectFit: 'contain',
+})
+globalStyle(`${richContent} .rich-link-favicon svg`, {
+  width: '0.9em',
+  height: '0.9em',
 })
 
 // ─── Lists ───────────────────────────────────────────────
@@ -187,43 +307,80 @@ globalStyle(
   `${richContent} .rich-list-item.rich-list-item-checked, ${richContent} .rich-list-item.rich-list-item-unchecked`,
   {
     position: 'relative',
-    paddingLeft: '1.9em',
+    paddingLeft: '2em',
     listStyleType: 'none',
     outline: 'none',
+    vars: {
+      '--rc-cb-size': '1.125rem',
+    },
   },
 )
 
+// Checkbox box
 globalStyle(
   `${richContent} .rich-list-item.rich-list-item-unchecked::before, ${richContent} .rich-list-item.rich-list-item-checked::before`,
   {
     content: '""',
-    width: 16,
-    height: 16,
-    border: `1px solid ${vars.color.border}`,
-    borderRadius: vars.borderRadius.sm,
     position: 'absolute',
     left: 0,
-    top: 'calc((1lh - 16px) / 2)',
+    top: 'calc((1lh - var(--rc-cb-size)) / 2)',
+    width: 'var(--rc-cb-size)',
+    height: 'var(--rc-cb-size)',
+    border: `2px solid color-mix(in oklab, ${vars.color.textSecondary} 60%, transparent)`,
+    borderRadius: vars.borderRadius.sm,
     boxSizing: 'border-box',
+    cursor: 'pointer',
+    verticalAlign: 'middle',
+    color: vars.color.text,
+    backgroundColor: 'transparent',
+    transition:
+      'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
   },
 )
 
+// Hover state for checkbox (editor only)
+globalStyle(
+  `[contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-unchecked:hover::before`,
+  {
+    borderColor: `color-mix(in oklab, ${vars.color.textSecondary} 80%, transparent)`,
+  },
+)
+
+// Checkmark (clip-path animation, rotated to form check shape)
+globalStyle(
+  `${richContent} .rich-list-item.rich-list-item-unchecked::after, ${richContent} .rich-list-item.rich-list-item-checked::after`,
+  {
+    content: '""',
+    position: 'absolute',
+    left: 0,
+    top: 'calc((1lh - var(--rc-cb-size)) / 2)',
+    width: 'var(--rc-cb-size)',
+    height: 'var(--rc-cb-size)',
+    opacity: 0,
+    clipPath: 'polygon(20% 100%, 20% 80%, 50% 80%, 50% 80%, 70% 80%, 70% 100%)',
+    backgroundColor: 'white',
+    boxSizing: 'border-box',
+    display: 'block',
+    pointerEvents: 'none',
+    transform: 'rotate(45deg)',
+    transformOrigin: 'center',
+    transition:
+      'clip-path 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s',
+  },
+)
+
+// Checked state: box
 globalStyle(`${richContent} .rich-list-item.rich-list-item-checked::before`, {
   backgroundColor: vars.color.accent,
   borderColor: vars.color.accent,
+  boxShadow: `0 0 0 1px ${vars.color.accent}`,
 })
 
+// Checked state: checkmark (scale 0.7 for smaller appearance)
 globalStyle(`${richContent} .rich-list-item.rich-list-item-checked::after`, {
-  content: '""',
-  position: 'absolute',
-  left: 5,
-  top: 'calc((1lh - 16px) / 2 + 5px)',
-  width: 6,
-  height: 3,
-  borderLeft: '2px solid #fff',
-  borderBottom: '2px solid #fff',
-  transform: 'rotate(-45deg)',
-  boxSizing: 'border-box',
+  clipPath: 'polygon(20% 100%, 20% 80%, 50% 80%, 50% 0%, 70% 0%, 70% 100%)',
+  opacity: 1,
+  transform: 'rotate(45deg) scale(0.7)',
 })
 
 globalStyle(`${richContent} .rich-list-item-checked`, {
@@ -253,7 +410,7 @@ globalStyle(`${richContent} .rich-quote > .rich-paragraph:last-child`, {
 // ─── Horizontal rule (match markdown: 60px centered line) ─
 globalStyle(`${richContent} .rich-hr`, {
   border: 'none',
-  borderTop: `1px solid ${vars.color.border}`,
+  borderTop: `1px solid ${vars.color.hrBorder}`,
   margin: `${vars.spacing.lg} auto`,
   width: 60,
 })
@@ -380,6 +537,41 @@ globalStyle(`${richContent} .rich-spoiler-revealed`, {
   userSelect: 'auto',
 })
 
+// ─── Ruby ───────────────────────────────────────────────
+globalStyle(`${richContent} .rich-ruby`, {
+  rubyPosition: 'over',
+  rubyAlign: 'center',
+})
+
+globalStyle(`${richContent} .rich-ruby-rt`, {
+  fontSize: '0.58em',
+  lineHeight: 1,
+  color: vars.color.textSecondary,
+  userSelect: 'none',
+})
+
+globalStyle(`[contenteditable="true"] .rich-ruby[data-ruby]`, {
+  position: 'relative',
+  display: 'inline-block',
+  paddingTop: '0.72em',
+  lineHeight: 1.2,
+})
+
+globalStyle(`[contenteditable="true"] .rich-ruby[data-ruby]::before`, {
+  content: 'attr(data-ruby)',
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  top: 0,
+  transform: 'translateY(-0.68em)',
+  fontSize: '0.58em',
+  lineHeight: 1,
+  textAlign: 'center',
+  color: vars.color.textSecondary,
+  pointerEvents: 'none',
+  whiteSpace: 'nowrap',
+})
+
 // ─── Footnote ───────────────────────────────────────────
 globalStyle(`${richContent} .rich-footnote`, {
   verticalAlign: 'super',
@@ -452,6 +644,7 @@ globalStyle(`${richContent} .rich-footnote-back-ref`, {
   textDecoration: 'none',
   fontSize: '0.85em',
   transition: 'opacity 0.15s ease',
+  fontFamily: vars.typography.fontMono,
 })
 
 globalStyle(`${richContent} .rich-footnote-back-ref:hover`, {
@@ -529,7 +722,7 @@ globalStyle(`.rich-drag-handle`, {
 
 globalStyle(`.rich-drag-handle:hover`, {
   opacity: 1,
-  backgroundColor: vars.color.bgSecondary,
+  backgroundColor: vars.color.fillSecondary,
 })
 
 globalStyle(`.rich-drag-handle:active`, {
@@ -543,6 +736,15 @@ globalStyle(`.rich-drop-indicator`, {
   borderRadius: '1px',
   pointerEvents: 'none',
   zIndex: 10,
+})
+
+// ─── Alert (unified across variants) ────────────────────
+globalStyle(`${richContent} .rich-alert`, {
+  margin: '2em 0',
+  padding: '0 1em',
+  backgroundColor: 'transparent',
+  border: 'none',
+  borderRadius: 0,
 })
 
 // ─── First-child reset ──────────────────────────────────

@@ -1,14 +1,15 @@
 {
   "name": "@haklex/rich-editor",
-  "version": "0.0.11",
+  "type": "module",
+  "version": "0.0.61",
   "description": "Core rich text editor based on Lexical",
   "license": "MIT",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./editor": "./src/editor.ts",
-    "./renderer": "./src/renderer.ts",
-    "./style.css": "./dist/rich-editor.css"
+    "./static": "./src/static-entry.ts",
+    "./style.css": "./dist/rich-editor.css",
+    "./styles": "./src/styles-entry.ts"
   },
   "main": "./src/index.ts",
   "files": [
@@ -18,48 +19,18 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "dependencies": {
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-headless": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
-    "thumbhash": "^0.1.1"
-  },
-  "devDependencies": {
-    "@base-ui/react": "^1.1.0",
-    "@lexical/code": "^0.40.0",
-    "@lexical/extension": "^0.40.0",
-    "@lexical/link": "^0.40.0",
-    "@lexical/list": "^0.40.0",
-    "@lexical/markdown": "^0.40.0",
-    "@lexical/react": "^0.40.0",
-    "@lexical/rich-text": "^0.40.0",
-    "@lexical/table": "^0.40.0",
-    "@types/react": "^19.2.9",
-    "@types/react-dom": "^19.2.3",
-    "@vanilla-extract/css": "^1.17.1",
-    "@vanilla-extract/vite-plugin": "^4.0.20",
-    "katex": ">=0.16.0",
-    "lexical": "^0.40.0",
-    "lucide-react": "^0.574.0",
-    "react": ">=19",
-    "react-dom": ">=19",
-    "shiki": "^3.21.0",
-    "typescript": "^5.9.0",
-    "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.0"
-  },
   "peerDependencies": {
     "@base-ui/react": "^1.1.0",
-    "@lexical/code": "^0.40.0",
-    "@lexical/extension": "^0.40.0",
-    "@lexical/link": "^0.40.0",
-    "@lexical/list": "^0.40.0",
-    "@lexical/markdown": "^0.40.0",
-    "@lexical/react": "^0.40.0",
-    "@lexical/rich-text": "^0.40.0",
-    "@lexical/table": "^0.40.0",
+    "@lexical/code": "^0.41.0",
+    "@lexical/extension": "^0.41.0",
+    "@lexical/link": "^0.41.0",
+    "@lexical/list": "^0.41.0",
+    "@lexical/markdown": "^0.41.0",
+    "@lexical/react": "^0.41.0",
+    "@lexical/rich-text": "^0.41.0",
+    "@lexical/table": "^0.41.0",
     "katex": ">=0.16.0",
-    "lexical": "^0.40.0",
+    "lexical": "^0.41.0",
     "lucide-react": "^0.574.0",
     "react": ">=19",
     "react-dom": ">=19",
@@ -73,6 +44,37 @@
       "optional": true
     }
   },
+  "dependencies": {
+    "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-headless": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*",
+    "nanoid": "^5.1.6",
+    "thumbhash": "^0.1.1"
+  },
+  "devDependencies": {
+    "@base-ui/react": "^1.2.0",
+    "@lexical/code": "^0.41.0",
+    "@lexical/extension": "^0.41.0",
+    "@lexical/link": "^0.41.0",
+    "@lexical/list": "^0.41.0",
+    "@lexical/markdown": "^0.41.0",
+    "@lexical/react": "^0.41.0",
+    "@lexical/rich-text": "^0.41.0",
+    "@lexical/table": "^0.41.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vanilla-extract/css": "^1.18.0",
+    "@vanilla-extract/vite-plugin": "^5.1.4",
+    "katex": "^0.16.33",
+    "lexical": "^0.41.0",
+    "lucide-react": "^0.577.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "shiki": "^4.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -84,9 +86,13 @@
         "import": "./dist/editor.mjs",
         "types": "./dist/editor.d.ts"
       },
-      "./renderer": {
-        "import": "./dist/renderer.mjs",
-        "types": "./dist/renderer.d.ts"
+      "./static": {
+        "import": "./dist/static-entry.mjs",
+        "types": "./dist/static-entry.d.ts"
+      },
+      "./styles": {
+        "import": "./dist/styles-entry.mjs",
+        "types": "./dist/styles-entry.d.ts"
       },
       "./style.css": "./dist/rich-editor.css"
     },

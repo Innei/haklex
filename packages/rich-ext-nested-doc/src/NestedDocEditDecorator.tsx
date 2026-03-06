@@ -1,0 +1,295 @@
+import {
+  AutoLinkPlugin,
+  BlockExitPlugin,
+  editorTheme,
+  FootnotePlugin,
+  getResolvedEditNodes,
+  HorizontalRulePlugin,
+  ImagePlugin,
+  ImageUploadPlugin,
+  KaTeXPlugin,
+  LinkFaviconPlugin,
+  MarkdownShortcutsPlugin,
+  MermaidPlugin,
+  useColorScheme,
+  useImageUpload,
+} from '@haklex/rich-editor'
+import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar'
+import { usePortalTheme } from '@haklex/rich-style-token'
+import { CheckListPlugin } from '@lexical/react/LexicalCheckListPlugin'
+import { LexicalComposer } from '@lexical/react/LexicalComposer'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import { ContentEditable } from '@lexical/react/LexicalContentEditable'
+import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
+import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
+import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin'
+import { ListPlugin } from '@lexical/react/LexicalListPlugin'
+import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
+import { TabIndentationPlugin } from '@lexical/react/LexicalTabIndentationPlugin'
+import { TablePlugin } from '@lexical/react/LexicalTablePlugin'
+import type { LexicalEditor, SerializedEditorState } from 'lexical'
+import { $getNodeByKey } from 'lexical'
+import { FileText, Pencil, Save, X } from 'lucide-react'
+import {
+  type KeyboardEvent,
+  type RefObject,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react'
+
+import { $isNestedDocNode } from './NestedDocNode'
+import { NestedDocPlugin } from './NestedDocPlugin'
+import { NestedDocRenderer } from './NestedDocRenderer'
+import * as css from './styles.css'
+import { hasRenderableEditorState, truncateEditorState } from './utils'
+
+const PREVIEW_NODE_LIMIT = 6
+
+const EMPTY_EDITOR_STATE = {
+  root: {
+    children: [
+      {
+        children: [],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        type: 'paragraph',
+        version: 1,
+        textFormat: 0,
+        textStyle: '',
+      },
+    ],
+    direction: 'ltr',
+    format: '',
+    indent: 0,
+    type: 'root',
+    version: 1,
+  },
+} as unknown as SerializedEditorState
+
+interface NestedDocEditDecoratorProps {
+  nodeKey: string
+  contentEditor: LexicalEditor
+  contentState: SerializedEditorState
+}
+
+export function NestedDocEditDecorator({
+  nodeKey,
+  contentEditor,
+  contentState,
+}: NestedDocEditDecoratorProps) {
+  const [editor] = useLexicalComposerContext()
+  const colorScheme = useColorScheme()
+  const { className: portalClassName } = usePortalTheme()
+
+  const previewState = useMemo(
+    () => truncateEditorState(contentState, PREVIEW_NODE_LIMIT),
+    [contentState],
+  )
+  const hasPreview = hasRenderableEditorState(previewState)
+
+  const handleOpenDialog = useCallback(async () => {
+    const { presentDialog } = await import('@haklex/rich-editor-ui')
+
+    presentDialog({
+      content: ({ dismiss }) => (
+        <NestedDocDialogContent
+          initialState={contentEditor.getEditorState().toJSON()}
+          parentEditor={editor}
+          nodeKey={nodeKey}
+          contentEditor={contentEditor}
+          onDismiss={dismiss}
+        />
+      ),
+      className: css.dialogPopup,
+      portalClassName,
+      theme: colorScheme,
+      showCloseButton: true,
+      clickOutsideToDismiss: false,
+    })
+  }, [colorScheme, contentEditor, editor, nodeKey, portalClassName])
+
+  return (
+    <div
+      className={css.editOverlayRoot}
+      onClick={handleOpenDialog}
+      role="button"
+      tabIndex={0}
+      aria-label="Open nested document editor"
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault()
+          handleOpenDialog()
+        }
+      }}
+    >
+      <div className="rich-nested-doc-content">
+        {hasPreview ? (
+          <div className={css.previewSurface}>
+            <NestedDocRenderer value={previewState} />
+          </div>
+        ) : (
+          <p className={css.previewEmpty}>
+            Empty nested document. Click to edit.
+          </p>
+        )}
+      </div>
+      <div className={css.editOverlay} aria-hidden>
+        <Pencil size={24} />
+      </div>
+    </div>
+  )
+}
+
+function NestedDocDialogContent({
+  initialState,
+  parentEditor,
+  nodeKey,
+  contentEditor,
+  onDismiss,
+}: {
+  initialState: SerializedEditorState
+  parentEditor: LexicalEditor
+  nodeKey: string
+  contentEditor: LexicalEditor
+  onDismiss: () => void
+}) {
+  const dialogEditorRef = useRef<LexicalEditor | null>(null)
+  const imageUpload = useImageUpload()
+
+  const safeInitialState =
+    initialState?.root?.children?.length > 0 ? initialState : EMPTY_EDITOR_STATE
+
+  const initialConfig = {
+    namespace: 'NestedDocDialog',
+    nodes: getResolvedEditNodes(),
+    theme: editorTheme,
+    editable: true,
+    editorState: JSON.stringify(safeInitialState),
+    onError: (error: Error) => {
+      console.error('[NestedDocDialog]', error)
+    },
+  }
+
+  const handleDone = useCallback(() => {
+    const dialogEditor = dialogEditorRef.current
+    if (dialogEditor) {
+      const newState = dialogEditor.getEditorState().toJSON()
+      const parsed = contentEditor.parseEditorState(newState)
+      contentEditor.setEditorState(parsed)
+      parentEditor.update(() => {
+        const node = $getNodeByKey(nodeKey)
+        if ($isNestedDocNode(node)) {
+          node.setContentState(newState)
+        }
+      })
+    }
+    onDismiss()
+  }, [contentEditor, nodeKey, onDismiss, parentEditor])
+
+  const handleKeyDownCapture = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      const isModifier = event.metaKey || event.ctrlKey
+      if (!isModifier) return
+
+      if (event.key === 'Enter' || event.key.toLowerCase() === 's') {
+        event.preventDefault()
+        handleDone()
+      }
+    },
+    [handleDone],
+  )
+
+  return (
+    <LexicalComposer initialConfig={initialConfig}>
+      <EditorRefCapture editorRef={dialogEditorRef} />
+      <FootnotePlugin>
+        <div
+          className={css.dialogShell}
+          onKeyDownCapture={handleKeyDownCapture}
+        >
+          <div className={css.dialogHeader}>
+            <div className={css.dialogHeaderMain}>
+              <span className={css.dialogHeaderIcon}>
+                <FileText size={18} />
+              </span>
+              <div className={css.dialogHeaderText}>
+                <h3 className={css.dialogTitle}>Nested document</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className={css.dialogToolbarSection}>
+            <ToolbarPlugin className={css.dialogToolbar} />
+          </div>
+
+          <div className={css.editorArea}>
+            <div className={css.editorScrollContainer}>
+              <div className={css.editorCard}>
+                <RichTextPlugin
+                  contentEditable={
+                    <ContentEditable
+                      className={css.editorEditable}
+                      aria-placeholder=""
+                      placeholder={<span style={{ display: 'none' }} />}
+                    />
+                  }
+                  ErrorBoundary={LexicalErrorBoundary}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className={css.dialogFooter}>
+            <div className={css.dialogActions}>
+              <button
+                type="button"
+                className={css.secondaryButton}
+                onClick={onDismiss}
+              >
+                <X size={15} />
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={css.primaryButton}
+                onClick={handleDone}
+              >
+                <Save size={15} />
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </FootnotePlugin>
+
+      <HistoryPlugin />
+      <ListPlugin />
+      <LinkPlugin />
+      <CheckListPlugin />
+      <TabIndentationPlugin />
+      <TablePlugin />
+      <MarkdownShortcutsPlugin />
+      <AutoLinkPlugin />
+      <HorizontalRulePlugin />
+      <ImagePlugin />
+      {imageUpload ? <ImageUploadPlugin onUpload={imageUpload} /> : null}
+      <KaTeXPlugin />
+      <MermaidPlugin />
+      <NestedDocPlugin />
+      <LinkFaviconPlugin />
+      <BlockExitPlugin />
+    </LexicalComposer>
+  )
+}
+
+function EditorRefCapture({
+  editorRef,
+}: {
+  editorRef: RefObject<LexicalEditor | null>
+}) {
+  const [editor] = useLexicalComposerContext()
+  editorRef.current = editor
+  return null
+}

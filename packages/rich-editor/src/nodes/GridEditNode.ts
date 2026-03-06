@@ -1,15 +1,18 @@
 import type {
   EditorConfig,
   LexicalEditor,
+  LexicalNode,
   SerializedEditorState,
   SerializedLexicalNode,
 } from 'lexical'
-import { createEditor } from 'lexical'
+import { $getRoot, $insertNodes, createEditor } from 'lexical'
+import { LayoutGrid } from 'lucide-react'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { GridEditDecorator } from '../components/decorators/GridEditDecorator'
 import { editorTheme } from '../styles/theme'
+import type { SlashMenuItemConfig } from '../types/slash-menu'
 import {
   GridContainerNode,
   type SerializedGridContainerNode,
@@ -37,37 +40,75 @@ function createCellEditor(): LexicalEditor {
 }
 
 export class GridEditNode extends GridContainerNode {
+  __cellEditors: LexicalEditor[]
+
+  static slashMenuItems: SlashMenuItemConfig[] = [
+    {
+      title: 'Grid',
+      icon: createElement(LayoutGrid, { size: 20 }),
+      description: 'Grid layout container',
+      keywords: ['grid', 'columns', 'layout'],
+      section: 'LAYOUT',
+      onSelect: (editor) => {
+        editor.update(() => {
+          $insertNodes([$createGridEditNode(2)])
+        })
+      },
+    },
+  ]
+
   static clone(node: GridEditNode): GridEditNode {
-    return new GridEditNode(
+    const cloned = new GridEditNode(
       node.__cols,
       node.__gap,
-      [...node.__cellEditors],
+      node.__cellStates,
       node.__key,
     )
+    cloned.__cellEditors = [...node.__cellEditors]
+    return cloned
   }
 
-  static importJSON(serializedNode: SerializedGridContainerNode): GridEditNode {
-    const legacy = serializedNode as LegacySerializedGridEditNode
-    const cols = legacy.cols || 2
-    const rawGap = legacy.gap
-    const gap = typeof rawGap === 'number' ? `${rawGap}px` : rawGap
-    const node = new GridEditNode(cols, gap)
+  constructor(
+    cols = 2,
+    gap?: string,
+    cellStates?: SerializedEditorState[],
+    key?: string,
+  ) {
+    super(cols, gap, cellStates, key)
+    this.__cellEditors = this.__cellStates.map((state) => {
+      const editor = createCellEditor()
+      const editorState = editor.parseEditorState(state)
+      editor.setEditorState(editorState)
+      return editor
+    })
+  }
 
-    if (legacy.cells && legacy.cells.length > 0) {
-      const editors: LexicalEditor[] = legacy.cells.map((cellState) => {
+  getCellEditors(): LexicalEditor[] {
+    return this.getLatest().__cellEditors
+  }
+
+  setCols(cols: number): void {
+    const writable = this.getWritable() as GridEditNode
+    const prev = writable.__cellEditors.length
+    writable.__cols = cols
+    if (cols > prev) {
+      for (let i = prev; i < cols; i++) {
         const editor = createCellEditor()
-        const editorState = editor.parseEditorState(cellState)
-        editor.setEditorState(editorState)
-        return editor
-      })
-      node.__cellEditors = editors
-    } else if (legacy.children) {
-      const { children } = legacy
-      const editors: LexicalEditor[] = children.map((child) => {
-        const editor = createCellEditor()
-        const content = {
+        writable.__cellEditors.push(editor)
+        const emptyState = {
           root: {
-            children: [child],
+            children: [
+              {
+                type: 'paragraph',
+                children: [],
+                direction: null,
+                format: '',
+                indent: 0,
+                textFormat: 0,
+                textStyle: '',
+                version: 1,
+              },
+            ],
             direction: null,
             format: '',
             indent: 0,
@@ -75,14 +116,100 @@ export class GridEditNode extends GridContainerNode {
             version: 1,
           },
         } as unknown as SerializedEditorState
-        const editorState = editor.parseEditorState(content)
-        editor.setEditorState(editorState)
-        return editor
+        writable.__cellStates.push(emptyState)
+      }
+    }
+  }
+
+  addCells(count: number): void {
+    const writable = this.getWritable() as GridEditNode
+    for (let i = 0; i < count; i++) {
+      const editor = createCellEditor()
+      writable.__cellEditors.push(editor)
+      const emptyState = {
+        root: {
+          children: [
+            {
+              type: 'paragraph',
+              children: [],
+              direction: null,
+              format: '',
+              indent: 0,
+              textFormat: 0,
+              textStyle: '',
+              version: 1,
+            },
+          ],
+          direction: null,
+          format: '',
+          indent: 0,
+          type: 'root',
+          version: 1,
+        },
+      } as unknown as SerializedEditorState
+      writable.__cellStates.push(emptyState)
+    }
+  }
+
+  removeCells(count: number): void {
+    const writable = this.getWritable() as GridEditNode
+    const editors = writable.__cellEditors
+    const states = writable.__cellStates
+    const toRemove = Math.min(count, editors.length)
+    for (let i = 0; i < toRemove; i++) {
+      const editor = editors.at(-1)
+      if (!editor) break
+      const isEmpty = editor.getEditorState().read(() => {
+        return $getRoot().getTextContentSize() === 0
       })
-      node.__cellEditors = editors
+      if (!isEmpty) break
+      editors.pop()
+      states.pop()
+    }
+  }
+
+  static importJSON(serializedNode: SerializedGridContainerNode): GridEditNode {
+    const legacy = serializedNode as LegacySerializedGridEditNode
+    const cols = legacy.cols || 2
+    const rawGap = legacy.gap
+    const gap = typeof rawGap === 'number' ? `${rawGap}px` : rawGap
+
+    if (legacy.cells && legacy.cells.length > 0) {
+      return new GridEditNode(cols, gap, legacy.cells)
     }
 
-    return node
+    if (legacy.children) {
+      const cellStates: SerializedEditorState[] = legacy.children.map(
+        (child) => {
+          return {
+            root: {
+              children: [child],
+              direction: null,
+              format: '',
+              indent: 0,
+              type: 'root',
+              version: 1,
+            },
+          } as unknown as SerializedEditorState
+        },
+      )
+      return new GridEditNode(cols, gap, cellStates)
+    }
+
+    return new GridEditNode(cols, gap)
+  }
+
+  exportJSON(): SerializedGridContainerNode {
+    return {
+      ...super.exportJSON(),
+      type: 'grid-container',
+      cols: this.__cols,
+      gap: this.__gap,
+      cells: this.__cellEditors.map((editor) =>
+        editor.getEditorState().toJSON(),
+      ),
+      version: 1,
+    }
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -93,4 +220,14 @@ export class GridEditNode extends GridContainerNode {
       cellEditors: this.__cellEditors,
     })
   }
+}
+
+export function $createGridEditNode(cols = 2, gap?: string): GridEditNode {
+  return new GridEditNode(cols, gap)
+}
+
+export function $isGridEditNode(
+  node: LexicalNode | null | undefined,
+): node is GridEditNode {
+  return node instanceof GridEditNode
 }

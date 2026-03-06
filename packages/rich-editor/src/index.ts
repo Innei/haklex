@@ -50,6 +50,17 @@ export { $createRubyNode, $isRubyNode, RubyNode } from './nodes/RubyNode'
 export type { AlertType } from './nodes/AlertQuoteNode'
 export { ALERT_LABELS, ALERT_TYPES } from './nodes/AlertQuoteNode'
 
+// Re-export plugin components for extension packages
+export { AutoLinkPlugin } from './plugins/AutoLinkPlugin'
+export { BlockExitPlugin } from './plugins/BlockExitPlugin'
+export { HorizontalRulePlugin } from './plugins/HorizontalRulePlugin'
+export { ImagePlugin } from './plugins/ImagePlugin'
+export { ImageUploadPlugin } from './plugins/ImageUploadPlugin'
+export { KaTeXPlugin } from './plugins/KaTeXPlugin'
+export { LinkFaviconPlugin } from './plugins/LinkFaviconPlugin'
+export { MarkdownShortcutsPlugin } from './plugins/MarkdownShortcutsPlugin'
+export { MermaidPlugin } from './plugins/MermaidPlugin'
+
 // Re-export plugin commands
 export { INSERT_ALERT_COMMAND } from './plugins/AlertPlugin'
 export { FootnotePlugin } from './plugins/FootnotePlugin'
@@ -146,6 +157,7 @@ export type { RenderEditorStateFn } from './context/NestedContentRendererContext
 export {
   NestedContentRendererProvider,
   useNestedContentRenderer,
+  useOptionalNestedContentRenderer,
 } from './context/NestedContentRendererContext'
 
 // Re-export FootnoteStaticRenderer

@@ -11,6 +11,7 @@ import { LayoutGrid, Minus, Plus } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 
 import { $isGridContainerNode } from '../../nodes/GridContainerNode'
+import { $isGridEditNode } from '../../nodes/GridEditNode'
 
 interface GridEditDecoratorProps {
   nodeKey: string
@@ -65,7 +66,7 @@ export function GridEditDecorator({
   const handleRemoveRow = useCallback(() => {
     editor.update(() => {
       const node = $getNodeByKey(nodeKey)
-      if (!$isGridContainerNode(node)) return
+      if (!$isGridEditNode(node)) return
       const cols = node.getCols()
       const editors = node.getCellEditors()
       if (editors.length <= cols) return

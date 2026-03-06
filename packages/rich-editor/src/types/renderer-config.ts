@@ -10,6 +10,7 @@ import type { KaTeXRendererProps } from '../components/renderers/KaTeXRenderer'
 import type { LinkCardRendererProps } from '../components/renderers/LinkCardRenderer'
 import type { MentionRendererProps } from '../components/renderers/MentionRenderer'
 import type { MermaidRendererProps } from '../components/renderers/MermaidRenderer'
+import type { RubyRendererProps } from '../components/renderers/RubyRenderer'
 import type { VideoRendererProps } from '../components/renderers/VideoRenderer'
 
 export interface CodeFile {
@@ -67,6 +68,8 @@ export interface RendererConfig {
   Mermaid?: ComponentType<MermaidRendererProps>
   /** Custom renderer for social media mentions */
   Mention?: ComponentType<MentionRendererProps>
+  /** Custom renderer for ruby annotations */
+  Ruby?: ComponentType<RubyRendererProps>
   /** Custom renderer for video embeds */
   Video?: ComponentType<VideoRendererProps>
 }

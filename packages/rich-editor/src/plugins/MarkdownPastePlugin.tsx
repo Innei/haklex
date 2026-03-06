@@ -59,12 +59,51 @@ function detectMarkdown(text: string): boolean {
   if (/^[-*_]{3,}$/m.test(text)) score += 2
 
   const paragraphs = text.split(/\n{2,}/).filter(Boolean)
-  if (paragraphs.length >= 3) score += 2
+  if (paragraphs.length >= 2) score += 5
 
   if (text.length < 20) score -= 3
   if (!text.includes('\n')) score -= 2
 
   return score >= 5
+}
+
+function _debugPastePayload(event: Event, clipboardData: DataTransfer): void {
+  const itemDetails = Array.from(clipboardData.items).map((item, index) => ({
+    index,
+    kind: item.kind,
+    type: item.type,
+  }))
+
+  const fileDetails = Array.from(clipboardData.files).map((file, index) => ({
+    index,
+    name: file.name,
+    type: file.type,
+    size: file.size,
+    lastModified: file.lastModified,
+    lastModifiedISO: new Date(file.lastModified).toISOString(),
+  }))
+
+  const typePayload: Record<string, string> = {}
+  for (const type of Array.from(clipboardData.types)) {
+    typePayload[type] = clipboardData.getData(type)
+  }
+
+  console.info('[MarkdownPastePlugin] paste debug payload')
+  console.info('event', {
+    type: event.type,
+    defaultPrevented: event.defaultPrevented,
+    timeStamp: event.timeStamp,
+  })
+  console.info('clipboardMeta', {
+    dropEffect: clipboardData.dropEffect,
+    effectAllowed: clipboardData.effectAllowed,
+    types: Array.from(clipboardData.types),
+    itemsCount: clipboardData.items.length,
+    filesCount: clipboardData.files.length,
+  })
+  console.info('items', itemDetails)
+  if (fileDetails.length > 0) console.info('files', fileDetails)
+  console.info('payloadByType', typePayload)
 }
 
 function convertAndInsert(markdown: string): void {
@@ -101,6 +140,8 @@ export function MarkdownPastePlugin() {
             ? (event as ClipboardEvent).clipboardData
             : null
         if (!clipboardData) return false
+
+        // debugPastePayload(event as Event, clipboardData)
 
         // Image files → let ImageUploadPlugin handle
         if (

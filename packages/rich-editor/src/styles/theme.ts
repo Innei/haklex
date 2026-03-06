@@ -6,6 +6,8 @@ export const editorTheme: EditorThemeClasses = {
     italic: 'rich-text-italic',
     underline: 'rich-text-underline',
     strikethrough: 'rich-text-strikethrough',
+    superscript: 'rich-text-superscript',
+    subscript: 'rich-text-subscript',
     code: 'rich-text-code',
     highlight: 'rich-text-highlight',
   },

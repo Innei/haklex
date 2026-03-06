@@ -1,9 +1,9 @@
 {
   "name": "@haklex/rich-headless",
-  "version": "0.0.11",
+  "type": "module",
+  "version": "0.0.61",
   "description": "Headless Lexical node registry for server-side parsing (no React)",
   "license": "MIT",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./transformers": "./src/transformers.ts"
@@ -16,23 +16,23 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
+  "peerDependencies": {
+    "lexical": "^0.41.0"
+  },
   "dependencies": {
-    "@lexical/code": "^0.40.0",
-    "@lexical/extension": "^0.40.0",
-    "@lexical/link": "^0.40.0",
-    "@lexical/list": "^0.40.0",
-    "@lexical/markdown": "^0.40.0",
-    "@lexical/rich-text": "^0.40.0",
-    "@lexical/table": "^0.40.0"
+    "@lexical/code": "^0.41.0",
+    "@lexical/extension": "^0.41.0",
+    "@lexical/link": "^0.41.0",
+    "@lexical/list": "^0.41.0",
+    "@lexical/markdown": "^0.41.0",
+    "@lexical/rich-text": "^0.41.0",
+    "@lexical/table": "^0.41.0"
   },
   "devDependencies": {
-    "lexical": "^0.40.0",
-    "typescript": "^5.9.0",
+    "lexical": "^0.41.0",
+    "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.0"
-  },
-  "peerDependencies": {
-    "lexical": "^0.40.0"
+    "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {
     "access": "public",

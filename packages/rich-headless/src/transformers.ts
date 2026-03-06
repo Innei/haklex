@@ -22,6 +22,13 @@ function qA(v: string): string {
   return v.replaceAll('"', '\\"')
 }
 
+function escHtml(v: string): string {
+  return v
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+}
+
 function escCell(v: string): string {
   return v.replaceAll('|', '\\|').replaceAll('\n', '<br/>')
 }
@@ -100,11 +107,41 @@ export const KATEX_INLINE_TRANSFORMER: TextMatchTransformer = {
   type: 'text-match',
 }
 
+export const RUBY_TRANSFORMER: TextMatchTransformer = {
+  dependencies: [],
+  export: (node) => {
+    if (node.getType() !== 'ruby') return null
+    const base = escHtml(node.getTextContent())
+    const reading = escHtml((node as any).__reading ?? '')
+    if (!reading) return base
+    return `<ruby>${base}<rt>${reading}</rt></ruby>`
+  },
+  importRegExp:
+    /<ruby>\s*([\s\S]*?)\s*<rt>\s*([\s\S]*?)\s*<\/rt>\s*(?:<rp>[\s\S]*?<\/rp>\s*)*<\/ruby>/i,
+  regExp:
+    /<ruby>\s*([\s\S]*?)\s*<rt>\s*([\s\S]*?)\s*<\/rt>\s*(?:<rp>[\s\S]*?<\/rp>\s*)*<\/ruby>$/i,
+  replace: NOOP as any,
+  trigger: '>',
+  type: 'text-match',
+}
+
 // ── TextFormat ──
 
 export const INSERT_TRANSFORMER: TextFormatTransformer = {
   format: ['underline'],
   tag: '++',
+  type: 'text-format',
+}
+
+export const SUPERSCRIPT_TRANSFORMER: TextFormatTransformer = {
+  format: ['superscript'],
+  tag: '^',
+  type: 'text-format',
+}
+
+export const SUBSCRIPT_TRANSFORMER: TextFormatTransformer = {
+  format: ['subscript'],
+  tag: '~',
   type: 'text-format',
 }
 
@@ -244,6 +281,17 @@ export const MERMAID_BLOCK_TRANSFORMER: ElementTransformer = {
   type: 'element',
 }
 
+export const NESTED_DOC_BLOCK_TRANSFORMER: ElementTransformer = {
+  dependencies: [],
+  export: (node) => {
+    if (node.getType() !== 'nested-doc') return null
+    return `<nested-doc>\n${stateText((node as any).__contentState)}\n</nested-doc>`
+  },
+  regExp: NEVER,
+  replace: NOOP,
+  type: 'element',
+}
+
 export const GRID_CONTAINER_BLOCK_TRANSFORMER: ElementTransformer = {
   dependencies: [],
   export: (node) => {
@@ -339,11 +387,11 @@ export const GALLERY_BLOCK_TRANSFORMER: ElementTransformer = {
   type: 'element',
 }
 
-export const TLDRAW_BLOCK_TRANSFORMER: ElementTransformer = {
+export const EXCALIDRAW_BLOCK_TRANSFORMER: ElementTransformer = {
   dependencies: [],
   export: (node) =>
-    node.getType() === 'tldraw'
-      ? `<tldraw>\n${(node as any).__snapshot || ''}\n</tldraw>`
+    node.getType() === 'excalidraw'
+      ? `<excalidraw>\n${(node as any).__snapshot || ''}\n</excalidraw>`
       : null,
   regExp: NEVER,
   replace: NOOP,
@@ -358,6 +406,9 @@ export const allHeadlessTransformers = [
   MENTION_TRANSFORMER,
   FOOTNOTE_TRANSFORMER,
   INSERT_TRANSFORMER,
+  SUPERSCRIPT_TRANSFORMER,
+  SUBSCRIPT_TRANSFORMER,
+  RUBY_TRANSFORMER,
   KATEX_INLINE_TRANSFORMER,
   // Block (specific first)
   FOOTNOTE_SECTION_TRANSFORMER,
@@ -370,13 +421,14 @@ export const allHeadlessTransformers = [
   CODE_BLOCK_NODE_TRANSFORMER,
   LINK_CARD_BLOCK_TRANSFORMER,
   MERMAID_BLOCK_TRANSFORMER,
+  NESTED_DOC_BLOCK_TRANSFORMER,
   GRID_CONTAINER_BLOCK_TRANSFORMER,
   HORIZONTAL_RULE_BLOCK_TRANSFORMER,
   TABLE_BLOCK_TRANSFORMER,
   CODE_SNIPPET_BLOCK_TRANSFORMER,
   EMBED_BLOCK_TRANSFORMER,
   GALLERY_BLOCK_TRANSFORMER,
-  TLDRAW_BLOCK_TRANSFORMER,
+  EXCALIDRAW_BLOCK_TRANSFORMER,
   // Standard (heading, quote, list, code, bold, italic, strikethrough, link…)
   ...TRANSFORMERS,
 ]

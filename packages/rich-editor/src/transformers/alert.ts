@@ -2,11 +2,8 @@ import { GIT_ALERT_TRANSFORMER as BASE } from '@haklex/rich-headless/transformer
 import type { ElementTransformer } from '@lexical/markdown'
 import type { SerializedEditorState } from 'lexical'
 
-import {
-  $createAlertQuoteNode,
-  AlertQuoteNode,
-  type AlertType,
-} from '../nodes/AlertQuoteNode'
+import { $createAlertQuoteEditNode } from '../nodes/AlertQuoteEditNode'
+import { AlertQuoteNode, type AlertType } from '../nodes/AlertQuoteNode'
 
 const ALERT_TYPE_MAP: Record<string, AlertType> = {
   NOTE: 'note',
@@ -23,8 +20,6 @@ export const GIT_ALERT_TRANSFORMER: ElementTransformer = {
   replace: (parentNode, children, match) => {
     const typeKey = match[1]
     const alertType = ALERT_TYPE_MAP[typeKey] || 'note'
-
-    const alertNode = $createAlertQuoteNode(alertType)
 
     const serializedChildren = children.map((child) => child.exportJSON())
     const content = {
@@ -49,9 +44,7 @@ export const GIT_ALERT_TRANSFORMER: ElementTransformer = {
       },
     } as unknown as SerializedEditorState
 
-    const editorState = alertNode.getContentEditor().parseEditorState(content)
-    alertNode.getContentEditor().setEditorState(editorState)
-
+    const alertNode = $createAlertQuoteEditNode(alertType, content)
     parentNode.replace(alertNode)
   },
 }

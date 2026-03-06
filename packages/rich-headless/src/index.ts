@@ -95,6 +95,48 @@ export class SpoilerNode extends ElementNode {
   }
 }
 
+// ── RubyNode (ElementNode, inline) ──
+
+export class RubyNode extends ElementNode {
+  __reading = ''
+
+  static getType(): string {
+    return 'ruby'
+  }
+  static clone(node: RubyNode): RubyNode {
+    const n = new RubyNode((node as any).__key)
+    n.__reading = node.__reading
+    return n
+  }
+  constructor(key?: NodeKey) {
+    super(key)
+  }
+  static importJSON(
+    json: SerializedElementNode & { reading?: string },
+  ): RubyNode {
+    const node = new RubyNode()
+    node.__reading = json.reading ?? ''
+    return node
+  }
+  exportJSON(): SerializedElementNode & { reading: string } {
+    return {
+      ...super.exportJSON(),
+      type: 'ruby',
+      reading: this.__reading,
+      version: 1,
+    }
+  }
+  createDOM(): HTMLElement {
+    return stubDOM()
+  }
+  updateDOM(): boolean {
+    return false
+  }
+  isInline(): boolean {
+    return true
+  }
+}
+
 // ── DetailsNode (ElementNode, block) ──
 
 export class DetailsNode extends ElementNode {
@@ -285,7 +327,7 @@ export const GalleryNode = headlessDecorator('gallery', ['images', 'layout'], {
   layout: 'grid',
 })
 
-export const TldrawNode = headlessDecorator('tldraw', ['snapshot'], {
+export const ExcalidrawNode = headlessDecorator('excalidraw', ['snapshot'], {
   snapshot: '',
 })
 
@@ -389,6 +431,48 @@ export class AlertQuoteNode extends DecoratorNode<null> {
   }
 }
 
+export class NestedDocNode extends DecoratorNode<null> {
+  __contentState: unknown = null
+
+  static getType(): string {
+    return 'nested-doc'
+  }
+  constructor(key?: NodeKey) {
+    super(key)
+  }
+  static clone(node: NestedDocNode): NestedDocNode {
+    const n = new NestedDocNode((node as any).__key)
+    n.__contentState = node.__contentState
+    return n
+  }
+  static importJSON(
+    json: SerializedLexicalNode & { content?: unknown },
+  ): NestedDocNode {
+    const node = new NestedDocNode()
+    node.__contentState = json.content ?? null
+    return node
+  }
+  exportJSON(): SerializedLexicalNode {
+    return {
+      type: 'nested-doc',
+      version: 1,
+      content: this.__contentState,
+    } as SerializedLexicalNode
+  }
+  createDOM(): HTMLElement {
+    return stubDOM()
+  }
+  updateDOM(): boolean {
+    return false
+  }
+  decorate(): null {
+    return null
+  }
+  getTextContent(): string {
+    return extractText(this.__contentState)
+  }
+}
+
 export class GridContainerNode extends DecoratorNode<null> {
   __cols = 2
   __gap = '16px'
@@ -448,6 +532,7 @@ export class GridContainerNode extends DecoratorNode<null> {
 
 export const customHeadlessNodes: Klass<LexicalNode>[] = [
   SpoilerNode,
+  RubyNode,
   DetailsNode,
   ImageNode,
   VideoNode,
@@ -462,9 +547,10 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   EmbedNode,
   CodeSnippetNode,
   GalleryNode,
-  TldrawNode,
+  ExcalidrawNode,
   BannerNode,
   AlertQuoteNode,
+  NestedDocNode,
   GridContainerNode,
 ]
 
@@ -475,4 +561,4 @@ export const allHeadlessNodes: Klass<LexicalNode>[] = [
 
 // ── Transformers (Lexical → Markdown) ──
 
-export { $toMarkdown,allHeadlessTransformers } from './transformers'
+export { $toMarkdown, allHeadlessTransformers } from './transformers'

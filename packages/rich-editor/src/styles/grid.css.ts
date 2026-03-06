@@ -1,7 +1,7 @@
+import { vars } from '@haklex/rich-style-token'
 import { globalStyle } from '@vanilla-extract/css'
 
 import { richContent } from './shared.css'
-import { vars } from './vars.css'
 
 // ─── Grid Container ─────────────────────────────────────
 globalStyle(`${richContent} .rich-grid-container`, {
@@ -22,7 +22,7 @@ globalStyle(`${richContent} .rich-grid-toolbar`, {
   pointerEvents: 'none',
   background: vars.color.bg,
   border: `1px solid ${vars.color.border}`,
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+  boxShadow: vars.boxShadow.topBar,
   zIndex: 10,
   userSelect: 'none',
   whiteSpace: 'nowrap',
@@ -67,12 +67,12 @@ globalStyle(`${richContent} .rich-grid-col-btn`, {
 })
 
 globalStyle(`${richContent} .rich-grid-col-btn:hover`, {
-  backgroundColor: vars.color.bgSecondary,
+  backgroundColor: vars.color.fillSecondary,
   color: vars.color.text,
 })
 
 globalStyle(`${richContent} .rich-grid-col-btn-active`, {
-  background: vars.color.bgSecondary,
+  background: vars.color.fill,
   fontWeight: 600,
   color: vars.color.text,
 })
@@ -101,7 +101,7 @@ globalStyle(`${richContent} .rich-grid-action-btn`, {
 })
 
 globalStyle(`${richContent} .rich-grid-action-btn:hover`, {
-  backgroundColor: vars.color.bgSecondary,
+  backgroundColor: vars.color.fillSecondary,
   color: vars.color.text,
 })
 

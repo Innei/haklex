@@ -30,6 +30,7 @@ export function AutoLinkPlugin({ matchers }: AutoLinkPluginProps) {
     return registerAutoLink(editor, {
       matchers: matchers ?? DEFAULT_MATCHERS,
       changeHandlers: [],
+      excludeParents: [],
     })
   }, [editor, matchers])
 

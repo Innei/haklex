@@ -7,19 +7,12 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { $getRoot, $insertNodes, createEditor, DecoratorNode } from 'lexical'
-import {
-  Info,
-  Lightbulb,
-  TriangleAlert as TriangleAlertIcon,
-} from 'lucide-react'
+import { DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
-import { AlertReadOnlyDecorator } from '../components/renderers/AlertReadOnlyDecorator'
-import { editorTheme } from '../styles/theme'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
-import { NESTED_EDITOR_NODES } from './shared'
+import { AlertStaticDecorator } from '../components/renderers/AlertStaticDecorator'
+import { extractTextContent } from '../utils/extractTextContent'
 
 export type AlertType = 'note' | 'tip' | 'important' | 'warning' | 'caution'
 
@@ -39,17 +32,6 @@ export const ALERT_LABELS: Record<AlertType, string> = {
   caution: 'Caution',
 }
 
-function createContentEditor(): LexicalEditor {
-  return createEditor({
-    namespace: 'AlertContent',
-    nodes: NESTED_EDITOR_NODES,
-    theme: editorTheme,
-    onError: (error: Error) => {
-      console.error('[AlertContent]', error)
-    },
-  })
-}
-
 export type SerializedAlertQuoteNode = Spread<
   {
     alertType: AlertType
@@ -60,67 +42,46 @@ export type SerializedAlertQuoteNode = Spread<
 
 export class AlertQuoteNode extends DecoratorNode<ReactElement> {
   __alertType: AlertType
-  __contentEditor: LexicalEditor
-
-  static slashMenuItems: SlashMenuItemConfig[] = [
-    {
-      title: 'Callout',
-      icon: createElement(Info, { size: 20 }),
-      description: 'Info callout block',
-      keywords: ['alert', 'note', 'info', 'callout'],
-      section: 'ADVANCED',
-      onSelect: (editor) => {
-        editor.update(() => {
-          $insertNodes([$createAlertQuoteNode('note')])
-        })
-      },
-    },
-    {
-      title: 'Tip',
-      icon: createElement(Lightbulb, { size: 20 }),
-      description: 'Highlight a useful tip',
-      keywords: ['alert', 'tip', 'hint'],
-      section: 'ADVANCED',
-      onSelect: (editor) => {
-        editor.update(() => {
-          $insertNodes([$createAlertQuoteNode('tip')])
-        })
-      },
-    },
-    {
-      title: 'Warning',
-      icon: createElement(TriangleAlertIcon, { size: 20 }),
-      description: 'Warn about something',
-      keywords: ['alert', 'warning', 'caution'],
-      section: 'ADVANCED',
-      onSelect: (editor) => {
-        editor.update(() => {
-          $insertNodes([$createAlertQuoteNode('warning')])
-        })
-      },
-    },
-  ]
+  __contentState: SerializedEditorState
 
   static getType(): string {
     return 'alert-quote'
   }
 
   static clone(node: AlertQuoteNode): AlertQuoteNode {
-    return new AlertQuoteNode(
-      node.__alertType,
-      node.__contentEditor,
-      node.__key,
-    )
+    return new AlertQuoteNode(node.__alertType, node.__contentState, node.__key)
   }
 
   constructor(
     alertType: AlertType,
-    contentEditor?: LexicalEditor,
+    contentState?: SerializedEditorState,
     key?: NodeKey,
   ) {
     super(key)
     this.__alertType = alertType
-    this.__contentEditor = contentEditor || createContentEditor()
+    this.__contentState =
+      contentState ||
+      ({
+        root: {
+          children: [
+            {
+              type: 'paragraph',
+              children: [],
+              direction: null,
+              format: '',
+              indent: 0,
+              textFormat: 0,
+              textStyle: '',
+              version: 1,
+            },
+          ],
+          direction: null,
+          format: '',
+          indent: 0,
+          type: 'root',
+          version: 1,
+        },
+      } as unknown as SerializedEditorState)
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
@@ -149,25 +110,21 @@ export class AlertQuoteNode extends DecoratorNode<ReactElement> {
     writable.__alertType = alertType
   }
 
-  getContentEditor(): LexicalEditor {
-    return this.__contentEditor
+  getContentState(): SerializedEditorState {
+    return this.getLatest().__contentState
+  }
+
+  setContentState(state: SerializedEditorState): void {
+    const writable = this.getWritable()
+    writable.__contentState = state
   }
 
   getTextContent(): string {
-    return this.__contentEditor.getEditorState().read(() => {
-      return $getRoot().getTextContent()
-    })
+    return extractTextContent(this.__contentState)
   }
 
   static importJSON(serializedNode: SerializedAlertQuoteNode): AlertQuoteNode {
-    const node = new AlertQuoteNode(serializedNode.alertType)
-    if (serializedNode.content) {
-      const editorState = node.__contentEditor.parseEditorState(
-        serializedNode.content,
-      )
-      node.__contentEditor.setEditorState(editorState)
-    }
-    return node
+    return new AlertQuoteNode(serializedNode.alertType, serializedNode.content)
   }
 
   exportJSON(): SerializedAlertQuoteNode {
@@ -175,21 +132,24 @@ export class AlertQuoteNode extends DecoratorNode<ReactElement> {
       ...super.exportJSON(),
       type: 'alert-quote',
       alertType: this.__alertType,
-      content: this.__contentEditor.getEditorState().toJSON(),
+      content: this.__contentState,
       version: 1,
     }
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(AlertReadOnlyDecorator, {
+    return createElement(AlertStaticDecorator, {
       alertType: this.__alertType,
-      contentEditor: this.__contentEditor,
+      contentState: this.__contentState,
     })
   }
 }
 
-export function $createAlertQuoteNode(alertType: AlertType): AlertQuoteNode {
-  return new AlertQuoteNode(alertType)
+export function $createAlertQuoteNode(
+  alertType: AlertType,
+  contentState?: SerializedEditorState,
+): AlertQuoteNode {
+  return new AlertQuoteNode(alertType, contentState)
 }
 
 export function $isAlertQuoteNode(

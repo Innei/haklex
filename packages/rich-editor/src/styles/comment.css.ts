@@ -1,7 +1,7 @@
+import { commentTheme, vars } from '@haklex/rich-style-token'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 import { richContent } from './shared.css'
-import { commentTheme, darkCommentTheme, vars } from './vars.css'
 
 const commentBase = style({
   fontSize: vars.typography.fontSizeBase,
@@ -9,11 +9,6 @@ const commentBase = style({
 })
 
 export const commentVariant = style([richContent, commentTheme, commentBase])
-export const darkCommentVariant = style([
-  richContent,
-  darkCommentTheme,
-  commentBase,
-])
 
 // ─── Paragraphs (tighter) ───────────────────────────────
 globalStyle(`${commentBase} .rich-paragraph`, {
@@ -92,6 +87,11 @@ globalStyle(`${commentBase} .rich-code-block pre`, {
   padding: vars.spacing.sm,
 })
 
+// Hide line numbers in comment variant (covers both shikicode and fallback)
+globalStyle(`${commentBase} .line::before`, {
+  display: 'none !important' as any,
+})
+
 // ─── Table (compact cells) ─────────────────────────────
 globalStyle(`${commentBase} .rich-table`, {
   margin: `${vars.spacing.sm} 0`,
@@ -117,7 +117,7 @@ globalStyle(`${commentBase} .rich-image figcaption`, {
 // ─── HR (compact, match markdown short centered line) ───
 globalStyle(`${commentBase} .rich-hr`, {
   border: 'none',
-  borderTop: `1px solid ${vars.color.border}`,
+  borderTop: `1px solid ${vars.color.hrBorder}`,
   margin: `${vars.spacing.lg} auto`,
   width: 60,
 })
@@ -125,8 +125,8 @@ globalStyle(`${commentBase} .rich-hr`, {
 // ─── Alert (compact) ───────────────────────────────────
 globalStyle(`${commentBase} .rich-alert`, {
   padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  paddingLeft: vars.spacing.lg,
   margin: `${vars.spacing.sm} 0`,
-  borderLeftWidth: '3px',
 })
 
 // ─── KaTeX block (compact) ─────────────────────────────

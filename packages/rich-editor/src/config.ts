@@ -19,6 +19,7 @@ import { KaTeXInlineNode } from './nodes/KaTeXInlineNode'
 import { LinkCardNode } from './nodes/LinkCardNode'
 import { MentionNode } from './nodes/MentionNode'
 import { MermaidNode } from './nodes/MermaidNode'
+import { RubyNode } from './nodes/RubyNode'
 import { SpoilerNode } from './nodes/SpoilerNode'
 import { VideoNode } from './nodes/VideoNode'
 
@@ -52,6 +53,7 @@ export const customNodes: Array<Klass<LexicalNode>> = [
   GridContainerNode,
   BannerNode,
   MermaidNode,
+  RubyNode,
 ]
 
 export const allNodes: Array<Klass<LexicalNode>> = [

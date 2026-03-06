@@ -13,7 +13,7 @@ export function ContentEditable({
   placeholder,
   hasHeader,
 }: ContentEditableProps) {
-  const paddingTop = hasHeader ? 48 : 12
+  const paddingTop = hasHeader ? 40 : 12
   return (
     <div
       className="rich-editor__content-wrapper"

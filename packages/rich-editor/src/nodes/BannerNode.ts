@@ -7,15 +7,12 @@ import type {
   SerializedLexicalNode,
   Spread,
 } from 'lexical'
-import { $getRoot, $insertNodes, createEditor, DecoratorNode } from 'lexical'
-import { Flag } from 'lucide-react'
+import { DecoratorNode } from 'lexical'
 import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
-import { BannerReadOnlyDecorator } from '../components/renderers/BannerReadOnlyDecorator'
-import { editorTheme } from '../styles/theme'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
-import { NESTED_EDITOR_NODES } from './shared'
+import { BannerStaticDecorator } from '../components/renderers/BannerStaticDecorator'
+import { extractTextContent } from '../utils/extractTextContent'
 
 export type BannerType = 'note' | 'tip' | 'important' | 'warning' | 'caution'
 
@@ -46,17 +43,6 @@ export const BANNER_LABELS: Record<BannerType, string> = {
   caution: 'Caution',
 }
 
-function createContentEditor(): LexicalEditor {
-  return createEditor({
-    namespace: 'BannerContent',
-    nodes: NESTED_EDITOR_NODES,
-    theme: editorTheme,
-    onError: (error: Error) => {
-      console.error('[BannerContent]', error)
-    },
-  })
-}
-
 export type SerializedBannerNode = Spread<
   {
     bannerType: BannerType
@@ -71,39 +57,46 @@ interface LegacySerializedBannerNode extends SerializedBannerNode {
 
 export class BannerNode extends DecoratorNode<ReactElement> {
   __bannerType: BannerType
-  __contentEditor: LexicalEditor
-
-  static slashMenuItems: SlashMenuItemConfig[] = [
-    {
-      title: 'Banner',
-      icon: createElement(Flag, { size: 20 }),
-      description: 'Highlighted banner block',
-      keywords: ['banner', 'notice', 'announcement'],
-      section: 'ADVANCED',
-      onSelect: (editor) => {
-        editor.update(() => {
-          $insertNodes([$createBannerNode('note')])
-        })
-      },
-    },
-  ]
+  __contentState: SerializedEditorState
 
   static getType(): string {
     return 'banner'
   }
 
   static clone(node: BannerNode): BannerNode {
-    return new BannerNode(node.__bannerType, node.__contentEditor, node.__key)
+    return new BannerNode(node.__bannerType, node.__contentState, node.__key)
   }
 
   constructor(
     bannerType: BannerType,
-    contentEditor?: LexicalEditor,
+    contentState?: SerializedEditorState,
     key?: NodeKey,
   ) {
     super(key)
     this.__bannerType = bannerType
-    this.__contentEditor = contentEditor || createContentEditor()
+    this.__contentState =
+      contentState ||
+      ({
+        root: {
+          children: [
+            {
+              type: 'paragraph',
+              children: [],
+              direction: null,
+              format: '',
+              indent: 0,
+              textFormat: 0,
+              textStyle: '',
+              version: 1,
+            },
+          ],
+          direction: null,
+          format: '',
+          indent: 0,
+          type: 'root',
+          version: 1,
+        },
+      } as unknown as SerializedEditorState)
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
@@ -132,28 +125,28 @@ export class BannerNode extends DecoratorNode<ReactElement> {
     writable.__bannerType = bannerType
   }
 
-  getContentEditor(): LexicalEditor {
-    return this.__contentEditor
+  getContentState(): SerializedEditorState {
+    return this.getLatest().__contentState
+  }
+
+  setContentState(state: SerializedEditorState): void {
+    const writable = this.getWritable()
+    writable.__contentState = state
   }
 
   getTextContent(): string {
-    return this.__contentEditor.getEditorState().read(() => {
-      return $getRoot().getTextContent()
-    })
+    return extractTextContent(this.__contentState)
   }
 
   static importJSON(serializedNode: SerializedBannerNode): BannerNode {
     const legacy = serializedNode as LegacySerializedBannerNode
     const bannerType = normalizeBannerType(serializedNode.bannerType)
-    const node = new BannerNode(bannerType)
 
     if (serializedNode.content) {
-      const editorState = node.__contentEditor.parseEditorState(
-        serializedNode.content,
-      )
-      node.__contentEditor.setEditorState(editorState)
-    } else if (legacy.children) {
-      // Legacy ElementNode format: wrap children into editor state
+      return new BannerNode(bannerType, serializedNode.content)
+    }
+
+    if (legacy.children) {
       const content = {
         root: {
           children: legacy.children,
@@ -164,11 +157,10 @@ export class BannerNode extends DecoratorNode<ReactElement> {
           version: 1,
         },
       } as unknown as SerializedEditorState
-      const editorState = node.__contentEditor.parseEditorState(content)
-      node.__contentEditor.setEditorState(editorState)
+      return new BannerNode(bannerType, content)
     }
 
-    return node
+    return new BannerNode(bannerType)
   }
 
   exportJSON(): SerializedBannerNode {
@@ -176,21 +168,24 @@ export class BannerNode extends DecoratorNode<ReactElement> {
       ...super.exportJSON(),
       type: 'banner',
       bannerType: this.__bannerType,
-      content: this.__contentEditor.getEditorState().toJSON(),
+      content: this.__contentState,
       version: 1,
     }
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(BannerReadOnlyDecorator, {
+    return createElement(BannerStaticDecorator, {
       bannerType: this.__bannerType,
-      contentEditor: this.__contentEditor,
+      contentState: this.__contentState,
     })
   }
 }
 
-export function $createBannerNode(bannerType: BannerType): BannerNode {
-  return new BannerNode(bannerType)
+export function $createBannerNode(
+  bannerType: BannerType,
+  contentState?: SerializedEditorState,
+): BannerNode {
+  return new BannerNode(bannerType, contentState)
 }
 
 export function $isBannerNode(

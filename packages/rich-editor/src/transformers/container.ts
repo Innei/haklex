@@ -3,8 +3,9 @@ import type { ElementTransformer } from '@lexical/markdown'
 import type { LexicalNode, SerializedEditorState } from 'lexical'
 import { $createParagraphNode, $createTextNode } from 'lexical'
 
+import { $createBannerEditNode } from '../nodes/BannerEditNode'
 import type { BannerType } from '../nodes/BannerNode'
-import { $createBannerNode, BannerNode } from '../nodes/BannerNode'
+import { BannerNode } from '../nodes/BannerNode'
 import { $createDetailsNode, DetailsNode } from '../nodes/DetailsNode'
 
 const BANNER_TYPE_MAP: Record<string, BannerType> = {
@@ -30,7 +31,6 @@ export const CONTAINER_TRANSFORMER: ElementTransformer = {
 
     if (type in BANNER_TYPE_MAP) {
       const bannerType = BANNER_TYPE_MAP[type]
-      const banner = $createBannerNode(bannerType)
 
       const serializedChildren = children.map((child: LexicalNode) =>
         child.exportJSON(),
@@ -57,9 +57,7 @@ export const CONTAINER_TRANSFORMER: ElementTransformer = {
         },
       } as unknown as SerializedEditorState
 
-      const editorState = banner.getContentEditor().parseEditorState(content)
-      banner.getContentEditor().setEditorState(editorState)
-
+      const banner = $createBannerEditNode(bannerType, content)
       parentNode.replace(banner)
       return
     }

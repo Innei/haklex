@@ -1,0 +1,59 @@
+import type { MouseEvent } from 'react'
+import { useCallback } from 'react'
+
+import {
+  useFootnoteContent,
+  useFootnoteDisplayNumber,
+} from '../../context/FootnoteDefinitionsContext'
+
+export interface FootnoteStaticRendererProps {
+  identifier: string
+}
+
+export function FootnoteStaticRenderer({
+  identifier,
+}: FootnoteStaticRendererProps) {
+  const content = useFootnoteContent(identifier)
+  const displayNumber = useFootnoteDisplayNumber(identifier)
+
+  const referenceId = `footnote-ref-${identifier}`
+  const targetId = `footnote-${identifier}`
+
+  const handleClick = useCallback(
+    (e: MouseEvent<HTMLAnchorElement>) => {
+      const target =
+        document.getElementById(targetId) ||
+        document.getElementById(`fn-${identifier}`)
+      if (!target) return
+
+      e.preventDefault()
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      target.classList.add('rich-footnote-highlight')
+
+      window.setTimeout(() => {
+        target.classList.remove('rich-footnote-highlight')
+      }, 1200)
+    },
+    [identifier, targetId],
+  )
+
+  const label = displayNumber ?? identifier
+
+  return (
+    <span className="rich-footnote-ref-wrapper">
+      <a
+        className="rich-footnote-ref"
+        href={`#${targetId}`}
+        id={referenceId}
+        role="doc-noteref"
+        aria-label={
+          content ? `Footnote ${label}: ${content}` : `Footnote ${label}`
+        }
+        onClick={handleClick}
+        data-footnote-ref={identifier}
+      >
+        {label}
+      </a>
+    </span>
+  )
+}
