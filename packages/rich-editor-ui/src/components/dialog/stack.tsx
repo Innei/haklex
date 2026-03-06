@@ -1,7 +1,10 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
-import { PortalThemeProvider } from '@shiro/rich-style-token'
+import {
+  PortalThemeProvider,
+  PortalThemeWrapper,
+} from '@haklex/rich-style-token'
 import { X } from 'lucide-react'
-import type { FC, PropsWithChildren, ReactNode } from 'react'
+import type { FC, PropsWithChildren } from 'react'
 import {
   createElement,
   useCallback,
@@ -9,19 +12,35 @@ import {
   useSyncExternalStore,
 } from 'react'
 
+import { SheetStackEntry } from './sheet'
 import type { DialogStackItem } from './store'
 import { dismissDialog, getSnapshot, removeDialog, subscribe } from './store'
 import * as css from './styles.css'
 
-const CloseIcon: FC = () => <X />
+const MOBILE_QUERY = '(max-width: 640px)'
 
-const PortalWrapper: FC<{ className?: string; children: ReactNode }> = ({
-  className,
-  children,
-}) => {
-  if (!className) return <>{children}</>
-  return <div className={className}>{children}</div>
+function useIsMobile(): boolean {
+  return useSyncExternalStore(
+    (cb) => {
+      const mql = window.matchMedia(MOBILE_QUERY)
+      mql.addEventListener('change', cb)
+      return () => mql.removeEventListener('change', cb)
+    },
+    () => window.matchMedia(MOBILE_QUERY).matches,
+    () => false,
+  )
 }
+
+function shouldUseSheet(
+  sheet: boolean | 'auto' | undefined,
+  isMobile: boolean,
+): boolean {
+  if (sheet === true) return true
+  if (sheet === 'auto') return isMobile
+  return false
+}
+
+const CloseIcon: FC = () => <X />
 
 const DialogStackEntry: FC<{
   item: DialogStackItem
@@ -35,6 +54,7 @@ const DialogStackEntry: FC<{
     content,
     className,
     portalClassName,
+    theme = 'light',
     showCloseButton = true,
     clickOutsideToDismiss = true,
   } = item
@@ -61,13 +81,15 @@ const DialogStackEntry: FC<{
       }}
     >
       <DialogPrimitive.Portal>
-        <PortalThemeProvider className={portalClassName ?? ''}>
-          <PortalWrapper className={portalClassName}>
+        <PortalThemeProvider className={portalClassName ?? ''} theme={theme}>
+          <PortalThemeWrapper>
             <DialogPrimitive.Backdrop
               className={css.backdrop}
               style={{ zIndex }}
             />
             <DialogPrimitive.Popup
+              data-theme={theme}
+              suppressHydrationWarning
               className={`${css.popup}${className ? ` ${className}` : ''}`}
               style={{ zIndex: zIndex + 1 }}
             >
@@ -92,7 +114,7 @@ const DialogStackEntry: FC<{
                 </DialogPrimitive.Close>
               )}
             </DialogPrimitive.Popup>
-          </PortalWrapper>
+          </PortalThemeWrapper>
         </PortalThemeProvider>
       </DialogPrimitive.Portal>
     </DialogPrimitive.Root>
@@ -101,13 +123,18 @@ const DialogStackEntry: FC<{
 
 export const DialogStackProvider: FC<PropsWithChildren> = ({ children }) => {
   const stack = useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
+  const isMobile = useIsMobile()
 
   return (
     <>
       {children}
-      {stack.map((item, index) => (
-        <DialogStackEntry key={item.id} item={item} index={index} />
-      ))}
+      {stack.map((item, index) =>
+        shouldUseSheet(item.sheet, isMobile) ? (
+          <SheetStackEntry key={item.id} item={item} index={index} />
+        ) : (
+          <DialogStackEntry key={item.id} item={item} index={index} />
+        ),
+      )}
     </>
   )
 }

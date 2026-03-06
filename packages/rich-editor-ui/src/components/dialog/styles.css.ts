@@ -1,8 +1,5 @@
-import { vars } from '@shiro/rich-style-token'
+import { vars } from '@haklex/rich-style-token'
 import { globalStyle, keyframes, style } from '@vanilla-extract/css'
-
-const systemFont =
-  'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif'
 
 const fadeIn = keyframes({
   from: { opacity: 0 },
@@ -29,14 +26,14 @@ export const backdrop = style({
   inset: 0,
   zIndex: 50,
   backgroundColor: 'rgba(0, 0, 0, 0.8)',
-})
-
-globalStyle(`${backdrop}[data-open]`, {
-  animation: `${fadeIn} 150ms ease-out`,
-})
-
-globalStyle(`${backdrop}[data-closed]`, {
-  animation: `${fadeOut} 100ms ease-in`,
+  selectors: {
+    '&[data-open]': {
+      animation: `${fadeIn} 250ms ease-out`,
+    },
+    '&[data-closed]': {
+      animation: `${fadeOut} 200ms ease-in`,
+    },
+  },
 })
 
 export const popup = style({
@@ -52,26 +49,26 @@ export const popup = style({
   borderRadius: '0.75rem',
   border: `1px solid ${vars.color.border}`,
   padding: '1.5rem',
-  fontFamily: systemFont,
-  fontSize: '0.875rem',
+  fontFamily: vars.typography.fontFamilySans,
+
   lineHeight: '1.43',
   color: vars.color.text,
   backgroundColor: vars.color.bg,
-  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+  boxShadow: vars.boxShadow.modal,
   outline: 'none',
+  selectors: {
+    '&[data-open]': {
+      animation: `${contentIn} 150ms ease-out`,
+    },
+    '&[data-closed]': {
+      animation: `${contentOut} 100ms ease-in`,
+    },
+  },
   '@media': {
     '(min-width: 640px)': {
       maxWidth: '28rem',
     },
   },
-})
-
-globalStyle(`${popup}[data-open]`, {
-  animation: `${contentIn} 150ms ease-out`,
-})
-
-globalStyle(`${popup}[data-closed]`, {
-  animation: `${contentOut} 100ms ease-in`,
 })
 
 export const closeButton = style({
@@ -139,8 +136,8 @@ export const footer = style({
 })
 
 export const title = style({
-  fontFamily: systemFont,
-  fontSize: '1.125rem',
+  fontFamily: vars.typography.fontFamily,
+  fontSize: '1.125em',
   fontWeight: 600,
   lineHeight: '1.33',
   letterSpacing: '-0.015em',
@@ -148,8 +145,91 @@ export const title = style({
 })
 
 export const description = style({
-  fontFamily: systemFont,
-  fontSize: '0.875rem',
+  fontFamily: vars.typography.fontFamily,
+  fontSize: vars.typography.fontSizeMd,
   lineHeight: '1.43',
   color: vars.color.textSecondary,
+})
+
+// -- Bottom Sheet --
+
+const slideUp = keyframes({
+  from: { transform: 'translateY(100%)' },
+  to: { transform: 'translateY(0)' },
+})
+
+const slideDown = keyframes({
+  from: { transform: 'translateY(0)' },
+  to: { transform: 'translateY(100%)' },
+})
+
+export const sheetBackdrop = style({
+  position: 'fixed',
+  inset: 0,
+  zIndex: 50,
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  transition: 'opacity 200ms ease',
+})
+
+export const sheetContainer = style({
+  position: 'fixed',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  zIndex: 50,
+  display: 'flex',
+  flexDirection: 'column',
+  maxHeight: '85vh',
+  borderTopLeftRadius: 12,
+  borderTopRightRadius: 12,
+  backgroundColor: vars.color.bg,
+  color: vars.color.text,
+  fontFamily: vars.typography.fontFamilySans,
+  boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.15)',
+  willChange: 'transform',
+  selectors: {
+    '&[data-open]': {
+      animation: `${slideUp} 300ms cubic-bezier(0.32, 0.72, 0, 1)`,
+    },
+    '&[data-closed]': {
+      animation: `${slideDown} 200ms ease-in`,
+    },
+  },
+})
+
+export const sheetDragHandle = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  padding: '12px 0 4px',
+  cursor: 'grab',
+  flexShrink: 0,
+  touchAction: 'none',
+  ':active': {
+    cursor: 'grabbing',
+  },
+})
+
+export const sheetDragPill = style({
+  width: 36,
+  height: 4,
+  borderRadius: 2,
+  backgroundColor: vars.color.textTertiary,
+  opacity: 0.5,
+})
+
+export const sheetContent = style({
+  flex: 1,
+  overflowY: 'auto',
+  overflowX: 'hidden',
+  padding: '0 1.5rem 1.5rem',
+  WebkitOverflowScrolling: 'touch',
+})
+
+export const sheetHeader = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '0.375rem',
+  textAlign: 'center',
+  padding: '0 1.5rem 0.5rem',
 })

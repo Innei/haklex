@@ -6,8 +6,10 @@ export interface DialogStackItemProps {
   content: FC<{ dismiss: () => void }>
   className?: string
   portalClassName?: string
+  theme?: 'light' | 'dark'
   showCloseButton?: boolean
   clickOutsideToDismiss?: boolean
+  sheet?: boolean | 'auto'
 }
 
 export interface DialogStackItem extends DialogStackItemProps {
