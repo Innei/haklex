@@ -31,7 +31,8 @@ export const editOverlay = style({
 })
 
 globalStyle(`${richContent} .rich-nested-doc-content`, {
-  padding: vars.spacing.md,
+  paddingBlock: vars.spacing.md,
+  paddingInline: vars.spacing.xl,
   maxHeight: '400px',
   overflow: 'clip',
 })
@@ -128,6 +129,19 @@ globalStyle(`${editorArea} .rich-editor`, {
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
+})
+
+globalStyle(`${editorArea} .rich-editor__content-wrapper`, {
+  maxWidth: 'none',
+})
+
+globalStyle(`${editorArea} .rich-editor__content`, {
+  paddingLeft: '1.5rem',
+  paddingRight: '1.5rem',
+})
+
+globalStyle(`${editorArea} .rich-editor__placeholder`, {
+  left: '1.5rem',
 })
 
 globalStyle(`${editorArea} ${richContent} > *:first-child`, {

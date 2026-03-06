@@ -1,10 +1,19 @@
 import { useColorScheme } from '@haklex/rich-editor'
-import { usePortalTheme } from '@haklex/rich-style-token'
+import {
+  PortalContainerProvider,
+  usePortalTheme,
+} from '@haklex/rich-style-token'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import type { LexicalEditor, SerializedEditorState } from 'lexical'
 import { $getNodeByKey } from 'lexical'
 import { FileText, Pencil, Save, X } from 'lucide-react'
-import { type KeyboardEvent, useCallback, useMemo, useRef } from 'react'
+import {
+  type KeyboardEvent,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 
 import { useNestedDocDialogEditor } from './NestedDocDialogEditorContext'
 import { $isNestedDocNode } from './NestedDocNode'
@@ -140,6 +149,7 @@ function NestedDocDialogContent({
   }>
 }) {
   const dialogEditorRef = useRef<LexicalEditor | null>(null)
+  const [shellEl, setShellEl] = useState<HTMLDivElement | null>(null)
 
   const safeInitialState =
     initialState?.root?.children?.length > 0 ? initialState : EMPTY_EDITOR_STATE
@@ -178,7 +188,11 @@ function NestedDocDialogContent({
   }, [])
 
   return (
-    <div className={css.dialogShell} onKeyDownCapture={handleKeyDownCapture}>
+    <div
+      ref={setShellEl}
+      className={css.dialogShell}
+      onKeyDownCapture={handleKeyDownCapture}
+    >
       <div className={css.dialogHeader}>
         <div className={css.dialogHeaderMain}>
           <span className={css.dialogHeaderIcon}>
@@ -191,10 +205,14 @@ function NestedDocDialogContent({
       </div>
 
       <div className={css.editorArea}>
-        <DialogEditor
-          initialValue={safeInitialState}
-          onEditorReady={handleEditorReady}
-        />
+        {shellEl && (
+          <PortalContainerProvider value={shellEl}>
+            <DialogEditor
+              initialValue={safeInitialState}
+              onEditorReady={handleEditorReady}
+            />
+          </PortalContainerProvider>
+        )}
       </div>
 
       <div className={css.dialogFooter}>

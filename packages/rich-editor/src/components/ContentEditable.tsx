@@ -1,5 +1,6 @@
 import { ContentEditable as LexicalContentEditable } from '@lexical/react/LexicalContentEditable'
 
+import * as styles from './ContentEditable.css'
 import { clsx } from './utils'
 
 interface ContentEditableProps {
@@ -16,37 +17,16 @@ export function ContentEditable({
   const paddingTop = hasHeader ? 40 : 12
   return (
     <div
-      className="rich-editor__content-wrapper"
-      style={{
-        position: 'relative',
-        maxWidth: 'var(--rc-max-width, none)',
-        margin: '0 auto',
-        flex: 1,
-        minHeight: 0,
-        padding: '0 16px',
-        overflowY: 'auto',
-      }}
+      className={clsx('rich-editor__content-wrapper', styles.contentWrapper)}
+      style={{ '--ce-padding-top': `${paddingTop}px` } as React.CSSProperties}
     >
       <LexicalContentEditable
-        className={clsx('rich-editor__content', className)}
-        style={{
-          outline: 'none',
-          minHeight: '100px',
-          padding: `${paddingTop}px 16px 12px`,
-        }}
+        className={clsx('rich-editor__content', styles.content, className)}
         aria-placeholder={placeholder ?? ''}
         placeholder={
           <div
-            className="rich-editor__placeholder"
-            style={{
-              position: 'absolute',
-              top: paddingTop,
-              left: 16,
-              color: 'var(--rich-editor-text-secondary, #999)',
-              pointerEvents: 'none',
-              userSelect: 'none',
-              display: placeholder ? undefined : 'none',
-            }}
+            className={clsx('rich-editor__placeholder', styles.placeholder)}
+            style={{ display: placeholder ? undefined : 'none' }}
           >
             {placeholder}
           </div>

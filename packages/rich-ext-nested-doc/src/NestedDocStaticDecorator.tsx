@@ -42,6 +42,7 @@ export function NestedDocStaticDecorator({
       theme: colorScheme,
       showCloseButton: true,
       clickOutsideToDismiss: true,
+      sheet: 'auto',
     })
   }, [colorScheme, contentState, portalClassName])
 
