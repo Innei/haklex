@@ -99,8 +99,8 @@ export { enhancedEditRendererConfig } from '@haklex/rich-renderers-edit'
 
 ```json
 {
-  "lexical": "^0.40.0",
-  "@lexical/react": "^0.40.0",
+  "lexical": "^0.41.0",
+  "@lexical/react": "^0.41.0",
   "react": ">=19",
   "react-dom": ">=19"
 }

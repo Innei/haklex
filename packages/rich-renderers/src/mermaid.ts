@@ -1,1 +1,1 @@
-export { default, MermaidRenderer } from '@haklex/rich-renderer-mermaid'
+export { default, MermaidRenderer } from '@haklex/rich-renderer-mermaid/static'

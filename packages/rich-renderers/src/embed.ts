@@ -5,7 +5,7 @@ export type {
   EmbedStaticRendererProps,
   EmbedType,
   SerializedEmbedNode,
-} from '@haklex/rich-ext-embed'
+} from '@haklex/rich-ext-embed/static'
 export {
   $createEmbedNode,
   $isEmbedNode,
@@ -23,4 +23,4 @@ export {
   isYoutubeUrl,
   matchEmbedUrl,
   useEmbedRenderers,
-} from '@haklex/rich-ext-embed'
+} from '@haklex/rich-ext-embed/static'

@@ -8,7 +8,7 @@ export type {
   PluginRegistry,
   UrlMatchInfo,
   UrlMatchResult,
-} from '@haklex/rich-renderer-linkcard'
+} from '@haklex/rich-renderer-linkcard/static'
 export {
   arxivPlugin,
   bangumiPlugin,
@@ -27,11 +27,10 @@ export {
   LinkCardFetchProvider,
   LinkCardRenderer,
   LinkCardSkeleton,
-  mxSpacePlugin,
   neteaseMusicPlugin,
   pluginMap,
   plugins,
   qqMusicPlugin,
   tmdbPlugin,
   useUrlMatcher,
-} from '@haklex/rich-renderer-linkcard'
+} from '@haklex/rich-renderer-linkcard/static'

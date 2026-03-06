@@ -1,8 +1,8 @@
 {
-  "name": "@haklex/rich-renderers",
+  "name": "@haklex/rich-renderers-edit",
   "type": "module",
   "version": "0.0.61",
-  "description": "Static renderers aggregator for haklex rich editor",
+  "description": "Edit renderers aggregator for haklex rich editor",
   "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
@@ -10,21 +10,17 @@
     "./banner": "./src/banner.ts",
     "./code-snippet": "./src/code-snippet.ts",
     "./codeblock": "./src/codeblock.ts",
+    "./config": "./src/config.ts",
     "./embed": "./src/embed.ts",
     "./excalidraw": "./src/excalidraw.ts",
-    "./gallery": "./src/gallery.ts",
-    "./image": "./src/image.ts",
-    "./linkcard": "./src/linkcard.ts",
     "./mention": "./src/mention.ts",
     "./mermaid": "./src/mermaid.ts",
     "./ruby": "./src/ruby.ts",
-    "./style.css": "./src/style.css",
-    "./video": "./src/video.ts"
+    "./slash-menu": "./src/slash-menu.ts"
   },
   "main": "./src/index.ts",
   "files": [
-    "dist",
-    "src/style.css"
+    "dist"
   ],
   "scripts": {
     "build": "vite build",
@@ -42,15 +38,20 @@
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-gallery": "workspace:*",
+    "@haklex/rich-plugin-block-handle": "workspace:*",
+    "@haklex/rich-plugin-mention": "workspace:*",
+    "@haklex/rich-plugin-slash-menu": "workspace:*",
     "@haklex/rich-renderer-alert": "workspace:*",
     "@haklex/rich-renderer-banner": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
     "@haklex/rich-renderer-image": "workspace:*",
+    "@haklex/rich-renderer-katex": "workspace:*",
     "@haklex/rich-renderer-linkcard": "workspace:*",
     "@haklex/rich-renderer-mention": "workspace:*",
     "@haklex/rich-renderer-mermaid": "workspace:*",
     "@haklex/rich-renderer-ruby": "workspace:*",
-    "@haklex/rich-renderer-video": "workspace:*"
+    "@haklex/rich-renderer-video": "workspace:*",
+    "@haklex/rich-renderers": "workspace:*"
   },
   "devDependencies": {
     "@lexical/react": "^0.41.0",
@@ -70,6 +71,10 @@
         "import": "./dist/index.mjs",
         "types": "./dist/index.d.ts"
       },
+      "./config": {
+        "import": "./dist/config.mjs",
+        "types": "./dist/config.d.ts"
+      },
       "./alert": {
         "import": "./dist/alert.mjs",
         "types": "./dist/alert.d.ts"
@@ -81,18 +86,6 @@
       "./codeblock": {
         "import": "./dist/codeblock.mjs",
         "types": "./dist/codeblock.d.ts"
-      },
-      "./gallery": {
-        "import": "./dist/gallery.mjs",
-        "types": "./dist/gallery.d.ts"
-      },
-      "./image": {
-        "import": "./dist/image.mjs",
-        "types": "./dist/image.d.ts"
-      },
-      "./linkcard": {
-        "import": "./dist/linkcard.mjs",
-        "types": "./dist/linkcard.d.ts"
       },
       "./mention": {
         "import": "./dist/mention.mjs",
@@ -106,18 +99,17 @@
         "import": "./dist/ruby.mjs",
         "types": "./dist/ruby.d.ts"
       },
-      "./style.css": "./src/style.css",
       "./excalidraw": {
         "import": "./dist/excalidraw.mjs",
         "types": "./dist/excalidraw.d.ts"
       },
-      "./video": {
-        "import": "./dist/video.mjs",
-        "types": "./dist/video.d.ts"
-      },
       "./embed": {
         "import": "./dist/embed.mjs",
         "types": "./dist/embed.d.ts"
+      },
+      "./slash-menu": {
+        "import": "./dist/slash-menu.mjs",
+        "types": "./dist/slash-menu.d.ts"
       },
       "./code-snippet": {
         "import": "./dist/code-snippet.mjs",

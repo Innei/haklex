@@ -1,1 +1,1 @@
-export { AlertRenderer, default } from '@haklex/rich-renderer-alert'
+export { AlertRenderer, default } from '@haklex/rich-renderer-alert/static'

@@ -1,1 +1,1 @@
-export { default, GalleryRenderer } from '@haklex/rich-ext-gallery'
+export { default, GalleryRenderer } from '@haklex/rich-ext-gallery/static'

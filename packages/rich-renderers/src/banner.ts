@@ -1,1 +1,1 @@
-export { BannerRenderer, default } from '@haklex/rich-renderer-banner'
+export { BannerRenderer, default } from '@haklex/rich-renderer-banner/static'

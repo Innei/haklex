@@ -1,13 +1,22 @@
 {
   "name": "@haklex/rich-kit-shiro",
-  "version": "0.0.10",
+  "type": "module",
+  "version": "0.0.61",
   "description": "Production bundle for Shiroi blog",
   "license": "MIT",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./editor": "./src/ShiroEditor.tsx",
-    "./renderer": "./src/ShiroRenderer.tsx",
+    "./editor": "./src/editor.tsx",
+    "./editor-core": "./src/exports/editor-core.ts",
+    "./excalidraw": "./src/exports/excalidraw.ts",
+    "./markdown": "./src/exports/markdown.ts",
+    "./nodes": "./src/exports/nodes.ts",
+    "./plugins": "./src/exports/plugins.ts",
+    "./renderer": "./src/renderer.tsx",
+    "./renderers": "./src/exports/renderers.ts",
+    "./renderers-edit": "./src/exports/renderers-edit.ts",
+    "./style": "./src/exports/style.ts",
+    "./style-renderer.css": "./src/style-renderer.css",
     "./style.css": "./src/style.css"
   },
   "main": "./src/index.ts",
@@ -19,35 +28,45 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
+  "peerDependencies": {
+    "@lexical/react": "^0.41.0",
+    "lexical": "^0.41.0",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
-    "@haklex/rich-ext-tldraw": "workspace:*",
+    "@haklex/rich-ext-embed": "workspace:*",
+    "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-plugin-block-handle": "workspace:*",
     "@haklex/rich-plugin-floating-toolbar": "workspace:*",
     "@haklex/rich-plugin-link-edit": "workspace:*",
+    "@haklex/rich-plugin-mention": "workspace:*",
     "@haklex/rich-plugin-slash-menu": "workspace:*",
     "@haklex/rich-plugin-table": "workspace:*",
+    "@haklex/rich-plugin-toolbar": "workspace:*",
+    "@haklex/rich-renderer-katex": "workspace:*",
     "@haklex/rich-renderers": "workspace:*",
-    "@haklex/rich-renderers-edit": "workspace:*"
+    "@haklex/rich-renderers-edit": "workspace:*",
+    "@haklex/rich-static-renderer": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*",
+    "katex": "^0.16.33",
+    "react-shadow": "^20.6.0"
   },
   "devDependencies": {
-    "@lexical/react": "^0.40.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "lexical": "^0.40.0",
+    "@lexical/react": "^0.41.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vanilla-extract/vite-plugin": "^5.1.4",
+    "lexical": "^0.41.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "typescript": "^5.9.0",
+    "rollup-plugin-visualizer": "^7.0.1",
+    "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.0"
-  },
-  "peerDependencies": {
-    "@lexical/react": "^0.40.0",
-    "lexical": "^0.40.0",
-    "react": ">=19",
-    "react-dom": ">=19"
+    "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {
     "access": "public",
@@ -64,7 +83,40 @@
         "import": "./dist/renderer.mjs",
         "types": "./dist/renderer.d.ts"
       },
-      "./style.css": "./src/style.css"
+      "./nodes": {
+        "import": "./dist/exports/nodes.mjs",
+        "types": "./dist/exports/nodes.d.ts"
+      },
+      "./renderers": {
+        "import": "./dist/exports/renderers.mjs",
+        "types": "./dist/exports/renderers.d.ts"
+      },
+      "./renderers-edit": {
+        "import": "./dist/exports/renderers-edit.mjs",
+        "types": "./dist/exports/renderers-edit.d.ts"
+      },
+      "./plugins": {
+        "import": "./dist/exports/plugins.mjs",
+        "types": "./dist/exports/plugins.d.ts"
+      },
+      "./editor-core": {
+        "import": "./dist/exports/editor-core.mjs",
+        "types": "./dist/exports/editor-core.d.ts"
+      },
+      "./excalidraw": {
+        "import": "./dist/exports/excalidraw.mjs",
+        "types": "./dist/exports/excalidraw.d.ts"
+      },
+      "./style": {
+        "import": "./dist/exports/style.mjs",
+        "types": "./dist/exports/style.d.ts"
+      },
+      "./markdown": {
+        "import": "./dist/exports/markdown.mjs",
+        "types": "./dist/exports/markdown.d.ts"
+      },
+      "./style.css": "./dist/index.css",
+      "./style-renderer.css": "./dist/renderer.css"
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"

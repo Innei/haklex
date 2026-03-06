@@ -6,5 +6,6 @@
 @import '@haklex/rich-renderer-linkcard/style.css';
 @import '@haklex/rich-renderer-mention/style.css';
 @import '@haklex/rich-renderer-mermaid/style.css';
+@import '@haklex/rich-renderer-ruby/style.css';
 @import '@haklex/rich-renderer-video/style.css';
-@import '@haklex/rich-ext-tldraw/style.css';
+@import '@haklex/rich-ext-excalidraw/style.css';
