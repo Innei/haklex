@@ -7,6 +7,7 @@ import { richContent } from './shared.css'
 globalStyle(`${richContent} .rich-details`, {
   margin: `${vars.spacing.md} 0`,
   border: 'none',
+  backgroundColor: 'transparent',
   interpolateSize: 'allow-keywords',
 })
 
@@ -14,21 +15,26 @@ globalStyle(`${richContent} .rich-details`, {
 globalStyle(`${richContent} .rich-details-summary`, {
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '1rem',
+  gap: vars.spacing.sm,
   cursor: 'pointer',
   userSelect: 'none',
-  fontWeight: 500,
-  fontSize: '0.9375rem',
-  lineHeight: '1.5',
-  padding: `0.75rem 0`,
+  padding: `${vars.spacing.xs} 0`,
   color: vars.color.text,
+  fontWeight: 500,
+  fontSize: '1em',
+  lineHeight: vars.typography.lineHeight,
   listStyle: 'none',
-  transition: 'color 0.2s ease',
+  outline: 'none',
+  borderRadius: vars.borderRadius.sm,
+  transition: 'opacity 0.2s ease, color 0.2s ease, box-shadow 0.2s ease',
 })
 
 globalStyle(`${richContent} .rich-details-summary:hover`, {
-  opacity: '0.8',
+  opacity: '0.82',
+})
+
+globalStyle(`${richContent} .rich-details-summary:focus-visible`, {
+  boxShadow: `0 0 0 2px ${vars.color.accentLight}`,
 })
 
 globalStyle(`${richContent} .rich-details-summary::-webkit-details-marker`, {
@@ -42,18 +48,32 @@ globalStyle(`${richContent} .rich-details-summary::marker`, {
 
 globalStyle(`${richContent} .rich-details-summary-text`, {
   flex: '1',
+  minWidth: 0,
 })
 
 // ─── Chevron ────────────────────────────────────────────
 globalStyle(`${richContent} .rich-details-chevron`, {
   display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '1.25rem',
+  height: '1.25rem',
   flexShrink: 0,
-  color: vars.color.textSecondary,
-  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+  color: vars.color.textTertiary,
+  transformOrigin: 'center',
+  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease',
 })
 
+globalStyle(
+  `${richContent} .rich-details-summary:hover .rich-details-chevron`,
+  {
+    color: vars.color.textSecondary,
+  },
+)
+
 globalStyle(`${richContent} .rich-details[open] .rich-details-chevron`, {
-  transform: 'rotate(180deg)',
+  color: vars.color.accent,
+  transform: 'rotate(90deg)',
 })
 
 // ─── ::details-content Transition ───────────────────────
@@ -74,18 +94,12 @@ globalStyle(`${richContent} .rich-details[open]::details-content`, {
 } as any)
 
 // ─── Content body ───────────────────────────────────────
-// 正文色阶低于 summary，形成层级
 globalStyle(`${richContent} .rich-details-content`, {
-  padding: '0 0 0.75rem',
-  color: vars.color.textSecondary,
-})
-
-// Editor mode: bg for visual boundary
-globalStyle(`[contenteditable="true"] .rich-details-content`, {
-  backgroundColor: vars.color.bgSecondary,
-  borderRadius: vars.borderRadius.sm,
-  padding: `${vars.spacing.sm} ${vars.spacing.md}`,
   marginTop: vars.spacing.xs,
+  padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  color: vars.color.textSecondary,
+  backgroundColor: `color-mix(in srgb, ${vars.color.accent} 6%, ${vars.color.bgSecondary})`,
+  borderRadius: vars.borderRadius.md,
 })
 
 globalStyle(

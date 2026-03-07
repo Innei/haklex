@@ -174,8 +174,7 @@ export function renderBuiltinNode(
           open={node.open || undefined}
         >
           <summary className="rich-details-summary">
-            <span className="rich-details-summary-text">{summary}</span>
-            <span className="rich-details-chevron">
+            <span className="rich-details-chevron" aria-hidden="true">
               <svg
                 width="20"
                 height="20"
@@ -186,9 +185,10 @@ export function renderBuiltinNode(
                 strokeLinecap="round"
                 strokeLinejoin="round"
               >
-                <path d="M6 8L10 12L14 8" />
+                <path d="M8 6L12 10L8 14" />
               </svg>
             </span>
+            <span className="rich-details-summary-text">{summary}</span>
           </summary>
           <div className="rich-details-content">{children}</div>
         </details>

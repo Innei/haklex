@@ -14,7 +14,7 @@ import { createLucideSvg } from '../utils/lucide-dom'
 
 type IconNode = [string, Record<string, string>][]
 
-const ChevronDownIconNode: IconNode = [['path', { d: 'M6 8L10 12L14 8' }]]
+const ChevronRightIconNode: IconNode = [['path', { d: 'M8 6L12 10L8 14' }]]
 
 export type SerializedDetailsNode = Spread<
   {
@@ -67,15 +67,11 @@ export class DetailsNode extends ElementNode {
     const summary = document.createElement('summary')
     summary.className = 'rich-details-summary'
 
-    const label = document.createElement('span')
-    label.className = 'rich-details-summary-text'
-    label.textContent = this.__summary
-    summary.append(label)
-
     const chevron = document.createElement('span')
     chevron.className = 'rich-details-chevron'
+    chevron.setAttribute('aria-hidden', 'true')
     chevron.append(
-      createLucideSvg(ChevronDownIconNode, {
+      createLucideSvg(ChevronRightIconNode, {
         width: '20',
         height: '20',
         viewBox: '0 0 20 20',
@@ -83,6 +79,11 @@ export class DetailsNode extends ElementNode {
       }),
     )
     summary.append(chevron)
+
+    const label = document.createElement('span')
+    label.className = 'rich-details-summary-text'
+    label.textContent = this.__summary
+    summary.append(label)
 
     const content = document.createElement('div')
     content.className = 'rich-details-content'
