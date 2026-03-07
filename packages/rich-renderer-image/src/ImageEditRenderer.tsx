@@ -1,14 +1,18 @@
 import { type ImageRendererProps, useRendererMode } from '@haklex/rich-editor'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { useAtomValue, useSetAtom } from 'jotai'
+import { useCallback } from 'react'
 
 import {
   altTextAtom,
   captionTextAtom,
+  focusCaptionOnOpenAtom,
   frameStyleAtom,
   heightAtom,
   hoveringAtom,
   loadStateAtom,
+  metaOpenAtom,
+  replaceOpenAtom,
   srcAtom,
   widthAtom,
   wrapperRefAtom,
@@ -61,6 +65,24 @@ function ImageEditContent() {
   const width = useAtomValue(widthAtom)
   const height = useAtomValue(heightAtom)
   const captionText = useAtomValue(captionTextAtom)
+  const setMetaOpen = useSetAtom(metaOpenAtom)
+  const setReplaceOpen = useSetAtom(replaceOpenAtom)
+  const setFocusCaptionOnOpen = useSetAtom(focusCaptionOnOpenAtom)
+
+  const handleCaptionClick = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation()
+      const scrollY = window.scrollY
+      setReplaceOpen(false)
+      setMetaOpen(true)
+      setFocusCaptionOnOpen(true)
+      // BaseUI Popover focus management may cause scroll; restore position
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: scrollY })
+      })
+    },
+    [setMetaOpen, setReplaceOpen, setFocusCaptionOnOpen],
+  )
 
   return (
     <div
@@ -101,6 +123,7 @@ function ImageEditContent() {
           {captionText && (
             <figcaption
               className={`${styles.caption} ${styles.semanticClassNames.caption}`}
+              onClick={handleCaptionClick}
             >
               {captionText}
             </figcaption>

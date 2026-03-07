@@ -389,14 +389,28 @@ globalStyle(`${richContent} .rich-list-item-checked`, {
 })
 
 // ─── Blockquote ──────────────────────────────────────────
+const quoteBarWidth = 4
+
 globalStyle(`${richContent} .rich-quote`, {
-  borderLeft: `4px solid ${vars.color.quoteBorder}`,
+  position: 'relative',
   backgroundColor: vars.color.quoteBg,
   margin: `${vars.spacing.md} 0`,
   padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  paddingLeft: `calc(${vars.spacing.md} + ${quoteBarWidth}px)`,
   fontStyle: 'italic',
   color: vars.color.textSecondary,
   borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
+})
+
+globalStyle(`${richContent} .rich-quote::before`, {
+  content: '""',
+  position: 'absolute',
+  left: '0',
+  top: '0',
+  bottom: '0',
+  width: `${quoteBarWidth}px`,
+  borderRadius: vars.borderRadius.sm,
+  backgroundColor: vars.color.quoteBorder,
 })
 
 globalStyle(`${richContent} .rich-quote > .rich-paragraph:first-child`, {

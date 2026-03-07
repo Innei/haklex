@@ -60,10 +60,14 @@ globalStyle(`${commentBase} .rich-heading-h6`, {
 
 // ─── Blockquote (compact) ───────────────────────────────
 globalStyle(`${commentBase} .rich-quote`, {
-  borderLeftWidth: '3px',
   padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  paddingLeft: `calc(${vars.spacing.md} + 3px)`,
   margin: `${vars.spacing.sm} 0`,
   fontSize: '0.95em',
+})
+
+globalStyle(`${commentBase} .rich-quote::before`, {
+  width: '3px',
 })
 
 // ─── Lists (compact) ───────────────────────────────────

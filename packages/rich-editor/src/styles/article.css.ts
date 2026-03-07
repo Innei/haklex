@@ -5,7 +5,8 @@ import { richContent } from './shared.css'
 
 // Helper for em calculation (based on 16px base)
 const em = (target: number, context = 16) => `${target / context}em`
-const round = (num: number) => num.toFixed(7).replace(/(\.\d+?)0+$/, '$1')
+const trailingZeroRe = /(\.\d+?)0+$/
+const round = (num: number) => num.toFixed(7).replace(trailingZeroRe, '$1')
 
 // Prose-style typography
 // Base font size: 16px
@@ -74,12 +75,9 @@ globalStyle(`${articleBase} .rich-quote`, {
   fontWeight: 500,
   fontStyle: 'italic',
   color: vars.color.text,
-  borderLeftWidth: '0.25rem',
-  borderLeftStyle: 'solid',
-  borderLeftColor: vars.color.quoteBorder,
   marginTop: em(40, 16),
   marginBottom: em(40, 16),
-  paddingLeft: em(24, 16),
+  paddingLeft: `calc(${em(24, 16)} + 4px)`,
   backgroundColor: 'transparent',
   borderRadius: 0,
   quotes: '"\\201C""\\201D""\\2018""\\2019"',

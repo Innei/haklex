@@ -32,6 +32,8 @@ export const toolbarVisibleAtom = atom(
   (get) => get(hoveringAtom) || get(metaOpenAtom) || get(replaceOpenAtom),
 )
 
+export const focusCaptionOnOpenAtom = atom(false)
+
 // --- Edit form ---
 export const editSrcAtom = atom('')
 export const editAltTextAtom = atom('')

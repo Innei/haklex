@@ -1,10 +1,12 @@
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Captions, ImageIcon, Type } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 import {
   editAltTextAtom,
   editCaptionAtom,
   editSrcAtom,
+  focusCaptionOnOpenAtom,
   metaOpenAtom,
 } from './atoms'
 import * as styles from './styles.css'
@@ -19,6 +21,18 @@ export function EditMetaPopover() {
   const setEditCaption = useSetAtom(editCaptionAtom)
   const setMetaOpen = useSetAtom(metaOpenAtom)
   const { commitMeta } = useImageActions()
+
+  const captionInputRef = useRef<HTMLInputElement>(null)
+  const focusCaptionOnOpen = useAtomValue(focusCaptionOnOpenAtom)
+  const setFocusCaptionOnOpen = useSetAtom(focusCaptionOnOpenAtom)
+
+  useEffect(() => {
+    if (focusCaptionOnOpen && captionInputRef.current) {
+      captionInputRef.current.focus()
+      captionInputRef.current.select()
+      setFocusCaptionOnOpen(false)
+    }
+  }, [focusCaptionOnOpen, setFocusCaptionOnOpen])
 
   return (
     <>
@@ -60,6 +74,7 @@ export function EditMetaPopover() {
           size={14}
         />
         <input
+          ref={captionInputRef}
           className={`${styles.editInput} ${styles.semanticClassNames.editInput}`}
           type="text"
           value={editCaption}

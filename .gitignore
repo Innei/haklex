@@ -33,3 +33,4 @@ yarn-error.log*
 
 # benchmark compiled output
 _bench_compiled*
+.vercel

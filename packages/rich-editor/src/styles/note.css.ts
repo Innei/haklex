@@ -159,7 +159,6 @@ globalStyle(`${noteBase} .rich-quote`, {
   fontStyle: 'normal',
   lineHeight: '1.8',
   color: 'inherit',
-  borderLeft: 'none',
   backgroundColor: `color-mix(in srgb, ${vars.color.accent} 10%, transparent)`,
   marginTop: '1.6em',
   marginBottom: '1.6em',
@@ -170,6 +169,10 @@ globalStyle(`${noteBase} .rich-quote`, {
   paddingLeft: '2em',
   paddingRight: '2em',
   borderRadius: 0,
+})
+
+globalStyle(`${noteBase} .rich-quote::before`, {
+  display: 'none',
 })
 
 globalStyle(
