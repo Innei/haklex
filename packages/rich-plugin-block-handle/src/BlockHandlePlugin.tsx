@@ -7,6 +7,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@haklex/rich-editor-ui'
+import { usePortalTheme } from '@haklex/rich-style-token'
 import { $createCodeNode } from '@lexical/code'
 import {
   INSERT_CHECK_LIST_COMMAND,
@@ -116,7 +117,7 @@ function getNearestBlockByY(
   rootElement: HTMLElement,
   clientY: number,
 ): HTMLElement | null {
-  const blocks = Array.from(rootElement.children).filter(
+  const blocks = [...rootElement.children].filter(
     (child): child is HTMLElement => child instanceof HTMLElement,
   )
   if (!blocks.length) return null
@@ -205,6 +206,7 @@ function BlockHandleInner({
 }: {
   editor: LexicalEditor
 }): ReactElement | null {
+  const { className: portalClassName, theme } = usePortalTheme()
   const [handle, setHandle] = useState<HandlePosition>({
     visible: false,
     top: 0,
@@ -486,10 +488,22 @@ function BlockHandleInner({
       const preview = block.cloneNode(true) as HTMLElement
       preview.classList.add(css.dragPreview)
       preview.style.width = `${rect.width}px`
-      document.body.append(preview)
+
+      if (portalClassName) {
+        const wrapper = document.createElement('div')
+        wrapper.className = portalClassName
+        wrapper.setAttribute('data-theme', theme)
+        wrapper.style.cssText =
+          'position:fixed;top:-10000px;left:-10000px;pointer-events:none'
+        wrapper.appendChild(preview)
+        document.body.append(wrapper)
+        dragPreviewRef.current = wrapper
+      } else {
+        document.body.append(preview)
+        dragPreviewRef.current = preview
+      }
 
       draggingBlockRef.current = block
-      dragPreviewRef.current = preview
       block.classList.add(css.draggingBlock)
 
       const offsetX = Math.max(
@@ -502,7 +516,7 @@ function BlockHandleInner({
       )
       e.dataTransfer.setDragImage(preview, offsetX, offsetY)
     },
-    [clearDragVisualState, handle.nodeKey],
+    [clearDragVisualState, handle.nodeKey, portalClassName, theme],
   )
 
   const onGripOpenChange = useCallback(
@@ -641,8 +655,16 @@ function BlockHandleInner({
   }, [clearDragVisualState, editor])
 
   // ── Render ──
+  const themeWrapperProps = portalClassName
+    ? {
+        className: portalClassName,
+        'data-theme': theme,
+        style: { display: 'contents' as const },
+      }
+    : {}
+
   return (
-    <>
+    <div {...themeWrapperProps}>
       <div
         className={`${css.handleContainer} ${handle.visible ? css.handleContainerVisible : ''}`}
         style={{ top: handle.top, left: handle.left }}
@@ -722,7 +744,7 @@ function BlockHandleInner({
           }}
         />
       )}
-    </>
+    </div>
   )
 }
 

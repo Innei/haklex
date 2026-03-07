@@ -4,6 +4,8 @@ import {
   KaTeXRenderer,
 } from '@haklex/rich-editor'
 import {
+  ActionBar,
+  ActionButton,
   AnimatedTabs,
   Popover,
   PopoverPanel,
@@ -105,7 +107,7 @@ export function KaTeXEditDecorator({
   const handleCopy = useCallback(() => {
     navigator.clipboard.writeText(value)
     setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+    setTimeout(setCopied, 2000, false)
   }, [value])
 
   const handleReset = useCallback(() => {
@@ -279,9 +281,9 @@ export function KaTeXEditDecorator({
                   <div
                     className={`${styles.inputActions} ${styles.semanticClassNames.inputActions}`}
                   >
-                    <button
-                      className={`${styles.actionButton} ${styles.semanticClassNames.actionButton}`}
-                      type="button"
+                    <ActionButton
+                      icon
+                      size="sm"
                       onClick={handleCopy}
                       title="Copy LaTeX"
                       disabled={!value.trim()}
@@ -291,16 +293,16 @@ export function KaTeXEditDecorator({
                       ) : (
                         <Copy size={12} />
                       )}
-                    </button>
-                    <button
-                      className={`${styles.actionButton} ${styles.semanticClassNames.actionButton}`}
-                      type="button"
+                    </ActionButton>
+                    <ActionButton
+                      icon
+                      size="sm"
                       onClick={handleReset}
                       title="Reset"
                       disabled={value === equation}
                     >
                       <RotateCcw size={12} />
-                    </button>
+                    </ActionButton>
                   </div>
                 </div>
               </div>
@@ -422,25 +424,19 @@ export function KaTeXEditDecorator({
           >
             {value.trim() ? `${value.length} chars` : 'Enter a formula'}
           </span>
-          <div
-            className={`${styles.footerActions} ${styles.semanticClassNames.footerActions}`}
-          >
-            <button
-              className={`${styles.footerButton} ${styles.semanticClassNames.footerButton}`}
-              type="button"
-              onClick={cancel}
-            >
+          <ActionBar>
+            <ActionButton variant="ghost" size="md" onClick={cancel}>
               Cancel
-            </button>
-            <button
-              className={`${styles.footerButton} ${styles.semanticClassNames.footerButton} ${styles.footerButtonPrimary} ${styles.semanticClassNames.footerButtonPrimary}`}
-              type="button"
+            </ActionButton>
+            <ActionButton
+              variant="accent"
+              size="md"
               onClick={commit}
               disabled={!value.trim()}
             >
               Save
-            </button>
-          </div>
+            </ActionButton>
+          </ActionBar>
         </div>
       </PopoverPanel>
     </Popover>

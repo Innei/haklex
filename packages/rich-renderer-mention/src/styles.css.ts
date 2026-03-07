@@ -13,9 +13,6 @@ export const semanticClassNames = {
   editFieldIcon: 'rich-mention-edit-field-icon',
   editInput: 'rich-mention-edit-input',
   editSelect: 'rich-mention-edit-select',
-  editActions: 'rich-mention-edit-actions',
-  editActionButton: 'rich-mention-edit-action-btn',
-  editActionButtonEnd: 'rich-mention-edit-action-btn--end',
 } as const
 
 // ─── Tag-style mention ──────────────────────────────────
@@ -136,36 +133,4 @@ export const editSelect = style({
   outline: 'none',
   cursor: 'pointer',
   minWidth: 0,
-})
-
-export const editActions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
-})
-
-export const editActionButton = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  color: 'inherit',
-  fontSize: vars.typography.fontSizeSm,
-  fontWeight: 500,
-  cursor: 'pointer',
-  padding: '4px 8px',
-  borderRadius: '4px',
-  transition: 'color 0.15s ease, background-color 0.15s ease',
-  whiteSpace: 'nowrap',
-  selectors: {
-    '&:hover': {
-      backgroundColor: vars.color.fillSecondary,
-    },
-  },
-})
-
-export const editActionButtonEnd = style({
-  marginLeft: 'auto',
 })

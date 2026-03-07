@@ -1,10 +1,5 @@
 import { vars } from '@haklex/rich-style-token/styles'
-import {
-  createVar,
-  globalStyle,
-  style,
-  styleVariants,
-} from '@vanilla-extract/css'
+import { createVar, style, styleVariants } from '@vanilla-extract/css'
 
 const embedAccent = createVar()
 
@@ -23,9 +18,6 @@ export const semanticClassNames = {
   dot: 'rich-embed__dot',
   divider: 'rich-embed__divider',
   input: 'rich-embed__input',
-  actions: 'rich-embed__actions',
-  actionButton: 'rich-embed__action-btn',
-  actionButtonDanger: 'rich-embed__action-btn--danger',
 } as const
 
 export const semanticEmbedModifierClass = {
@@ -119,53 +111,4 @@ export const input = style({
       color: `color-mix(in srgb, ${vars.color.textSecondary} 60%, transparent)`,
     },
   },
-})
-
-export const actions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 2,
-  flexShrink: 0,
-})
-
-export const actionButton = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  padding: 6,
-  borderRadius: 6,
-  transition: 'color 0.15s ease, background-color 0.15s ease',
-  selectors: {
-    '&:hover': {
-      color: vars.color.text,
-      backgroundColor: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-    },
-    '&:disabled': {
-      opacity: 0.3,
-      cursor: 'default',
-    },
-    '&:disabled:hover': {
-      background: 'none',
-      color: vars.color.textSecondary,
-    },
-  },
-})
-
-export const actionButtonDanger = style({
-  selectors: {
-    '&:hover': {
-      color: vars.color.alertCaution,
-      backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
-    },
-  },
-})
-
-globalStyle(`${actionButton} svg`, {
-  width: 16,
-  height: 16,
 })

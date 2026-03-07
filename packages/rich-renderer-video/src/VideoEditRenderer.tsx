@@ -1,6 +1,12 @@
 import type { VideoRendererProps } from '@haklex/rich-editor'
 import { useRendererMode } from '@haklex/rich-editor'
-import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui'
+import {
+  ActionBar,
+  ActionButton,
+  Popover,
+  PopoverPanel,
+  PopoverTrigger,
+} from '@haklex/rich-editor-ui'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getNearestNodeFromDOMNode } from 'lexical'
 import { ExternalLink, ImageIcon, Trash2, Video } from 'lucide-react'
@@ -8,6 +14,9 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 
 import * as styles from './styles.css'
 import { VideoRenderer } from './VideoRenderer'
+
+const UNSAFE_VIDEO_URL_RE =
+  /^(?:javascript\s*:|vbscript\s*:|data\s*:(?!video\/))/i
 
 export function VideoEditRenderer(props: VideoRendererProps) {
   const mode = useRendererMode()
@@ -52,10 +61,7 @@ function VideoEditRendererInner({
   const commitChanges = useCallback(() => {
     const trimmedSrc = editSrc.trim()
     if (!trimmedSrc) return
-    if (
-      /^(?:javascript\s*:|vbscript\s*:|data\s*:(?!video\/))/i.test(trimmedSrc)
-    )
-      return
+    if (UNSAFE_VIDEO_URL_RE.test(trimmedSrc)) return
     if (!wrapperRef.current) return
 
     editor.update(() => {
@@ -199,26 +205,16 @@ function VideoEditRendererInner({
             placeholder="Poster URL (optional)"
           />
         </div>
-        <div
-          className={`${styles.editActions} ${styles.semanticClassNames.editActions}`}
-        >
-          <button
-            className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton}`}
-            type="button"
-            onClick={handleOpen}
-          >
+        <ActionBar>
+          <ActionButton onClick={handleOpen}>
             <ExternalLink size={14} />
             Open
-          </button>
-          <button
-            className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton} ${styles.editActionButtonEnd} ${styles.semanticClassNames.editActionButtonEnd}`}
-            type="button"
-            onClick={handleDelete}
-          >
+          </ActionButton>
+          <ActionButton danger onClick={handleDelete}>
             <Trash2 size={14} />
             Remove
-          </button>
-        </div>
+          </ActionButton>
+        </ActionBar>
       </PopoverPanel>
     </Popover>
   )

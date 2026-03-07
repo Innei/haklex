@@ -1,4 +1,6 @@
 import {
+  ActionBar,
+  ActionButton,
   Dialog,
   DialogPopup,
   DialogTitle,
@@ -37,14 +39,16 @@ function isImageFile(file: File): boolean {
 function hasImageData(dataTransfer: DataTransfer | null): boolean {
   if (!dataTransfer) return false
 
-  if (Array.from(dataTransfer.files).some(isImageFile)) return true
-  return Array.from(dataTransfer.items).some((item) =>
+  if ([...dataTransfer.files].some(isImageFile)) return true
+  return [...dataTransfer.items].some((item) =>
     item.type.startsWith('image/'),
   )
 }
 
+const UNSAFE_URL_RE = /^(?:javascript\s*:|vbscript\s*:|data\s*:(?!image\/))/i
+
 function isSafeImageUrl(url: string): boolean {
-  return !/^(?:javascript\s*:|vbscript\s*:|data\s*:(?!image\/))/i.test(url)
+  return !UNSAFE_URL_RE.test(url)
 }
 
 function loadImageByUrl(
@@ -126,7 +130,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
       if (toastTimerRef.current) {
         window.clearTimeout(toastTimerRef.current)
       }
-      toastTimerRef.current = window.setTimeout(() => setToast(null), 2200)
+      toastTimerRef.current = window.setTimeout(setToast, 2200, null)
     },
     [],
   )
@@ -207,7 +211,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
             : null
         if (!clipboardData) return false
 
-        const files = Array.from(clipboardData.files)
+        const files = [...clipboardData.files]
         if (files.some(isImageFile)) {
           return handleFiles(files)
         }
@@ -429,7 +433,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
                 onDrop={(event) => {
                   event.preventDefault()
                   setDialogDragActive(false)
-                  const file = Array.from(event.dataTransfer.files).find(
+                  const file = [...event.dataTransfer.files].find(
                     isImageFile,
                   )
                   void handleDialogFile(file ?? null)
@@ -493,22 +497,22 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
                       }
                     }}
                   />
-                  <button
-                    type="button"
-                    className={css.secondaryButton}
+                  <ActionButton
+                    variant="outline"
+                    size="md"
                     disabled={urlLoading || !urlInput.trim()}
                     onClick={() => void handleUrlPreview()}
                   >
                     {urlLoading ? 'Loading' : 'Preview'}
-                  </button>
-                  <button
-                    type="button"
-                    className={css.actionButton}
+                  </ActionButton>
+                  <ActionButton
+                    variant="accent"
+                    size="md"
                     disabled={!urlPreview}
                     onClick={handleInsertByUrl}
                   >
                     Insert
-                  </button>
+                  </ActionButton>
                 </div>
 
                 {urlError && (
@@ -538,16 +542,16 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
               <Link2 size={12} />
               You can also paste images or drag files directly into the editor.
             </span>
-            <div className={css.dialogFooterActions}>
-              <button
-                type="button"
-                className={css.secondaryButton}
+            <ActionBar>
+              <ActionButton
+                variant="outline"
+                size="md"
                 onClick={() => setDialogOpen(false)}
                 disabled={dialogUploading}
               >
                 Close
-              </button>
-            </div>
+              </ActionButton>
+            </ActionBar>
           </div>
         </DialogPopup>
       </Dialog>

@@ -215,54 +215,6 @@ export const textInput = style({
   },
 })
 
-const actionButtonBase = style({
-  height: 34,
-  borderRadius: vars.borderRadius.sm,
-  border: '1px solid transparent',
-  fontSize: vars.typography.fontSizeXs,
-  fontWeight: 600,
-  cursor: 'pointer',
-  padding: '0 0.75rem',
-  transition:
-    'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
-})
-
-export const actionButton = style([
-  actionButtonBase,
-  {
-    backgroundColor: vars.color.text,
-    color: vars.color.bg,
-    selectors: {
-      '&:hover': {
-        backgroundColor: `color-mix(in srgb, ${vars.color.text} 85%, transparent)`,
-      },
-      '&:disabled': {
-        opacity: 0.45,
-        cursor: 'not-allowed',
-      },
-    },
-  },
-])
-
-export const secondaryButton = style([
-  actionButtonBase,
-  {
-    borderColor: vars.color.border,
-    backgroundColor: vars.color.bg,
-    color: vars.color.textSecondary,
-    selectors: {
-      '&:hover': {
-        color: vars.color.text,
-        backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
-      },
-      '&:disabled': {
-        opacity: 0.45,
-        cursor: 'not-allowed',
-      },
-    },
-  },
-])
-
 export const urlPreview = style({
   borderRadius: vars.borderRadius.md,
   border: `1px solid ${vars.color.border}`,
@@ -293,10 +245,4 @@ export const dialogFooter = style({
   borderTop: `1px solid ${vars.color.border}`,
   backgroundColor: `color-mix(in srgb, ${vars.color.text} 2%, transparent)`,
   padding: '0.65rem 1rem',
-})
-
-export const dialogFooterActions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
 })

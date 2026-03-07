@@ -189,57 +189,6 @@ export const dialogFooter = style({
   background: `color-mix(in srgb, ${vars.color.text} 2%, transparent)`,
 })
 
-export const dialogActions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.625rem',
-  flexShrink: 0,
-})
-
-const actionButtonBase = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '0.45rem',
-  height: 36,
-  padding: '0 0.875rem',
-  borderRadius: vars.borderRadius.sm,
-  border: '1px solid transparent',
-  fontSize: vars.typography.fontSizeXs,
-  fontWeight: 600,
-  cursor: 'pointer',
-  transition:
-    'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease',
-})
-
-export const secondaryButton = style([
-  actionButtonBase,
-  {
-    borderColor: vars.color.border,
-    background: vars.color.bg,
-    color: vars.color.textSecondary,
-    selectors: {
-      '&:hover': {
-        background: vars.color.fillSecondary,
-        color: vars.color.text,
-      },
-    },
-  },
-])
-
-export const primaryButton = style([
-  actionButtonBase,
-  {
-    background: vars.color.text,
-    color: vars.color.bg,
-    selectors: {
-      '&:hover': {
-        background: `color-mix(in srgb, ${vars.color.text} 86%, transparent)`,
-      },
-    },
-  },
-])
-
 export const staticOverlayRoot = style({
   position: 'relative',
   display: 'block',

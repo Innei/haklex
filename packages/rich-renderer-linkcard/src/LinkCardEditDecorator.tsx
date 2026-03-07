@@ -1,6 +1,12 @@
 import type { LinkCardNodePayload } from '@haklex/rich-editor'
 import { $isLinkCardNode } from '@haklex/rich-editor'
-import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui'
+import {
+  ActionBar,
+  ActionButton,
+  Popover,
+  PopoverPanel,
+  PopoverTrigger,
+} from '@haklex/rich-editor-ui'
 import { $createLinkNode } from '@lexical/link'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $createParagraphNode, $createTextNode, $getNodeByKey } from 'lexical'
@@ -145,34 +151,20 @@ export function LinkCardEditDecorator({
             placeholder="https://..."
           />
         </div>
-        <div
-          className={`${styles.editActions} ${styles.semanticClassNames.editActions}`}
-        >
-          <button
-            className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton}`}
-            type="button"
-            onClick={handleOpen}
-          >
+        <ActionBar>
+          <ActionButton onClick={handleOpen}>
             <ExternalLink size={14} />
             Open
-          </button>
-          <button
-            className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton}`}
-            type="button"
-            onClick={handleConvertToLink}
-          >
+          </ActionButton>
+          <ActionButton onClick={handleConvertToLink}>
             <RemoveFormatting size={14} />
             To Link
-          </button>
-          <button
-            className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton} ${styles.editActionButtonEnd} ${styles.semanticClassNames.editActionButtonEnd}`}
-            type="button"
-            onClick={handleDelete}
-          >
+          </ActionButton>
+          <ActionButton danger onClick={handleDelete}>
             <Unlink size={14} />
             Remove
-          </button>
-        </div>
+          </ActionButton>
+        </ActionBar>
       </PopoverPanel>
     </Popover>
   )

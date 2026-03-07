@@ -23,9 +23,6 @@ export const semanticClassNames = {
   editField: 'rr-video-edit-field',
   editFieldIcon: 'rr-video-edit-field-icon',
   editInput: 'rr-video-edit-input',
-  editActions: 'rr-video-edit-actions',
-  editActionButton: 'rr-video-edit-action-btn',
-  editActionButtonEnd: 'rr-video-edit-action-btn--end',
 } as const
 
 export const root = style({ margin: '1.25rem 0' })
@@ -277,33 +274,3 @@ export const editInput = style({
     },
   },
 })
-
-export const editActions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
-})
-
-export const editActionButton = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  color: 'inherit',
-  fontSize: vars.typography.fontSizeSm,
-  fontWeight: 500,
-  cursor: 'pointer',
-  padding: '4px 8px',
-  borderRadius: '4px',
-  transition: 'color 0.15s ease, background-color 0.15s ease',
-  whiteSpace: 'nowrap',
-  selectors: {
-    '&:hover': {
-      backgroundColor: vars.color.fillSecondary,
-    },
-  },
-})
-
-export const editActionButtonEnd = style({ marginLeft: 'auto' })

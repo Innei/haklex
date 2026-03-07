@@ -1,4 +1,8 @@
-import { SegmentedControl } from '@haklex/rich-editor-ui'
+import {
+  ActionBar,
+  ActionButton,
+  SegmentedControl,
+} from '@haklex/rich-editor-ui'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { ImageIcon, Loader2, Upload } from 'lucide-react'
 
@@ -94,26 +98,21 @@ export function ReplacePanel() {
               placeholder="https://example.com/image.jpg"
             />
           </div>
-          <div
-            className={`${styles.editActions} ${styles.semanticClassNames.editActions}`}
-          >
-            <button
-              className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton}`}
-              type="button"
+          <ActionBar>
+            <ActionButton
               disabled={replaceLoading || !replaceUrl.trim()}
               onClick={handlePreviewUrl}
             >
               Preview
-            </button>
-            <button
-              className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton} ${styles.editActionButtonEnd} ${styles.semanticClassNames.editActionButtonEnd}`}
-              type="button"
+            </ActionButton>
+            <ActionButton
+              variant="accent"
               disabled={!replacePreview}
               onClick={handleReplaceByUrl}
             >
               Apply
-            </button>
-          </div>
+            </ActionButton>
+          </ActionBar>
         </>
       )}
 

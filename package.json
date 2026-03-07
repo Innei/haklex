@@ -2,7 +2,7 @@
   "name": "haklex",
   "type": "module",
   "private": true,
-  "description": "A modular rich text editor ecosystem built on Lexical",
+  "description": "Modular Lexical-based rich editor ecosystem. Edit, static render, SSR, and server-side parse — all from one schema. React 19, TypeScript 5.9, Vanilla Extract, ESM.",
   "license": "MIT",
   "repository": {
     "type": "git",

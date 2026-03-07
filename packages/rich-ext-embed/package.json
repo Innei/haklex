@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "lucide-react": "^0.577.0",
     "react-tweet": "npm:@innei/react-tweet@3.4.2"

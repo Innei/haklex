@@ -1,5 +1,11 @@
 import { useRendererMode } from '@haklex/rich-editor'
-import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui'
+import {
+  ActionBar,
+  ActionButton,
+  Popover,
+  PopoverPanel,
+  PopoverTrigger,
+} from '@haklex/rich-editor-ui'
 import { vars } from '@haklex/rich-style-token'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getNearestNodeFromDOMNode } from 'lexical'
@@ -13,6 +19,8 @@ import {
   platformMetaMap,
 } from './MentionRenderer'
 import * as styles from './styles.css'
+
+const LEADING_AT_RE = /^@+/
 
 export function MentionEditRenderer(props: MentionRendererProps) {
   const mode = useRendererMode()
@@ -71,7 +79,7 @@ function MentionEditRendererInner({
   }, [editor])
 
   const handleOpen = useCallback(() => {
-    const normalizedHandle = handle.replace(/^@+/, '')
+    const normalizedHandle = handle.replace(LEADING_AT_RE, '')
     const meta = platformMetaMap[platform]
     if (meta) {
       window.open(
@@ -195,26 +203,16 @@ function MentionEditRendererInner({
             placeholder="Display name (optional)"
           />
         </div>
-        <div
-          className={`${styles.editActions} ${styles.semanticClassNames.editActions}`}
-        >
-          <button
-            className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton}`}
-            type="button"
-            onClick={handleOpen}
-          >
+        <ActionBar>
+          <ActionButton onClick={handleOpen}>
             <ExternalLink size={14} />
             Open
-          </button>
-          <button
-            className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton} ${styles.editActionButtonEnd} ${styles.semanticClassNames.editActionButtonEnd}`}
-            type="button"
-            onClick={handleDelete}
-          >
+          </ActionButton>
+          <ActionButton danger onClick={handleDelete}>
             <Trash2 size={14} />
             Remove
-          </button>
-        </div>
+          </ActionButton>
+        </ActionBar>
       </PopoverPanel>
     </Popover>
   )

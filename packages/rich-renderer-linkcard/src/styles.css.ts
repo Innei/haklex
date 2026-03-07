@@ -26,9 +26,6 @@ export const semanticClassNames = {
   editUrlRow: 'rich-link-card-edit-url-row',
   editLinkIcon: 'rich-link-card-edit-link-icon',
   editInput: 'rich-link-card-edit-input',
-  editActions: 'rich-link-card-edit-actions',
-  editActionButton: 'rich-link-card-edit-action-btn',
-  editActionButtonEnd: 'rich-link-card-edit-action-btn--end',
 } as const
 
 export const card = style({
@@ -324,38 +321,6 @@ export const editInput = style({
   padding: 0,
   outline: 'none',
   minWidth: 0,
-})
-
-export const editActions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
-})
-
-export const editActionButton = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  color: vars.color.text,
-  fontSize: vars.typography.fontSizeSm,
-  fontWeight: 500,
-  cursor: 'pointer',
-  padding: '4px 8px',
-  borderRadius: vars.borderRadius.sm,
-  transition: 'color 0.15s ease, background-color 0.15s ease',
-  whiteSpace: 'nowrap',
-  selectors: {
-    '&:hover': {
-      backgroundColor: vars.color.fillSecondary,
-    },
-  },
-})
-
-export const editActionButtonEnd = style({
-  marginLeft: 'auto',
 })
 
 export const typeCardModifier = {

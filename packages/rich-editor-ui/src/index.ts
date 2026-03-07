@@ -1,4 +1,13 @@
 export type {
+  ActionBarProps,
+  ActionButtonProps,
+} from './components/action-button'
+export {
+  ActionBar,
+  ActionButton,
+  getActionButtonClassName,
+} from './components/action-button'
+export type {
   AnimatedTabsProps,
   Tab as AnimatedTabsTab,
 } from './components/animated-tabs'

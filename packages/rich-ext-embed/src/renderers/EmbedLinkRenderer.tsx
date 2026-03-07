@@ -1,5 +1,6 @@
 import '../styles.css.ts'
 
+import { ActionBar, ActionButton } from '@haklex/rich-editor-ui'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getNodeByKey } from 'lexical'
 import { ExternalLink, Trash2 } from 'lucide-react'
@@ -123,27 +124,26 @@ export function EmbedLinkRenderer({
         onKeyDown={handleKeyDown}
         placeholder="https://..."
       />
-      <span
-        className={`${styles.actions} ${styles.semanticClassNames.actions}`}
-      >
-        <button
-          type="button"
-          className={`${styles.actionButton} ${styles.semanticClassNames.actionButton}`}
+      <ActionBar>
+        <ActionButton
+          icon
+          size="md"
           onClick={handleOpen}
           title="Open in new tab"
           disabled={!url}
         >
           <ExternalLink />
-        </button>
-        <button
-          type="button"
-          className={`${styles.actionButton} ${styles.semanticClassNames.actionButton} ${styles.actionButtonDanger} ${styles.semanticClassNames.actionButtonDanger}`}
+        </ActionButton>
+        <ActionButton
+          icon
+          size="md"
+          danger
           onClick={handleDelete}
           title="Delete"
         >
           <Trash2 />
-        </button>
-      </span>
+        </ActionButton>
+      </ActionBar>
     </div>
   )
 }

@@ -19,7 +19,6 @@ export const semanticClassNames = {
   inputWrap: 'rich-katex-editor-input-wrap',
   textarea: 'rich-katex-editor-textarea',
   inputActions: 'rich-katex-editor-input-actions',
-  actionButton: 'rich-katex-editor-action-btn',
   preview: 'rich-katex-editor-preview',
   previewEmpty: 'rich-katex-editor-preview-empty',
   snippetSearchWrap: 'rich-katex-editor-snippet-search-wrap',
@@ -37,9 +36,6 @@ export const semanticClassNames = {
   snippetsPlaceholder: 'rich-katex-editor-snippets-placeholder',
   footer: 'rich-katex-editor-footer',
   charCount: 'rich-katex-editor-charcount',
-  footerActions: 'rich-katex-editor-footer-actions',
-  footerButton: 'rich-katex-editor-btn',
-  footerButtonPrimary: 'rich-katex-editor-btn-primary',
 } as const
 
 export const editWrapper = style({
@@ -201,32 +197,6 @@ export const inputActions = style({
   top: '6px',
   display: 'flex',
   gap: '2px',
-})
-
-export const actionButton = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  color: `color-mix(in srgb, ${vars.color.textSecondary} 60%, transparent)`,
-  cursor: 'pointer',
-  width: '24px',
-  height: '24px',
-  borderRadius: vars.borderRadius.sm,
-  transition: 'color 0.15s ease, background-color 0.15s ease',
-  selectors: {
-    '&:hover': {
-      color: vars.color.text,
-      backgroundColor: vars.color.fillSecondary,
-    },
-    '&:disabled': {
-      opacity: 0.3,
-      cursor: 'default',
-      pointerEvents: 'none',
-    },
-  },
 })
 
 export const preview = style({
@@ -395,50 +365,4 @@ export const charCount = style({
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
   maxWidth: '200px',
-})
-
-export const footerActions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-})
-
-export const footerButton = style({
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  padding: '4px 10px',
-  borderRadius: vars.borderRadius.sm,
-  fontSize: vars.typography.fontSizeXs,
-  fontWeight: 500,
-  lineHeight: 1.4,
-  height: '28px',
-  display: 'inline-flex',
-  alignItems: 'center',
-  transition: 'color 0.15s ease, background-color 0.15s ease',
-  selectors: {
-    '&:hover': {
-      color: vars.color.text,
-      backgroundColor: vars.color.fillSecondary,
-    },
-  },
-})
-
-export const footerButtonPrimary = style({
-  backgroundColor: vars.color.accent,
-  color: '#fff',
-  selectors: {
-    '&:hover': {
-      backgroundColor: vars.color.accent,
-      filter: 'brightness(0.9)',
-      color: '#fff',
-    },
-    '&:disabled': {
-      opacity: 0.5,
-      cursor: 'default',
-      pointerEvents: 'none',
-    },
-  },
 })

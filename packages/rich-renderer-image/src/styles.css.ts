@@ -26,9 +26,6 @@ export const semanticClassNames = {
   editField: 'rr-image-edit-field',
   editFieldIcon: 'rr-image-edit-field-icon',
   editInput: 'rr-image-edit-input',
-  editActions: 'rr-image-edit-actions',
-  editActionButton: 'rr-image-edit-action-btn',
-  editActionButtonEnd: 'rr-image-edit-action-btn--end',
   replaceUploadArea: 'rr-image-replace-upload-area',
   replacePreview: 'rr-image-replace-preview',
   panelHint: 'rr-image-panel-hint',
@@ -296,7 +293,7 @@ export const editPanel = style({
   gap: '8px',
   width: '360px',
   padding: '12px',
-  fontSize: vars.typography.fontSizeSm,
+  fontSize: vars.typography.fontSizeBase,
   fontFamily: vars.typography.fontFamily,
   zIndex: 30,
 })
@@ -331,38 +328,6 @@ export const editInput = style({
       color: vars.color.textSecondary,
     },
   },
-})
-
-export const editActions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
-})
-
-export const editActionButton = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '6px',
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  color: 'inherit',
-  fontSize: vars.typography.fontSizeSm,
-  fontWeight: 500,
-  cursor: 'pointer',
-  padding: '4px 8px',
-  borderRadius: '4px',
-  transition: 'color 0.15s ease, background-color 0.15s ease',
-  whiteSpace: 'nowrap',
-  selectors: {
-    '&:hover': {
-      backgroundColor: vars.color.fillSecondary,
-    },
-  },
-})
-
-export const editActionButtonEnd = style({
-  marginLeft: 'auto',
 })
 
 export const replaceUploadArea = style({

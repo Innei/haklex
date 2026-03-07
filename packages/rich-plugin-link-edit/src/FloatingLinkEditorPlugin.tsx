@@ -1,4 +1,7 @@
 import {
+  ActionBar,
+  ActionButton,
+  getActionButtonClassName,
   Popover,
   PopoverPopup,
   PopoverPortal,
@@ -256,31 +259,21 @@ export function FloatingLinkEditorPlugin({
                 placeholder="https://..."
               />
             </div>
-            <div
-              className={`${styles.actions} ${styles.semanticClassNames.actions}`}
-            >
-              <button
-                className={`${styles.actionButton} ${styles.semanticClassNames.actionButton}`}
-                type="button"
-                onClick={handleOpen}
-              >
+            <ActionBar>
+              <ActionButton onClick={handleOpen}>
                 <ExternalLink size={14} />
                 Open
-              </button>
+              </ActionButton>
               {renderExtraActions?.({
                 url: linkState.url,
                 linkKey: linkState.linkKey,
-                actionButtonClassName: `${styles.actionButton} ${styles.semanticClassNames.actionButton}`,
+                actionButtonClassName: getActionButtonClassName(),
               })}
-              <button
-                className={`${styles.actionButton} ${styles.semanticClassNames.actionButton} ${styles.actionButtonEnd} ${styles.semanticClassNames.actionButtonEnd}`}
-                type="button"
-                onClick={handleUnlink}
-              >
+              <ActionButton danger onClick={handleUnlink}>
                 <Unlink size={14} />
                 Unlink
-              </button>
-            </div>
+              </ActionButton>
+            </ActionBar>
           </PopoverPopup>
         </PopoverPositioner>
       </PopoverPortal>

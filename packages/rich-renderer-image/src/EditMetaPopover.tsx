@@ -1,3 +1,4 @@
+import { ActionBar, ActionButton } from '@haklex/rich-editor-ui'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { Captions, ImageIcon, Type } from 'lucide-react'
 import { useEffect, useRef } from 'react'
@@ -82,24 +83,12 @@ export function EditMetaPopover() {
           placeholder="Caption (optional)"
         />
       </div>
-      <div
-        className={`${styles.editActions} ${styles.semanticClassNames.editActions}`}
-      >
-        <button
-          className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton}`}
-          type="button"
-          onClick={commitMeta}
-        >
+      <ActionBar>
+        <ActionButton onClick={() => setMetaOpen(false)}>Close</ActionButton>
+        <ActionButton variant="accent" onClick={commitMeta}>
           Save
-        </button>
-        <button
-          className={`${styles.editActionButton} ${styles.semanticClassNames.editActionButton} ${styles.editActionButtonEnd} ${styles.semanticClassNames.editActionButtonEnd}`}
-          type="button"
-          onClick={() => setMetaOpen(false)}
-        >
-          Close
-        </button>
-      </div>
+        </ActionButton>
+      </ActionBar>
     </>
   )
 }

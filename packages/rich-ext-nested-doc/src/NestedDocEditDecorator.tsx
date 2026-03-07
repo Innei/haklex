@@ -1,4 +1,5 @@
 import { useColorScheme } from '@haklex/rich-editor'
+import { ActionBar, ActionButton } from '@haklex/rich-editor-ui'
 import {
   PortalContainerProvider,
   usePortalTheme,
@@ -216,24 +217,16 @@ function NestedDocDialogContent({
       </div>
 
       <div className={css.dialogFooter}>
-        <div className={css.dialogActions}>
-          <button
-            type="button"
-            className={css.secondaryButton}
-            onClick={onDismiss}
-          >
+        <ActionBar gap="0.625rem">
+          <ActionButton variant="outline" size="lg" onClick={onDismiss}>
             <X size={15} />
             Cancel
-          </button>
-          <button
-            type="button"
-            className={css.primaryButton}
-            onClick={handleDone}
-          >
+          </ActionButton>
+          <ActionButton variant="accent" size="lg" onClick={handleDone}>
             <Save size={15} />
             Save
-          </button>
-        </div>
+          </ActionButton>
+        </ActionBar>
       </div>
     </div>
   )
