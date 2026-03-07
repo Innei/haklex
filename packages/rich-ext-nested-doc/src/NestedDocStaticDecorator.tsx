@@ -27,10 +27,22 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
   );
   const hasPreview = hasRenderableEditorState(contentState);
 
+  const title = useMemo(() => {
+    const firstChild = children[0] as any;
+    if (!firstChild) return '';
+    const walk = (node: any): string => {
+      if (node.text) return node.text;
+      if (node.children) return node.children.map(walk).join('');
+      return '';
+    };
+    return walk(firstChild).slice(0, 80);
+  }, [children]);
+
   const handleOpen = useCallback(async () => {
     const present = presentDialogFromCtx ?? (await import('@haklex/rich-editor-ui')).presentDialog;
 
     present({
+      title: title || undefined,
       content: () => (
         <div className={css.staticDialogBody}>
           <NestedDocRenderer value={contentState} />
@@ -43,7 +55,7 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
       clickOutsideToDismiss: true,
       sheet: 'auto',
     });
-  }, [colorScheme, contentState, portalClassName, presentDialogFromCtx]);
+  }, [colorScheme, contentState, portalClassName, presentDialogFromCtx, title]);
 
   if (!hasPreview) {
     return null;
