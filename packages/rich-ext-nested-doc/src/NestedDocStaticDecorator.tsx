@@ -1,4 +1,4 @@
-import { useColorScheme } from '@haklex/rich-editor/static';
+import { useColorScheme, usePresentDialog } from '@haklex/rich-editor/static';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import type { SerializedEditorState } from 'lexical';
 import { Maximize2 } from 'lucide-react';
@@ -17,6 +17,7 @@ interface NestedDocStaticDecoratorProps {
 export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecoratorProps) {
   const colorScheme = useColorScheme();
   const { className: portalClassName } = usePortalTheme();
+  const presentDialogFromCtx = usePresentDialog();
 
   const children = contentState.root?.children ?? [];
   const needsTruncation = children.length > PREVIEW_NODE_LIMIT;
@@ -27,9 +28,9 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
   const hasPreview = hasRenderableEditorState(contentState);
 
   const handleOpen = useCallback(async () => {
-    const { presentDialog } = await import('@haklex/rich-editor-ui');
+    const present = presentDialogFromCtx ?? (await import('@haklex/rich-editor-ui')).presentDialog;
 
-    presentDialog({
+    present({
       content: () => (
         <div className={css.staticDialogBody}>
           <NestedDocRenderer value={contentState} />
@@ -42,7 +43,7 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
       clickOutsideToDismiss: true,
       sheet: 'auto',
     });
-  }, [colorScheme, contentState, portalClassName]);
+  }, [colorScheme, contentState, portalClassName, presentDialogFromCtx]);
 
   if (!hasPreview) {
     return null;

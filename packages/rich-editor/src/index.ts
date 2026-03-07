@@ -20,6 +20,8 @@ export {
   useNestedContentRenderer,
   useOptionalNestedContentRenderer,
 } from './context/NestedContentRendererContext';
+export type { PresentDialogFn, PresentDialogProps } from './context/PresentDialogContext';
+export { PresentDialogProvider, usePresentDialog } from './context/PresentDialogContext';
 export type { RendererMode } from './context/RendererConfigContext';
 export {
   RendererConfigProvider,
