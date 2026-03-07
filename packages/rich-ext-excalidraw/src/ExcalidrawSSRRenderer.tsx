@@ -1,29 +1,27 @@
-import { ViewportGate } from '@haklex/rich-editor-ui'
-import type { FC } from 'react'
-import { lazy, Suspense } from 'react'
+import { ViewportGate } from '@haklex/rich-editor-ui';
+import type { FC } from 'react';
+import { lazy, Suspense } from 'react';
 
-import * as css from './styles.css'
+import * as css from './styles.css';
 
 export interface ExcalidrawSSRRendererProps {
-  snapshot: string
+  snapshot: string;
 }
 
 const LazyDisplayRenderer = lazy(() =>
   import('./ExcalidrawDisplayRenderer').then((m) => ({
     default: m.ExcalidrawDisplayRenderer,
   })),
-)
+);
 
 const ExcalidrawPlaceholder: FC<{ snapshot: string }> = ({ snapshot }) => {
-  let label = 'Excalidraw Whiteboard'
+  let label = 'Excalidraw Whiteboard';
   try {
-    const data = JSON.parse(snapshot)
+    const data = JSON.parse(snapshot);
     if (data && typeof data === 'object') {
-      const elementCount = Array.isArray(data.elements)
-        ? data.elements.length
-        : 0
+      const elementCount = Array.isArray(data.elements) ? data.elements.length : 0;
       if (elementCount > 0) {
-        label = `Excalidraw Whiteboard (${elementCount} elements)`
+        label = `Excalidraw Whiteboard (${elementCount} elements)`;
       }
     }
   } catch {
@@ -31,20 +29,18 @@ const ExcalidrawPlaceholder: FC<{ snapshot: string }> = ({ snapshot }) => {
   }
 
   return (
-    <div className={css.excalidrawPlaceholder} aria-label={label}>
+    <div aria-label={label} className={css.excalidrawPlaceholder}>
       <span>{label}</span>
     </div>
-  )
-}
+  );
+};
 
-export const ExcalidrawSSRRenderer: FC<ExcalidrawSSRRendererProps> = ({
-  snapshot,
-}) => {
+export const ExcalidrawSSRRenderer: FC<ExcalidrawSSRRendererProps> = ({ snapshot }) => {
   return (
     <ViewportGate fallback={<ExcalidrawPlaceholder snapshot={snapshot} />}>
       <Suspense fallback={<ExcalidrawPlaceholder snapshot={snapshot} />}>
         <LazyDisplayRenderer snapshot={snapshot} />
       </Suspense>
     </ViewportGate>
-  )
-}
+  );
+};

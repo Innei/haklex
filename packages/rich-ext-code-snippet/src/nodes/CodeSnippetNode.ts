@@ -1,5 +1,5 @@
-import type { CodeFile } from '@haklex/rich-editor'
-import { createRendererDecoration } from '@haklex/rich-editor'
+import type { CodeFile } from '@haklex/rich-editor/renderers';
+import { createRendererDecoration } from '@haklex/rich-editor/renderers';
 import type {
   EditorConfig,
   LexicalEditor,
@@ -7,53 +7,51 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { DecoratorNode } from 'lexical'
-import type { ReactElement } from 'react'
+} from 'lexical';
+import { DecoratorNode } from 'lexical';
+import type { ReactElement } from 'react';
 
-import { CodeSnippetRenderer } from '../CodeSnippetRenderer'
+import { CodeSnippetRenderer } from '../CodeSnippetRenderer';
 
 export type SerializedCodeSnippetNode = Spread<
   {
-    files: CodeFile[]
+    files: CodeFile[];
   },
   SerializedLexicalNode
->
+>;
 
 export class CodeSnippetNode extends DecoratorNode<ReactElement> {
-  __files: CodeFile[]
+  __files: CodeFile[];
 
   static getType(): string {
-    return 'code-snippet'
+    return 'code-snippet';
   }
 
   static clone(node: CodeSnippetNode): CodeSnippetNode {
-    return new CodeSnippetNode(node.__files, node.__key)
+    return new CodeSnippetNode(node.__files, node.__key);
   }
 
   constructor(files: CodeFile[], key?: NodeKey) {
-    super(key)
-    this.__files = files
+    super(key);
+    this.__files = files;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = 'rich-code-snippet'
-    return div
+    const div = document.createElement('div');
+    div.className = 'rich-code-snippet';
+    return div;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
-  static importJSON(
-    serializedNode: SerializedCodeSnippetNode,
-  ): CodeSnippetNode {
-    return $createCodeSnippetNode(serializedNode.files)
+  static importJSON(serializedNode: SerializedCodeSnippetNode): CodeSnippetNode {
+    return $createCodeSnippetNode(serializedNode.files);
   }
 
   exportJSON(): SerializedCodeSnippetNode {
@@ -62,31 +60,29 @@ export class CodeSnippetNode extends DecoratorNode<ReactElement> {
       type: 'code-snippet',
       files: this.__files,
       version: 1,
-    }
+    };
   }
 
   getFiles(): CodeFile[] {
-    return this.getLatest().__files
+    return this.getLatest().__files;
   }
 
   setFiles(files: CodeFile[]): void {
-    const writable = this.getWritable()
-    writable.__files = files
+    const writable = this.getWritable();
+    writable.__files = files;
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createRendererDecoration('CodeSnippet', CodeSnippetRenderer, {
       files: this.__files,
-    })
+    });
   }
 }
 
 export function $createCodeSnippetNode(files: CodeFile[]): CodeSnippetNode {
-  return new CodeSnippetNode(files)
+  return new CodeSnippetNode(files);
 }
 
-export function $isCodeSnippetNode(
-  node: LexicalNode | null | undefined,
-): node is CodeSnippetNode {
-  return node instanceof CodeSnippetNode
+export function $isCodeSnippetNode(node: LexicalNode | null | undefined): node is CodeSnippetNode {
+  return node instanceof CodeSnippetNode;
 }

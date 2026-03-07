@@ -1,11 +1,6 @@
-import {
-  defaultKeymap,
-  history,
-  historyKeymap,
-  indentWithTab,
-} from '@codemirror/commands'
-import { Compartment, EditorState } from '@codemirror/state'
-import { EditorView, keymap, lineNumbers } from '@codemirror/view'
+import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
+import { Compartment, EditorState } from '@codemirror/state';
+import { EditorView, keymap, lineNumbers } from '@codemirror/view';
 import {
   closestCenter,
   DndContext,
@@ -14,47 +9,48 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
-} from '@dnd-kit/core'
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
   useSortable,
   verticalListSortingStrategy,
-} from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import { getThemeExtensions, loadLanguageExtension } from '@haklex/cm-editor'
-import type { CodeFile, ColorScheme } from '@haklex/rich-editor'
-import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants'
-import { FileIcon } from '@haklex/rich-renderer-codeblock/icons'
-import { usePortalTheme } from '@haklex/rich-style-token'
-import { GripVertical, Plus, Trash2, X } from 'lucide-react'
-import type { CSSProperties, FC } from 'react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { getThemeExtensions, loadLanguageExtension } from '@haklex/cm-editor';
+import type { ColorScheme } from '@haklex/rich-editor';
+import type { CodeFile } from '@haklex/rich-editor/renderers';
+import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants';
+import { FileIcon } from '@haklex/rich-renderer-codeblock/icons';
+import { usePortalTheme } from '@haklex/rich-style-token';
+import { GripVertical, Plus, Trash2, X } from 'lucide-react';
+import type { CSSProperties, FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import * as styles from './styles.css'
-import { getLanguageFromFilename } from './utils'
+import * as styles from './styles.css';
+import { getLanguageFromFilename } from './utils';
 
 export interface CodeEditorModalProps {
-  files: CodeFile[]
-  onFilesChange?: (files: CodeFile[]) => void
-  dismiss: () => void
-  colorScheme: ColorScheme
+  colorScheme: ColorScheme;
+  dismiss: () => void;
+  files: CodeFile[];
+  onFilesChange?: (files: CodeFile[]) => void;
 }
 
 // ─── Sortable file item ──────────────────────────────────
 const SortableFileItem: FC<{
-  file: CodeFile
-  isActive: boolean
-  isEditing: boolean
-  editValue: string
-  canDelete: boolean
-  onSelect: () => void
-  onStartRename: () => void
-  onEditChange: (v: string) => void
-  onCommitRename: () => void
-  onCancelRename: () => void
-  onDelete: () => void
+  file: CodeFile;
+  isActive: boolean;
+  isEditing: boolean;
+  editValue: string;
+  canDelete: boolean;
+  onSelect: () => void;
+  onStartRename: () => void;
+  onEditChange: (v: string) => void;
+  onCommitRename: () => void;
+  onCancelRename: () => void;
+  onDelete: () => void;
 }> = ({
   file,
   isActive,
@@ -68,25 +64,20 @@ const SortableFileItem: FC<{
   onCancelRename,
   onDelete,
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: file.filename })
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: file.filename,
+  });
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition,
-  }
+  };
 
   return (
     <div
+      className={`${styles.fileItem({ active: isActive, dragging: isDragging })} ${styles.semanticClassNames.fileItem} ${isActive ? styles.semanticClassNames.fileItemActive : ''} ${isDragging ? styles.semanticClassNames.fileItemDragging : ''}`.trim()}
       ref={setNodeRef}
       style={style}
-      className={`${styles.fileItem({ active: isActive, dragging: isDragging })} ${styles.semanticClassNames.fileItem} ${isActive ? styles.semanticClassNames.fileItemActive : ''} ${isDragging ? styles.semanticClassNames.fileItemDragging : ''}`.trim()}
       onClick={onSelect}
       onDoubleClick={onStartRename}
     >
@@ -99,46 +90,44 @@ const SortableFileItem: FC<{
         <GripVertical size={12} />
       </span>
       <FileIcon
+        className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
         filename={file.filename}
         size={14}
-        className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
       />
       {isEditing ? (
         <input
+          autoFocus
           className={`${styles.renameInput} ${styles.semanticClassNames.renameInput}`}
           value={editValue}
-          onChange={(e) => onEditChange(e.target.value)}
           onBlur={onCommitRename}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') onCommitRename()
-            if (e.key === 'Escape') onCancelRename()
-          }}
-          autoFocus
+          onChange={(e) => onEditChange(e.target.value)}
           onClick={(e) => e.stopPropagation()}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') onCommitRename();
+            if (e.key === 'Escape') onCancelRename();
+          }}
         />
       ) : (
-        <span
-          className={`${styles.fileName} ${styles.semanticClassNames.fileName}`}
-        >
+        <span className={`${styles.fileName} ${styles.semanticClassNames.fileName}`}>
           {file.filename}
         </span>
       )}
       {canDelete && (
         <button
-          type="button"
-          className={`${styles.fileDelete} ${styles.semanticClassNames.fileDelete}`}
-          onClick={(e) => {
-            e.stopPropagation()
-            onDelete()
-          }}
           aria-label={`Delete ${file.filename}`}
+          className={`${styles.fileDelete} ${styles.semanticClassNames.fileDelete}`}
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
         >
           <Trash2 size={12} />
         </button>
       )}
     </div>
-  )
-}
+  );
+};
 
 // ─── Main modal ─────────────────────────────────────────
 export const CodeEditorModal: FC<CodeEditorModalProps> = ({
@@ -147,52 +136,41 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
   dismiss,
   colorScheme,
 }) => {
-  const [editFiles, setEditFiles] = useState<CodeFile[]>(() =>
-    initialFiles.map((f) => ({ ...f })),
-  )
-  const [activeFilename, setActiveFilename] = useState(
-    initialFiles[0]?.filename ?? '',
-  )
+  const [editFiles, setEditFiles] = useState<CodeFile[]>(() => initialFiles.map((f) => ({ ...f })));
+  const [activeFilename, setActiveFilename] = useState(initialFiles[0]?.filename ?? '');
 
-  const [editingFilename, setEditingFilename] = useState<string | null>(null)
-  const [newFilenameInput, setNewFilenameInput] = useState('')
-  const [dragActiveId, setDragActiveId] = useState<string | null>(null)
+  const [editingFilename, setEditingFilename] = useState<string | null>(null);
+  const [newFilenameInput, setNewFilenameInput] = useState('');
+  const [dragActiveId, setDragActiveId] = useState<string | null>(null);
 
-  const containerRef = useRef<HTMLDivElement>(null)
-  const editorRef = useRef<EditorView | null>(null)
-  const languageCompartmentRef = useRef<Compartment>(null!)
-  const themeCompartmentRef = useRef<Compartment>(null!)
-  if (!languageCompartmentRef.current)
-    languageCompartmentRef.current = new Compartment()
-  if (!themeCompartmentRef.current)
-    themeCompartmentRef.current = new Compartment()
+  const containerRef = useRef<HTMLDivElement>(null);
+  const editorRef = useRef<EditorView | null>(null);
+  const languageCompartmentRef = useRef<Compartment>(null!);
+  const themeCompartmentRef = useRef<Compartment>(null!);
+  if (!languageCompartmentRef.current) languageCompartmentRef.current = new Compartment();
+  if (!themeCompartmentRef.current) themeCompartmentRef.current = new Compartment();
 
-  const onCodeChangeRef = useRef<(code: string) => void>(undefined)
-  const editFilesRef = useRef(editFiles)
-  editFilesRef.current = editFiles
+  const onCodeChangeRef = useRef<(code: string) => void>(undefined);
+  const editFilesRef = useRef(editFiles);
+  editFilesRef.current = editFiles;
 
-  const activeFile =
-    editFiles.find((f) => f.filename === activeFilename) ?? editFiles[0]
+  const activeFile = editFiles.find((f) => f.filename === activeFilename) ?? editFiles[0];
 
   onCodeChangeRef.current = (code: string) => {
-    setEditFiles((prev) =>
-      prev.map((f) => (f.filename === activeFilename ? { ...f, code } : f)),
-    )
-  }
+    setEditFiles((prev) => prev.map((f) => (f.filename === activeFilename ? { ...f, code } : f)));
+  };
 
   // Recreate editor when switching files
   useEffect(() => {
-    const container = containerRef.current
-    if (!container) return
+    const container = containerRef.current;
+    if (!container) return;
 
-    const file = editFilesRef.current.find((f) => f.filename === activeFilename)
-    if (!file) return
+    const file = editFilesRef.current.find((f) => f.filename === activeFilename);
+    if (!file) return;
 
-    let cancelled = false
+    let cancelled = false;
 
-    const lang = normalizeLanguage(
-      file.language ?? getLanguageFromFilename(file.filename),
-    )
+    const lang = normalizeLanguage(file.language ?? getLanguageFromFilename(file.filename));
 
     const editor = new EditorView({
       parent: container,
@@ -202,70 +180,68 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
           history(),
           keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
           EditorView.updateListener.of((update) => {
-            if (!update.docChanged) return
-            onCodeChangeRef.current?.(update.state.doc.toString())
+            if (!update.docChanged) return;
+            onCodeChangeRef.current?.(update.state.doc.toString());
           }),
           lineNumbers(),
           themeCompartmentRef.current.of(getThemeExtensions(colorScheme)),
           languageCompartmentRef.current.of([]),
         ],
       }),
-    })
+    });
 
-    editorRef.current = editor
-    ;(async () => {
-      const extension = await loadLanguageExtension(lang)
-      if (cancelled) return
+    editorRef.current = editor;
+    (async () => {
+      const extension = await loadLanguageExtension(lang);
+      if (cancelled) return;
       editor.dispatch({
         effects: languageCompartmentRef.current.reconfigure(extension),
-      })
-    })()
+      });
+    })();
 
     return () => {
-      cancelled = true
-      editor.destroy()
-      editorRef.current = null
-    }
-  }, [activeFilename]) // eslint-disable-line react-hooks/exhaustive-deps
+      cancelled = true;
+      editor.destroy();
+      editorRef.current = null;
+    };
+  }, [activeFilename]);
 
   // Sync theme when colorScheme changes
   useEffect(() => {
-    const editor = editorRef.current
-    if (!editor) return
+    const editor = editorRef.current;
+    if (!editor) return;
     editor.dispatch({
-      effects: themeCompartmentRef.current.reconfigure(
-        getThemeExtensions(colorScheme),
-      ),
-    })
-  }, [colorScheme])
+      effects: themeCompartmentRef.current.reconfigure(getThemeExtensions(colorScheme)),
+    });
+  }, [colorScheme]);
 
   const handleDismiss = useCallback(() => {
-    onFilesChange?.(editFiles)
-    dismiss()
-  }, [editFiles, onFilesChange, dismiss])
+    onFilesChange?.(editFiles);
+    dismiss();
+  }, [editFiles, onFilesChange, dismiss]);
 
   const handleAddFile = useCallback(() => {
-    const name = `untitled-${editFiles.length + 1}.ts`
+    const name = `untitled-${editFiles.length + 1}.ts`;
     const newFile: CodeFile = {
       filename: name,
       code: '',
       language: 'typescript',
-    }
-    setEditFiles((prev) => [...prev, newFile])
-    setActiveFilename(name)
-  }, [editFiles.length])
+    };
+    setEditFiles((prev) => [...prev, newFile]);
+    setActiveFilename(name);
+  }, [editFiles.length]);
 
   const handleDeleteFile = useCallback(
     (filename: string) => {
-      if (editFiles.length <= 1) return
-      const newFiles = editFiles.filter((f) => f.filename !== filename)
-      setEditFiles(newFiles)
+      if (editFiles.length <= 1) return;
+      const newFiles = editFiles.filter((f) => f.filename !== filename);
+      setEditFiles(newFiles);
       if (activeFilename === filename) {
-        setActiveFilename(newFiles[0]?.filename ?? '')
+        setActiveFilename(newFiles[0]?.filename ?? '');
       }
     },
     [editFiles, activeFilename],
-  )
+  );
 
   const handleRenameFile = useCallback(
     (oldName: string, newName: string) => {
@@ -273,70 +249,60 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
         !newName.trim() ||
         editFiles.some((f) => f.filename === newName && f.filename !== oldName)
       ) {
-        setEditingFilename(null)
-        return
+        setEditingFilename(null);
+        return;
       }
       setEditFiles((prev) =>
         prev.map((f) =>
-          f.filename === oldName
-            ? { ...f, filename: newName, language: undefined }
-            : f,
+          f.filename === oldName ? { ...f, filename: newName, language: undefined } : f,
         ),
-      )
+      );
       if (activeFilename === oldName) {
-        setActiveFilename(newName)
+        setActiveFilename(newName);
       }
-      setEditingFilename(null)
+      setEditingFilename(null);
     },
     [editFiles, activeFilename],
-  )
+  );
 
   // DnD
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-  )
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
-  const fileIds = useMemo(() => editFiles.map((f) => f.filename), [editFiles])
+  const fileIds = useMemo(() => editFiles.map((f) => f.filename), [editFiles]);
 
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
-      const { active, over } = event
-      setDragActiveId(null)
-      if (!over || active.id === over.id) return
+      const { active, over } = event;
+      setDragActiveId(null);
+      if (!over || active.id === over.id) return;
 
-      const oldIndex = editFiles.findIndex((f) => f.filename === active.id)
-      const newIndex = editFiles.findIndex((f) => f.filename === over.id)
-      if (oldIndex === -1 || newIndex === -1) return
+      const oldIndex = editFiles.findIndex((f) => f.filename === active.id);
+      const newIndex = editFiles.findIndex((f) => f.filename === over.id);
+      if (oldIndex === -1 || newIndex === -1) return;
 
-      setEditFiles(arrayMove(editFiles, oldIndex, newIndex))
+      setEditFiles(arrayMove(editFiles, oldIndex, newIndex));
     },
     [editFiles],
-  )
+  );
 
-  const dragActiveFile = dragActiveId
-    ? editFiles.find((f) => f.filename === dragActiveId)
-    : null
+  const dragActiveFile = dragActiveId ? editFiles.find((f) => f.filename === dragActiveId) : null;
 
-  const { className: portalThemeClassName } = usePortalTheme()
+  const { className: portalThemeClassName } = usePortalTheme();
 
   const language = activeFile
     ? (activeFile.language ?? getLanguageFromFilename(activeFile.filename))
-    : ''
+    : '';
 
   return (
     <div className={`${styles.modal} ${styles.semanticClassNames.modal}`}>
       {/* Title bar */}
-      <div
-        className={`${styles.modalTitlebar} ${styles.semanticClassNames.modalTitlebar}`}
-      >
-        <span
-          className={`${styles.modalTitle} ${styles.semanticClassNames.modalTitle}`}
-        >
+      <div className={`${styles.modalTitlebar} ${styles.semanticClassNames.modalTitlebar}`}>
+        <span className={`${styles.modalTitle} ${styles.semanticClassNames.modalTitle}`}>
           Code Snippet
         </span>
         <button
-          type="button"
           className={`${styles.modalIconButton} ${styles.semanticClassNames.modalIconButton}`}
+          type="button"
           onClick={handleDismiss}
         >
           <X size={14} />
@@ -344,61 +310,46 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
       </div>
 
       {/* Body */}
-      <div
-        className={`${styles.modalBody} ${styles.semanticClassNames.modalBody}`}
-      >
+      <div className={`${styles.modalBody} ${styles.semanticClassNames.modalBody}`}>
         {/* Sidebar */}
-        <div
-          className={`${styles.modalSidebar} ${styles.semanticClassNames.modalSidebar}`}
-        >
-          <div
-            className={`${styles.sidebarHeader} ${styles.semanticClassNames.sidebarHeader}`}
-          >
+        <div className={`${styles.modalSidebar} ${styles.semanticClassNames.modalSidebar}`}>
+          <div className={`${styles.sidebarHeader} ${styles.semanticClassNames.sidebarHeader}`}>
             <span>Files</span>
             <button
-              type="button"
-              className={`${styles.sidebarAddButton} ${styles.semanticClassNames.sidebarAddButton}`}
-              onClick={handleAddFile}
               aria-label="Add file"
+              className={`${styles.sidebarAddButton} ${styles.semanticClassNames.sidebarAddButton}`}
+              type="button"
+              onClick={handleAddFile}
             >
               <Plus size={14} />
             </button>
           </div>
-          <div
-            className={`${styles.fileList} ${styles.semanticClassNames.fileList}`}
-          >
+          <div className={`${styles.fileList} ${styles.semanticClassNames.fileList}`}>
             <DndContext
-              sensors={sensors}
               collisionDetection={closestCenter}
-              onDragStart={(event) =>
-                setDragActiveId(event.active.id as string)
-              }
-              onDragEnd={handleDragEnd}
+              sensors={sensors}
               onDragCancel={() => setDragActiveId(null)}
+              onDragEnd={handleDragEnd}
+              onDragStart={(event) => setDragActiveId(event.active.id as string)}
             >
-              <SortableContext
-                items={fileIds}
-                strategy={verticalListSortingStrategy}
-              >
+              <SortableContext items={fileIds} strategy={verticalListSortingStrategy}>
                 {editFiles.map((file) => (
                   <SortableFileItem
-                    key={file.filename}
+                    canDelete={editFiles.length > 1}
+                    editValue={newFilenameInput}
                     file={file}
                     isActive={file.filename === activeFilename}
                     isEditing={editingFilename === file.filename}
-                    editValue={newFilenameInput}
-                    canDelete={editFiles.length > 1}
+                    key={file.filename}
+                    onCancelRename={() => setEditingFilename(null)}
+                    onCommitRename={() => handleRenameFile(file.filename, newFilenameInput)}
+                    onDelete={() => handleDeleteFile(file.filename)}
+                    onEditChange={setNewFilenameInput}
                     onSelect={() => setActiveFilename(file.filename)}
                     onStartRename={() => {
-                      setEditingFilename(file.filename)
-                      setNewFilenameInput(file.filename)
+                      setEditingFilename(file.filename);
+                      setNewFilenameInput(file.filename);
                     }}
-                    onEditChange={setNewFilenameInput}
-                    onCommitRename={() =>
-                      handleRenameFile(file.filename, newFilenameInput)
-                    }
-                    onCancelRename={() => setEditingFilename(null)}
-                    onDelete={() => handleDeleteFile(file.filename)}
                   />
                 ))}
               </SortableContext>
@@ -406,18 +357,15 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
               {typeof document !== 'undefined'
                 ? createPortal(
                     <DragOverlay>
-                      <div
-                        className={portalThemeClassName}
-                        style={{ display: 'contents' }}
-                      >
+                      <div className={portalThemeClassName} style={{ display: 'contents' }}>
                         {dragActiveFile ? (
                           <div
                             className={`${styles.fileItem()} ${styles.semanticClassNames.fileItem} ${styles.dragOverlay} ${styles.semanticClassNames.dragOverlay}`}
                           >
                             <FileIcon
+                              className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
                               filename={dragActiveFile.filename}
                               size={14}
-                              className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
                             />
                             <span
                               className={`${styles.fileName} ${styles.semanticClassNames.fileName}`}
@@ -436,22 +384,16 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
         </div>
 
         {/* Code panel */}
-        <div
-          className={`${styles.modalEditor} ${styles.semanticClassNames.modalEditor}`}
-        >
+        <div className={`${styles.modalEditor} ${styles.semanticClassNames.modalEditor}`}>
           {/* Breadcrumb bar */}
-          <div
-            className={`${styles.breadcrumb} ${styles.semanticClassNames.breadcrumb}`}
-          >
-            <div
-              className={`${styles.breadcrumbLeft} ${styles.semanticClassNames.breadcrumbLeft}`}
-            >
+          <div className={`${styles.breadcrumb} ${styles.semanticClassNames.breadcrumb}`}>
+            <div className={`${styles.breadcrumbLeft} ${styles.semanticClassNames.breadcrumbLeft}`}>
               {activeFile && (
                 <>
                   <FileIcon
+                    className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
                     filename={activeFile.filename}
                     size={14}
-                    className={`${styles.fileIcon} ${styles.semanticClassNames.fileIcon}`}
                   />
                   <span
                     className={`${styles.breadcrumbName} ${styles.semanticClassNames.breadcrumbName}`}
@@ -472,11 +414,11 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
 
           {/* Editor container */}
           <div
-            ref={containerRef}
             className={`${styles.editorContainer} ${styles.semanticClassNames.editorContainer}`}
+            ref={containerRef}
           />
         </div>
       </div>
     </div>
-  )
-}
+  );
+};

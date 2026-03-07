@@ -1,7 +1,7 @@
-import type { FC, ReactNode } from 'react'
-import { useMemo } from 'react'
+import type { FC, ReactNode } from 'react';
+import { useMemo } from 'react';
 
-import { getMaterialIconSvg } from './material-icon'
+import { getMaterialIconSvg } from './material-icon';
 
 /** Maps file extension to material-icon-theme icon name. */
 export const EXT_TO_ICON: Record<string, string> = {
@@ -54,30 +54,25 @@ export const EXT_TO_ICON: Record<string, string> = {
   dockerfile: 'docker',
   lua: 'lua',
   zig: 'zig',
-}
+};
 
 function getFileIconSvg(filename: string): string | null {
-  const ext = filename.split('.').pop()?.toLowerCase() ?? ''
-  const iconName = EXT_TO_ICON[ext] ?? 'file'
-  return getMaterialIconSvg(iconName)
+  const ext = filename.split('.').pop()?.toLowerCase() ?? '';
+  const iconName = EXT_TO_ICON[ext] ?? 'file';
+  return getMaterialIconSvg(iconName);
 }
 
 export interface FileIconProps {
-  filename: string
-  size?: number
   /** Optional class for the wrapper (e.g. consumer styles). */
-  className?: string
+  className?: string;
   /** Fallback when no icon is found. Default "F". */
-  fallback?: ReactNode
+  fallback?: ReactNode;
+  filename: string;
+  size?: number;
 }
 
-export const FileIcon: FC<FileIconProps> = ({
-  filename,
-  size = 16,
-  className,
-  fallback = 'F',
-}) => {
-  const html = useMemo(() => getFileIconSvg(filename), [filename])
+export const FileIcon: FC<FileIconProps> = ({ filename, size = 16, className, fallback = 'F' }) => {
+  const html = useMemo(() => getFileIconSvg(filename), [filename]);
 
   const wrapperStyle = {
     width: size,
@@ -87,21 +82,21 @@ export const FileIcon: FC<FileIconProps> = ({
     justifyContent: 'center' as const,
     opacity: html ? 1 : 0.5,
     fontSize: size * 0.6,
-  }
+  };
 
   if (!html) {
     return (
       <span className={className} style={wrapperStyle}>
         {fallback}
       </span>
-    )
+    );
   }
 
   return (
     <span
       className={className}
-      style={{ width: size, height: size }}
       dangerouslySetInnerHTML={{ __html: html }}
+      style={{ width: size, height: size }}
     />
-  )
-}
+  );
+};

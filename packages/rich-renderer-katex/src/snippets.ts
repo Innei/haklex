@@ -1,18 +1,18 @@
-export const CURSOR_TOKEN = '__cursor__'
+export const CURSOR_TOKEN = '__cursor__';
 
 export interface KaTeXSnippet {
-  id: string
-  title: string
-  template: string
-  previewEquation: string
-  category: 'Basic' | 'Greek' | 'Operators' | 'Structures'
-  keywords: string[]
+  category: 'Basic' | 'Greek' | 'Operators' | 'Structures';
+  id: string;
+  keywords: string[];
+  previewEquation: string;
+  template: string;
+  title: string;
 }
 
 export interface SnippetInsertionResult {
-  value: string
-  selectionStart: number
-  selectionEnd: number
+  selectionEnd: number;
+  selectionStart: number;
+  value: string;
 }
 
 export const katexSnippets: KaTeXSnippet[] = [
@@ -80,13 +80,13 @@ export const katexSnippets: KaTeXSnippet[] = [
     category: 'Structures',
     keywords: ['piecewise', 'conditional'],
   },
-]
+];
 
 export function filterKaTeXSnippets(query: string): KaTeXSnippet[] {
-  const normalizedQuery = query.trim().toLowerCase()
+  const normalizedQuery = query.trim().toLowerCase();
 
   if (!normalizedQuery) {
-    return katexSnippets
+    return katexSnippets;
   }
 
   return katexSnippets.filter((snippet) => {
@@ -98,10 +98,10 @@ export function filterKaTeXSnippets(query: string): KaTeXSnippet[] {
       ...snippet.keywords,
     ]
       .join(' ')
-      .toLowerCase()
+      .toLowerCase();
 
-    return haystack.includes(normalizedQuery)
-  })
+    return haystack.includes(normalizedQuery);
+  });
 }
 
 export function insertSnippetAtSelection(
@@ -110,22 +110,18 @@ export function insertSnippetAtSelection(
   selectionStart: number | null,
   selectionEnd: number | null,
 ): SnippetInsertionResult {
-  const start = selectionStart ?? value.length
-  const end = selectionEnd ?? start
-  const cursorOffset = template.indexOf(CURSOR_TOKEN)
-  const sanitizedTemplate = template.replace(CURSOR_TOKEN, '')
+  const start = selectionStart ?? value.length;
+  const end = selectionEnd ?? start;
+  const cursorOffset = template.indexOf(CURSOR_TOKEN);
+  const sanitizedTemplate = template.replace(CURSOR_TOKEN, '');
 
-  const nextValue =
-    value.slice(0, start) +
-    sanitizedTemplate +
-    value.slice(Math.max(start, end))
+  const nextValue = value.slice(0, start) + sanitizedTemplate + value.slice(Math.max(start, end));
 
-  const nextCursorPosition =
-    start + (cursorOffset >= 0 ? cursorOffset : sanitizedTemplate.length)
+  const nextCursorPosition = start + (cursorOffset >= 0 ? cursorOffset : sanitizedTemplate.length);
 
   return {
     value: nextValue,
     selectionStart: nextCursorPosition,
     selectionEnd: nextCursorPosition,
-  }
+  };
 }

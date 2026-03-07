@@ -1,4 +1,4 @@
-import type { SerializedEditorState } from 'lexical'
+import type { SerializedEditorState } from 'lexical';
 
 import {
   alertQuote,
@@ -11,14 +11,14 @@ import {
   tableCell,
   tableRow,
   text,
-} from './helpers'
+} from './helpers';
 
 export interface NodeSample {
-  key: string
-  label: string
-  description: string
-  category: 'inline' | 'block' | 'container'
-  data: SerializedEditorState
+  category: 'inline' | 'block' | 'container';
+  data: SerializedEditorState;
+  description: string;
+  key: string;
+  label: string;
 }
 
 export const nodeSamples: NodeSample[] = [
@@ -329,8 +329,7 @@ void bootstrap()`,
   {
     key: 'table',
     label: 'Table',
-    description:
-      'Table with header row, action menu, hover add, and column resize',
+    description: 'Table with header row, action menu, hover add, and column resize',
     category: 'block',
     data: doc(
       table(
@@ -405,9 +404,7 @@ void bootstrap()`,
     data: doc(
       alertQuote(
         'note',
-        paragraph(
-          text('This is a note alert. Use it for additional information.'),
-        ),
+        paragraph(text('This is a note alert. Use it for additional information.')),
       ) as any,
     ),
   },
@@ -441,10 +438,7 @@ void bootstrap()`,
     description: 'Warning alert type',
     category: 'container',
     data: doc(
-      alertQuote(
-        'warning',
-        paragraph(text('⚡ Warning: This operation cannot be undone!')),
-      ) as any,
+      alertQuote('warning', paragraph(text('⚡ Warning: This operation cannot be undone!'))) as any,
     ),
   },
   {
@@ -455,11 +449,7 @@ void bootstrap()`,
     data: doc(
       alertQuote(
         'caution',
-        paragraph(
-          text(
-            '🚨 Caution: Modifying this configuration may break your system.',
-          ),
-        ),
+        paragraph(text('🚨 Caution: Modifying this configuration may break your system.')),
       ) as any,
     ),
   },
@@ -473,11 +463,7 @@ void bootstrap()`,
     data: doc({
       type: 'banner',
       bannerType: 'info',
-      children: [
-        paragraph(
-          text('ℹ️ New feature available! Check out our latest update.'),
-        ),
-      ],
+      children: [paragraph(text('ℹ️ New feature available! Check out our latest update.'))],
       direction: 'ltr',
       format: '',
       indent: 0,
@@ -507,9 +493,7 @@ void bootstrap()`,
     data: doc({
       type: 'banner',
       bannerType: 'warning',
-      children: [
-        paragraph(text('⚠️ Your trial period will expire in 7 days.')),
-      ],
+      children: [paragraph(text('⚠️ Your trial period will expire in 7 days.'))],
       direction: 'ltr',
       format: '',
       indent: 0,
@@ -524,9 +508,7 @@ void bootstrap()`,
     data: doc({
       type: 'banner',
       bannerType: 'error',
-      children: [
-        paragraph(text('❌ Failed to save changes. Please try again.')),
-      ],
+      children: [paragraph(text('❌ Failed to save changes. Please try again.'))],
       direction: 'ltr',
       format: '',
       indent: 0,
@@ -545,9 +527,7 @@ void bootstrap()`,
       summary: 'Click to expand',
       open: false,
       children: [
-        paragraph(
-          text('This content is hidden by default and can be toggled.'),
-        ),
+        paragraph(text('This content is hidden by default and can be toggled.')),
         paragraph(text('Perfect for FAQ sections or additional information.')),
       ],
       direction: 'ltr',
@@ -634,8 +614,7 @@ void bootstrap()`,
   {
     key: 'excalidraw',
     label: 'Excalidraw Canvas',
-    description:
-      'Interactive excalidraw whiteboard (extension node via extraNodes)',
+    description: 'Interactive excalidraw whiteboard (extension node via extraNodes)',
     category: 'block',
     data: doc({
       type: 'excalidraw',
@@ -704,11 +683,7 @@ void bootstrap()`,
       cells: [
         {
           root: {
-            children: [
-              paragraph(
-                text('Left column content with some text', FORMAT_BOLD),
-              ),
-            ],
+            children: [paragraph(text('Left column content with some text', FORMAT_BOLD))],
             direction: null,
             format: '',
             indent: 0,
@@ -719,10 +694,7 @@ void bootstrap()`,
         {
           root: {
             children: [
-              paragraph(
-                text('Right column content with ', 0),
-                text('italic text', FORMAT_ITALIC),
-              ),
+              paragraph(text('Right column content with ', 0), text('italic text', FORMAT_ITALIC)),
             ],
             direction: null,
             format: '',
@@ -735,4 +707,4 @@ void bootstrap()`,
       version: 1,
     } as any),
   },
-]
+];

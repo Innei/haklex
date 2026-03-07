@@ -4,28 +4,25 @@ import type {
   LexicalNode,
   SerializedEditorState,
   SerializedLexicalNode,
-} from 'lexical'
-import { $getRoot, $insertNodes, createEditor } from 'lexical'
-import { LayoutGrid } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { $getRoot, $insertNodes, createEditor } from 'lexical';
+import { LayoutGrid } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { GridEditDecorator } from '../components/decorators/GridEditDecorator'
-import { editorTheme } from '../styles/theme'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
-import {
-  GridContainerNode,
-  type SerializedGridContainerNode,
-} from './GridContainerNode'
-import { NESTED_EDITOR_NODES } from './shared'
+import { GridEditDecorator } from '../components/decorators/GridEditDecorator';
+import { editorTheme } from '../styles/theme';
+import type { SlashMenuItemConfig } from '../types/slash-menu';
+import { GridContainerNode, type SerializedGridContainerNode } from './GridContainerNode';
+import { NESTED_EDITOR_NODES } from './shared';
 
 interface LegacySerializedGridEditNode {
-  type?: string
-  version?: number
-  cols?: number
-  gap?: string | number
-  cells?: SerializedEditorState[]
-  children?: SerializedLexicalNode[]
+  cells?: SerializedEditorState[];
+  children?: SerializedLexicalNode[];
+  cols?: number;
+  gap?: string | number;
+  type?: string;
+  version?: number;
 }
 
 function createCellEditor(): LexicalEditor {
@@ -34,13 +31,13 @@ function createCellEditor(): LexicalEditor {
     nodes: NESTED_EDITOR_NODES,
     theme: editorTheme,
     onError: (error: Error) => {
-      console.error('[GridCell]', error)
+      console.error('[GridCell]', error);
     },
-  })
+  });
 }
 
 export class GridEditNode extends GridContainerNode {
-  __cellEditors: LexicalEditor[]
+  __cellEditors: LexicalEditor[];
 
   static slashMenuItems: SlashMenuItemConfig[] = [
     {
@@ -51,50 +48,40 @@ export class GridEditNode extends GridContainerNode {
       section: 'LAYOUT',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createGridEditNode(2)])
-        })
+          $insertNodes([$createGridEditNode(2)]);
+        });
       },
     },
-  ]
+  ];
 
   static clone(node: GridEditNode): GridEditNode {
-    const cloned = new GridEditNode(
-      node.__cols,
-      node.__gap,
-      node.__cellStates,
-      node.__key,
-    )
-    cloned.__cellEditors = [...node.__cellEditors]
-    return cloned
+    const cloned = new GridEditNode(node.__cols, node.__gap, node.__cellStates, node.__key);
+    cloned.__cellEditors = [...node.__cellEditors];
+    return cloned;
   }
 
-  constructor(
-    cols = 2,
-    gap?: string,
-    cellStates?: SerializedEditorState[],
-    key?: string,
-  ) {
-    super(cols, gap, cellStates, key)
+  constructor(cols = 2, gap?: string, cellStates?: SerializedEditorState[], key?: string) {
+    super(cols, gap, cellStates, key);
     this.__cellEditors = this.__cellStates.map((state) => {
-      const editor = createCellEditor()
-      const editorState = editor.parseEditorState(state)
-      editor.setEditorState(editorState)
-      return editor
-    })
+      const editor = createCellEditor();
+      const editorState = editor.parseEditorState(state);
+      editor.setEditorState(editorState);
+      return editor;
+    });
   }
 
   getCellEditors(): LexicalEditor[] {
-    return this.getLatest().__cellEditors
+    return this.getLatest().__cellEditors;
   }
 
   setCols(cols: number): void {
-    const writable = this.getWritable() as GridEditNode
-    const prev = writable.__cellEditors.length
-    writable.__cols = cols
+    const writable = this.getWritable() as GridEditNode;
+    const prev = writable.__cellEditors.length;
+    writable.__cols = cols;
     if (cols > prev) {
       for (let i = prev; i < cols; i++) {
-        const editor = createCellEditor()
-        writable.__cellEditors.push(editor)
+        const editor = createCellEditor();
+        writable.__cellEditors.push(editor);
         const emptyState = {
           root: {
             children: [
@@ -115,17 +102,17 @@ export class GridEditNode extends GridContainerNode {
             type: 'root',
             version: 1,
           },
-        } as unknown as SerializedEditorState
-        writable.__cellStates.push(emptyState)
+        } as unknown as SerializedEditorState;
+        writable.__cellStates.push(emptyState);
       }
     }
   }
 
   addCells(count: number): void {
-    const writable = this.getWritable() as GridEditNode
+    const writable = this.getWritable() as GridEditNode;
     for (let i = 0; i < count; i++) {
-      const editor = createCellEditor()
-      writable.__cellEditors.push(editor)
+      const editor = createCellEditor();
+      writable.__cellEditors.push(editor);
       const emptyState = {
         root: {
           children: [
@@ -146,57 +133,55 @@ export class GridEditNode extends GridContainerNode {
           type: 'root',
           version: 1,
         },
-      } as unknown as SerializedEditorState
-      writable.__cellStates.push(emptyState)
+      } as unknown as SerializedEditorState;
+      writable.__cellStates.push(emptyState);
     }
   }
 
   removeCells(count: number): void {
-    const writable = this.getWritable() as GridEditNode
-    const editors = writable.__cellEditors
-    const states = writable.__cellStates
-    const toRemove = Math.min(count, editors.length)
+    const writable = this.getWritable() as GridEditNode;
+    const editors = writable.__cellEditors;
+    const states = writable.__cellStates;
+    const toRemove = Math.min(count, editors.length);
     for (let i = 0; i < toRemove; i++) {
-      const editor = editors.at(-1)
-      if (!editor) break
+      const editor = editors.at(-1);
+      if (!editor) break;
       const isEmpty = editor.getEditorState().read(() => {
-        return $getRoot().getTextContentSize() === 0
-      })
-      if (!isEmpty) break
-      editors.pop()
-      states.pop()
+        return $getRoot().getTextContentSize() === 0;
+      });
+      if (!isEmpty) break;
+      editors.pop();
+      states.pop();
     }
   }
 
   static importJSON(serializedNode: SerializedGridContainerNode): GridEditNode {
-    const legacy = serializedNode as LegacySerializedGridEditNode
-    const cols = legacy.cols || 2
-    const rawGap = legacy.gap
-    const gap = typeof rawGap === 'number' ? `${rawGap}px` : rawGap
+    const legacy = serializedNode as LegacySerializedGridEditNode;
+    const cols = legacy.cols || 2;
+    const rawGap = legacy.gap;
+    const gap = typeof rawGap === 'number' ? `${rawGap}px` : rawGap;
 
     if (legacy.cells && legacy.cells.length > 0) {
-      return new GridEditNode(cols, gap, legacy.cells)
+      return new GridEditNode(cols, gap, legacy.cells);
     }
 
     if (legacy.children) {
-      const cellStates: SerializedEditorState[] = legacy.children.map(
-        (child) => {
-          return {
-            root: {
-              children: [child],
-              direction: null,
-              format: '',
-              indent: 0,
-              type: 'root',
-              version: 1,
-            },
-          } as unknown as SerializedEditorState
-        },
-      )
-      return new GridEditNode(cols, gap, cellStates)
+      const cellStates: SerializedEditorState[] = legacy.children.map((child) => {
+        return {
+          root: {
+            children: [child],
+            direction: null,
+            format: '',
+            indent: 0,
+            type: 'root',
+            version: 1,
+          },
+        } as unknown as SerializedEditorState;
+      });
+      return new GridEditNode(cols, gap, cellStates);
     }
 
-    return new GridEditNode(cols, gap)
+    return new GridEditNode(cols, gap);
   }
 
   exportJSON(): SerializedGridContainerNode {
@@ -205,11 +190,9 @@ export class GridEditNode extends GridContainerNode {
       type: 'grid-container',
       cols: this.__cols,
       gap: this.__gap,
-      cells: this.__cellEditors.map((editor) =>
-        editor.getEditorState().toJSON(),
-      ),
+      cells: this.__cellEditors.map((editor) => editor.getEditorState().toJSON()),
       version: 1,
-    }
+    };
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -218,16 +201,14 @@ export class GridEditNode extends GridContainerNode {
       cols: this.__cols,
       gap: this.__gap,
       cellEditors: this.__cellEditors,
-    })
+    });
   }
 }
 
 export function $createGridEditNode(cols = 2, gap?: string): GridEditNode {
-  return new GridEditNode(cols, gap)
+  return new GridEditNode(cols, gap);
 }
 
-export function $isGridEditNode(
-  node: LexicalNode | null | undefined,
-): node is GridEditNode {
-  return node instanceof GridEditNode
+export function $isGridEditNode(node: LexicalNode | null | undefined): node is GridEditNode {
+  return node instanceof GridEditNode;
 }

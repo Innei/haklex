@@ -6,81 +6,63 @@ import {
   getVariantClass,
   NestedContentRendererProvider,
   RendererConfigProvider,
-} from '@haklex/rich-editor/static'
-import { PortalThemeProvider } from '@haklex/rich-style-token'
-import { createHeadlessEditor } from '@lexical/headless'
-import type { LexicalEditor, SerializedEditorState } from 'lexical'
-import { $getRoot } from 'lexical'
-import {
-  cloneElement,
-  createElement,
-  isValidElement,
-  type ReactNode,
-  useMemo,
-} from 'react'
+} from '@haklex/rich-editor/static';
+import { PortalThemeProvider } from '@haklex/rich-style-token';
+import { createHeadlessEditor } from '@lexical/headless';
+import type { LexicalEditor, SerializedEditorState } from 'lexical';
+import { $getRoot } from 'lexical';
+import { cloneElement, createElement, isValidElement, type ReactNode, useMemo } from 'react';
 
-import { renderBuiltinNode } from './engine/renderBuiltinNode'
-import { renderTextNode } from './engine/renderTextNode'
-import { preprocessFootnotes } from './preprocess/footnote'
-import type { BuiltinNodeRenderer, RichRendererProps } from './types'
+import { renderBuiltinNode } from './engine/renderBuiltinNode';
+import { renderTextNode } from './engine/renderTextNode';
+import { preprocessFootnotes } from './preprocess/footnote';
+import type { BuiltinNodeRenderer, RichRendererProps } from './types';
 
 interface EditorConfig {
-  namespace: string
-  theme: Record<string, any>
+  namespace: string;
+  theme: Record<string, any>;
 }
 
-function wrapDecoration(
-  serialized: any,
-  key: string,
-  decoration: ReactNode,
-): ReactNode {
+function wrapDecoration(serialized: any, key: string, decoration: ReactNode): ReactNode {
   switch (serialized.type) {
-    case 'alert-quote':
+    case 'alert-quote': {
       return createElement(
         'div',
         { key, className: `rich-alert rich-alert-${serialized.alertType}` },
         decoration,
-      )
-    case 'banner':
+      );
+    }
+    case 'banner': {
       return createElement(
         'div',
         { key, className: `rich-banner rich-banner-${serialized.bannerType}` },
         decoration,
-      )
-    case 'grid-container':
-      return createElement(
-        'div',
-        { key, className: 'rich-grid-container' },
-        decoration,
-      )
-    default:
+      );
+    }
+    case 'grid-container': {
+      return createElement('div', { key, className: 'rich-grid-container' }, decoration);
+    }
+    default: {
       if (isValidElement(decoration)) {
-        return cloneElement(decoration, { key })
+        return cloneElement(decoration, { key });
       }
-      return decoration
+      return decoration;
+    }
   }
 }
 
-function applyBlockId(
-  element: ReactNode,
-  blockId: string | undefined,
-  nodeKey: string,
-): ReactNode {
-  if (!blockId) return element
+function applyBlockId(element: ReactNode, blockId: string | undefined, nodeKey: string): ReactNode {
+  if (!blockId) return element;
 
   if (isValidElement(element) && typeof element.type === 'string') {
-    return cloneElement(element as any, { 'data-block-id': blockId } as any)
+    return cloneElement(element as any, { 'data-block-id': blockId } as any);
   }
 
   return (
-    <div
-      key={`${nodeKey}-block-anchor`}
-      className="rich-block-anchor"
-      data-block-id={blockId}
-    >
+    <div className="rich-block-anchor" data-block-id={blockId} key={`${nodeKey}-block-anchor`}>
       {element}
     </div>
-  )
+  );
 }
 
 function renderTree(
@@ -92,33 +74,29 @@ function renderTree(
   blockId?: string,
   builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>,
 ): ReactNode {
-  const nodeKey = node.getKey ? node.getKey() : key
+  const nodeKey = node.getKey ? node.getKey() : key;
 
   if (typeof node.decorate === 'function') {
     try {
-      const decoration = node.decorate(editor, editorConfig)
+      const decoration = node.decorate(editor, editorConfig);
       if (decoration != null) {
-        const serialized = node.exportJSON ? node.exportJSON() : {}
-        return applyBlockId(
-          wrapDecoration(serialized, nodeKey, decoration),
-          blockId,
-          nodeKey,
-        )
+        const serialized = node.exportJSON ? node.exportJSON() : {};
+        return applyBlockId(wrapDecoration(serialized, nodeKey, decoration), blockId, nodeKey);
       }
     } catch {
       /* fallthrough to builtin */
     }
   }
 
-  const serialized = node.exportJSON ? node.exportJSON() : {}
+  const serialized = node.exportJSON ? node.exportJSON() : {};
 
   if (serialized.type === 'text') {
-    return renderTextNode(serialized, nodeKey)
+    return renderTextNode(serialized, nodeKey);
   }
 
-  let children: ReactNode[] | null = null
+  let children: ReactNode[] | null = null;
   if (node.getChildren) {
-    const childNodes = node.getChildren()
+    const childNodes = node.getChildren();
     if (childNodes.length > 0) {
       children = childNodes.map((child: any, i: number) =>
         renderTree(
@@ -130,34 +108,24 @@ function renderTree(
           undefined,
           builtinNodeOverrides,
         ),
-      )
+      );
     }
   }
 
-  const textContent = node.getTextContent ? node.getTextContent() : undefined
+  const textContent = node.getTextContent ? node.getTextContent() : undefined;
 
-  const override = builtinNodeOverrides?.[serialized.type]
+  const override = builtinNodeOverrides?.[serialized.type];
   if (override) {
     const defaultRenderer = () =>
-      renderBuiltinNode(
-        serialized,
-        nodeKey,
-        children,
-        headingSlugs,
-        textContent,
-      )
-    return applyBlockId(
-      override(serialized, nodeKey, children, defaultRenderer),
-      blockId,
-      nodeKey,
-    )
+      renderBuiltinNode(serialized, nodeKey, children, headingSlugs, textContent);
+    return applyBlockId(override(serialized, nodeKey, children, defaultRenderer), blockId, nodeKey);
   }
 
   return applyBlockId(
     renderBuiltinNode(serialized, nodeKey, children, headingSlugs, textContent),
     blockId,
     nodeKey,
-  )
+  );
 }
 
 function renderEditorToReact(
@@ -165,32 +133,32 @@ function renderEditorToReact(
   nodes: any[],
   builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>,
 ): {
-  content: ReactNode
-  footnoteData: ReturnType<typeof preprocessFootnotes>
-  renderNestedContent: (state: SerializedEditorState) => ReactNode
+  content: ReactNode;
+  footnoteData: ReturnType<typeof preprocessFootnotes>;
+  renderNestedContent: (state: SerializedEditorState) => ReactNode;
 } {
   const editor = createHeadlessEditor({
     nodes,
     theme: editorTheme,
     editable: false,
     onError: (error: Error) => {
-      console.error('[RichRenderer]', error)
+      console.error('[RichRenderer]', error);
     },
-  })
+  });
 
-  const editorConfig: EditorConfig = { namespace: 'ssr', theme: editorTheme }
+  const editorConfig: EditorConfig = { namespace: 'ssr', theme: editorTheme };
 
-  const editorState = editor.parseEditorState(value)
-  editor.setEditorState(editorState)
+  const editorState = editor.parseEditorState(value);
+  editor.setEditorState(editorState);
 
-  const footnoteData = preprocessFootnotes(value)
+  const footnoteData = preprocessFootnotes(value);
 
-  const rawRootChildren = (value as any).root?.children as any[] | undefined
+  const rawRootChildren = (value as any).root?.children as any[] | undefined;
 
-  let content: ReactNode = null
+  let content: ReactNode = null;
   editorState.read(() => {
-    const root = $getRoot()
-    const headingSlugs = new Map<string, number>()
+    const root = $getRoot();
+    const headingSlugs = new Map<string, number>();
     const children = root
       .getChildren()
       .map((child: any, i: number) =>
@@ -203,9 +171,9 @@ function renderEditorToReact(
           rawRootChildren?.[i]?.$?.blockId,
           builtinNodeOverrides,
         ),
-      )
-    content = <>{children}</>
-  })
+      );
+    content = <>{children}</>;
+  });
 
   const renderNestedContent = (state: SerializedEditorState): ReactNode => {
     const nestedEditor = createHeadlessEditor({
@@ -213,20 +181,20 @@ function renderEditorToReact(
       theme: editorTheme,
       editable: false,
       onError: (error: Error) => {
-        console.error('[RichRenderer:nested]', error)
+        console.error('[RichRenderer:nested]', error);
       },
-    })
+    });
     const nestedEditorConfig: EditorConfig = {
       namespace: 'ssr-nested',
       theme: editorTheme,
-    }
-    const nestedState = nestedEditor.parseEditorState(state)
-    nestedEditor.setEditorState(nestedState)
-    let nested: ReactNode = null
-    const nestedRawChildren = (state as any).root?.children as any[] | undefined
+    };
+    const nestedState = nestedEditor.parseEditorState(state);
+    nestedEditor.setEditorState(nestedState);
+    let nested: ReactNode = null;
+    const nestedRawChildren = (state as any).root?.children as any[] | undefined;
     nestedState.read(() => {
-      const root = $getRoot()
-      const headingSlugs = new Map<string, number>()
+      const root = $getRoot();
+      const headingSlugs = new Map<string, number>();
       const ch = root
         .getChildren()
         .map((child: any, i: number) =>
@@ -239,13 +207,13 @@ function renderEditorToReact(
             nestedRawChildren?.[i]?.$?.blockId,
             builtinNodeOverrides,
           ),
-        )
-      nested = <>{ch}</>
-    })
-    return nested
-  }
+        );
+      nested = <>{ch}</>;
+    });
+    return nested;
+  };
 
-  return { content, footnoteData, renderNestedContent }
+  return { content, footnoteData, renderNestedContent };
 }
 
 export function RichRenderer({
@@ -259,35 +227,29 @@ export function RichRenderer({
   extraNodes,
   builtinNodeOverrides,
 }: RichRendererProps) {
-  const variantClass = getVariantClass(variant)
+  const variantClass = getVariantClass(variant);
 
   const { content, footnoteData, renderNestedContent } = useMemo(() => {
-    const nodes = extraNodes ? [...allNodes, ...extraNodes] : allNodes
-    return renderEditorToReact(value, nodes, builtinNodeOverrides)
-  }, [builtinNodeOverrides, extraNodes, value])
+    const nodes = extraNodes ? [...allNodes, ...extraNodes] : allNodes;
+    return renderEditorToReact(value, nodes, builtinNodeOverrides);
+  }, [builtinNodeOverrides, extraNodes, value]);
 
-  const classes = ['rich-content', variantClass, className]
-    .filter(Boolean)
-    .join(' ')
+  const classes = ['rich-content', variantClass, className].filter(Boolean).join(' ');
 
   return (
     <PortalThemeProvider className={variantClass} theme={theme}>
       <ColorSchemeProvider colorScheme={theme}>
-        <RendererConfigProvider
-          config={rendererConfig}
-          mode="renderer"
-          variant={variant}
-        >
+        <RendererConfigProvider config={rendererConfig} mode="renderer" variant={variant}>
           <FootnoteDefinitionsProvider
             definitions={footnoteData.definitions}
             displayNumberMap={footnoteData.displayNumberMap}
           >
             <NestedContentRendererProvider value={renderNestedContent}>
               <Component
-                className={classes}
-                style={style}
-                data-theme={theme}
                 suppressHydrationWarning
+                className={classes}
+                data-theme={theme}
+                style={style}
               >
                 {content}
               </Component>
@@ -296,5 +258,5 @@ export function RichRenderer({
         </RendererConfigProvider>
       </ColorSchemeProvider>
     </PortalThemeProvider>
-  )
+  );
 }

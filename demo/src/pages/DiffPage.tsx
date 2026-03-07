@@ -1,21 +1,20 @@
-import '@haklex/rich-diff/style.css'
+import '@haklex/rich-diff/style.css';
 
-import { RichDiff } from '@haklex/rich-diff'
-import type { RichEditorVariant } from '@haklex/rich-editor'
-import { RichRenderer } from '@haklex/rich-static-renderer'
-import { useState } from 'react'
+import { RichDiff } from '@haklex/rich-diff';
+import type { RichEditorVariant } from '@haklex/rich-editor';
+import { RichRenderer } from '@haklex/rich-static-renderer';
+import { useState } from 'react';
 
-import { Panel } from '../components/Panel'
-import { useTheme } from '../context/ThemeContext'
-import { diffSamples } from '../fixtures/diff-samples'
+import { Panel } from '../components/Panel';
+import { useTheme } from '../context/ThemeContext';
+import { diffSamples } from '../fixtures/diff-samples';
 
 export function DiffPage() {
-  const theme = useTheme()
-  const [variant, setVariant] = useState<RichEditorVariant>('comment')
-  const [selectedKey, setSelectedKey] = useState(diffSamples[0].key)
+  const theme = useTheme();
+  const [variant, setVariant] = useState<RichEditorVariant>('comment');
+  const [selectedKey, setSelectedKey] = useState(diffSamples[0].key);
 
-  const selected =
-    diffSamples.find((s) => s.key === selectedKey) || diffSamples[0]
+  const selected = diffSamples.find((s) => s.key === selectedKey) || diffSamples[0];
 
   return (
     <div className="page">
@@ -24,10 +23,10 @@ export function DiffPage() {
           <span className="toolbar-label">Sample</span>
           {diffSamples.map((sample) => (
             <button
-              key={sample.key}
               className={selectedKey === sample.key ? 'btn btn-active' : 'btn'}
-              onClick={() => setSelectedKey(sample.key)}
+              key={sample.key}
               title={sample.description}
+              onClick={() => setSelectedKey(sample.key)}
             >
               {sample.label}
             </button>
@@ -50,17 +49,14 @@ export function DiffPage() {
         </div>
       </div>
 
-      <Panel
-        title="Side-by-Side Diff"
-        badge={`${selected.label} · ${variant} · ${theme}`}
-      >
+      <Panel badge={`${selected.label} · ${variant} · ${theme}`} title="Side-by-Side Diff">
         <RichDiff
-          key={selected.key}
-          oldValue={selected.oldValue}
-          newValue={selected.newValue}
-          variant={variant}
-          theme={theme}
           className={theme === 'dark' ? 'rich-diff-dark' : ''}
+          key={selected.key}
+          newValue={selected.newValue}
+          oldValue={selected.oldValue}
+          theme={theme}
+          variant={variant}
         />
       </Panel>
 
@@ -75,20 +71,20 @@ export function DiffPage() {
         <Panel title="Old">
           <RichRenderer
             key={`${selected.key}-old`}
+            theme={theme}
             value={selected.oldValue}
             variant={variant}
-            theme={theme}
           />
         </Panel>
         <Panel title="New">
           <RichRenderer
             key={`${selected.key}-new`}
+            theme={theme}
             value={selected.newValue}
             variant={variant}
-            theme={theme}
           />
         </Panel>
       </div>
     </div>
-  )
+  );
 }

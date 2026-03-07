@@ -1,20 +1,14 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 interface PanelProps {
-  title: string
-  badge?: string
-  headerExtra?: ReactNode
-  children: ReactNode
-  bodyStyle?: React.CSSProperties
+  badge?: string;
+  bodyStyle?: React.CSSProperties;
+  children: ReactNode;
+  headerExtra?: ReactNode;
+  title: string;
 }
 
-export function Panel({
-  title,
-  badge,
-  headerExtra,
-  children,
-  bodyStyle,
-}: PanelProps) {
+export function Panel({ title, badge, headerExtra, children, bodyStyle }: PanelProps) {
   return (
     <div className="panel">
       <div className="panel-header">
@@ -28,5 +22,5 @@ export function Panel({
         {children}
       </div>
     </div>
-  )
+  );
 }

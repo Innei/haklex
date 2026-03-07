@@ -1,5 +1,5 @@
-import { collectCommandItems } from '@haklex/rich-editor'
-import type { TooltipRootProps } from '@haklex/rich-editor-ui'
+import { collectCommandItems } from '@haklex/rich-editor/commands';
+import type { TooltipRootProps } from '@haklex/rich-editor-ui';
 import {
   createTooltipHandle,
   DropdownMenu,
@@ -10,22 +10,22 @@ import {
   TooltipProvider,
   TooltipRoot,
   TooltipTrigger,
-} from '@haklex/rich-editor-ui'
+} from '@haklex/rich-editor-ui';
 import {
   $isListNode,
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
-} from '@lexical/list'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text'
+} from '@lexical/list';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text';
 import {
   $getSelectionStyleValueForProperty,
   $patchStyleText,
   $setBlocksType,
-} from '@lexical/selection'
-import { $findMatchingParent } from '@lexical/utils'
-import type { ElementFormatType, ElementNode } from 'lexical'
+} from '@lexical/selection';
+import { $findMatchingParent } from '@lexical/utils';
+import type { ElementFormatType, ElementNode } from 'lexical';
 import {
   $createParagraphNode,
   $getSelection,
@@ -39,7 +39,7 @@ import {
   FORMAT_TEXT_COMMAND,
   REDO_COMMAND,
   UNDO_COMMAND,
-} from 'lexical'
+} from 'lexical';
 import {
   AlignCenter,
   AlignJustify,
@@ -61,24 +61,24 @@ import {
   Strikethrough,
   Underline,
   Undo,
-} from 'lucide-react'
-import type { CSSProperties, ReactElement } from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+} from 'lucide-react';
+import type { CSSProperties, ReactElement } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
-import * as css from './styles.css'
-import { ToolbarButton } from './ToolbarButton'
-import { ToolbarDropdown } from './ToolbarDropdown'
-import { ToolbarSeparator } from './ToolbarSeparator'
-import type { ToolbarTooltipPayload } from './types'
+import * as css from './styles.css';
+import { ToolbarButton } from './ToolbarButton';
+import { ToolbarDropdown } from './ToolbarDropdown';
+import { ToolbarSeparator } from './ToolbarSeparator';
+import type { ToolbarTooltipPayload } from './types';
 
-const ICON_SIZE = 15
-const ICON_STROKE = 2
+const ICON_SIZE = 15;
+const ICON_STROKE = 2;
 
 // ─── Font Family ────────────────────────────────────────
 
 interface FontFamilyDef {
-  label: string
-  value: string
+  label: string;
+  value: string;
 }
 
 const FONT_FAMILIES: FontFamilyDef[] = [
@@ -95,31 +95,23 @@ const FONT_FAMILIES: FontFamilyDef[] = [
   { label: 'Sans', value: 'system-ui, -apple-system, sans-serif' },
   { label: 'Serif', value: 'Georgia, "Times New Roman", serif' },
   { label: 'Mono', value: 'ui-monospace, "SF Mono", "Fira Code", monospace' },
-]
+];
 
 function getFontLabel(fontFamily: string): string {
-  if (!fontFamily) return '默认'
-  const match = FONT_FAMILIES.find((f) => f.value === fontFamily)
-  if (match) return match.label
+  if (!fontFamily) return '默认';
+  const match = FONT_FAMILIES.find((f) => f.value === fontFamily);
+  if (match) return match.label;
   for (const def of FONT_FAMILIES) {
     if (def.value && fontFamily.startsWith(def.value.split(',')[0]!)) {
-      return def.label
+      return def.label;
     }
   }
-  return '默认'
+  return '默认';
 }
 
 // ─── Block Type ─────────────────────────────────────────
 
-type BlockType =
-  | 'paragraph'
-  | 'h1'
-  | 'h2'
-  | 'h3'
-  | 'bullet'
-  | 'number'
-  | 'check'
-  | 'other'
+type BlockType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'bullet' | 'number' | 'check' | 'other';
 
 const BLOCK_TYPE_LABELS: Record<BlockType, string> = {
   paragraph: 'Text',
@@ -130,22 +122,22 @@ const BLOCK_TYPE_LABELS: Record<BlockType, string> = {
   number: 'Numbered List',
   check: 'To-do List',
   other: 'Other',
-}
+};
 
 // ─── State ──────────────────────────────────────────────
 
 interface ToolbarState {
-  canUndo: boolean
-  canRedo: boolean
-  blockType: BlockType
-  fontFamily: string
-  elementFormat: ElementFormatType
-  isBold: boolean
-  isItalic: boolean
-  isUnderline: boolean
-  isStrikethrough: boolean
-  isCode: boolean
-  isHighlight: boolean
+  blockType: BlockType;
+  canRedo: boolean;
+  canUndo: boolean;
+  elementFormat: ElementFormatType;
+  fontFamily: string;
+  isBold: boolean;
+  isCode: boolean;
+  isHighlight: boolean;
+  isItalic: boolean;
+  isStrikethrough: boolean;
+  isUnderline: boolean;
 }
 
 const INITIAL_STATE: ToolbarState = {
@@ -160,34 +152,34 @@ const INITIAL_STATE: ToolbarState = {
   isStrikethrough: false,
   isCode: false,
   isHighlight: false,
-}
+};
 
 function getBlockType(anchorNode: ElementNode): BlockType {
   if ($isHeadingNode(anchorNode)) {
-    const tag = anchorNode.getTag()
-    if (tag === 'h1' || tag === 'h2' || tag === 'h3') return tag
-    return 'other'
+    const tag = anchorNode.getTag();
+    if (tag === 'h1' || tag === 'h2' || tag === 'h3') return tag;
+    return 'other';
   }
   if ($isListNode(anchorNode)) {
-    const listType = anchorNode.getListType()
-    if (listType === 'bullet') return 'bullet'
-    if (listType === 'number') return 'number'
-    if (listType === 'check') return 'check'
-    return 'other'
+    const listType = anchorNode.getListType();
+    if (listType === 'bullet') return 'bullet';
+    if (listType === 'number') return 'number';
+    if (listType === 'check') return 'check';
+    return 'other';
   }
-  const type = anchorNode.getType()
-  if (type === 'paragraph') return 'paragraph'
-  return 'other'
+  const type = anchorNode.getType();
+  if (type === 'paragraph') return 'paragraph';
+  return 'other';
 }
 
 // ─── Component ──────────────────────────────────────────
 
-const DEFAULT_MAX_VISIBLE_INSERT_ITEMS = 5
+const DEFAULT_MAX_VISIBLE_INSERT_ITEMS = 5;
 
 export interface ToolbarPluginProps {
-  className?: string
-  maxVisibleInsertItems?: number
-  insertItemOrder?: string[]
+  className?: string;
+  insertItemOrder?: string[];
+  maxVisibleInsertItems?: number;
 }
 
 export function ToolbarPlugin({
@@ -195,55 +187,47 @@ export function ToolbarPlugin({
   maxVisibleInsertItems = DEFAULT_MAX_VISIBLE_INSERT_ITEMS,
   insertItemOrder,
 }: ToolbarPluginProps): ReactElement {
-  const [editor] = useLexicalComposerContext()
-  const [state, setState] = useState<ToolbarState>(INITIAL_STATE)
-  const [tooltipHandle] = useState(() =>
-    createTooltipHandle<ToolbarTooltipPayload>(),
-  )
+  const [editor] = useLexicalComposerContext();
+  const [state, setState] = useState<ToolbarState>(INITIAL_STATE);
+  const [tooltipHandle] = useState(() => createTooltipHandle<ToolbarTooltipPayload>());
 
   const toolbarItems = useMemo(() => {
     const items = collectCommandItems(editor).filter(
       (item) => item.placement?.includes('toolbar') && item.group === 'insert',
-    )
-    if (!insertItemOrder || insertItemOrder.length === 0) return items
+    );
+    if (!insertItemOrder || insertItemOrder.length === 0) return items;
     return items.sort((a, b) => {
-      const ai = insertItemOrder.indexOf(a.title)
-      const bi = insertItemOrder.indexOf(b.title)
-      return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi)
-    })
-  }, [editor, insertItemOrder])
+      const ai = insertItemOrder.indexOf(a.title);
+      const bi = insertItemOrder.indexOf(b.title);
+      return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
+    });
+  }, [editor, insertItemOrder]);
 
   const updateToolbar = useCallback(() => {
-    const selection = $getSelection()
-    if (!$isRangeSelection(selection)) return
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) return;
 
-    const anchorNode = selection.anchor.getNode()
+    const anchorNode = selection.anchor.getNode();
     let element =
       anchorNode.getKey() === 'root'
         ? anchorNode
         : ($findMatchingParent(anchorNode, (e) => {
-            const parent = e.getParent()
-            return parent !== null && $isRootOrShadowRoot(parent)
-          }) ?? anchorNode.getTopLevelElementOrThrow())
+            const parent = e.getParent();
+            return parent !== null && $isRootOrShadowRoot(parent);
+          }) ?? anchorNode.getTopLevelElementOrThrow());
 
     if ($isListNode(element)) {
-      const parentList = $findMatchingParent(anchorNode, (node) =>
-        $isListNode(node),
-      )
+      const parentList = $findMatchingParent(anchorNode, (node) => $isListNode(node));
       if (parentList) {
-        element = parentList
+        element = parentList;
       }
     }
 
-    const blockType = getBlockType(element as ElementNode)
-    const fontFamily = $getSelectionStyleValueForProperty(
-      selection,
-      'font-family',
-      '',
-    )
+    const blockType = getBlockType(element as ElementNode);
+    const fontFamily = $getSelectionStyleValueForProperty(selection, 'font-family', '');
     const elementFormat: ElementFormatType = $isElementNode(element)
       ? element.getFormatType()
-      : 'left'
+      : 'left';
 
     setState((prev) => ({
       ...prev,
@@ -256,64 +240,60 @@ export function ToolbarPlugin({
       isStrikethrough: selection.hasFormat('strikethrough'),
       isCode: selection.hasFormat('code'),
       isHighlight: selection.hasFormat('highlight'),
-    }))
-  }, [])
+    }));
+  }, []);
 
   useEffect(() => {
     const unregisterUndo = editor.registerCommand(
       CAN_UNDO_COMMAND,
       (payload) => {
-        setState((prev) => ({ ...prev, canUndo: payload }))
-        return false
+        setState((prev) => ({ ...prev, canUndo: payload }));
+        return false;
       },
       COMMAND_PRIORITY_LOW,
-    )
+    );
     const unregisterRedo = editor.registerCommand(
       CAN_REDO_COMMAND,
       (payload) => {
-        setState((prev) => ({ ...prev, canRedo: payload }))
-        return false
+        setState((prev) => ({ ...prev, canRedo: payload }));
+        return false;
       },
       COMMAND_PRIORITY_LOW,
-    )
-    const unregisterUpdate = editor.registerUpdateListener(
-      ({ editorState }) => {
-        editorState.read(() => {
-          updateToolbar()
-        })
-      },
-    )
+    );
+    const unregisterUpdate = editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        updateToolbar();
+      });
+    });
     return () => {
-      unregisterUndo()
-      unregisterRedo()
-      unregisterUpdate()
-    }
-  }, [editor, updateToolbar])
+      unregisterUndo();
+      unregisterRedo();
+      unregisterUpdate();
+    };
+  }, [editor, updateToolbar]);
 
   const applyFontFamily = useCallback(
     (value: string) => {
       editor.update(() => {
-        const selection = $getSelection()
+        const selection = $getSelection();
         if ($isRangeSelection(selection)) {
-          $patchStyleText(selection, { 'font-family': value || '' })
+          $patchStyleText(selection, { 'font-family': value || '' });
         }
-      })
+      });
     },
     [editor],
-  )
+  );
 
   const fontFamilyItems = useMemo(
     () =>
       FONT_FAMILIES.map((def) => ({
         label: def.label,
         active: state.fontFamily === def.value,
-        style: def.value
-          ? ({ fontFamily: def.value } as CSSProperties)
-          : undefined,
+        style: def.value ? ({ fontFamily: def.value } as CSSProperties) : undefined,
         onSelect: () => applyFontFamily(def.value),
       })),
     [state.fontFamily, applyFontFamily],
-  )
+  );
 
   const headingItems = useMemo(
     () => [
@@ -323,11 +303,11 @@ export function ToolbarPlugin({
         active: state.blockType === 'paragraph',
         onSelect: () => {
           editor.update(() => {
-            const selection = $getSelection()
+            const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createParagraphNode())
+              $setBlocksType(selection, () => $createParagraphNode());
             }
-          })
+          });
         },
       },
       {
@@ -336,11 +316,11 @@ export function ToolbarPlugin({
         active: state.blockType === 'h1',
         onSelect: () => {
           editor.update(() => {
-            const selection = $getSelection()
+            const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createHeadingNode('h1'))
+              $setBlocksType(selection, () => $createHeadingNode('h1'));
             }
-          })
+          });
         },
       },
       {
@@ -349,11 +329,11 @@ export function ToolbarPlugin({
         active: state.blockType === 'h2',
         onSelect: () => {
           editor.update(() => {
-            const selection = $getSelection()
+            const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createHeadingNode('h2'))
+              $setBlocksType(selection, () => $createHeadingNode('h2'));
             }
-          })
+          });
         },
       },
       {
@@ -362,222 +342,189 @@ export function ToolbarPlugin({
         active: state.blockType === 'h3',
         onSelect: () => {
           editor.update(() => {
-            const selection = $getSelection()
+            const selection = $getSelection();
             if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createHeadingNode('h3'))
+              $setBlocksType(selection, () => $createHeadingNode('h3'));
             }
-          })
+          });
         },
       },
     ],
     [editor, state.blockType],
-  )
+  );
 
   const containerClassName = className
     ? `${css.toolbarContainer} ${className}`
-    : css.toolbarContainer
+    : css.toolbarContainer;
 
-  const h = tooltipHandle
+  const h = tooltipHandle;
 
   return (
     <TooltipProvider delay={300}>
-      <TooltipRoot
-        handle={tooltipHandle as TooltipRootProps['handle']}
-        disableHoverablePopup
-      >
+      <TooltipRoot disableHoverablePopup handle={tooltipHandle as TooltipRootProps['handle']}>
         {
           ((props: { payload?: ToolbarTooltipPayload }) =>
             props.payload !== undefined ? (
               <TooltipContent side="bottom" sideOffset={4}>
                 {props.payload.title}
                 {props.payload.shortcut && (
-                  <span className={css.tooltipShortcut}>
-                    {props.payload.shortcut}
-                  </span>
+                  <span className={css.tooltipShortcut}>{props.payload.shortcut}</span>
                 )}
               </TooltipContent>
             ) : null) as TooltipRootProps['children']
         }
       </TooltipRoot>
 
-      <div
-        className={containerClassName}
-        role="toolbar"
-        aria-label="Editor toolbar"
-      >
+      <div aria-label="Editor toolbar" className={containerClassName} role="toolbar">
         <div className={css.toolbarRow}>
           {/* Font Family */}
           <ToolbarDropdown
+            items={fontFamilyItems}
             label={getFontLabel(state.fontFamily)}
             title="Font family"
-            items={fontFamilyItems}
-            triggerWidth={76}
             tooltipHandle={h}
+            triggerWidth={76}
           />
 
           <ToolbarSeparator />
 
           {/* Heading dropdown */}
           <ToolbarDropdown
+            items={headingItems}
             label={BLOCK_TYPE_LABELS[state.blockType] ?? 'Text'}
             title="Block type"
-            items={headingItems}
-            triggerWidth={120}
             tooltipHandle={h}
+            triggerWidth={120}
           />
 
           <ToolbarSeparator />
 
           {/* Undo / Redo */}
           <ToolbarButton
-            icon={<Undo size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Undo"
-            shortcut="Ctrl+Z"
             disabled={!state.canUndo}
-            onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
+            icon={<Undo size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
+            shortcut="Ctrl+Z"
+            title="Undo"
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
           />
           <ToolbarButton
-            icon={<Redo size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Redo"
-            shortcut="Ctrl+Y"
             disabled={!state.canRedo}
-            onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
+            icon={<Redo size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
+            shortcut="Ctrl+Y"
+            title="Redo"
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
           />
 
           <ToolbarSeparator />
 
           {/* Format buttons */}
           <ToolbarButton
-            icon={<Bold size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Bold"
-            shortcut="Ctrl+B"
             active={state.isBold}
+            icon={<Bold size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
+            shortcut="Ctrl+B"
+            title="Bold"
+            tooltipHandle={h}
             onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
-            tooltipHandle={h}
           />
           <ToolbarButton
-            icon={<Italic size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Italic"
-            shortcut="Ctrl+I"
             active={state.isItalic}
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')
-            }
+            icon={<Italic size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
+            shortcut="Ctrl+I"
+            title="Italic"
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
           />
           <ToolbarButton
-            icon={<Underline size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Underline"
-            shortcut="Ctrl+U"
             active={state.isUnderline}
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')
-            }
+            icon={<Underline size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
+            shortcut="Ctrl+U"
+            title="Underline"
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
           />
           <ToolbarButton
+            active={state.isStrikethrough}
             icon={<Strikethrough size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Strikethrough"
-            active={state.isStrikethrough}
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
           />
           <ToolbarButton
+            active={state.isCode}
             icon={<Code size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Inline Code"
-            active={state.isCode}
-            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
           />
 
           <ToolbarSeparator />
 
           {/* Highlight */}
           <ToolbarButton
+            active={state.isHighlight}
             icon={<Highlighter size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Highlight"
-            active={state.isHighlight}
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'highlight')
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'highlight')}
           />
 
           <ToolbarSeparator />
 
           {/* List buttons */}
           <ToolbarButton
+            active={state.blockType === 'bullet'}
             icon={<List size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Bulleted List"
-            active={state.blockType === 'bullet'}
-            onClick={() =>
-              editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)}
           />
           <ToolbarButton
+            active={state.blockType === 'number'}
             icon={<ListOrdered size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Numbered List"
-            active={state.blockType === 'number'}
-            onClick={() =>
-              editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)}
           />
           <ToolbarButton
+            active={state.blockType === 'check'}
             icon={<ListChecks size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Checklist"
-            active={state.blockType === 'check'}
-            onClick={() =>
-              editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)}
           />
 
           <ToolbarSeparator />
 
           {/* Alignment */}
           <ToolbarButton
+            active={state.elementFormat === 'left' || state.elementFormat === ''}
             icon={<AlignLeft size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Align Left"
-            active={
-              state.elementFormat === 'left' || state.elementFormat === ''
-            }
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
           />
           <ToolbarButton
+            active={state.elementFormat === 'center'}
             icon={<AlignCenter size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Align Center"
-            active={state.elementFormat === 'center'}
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
           />
           <ToolbarButton
+            active={state.elementFormat === 'right'}
             icon={<AlignRight size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Align Right"
-            active={state.elementFormat === 'right'}
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
           />
           <ToolbarButton
+            active={state.elementFormat === 'justify'}
             icon={<AlignJustify size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
             title="Justify"
-            active={state.elementFormat === 'justify'}
-            onClick={() =>
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')
-            }
             tooltipHandle={h}
+            onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
           />
 
           {/* Dynamic insert items */}
@@ -586,12 +533,12 @@ export function ToolbarPlugin({
               <ToolbarSeparator />
               {toolbarItems.slice(0, maxVisibleInsertItems).map((item) => (
                 <ToolbarButton
-                  key={item.title}
                   icon={item.icon}
-                  title={item.title}
+                  key={item.title}
                   shortcut={item.shortcut}
-                  onClick={() => item.onSelect(editor, '')}
+                  title={item.title}
                   tooltipHandle={h}
+                  onClick={() => item.onSelect(editor, '')}
                 />
               ))}
               {toolbarItems.length > maxVisibleInsertItems && (
@@ -610,10 +557,7 @@ export function ToolbarPlugin({
                   </TooltipTrigger>
                   <DropdownMenuContent positionMethod="fixed" sideOffset={4}>
                     {toolbarItems.slice(maxVisibleInsertItems).map((item) => (
-                      <DropdownMenuItem
-                        key={item.title}
-                        onClick={() => item.onSelect(editor, '')}
-                      >
+                      <DropdownMenuItem key={item.title} onClick={() => item.onSelect(editor, '')}>
                         {item.icon && (
                           <span
                             style={{
@@ -637,5 +581,5 @@ export function ToolbarPlugin({
         </div>
       </div>
     </TooltipProvider>
-  )
+  );
 }

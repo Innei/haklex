@@ -8,22 +8,22 @@ export {
   getResolvedEditNodes,
   NESTED_EDITOR_NODES,
   setResolvedEditNodes,
-} from '@haklex/rich-editor'
+} from '@haklex/rich-editor/nodes';
 
 // Re-export from @haklex/rich-ext-excalidraw
-export type { SerializedExcalidrawNode } from '@haklex/rich-ext-excalidraw'
+export type { SerializedExcalidrawNode } from '@haklex/rich-ext-excalidraw';
 export {
   $createExcalidrawNode,
   $isExcalidrawNode,
   ExcalidrawNode,
-} from '@haklex/rich-ext-excalidraw'
+} from '@haklex/rich-ext-excalidraw';
 
 // Re-export from @haklex/rich-renderers
 export type {
   SerializedCodeSnippetNode,
   SerializedEmbedNode,
   SerializedGalleryNode,
-} from '@haklex/rich-renderers'
+} from '@haklex/rich-renderers';
 export {
   $createCodeSnippetNode,
   $createGalleryNode,
@@ -35,7 +35,7 @@ export {
   embedNodes,
   GalleryNode,
   galleryNodes,
-} from '@haklex/rich-renderers'
+} from '@haklex/rich-renderers';
 
 // Re-export from @haklex/rich-renderers-edit
 export {
@@ -52,4 +52,4 @@ export {
   KaTeXInlineEditNode,
   LinkCardEditNode,
   linkCardEditNodes,
-} from '@haklex/rich-renderers-edit'
+} from '@haklex/rich-renderers-edit';

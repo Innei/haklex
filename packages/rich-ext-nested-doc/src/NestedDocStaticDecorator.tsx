@@ -1,35 +1,33 @@
-import { useColorScheme } from '@haklex/rich-editor/static'
-import { usePortalTheme } from '@haklex/rich-style-token'
-import type { SerializedEditorState } from 'lexical'
-import { Maximize2 } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
+import { useColorScheme } from '@haklex/rich-editor/static';
+import { usePortalTheme } from '@haklex/rich-style-token';
+import type { SerializedEditorState } from 'lexical';
+import { Maximize2 } from 'lucide-react';
+import { useCallback, useMemo } from 'react';
 
-import { NestedDocRenderer } from './NestedDocRenderer'
-import * as css from './styles.css'
-import { hasRenderableEditorState, truncateEditorState } from './utils'
+import { NestedDocRenderer } from './NestedDocRenderer';
+import * as css from './styles.css';
+import { hasRenderableEditorState, truncateEditorState } from './utils';
 
-const PREVIEW_NODE_LIMIT = 6
+const PREVIEW_NODE_LIMIT = 6;
 
 interface NestedDocStaticDecoratorProps {
-  contentState: SerializedEditorState
+  contentState: SerializedEditorState;
 }
 
-export function NestedDocStaticDecorator({
-  contentState,
-}: NestedDocStaticDecoratorProps) {
-  const colorScheme = useColorScheme()
-  const { className: portalClassName } = usePortalTheme()
+export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecoratorProps) {
+  const colorScheme = useColorScheme();
+  const { className: portalClassName } = usePortalTheme();
 
-  const children = contentState.root?.children ?? []
-  const needsTruncation = children.length > PREVIEW_NODE_LIMIT
+  const children = contentState.root?.children ?? [];
+  const needsTruncation = children.length > PREVIEW_NODE_LIMIT;
   const previewState = useMemo(
     () => truncateEditorState(contentState, PREVIEW_NODE_LIMIT),
     [contentState],
-  )
-  const hasPreview = hasRenderableEditorState(contentState)
+  );
+  const hasPreview = hasRenderableEditorState(contentState);
 
   const handleOpen = useCallback(async () => {
-    const { presentDialog } = await import('@haklex/rich-editor-ui')
+    const { presentDialog } = await import('@haklex/rich-editor-ui');
 
     presentDialog({
       content: () => (
@@ -43,23 +41,23 @@ export function NestedDocStaticDecorator({
       showCloseButton: true,
       clickOutsideToDismiss: true,
       sheet: 'auto',
-    })
-  }, [colorScheme, contentState, portalClassName])
+    });
+  }, [colorScheme, contentState, portalClassName]);
 
   if (!hasPreview) {
-    return null
+    return null;
   }
 
   return (
     <div
       className={css.staticOverlayRoot}
-      onClick={handleOpen}
       role="button"
       tabIndex={0}
+      onClick={handleOpen}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          handleOpen()
+          e.preventDefault();
+          handleOpen();
         }
       }}
     >
@@ -68,12 +66,10 @@ export function NestedDocStaticDecorator({
           <NestedDocRenderer value={previewState} />
         </div>
       </div>
-      {needsTruncation && (
-        <div className={css.staticGradientMask} aria-hidden />
-      )}
-      <div className={css.staticOverlay} aria-hidden>
+      {needsTruncation && <div aria-hidden className={css.staticGradientMask} />}
+      <div aria-hidden className={css.staticOverlay}>
         <Maximize2 size={24} />
       </div>
     </div>
-  )
+  );
 }

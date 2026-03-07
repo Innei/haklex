@@ -1,7 +1,7 @@
-import { Check, ChevronDown } from 'lucide-react'
+import { Check, ChevronDown } from 'lucide-react';
 
-import { Popover, PopoverPanel, PopoverTrigger } from '../popover'
-import * as css from './styles.css'
+import { Popover, PopoverPanel, PopoverTrigger } from '../popover';
+import * as css from './styles.css';
 
 const TEXT_COLORS = [
   { name: 'Default', value: 'inherit' },
@@ -14,69 +14,56 @@ const TEXT_COLORS = [
   { name: 'Blue', value: '#3b82f6' },
   { name: 'Indigo', value: '#6366f1' },
   { name: 'Pink', value: '#ec4899' },
-]
+];
 
 export interface ColorPickerProps {
-  currentColor: string
-  onSelect: (color: string) => void
-  className?: string
+  className?: string;
+  currentColor: string;
+  onSelect: (color: string) => void;
 }
 
-export function ColorPicker({
-  currentColor,
-  onSelect,
-  className,
-}: ColorPickerProps) {
-  const displayColor =
-    currentColor === 'inherit' || !currentColor ? 'currentColor' : currentColor
+export function ColorPicker({ currentColor, onSelect, className }: ColorPickerProps) {
+  const displayColor = currentColor === 'inherit' || !currentColor ? 'currentColor' : currentColor;
 
   return (
     <Popover>
       <PopoverTrigger
         className={`${css.trigger}${className ? ` ${className}` : ''}`}
-        render={
-          <button type="button" onMouseDown={(e) => e.preventDefault()} />
-        }
+        render={<button type="button" onMouseDown={(e) => e.preventDefault()} />}
       >
         <span className={css.triggerLabel}>
           <span className={css.triggerLetter} style={{ color: displayColor }}>
             A
           </span>
-          <span
-            className={css.triggerBar}
-            style={{ backgroundColor: displayColor }}
-          />
+          <span className={css.triggerBar} style={{ backgroundColor: displayColor }} />
         </span>
         <ChevronDown className={css.triggerChevron} />
       </PopoverTrigger>
 
-      <PopoverPanel side="bottom" sideOffset={6} className={css.panel}>
+      <PopoverPanel className={css.panel} side="bottom" sideOffset={6}>
         <div className={css.grid}>
           {TEXT_COLORS.map((color) => (
             <button
+              aria-label={color.name}
+              className={css.swatch}
               key={color.value}
               type="button"
-              className={css.swatch}
-              aria-label={color.name}
               onMouseDown={(e) => {
-                e.preventDefault()
-                onSelect(color.value)
+                e.preventDefault();
+                onSelect(color.value);
               }}
             >
               <span
                 className={css.swatchDot}
                 style={{
-                  backgroundColor:
-                    color.value === 'inherit' ? 'currentColor' : color.value,
+                  backgroundColor: color.value === 'inherit' ? 'currentColor' : color.value,
                 }}
               />
-              {currentColor === color.value && (
-                <Check className={css.swatchCheck} />
-              )}
+              {currentColor === color.value && <Check className={css.swatchCheck} />}
             </button>
           ))}
         </div>
       </PopoverPanel>
     </Popover>
-  )
+  );
 }

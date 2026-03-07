@@ -5,47 +5,47 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { $insertNodes, DecoratorNode } from 'lexical'
-import { Link } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { $insertNodes, DecoratorNode } from 'lexical';
+import { Link } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { LinkCardRenderer } from '../components/renderers/LinkCardRenderer'
-import { createRendererDecoration } from '../components/RendererWrapper'
-import type { CommandItemConfig } from '../types/slash-menu'
+import { LinkCardRenderer } from '../components/renderers/LinkCardRenderer';
+import { createRendererDecoration } from '../components/RendererWrapper';
+import type { CommandItemConfig } from '../types/slash-menu';
 
 export type SerializedLinkCardNode = Spread<
   {
-    url: string
-    source?: string
-    id?: string
-    title?: string
-    description?: string
-    favicon?: string
-    image?: string
+    url: string;
+    source?: string;
+    id?: string;
+    title?: string;
+    description?: string;
+    favicon?: string;
+    image?: string;
   },
   SerializedLexicalNode
->
+>;
 
 export interface LinkCardNodePayload {
-  url: string
-  source?: string
-  id?: string
-  title?: string
-  description?: string
-  favicon?: string
-  image?: string
+  description?: string;
+  favicon?: string;
+  id?: string;
+  image?: string;
+  source?: string;
+  title?: string;
+  url: string;
 }
 
 export class LinkCardNode extends DecoratorNode<ReactElement> {
-  __url: string
-  __source?: string
-  __id?: string
-  __title?: string
-  __description?: string
-  __favicon?: string
-  __image?: string
+  __url: string;
+  __source?: string;
+  __id?: string;
+  __title?: string;
+  __description?: string;
+  __favicon?: string;
+  __image?: string;
 
   static commandItems: CommandItemConfig[] = [
     {
@@ -58,14 +58,14 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createLinkCardNode({ url: '' })])
-        })
+          $insertNodes([$createLinkCardNode({ url: '' })]);
+        });
       },
     },
-  ]
+  ];
 
   static getType(): string {
-    return 'link-card'
+    return 'link-card';
   }
 
   static clone(node: LinkCardNode): LinkCardNode {
@@ -80,32 +80,32 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
         image: node.__image,
       },
       node.__key,
-    )
+    );
   }
 
   constructor(payload: LinkCardNodePayload, key?: NodeKey) {
-    super(key)
-    this.__url = payload.url
-    this.__source = payload.source
-    this.__id = payload.id
-    this.__title = payload.title
-    this.__description = payload.description
-    this.__favicon = payload.favicon
-    this.__image = payload.image
+    super(key);
+    this.__url = payload.url;
+    this.__source = payload.source;
+    this.__id = payload.id;
+    this.__title = payload.title;
+    this.__description = payload.description;
+    this.__favicon = payload.favicon;
+    this.__image = payload.image;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = 'rich-link-card-wrapper'
-    return div
+    const div = document.createElement('div');
+    div.className = 'rich-link-card-wrapper';
+    return div;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
   static importJSON(serializedNode: SerializedLinkCardNode): LinkCardNode {
@@ -117,7 +117,7 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
       description: serializedNode.description,
       favicon: serializedNode.favicon,
       image: serializedNode.image,
-    })
+    });
   }
 
   exportJSON(): SerializedLinkCardNode {
@@ -132,34 +132,34 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
       favicon: this.__favicon,
       image: this.__image,
       version: 1,
-    }
+    };
   }
 
   getUrl(): string {
-    return this.getLatest().__url
+    return this.getLatest().__url;
   }
 
   setUrl(url: string): void {
-    const writable = this.getWritable()
-    writable.__url = url
+    const writable = this.getWritable();
+    writable.__url = url;
   }
 
   getSource(): string | undefined {
-    return this.getLatest().__source
+    return this.getLatest().__source;
   }
 
   setSource(source: string | undefined): void {
-    const writable = this.getWritable()
-    writable.__source = source
+    const writable = this.getWritable();
+    writable.__source = source;
   }
 
   getId(): string | undefined {
-    return this.getLatest().__id
+    return this.getLatest().__id;
   }
 
   setId(id: string | undefined): void {
-    const writable = this.getWritable()
-    writable.__id = id
+    const writable = this.getWritable();
+    writable.__id = id;
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -171,18 +171,14 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
       description: this.__description,
       favicon: this.__favicon,
       image: this.__image,
-    })
+    });
   }
 }
 
-export function $createLinkCardNode(
-  payload: LinkCardNodePayload,
-): LinkCardNode {
-  return new LinkCardNode(payload)
+export function $createLinkCardNode(payload: LinkCardNodePayload): LinkCardNode {
+  return new LinkCardNode(payload);
 }
 
-export function $isLinkCardNode(
-  node: LexicalNode | null | undefined,
-): node is LinkCardNode {
-  return node instanceof LinkCardNode
+export function $isLinkCardNode(node: LexicalNode | null | undefined): node is LinkCardNode {
+  return node instanceof LinkCardNode;
 }

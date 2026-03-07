@@ -5,38 +5,38 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { $insertNodes, DecoratorNode } from 'lexical'
-import { Video } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { $insertNodes, DecoratorNode } from 'lexical';
+import { Video } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { VideoRenderer } from '../components/renderers/VideoRenderer'
-import { createRendererDecoration } from '../components/RendererWrapper'
-import type { CommandItemConfig } from '../types/slash-menu'
+import { VideoRenderer } from '../components/renderers/VideoRenderer';
+import { createRendererDecoration } from '../components/RendererWrapper';
+import type { CommandItemConfig } from '../types/slash-menu';
 
 export type SerializedVideoNode = Spread<
   {
-    src: string
-    poster?: string
-    width?: number
-    height?: number
+    src: string;
+    poster?: string;
+    width?: number;
+    height?: number;
   },
   SerializedLexicalNode
->
+>;
 
 export interface VideoNodePayload {
-  src: string
-  poster?: string
-  width?: number
-  height?: number
+  height?: number;
+  poster?: string;
+  src: string;
+  width?: number;
 }
 
 export class VideoNode extends DecoratorNode<ReactElement> {
-  __src: string
-  __poster?: string
-  __width?: number
-  __height?: number
+  __src: string;
+  __poster?: string;
+  __width?: number;
+  __height?: number;
 
   static commandItems: CommandItemConfig[] = [
     {
@@ -49,14 +49,14 @@ export class VideoNode extends DecoratorNode<ReactElement> {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createVideoNode({ src: '' })])
-        })
+          $insertNodes([$createVideoNode({ src: '' })]);
+        });
       },
     },
-  ]
+  ];
 
   static getType(): string {
-    return 'video'
+    return 'video';
   }
 
   static clone(node: VideoNode): VideoNode {
@@ -68,29 +68,29 @@ export class VideoNode extends DecoratorNode<ReactElement> {
         height: node.__height,
       },
       node.__key,
-    )
+    );
   }
 
   constructor(payload: VideoNodePayload, key?: NodeKey) {
-    super(key)
-    this.__src = payload.src
-    this.__poster = payload.poster
-    this.__width = payload.width
-    this.__height = payload.height
+    super(key);
+    this.__src = payload.src;
+    this.__poster = payload.poster;
+    this.__width = payload.width;
+    this.__height = payload.height;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = 'rich-video-wrapper'
-    return div
+    const div = document.createElement('div');
+    div.className = 'rich-video-wrapper';
+    return div;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
   static importJSON(serializedNode: SerializedVideoNode): VideoNode {
@@ -99,7 +99,7 @@ export class VideoNode extends DecoratorNode<ReactElement> {
       poster: serializedNode.poster,
       width: serializedNode.width,
       height: serializedNode.height,
-    })
+    });
   }
 
   exportJSON(): SerializedVideoNode {
@@ -111,16 +111,16 @@ export class VideoNode extends DecoratorNode<ReactElement> {
       width: this.__width,
       height: this.__height,
       version: 1,
-    }
+    };
   }
 
   getSrc(): string {
-    return this.getLatest().__src
+    return this.getLatest().__src;
   }
 
   setSrc(src: string): void {
-    const writable = this.getWritable()
-    writable.__src = src
+    const writable = this.getWritable();
+    writable.__src = src;
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -129,16 +129,14 @@ export class VideoNode extends DecoratorNode<ReactElement> {
       poster: this.__poster,
       width: this.__width,
       height: this.__height,
-    })
+    });
   }
 }
 
 export function $createVideoNode(payload: VideoNodePayload): VideoNode {
-  return new VideoNode(payload)
+  return new VideoNode(payload);
 }
 
-export function $isVideoNode(
-  node: LexicalNode | null | undefined,
-): node is VideoNode {
-  return node instanceof VideoNode
+export function $isVideoNode(node: LexicalNode | null | undefined): node is VideoNode {
+  return node instanceof VideoNode;
 }

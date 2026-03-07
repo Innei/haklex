@@ -1,13 +1,13 @@
-import type { ReactNode } from 'react'
+import type { ReactNode } from 'react';
 
 export interface RubyRendererProps {
-  reading: string
-  children?: ReactNode
+  children?: ReactNode;
+  reading: string;
 }
 
 export function RubyRenderer({ reading, children }: RubyRendererProps) {
   if (!reading) {
-    return <>{children}</>
+    return <>{children}</>;
   }
 
   return (
@@ -15,5 +15,5 @@ export function RubyRenderer({ reading, children }: RubyRendererProps) {
       {children}
       <rt className="rich-ruby-rt">{reading}</rt>
     </ruby>
-  )
+  );
 }

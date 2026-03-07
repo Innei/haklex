@@ -10,8 +10,8 @@
  */
 
 interface MermaidThemeConfig {
-  theme: 'base'
-  themeVariables: Record<string, string>
+  theme: 'base';
+  themeVariables: Record<string, string>;
 }
 
 // beautiful-mermaid MIX ratios (percentage of fg mixed into bg)
@@ -26,44 +26,40 @@ const MIX = {
   nodeStroke: 20,
   groupHeader: 5,
   innerStroke: 12,
-} as const
+} as const;
 
 function parseHex(hex: string): [number, number, number] {
   return [
     Number.parseInt(hex.slice(1, 3), 16),
     Number.parseInt(hex.slice(3, 5), 16),
     Number.parseInt(hex.slice(5, 7), 16),
-  ]
+  ];
 }
 
 function toHex(r: number, g: number, b: number): string {
-  const clamp = (v: number) => Math.round(Math.max(0, Math.min(255, v)))
-  return `#${clamp(r).toString(16).padStart(2, '0')}${clamp(g).toString(16).padStart(2, '0')}${clamp(b).toString(16).padStart(2, '0')}`
+  const clamp = (v: number) => Math.round(Math.max(0, Math.min(255, v)));
+  return `#${clamp(r).toString(16).padStart(2, '0')}${clamp(g).toString(16).padStart(2, '0')}${clamp(b).toString(16).padStart(2, '0')}`;
 }
 
 function mix(fg: string, bg: string, percent: number): string {
-  const [fR, fG, fB] = parseHex(fg)
-  const [bR, bG, bB] = parseHex(bg)
-  const p = percent / 100
-  return toHex(
-    fR * p + bR * (1 - p),
-    fG * p + bG * (1 - p),
-    fB * p + bB * (1 - p),
-  )
+  const [fR, fG, fB] = parseHex(fg);
+  const [bR, bG, bB] = parseHex(bg);
+  const p = percent / 100;
+  return toHex(fR * p + bR * (1 - p), fG * p + bG * (1 - p), fB * p + bB * (1 - p));
 }
 
 export interface ThemeTokens {
-  bg: string
-  fg: string
-  line: string
-  arrow: string
-  nodeFill: string
-  nodeStroke: string
-  groupHeader: string
-  innerStroke: string
-  textSec: string
-  textMuted: string
-  textFaint: string
+  arrow: string;
+  bg: string;
+  fg: string;
+  groupHeader: string;
+  innerStroke: string;
+  line: string;
+  nodeFill: string;
+  nodeStroke: string;
+  textFaint: string;
+  textMuted: string;
+  textSec: string;
 }
 
 export function deriveTokens(bg: string, fg: string): ThemeTokens {
@@ -79,11 +75,11 @@ export function deriveTokens(bg: string, fg: string): ThemeTokens {
     textSec: mix(fg, bg, MIX.textSec),
     textMuted: mix(fg, bg, MIX.textMuted),
     textFaint: mix(fg, bg, MIX.textFaint),
-  }
+  };
 }
 
 function buildTheme(bg: string, fg: string): MermaidThemeConfig {
-  const t = deriveTokens(bg, fg)
+  const t = deriveTokens(bg, fg);
 
   return {
     theme: 'base',
@@ -225,14 +221,14 @@ function buildTheme(bg: string, fg: string): MermaidThemeConfig {
       cScaleLabel0: t.fg,
       cScaleLabel2: t.fg,
     },
-  }
+  };
 }
 
 // Zinc Light: clean white bg with dark neutral fg
-export const lightTheme = buildTheme('#ffffff', '#27272a')
+export const lightTheme = buildTheme('#ffffff', '#27272a');
 
 // Zinc Dark: dark bg with near-white fg
-export const darkTheme = buildTheme('#18181b', '#fafafa')
+export const darkTheme = buildTheme('#18181b', '#fafafa');
 
-export const lightTokens = deriveTokens('#ffffff', '#27272a')
-export const darkTokens = deriveTokens('#18181b', '#fafafa')
+export const lightTokens = deriveTokens('#ffffff', '#27272a');
+export const darkTokens = deriveTokens('#18181b', '#fafafa');

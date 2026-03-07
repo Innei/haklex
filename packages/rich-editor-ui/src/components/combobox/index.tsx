@@ -1,25 +1,25 @@
-import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox'
-import { PortalThemeWrapper } from '@haklex/rich-style-token'
-import type { ComponentProps, ReactNode } from 'react'
+import { Combobox as ComboboxPrimitive } from '@base-ui/react/combobox';
+import { PortalThemeWrapper } from '@haklex/rich-style-token';
+import type { ComponentProps, ReactNode } from 'react';
 
-import * as css from './styles.css'
+import * as css from './styles.css';
 
 // -- Root --
 
 export function Combobox<Value, Multiple extends boolean | undefined = false>(
   props: ComponentProps<typeof ComboboxPrimitive.Root<Value, Multiple>>,
 ) {
-  return <ComboboxPrimitive.Root {...props} />
+  return <ComboboxPrimitive.Root {...props} />;
 }
 
 // -- Input --
 
 type ComboboxInputProps = ComponentProps<typeof ComboboxPrimitive.Input> & {
-  className?: string
-}
+  className?: string;
+};
 
 export function ComboboxInput({ className, ...props }: ComboboxInputProps) {
-  return <ComboboxPrimitive.Input className={className} {...props} />
+  return <ComboboxPrimitive.Input className={className} {...props} />;
 }
 
 // -- Portal --
@@ -29,27 +29,20 @@ function ComboboxPortal({ children }: { children: ReactNode }) {
     <ComboboxPrimitive.Portal>
       <PortalThemeWrapper>{children}</PortalThemeWrapper>
     </ComboboxPrimitive.Portal>
-  )
+  );
 }
 
 // -- Content (Portal + Positioner + Popup) --
 
-type ComboboxContentProps = Omit<
-  ComponentProps<typeof ComboboxPrimitive.Popup>,
-  'render'
-> & {
-  align?: ComponentProps<typeof ComboboxPrimitive.Positioner>['align']
-  alignOffset?: ComponentProps<
-    typeof ComboboxPrimitive.Positioner
-  >['alignOffset']
-  side?: ComponentProps<typeof ComboboxPrimitive.Positioner>['side']
-  sideOffset?: ComponentProps<typeof ComboboxPrimitive.Positioner>['sideOffset']
-  className?: string
-  children?: ReactNode
-  positionMethod?: ComponentProps<
-    typeof ComboboxPrimitive.Positioner
-  >['positionMethod']
-}
+type ComboboxContentProps = Omit<ComponentProps<typeof ComboboxPrimitive.Popup>, 'render'> & {
+  align?: ComponentProps<typeof ComboboxPrimitive.Positioner>['align'];
+  alignOffset?: ComponentProps<typeof ComboboxPrimitive.Positioner>['alignOffset'];
+  side?: ComponentProps<typeof ComboboxPrimitive.Positioner>['side'];
+  sideOffset?: ComponentProps<typeof ComboboxPrimitive.Positioner>['sideOffset'];
+  className?: string;
+  children?: ReactNode;
+  positionMethod?: ComponentProps<typeof ComboboxPrimitive.Positioner>['positionMethod'];
+};
 
 export function ComboboxContent({
   align = 'start',
@@ -64,9 +57,9 @@ export function ComboboxContent({
   return (
     <ComboboxPortal>
       <ComboboxPrimitive.Positioner
-        positionMethod={positionMethod}
         align={align}
         alignOffset={alignOffset}
+        positionMethod={positionMethod}
         side={side}
         sideOffset={sideOffset}
         style={{ zIndex: 50 }}
@@ -79,22 +72,22 @@ export function ComboboxContent({
         </ComboboxPrimitive.Popup>
       </ComboboxPrimitive.Positioner>
     </ComboboxPortal>
-  )
+  );
 }
 
 // -- List --
 
-type ComboboxListProps = ComponentProps<typeof ComboboxPrimitive.List>
+type ComboboxListProps = ComponentProps<typeof ComboboxPrimitive.List>;
 
 export function ComboboxList(props: ComboboxListProps) {
-  return <ComboboxPrimitive.List {...props} />
+  return <ComboboxPrimitive.List {...props} />;
 }
 
 // -- Item --
 
 type ComboboxItemProps = ComponentProps<typeof ComboboxPrimitive.Item> & {
-  className?: string
-}
+  className?: string;
+};
 
 export function ComboboxItem({ className, ...props }: ComboboxItemProps) {
   return (
@@ -102,24 +95,22 @@ export function ComboboxItem({ className, ...props }: ComboboxItemProps) {
       className={`${css.item}${className ? ` ${className}` : ''}`}
       {...props}
     />
-  )
+  );
 }
 
 // -- ItemIndicator --
 
-type ComboboxItemIndicatorProps = ComponentProps<
-  typeof ComboboxPrimitive.ItemIndicator
->
+type ComboboxItemIndicatorProps = ComponentProps<typeof ComboboxPrimitive.ItemIndicator>;
 
 export function ComboboxItemIndicator(props: ComboboxItemIndicatorProps) {
-  return <ComboboxPrimitive.ItemIndicator {...props} />
+  return <ComboboxPrimitive.ItemIndicator {...props} />;
 }
 
 // -- Empty --
 
 type ComboboxEmptyProps = ComponentProps<typeof ComboboxPrimitive.Empty> & {
-  className?: string
-}
+  className?: string;
+};
 
 export function ComboboxEmpty({ className, ...props }: ComboboxEmptyProps) {
   return (
@@ -127,25 +118,23 @@ export function ComboboxEmpty({ className, ...props }: ComboboxEmptyProps) {
       className={`${css.empty}${className ? ` ${className}` : ''}`}
       {...props}
     />
-  )
+  );
 }
 
 // -- Group --
 
-type ComboboxGroupProps = ComponentProps<typeof ComboboxPrimitive.Group>
+type ComboboxGroupProps = ComponentProps<typeof ComboboxPrimitive.Group>;
 
 export function ComboboxGroup(props: ComboboxGroupProps) {
-  return <ComboboxPrimitive.Group {...props} />
+  return <ComboboxPrimitive.Group {...props} />;
 }
 
 // -- GroupLabel --
 
-type ComboboxGroupLabelProps = ComponentProps<
-  typeof ComboboxPrimitive.GroupLabel
->
+type ComboboxGroupLabelProps = ComponentProps<typeof ComboboxPrimitive.GroupLabel>;
 
 export function ComboboxGroupLabel(props: ComboboxGroupLabelProps) {
-  return <ComboboxPrimitive.GroupLabel {...props} />
+  return <ComboboxPrimitive.GroupLabel {...props} />;
 }
 
 // -- Type exports --
@@ -159,4 +148,4 @@ export type {
   ComboboxItemIndicatorProps,
   ComboboxItemProps,
   ComboboxListProps,
-}
+};

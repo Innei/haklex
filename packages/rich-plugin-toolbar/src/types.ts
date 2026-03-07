@@ -1,10 +1,8 @@
-import type { createTooltipHandle } from '@haklex/rich-editor-ui'
+import type { createTooltipHandle } from '@haklex/rich-editor-ui';
 
 export interface ToolbarTooltipPayload {
-  title: string
-  shortcut?: string
+  shortcut?: string;
+  title: string;
 }
 
-export type ToolbarTooltipHandle = ReturnType<
-  typeof createTooltipHandle<ToolbarTooltipPayload>
->
+export type ToolbarTooltipHandle = ReturnType<typeof createTooltipHandle<ToolbarTooltipPayload>>;

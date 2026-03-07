@@ -1,24 +1,20 @@
-import type { ReactNode } from 'react'
-import { createContext, use } from 'react'
+import type { ReactNode } from 'react';
+import { createContext, use } from 'react';
 
-import type { ImageUploadFn } from '../plugins/ImageUploadPlugin'
+import type { ImageUploadFn } from '../plugins/ImageUploadPlugin';
 
-const ImageUploadContext = createContext<ImageUploadFn | null>(null)
+const ImageUploadContext = createContext<ImageUploadFn | null>(null);
 
 export function ImageUploadProvider({
   upload,
   children,
 }: {
-  upload: ImageUploadFn
-  children: ReactNode
+  upload: ImageUploadFn;
+  children: ReactNode;
 }) {
-  return (
-    <ImageUploadContext.Provider value={upload}>
-      {children}
-    </ImageUploadContext.Provider>
-  )
+  return <ImageUploadContext.Provider value={upload}>{children}</ImageUploadContext.Provider>;
 }
 
 export function useImageUpload(): ImageUploadFn | null {
-  return use(ImageUploadContext)
+  return use(ImageUploadContext);
 }

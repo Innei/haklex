@@ -1,23 +1,19 @@
 {
   "name": "haklex",
-  "type": "module",
   "private": true,
   "description": "Modular Lexical-based rich editor ecosystem. Edit, static render, SSR, and server-side parse — all from one schema. React 19, TypeScript 5.9, Vanilla Extract, ESM.",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Innei/haklex.git"
   },
-  "packageManager": "pnpm@10.27.0",
-  "engines": {
-    "node": ">=20"
-  },
+  "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "turbo build",
     "build:packages": "turbo run build --filter='./packages/*'",
     "build:rich": "pnpm run build:packages",
     "dev": "turbo dev --filter=./demo",
-    "lint": "turbo lint",
+    "lint": "eslint . --fix",
     "prepare": "pnpm exec simple-git-hooks",
     "publish:packages": "pnpm run build:packages && pnpm -r publish --no-git-checks --filter '@haklex/*' --filter '!@haklex/rich-editor-demo'",
     "publish:rich": "pnpm run publish:packages",
@@ -26,18 +22,36 @@
     "release:packages": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\"",
     "release:rich": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\""
   },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,yml,yaml}": [
+      "eslint --fix"
+    ],
+    "*": [
+      "prettier --write --ignore-unknown"
+    ]
+  },
   "devDependencies": {
-    "@innei/prettier": "1.0.0",
+    "@lobehub/eslint-config": "^2.1.5",
+    "@lobehub/prettier-config": "^2.1.5",
     "@types/node": "25.3.3",
     "bumpp": "^10.4.1",
+    "commitlint": "^20.4.3",
     "eslint": "^9.39.4",
     "eslint-config-hyoban": "6.0.0",
     "knip": "^5.85.0",
     "lint-staged": "16.3.2",
     "prettier": "3.8.1",
     "simple-git-hooks": "2.13.1",
+    "stylelint": "^17.4.0",
     "turbo": "^2.8.14",
     "vitest": "^4.0.18"
+  },
+  "packageManager": "pnpm@10.27.0",
+  "engines": {
+    "node": ">=20"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -65,16 +79,5 @@
       "object.values": "npm:@nolyfill/object.values@^1.0.44",
       "string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@^1.0.44"
     }
-  },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm exec lint-staged"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "prettier --ignore-path ./.gitignore --write "
-    ],
-    "*.{js,ts,cjs,mjs,jsx,tsx,json}": [
-      "eslint --fix"
-    ]
   }
 }

@@ -1,21 +1,18 @@
-import { getVariantClass } from '@haklex/rich-editor'
-import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static'
-import { useState } from 'react'
+import { getVariantClass } from '@haklex/rich-editor';
+import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static';
+import { useState } from 'react';
 
-import { Panel } from '../components/Panel'
-import { useTheme } from '../context/ThemeContext'
-import {
-  customGithubRepoPlugin,
-  extraLinkCardPlugins,
-} from '../fixtures/extra-linkcard-plugins'
+import { Panel } from '../components/Panel';
+import { useTheme } from '../context/ThemeContext';
+import { customGithubRepoPlugin, extraLinkCardPlugins } from '../fixtures/extra-linkcard-plugins';
 
 interface DemoCard {
-  key: string
-  label: string
-  url: string
-  description: string
-  title?: string
-  useOverride?: boolean
+  description: string;
+  key: string;
+  label: string;
+  title?: string;
+  url: string;
+  useOverride?: boolean;
 }
 
 const demoCards: DemoCard[] = [
@@ -23,15 +20,13 @@ const demoCards: DemoCard[] = [
     key: 'douban',
     label: 'Douban Book (custom plugin)',
     url: 'https://book.douban.com/subject/1477390',
-    description:
-      'doubanBookPlugin 匹配 book.douban.com，与内置 11 个插件合并后生效',
+    description: 'doubanBookPlugin 匹配 book.douban.com，与内置 11 个插件合并后生效',
   },
   {
     key: 'issue',
     label: 'Internal Issue (custom plugin)',
     url: 'https://issues.example.com/PROJ-1234',
-    description:
-      'internalIssuePlugin 匹配 issues.example.com，新增插件不影响内置',
+    description: 'internalIssuePlugin 匹配 issues.example.com，新增插件不影响内置',
   },
   {
     key: 'github',
@@ -43,8 +38,7 @@ const demoCards: DemoCard[] = [
     key: 'github-override',
     label: 'GitHub Repo (overridden)',
     url: 'https://github.com/vercel/next.js',
-    description:
-      '传入同名 "gh-repo" 插件覆盖内置实现，卡片标题带 (custom plugin) 标记',
+    description: '传入同名 "gh-repo" 插件覆盖内置实现，卡片标题带 (custom plugin) 标记',
     useOverride: true,
   },
   {
@@ -54,19 +48,18 @@ const demoCards: DemoCard[] = [
     title: 'Example Article',
     description: '无插件匹配时降级为静态 props 渲染',
   },
-]
+];
 
 export function LinkCardPluginsPage() {
-  const theme = useTheme()
-  const [showOverride, setShowOverride] = useState(false)
+  const theme = useTheme();
+  const [showOverride, setShowOverride] = useState(false);
 
   return (
     <div className="page">
       <div className="showcase-intro">
         <h2>LinkCard Plugin Extension Demo</h2>
         <p>
-          <code>plugins</code> prop 传入的插件会与内置 11
-          个插件合并（同名覆盖，按 priority 排序）。
+          <code>plugins</code> prop 传入的插件会与内置 11 个插件合并（同名覆盖，按 priority 排序）。
           业务方只需提供额外插件，无需重复声明内置插件。
         </p>
       </div>
@@ -93,7 +86,7 @@ export function LinkCardPluginsPage() {
           {demoCards
             .filter((c) => !c.useOverride || showOverride)
             .map((card) => (
-              <Panel key={card.key} title={card.label} badge="linkcard">
+              <Panel badge="linkcard" key={card.key} title={card.label}>
                 <p className="node-description">{card.description}</p>
                 <div
                   className={`node-render ${getVariantClass('article')}`}
@@ -101,8 +94,8 @@ export function LinkCardPluginsPage() {
                   style={{ marginTop: 8 }}
                 >
                   <LinkCardRenderer
-                    url={card.url}
                     title={card.title}
+                    url={card.url}
                     plugins={
                       card.useOverride
                         ? [...extraLinkCardPlugins, customGithubRepoPlugin]
@@ -155,5 +148,5 @@ const doubanBookPlugin: LinkCardPlugin = {
         </pre>
       </section>
     </div>
-  )
+  );
 }

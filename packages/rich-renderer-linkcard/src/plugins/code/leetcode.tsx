@@ -1,23 +1,27 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token';
 
 import type {
   LinkCardData,
   LinkCardFetchContext,
   LinkCardPlugin,
   UrlMatchResult,
-} from '../../types'
-import { camelcaseKeys, fetchJsonWithContext } from '../../utils'
+} from '../../types';
+import { camelcaseKeys, fetchJsonWithContext } from '../../utils';
 
 function getDifficultyColor(difficulty: string): string {
   switch (difficulty) {
-    case 'Easy':
-      return '#00BFA5'
-    case 'Medium':
-      return '#FFA726'
-    case 'Hard':
-      return '#F44336'
-    default:
-      return '#757575'
+    case 'Easy': {
+      return '#00BFA5';
+    }
+    case 'Medium': {
+      return '#FFA726';
+    }
+    case 'Hard': {
+      return '#F44336';
+    }
+    default: {
+      return '#757575';
+    }
   }
 }
 
@@ -29,15 +33,14 @@ export const leetcodePlugin: LinkCardPlugin = {
   provider: 'leetcode',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'leetcode.cn' && url.hostname !== 'leetcode.com')
-      return null
-    const parts = url.pathname.split('/').filter(Boolean)
-    if (parts[0] !== 'problems' || !parts[1]) return null
-    return { id: parts[1], fullUrl: url.toString() }
+    if (url.hostname !== 'leetcode.cn' && url.hostname !== 'leetcode.com') return null;
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts[0] !== 'problems' || !parts[1]) return null;
+    return { id: parts[1], fullUrl: url.toString() };
   },
 
   isValidId(id: string): boolean {
-    return typeof id === 'string' && id.length > 0
+    return typeof id === 'string' && id.length > 0;
   },
 
   async fetch(
@@ -48,7 +51,7 @@ export const leetcodePlugin: LinkCardPlugin = {
     const body = {
       query: `query questionData($titleSlug: String!) {\n  question(titleSlug: $titleSlug) {translatedTitle\n   difficulty\n    likes\n     topicTags { translatedName\n }\n    stats\n  }\n}\n`,
       variables: { titleSlug: id },
-    }
+    };
 
     const questionData = await fetchJsonWithContext(
       'https://leetcode.cn/graphql/',
@@ -59,10 +62,10 @@ export const leetcodePlugin: LinkCardPlugin = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       },
-    )
+    );
 
-    const questionTitleData = camelcaseKeys(questionData.data.question)
-    const stats = JSON.parse(questionTitleData.stats)
+    const questionTitleData = camelcaseKeys(questionData.data.question);
+    const stats = JSON.parse(questionTitleData.stats);
 
     return {
       title: (
@@ -100,18 +103,13 @@ export const leetcodePlugin: LinkCardPlugin = {
             {questionTitleData.difficulty}
           </span>
           <span style={{ overflow: 'hidden' }}>
-            {questionTitleData.topicTags
-              .map((tag: any) => tag.translatedName)
-              .join(' / ')}
+            {questionTitleData.topicTags.map((tag: any) => tag.translatedName).join(' / ')}
           </span>
-          <span style={{ float: 'right', overflow: 'hidden' }}>
-            AR: {stats.acRate}
-          </span>
+          <span style={{ float: 'right', overflow: 'hidden' }}>AR: {stats.acRate}</span>
         </>
       ),
-      image:
-        'https://upload.wikimedia.org/wikipedia/commons/1/19/LeetCode_logo_black.png',
+      image: 'https://upload.wikimedia.org/wikipedia/commons/1/19/LeetCode_logo_black.png',
       color: getDifficultyColor(questionTitleData.difficulty),
-    }
+    };
   },
-}
+};

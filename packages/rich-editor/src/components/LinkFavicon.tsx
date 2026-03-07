@@ -1,20 +1,20 @@
-'use client'
+'use client';
 
-import { Globe } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { Globe } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
-import { getHostname, probeFavicon } from '../utils/favicon'
+import { getHostname, probeFavicon } from '../utils/favicon';
 
 export type LinkFaviconProps = {
-  href?: string
-  source?: string
-  noIcon?: boolean
-  className?: string
+  href?: string;
+  source?: string;
+  noIcon?: boolean;
+  className?: string;
   /** Platform type -> icon map, injected by app for known platforms (e.g. GitHub, Bilibili) */
-  platformIconMap?: Record<string, React.ReactNode>
+  platformIconMap?: Record<string, React.ReactNode>;
   /** Resolve platform type from URL, injected by app */
-  getPlatformFromUrl?: (url: URL) => string | null
-}
+  getPlatformFromUrl?: (url: URL) => string | null;
+};
 
 export function LinkFavicon({
   href,
@@ -24,29 +24,29 @@ export function LinkFavicon({
   platformIconMap,
   getPlatformFromUrl,
 }: LinkFaviconProps) {
-  const [faviconUrl, setFaviconUrl] = useState<string | null>(null)
+  const [faviconUrl, setFaviconUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!href) return
-    const hostname = getHostname(href)
-    if (!hostname) return
+    if (!href) return;
+    const hostname = getHostname(href);
+    if (!hostname) return;
 
-    let cancelled = false
+    let cancelled = false;
     probeFavicon(hostname).then((url) => {
-      if (!cancelled) setFaviconUrl(url)
-    })
+      if (!cancelled) setFaviconUrl(url);
+    });
     return () => {
-      cancelled = true
-    }
-  }, [href])
+      cancelled = true;
+    };
+  }, [href]);
 
-  if (noIcon || (!href && !source)) return null
+  if (noIcon || (!href && !source)) return null;
 
   // Direct source (e.g. SocialSourceLink)
-  let platformType = source
+  let platformType = source;
   if (!platformType && href && getPlatformFromUrl) {
     try {
-      platformType = getPlatformFromUrl(new URL(href)) ?? undefined
+      platformType = getPlatformFromUrl(new URL(href)) ?? undefined;
     } catch {
       /* invalid url */
     }
@@ -57,26 +57,20 @@ export function LinkFavicon({
       <span className={`rich-link-favicon ${className ?? ''}`.trim()}>
         {platformIconMap[platformType]}
       </span>
-    )
+    );
   }
 
   if (faviconUrl) {
     return (
       <span className={`rich-link-favicon ${className ?? ''}`.trim()}>
-        <img
-          src={faviconUrl}
-          alt=""
-          width={14}
-          height={14}
-          aria-hidden="true"
-        />
+        <img alt="" aria-hidden="true" height={14} src={faviconUrl} width={14} />
       </span>
-    )
+    );
   }
 
   return (
     <span className={`rich-link-favicon ${className ?? ''}`.trim()}>
-      <Globe size={14} aria-hidden />
+      <Globe aria-hidden size={14} />
     </span>
-  )
+  );
 }

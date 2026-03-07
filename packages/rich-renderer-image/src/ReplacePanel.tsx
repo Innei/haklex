@@ -1,10 +1,6 @@
-import {
-  ActionBar,
-  ActionButton,
-  SegmentedControl,
-} from '@haklex/rich-editor-ui'
-import { useAtomValue, useSetAtom } from 'jotai'
-import { ImageIcon, Loader2, Upload } from 'lucide-react'
+import { ActionBar, ActionButton, SegmentedControl } from '@haklex/rich-editor-ui';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { ImageIcon, Loader2, Upload } from 'lucide-react';
 
 import {
   fileInputRefAtom,
@@ -14,52 +10,51 @@ import {
   replaceModeAtom,
   replacePreviewAtom,
   replaceUrlAtom,
-} from './atoms'
-import * as styles from './styles.css'
-import { useImageActions } from './useImageActions'
+} from './atoms';
+import * as styles from './styles.css';
+import { useImageActions } from './useImageActions';
 
 const replaceModeItems: Array<{ value: ReplaceMode; label: string }> = [
   { value: 'upload', label: 'Upload' },
   { value: 'url', label: 'URL' },
-]
+];
 
 export function ReplacePanel() {
-  const replaceMode = useAtomValue(replaceModeAtom)
-  const setReplaceMode = useSetAtom(replaceModeAtom)
-  const replaceUrl = useAtomValue(replaceUrlAtom)
-  const setReplaceUrl = useSetAtom(replaceUrlAtom)
-  const replacePreview = useAtomValue(replacePreviewAtom)
-  const replaceError = useAtomValue(replaceErrorAtom)
-  const replaceLoading = useAtomValue(replaceLoadingAtom)
-  const fileInputRef = useAtomValue(fileInputRefAtom)
-  const { handleReplaceFile, handlePreviewUrl, handleReplaceByUrl } =
-    useImageActions()
+  const replaceMode = useAtomValue(replaceModeAtom);
+  const setReplaceMode = useSetAtom(replaceModeAtom);
+  const replaceUrl = useAtomValue(replaceUrlAtom);
+  const setReplaceUrl = useSetAtom(replaceUrlAtom);
+  const replacePreview = useAtomValue(replacePreviewAtom);
+  const replaceError = useAtomValue(replaceErrorAtom);
+  const replaceLoading = useAtomValue(replaceLoadingAtom);
+  const fileInputRef = useAtomValue(fileInputRefAtom);
+  const { handleReplaceFile, handlePreviewUrl, handleReplaceByUrl } = useImageActions();
 
   return (
     <>
       <SegmentedControl
+        fullWidth
         items={replaceModeItems}
         value={replaceMode}
         onChange={setReplaceMode}
-        fullWidth
       />
 
       {replaceMode === 'upload' ? (
         <>
           <input
-            ref={fileInputRef}
-            type="file"
             accept="image/*"
+            ref={fileInputRef}
             style={{ display: 'none' }}
+            type="file"
             onChange={(event) => {
-              const file = event.currentTarget.files?.[0] ?? null
-              void handleReplaceFile(file)
-              event.currentTarget.value = ''
+              const file = event.currentTarget.files?.[0] ?? null;
+              void handleReplaceFile(file);
+              event.currentTarget.value = '';
             }}
           />
           <button
-            type="button"
             className={`${styles.replaceUploadArea} ${styles.semanticClassNames.replaceUploadArea}`}
+            type="button"
             onClick={() => fileInputRef.current?.click()}
           >
             {replaceLoading ? (
@@ -77,25 +72,23 @@ export function ReplacePanel() {
         </>
       ) : (
         <>
-          <div
-            className={`${styles.editField} ${styles.semanticClassNames.editField}`}
-          >
+          <div className={`${styles.editField} ${styles.semanticClassNames.editField}`}>
             <ImageIcon
               className={`${styles.editFieldIcon} ${styles.semanticClassNames.editFieldIcon}`}
               size={14}
             />
             <input
               className={`${styles.editInput} ${styles.semanticClassNames.editInput}`}
+              placeholder="https://example.com/image.jpg"
               type="url"
               value={replaceUrl}
               onChange={(event) => setReplaceUrl(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === 'Enter') {
-                  event.preventDefault()
-                  handlePreviewUrl()
+                  event.preventDefault();
+                  handlePreviewUrl();
                 }
               }}
-              placeholder="https://example.com/image.jpg"
             />
           </div>
           <ActionBar>
@@ -105,11 +98,7 @@ export function ReplacePanel() {
             >
               Preview
             </ActionButton>
-            <ActionButton
-              variant="accent"
-              disabled={!replacePreview}
-              onClick={handleReplaceByUrl}
-            >
+            <ActionButton disabled={!replacePreview} variant="accent" onClick={handleReplaceByUrl}>
               Apply
             </ActionButton>
           </ActionBar>
@@ -117,20 +106,16 @@ export function ReplacePanel() {
       )}
 
       {replaceError && (
-        <span
-          className={`${styles.panelHint} ${styles.semanticClassNames.panelHint}`}
-        >
+        <span className={`${styles.panelHint} ${styles.semanticClassNames.panelHint}`}>
           {replaceError}
         </span>
       )}
 
       {replacePreview && (
-        <div
-          className={`${styles.replacePreview} ${styles.semanticClassNames.replacePreview}`}
-        >
-          <img src={replacePreview} alt="Replace preview" />
+        <div className={`${styles.replacePreview} ${styles.semanticClassNames.replacePreview}`}>
+          <img alt="Replace preview" src={replacePreview} />
         </div>
       )}
     </>
-  )
+  );
 }

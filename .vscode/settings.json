@@ -1,0 +1,27 @@
+{
+  "eslint.codeActionsOnSave.rules": [
+    "*",
+    "!perfectionist/sort-enums",
+    "!perfectionist/sort-interfaces",
+    "!simple-import-sort/imports",
+    "!simple-import-sort/exports"
+  ],
+  "eslint.rules.customizations": [
+    {
+      "rule": "perfectionist/sort-enums",
+      "severity": "info"
+    },
+    {
+      "rule": "perfectionist/sort-interfaces",
+      "severity": "info"
+    },
+    {
+      "rule": "simple-import-sort/imports",
+      "severity": "info"
+    },
+    {
+      "rule": "simple-import-sort/exports",
+      "severity": "info"
+    }
+  ]
+}

@@ -1,25 +1,21 @@
-import type { RichEditorVariant } from '@haklex/rich-editor'
+import type { RichEditorVariant } from '@haklex/rich-editor';
 import {
   type NestedDocDialogEditorProps,
   NestedDocDialogEditorProvider,
   nestedDocEditNodes,
   nestedDocNodes,
   NestedDocPlugin,
-} from '@haklex/rich-ext-nested-doc'
-import {
-  MentionPlatformProvider,
-  ShiroEditor,
-  ShiroRenderer,
-} from '@haklex/rich-kit-shiro'
-import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar'
-import { createThemeStyle } from '@haklex/rich-style-token'
-import type { SerializedEditorState } from 'lexical'
-import { useCallback, useMemo, useState } from 'react'
+} from '@haklex/rich-ext-nested-doc';
+import { MentionPlatformProvider, ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro';
+import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
+import { createThemeStyle } from '@haklex/rich-style-token';
+import type { SerializedEditorState } from 'lexical';
+import { useCallback, useMemo, useState } from 'react';
 
-import { Panel } from '../components/Panel'
-import { useTheme } from '../context/ThemeContext'
-import { extraMentionPlatforms } from '../fixtures/extra-mention-platforms'
-import { initialContent } from '../fixtures/initial-content'
+import { Panel } from '../components/Panel';
+import { useTheme } from '../context/ThemeContext';
+import { extraMentionPlatforms } from '../fixtures/extra-mention-platforms';
+import { initialContent } from '../fixtures/initial-content';
 
 const insertItemOrder = [
   'Image',
@@ -34,40 +30,32 @@ const insertItemOrder = [
   'Embed',
   'Whiteboard',
   'Nested Document',
-]
+];
 
 interface ColorSet {
-  accent: string
-  text: string
-  bg: string
+  accent: string;
+  bg: string;
+  text: string;
 }
 
 interface ColorPreset {
-  label: string
-  light: ColorSet
-  dark: ColorSet
+  dark: ColorSet;
+  label: string;
+  light: ColorSet;
 }
 
-function NestedDocDialogEditor({
-  initialValue,
-  onEditorReady,
-}: NestedDocDialogEditorProps) {
+function NestedDocDialogEditor({ initialValue, onEditorReady }: NestedDocDialogEditorProps) {
   return (
     <ShiroEditor
+      extraNodes={nestedDocEditNodes}
+      header={<ToolbarPlugin insertItemOrder={insertItemOrder} maxVisibleInsertItems={5} />}
       initialValue={initialValue}
       onEditorReady={onEditorReady}
-      extraNodes={nestedDocEditNodes}
-      header={
-        <ToolbarPlugin
-          maxVisibleInsertItems={5}
-          insertItemOrder={insertItemOrder}
-        />
-      }
     />
-  )
+  );
 }
 
-const emptyColors: ColorSet = { accent: '', text: '', bg: '' }
+const emptyColors: ColorSet = { accent: '', text: '', bg: '' };
 
 const colorOverridePresets: ColorPreset[] = [
   { label: 'Default', light: emptyColors, dark: emptyColors },
@@ -91,48 +79,44 @@ const colorOverridePresets: ColorPreset[] = [
     light: { accent: '#a3a3a3', text: '#525252', bg: '#fafafa' },
     dark: { accent: '#737373', text: '#a3a3a3', bg: '#0a0a0a' },
   },
-]
+];
 
 export function EditorPage() {
-  const theme = useTheme()
-  const [variant, setVariant] = useState<RichEditorVariant>('article')
-  const [editorState, setEditorState] = useState<SerializedEditorState | null>(
-    null,
-  )
-  const [showJson, setShowJson] = useState(false)
-  const [showRenderer, setShowRenderer] = useState(true)
-  const [showImport, setShowImport] = useState(false)
-  const [importJson, setImportJson] = useState('')
-  const [selectedPreset, setSelectedPreset] = useState('Default')
-  const [customAccent, setCustomAccent] = useState('')
-  const [enabledPlatforms, setEnabledPlatforms] = useState<Set<string>>(
-    new Set(),
-  )
+  const theme = useTheme();
+  const [variant, setVariant] = useState<RichEditorVariant>('article');
+  const [editorState, setEditorState] = useState<SerializedEditorState | null>(null);
+  const [showJson, setShowJson] = useState(false);
+  const [showRenderer, setShowRenderer] = useState(true);
+  const [showImport, setShowImport] = useState(false);
+  const [importJson, setImportJson] = useState('');
+  const [selectedPreset, setSelectedPreset] = useState('Default');
+  const [customAccent, setCustomAccent] = useState('');
+  const [enabledPlatforms, setEnabledPlatforms] = useState<Set<string>>(new Set());
 
   const activePlatforms = useMemo(
     () => extraMentionPlatforms.filter((p) => enabledPlatforms.has(p.key)),
     [enabledPlatforms],
-  )
+  );
 
   const togglePlatform = useCallback((key: string) => {
     setEnabledPlatforms((prev) => {
-      const next = new Set(prev)
-      if (next.has(key)) next.delete(key)
-      else next.add(key)
-      return next
-    })
-  }, [])
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
 
   const extraPlatformMeta = useMemo(() => {
     const map: Record<
       string,
       { label: string; icon: React.ReactNode; getUrl: (h: string) => string }
-    > = {}
+    > = {};
     for (const p of activePlatforms) {
-      map[p.key] = { label: p.label, icon: p.icon, getUrl: p.getUrl }
+      map[p.key] = { label: p.label, icon: p.icon, getUrl: p.getUrl };
     }
-    return map
-  }, [activePlatforms])
+    return map;
+  }, [activePlatforms]);
 
   const themeOverrideStyle = useMemo(() => {
     if (customAccent) {
@@ -143,38 +127,39 @@ export function EditorPage() {
           accentLight: `${customAccent}33`,
           quoteBorder: customAccent,
         },
-      })
+      });
     }
-    const preset = colorOverridePresets.find((p) => p.label === selectedPreset)
-    if (!preset) return
-    const colors = theme === 'dark' ? preset.dark : preset.light
-    if (!colors.accent) return
-    const overrides: Record<string, string> = {}
-    overrides.accent = colors.accent
-    overrides.link = colors.accent
-    overrides.accentLight = `${colors.accent}33`
-    overrides.quoteBorder = colors.accent
-    if (colors.text) overrides.text = colors.text
-    if (colors.bg) overrides.bg = colors.bg
-    return createThemeStyle({ color: overrides })
-  }, [selectedPreset, customAccent, theme])
+    const preset = colorOverridePresets.find((p) => p.label === selectedPreset);
+    if (!preset) return;
+    const colors = theme === 'dark' ? preset.dark : preset.light;
+    if (!colors.accent) return;
+    const overrides: Record<string, string> = {
+      accent: colors.accent,
+      link: colors.accent,
+      accentLight: `${colors.accent}33`,
+      quoteBorder: colors.accent,
+    };
+    if (colors.text) overrides.text = colors.text;
+    if (colors.bg) overrides.bg = colors.bg;
+    return createThemeStyle({ color: overrides });
+  }, [selectedPreset, customAccent, theme]);
 
   const handleChange = useCallback((state: SerializedEditorState) => {
-    setEditorState(state)
-  }, [])
+    setEditorState(state);
+  }, []);
 
   const handleImport = useCallback(() => {
     try {
-      const parsed = JSON.parse(importJson) as SerializedEditorState
+      const parsed = JSON.parse(importJson) as SerializedEditorState;
       if (parsed.root) {
-        setEditorState(parsed)
-        setShowImport(false)
-        setImportJson('')
+        setEditorState(parsed);
+        setShowImport(false);
+        setImportJson('');
       }
     } catch {
       // invalid JSON
     }
-  }, [importJson])
+  }, [importJson]);
 
   return (
     <NestedDocDialogEditorProvider value={NestedDocDialogEditor}>
@@ -207,18 +192,16 @@ export function EditorPage() {
             <div className="toolbar-group">
               <span className="toolbar-label">Colors</span>
               {colorOverridePresets.map((preset) => {
-                const colors = theme === 'dark' ? preset.dark : preset.light
+                const colors = theme === 'dark' ? preset.dark : preset.light;
                 return (
                   <button
                     key={preset.label}
                     className={
-                      !customAccent && selectedPreset === preset.label
-                        ? 'btn btn-active'
-                        : 'btn'
+                      !customAccent && selectedPreset === preset.label ? 'btn btn-active' : 'btn'
                     }
                     onClick={() => {
-                      setSelectedPreset(preset.label)
-                      setCustomAccent('')
+                      setSelectedPreset(preset.label);
+                      setCustomAccent('');
                     }}
                   >
                     {colors.accent && (
@@ -236,7 +219,7 @@ export function EditorPage() {
                     )}
                     {preset.label}
                   </button>
-                )
+                );
               })}
               <label
                 className={customAccent ? 'btn btn-active' : 'btn'}
@@ -244,12 +227,12 @@ export function EditorPage() {
               >
                 Custom
                 <input
+                  style={{ width: 20, height: 20, border: 'none', padding: 0 }}
                   type="color"
                   value={customAccent || '#33a6b8'}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setCustomAccent(e.target.value)
                   }
-                  style={{ width: 20, height: 20, border: 'none', padding: 0 }}
                 />
               </label>
             </div>
@@ -258,10 +241,8 @@ export function EditorPage() {
               <span className="toolbar-label">Mention+</span>
               {extraMentionPlatforms.map((p) => (
                 <button
+                  className={enabledPlatforms.has(p.key) ? 'btn btn-active' : 'btn'}
                   key={p.key}
-                  className={
-                    enabledPlatforms.has(p.key) ? 'btn btn-active' : 'btn'
-                  }
                   onClick={() => togglePlatform(p.key)}
                 >
                   {p.label}
@@ -293,26 +274,19 @@ export function EditorPage() {
           </div>
 
           {/* Editor panel */}
-          <Panel title="Editor" badge={variant} bodyStyle={{ padding: 0 }}>
+          <Panel badge={variant} bodyStyle={{ padding: 0 }} title="Editor">
             <ShiroEditor
-              initialValue={initialContent}
-              onChange={handleChange}
-              variant={variant}
-              theme={theme}
-              style={themeOverrideStyle}
-              placeholder="Start typing... Try markdown shortcuts like # heading, **bold**, *italic*, > quote, ||spoiler||"
-              onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
-              header={
-                <ToolbarPlugin
-                  maxVisibleInsertItems={5}
-                  insertItemOrder={insertItemOrder}
-                />
-              }
               autoFocus
+              extraMentionPlatforms={activePlatforms.length > 0 ? activePlatforms : undefined}
               extraNodes={nestedDocEditNodes}
-              extraMentionPlatforms={
-                activePlatforms.length > 0 ? activePlatforms : undefined
-              }
+              header={<ToolbarPlugin insertItemOrder={insertItemOrder} maxVisibleInsertItems={5} />}
+              initialValue={initialContent}
+              placeholder="Start typing... Try markdown shortcuts like # heading, **bold**, *italic*, > quote, ||spoiler||"
+              style={themeOverrideStyle}
+              theme={theme}
+              variant={variant}
+              onChange={handleChange}
+              onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
             >
               <NestedDocPlugin />
             </ShiroEditor>
@@ -320,13 +294,13 @@ export function EditorPage() {
 
           {/* Renderer panel */}
           {showRenderer && editorState && (
-            <Panel title="Renderer (readonly)" badge={variant}>
+            <Panel badge={variant} title="Renderer (readonly)">
               <ShiroRenderer
+                extraNodes={nestedDocNodes}
+                style={themeOverrideStyle}
+                theme={theme}
                 value={editorState}
                 variant={variant}
-                theme={theme}
-                style={themeOverrideStyle}
-                extraNodes={nestedDocNodes}
               />
             </Panel>
           )}
@@ -339,18 +313,14 @@ export function EditorPage() {
                 <button
                   className="btn btn-sm"
                   onClick={() => {
-                    navigator.clipboard.writeText(
-                      JSON.stringify(editorState, null, 2),
-                    )
+                    navigator.clipboard.writeText(JSON.stringify(editorState, null, 2));
                   }}
                 >
                   Copy
                 </button>
               }
             >
-              <pre className="json-pre">
-                {JSON.stringify(editorState, null, 2)}
-              </pre>
+              <pre className="json-pre">{JSON.stringify(editorState, null, 2)}</pre>
             </Panel>
           )}
 
@@ -359,12 +329,12 @@ export function EditorPage() {
             <Panel title="Import JSON">
               <textarea
                 className="import-textarea"
+                placeholder="Paste serialized EditorState JSON here..."
+                rows={8}
                 value={importJson}
                 onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
                   setImportJson(e.target.value)
                 }
-                placeholder="Paste serialized EditorState JSON here..."
-                rows={8}
               />
               <div style={{ marginTop: '8px', display: 'flex', gap: '8px' }}>
                 <button className="btn btn-active" onClick={handleImport}>
@@ -373,8 +343,8 @@ export function EditorPage() {
                 <button
                   className="btn"
                   onClick={() => {
-                    setShowImport(false)
-                    setImportJson('')
+                    setShowImport(false);
+                    setImportJson('');
                   }}
                 >
                   Cancel
@@ -413,5 +383,5 @@ export function EditorPage() {
         </div>
       </MentionPlatformProvider>
     </NestedDocDialogEditorProvider>
-  )
+  );
 }

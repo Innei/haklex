@@ -1,4 +1,4 @@
-import type { SerializedEditorState } from 'lexical'
+import type { SerializedEditorState } from 'lexical';
 
 import {
   alertQuote,
@@ -18,23 +18,15 @@ import {
   paragraph,
   quote,
   text,
-} from './helpers'
-import { markdownTestPreset } from './markdown-test-preset'
+} from './helpers';
+import { markdownTestPreset } from './markdown-test-preset';
 
 // ── Excalidraw diagram element builders ──────────────────────────
 
-let _exSeed = 1000
+let _exSeed = 1000;
 
-function _exBox(
-  id: string,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  bg: string,
-  label: string,
-) {
-  const tid = `${id}_t`
+function _exBox(id: string, x: number, y: number, w: number, h: number, bg: string, label: string) {
+  const tid = `${id}_t`;
   return [
     {
       id,
@@ -99,7 +91,7 @@ function _exBox(
       locked: false,
       lineHeight: 1.25,
     },
-  ]
+  ];
 }
 
 function _exArrow(
@@ -137,23 +129,19 @@ function _exArrow(
     updated: 1,
     link: null,
     locked: false,
-    startBinding: from
-      ? { elementId: from, focus: 0, gap: 5, fixedPoint: null }
-      : null,
-    endBinding: to
-      ? { elementId: to, focus: 0, gap: 5, fixedPoint: null }
-      : null,
+    startBinding: from ? { elementId: from, focus: 0, gap: 5, fixedPoint: null } : null,
+    endBinding: to ? { elementId: to, focus: 0, gap: 5, fixedPoint: null } : null,
     lastCommittedPoint: null,
     startArrowhead: null,
     endArrowhead: 'arrow',
-  }
+  };
 }
 
 function _exDiagram(...parts: any[]) {
   return JSON.stringify({
     elements: parts.flat(),
     appState: { viewBackgroundColor: '#ffffff' },
-  })
+  });
 }
 
 // Diagram 1: System architecture overview
@@ -207,7 +195,7 @@ const diagramArchitecture = _exDiagram(
     'gw',
     's3',
   ),
-)
+);
 
 // Diagram 2: Request lifecycle (vertical)
 const diagramRequestFlow = _exDiagram(
@@ -272,7 +260,7 @@ const diagramRequestFlow = _exDiagram(
     'r5',
     'r6',
   ),
-)
+);
 
 // Diagram 3: Event-driven communication
 const diagramEventDriven = _exDiagram(
@@ -325,7 +313,7 @@ const diagramEventDriven = _exDiagram(
     'mq',
     'c2x',
   ),
-)
+);
 
 // Diagram 4: Database per service
 const diagramDatabase = _exDiagram(
@@ -402,7 +390,7 @@ const diagramDatabase = _exDiagram(
     'ds3',
     'bus',
   ),
-)
+);
 
 // Diagram 5: CI/CD Pipeline
 const diagramCICD = _exDiagram(
@@ -455,20 +443,19 @@ const diagramCICD = _exDiagram(
     'ci4',
     'ci5',
   ),
-)
+);
 
 export interface Preset {
-  key: string
-  label: string
-  description: string
-  data: SerializedEditorState
+  data: SerializedEditorState;
+  description: string;
+  key: string;
+  label: string;
 }
 
 const notePreset: Preset = {
   key: 'note-diary',
   label: 'Note (Diary)',
-  description:
-    'Note variant showcase: serif font, drop cap, text-indent, accent blockquote',
+  description: 'Note variant showcase: serif font, drop cap, text-indent, accent blockquote',
   data: doc(
     paragraph(
       text(
@@ -485,13 +472,9 @@ const notePreset: Preset = {
     quote(paragraph(text('山中何事？松花酿酒，春水煎茶。', FORMAT_ITALIC))),
 
     paragraph(
-      text(
-        '傍晚时分，与友人相约茶室。品茗论道，谈及近日所读之书，皆有所悟。友人言：「',
-      ),
+      text('傍晚时分，与友人相约茶室。品茗论道，谈及近日所读之书，皆有所悟。友人言：「'),
       text('读书不在多，而在于精', FORMAT_BOLD),
-      text(
-        '。」深以为然。一本好书，反复研读，每次皆有新得。此即所谓温故而知新也',
-      ),
+      text('。」深以为然。一本好书，反复研读，每次皆有新得。此即所谓温故而知新也'),
       footnote('1') as any,
       text('。'),
     ),
@@ -544,7 +527,7 @@ const notePreset: Preset = {
       '2': '沈复（1763—1825），清代文学家，著有《浮生六记》，记述其与妻陈芸的日常生活。',
     }) as any,
   ),
-}
+};
 
 export const presets: Preset[] = [
   notePreset,
@@ -630,9 +613,7 @@ export const presets: Preset[] = [
       heading('h1', text('Enhanced Renderers Demo')),
 
       paragraph(
-        text(
-          'This preset showcases the enhanced renderers from standalone packages: ',
-        ),
+        text('This preset showcases the enhanced renderers from standalone packages: '),
         text('@haklex/rich-renderer-codeblock', FORMAT_CODE),
         text(', '),
         text('@haklex/rich-renderer-image', FORMAT_CODE),
@@ -741,8 +722,7 @@ async function bootstrapFeed() {
         type: 'link-card',
         url: 'https://github.com/facebook/react',
         title: 'facebook/react',
-        description:
-          'A JavaScript library for building user interfaces (fallback)',
+        description: 'A JavaScript library for building user interfaces (fallback)',
         version: 1,
       } as any,
 
@@ -752,8 +732,7 @@ async function bootstrapFeed() {
         type: 'link-card',
         url: 'https://example.com/article',
         title: 'Example Article Title',
-        description:
-          'This demonstrates the basic LinkCard renderer with static props.',
+        description: 'This demonstrates the basic LinkCard renderer with static props.',
         favicon: 'https://example.com/favicon.ico',
         image: 'https://picsum.photos/400/200?random=linkcard1',
         version: 1,
@@ -763,8 +742,7 @@ async function bootstrapFeed() {
         type: 'link-card',
         url: 'https://another-example.com',
         title: 'Another Example with Image',
-        description:
-          'LinkCards support optional images and favicons for richer previews.',
+        description: 'LinkCards support optional images and favicons for richer previews.',
         image: 'https://picsum.photos/400/200?random=linkcard2',
         version: 1,
       } as any,
@@ -941,16 +919,10 @@ async function bootstrapFeed() {
       list(
         'bullet',
         listItem(
-          paragraph(
-            text('CodeBlock: '),
-            text('Language badge + copy + collapse', FORMAT_BOLD),
-          ),
+          paragraph(text('CodeBlock: '), text('Language badge + copy + collapse', FORMAT_BOLD)),
         ),
         listItem(
-          paragraph(
-            text('Image: '),
-            text('Blurhash placeholder + zoom viewer', FORMAT_BOLD),
-          ),
+          paragraph(text('Image: '), text('Blurhash placeholder + zoom viewer', FORMAT_BOLD)),
         ),
         listItem(
           paragraph(
@@ -959,40 +931,16 @@ async function bootstrapFeed() {
           ),
         ),
         listItem(
-          paragraph(
-            text('LinkCard: '),
-            text('Plugin system for dynamic fetching', FORMAT_BOLD),
-          ),
+          paragraph(text('LinkCard: '), text('Plugin system for dynamic fetching', FORMAT_BOLD)),
         ),
+        listItem(paragraph(text('LinkCard: '), text('Spotlight hover effects', FORMAT_BOLD))),
+        listItem(paragraph(text('LinkCard: '), text('Platform-specific styling', FORMAT_BOLD))),
         listItem(
-          paragraph(
-            text('LinkCard: '),
-            text('Spotlight hover effects', FORMAT_BOLD),
-          ),
+          paragraph(text('Gallery: '), text('Carousel with bi-directional autoplay', FORMAT_BOLD)),
         ),
+        listItem(paragraph(text('Gallery: '), text('Photo zoom lightbox', FORMAT_BOLD))),
         listItem(
-          paragraph(
-            text('LinkCard: '),
-            text('Platform-specific styling', FORMAT_BOLD),
-          ),
-        ),
-        listItem(
-          paragraph(
-            text('Gallery: '),
-            text('Carousel with bi-directional autoplay', FORMAT_BOLD),
-          ),
-        ),
-        listItem(
-          paragraph(
-            text('Gallery: '),
-            text('Photo zoom lightbox', FORMAT_BOLD),
-          ),
-        ),
-        listItem(
-          paragraph(
-            text('Gallery: '),
-            text('Grid, Masonry, Carousel layouts', FORMAT_BOLD),
-          ),
+          paragraph(text('Gallery: '), text('Grid, Masonry, Carousel layouts', FORMAT_BOLD)),
         ),
         listItem(
           paragraph(
@@ -1011,8 +959,7 @@ async function bootstrapFeed() {
   {
     key: 'comprehensive-article',
     label: 'Comprehensive Article',
-    description:
-      'Complete showcase featuring ALL node types in a realistic blog post',
+    description: 'Complete showcase featuring ALL node types in a realistic blog post',
     data: doc(
       heading('h1', text('Building Modern Web Applications: A Complete Guide')),
 
@@ -1032,8 +979,7 @@ async function bootstrapFeed() {
         type: 'image',
         src: 'https://picsum.photos/1200/600?random=hero',
         altText: 'Modern web development workspace',
-        caption:
-          'A modern development environment with multiple monitors showing code',
+        caption: 'A modern development environment with multiple monitors showing code',
         width: 1200,
         height: 600,
         thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
@@ -1095,9 +1041,7 @@ async function bootstrapFeed() {
           handle: 'gaearon',
           version: 1,
         } as any,
-        text(
-          ' famously said, simplicity is key. This philosophy guides modern framework design.',
-        ),
+        text(' famously said, simplicity is key. This philosophy guides modern framework design.'),
       ),
 
       heading('h2', text('2. Setting Up Your Development Environment')),
@@ -1113,11 +1057,7 @@ async function bootstrapFeed() {
         ),
       ) as any,
 
-      paragraph(
-        text(
-          "Here's a quick installation script for setting up a modern React project:",
-        ),
-      ),
+      paragraph(text("Here's a quick installation script for setting up a modern React project:")),
 
       {
         type: 'code-block',
@@ -1255,17 +1195,13 @@ export default async function PostsPage() {
             listItem(
               paragraph(
                 text('Jotai', FORMAT_BOLD),
-                text(
-                  ' - Atomic approach, perfect for derived state, 3KB gzipped',
-                ),
+                text(' - Atomic approach, perfect for derived state, 3KB gzipped'),
               ),
             ),
             listItem(
               paragraph(
                 text('Redux Toolkit', FORMAT_BOLD),
-                text(
-                  ' - Battle-tested, excellent DevTools, but heavier at 12KB',
-                ),
+                text(' - Battle-tested, excellent DevTools, but heavier at 12KB'),
               ),
             ),
           ),
@@ -1281,9 +1217,7 @@ export default async function PostsPage() {
       heading('h3', text('Mathematical Optimization')),
 
       paragraph(
-        text(
-          'When optimizing rendering performance, we often need to calculate the ',
-        ),
+        text('When optimizing rendering performance, we often need to calculate the '),
         text('time complexity', FORMAT_BOLD),
         text('. The optimal algorithm has a complexity of '),
         {
@@ -1339,9 +1273,7 @@ export default async function PostsPage() {
       alertQuote(
         'caution',
         paragraph(
-          text(
-            '🚨 Caution: XSS attacks are still prevalent. Always sanitize user input and use ',
-          ),
+          text('🚨 Caution: XSS attacks are still prevalent. Always sanitize user input and use '),
           text('dangerouslySetInnerHTML', FORMAT_CODE),
           text(' sparingly.'),
         ),
@@ -1377,9 +1309,7 @@ export default async function PostsPage() {
             type: 'listitem',
             checked: true,
             value: 1,
-            children: [
-              paragraph(text('Set up CI/CD pipeline with GitHub Actions')),
-            ],
+            children: [paragraph(text('Set up CI/CD pipeline with GitHub Actions'))],
             direction: 'ltr',
             format: '',
             indent: 0,
@@ -1444,11 +1374,7 @@ export default async function PostsPage() {
 
       heading('h3', text('Performance Metrics')),
 
-      paragraph(
-        text(
-          "Here's a real-world performance comparison from our production deployment:",
-        ),
-      ),
+      paragraph(text("Here's a real-world performance comparison from our production deployment:")),
 
       {
         type: 'gallery',
@@ -1504,9 +1430,7 @@ export default async function PostsPage() {
 
       heading('h2', text('Video Tutorial')),
 
-      paragraph(
-        text('Watch this comprehensive walkthrough of the deployment process:'),
-      ),
+      paragraph(text('Watch this comprehensive walkthrough of the deployment process:')),
 
       {
         type: 'video',
@@ -1517,27 +1441,17 @@ export default async function PostsPage() {
         version: 1,
       } as any,
 
-      paragraph(
-        text(
-          'Complete deployment workflow tutorial (25 minutes)',
-          FORMAT_ITALIC,
-        ),
-      ),
+      paragraph(text('Complete deployment workflow tutorial (25 minutes)', FORMAT_ITALIC)),
 
       heading('h2', text('Additional Resources')),
 
-      paragraph(
-        text(
-          'For more in-depth coverage, check out these excellent resources:',
-        ),
-      ),
+      paragraph(text('For more in-depth coverage, check out these excellent resources:')),
 
       {
         type: 'link-card',
         url: 'https://react.dev',
         title: 'React Documentation',
-        description:
-          'The official React documentation with comprehensive guides and API reference',
+        description: 'The official React documentation with comprehensive guides and API reference',
         favicon: 'https://react.dev/favicon.ico',
         image: 'https://react.dev/images/og-home.png',
         version: 1,
@@ -1606,20 +1520,14 @@ export default async function PostsPage() {
 
       horizontalRule(),
 
-      paragraph(
-        text(
-          'Published: January 2026 | Reading time: 15 minutes',
-          FORMAT_ITALIC,
-        ),
-      ),
+      paragraph(text('Published: January 2026 | Reading time: 15 minutes', FORMAT_ITALIC)),
     ),
   },
 
   {
     key: 'tech-article',
     label: 'Technical Article',
-    description:
-      'Comprehensive technical article with code, math, alerts, and advanced features',
+    description: 'Comprehensive technical article with code, math, alerts, and advanced features',
     data: doc(
       heading('h1', text('Building a Lexical Editor: A Complete Guide')),
 
@@ -1631,9 +1539,7 @@ export default async function PostsPage() {
 
       alertQuote(
         'note',
-        paragraph(
-          text('This guide assumes familiarity with React and TypeScript.'),
-        ),
+        paragraph(text('This guide assumes familiarity with React and TypeScript.')),
       ) as any,
 
       heading('h2', text('Core Concepts')),
@@ -1697,9 +1603,7 @@ export default async function PostsPage() {
       heading('h2', text('Mathematical Expressions')),
 
       paragraph(
-        text(
-          'Lexical can render beautiful math equations. The quadratic formula ',
-        ),
+        text('Lexical can render beautiful math equations. The quadratic formula '),
         {
           type: 'katex-inline',
           equation: 'x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a}',
@@ -1725,9 +1629,7 @@ export default async function PostsPage() {
         children: [
           list(
             'number',
-            listItem(
-              paragraph(text('Forgetting to register custom nodes in config')),
-            ),
+            listItem(paragraph(text('Forgetting to register custom nodes in config'))),
             listItem(paragraph(text('Not stabilizing onEditorReady callback'))),
             listItem(paragraph(text('Mutating editor state outside updates'))),
           ),
@@ -1820,8 +1722,7 @@ export default async function PostsPage() {
   {
     key: 'excalidraw-multi-board',
     label: 'Tech Article (Multi-Excalidraw)',
-    description:
-      'Technical article with multiple Excalidraw whiteboards for lazy-loading testing',
+    description: 'Technical article with multiple Excalidraw whiteboards for lazy-loading testing',
     data: doc(
       heading('h1', text('微服务架构设计与实践')),
 
@@ -1854,9 +1755,7 @@ export default async function PostsPage() {
       excalidraw(diagramArchitecture) as any,
 
       paragraph(
-        text(
-          '上图展示了一个简化的微服务拓扑：客户端通过 API Gateway 访问三个核心服务——',
-        ),
+        text('上图展示了一个简化的微服务拓扑：客户端通过 API Gateway 访问三个核心服务——'),
         text('User Service', FORMAT_BOLD),
         text('、'),
         text('Order Service', FORMAT_BOLD),
@@ -1897,10 +1796,7 @@ export default async function PostsPage() {
           ),
         ),
         listItem(
-          paragraph(
-            text('Auth Middleware', FORMAT_BOLD),
-            text('：JWT 令牌验证 + RBAC 权限校验'),
-          ),
+          paragraph(text('Auth Middleware', FORMAT_BOLD), text('：JWT 令牌验证 + RBAC 权限校验')),
         ),
         listItem(
           paragraph(
@@ -2004,12 +1900,7 @@ await eventBus.publish('order.created', {
 
       list(
         'number',
-        listItem(
-          paragraph(
-            text('Git Push', FORMAT_BOLD),
-            text('：触发 Webhook，启动 CI 流水线'),
-          ),
-        ),
+        listItem(paragraph(text('Git Push', FORMAT_BOLD), text('：触发 Webhook，启动 CI 流水线'))),
         listItem(
           paragraph(
             text('Build', FORMAT_BOLD),
@@ -2023,10 +1914,7 @@ await eventBus.publish('order.created', {
           ),
         ),
         listItem(
-          paragraph(
-            text('Staging', FORMAT_BOLD),
-            text('：部署至预发环境，执行冒烟测试和性能基准'),
-          ),
+          paragraph(text('Staging', FORMAT_BOLD), text('：部署至预发环境，执行冒烟测试和性能基准')),
         ),
         listItem(
           paragraph(
@@ -2057,4 +1945,4 @@ await eventBus.publish('order.created', {
       ),
     ),
   },
-]
+];

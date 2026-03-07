@@ -1,18 +1,18 @@
-import type { MentionPlatformMeta } from '@haklex/rich-kit-shiro'
+import type { MentionPlatformMeta } from '@haklex/rich-kit-shiro';
 import {
   SiBilibili,
   SiDiscord,
   SiMastodon,
   SiReddit,
   SiYoutube,
-} from '@icons-pack/react-simple-icons'
-import { createElement } from 'react'
+} from '@icons-pack/react-simple-icons';
+import { createElement } from 'react';
 
 export interface ExtraMentionPlatformDef {
-  key: string
-  label: string
-  icon: React.ReactNode
-  getUrl: (handle: string) => string
+  getUrl: (handle: string) => string;
+  icon: React.ReactNode;
+  key: string;
+  label: string;
 }
 
 export const extraMentionPlatforms: ExtraMentionPlatformDef[] = [
@@ -46,12 +46,8 @@ export const extraMentionPlatforms: ExtraMentionPlatformDef[] = [
     icon: createElement(SiMastodon, { size: '1em', color: '#6364FF' }),
     getUrl: (h) => `https://mastodon.social/@${encodeURIComponent(h)}`,
   },
-]
+];
 
-export const allExtraPlatformMeta: Record<string, MentionPlatformMeta> =
-  Object.fromEntries(
-    extraMentionPlatforms.map((p) => [
-      p.key,
-      { label: p.label, icon: p.icon, getUrl: p.getUrl },
-    ]),
-  )
+export const allExtraPlatformMeta: Record<string, MentionPlatformMeta> = Object.fromEntries(
+  extraMentionPlatforms.map((p) => [p.key, { label: p.label, icon: p.icon, getUrl: p.getUrl }]),
+);

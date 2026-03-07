@@ -1,18 +1,17 @@
+import type { CommandItemConfig } from '@haklex/rich-editor/commands';
 import {
-  type CommandItemConfig,
-  createRendererDecoration,
   LinkCardNode,
   type LinkCardNodePayload,
-  LinkCardRenderer,
   type SerializedLinkCardNode,
-} from '@haklex/rich-editor'
-import type { EditorConfig, Klass, LexicalEditor, LexicalNode } from 'lexical'
-import { $insertNodes } from 'lexical'
-import { Link } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from '@haklex/rich-editor/nodes';
+import { createRendererDecoration, LinkCardRenderer } from '@haklex/rich-editor/renderers';
+import type { EditorConfig, Klass, LexicalEditor, LexicalNode } from 'lexical';
+import { $insertNodes } from 'lexical';
+import { Link } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { LinkCardEditDecorator } from './LinkCardEditDecorator'
+import { LinkCardEditDecorator } from './LinkCardEditDecorator';
 
 export class LinkCardEditNode extends LinkCardNode {
   static commandItems: CommandItemConfig[] = [
@@ -24,11 +23,11 @@ export class LinkCardEditNode extends LinkCardNode {
       section: 'MEDIA',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createLinkCardEditNode({ url: '' })])
-        })
+          $insertNodes([$createLinkCardEditNode({ url: '' })]);
+        });
       },
     },
-  ]
+  ];
 
   static clone(node: LinkCardEditNode): LinkCardEditNode {
     return new LinkCardEditNode(
@@ -40,7 +39,7 @@ export class LinkCardEditNode extends LinkCardNode {
         image: node.__image,
       },
       node.__key,
-    )
+    );
   }
 
   static importJSON(serializedNode: SerializedLinkCardNode): LinkCardEditNode {
@@ -50,7 +49,7 @@ export class LinkCardEditNode extends LinkCardNode {
       description: serializedNode.description,
       favicon: serializedNode.favicon,
       image: serializedNode.image,
-    })
+    });
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -60,24 +59,18 @@ export class LinkCardEditNode extends LinkCardNode {
       description: this.__description,
       favicon: this.__favicon,
       image: this.__image,
-    }
-    const rendererEl = createRendererDecoration(
-      'LinkCard',
-      LinkCardRenderer,
-      payload,
-    )
+    };
+    const rendererEl = createRendererDecoration('LinkCard', LinkCardRenderer, payload);
     return createElement(LinkCardEditDecorator, {
       nodeKey: this.__key,
       payload,
       children: rendererEl,
-    })
+    });
   }
 }
 
-export function $createLinkCardEditNode(
-  payload: LinkCardNodePayload,
-): LinkCardEditNode {
-  return new LinkCardEditNode(payload)
+export function $createLinkCardEditNode(payload: LinkCardNodePayload): LinkCardEditNode {
+  return new LinkCardEditNode(payload);
 }
 
-export const linkCardEditNodes: Array<Klass<LexicalNode>> = [LinkCardEditNode]
+export const linkCardEditNodes: Array<Klass<LexicalNode>> = [LinkCardEditNode];

@@ -1,32 +1,20 @@
-import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui'
-import { useAtomValue, useSetAtom } from 'jotai'
-import {
-  Copy,
-  Download,
-  ExternalLink,
-  Replace,
-  Trash2,
-  Type,
-} from 'lucide-react'
+import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { Copy, Download, ExternalLink, Replace, Trash2, Type } from 'lucide-react';
 
-import { metaOpenAtom, replaceOpenAtom, toolbarVisibleAtom } from './atoms'
-import { EditMetaPopover } from './EditMetaPopover'
-import { ReplacePanel } from './ReplacePanel'
-import * as styles from './styles.css'
-import { useImageActions } from './useImageActions'
+import { metaOpenAtom, replaceOpenAtom, toolbarVisibleAtom } from './atoms';
+import { EditMetaPopover } from './EditMetaPopover';
+import { ReplacePanel } from './ReplacePanel';
+import * as styles from './styles.css';
+import { useImageActions } from './useImageActions';
 
 export function ImageEditToolbar() {
-  const toolbarVisible = useAtomValue(toolbarVisibleAtom)
-  const metaOpen = useAtomValue(metaOpenAtom)
-  const setMetaOpen = useSetAtom(metaOpenAtom)
-  const replaceOpen = useAtomValue(replaceOpenAtom)
-  const {
-    handleReplaceOpenChange,
-    handleOpen,
-    handleDuplicate,
-    handleDownload,
-    handleDelete,
-  } = useImageActions()
+  const toolbarVisible = useAtomValue(toolbarVisibleAtom);
+  const metaOpen = useAtomValue(metaOpenAtom);
+  const setMetaOpen = useSetAtom(metaOpenAtom);
+  const replaceOpen = useAtomValue(replaceOpenAtom);
+  const { handleReplaceOpenChange, handleOpen, handleDuplicate, handleDownload, handleDelete } =
+    useImageActions();
 
   return (
     <div
@@ -35,8 +23,8 @@ export function ImageEditToolbar() {
       <Popover
         open={metaOpen}
         onOpenChange={(nextOpen) => {
-          setMetaOpen(nextOpen)
-          if (nextOpen) handleReplaceOpenChange(false)
+          setMetaOpen(nextOpen);
+          if (nextOpen) handleReplaceOpenChange(false);
         }}
       >
         <PopoverTrigger
@@ -45,7 +33,7 @@ export function ImageEditToolbar() {
         >
           <Type size={14} />
         </PopoverTrigger>
-        <PopoverPanel side="bottom" sideOffset={8} className={styles.editPanel}>
+        <PopoverPanel className={styles.editPanel} side="bottom" sideOffset={8}>
           <EditMetaPopover />
         </PopoverPanel>
       </Popover>
@@ -53,8 +41,8 @@ export function ImageEditToolbar() {
       <Popover
         open={replaceOpen}
         onOpenChange={(nextOpen) => {
-          handleReplaceOpenChange(nextOpen)
-          if (nextOpen) setMetaOpen(false)
+          handleReplaceOpenChange(nextOpen);
+          if (nextOpen) setMetaOpen(false);
         }}
       >
         <PopoverTrigger
@@ -63,62 +51,62 @@ export function ImageEditToolbar() {
         >
           <Replace size={14} />
         </PopoverTrigger>
-        <PopoverPanel side="bottom" sideOffset={8} className={styles.editPanel}>
+        <PopoverPanel className={styles.editPanel} side="bottom" sideOffset={8}>
           <ReplacePanel />
         </PopoverPanel>
       </Popover>
 
       <button
         className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}
-        type="button"
-        onMouseDown={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-        }}
-        onClick={handleOpen}
         title="Open source"
+        type="button"
+        onClick={handleOpen}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
       >
         <ExternalLink size={14} />
       </button>
 
       <button
         className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}
-        type="button"
-        onMouseDown={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-        }}
-        onClick={handleDuplicate}
         title="Duplicate"
+        type="button"
+        onClick={handleDuplicate}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
       >
         <Copy size={14} />
       </button>
 
       <button
         className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}
-        type="button"
-        onMouseDown={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-        }}
-        onClick={handleDownload}
         title="Download"
+        type="button"
+        onClick={handleDownload}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
       >
         <Download size={14} />
       </button>
 
       <button
         className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton} ${styles.editToolbarButtonDanger} ${styles.semanticClassNames.editToolbarButtonDanger}`}
-        type="button"
-        onMouseDown={(e) => {
-          e.preventDefault()
-          e.stopPropagation()
-        }}
-        onClick={handleDelete}
         title="Remove image"
+        type="button"
+        onClick={handleDelete}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
       >
         <Trash2 size={14} />
       </button>
     </div>
-  )
+  );
 }

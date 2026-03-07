@@ -1,15 +1,15 @@
-import root from 'react-shadow'
+import root from 'react-shadow';
 
-import type { ShiroRendererProps } from './ShiroRenderer'
-import { ShiroRenderer } from './ShiroRenderer'
+import type { ShiroRendererProps } from './ShiroRenderer';
+import { ShiroRenderer } from './ShiroRenderer';
 // @ts-expect-error -- vite ?inline returns processed CSS as string
-import cssText from './style.css?inline'
+import cssText from './style.css?inline';
 
-const resolvedCss = (cssText as string).replaceAll(':root {', ':root, :host {')
+const resolvedCss = (cssText as string).replaceAll(':root {', ':root, :host {');
 
 export type IsolateRendererProps = ShiroRendererProps & {
-  extraCss?: string
-}
+  extraCss?: string;
+};
 
 export function IsolateRenderer({
   theme = 'light',
@@ -19,7 +19,7 @@ export function IsolateRenderer({
 }: IsolateRendererProps) {
   return (
     <root.div className={className}>
-      <div id="shadow-html" data-theme={theme} suppressHydrationWarning>
+      <div suppressHydrationWarning data-theme={theme} id="shadow-html">
         <style
           dangerouslySetInnerHTML={{
             __html: extraCss ? resolvedCss + extraCss : resolvedCss,
@@ -28,5 +28,5 @@ export function IsolateRenderer({
         <ShiroRenderer {...props} theme={theme} />
       </div>
     </root.div>
-  )
+  );
 }

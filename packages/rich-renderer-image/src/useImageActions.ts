@@ -1,14 +1,10 @@
-import {
-  $createImageNode,
-  $isImageNode,
-  computeImageMeta,
-  type ImageUploadFn,
-  useImageUpload,
-} from '@haklex/rich-editor'
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { useStore } from 'jotai'
-import { $getNearestNodeFromDOMNode } from 'lexical'
-import { useCallback } from 'react'
+import { $createImageNode, $isImageNode } from '@haklex/rich-editor/nodes';
+import { type ImageUploadFn, useImageUpload } from '@haklex/rich-editor/plugins';
+import { computeImageMeta } from '@haklex/rich-editor/renderers';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { useStore } from 'jotai';
+import { $getNearestNodeFromDOMNode } from 'lexical';
+import { useCallback } from 'react';
 
 import {
   altTextAtom,
@@ -25,99 +21,97 @@ import {
   replaceUrlAtom,
   srcAtom,
   wrapperRefAtom,
-} from './atoms'
+} from './atoms';
 
 function isSafeImageSrc(src: string): boolean {
-  return !/^(?:javascript\s*:|vbscript\s*:|data\s*:(?!image\/))/i.test(src)
+  return !/^(?:javascript\s*:|vbscript\s*:|data\s*:(?!image\/))/i.test(src);
 }
 
 function readAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = () => resolve(String(reader.result))
-    reader.onerror = () => reject(reader.error ?? new Error('File read failed'))
-    reader.readAsDataURL(file)
-  })
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error('File read failed'));
+    reader.readAsDataURL(file);
+  });
 }
 
-function loadImageByUrl(
-  src: string,
-): Promise<{ width: number; height: number }> {
+function loadImageByUrl(src: string): Promise<{ width: number; height: number }> {
   return new Promise((resolve, reject) => {
-    const image = new Image()
+    const image = new Image();
     image.onload = () => {
       resolve({
         width: image.naturalWidth || image.width,
         height: image.naturalHeight || image.height,
-      })
-    }
-    image.onerror = () => reject(new Error('Image load failed'))
-    image.src = src
-  })
+      });
+    };
+    image.onerror = () => reject(new Error('Image load failed'));
+    image.src = src;
+  });
 }
 
 export function useImageActions() {
-  const store = useStore()
-  const [editor] = useLexicalComposerContext()
-  const uploadImage = useImageUpload()
+  const store = useStore();
+  const [editor] = useLexicalComposerContext();
+  const uploadImage = useImageUpload();
 
   const withImageNode = useCallback(
     (updater: (node: ReturnType<typeof $createImageNode>) => void) => {
-      const wrapperRef = store.get(wrapperRefAtom)
-      if (!wrapperRef.current) return
+      const wrapperRef = store.get(wrapperRefAtom);
+      if (!wrapperRef.current) return;
       editor.update(() => {
-        const node = $getNearestNodeFromDOMNode(wrapperRef.current!)
-        if ($isImageNode(node)) updater(node)
-      })
+        const node = $getNearestNodeFromDOMNode(wrapperRef.current!);
+        if ($isImageNode(node)) updater(node);
+      });
     },
     [editor, store],
-  )
+  );
 
   const closeReplacePanel = useCallback(() => {
-    store.set(replaceOpenAtom, false)
-    store.set(replaceModeAtom, 'upload')
-    store.set(replaceUrlAtom, '')
-    store.set(replacePreviewAtom, null)
-    store.set(replaceMetaAtom, null)
-    store.set(replaceLoadingAtom, false)
-    store.set(replaceErrorAtom, null)
-  }, [store])
+    store.set(replaceOpenAtom, false);
+    store.set(replaceModeAtom, 'upload');
+    store.set(replaceUrlAtom, '');
+    store.set(replacePreviewAtom, null);
+    store.set(replaceMetaAtom, null);
+    store.set(replaceLoadingAtom, false);
+    store.set(replaceErrorAtom, null);
+  }, [store]);
 
   const commitMeta = useCallback(() => {
-    const editSrc = store.get(editSrcAtom).trim()
-    if (!editSrc || !isSafeImageSrc(editSrc)) return
+    const editSrc = store.get(editSrcAtom).trim();
+    if (!editSrc || !isSafeImageSrc(editSrc)) return;
     withImageNode((node) => {
-      node.setSrc(editSrc)
-      node.setAltText(store.get(editAltTextAtom).trim())
-      node.setCaption(store.get(editCaptionAtom).trim() || undefined)
-    })
-    store.set(metaOpenAtom, false)
-  }, [store, withImageNode])
+      node.setSrc(editSrc);
+      node.setAltText(store.get(editAltTextAtom).trim());
+      node.setCaption(store.get(editCaptionAtom).trim() || undefined);
+    });
+    store.set(metaOpenAtom, false);
+  }, [store, withImageNode]);
 
   const handleDelete = useCallback(() => {
-    const wrapperRef = store.get(wrapperRefAtom)
-    if (!wrapperRef.current) return
+    const wrapperRef = store.get(wrapperRefAtom);
+    if (!wrapperRef.current) return;
     editor.update(() => {
-      const node = $getNearestNodeFromDOMNode(wrapperRef.current!)
-      if (node) node.remove()
-    })
-    store.set(metaOpenAtom, false)
-    closeReplacePanel()
-  }, [closeReplacePanel, editor, store])
+      const node = $getNearestNodeFromDOMNode(wrapperRef.current!);
+      if (node) node.remove();
+    });
+    store.set(metaOpenAtom, false);
+    closeReplacePanel();
+  }, [closeReplacePanel, editor, store]);
 
   const handleOpen = useCallback(() => {
-    const src = store.get(srcAtom)
-    if (src) window.open(src, '_blank', 'noopener,noreferrer')
-  }, [store])
+    const src = store.get(srcAtom);
+    if (src) window.open(src, '_blank', 'noopener,noreferrer');
+  }, [store]);
 
   const handleDownload = useCallback(() => {
-    const src = store.get(srcAtom)
-    if (!src) return
-    const link = document.createElement('a')
-    link.href = src
-    link.download = store.get(altTextAtom) || 'image'
-    link.click()
-  }, [store])
+    const src = store.get(srcAtom);
+    if (!src) return;
+    const link = document.createElement('a');
+    link.href = src;
+    link.download = store.get(altTextAtom) || 'image';
+    link.click();
+  }, [store]);
 
   const handleDuplicate = useCallback(() => {
     withImageNode((node) => {
@@ -129,85 +123,79 @@ export function useImageActions() {
         caption: node.getCaption(),
         thumbhash: node.getThumbhash(),
         accent: node.getAccent(),
-      })
-      node.insertAfter(copy)
-    })
-  }, [withImageNode])
+      });
+      node.insertAfter(copy);
+    });
+  }, [withImageNode]);
 
   const handleReplaceFile = useCallback(
     async (file: File | null) => {
-      if (!file || !file.type.startsWith('image/')) return
-      store.set(replaceLoadingAtom, true)
-      store.set(replaceErrorAtom, null)
+      if (!file || !file.type.startsWith('image/')) return;
+      store.set(replaceLoadingAtom, true);
+      store.set(replaceErrorAtom, null);
       try {
         const fallbackUploader: ImageUploadFn = async (nextFile) => ({
           src: await readAsDataUrl(nextFile),
           altText: nextFile.name,
-        })
-        const uploader = uploadImage ?? fallbackUploader
-        const [result, meta] = await Promise.all([
-          uploader(file),
-          computeImageMeta(file),
-        ])
+        });
+        const uploader = uploadImage ?? fallbackUploader;
+        const [result, meta] = await Promise.all([uploader(file), computeImageMeta(file)]);
         withImageNode((node) => {
-          node.setSrc(result.src)
-          node.setAltText(result.altText ?? file.name)
-          node.setDimensions(
-            result.width ?? meta.width,
-            result.height ?? meta.height,
-          )
-          node.setThumbhash(result.thumbhash ?? meta.thumbhash)
-        })
-        closeReplacePanel()
+          node.setSrc(result.src);
+          node.setAltText(result.altText ?? file.name);
+          node.setDimensions(result.width ?? meta.width, result.height ?? meta.height);
+          node.setThumbhash(result.thumbhash ?? meta.thumbhash);
+        });
+        closeReplacePanel();
       } catch {
-        store.set(replaceErrorAtom, 'Failed to replace image')
+        store.set(replaceErrorAtom, 'Failed to replace image');
       } finally {
-        store.set(replaceLoadingAtom, false)
+        store.set(replaceLoadingAtom, false);
       }
     },
     [closeReplacePanel, store, uploadImage, withImageNode],
-  )
+  );
 
   const handlePreviewUrl = useCallback(async () => {
-    const url = store.get(replaceUrlAtom).trim()
+    const url = store.get(replaceUrlAtom).trim();
     if (!url || !isSafeImageSrc(url)) {
-      store.set(replaceErrorAtom, 'Invalid image URL')
-      return
+      store.set(replaceErrorAtom, 'Invalid image URL');
+      return;
     }
-    store.set(replaceLoadingAtom, true)
-    store.set(replaceErrorAtom, null)
+    store.set(replaceLoadingAtom, true);
+    store.set(replaceErrorAtom, null);
     try {
-      const meta = await loadImageByUrl(url)
-      store.set(replacePreviewAtom, url)
-      store.set(replaceMetaAtom, meta)
+      const meta = await loadImageByUrl(url);
+      store.set(replacePreviewAtom, url);
+      store.set(replaceMetaAtom, meta);
     } catch {
-      store.set(replacePreviewAtom, null)
-      store.set(replaceMetaAtom, null)
-      store.set(replaceErrorAtom, 'Image URL could not be loaded')
+      store.set(replacePreviewAtom, null);
+      store.set(replaceMetaAtom, null);
+      store.set(replaceErrorAtom, 'Image URL could not be loaded');
     } finally {
-      store.set(replaceLoadingAtom, false)
+      store.set(replaceLoadingAtom, false);
     }
-  }, [store])
+  }, [store]);
 
   const handleReplaceByUrl = useCallback(() => {
-    const preview = store.get(replacePreviewAtom)
-    if (!preview || !isSafeImageSrc(preview)) return
-    const meta = store.get(replaceMetaAtom)
+    const preview = store.get(replacePreviewAtom);
+    if (!preview || !isSafeImageSrc(preview)) return;
+    const meta = store.get(replaceMetaAtom);
     withImageNode((node) => {
-      node.setSrc(preview)
-      node.setDimensions(meta?.width, meta?.height)
-      node.setThumbhash(undefined)
-    })
-    closeReplacePanel()
-  }, [closeReplacePanel, store, withImageNode])
+      node.setSrc(preview);
+      node.setDimensions(meta?.width, meta?.height);
+      node.setThumbhash(undefined);
+    });
+    closeReplacePanel();
+  }, [closeReplacePanel, store, withImageNode]);
 
   const handleReplaceOpenChange = useCallback(
     (nextOpen: boolean) => {
-      store.set(replaceOpenAtom, nextOpen)
-      if (!nextOpen) closeReplacePanel()
+      store.set(replaceOpenAtom, nextOpen);
+      if (!nextOpen) closeReplacePanel();
     },
     [closeReplacePanel, store],
-  )
+  );
 
   return {
     commitMeta,
@@ -220,5 +208,5 @@ export function useImageActions() {
     handleDuplicate,
     handleDownload,
     handleDelete,
-  }
+  };
 }

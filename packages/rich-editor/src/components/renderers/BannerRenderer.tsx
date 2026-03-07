@@ -1,13 +1,13 @@
-import type { FC } from 'react'
+import type { FC } from 'react';
 
-import type { BannerType } from '../../nodes/BannerNode'
+import type { BannerType } from '../../nodes/BannerNode';
 
 export interface BannerRendererProps {
-  type: BannerType
-  editable?: boolean
-  onTypeChange?: (type: BannerType) => void
+  editable?: boolean;
+  onTypeChange?: (type: BannerType) => void;
+  type: BannerType;
 }
 
 export const BannerRenderer: FC<BannerRendererProps> = ({ type }) => {
-  return <span className={`rich-banner-icon rich-banner-icon-${type}`} />
-}
+  return <span className={`rich-banner-icon rich-banner-icon-${type}`} />;
+};

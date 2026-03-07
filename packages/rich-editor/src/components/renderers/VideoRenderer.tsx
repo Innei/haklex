@@ -1,27 +1,22 @@
 export interface VideoRendererProps {
-  src: string
-  poster?: string
-  width?: number
-  height?: number
+  height?: number;
+  poster?: string;
+  src: string;
+  width?: number;
 }
 
-export function VideoRenderer({
-  src,
-  poster,
-  width,
-  height,
-}: VideoRendererProps) {
+export function VideoRenderer({ src, poster, width, height }: VideoRendererProps) {
   return (
     <figure className="rich-video">
       <video
-        src={src}
-        poster={poster}
-        width={width}
-        height={height}
         controls
+        height={height}
+        poster={poster}
         preload="metadata"
+        src={src}
         style={{ maxWidth: '100%', height: 'auto' }}
+        width={width}
       />
     </figure>
-  )
+  );
 }

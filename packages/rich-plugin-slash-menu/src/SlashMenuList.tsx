@@ -1,44 +1,38 @@
-import {
-  autoUpdate,
-  flip,
-  offset,
-  shift,
-  useFloating,
-} from '@floating-ui/react-dom'
-import { useEffect, useMemo } from 'react'
+import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/react-dom';
+import { useEffect, useMemo } from 'react';
 
-import type { SlashMenuItem } from './SlashMenuItem'
-import * as css from './styles.css'
+import type { SlashMenuItem } from './SlashMenuItem';
+import * as css from './styles.css';
 
 interface SlashMenuListProps {
-  anchorElement: HTMLElement
-  options: SlashMenuItem[]
-  selectedIndex: number | null
-  selectOptionAndCleanUp: (option: SlashMenuItem) => void
-  setHighlightedIndex: (index: number) => void
+  anchorElement: HTMLElement;
+  options: SlashMenuItem[];
+  selectedIndex: number | null;
+  selectOptionAndCleanUp: (option: SlashMenuItem) => void;
+  setHighlightedIndex: (index: number) => void;
 }
 
 interface SectionGroup {
-  label: string
-  items: { item: SlashMenuItem; globalIndex: number }[]
+  items: { item: SlashMenuItem; globalIndex: number }[];
+  label: string;
 }
 
 function groupBySection(options: SlashMenuItem[]): SectionGroup[] {
-  const groups: SectionGroup[] = []
-  const seen = new Map<string, SectionGroup>()
+  const groups: SectionGroup[] = [];
+  const seen = new Map<string, SectionGroup>();
 
   options.forEach((item, index) => {
-    const label = item.section
-    let group = seen.get(label)
+    const label = item.section;
+    let group = seen.get(label);
     if (!group) {
-      group = { label, items: [] }
-      seen.set(label, group)
-      groups.push(group)
+      group = { label, items: [] };
+      seen.set(label, group);
+      groups.push(group);
     }
-    group.items.push({ item, globalIndex: index })
-  })
+    group.items.push({ item, globalIndex: index });
+  });
 
-  return groups
+  return groups;
 }
 
 export function SlashMenuList({
@@ -62,60 +56,45 @@ export function SlashMenuList({
       }),
     ],
     whileElementsMounted: autoUpdate,
-  })
+  });
 
   useEffect(() => {
-    refs.setReference(anchorElement)
-  }, [anchorElement, refs])
+    refs.setReference(anchorElement);
+  }, [anchorElement, refs]);
 
-  const sections = useMemo(() => groupBySection(options), [options])
+  const sections = useMemo(() => groupBySection(options), [options]);
 
   if (options.length === 0) {
     return (
-      <div
-        ref={refs.setFloating}
-        style={floatingStyles}
-        className={css.slashMenu}
-      >
+      <div className={css.slashMenu} ref={refs.setFloating} style={floatingStyles}>
         <div className={css.slashMenuEmpty}>No matching commands</div>
       </div>
-    )
+    );
   }
 
   return (
-    <ul
-      ref={refs.setFloating}
-      style={floatingStyles}
-      className={css.slashMenu}
-      role="listbox"
-    >
+    <ul className={css.slashMenu} ref={refs.setFloating} role="listbox" style={floatingStyles}>
       {sections.map((section, sectionIndex) => (
-        <li
-          key={section.label}
-          role="presentation"
-          className={css.slashMenuSectionWrapper}
-        >
+        <li className={css.slashMenuSectionWrapper} key={section.label} role="presentation">
           {sectionIndex > 0 && <div className={css.slashMenuSectionDivider} />}
           <div className={css.slashMenuSection}>{section.label}</div>
           <ul className={css.slashMenuItems} role="group">
             {section.items.map(({ item, globalIndex }) => (
               <li
-                key={item.key}
-                className={css.slashMenuItem}
-                role="option"
                 aria-selected={globalIndex === selectedIndex}
+                className={css.slashMenuItem}
+                key={item.key}
+                ref={item.setRefElement}
+                role="option"
+                tabIndex={-1}
                 onClick={() => selectOptionAndCleanUp(item)}
                 onMouseEnter={() => setHighlightedIndex(globalIndex)}
-                ref={item.setRefElement}
-                tabIndex={-1}
               >
                 <span className={css.slashMenuItemIcon}>{item.icon}</span>
                 <span className={css.slashMenuItemText}>
                   <span className={css.slashMenuItemTitle}>{item.title}</span>
                   {item.description && (
-                    <span className={css.slashMenuItemDescription}>
-                      {item.description}
-                    </span>
+                    <span className={css.slashMenuItemDescription}>{item.description}</span>
                   )}
                 </span>
               </li>
@@ -124,5 +103,5 @@ export function SlashMenuList({
         </li>
       ))}
     </ul>
-  )
+  );
 }

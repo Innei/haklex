@@ -1,4 +1,4 @@
-import type { SerializedEditorState } from 'lexical'
+import type { SerializedEditorState } from 'lexical';
 
 import {
   alertQuote,
@@ -28,14 +28,14 @@ import {
   tableRow,
   text,
   video,
-} from './helpers'
+} from './helpers';
 
 export interface DiffSample {
-  key: string
-  label: string
-  description: string
-  oldValue: SerializedEditorState
-  newValue: SerializedEditorState
+  description: string;
+  key: string;
+  label: string;
+  newValue: SerializedEditorState;
+  oldValue: SerializedEditorState;
 }
 
 // ---------------------------------------------------------------------------
@@ -103,18 +103,14 @@ const blogPostV1 = doc(
 }`,
     version: 1,
   } as any,
-  paragraph(
-    text(
-      '这样就完成了最基础的代码块实现。接下来我们可以添加语法高亮、行号显示等功能。',
-    ),
-  ),
+  paragraph(text('这样就完成了最基础的代码块实现。接下来我们可以添加语法高亮、行号显示等功能。')),
   heading('h2', text('总结')),
   paragraph(
     text(
       'Lexical 作为新一代编辑器框架，在性能和开发体验上都有不错的表现。如果你正在寻找一个可定制的编辑器方案，它值得一试。',
     ),
   ),
-)
+);
 
 const blogPostV2 = doc(
   heading('h1', text('使用 Lexical 构建现代富文本编辑器')),
@@ -137,9 +133,7 @@ const blogPostV2 = doc(
     text('TipTap', FORMAT_CODE),
     text(' 等。Lexical 的独特之处在于其'),
     text('节点系统', FORMAT_BOLD),
-    text(
-      '——每个节点都有严格的类型约束和确定性的序列化行为，这使得跨端渲染和版本 diff 变得可靠。',
-    ),
+    text('——每个节点都有严格的类型约束和确定性的序列化行为，这使得跨端渲染和版本 diff 变得可靠。'),
   ),
   list(
     'bullet',
@@ -153,22 +147,14 @@ const blogPostV2 = doc(
   paragraph(text('Lexical 的架构分为三层：')),
   list(
     'number',
-    listItem(
-      text('Core'),
-      text(' — 编辑器内核，管理 EditorState 不可变树和更新调度'),
-    ),
+    listItem(text('Core'), text(' — 编辑器内核，管理 EditorState 不可变树和更新调度')),
     listItem(text('Nodes'), text(' — 节点定义，描述文档的结构与内容')),
-    listItem(
-      text('Plugins'),
-      text(' — 插件系统，以 React 组件的形式实现具体功能'),
-    ),
+    listItem(text('Plugins'), text(' — 插件系统，以 React 组件的形式实现具体功能')),
   ),
   paragraph(
     text('编辑器状态以不可变树的形式存在。每次修改都会产生新的 '),
     text('EditorState', FORMAT_CODE),
-    text(
-      ' 快照。这与 React 的状态管理思路一脉相承，也使得实现撤销/重做、协作编辑变得自然。',
-    ),
+    text(' 快照。这与 React 的状态管理思路一脉相承，也使得实现撤销/重做、协作编辑变得自然。'),
   ),
   quote(
     paragraph(
@@ -227,9 +213,7 @@ const blogPostV2 = doc(
     text('clone()', FORMAT_CODE),
     text(' 和 '),
     text('exportJSON()', FORMAT_CODE),
-    text(
-      ' 是 Lexical 节点的必需方法。前者用于节点复制（拖拽、协作同步），后者用于序列化到 JSON。',
-    ),
+    text(' 是 Lexical 节点的必需方法。前者用于节点复制（拖拽、协作同步），后者用于序列化到 JSON。'),
   ),
   heading('h2', text('渲染器模式')),
   paragraph(
@@ -247,14 +231,10 @@ const blogPostV2 = doc(
 </LexicalComposer>`,
     version: 1,
   } as any,
-  paragraph(
-    text('这意味着你只需维护一套节点代码，即可同时支持编辑和阅读场景。'),
-  ),
+  paragraph(text('这意味着你只需维护一套节点代码，即可同时支持编辑和阅读场景。')),
   heading('h2', text('总结与展望')),
   paragraph(
-    text(
-      'Lexical 作为新一代编辑器框架，在性能、类型安全和开发体验上都有出色的表现。',
-    ),
+    text('Lexical 作为新一代编辑器框架，在性能、类型安全和开发体验上都有出色的表现。'),
     text('结合 React 19 的新特性', FORMAT_BOLD),
     text('，它在 Server Components 渲染、流式注水等场景中也展现出了潜力。'),
   ),
@@ -264,7 +244,7 @@ const blogPostV2 = doc(
     listItem(link('https://lexical.dev', text('Lexical 官方文档'))),
     listItem(link('https://github.com/facebook/lexical', text('GitHub 仓库'))),
   ),
-)
+);
 
 // ---------------------------------------------------------------------------
 // Sample 2: Technical changelog / release notes revision
@@ -272,11 +252,7 @@ const blogPostV2 = doc(
 
 const changelogV1 = doc(
   heading('h1', text('v2.4.0 Release Notes')),
-  paragraph(
-    text(
-      'Released on 2025-12-01. This release focuses on performance and bug fixes.',
-    ),
-  ),
+  paragraph(text('Released on 2025-12-01. This release focuses on performance and bug fixes.')),
   heading('h2', text('Breaking Changes')),
   list(
     'bullet',
@@ -292,11 +268,7 @@ const changelogV1 = doc(
   list(
     'bullet',
     listItem(text('Added drag-and-drop support for block reordering')),
-    listItem(
-      text('New '),
-      text('ImageNode', FORMAT_CODE),
-      text(' with thumbhash placeholder'),
-    ),
+    listItem(text('New '), text('ImageNode', FORMAT_CODE), text(' with thumbhash placeholder')),
     listItem(text('Markdown import/export plugin')),
   ),
   heading('h2', text('Bug Fixes')),
@@ -308,9 +280,7 @@ const changelogV1 = doc(
   ),
   heading('h2', text('Performance')),
   paragraph(
-    text(
-      'Reduced reconciler overhead by ~30% through batched DOM updates. See ',
-    ),
+    text('Reduced reconciler overhead by ~30% through batched DOM updates. See '),
     link('https://github.com/example/issue/1234', text('#1234')),
     text(' for benchmarks.'),
   ),
@@ -322,7 +292,7 @@ const changelogV1 = doc(
     listItem(text('Update Node.js to version 18 or above')),
     listItem(text('Run '), text('npx @lexical/codemod v2.4', FORMAT_CODE)),
   ),
-)
+);
 
 const changelogV2 = doc(
   heading('h1', text('v2.4.0 Release Notes')),
@@ -452,7 +422,7 @@ const changelogV2 = doc(
     text('Full changelog: '),
     link('https://github.com/example/releases/v2.4.0', text('v2.3.0...v2.4.0')),
   ),
-)
+);
 
 // ---------------------------------------------------------------------------
 // Sample 3: Short note — minimal edits to a brief personal note
@@ -460,9 +430,7 @@ const changelogV2 = doc(
 
 const noteV1 = doc(
   heading('h2', text('周末计划')),
-  paragraph(
-    text('这周末打算去附近的山里徒步，天气预报说周六是晴天。需要准备的东西：'),
-  ),
+  paragraph(text('这周末打算去附近的山里徒步，天气预报说周六是晴天。需要准备的东西：')),
   list(
     'bullet',
     listItem(text('登山鞋')),
@@ -473,7 +441,7 @@ const noteV1 = doc(
   paragraph(text('路线还没确定，等小王回复。')),
   horizontalRule(),
   paragraph(text('如果下雨的话，备选方案是去市区的博物馆看新展。')),
-)
+);
 
 const noteV2 = doc(
   heading('h2', text('周末徒步记录')),
@@ -496,7 +464,7 @@ const noteV2 = doc(
   quote(paragraph(text('到山顶的时候刚好赶上日落，值了。'))),
   horizontalRule(),
   paragraph(text('下次想试试南坡的野营路线，需要提前预约营地。')),
-)
+);
 
 // ---------------------------------------------------------------------------
 // Sample 4: Technical documentation with KaTeX, Mermaid, and nested structures
@@ -506,14 +474,8 @@ const techDocV1 = doc(
   heading('h1', text('机器学习算法速查')),
   paragraph(text('本文介绍几种常用的机器学习算法，包括数学原理和实现细节。')),
   heading('h2', text('线性回归')),
-  paragraph(
-    text('线性回归的目标是找到最优参数 '),
-    text('θ', FORMAT_ITALIC),
-    text(' 使得：'),
-  ),
-  katexBlock(
-    'J(\\theta) = \\frac{1}{2m}\\sum_{i=1}^{m}(h_\\theta(x^{(i)}) - y^{(i)})^2',
-  ),
+  paragraph(text('线性回归的目标是找到最优参数 '), text('θ', FORMAT_ITALIC), text(' 使得：')),
+  katexBlock('J(\\theta) = \\frac{1}{2m}\\sum_{i=1}^{m}(h_\\theta(x^{(i)}) - y^{(i)})^2'),
   paragraph(
     text('其中假设函数为 '),
     text('hθ(x) = θ₀ + θ₁x', FORMAT_CODE),
@@ -535,7 +497,7 @@ const techDocV1 = doc(
     C --> D[Output Layer]`),
   paragraph(text('激活函数常用 ReLU：')),
   katexBlock('f(x) = \\max(0, x)'),
-)
+);
 
 const techDocV2 = doc(
   heading('h1', text('机器学习算法速查手册')),
@@ -561,9 +523,7 @@ const techDocV2 = doc(
     text('θ', FORMAT_ITALIC),
     text(' 使得代价函数最小：'),
   ),
-  katexBlock(
-    'J(\\theta) = \\frac{1}{2m}\\sum_{i=1}^{m}(h_\\theta(x^{(i)}) - y^{(i)})^2',
-  ),
+  katexBlock('J(\\theta) = \\frac{1}{2m}\\sum_{i=1}^{m}(h_\\theta(x^{(i)}) - y^{(i)})^2'),
   paragraph(
     text('其中假设函数为 '),
     text('hθ(x) = θᵀx', FORMAT_CODE),
@@ -602,24 +562,10 @@ const techDocV2 = doc(
   paragraph(text('激活函数发展历程：')),
   list(
     'bullet',
-    listItem(
-      text('Sigmoid: '),
-      katexInline('\\sigma(x) = \\frac{1}{1+e^{-x}}') as any,
-    ),
-    listItem(
-      text('Tanh: '),
-      katexInline('\\tanh(x) = \\frac{e^x - e^{-x}}{e^x + e^{-x}}') as any,
-    ),
-    listItem(
-      text('ReLU: '),
-      katexInline('f(x) = \\max(0, x)') as any,
-      text(' ← 当前主流'),
-    ),
-    listItem(
-      text('GELU: '),
-      katexInline('x \\cdot \\Phi(x)') as any,
-      text(' ← Transformer 常用'),
-    ),
+    listItem(text('Sigmoid: '), katexInline('\\sigma(x) = \\frac{1}{1+e^{-x}}') as any),
+    listItem(text('Tanh: '), katexInline('\\tanh(x) = \\frac{e^x - e^{-x}}{e^x + e^{-x}}') as any),
+    listItem(text('ReLU: '), katexInline('f(x) = \\max(0, x)') as any, text(' ← 当前主流')),
+    listItem(text('GELU: '), katexInline('x \\cdot \\Phi(x)') as any, text(' ← Transformer 常用')),
   ),
   heading('h2', text('实践建议')),
   alertQuote(
@@ -628,14 +574,11 @@ const techDocV2 = doc(
   ) as any,
   paragraph(
     text('更多细节参考 '),
-    link(
-      'https://scikit-learn.org/stable/modules/linear_model.html',
-      text('scikit-learn 文档'),
-    ),
+    link('https://scikit-learn.org/stable/modules/linear_model.html', text('scikit-learn 文档')),
     text('。'),
     footnote('sklearn') as any,
   ),
-)
+);
 
 // ---------------------------------------------------------------------------
 // Sample 5: Movie/Show review with spoilers, images, and banners
@@ -664,7 +607,7 @@ const movieReviewV1 = doc(
   ),
   horizontalRule(),
   paragraph(text('评分：★★★★☆')),
-)
+);
 
 const movieReviewV2 = doc(
   heading('h1', text('《奥本海默》：光影中的原子时代')),
@@ -677,9 +620,7 @@ const movieReviewV2 = doc(
     ),
   ) as any,
   paragraph(
-    text(
-      '克里斯托弗·诺兰用 3 小时构建了一座人类良知的纪念碑。这是他最成熟的作品',
-    ),
+    text('克里斯托弗·诺兰用 3 小时构建了一座人类良知的纪念碑。这是他最成熟的作品'),
     text('——', FORMAT_ITALIC),
     text('也是最令人不安的。'),
   ),
@@ -691,11 +632,7 @@ const movieReviewV2 = doc(
     caption: '《奥本海默》国际版海报（2023）',
   }) as any,
   heading('h2', text('叙事结构')),
-  paragraph(
-    text(
-      '影片采用非线性叙事，交错呈现 "Fission"（裂变）和 "Fusion"（聚变）两条线索：',
-    ),
-  ),
+  paragraph(text('影片采用非线性叙事，交错呈现 "Fission"（裂变）和 "Fusion"（聚变）两条线索：')),
   mermaid(`graph LR
     A[Fission: 奥本海默视角] --> B[曼哈顿计划]
     B --> C[三位一体核试验]
@@ -706,10 +643,7 @@ const movieReviewV2 = doc(
   heading('h2', text('演员表现')),
   list(
     'bullet',
-    listItem(
-      text('基里安·墨菲 饰 奥本海默'),
-      text(' —— 演技巅峰，静默中的恐惧', FORMAT_BOLD),
-    ),
+    listItem(text('基里安·墨菲 饰 奥本海默'), text(' —— 演技巅峰，静默中的恐惧', FORMAT_BOLD)),
     listItem(text('艾米莉·布朗特 饰 凯蒂'), text(' —— 坚韧而复杂的女性形象')),
     listItem(
       text('小罗伯特·唐尼 饰 刘易斯·施特劳斯'),
@@ -718,10 +652,7 @@ const movieReviewV2 = doc(
     listItem(text('马特·达蒙 饰 格罗夫斯将军')),
   ),
   heading('h2', text('剧透讨论')),
-  alertQuote(
-    'warning',
-    paragraph(text('以下内容涉及关键剧情，请谨慎阅读。')),
-  ) as any,
+  alertQuote('warning', paragraph(text('以下内容涉及关键剧情，请谨慎阅读。'))) as any,
   details(
     '点击展开剧透内容',
     false,
@@ -764,7 +695,7 @@ const movieReviewV2 = doc(
     text(' | '),
     link('https://example.com/dunkirk-review', text('《敦刻尔克》影评')),
   ),
-)
+);
 
 // ---------------------------------------------------------------------------
 // Sample 6: API documentation with code blocks, tables, and nested details
@@ -785,7 +716,7 @@ const apiDocV1 = doc(
     listItem(text('FloatingToolbarPlugin')),
     listItem(text('MarkdownShortcutPlugin')),
   ),
-)
+);
 
 const apiDocV2 = doc(
   heading('h1', text('Shiro Editor API Reference')),
@@ -797,9 +728,7 @@ const apiDocV2 = doc(
       text('。'),
     ),
   ) as any,
-  paragraph(
-    text('完整的富文本编辑器 API 文档，涵盖组件、Hooks、节点类型和插件系统。'),
-  ),
+  paragraph(text('完整的富文本编辑器 API 文档，涵盖组件、Hooks、节点类型和插件系统。')),
   heading('h2', text('组件')),
   heading('h3', text('RichEditor')),
   paragraph(text('功能完整的编辑器组件，支持所有自定义节点和插件。')),
@@ -849,11 +778,7 @@ const apiDocV2 = doc(
   paragraph(text('只读渲染器，无编辑依赖，适合 SSR 和静态页面。')),
   alertQuote(
     'tip',
-    paragraph(
-      text(
-        'RichRenderer 自动 tree-shake 所有编辑 UI 依赖，包体积比 RichEditor 小 ~40%。',
-      ),
-    ),
+    paragraph(text('RichRenderer 自动 tree-shake 所有编辑 UI 依赖，包体积比 RichEditor 小 ~40%。')),
   ) as any,
   heading('h2', text('自定义节点')),
   paragraph(text('所有节点继承自 Lexical 的 DecoratorNode：')),
@@ -908,7 +833,7 @@ const apiDocV2 = doc(
       tableCell(0, paragraph(text('迁移至 Lexical v0.39'))),
     ),
   ) as any,
-)
+);
 
 // ---------------------------------------------------------------------------
 // Sample 7: Multi-media content with video, image grid, and complex formatting
@@ -924,14 +849,11 @@ const multimediaV1 = doc(
   }) as any,
   heading('h2', text('日本')),
   paragraph(text('樱花季的京都非常美丽。')),
-)
+);
 
 const multimediaV2 = doc(
   heading('h1', text('2025 旅行记录：跨越四季的风景')),
-  banner(
-    'tip',
-    paragraph(text('所有照片使用 Sony A7IV + 24-70mm f/2.8 GM II 拍摄。')),
-  ) as any,
+  banner('tip', paragraph(text('所有照片使用 Sony A7IV + 24-70mm f/2.8 GM II 拍摄。'))) as any,
   paragraph(
     text(
       '这一年，走过四个国家，跨越了春夏秋冬。从日本的樱花到冰岛的极光，每一次出发都是对未知的期待。',
@@ -964,9 +886,7 @@ const multimediaV2 = doc(
     width: 1920,
     height: 1080,
   }) as any,
-  paragraph(
-    text('午夜的太阳永不落下。在冰岛的环岛公路上，我们追逐着极昼的光芒。'),
-  ),
+  paragraph(text('午夜的太阳永不落下。在冰岛的环岛公路上，我们追逐着极昼的光芒。')),
   quote(
     paragraph(
       text('The midnight sun turns everything golden.'),
@@ -996,15 +916,8 @@ const multimediaV2 = doc(
     ),
   ) as any,
   heading('h2', text('冬 · 瑞士')),
-  paragraph(
-    text(
-      '少女峰的雪景如童话世界。滑雪、温泉、巧克力——冬日的瑞士满足了所有想象。',
-    ),
-  ),
-  alertQuote(
-    'caution',
-    paragraph(text('冬季自驾需备雪链，部分山口可能封闭。')),
-  ) as any,
+  paragraph(text('少女峰的雪景如童话世界。滑雪、温泉、巧克力——冬日的瑞士满足了所有想象。')),
+  alertQuote('caution', paragraph(text('冬季自驾需备雪链，部分山口可能封闭。'))) as any,
   horizontalRule(),
   paragraph(text('旅行统计：')),
   table(
@@ -1039,7 +952,7 @@ const multimediaV2 = doc(
       tableCell(0, paragraph(text('少女峰日出'))),
     ),
   ) as any,
-)
+);
 
 // ---------------------------------------------------------------------------
 // Export all samples
@@ -1057,49 +970,43 @@ export const diffSamples: DiffSample[] = [
   {
     key: 'changelog',
     label: 'Release Notes 更新',
-    description:
-      '版本发布日志的迭代，含新增条目、表格数据、alert 提示、删除线标注、链接引用',
+    description: '版本发布日志的迭代，含新增条目、表格数据、alert 提示、删除线标注、链接引用',
     oldValue: changelogV1,
     newValue: changelogV2,
   },
   {
     key: 'note-edit',
     label: '笔记 → 记录',
-    description:
-      '从计划笔记演变为事后记录，标题改变、内容从待办变为已完成、新增子章节和引用',
+    description: '从计划笔记演变为事后记录，标题改变、内容从待办变为已完成、新增子章节和引用',
     oldValue: noteV1,
     newValue: noteV2,
   },
   {
     key: 'tech-doc',
     label: '技术文档修订',
-    description:
-      '机器学习算法文档的完善过程，含 KaTeX 公式、Mermaid 图表、嵌套 Details、表格对比',
+    description: '机器学习算法文档的完善过程，含 KaTeX 公式、Mermaid 图表、嵌套 Details、表格对比',
     oldValue: techDocV1,
     newValue: techDocV2,
   },
   {
     key: 'movie-review',
     label: '影评内容丰富',
-    description:
-      '从简单随笔到完整影评，含图片、Banner、剧透折叠、Mermaid 叙事图、评分表格',
+    description: '从简单随笔到完整影评，含图片、Banner、剧透折叠、Mermaid 叙事图、评分表格',
     oldValue: movieReviewV1,
     newValue: movieReviewV2,
   },
   {
     key: 'api-doc',
     label: 'API 文档迭代',
-    description:
-      '从简单说明到完整 API 参考，含嵌套 Details、Props 表格、版本历史、Alert 提示',
+    description: '从简单说明到完整 API 参考，含嵌套 Details、Props 表格、版本历史、Alert 提示',
     oldValue: apiDocV1,
     newValue: apiDocV2,
   },
   {
     key: 'multimedia',
     label: '多媒体游记',
-    description:
-      '从简单记录到丰富的多媒体游记，含图片、视频、Banner、嵌套列表、统计表格',
+    description: '从简单记录到丰富的多媒体游记，含图片、视频、Banner、嵌套列表、统计表格',
     oldValue: multimediaV1,
     newValue: multimediaV2,
   },
-]
+];

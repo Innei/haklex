@@ -1,28 +1,28 @@
-import type { ReactNode } from 'react'
-import { createContext, use, useMemo } from 'react'
+import type { ReactNode } from 'react';
+import { createContext, use, useMemo } from 'react';
 
-import type { RichEditorVariant } from '../types'
-import type { RendererConfig } from '../types/renderer-config'
+import type { RichEditorVariant } from '../types';
+import type { RendererConfig } from '../types/renderer-config';
 
-export type RendererMode = 'editor' | 'renderer'
+export type RendererMode = 'editor' | 'renderer';
 
 interface RendererConfigContextValue {
-  config?: RendererConfig
-  mode: RendererMode
-  variant: RichEditorVariant
+  config?: RendererConfig;
+  mode: RendererMode;
+  variant: RichEditorVariant;
 }
 
 const RendererConfigContext = createContext<RendererConfigContextValue>({
   config: undefined,
   mode: 'renderer',
   variant: 'article',
-})
+});
 
 export interface RendererConfigProviderProps {
-  config?: RendererConfig
-  mode: RendererMode
-  variant: RichEditorVariant
-  children: ReactNode
+  children: ReactNode;
+  config?: RendererConfig;
+  mode: RendererMode;
+  variant: RichEditorVariant;
 }
 
 export function RendererConfigProvider({
@@ -31,25 +31,18 @@ export function RendererConfigProvider({
   variant,
   children,
 }: RendererConfigProviderProps) {
-  const value = useMemo(
-    () => ({ config, mode, variant }),
-    [config, mode, variant],
-  )
-  return (
-    <RendererConfigContext.Provider value={value}>
-      {children}
-    </RendererConfigContext.Provider>
-  )
+  const value = useMemo(() => ({ config, mode, variant }), [config, mode, variant]);
+  return <RendererConfigContext.Provider value={value}>{children}</RendererConfigContext.Provider>;
 }
 
 export function useRendererConfig(): RendererConfig | undefined {
-  return use(RendererConfigContext).config
+  return use(RendererConfigContext).config;
 }
 
 export function useRendererMode(): RendererMode {
-  return use(RendererConfigContext).mode
+  return use(RendererConfigContext).mode;
 }
 
 export function useVariant(): RichEditorVariant {
-  return use(RendererConfigContext).variant
+  return use(RendererConfigContext).variant;
 }

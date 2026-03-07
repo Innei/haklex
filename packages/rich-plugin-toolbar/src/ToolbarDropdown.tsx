@@ -6,27 +6,27 @@ import {
   TooltipContent,
   TooltipRoot,
   TooltipTrigger,
-} from '@haklex/rich-editor-ui'
-import { ChevronDown } from 'lucide-react'
-import type { CSSProperties, ReactNode } from 'react'
+} from '@haklex/rich-editor-ui';
+import { ChevronDown } from 'lucide-react';
+import type { CSSProperties, ReactNode } from 'react';
 
-import * as css from './styles.css'
-import type { ToolbarTooltipHandle, ToolbarTooltipPayload } from './types'
+import * as css from './styles.css';
+import type { ToolbarTooltipHandle, ToolbarTooltipPayload } from './types';
 
 export interface ToolbarDropdownItem {
-  label: string
-  icon?: ReactNode
-  active?: boolean
-  style?: CSSProperties
-  onSelect: () => void
+  active?: boolean;
+  icon?: ReactNode;
+  label: string;
+  onSelect: () => void;
+  style?: CSSProperties;
 }
 
 export interface ToolbarDropdownProps {
-  label: string
-  title: string
-  items: ToolbarDropdownItem[]
-  triggerWidth?: number
-  tooltipHandle?: ToolbarTooltipHandle
+  items: ToolbarDropdownItem[];
+  label: string;
+  title: string;
+  tooltipHandle?: ToolbarTooltipHandle;
+  triggerWidth?: number;
 }
 
 export function ToolbarDropdown({
@@ -36,15 +36,15 @@ export function ToolbarDropdown({
   triggerWidth,
   tooltipHandle,
 }: ToolbarDropdownProps) {
-  const triggerStyle = triggerWidth ? { width: triggerWidth } : undefined
+  const triggerStyle = triggerWidth ? { width: triggerWidth } : undefined;
 
   const trigger = (
     <DropdownMenuTrigger
       className={css.toolbarDropdownTrigger}
-      style={triggerStyle}
       render={<button type="button" />}
+      style={triggerStyle}
     />
-  )
+  );
 
   const triggerContent = (
     <>
@@ -53,14 +53,14 @@ export function ToolbarDropdown({
         <ChevronDown size={12} />
       </span>
     </>
-  )
+  );
 
   const menu = (
     <DropdownMenuContent sideOffset={4}>
       {items.map((item) => (
         <DropdownMenuItem
-          key={item.label}
           className={item.active ? css.toolbarDropdownItemActive : undefined}
+          key={item.label}
           style={item.style}
           onClick={item.onSelect}
         >
@@ -80,7 +80,7 @@ export function ToolbarDropdown({
         </DropdownMenuItem>
       ))}
     </DropdownMenuContent>
-  )
+  );
 
   if (tooltipHandle) {
     return (
@@ -94,7 +94,7 @@ export function ToolbarDropdown({
         </TooltipTrigger>
         {menu}
       </DropdownMenu>
-    )
+    );
   }
 
   return (
@@ -107,5 +107,5 @@ export function ToolbarDropdown({
       </TooltipRoot>
       {menu}
     </DropdownMenu>
-  )
+  );
 }

@@ -1,19 +1,15 @@
-import type { SerializedEditorState } from 'lexical'
+import type { SerializedEditorState } from 'lexical';
 
-import { useNestedContentRenderer } from '../../context/NestedContentRendererContext'
+import { useNestedContentRenderer } from '../../context/NestedContentRendererContext';
 
 interface GridStaticDecoratorProps {
-  cols: number
-  gap: string
-  cellStates: SerializedEditorState[]
+  cellStates: SerializedEditorState[];
+  cols: number;
+  gap: string;
 }
 
-export function GridStaticDecorator({
-  cols,
-  gap,
-  cellStates,
-}: GridStaticDecoratorProps) {
-  const renderContent = useNestedContentRenderer()
+export function GridStaticDecorator({ cols, gap, cellStates }: GridStaticDecoratorProps) {
+  const renderContent = useNestedContentRenderer();
 
   return (
     <div
@@ -25,10 +21,10 @@ export function GridStaticDecorator({
       }}
     >
       {cellStates.map((state, i) => (
-        <div key={i} className="rich-grid-cell">
+        <div className="rich-grid-cell" key={i}>
           {renderContent(state)}
         </div>
       ))}
     </div>
-  )
+  );
 }

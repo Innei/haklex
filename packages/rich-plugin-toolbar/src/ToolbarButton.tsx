@@ -1,21 +1,17 @@
-import {
-  TooltipContent,
-  TooltipRoot,
-  TooltipTrigger,
-} from '@haklex/rich-editor-ui'
-import type { ReactNode } from 'react'
+import { TooltipContent, TooltipRoot, TooltipTrigger } from '@haklex/rich-editor-ui';
+import type { ReactNode } from 'react';
 
-import * as css from './styles.css'
-import type { ToolbarTooltipHandle, ToolbarTooltipPayload } from './types'
+import * as css from './styles.css';
+import type { ToolbarTooltipHandle, ToolbarTooltipPayload } from './types';
 
 export interface ToolbarButtonProps {
-  icon: ReactNode
-  title: string
-  shortcut?: string
-  active?: boolean
-  disabled?: boolean
-  onClick: () => void
-  tooltipHandle?: ToolbarTooltipHandle
+  active?: boolean;
+  disabled?: boolean;
+  icon: ReactNode;
+  onClick: () => void;
+  shortcut?: string;
+  title: string;
+  tooltipHandle?: ToolbarTooltipHandle;
 }
 
 export function ToolbarButton({
@@ -29,17 +25,17 @@ export function ToolbarButton({
 }: ToolbarButtonProps) {
   const button = (
     <button
-      type="button"
-      className={`${css.toolbarButton}${active ? ` ${css.toolbarButtonActive}` : ''}`}
-      disabled={disabled}
-      onMouseDown={(e) => {
-        e.preventDefault()
-        onClick()
-      }}
       aria-label={title}
       aria-pressed={active}
+      className={`${css.toolbarButton}${active ? ` ${css.toolbarButtonActive}` : ''}`}
+      disabled={disabled}
+      type="button"
+      onMouseDown={(e) => {
+        e.preventDefault();
+        onClick();
+      }}
     />
-  )
+  );
 
   if (tooltipHandle) {
     return (
@@ -50,7 +46,7 @@ export function ToolbarButton({
       >
         {icon}
       </TooltipTrigger>
-    )
+    );
   }
 
   return (
@@ -61,5 +57,5 @@ export function ToolbarButton({
         {shortcut && <span className={css.tooltipShortcut}>{shortcut}</span>}
       </TooltipContent>
     </TooltipRoot>
-  )
+  );
 }

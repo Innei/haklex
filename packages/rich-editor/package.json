@@ -1,12 +1,20 @@
 {
   "name": "@haklex/rich-editor",
-  "type": "module",
   "version": "0.0.65",
   "description": "Core rich text editor based on Lexical",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-editor"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./editor": "./src/editor.ts",
+    "./nodes": "./src/nodes-entry.ts",
+    "./plugins": "./src/plugins-entry.ts",
+    "./commands": "./src/commands-entry.ts",
+    "./renderers": "./src/renderers-entry.ts",
     "./static": "./src/static-entry.ts",
     "./style.css": "./dist/rich-editor.css",
     "./styles": "./src/styles-entry.ts"
@@ -18,31 +26,6 @@
   "scripts": {
     "build": "vite build",
     "dev:build": "vite build --watch"
-  },
-  "peerDependencies": {
-    "@base-ui/react": "^1.1.0",
-    "@lexical/code": "^0.41.0",
-    "@lexical/extension": "^0.41.0",
-    "@lexical/link": "^0.41.0",
-    "@lexical/list": "^0.41.0",
-    "@lexical/markdown": "^0.41.0",
-    "@lexical/react": "^0.41.0",
-    "@lexical/rich-text": "^0.41.0",
-    "@lexical/table": "^0.41.0",
-    "katex": ">=0.16.0",
-    "lexical": "^0.41.0",
-    "lucide-react": "^0.574.0",
-    "react": ">=19",
-    "react-dom": ">=19",
-    "shiki": "^3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "katex": {
-      "optional": true
-    },
-    "shiki": {
-      "optional": true
-    }
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
@@ -75,6 +58,31 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
+  "peerDependencies": {
+    "@base-ui/react": "^1.1.0",
+    "@lexical/code": "^0.41.0",
+    "@lexical/extension": "^0.41.0",
+    "@lexical/link": "^0.41.0",
+    "@lexical/list": "^0.41.0",
+    "@lexical/markdown": "^0.41.0",
+    "@lexical/react": "^0.41.0",
+    "@lexical/rich-text": "^0.41.0",
+    "@lexical/table": "^0.41.0",
+    "katex": ">=0.16.0",
+    "lexical": "^0.41.0",
+    "lucide-react": "^0.574.0",
+    "react": ">=19",
+    "react-dom": ">=19",
+    "shiki": "^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "katex": {
+      "optional": true
+    },
+    "shiki": {
+      "optional": true
+    }
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -82,9 +90,21 @@
         "import": "./dist/index.mjs",
         "types": "./dist/index.d.ts"
       },
-      "./editor": {
-        "import": "./dist/editor.mjs",
-        "types": "./dist/editor.d.ts"
+      "./nodes": {
+        "import": "./dist/nodes-entry.mjs",
+        "types": "./dist/nodes-entry.d.ts"
+      },
+      "./plugins": {
+        "import": "./dist/plugins-entry.mjs",
+        "types": "./dist/plugins-entry.d.ts"
+      },
+      "./commands": {
+        "import": "./dist/commands-entry.mjs",
+        "types": "./dist/commands-entry.d.ts"
+      },
+      "./renderers": {
+        "import": "./dist/renderers-entry.mjs",
+        "types": "./dist/renderers-entry.d.ts"
       },
       "./static": {
         "import": "./dist/static-entry.mjs",
@@ -98,10 +118,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-editor"
   }
 }

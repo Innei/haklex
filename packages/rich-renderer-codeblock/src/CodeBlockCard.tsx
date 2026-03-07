@@ -1,25 +1,21 @@
-import { Check, ChevronDown, Copy } from 'lucide-react'
-import type { CSSProperties, ReactNode } from 'react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Check, ChevronDown, Copy } from 'lucide-react';
+import type { CSSProperties, ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import {
-  getLanguageDisplayName,
-  languageToColorMap,
-  normalizeLanguage,
-} from './constants'
-import { hasLanguageIcon, LanguageIcon } from './icons'
-import * as styles from './styles.css'
+import { getLanguageDisplayName, languageToColorMap, normalizeLanguage } from './constants';
+import { hasLanguageIcon, LanguageIcon } from './icons';
+import * as styles from './styles.css';
 
-const CopyIcon = <Copy size={16} />
-const CheckIcon = <Check size={16} />
-const ExpandIcon = <ChevronDown size={14} />
+const CopyIcon = <Copy size={16} />;
+const CheckIcon = <Check size={16} />;
+const ExpandIcon = <ChevronDown size={14} />;
 
 interface CodeBlockCardProps {
-  code: string
-  language: string
-  collapsible?: boolean
-  langSlot?: ReactNode
-  children: ReactNode
+  children: ReactNode;
+  code: string;
+  collapsible?: boolean;
+  langSlot?: ReactNode;
+  language: string;
 }
 
 export function CodeBlockCard({
@@ -29,76 +25,64 @@ export function CodeBlockCard({
   langSlot,
   children,
 }: CodeBlockCardProps) {
-  const normalizedLanguage = normalizeLanguage(language)
-  const [copied, setCopied] = useState(false)
-  const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined)
+  const normalizedLanguage = normalizeLanguage(language);
+  const [copied, setCopied] = useState(false);
+  const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const [isCollapsed, setIsCollapsed] = useState(true)
-  const [isOverflow, setIsOverflow] = useState(false)
-  const scrollRef = useRef<HTMLDivElement>(null)
+  const [isCollapsed, setIsCollapsed] = useState(true);
+  const [isOverflow, setIsOverflow] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!collapsible) {
-      setIsOverflow(false)
-      return
+      setIsOverflow(false);
+      return;
     }
 
-    const el = scrollRef.current
-    if (!el) return
+    const el = scrollRef.current;
+    if (!el) return;
     const check = () => {
-      const halfVh = window.innerHeight / 2
-      setIsOverflow(el.scrollHeight >= halfVh)
-    }
-    const raf = requestAnimationFrame(check)
-    return () => cancelAnimationFrame(raf)
-  }, [code, collapsible])
+      const halfVh = window.innerHeight / 2;
+      setIsOverflow(el.scrollHeight >= halfVh);
+    };
+    const raf = requestAnimationFrame(check);
+    return () => cancelAnimationFrame(raf);
+  }, [code, collapsible]);
 
   useEffect(() => {
-    return () => clearTimeout(copyTimerRef.current)
-  }, [])
+    return () => clearTimeout(copyTimerRef.current);
+  }, []);
 
   const handleCopy = useCallback(() => {
     navigator.clipboard
       .writeText(code)
       .then(() => {
-        setCopied(true)
-        clearTimeout(copyTimerRef.current)
-        copyTimerRef.current = setTimeout(() => setCopied(false), 2000)
+        setCopied(true);
+        clearTimeout(copyTimerRef.current);
+        copyTimerRef.current = setTimeout(() => setCopied(false), 2000);
       })
-      .catch(() => {})
-  }, [code])
+      .catch(() => {});
+  }, [code]);
 
-  const languageLabel = getLanguageDisplayName(normalizedLanguage)
-  const accent = languageToColorMap[normalizedLanguage] || '#737373'
+  const languageLabel = getLanguageDisplayName(normalizedLanguage);
+  const accent = languageToColorMap[normalizedLanguage] || '#737373';
 
-  const cardStyle = useMemo(
-    () => ({ '--rr-code-accent': accent }) as CSSProperties,
-    [accent],
-  )
+  const cardStyle = useMemo(() => ({ '--rr-code-accent': accent }) as CSSProperties, [accent]);
 
   const scrollClassName = [
     styles.scroll,
     styles.semanticClassNames.scroll,
     collapsible && isCollapsed && isOverflow && styles.scrollCollapsed,
-    collapsible &&
-      isCollapsed &&
-      isOverflow &&
-      styles.semanticClassNames.scrollCollapsed,
+    collapsible && isCollapsed && isOverflow && styles.semanticClassNames.scrollCollapsed,
   ]
     .filter(Boolean)
-    .join(' ')
+    .join(' ');
 
   return (
-    <div
-      className={`${styles.card} ${styles.semanticClassNames.card}`}
-      style={cardStyle}
-    >
+    <div className={`${styles.card} ${styles.semanticClassNames.card}`} style={cardStyle}>
       {langSlot ??
         (normalizedLanguage !== 'text' && (
-          <div
-            className={`${styles.lang} ${styles.semanticClassNames.lang}`}
-            aria-hidden
-          >
+          <div aria-hidden className={`${styles.lang} ${styles.semanticClassNames.lang}`}>
             {hasLanguageIcon(normalizedLanguage) ? (
               <LanguageIcon language={normalizedLanguage} size={14} />
             ) : (
@@ -108,28 +92,24 @@ export function CodeBlockCard({
         ))}
 
       <button
-        type="button"
-        className={`${styles.copyButton} ${styles.semanticClassNames.copyButton}`}
-        onClick={handleCopy}
         aria-label={copied ? 'Copied' : 'Copy code'}
+        className={`${styles.copyButton} ${styles.semanticClassNames.copyButton}`}
+        type="button"
+        onClick={handleCopy}
       >
         {copied ? CheckIcon : CopyIcon}
       </button>
 
-      <div
-        className={`${styles.bodyBackground} ${styles.semanticClassNames.bodyBackground}`}
-      >
-        <div ref={scrollRef} className={scrollClassName}>
+      <div className={`${styles.bodyBackground} ${styles.semanticClassNames.bodyBackground}`}>
+        <div className={scrollClassName} ref={scrollRef}>
           {children}
         </div>
 
         {collapsible && isOverflow && isCollapsed && (
-          <div
-            className={`${styles.expandWrap} ${styles.semanticClassNames.expandWrap}`}
-          >
+          <div className={`${styles.expandWrap} ${styles.semanticClassNames.expandWrap}`}>
             <button
-              type="button"
               className={`${styles.expandButton} ${styles.semanticClassNames.expandButton}`}
+              type="button"
               onClick={() => setIsCollapsed(false)}
             >
               {ExpandIcon}
@@ -139,5 +119,5 @@ export function CodeBlockCard({
         )}
       </div>
     </div>
-  )
+  );
 }

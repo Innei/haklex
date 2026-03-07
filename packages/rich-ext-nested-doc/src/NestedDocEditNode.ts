@@ -1,20 +1,14 @@
-import {
-  type CommandItemConfig,
-  editorTheme,
-  getResolvedEditNodes,
-} from '@haklex/rich-editor'
-import type {
-  EditorConfig,
-  LexicalEditor,
-  SerializedEditorState,
-} from 'lexical'
-import { $insertNodes, createEditor } from 'lexical'
-import { FileText } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+import { editorTheme } from '@haklex/rich-editor';
+import type { CommandItemConfig } from '@haklex/rich-editor/commands';
+import { getResolvedEditNodes } from '@haklex/rich-editor/nodes';
+import type { EditorConfig, LexicalEditor, SerializedEditorState } from 'lexical';
+import { $insertNodes, createEditor } from 'lexical';
+import { FileText } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { NestedDocEditDecorator } from './NestedDocEditDecorator'
-import { NestedDocNode, type SerializedNestedDocNode } from './NestedDocNode'
+import { NestedDocEditDecorator } from './NestedDocEditDecorator';
+import { NestedDocNode, type SerializedNestedDocNode } from './NestedDocNode';
 
 function createContentEditor(): LexicalEditor {
   return createEditor({
@@ -22,13 +16,13 @@ function createContentEditor(): LexicalEditor {
     nodes: getResolvedEditNodes(),
     theme: editorTheme,
     onError: (error: Error) => {
-      console.error('[NestedDocContent]', error)
+      console.error('[NestedDocContent]', error);
     },
-  })
+  });
 }
 
 export class NestedDocEditNode extends NestedDocNode {
-  __contentEditor: LexicalEditor
+  __contentEditor: LexicalEditor;
 
   static commandItems: CommandItemConfig[] = [
     {
@@ -41,35 +35,33 @@ export class NestedDocEditNode extends NestedDocNode {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createNestedDocEditNode()])
-        })
+          $insertNodes([$createNestedDocEditNode()]);
+        });
       },
     },
-  ]
+  ];
 
   static clone(node: NestedDocEditNode): NestedDocEditNode {
-    const cloned = new NestedDocEditNode(node.__contentState, node.__key)
-    cloned.__contentEditor = node.__contentEditor
-    return cloned
+    const cloned = new NestedDocEditNode(node.__contentState, node.__key);
+    cloned.__contentEditor = node.__contentEditor;
+    return cloned;
   }
 
   constructor(contentState?: SerializedEditorState, key?: string) {
-    super(contentState, key)
-    this.__contentEditor = createContentEditor()
+    super(contentState, key);
+    this.__contentEditor = createContentEditor();
     if (contentState) {
-      const editorState = this.__contentEditor.parseEditorState(contentState)
-      this.__contentEditor.setEditorState(editorState)
+      const editorState = this.__contentEditor.parseEditorState(contentState);
+      this.__contentEditor.setEditorState(editorState);
     }
   }
 
   getContentEditor(): LexicalEditor {
-    return this.__contentEditor
+    return this.__contentEditor;
   }
 
-  static importJSON(
-    serializedNode: SerializedNestedDocNode,
-  ): NestedDocEditNode {
-    return new NestedDocEditNode(serializedNode.content)
+  static importJSON(serializedNode: SerializedNestedDocNode): NestedDocEditNode {
+    return new NestedDocEditNode(serializedNode.content);
   }
 
   exportJSON(): SerializedNestedDocNode {
@@ -78,7 +70,7 @@ export class NestedDocEditNode extends NestedDocNode {
       type: 'nested-doc',
       content: this.__contentEditor.getEditorState().toJSON(),
       version: 1,
-    }
+    };
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -86,16 +78,14 @@ export class NestedDocEditNode extends NestedDocNode {
       nodeKey: this.__key,
       contentEditor: this.__contentEditor,
       contentState: this.__contentState,
-    })
+    });
   }
 }
 
-export function $createNestedDocEditNode(
-  contentState?: SerializedEditorState,
-): NestedDocEditNode {
-  return new NestedDocEditNode(contentState)
+export function $createNestedDocEditNode(contentState?: SerializedEditorState): NestedDocEditNode {
+  return new NestedDocEditNode(contentState);
 }
 
 export function $isNestedDocEditNode(node: unknown): node is NestedDocEditNode {
-  return node instanceof NestedDocEditNode
+  return node instanceof NestedDocEditNode;
 }

@@ -1,12 +1,8 @@
-import {
-  LinkFavicon,
-  RendererWrapper,
-  RubyRenderer,
-} from '@haklex/rich-editor/static'
-import { Link } from 'lucide-react'
-import { createElement, type ReactNode } from 'react'
+import { LinkFavicon, RendererWrapper, RubyRenderer } from '@haklex/rich-editor/static';
+import { Link } from 'lucide-react';
+import { createElement, type ReactNode } from 'react';
 
-import * as tableStyles from '../table.css'
+import * as tableStyles from '../table.css';
 
 function textToSlug(text: string): string {
   return (
@@ -14,16 +10,16 @@ function textToSlug(text: string): string {
       .toLowerCase()
       .trim()
       // eslint-disable-next-line regexp/no-dupe-characters-character-class
-      .replaceAll(/[^\w\s\u3000-\u9FFF\uAC00-\uD7AF\uFF00-\uFFEF-]/g, '')
+      .replaceAll(/[^\s\w\u3000-\u9FFF\uAC00-\uD7AF\uFF00-\uFFEF-]/g, '')
       .replaceAll(/[\s_]+/g, '-')
       .replaceAll(/^-+|-+$/g, '')
-  )
+  );
 }
 
 function extractText(node: any): string {
-  if (node.text) return node.text
-  if (node.children) return node.children.map(extractText).join('')
-  return ''
+  if (node.text) return node.text;
+  if (node.children) return node.children.map(extractText).join('');
+  return '';
 }
 
 export function renderBuiltinNode(
@@ -34,156 +30,141 @@ export function renderBuiltinNode(
   textContent?: string,
 ): ReactNode {
   switch (node.type) {
-    case 'root':
-      return <>{children}</>
+    case 'root': {
+      return <>{children}</>;
+    }
     case 'paragraph': {
-      const align = node.format
-        ? ({ textAlign: node.format } as const)
-        : undefined
+      const align = node.format ? ({ textAlign: node.format } as const) : undefined;
       return (
-        <p key={key} className="rich-paragraph" style={align}>
+        <p className="rich-paragraph" key={key} style={align}>
           {children}
         </p>
-      )
+      );
     }
     case 'heading': {
-      const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
-      const text = textContent || extractText(node)
-      const baseSlug = textToSlug(text)
-      let slug = baseSlug
+      const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+      const text = textContent || extractText(node);
+      const baseSlug = textToSlug(text);
+      let slug = baseSlug;
       if (baseSlug) {
-        const count = headingSlugs.get(baseSlug)
+        const count = headingSlugs.get(baseSlug);
         if (count !== undefined) {
-          slug = `${baseSlug}-${count}`
-          headingSlugs.set(baseSlug, count + 1)
+          slug = `${baseSlug}-${count}`;
+          headingSlugs.set(baseSlug, count + 1);
         } else {
-          headingSlugs.set(baseSlug, 1)
+          headingSlugs.set(baseSlug, 1);
         }
       }
       return (
-        <Tag key={key} id={slug || undefined} className={`rich-heading-${Tag}`}>
+        <Tag className={`rich-heading-${Tag}`} id={slug || undefined} key={key}>
           {slug && (
-            <a className="rich-heading-anchor" tabIndex={0} href={`#${slug}`}>
-              <Link size={14} strokeWidth={2} aria-hidden />
+            <a className="rich-heading-anchor" href={`#${slug}`} tabIndex={0}>
+              <Link aria-hidden size={14} strokeWidth={2} />
             </a>
           )}
           {children}
         </Tag>
-      )
+      );
     }
-    case 'quote':
+    case 'quote': {
       return (
-        <blockquote key={key} className="rich-quote">
+        <blockquote className="rich-quote" key={key}>
           {children}
         </blockquote>
-      )
+      );
+    }
     case 'list': {
-      const Tag = node.listType === 'number' ? 'ol' : 'ul'
+      const Tag = node.listType === 'number' ? 'ol' : 'ul';
       const cls =
         node.listType === 'number'
           ? 'rich-list-ol'
           : node.listType === 'check'
             ? 'rich-checklist rich-list-ul'
-            : 'rich-list-ul'
+            : 'rich-list-ul';
       return (
-        <Tag
-          key={key}
-          className={cls}
-          start={node.start !== 1 ? node.start : undefined}
-        >
+        <Tag className={cls} key={key} start={node.start !== 1 ? node.start : undefined}>
           {children}
         </Tag>
-      )
+      );
     }
     case 'listitem': {
-      const isChecklist = node.checked !== undefined
-      const hasNestedList = node.children?.some((c: any) => c.type === 'list')
-      let cls: string
+      const isChecklist = node.checked !== undefined;
+      const hasNestedList = node.children?.some((c: any) => c.type === 'list');
+      let cls: string;
       if (hasNestedList) {
-        cls = 'rich-list-nested-item'
+        cls = 'rich-list-nested-item';
       } else if (isChecklist) {
         cls = node.checked
           ? 'rich-list-item rich-list-item-checked'
-          : 'rich-list-item rich-list-item-unchecked'
+          : 'rich-list-item rich-list-item-unchecked';
       } else {
-        cls = 'rich-list-item'
+        cls = 'rich-list-item';
       }
       return (
-        <li key={key} className={cls} value={node.value}>
+        <li className={cls} key={key} value={node.value}>
           {children}
         </li>
-      )
+      );
     }
-    case 'link':
+    case 'link': {
       return (
         <a
-          key={key}
           className="rich-link"
           href={node.url}
-          target={node.target || '_blank'}
+          key={key}
           rel={node.rel || 'noopener'}
+          target={node.target || '_blank'}
         >
           <LinkFavicon href={node.url} />
           {children}
         </a>
-      )
-    case 'autolink':
+      );
+    }
+    case 'autolink': {
       return (
-        <a
-          key={key}
-          className="rich-link"
-          href={node.url}
-          target="_blank"
-          rel="noopener"
-        >
+        <a className="rich-link" href={node.url} key={key} rel="noopener" target="_blank">
           <LinkFavicon href={node.url} />
           {children}
         </a>
-      )
-    case 'horizontalrule':
-      return <hr key={key} className="rich-hr" />
-    case 'table':
+      );
+    }
+    case 'horizontalrule': {
+      return <hr className="rich-hr" key={key} />;
+    }
+    case 'table': {
       return (
-        <div key={key} className={tableStyles.tableWrapper}>
+        <div className={tableStyles.tableWrapper} key={key}>
           <table className={tableStyles.table}>{children}</table>
         </div>
-      )
-    case 'tablerow':
-      return <tr key={key}>{children}</tr>
+      );
+    }
+    case 'tablerow': {
+      return <tr key={key}>{children}</tr>;
+    }
     case 'tablecell': {
-      const CellTag = node.headerState ? 'th' : 'td'
-      const cls = node.headerState
-        ? tableStyles.tableHead
-        : tableStyles.tableCell
+      const CellTag = node.headerState ? 'th' : 'td';
+      const cls = node.headerState ? tableStyles.tableHead : tableStyles.tableCell;
       return (
-        <CellTag
-          key={key}
-          className={cls}
-          colSpan={node.colSpan > 1 ? node.colSpan : undefined}
-        >
+        <CellTag className={cls} colSpan={node.colSpan > 1 ? node.colSpan : undefined} key={key}>
           {children}
         </CellTag>
-      )
+      );
     }
     case 'details': {
-      const summary = node.summary || ''
+      const summary = node.summary || '';
       return (
-        <details
-          key={key}
-          className="rich-details"
-          open={node.open || undefined}
-        >
+        <details className="rich-details" key={key} open={node.open || undefined}>
           <summary className="rich-details-summary">
-            <span className="rich-details-chevron" aria-hidden="true">
+            <span aria-hidden="true" className="rich-details-chevron">
               <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
                 fill="none"
+                height="20"
                 stroke="currentColor"
-                strokeWidth="1.5"
                 strokeLinecap="round"
                 strokeLinejoin="round"
+                strokeWidth="1.5"
+                viewBox="0 0 20 20"
+                width="20"
               >
                 <path d="M8 6L12 10L8 14" />
               </svg>
@@ -192,15 +173,16 @@ export function renderBuiltinNode(
           </summary>
           <div className="rich-details-content">{children}</div>
         </details>
-      )
+      );
     }
-    case 'spoiler':
+    case 'spoiler': {
       return (
-        <span key={key} className="rich-spoiler" role="button" tabIndex={0}>
+        <span className="rich-spoiler" key={key} role="button" tabIndex={0}>
           {children}
         </span>
-      )
-    case 'ruby':
+      );
+    }
+    case 'ruby': {
       return createElement(RendererWrapper as any, {
         key,
         rendererKey: 'Ruby',
@@ -209,20 +191,26 @@ export function renderBuiltinNode(
           reading: node.reading ?? '',
           children,
         },
-      })
-    case 'code':
+      });
+    }
+    case 'code': {
       return (
-        <pre key={key} className="rich-code-block">
+        <pre className="rich-code-block" key={key}>
           <code>{children}</code>
         </pre>
-      )
-    case 'code-highlight':
-      return <span key={key}>{node.text}</span>
-    case 'linebreak':
-      return <br key={key} />
-    case 'tab':
-      return <span key={key}>{'  '}</span>
-    default:
-      return null
+      );
+    }
+    case 'code-highlight': {
+      return <span key={key}>{node.text}</span>;
+    }
+    case 'linebreak': {
+      return <br key={key} />;
+    }
+    case 'tab': {
+      return <span key={key}>{'  '}</span>;
+    }
+    default: {
+      return null;
+    }
   }
 }
