@@ -1,7 +1,7 @@
-import { resolve } from 'node:path'
+import path from 'node:path';
 
-import { visualizer } from 'rollup-plugin-visualizer'
-import { defineConfig } from 'vite'
+import { visualizer } from 'rollup-plugin-visualizer';
+import { defineConfig } from 'vite';
 
 export default defineConfig({
   root: __dirname,
@@ -12,7 +12,7 @@ export default defineConfig({
   },
   plugins: [
     visualizer({
-      filename: resolve(__dirname, 'stats.html'),
+      filename: path.resolve(__dirname, 'stats.html'),
       open: false,
       gzipSize: true,
       brotliSize: true,
@@ -20,11 +20,11 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: resolve(__dirname, 'dist'),
+    outDir: path.resolve(__dirname, 'dist'),
     rollupOptions: {
-      input: resolve(__dirname, 'index.html'),
+      input: path.resolve(__dirname, 'index.html'),
     },
     minify: true,
     sourcemap: false,
   },
-})
+});

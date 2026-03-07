@@ -3,7 +3,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 const files = readdirSync('dist/assets').filter((f) => f.endsWith('.js'));
 
 // Find entry chunk from index.html
-const html = readFileSync('dist/index.html', 'utf-8');
+const html = readFileSync('dist/index.html', 'utf8');
 const entryMatch = html.match(/src="\/assets\/(index-[^"]+\.js)"/);
 const entryName = entryMatch ? entryMatch[1] : null;
 if (!entryName) {
@@ -11,7 +11,7 @@ if (!entryName) {
   process.exit(1);
 }
 
-const entry = readFileSync(`dist/assets/${entryName}`, 'utf-8');
+const entry = readFileSync(`dist/assets/${entryName}`, 'utf8');
 const entrySize = entry.length;
 
 const chunks = files

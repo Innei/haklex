@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import path from 'node:path';
 
 import type { UserConfig } from 'vite';
 
@@ -27,12 +27,12 @@ export async function createViteConfig(options: SharedViteOptions = {}): Promise
   const cwd = process.cwd();
   const isMap = typeof entry !== 'string';
   const libEntry = isMap
-    ? Object.fromEntries(Object.entries(entry).map(([k, v]) => [k, resolve(cwd, v)]))
-    : resolve(cwd, entry);
+    ? Object.fromEntries(Object.entries(entry).map(([k, v]) => [k, path.resolve(cwd, v)]))
+    : path.resolve(cwd, entry);
 
   const fileName = isMap ? (_: string, name: string) => `${name}.mjs` : () => 'index.mjs';
 
-  const pkg = JSON.parse(readFileSync(resolve(cwd, 'package.json'), 'utf-8'));
+  const pkg = JSON.parse(readFileSync(path.resolve(cwd, 'package.json'), 'utf8'));
   const depNames = new Set([
     ...BASE_EXTERNALS,
     ...Object.keys(pkg.dependencies || {}),

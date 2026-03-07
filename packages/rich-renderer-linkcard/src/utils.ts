@@ -122,8 +122,8 @@ export function generateColor(
 
 export function stripMarkdown(text: string): string {
   return text
-    .replaceAll(/!\[.*?\]\(.*?\)/g, '')
-    .replaceAll(/\[([^\]]*)\]\(.*?\)/g, '$1')
+    .replaceAll(/!\[[^\]]*\]\([^)]*\)/g, '')
+    .replaceAll(/\[([^\]]*)\]\([^)]*\)/g, '$1')
     .replaceAll(/[#*>_`~]/g, '')
     .replaceAll(/\n+/g, ' ')
     .trim();

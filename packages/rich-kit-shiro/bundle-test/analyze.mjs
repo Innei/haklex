@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 
-const content = readFileSync('dist/assets/index-CWYnySad.js', 'utf-8');
+const content = readFileSync('dist/assets/index-CWYnySad.js', 'utf8');
 
 const editorPatterns = [
   ['ExcalidrawEditRenderer', 'excalidraw edit renderer'],
@@ -33,7 +33,7 @@ for (const [pattern, label] of editorPatterns) {
   if (matches) {
     const idx = content.indexOf(matches[0]);
     const ctx = content
-      .substring(Math.max(0, idx - 30), Math.min(content.length, idx + 50))
+      .slice(Math.max(0, idx - 30), Math.min(content.length, idx + 50))
       .replaceAll('\n', ' ');
     console.log(`[FOUND] ${label} (${matches.length}x)`);
     console.log(`  ctx: ...${ctx}...`);

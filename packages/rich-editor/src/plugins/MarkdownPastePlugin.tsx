@@ -41,8 +41,8 @@ function detectMarkdown(text: string): boolean {
 
   if (/^#{1,6}\s+\S/m.test(text)) score += 5;
   if (/^```[\w-]*$/m.test(text)) score += 5;
-  if (/\[.+?\]\(.+?\)/.test(text)) score += 4;
-  if (/!\[.*?\]\(.+?\)/.test(text)) score += 5;
+  if (/\[[^\]]+\]\([^)]+\)/.test(text)) score += 4;
+  if (/!\[[^\]]*\]\([^)]+\)/.test(text)) score += 5;
   if (/^\|.+\|$/m.test(text) && /^\|[\s:|-]+\|$/m.test(text)) score += 5;
   if (/^>\s*\[!(?:note|tip|warning|caution|important)\]/im.test(text)) score += 5;
   if (/^[*-]\s+\[[ x]\]/m.test(text)) score += 4;
