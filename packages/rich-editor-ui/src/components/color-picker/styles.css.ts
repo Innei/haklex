@@ -1,5 +1,5 @@
-import { vars } from '@shiro/rich-style-token'
-import { globalStyle, keyframes, style } from '@vanilla-extract/css'
+import { vars } from '@haklex/rich-style-token/styles'
+import { keyframes, style } from '@vanilla-extract/css'
 
 const fadeIn = keyframes({
   from: { opacity: 0, transform: 'scale(0.95)' },
@@ -31,7 +31,7 @@ export const triggerLabel = style({
 })
 
 export const triggerLetter = style({
-  fontSize: 12,
+  fontSize: vars.typography.fontSizeXs,
   fontWeight: 600,
   lineHeight: 1,
 })
@@ -52,10 +52,11 @@ export const triggerChevron = style({
 export const panel = style({
   padding: 8,
   width: 'auto',
-})
-
-globalStyle(`${panel}[data-open]`, {
-  animation: `${fadeIn} 120ms ease-out`,
+  selectors: {
+    '&[data-open]': {
+      animation: `${fadeIn} 120ms ease-out`,
+    },
+  },
 })
 
 export const grid = style({

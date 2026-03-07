@@ -109,7 +109,8 @@ export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (
     ? styles.semanticTypeClassNames[typeClass]
     : ''
 
-  const finalTitle = cardInfo?.title || title || url
+  const isErrorState = useDynamicFetch && isError
+  const finalTitle = cardInfo?.title || title || (isErrorState ? '' : url)
   const finalDesc = cardInfo?.desc || description
   const finalImage = cardInfo?.image || image
   const finalColor = cardInfo?.color
@@ -151,7 +152,8 @@ export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (
   }
 
   const hasImage = !!finalImage
-  const showImagePlaceholder = useDynamicFetch && isError && !hasImage
+  const showImagePlaceholder = isErrorState && !hasImage
+  const shouldCenterContent = !finalDesc || shortDesc
 
   return (
     <a
@@ -162,8 +164,8 @@ export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (
         styles.semanticClassNames.card,
         typeStyleClass,
         typeSemanticClass,
-        shortDesc && styles.cardShortDesc,
-        shortDesc && styles.semanticClassNames.cardShortDesc,
+        shouldCenterContent && styles.cardShortDesc,
+        shouldCenterContent && styles.semanticClassNames.cardShortDesc,
         useDynamicFetch && (loading || isError) && styles.cardSkeleton,
         useDynamicFetch &&
           (loading || isError) &&

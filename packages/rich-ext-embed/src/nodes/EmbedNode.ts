@@ -11,6 +11,7 @@ import type { ReactElement } from 'react'
 import { createElement } from 'react'
 
 import { EmbedStaticRenderer } from '../renderers/EmbedStaticRenderer'
+import { semanticClassNames, wrapper } from '../styles.css'
 import type { EmbedType } from '../url-matchers'
 
 export type SerializedEmbedNode = Spread<
@@ -38,7 +39,7 @@ export class EmbedNode extends DecoratorNode<ReactElement> {
 
   createDOM(_config: EditorConfig): HTMLElement {
     const div = document.createElement('div')
-    div.className = 'rich-embed-link-wrapper'
+    div.className = `${wrapper} ${semanticClassNames.wrapper}`
     return div
   }
 

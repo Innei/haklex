@@ -410,6 +410,31 @@ export function banner(
   }
 }
 
+export function excalidraw(snapshot: string) {
+  return {
+    type: 'excalidraw',
+    snapshot,
+    version: 1,
+  }
+}
+
+export function nestedDoc(...children: SerializedLexicalNode[]) {
+  return {
+    type: 'nested-doc',
+    content: {
+      root: {
+        children,
+        direction: 'ltr' as const,
+        format: '',
+        indent: 0,
+        type: 'root' as const,
+        version: 1,
+      },
+    },
+    version: 1,
+  }
+}
+
 export function doc(
   ...children: SerializedLexicalNode[]
 ): SerializedEditorState {

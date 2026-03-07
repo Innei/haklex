@@ -1,4 +1,4 @@
-import { richContent, vars } from '@haklex/rich-editor/static'
+import { richContent, vars } from '@haklex/rich-editor/styles'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 export const editOverlayRoot = style({
@@ -133,6 +133,7 @@ globalStyle(`${editorArea} .rich-editor`, {
 
 globalStyle(`${editorArea} .rich-editor__content-wrapper`, {
   maxWidth: 'none',
+  overflowY: 'auto',
 })
 
 globalStyle(`${editorArea} .rich-editor__content`, {

@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-kit-shiro",
   "type": "module",
-  "version": "0.0.61",
+  "version": "0.0.64",
   "description": "Production bundle for Shiroi blog",
   "license": "MIT",
   "exports": {
@@ -52,7 +52,7 @@
     "@haklex/rich-renderers-edit": "workspace:*",
     "@haklex/rich-static-renderer": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "katex": "^0.16.33",
+    "katex": "^0.16.37",
     "react-shadow": "^20.6.0"
   },
   "devDependencies": {

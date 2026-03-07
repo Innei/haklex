@@ -1,9 +1,9 @@
 {
   "name": "@haklex/rich-static-renderer",
-  "version": "0.0.38",
+  "type": "module",
+  "version": "0.0.64",
   "description": "Headless SSR engine for Lexical rich content",
   "license": "MIT",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
@@ -15,29 +15,6 @@
     "bench": "node benchmark/build-and-run.mjs",
     "build": "vite build"
   },
-  "dependencies": {
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
-    "@lexical/headless": "^0.41.0"
-  },
-  "devDependencies": {
-    "@lexical/code": "^0.41.0",
-    "@lexical/extension": "^0.41.0",
-    "@lexical/link": "^0.41.0",
-    "@lexical/list": "^0.41.0",
-    "@lexical/rich-text": "^0.41.0",
-    "@lexical/table": "^0.41.0",
-    "@types/react": "^19.2.14",
-    "@vanilla-extract/css": "^1.18.0",
-    "@vanilla-extract/vite-plugin": "^4.0.20",
-    "lexical": "^0.41.0",
-    "markdown-to-jsx": "npm:@innei/markdown-to-jsx-yet@7.7.7-11",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "typescript": "^5.9.3",
-    "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.4"
-  },
   "peerDependencies": {
     "@lexical/code": "^0.41.0",
     "@lexical/extension": "^0.41.0",
@@ -48,6 +25,29 @@
     "lexical": "^0.41.0",
     "react": ">=19",
     "react-dom": ">=19"
+  },
+  "dependencies": {
+    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*",
+    "@lexical/headless": "^0.41.0",
+    "lucide-react": "^0.577.0"
+  },
+  "devDependencies": {
+    "@lexical/code": "^0.41.0",
+    "@lexical/extension": "^0.41.0",
+    "@lexical/link": "^0.41.0",
+    "@lexical/list": "^0.41.0",
+    "@lexical/rich-text": "^0.41.0",
+    "@lexical/table": "^0.41.0",
+    "@types/react": "^19.2.14",
+    "@vanilla-extract/css": "^1.18.0",
+    "@vanilla-extract/vite-plugin": "^5.1.4",
+    "lexical": "^0.41.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {
     "access": "public",

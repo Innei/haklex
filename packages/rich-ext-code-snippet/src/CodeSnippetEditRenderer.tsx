@@ -40,6 +40,7 @@ export const CodeSnippetEditRenderer: FC<CodeSnippetEditRendererProps> = ({
       ),
       className: codeSnippetDialogPopup,
       portalClassName,
+      theme: colorScheme,
       showCloseButton: false,
       clickOutsideToDismiss: false,
     })

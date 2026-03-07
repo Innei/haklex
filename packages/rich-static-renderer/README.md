@@ -43,7 +43,15 @@ interface RichRendererProps {
   as?: keyof React.JSX.IntrinsicElements
   rendererConfig?: RendererConfig
   extraNodes?: Array<Klass<LexicalNode>>
+  builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>
 }
+
+type BuiltinNodeRenderer = (
+  node: any,
+  key: string,
+  children: ReactNode[] | null,
+  defaultRenderer: () => ReactNode,
+) => ReactNode
 ```
 
 字段说明：
@@ -52,6 +60,7 @@ interface RichRendererProps {
 - `as`：渲染容器标签，默认 `div`
 - `rendererConfig`：覆写某些节点的渲染组件（Image/CodeBlock/...）
 - `extraNodes`：注册扩展节点（如 Tldraw、Embed、Gallery、CodeSnippet）
+- `builtinNodeOverrides`：覆写内置节点的渲染（paragraph/heading/link/...），按 `node.type` 匹配
 
 ## 与增强渲染器一起用
 
@@ -85,6 +94,32 @@ const extraNodes = [
   extraNodes={extraNodes}
 />
 ```
+
+## 覆写内置节点渲染
+
+通过 `builtinNodeOverrides` 可按 `node.type` 覆写 paragraph、heading、link 等内置节点的渲染逻辑。回调提供 `defaultRenderer` 用于回退默认渲染。
+
+```tsx
+<RichRenderer
+  value={value}
+  builtinNodeOverrides={{
+    link: (node, key, children) => (
+      <a key={key} href={node.url} className="custom-link" target="_blank">
+        {children}
+      </a>
+    ),
+    heading: (node, key, children, defaultRenderer) => {
+      // 仅覆写 h1，其余回退默认
+      if (node.tag === 'h1') {
+        return <h1 key={key} className="custom-h1">{children}</h1>
+      }
+      return defaultRenderer()
+    },
+  }}
+/>
+```
+
+支持的 type：`root`、`paragraph`、`heading`、`quote`、`list`、`listitem`、`link`、`autolink`、`horizontalrule`、`table`、`tablerow`、`tablecell`、`details`、`spoiler`、`ruby`、`code`、`code-highlight`、`linebreak`、`tab`。
 
 ## 渲染行为说明
 

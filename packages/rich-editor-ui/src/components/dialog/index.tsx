@@ -1,7 +1,7 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
-import { PortalThemeWrapper } from '@shiro/rich-style-token'
+import { PortalThemeWrapper } from '@haklex/rich-style-token'
 import { X } from 'lucide-react'
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, HTMLAttributes, ReactNode } from 'react'
 
 import * as css from './styles.css'
 
@@ -88,7 +88,7 @@ export function DialogClose(props: DialogCloseProps) {
 
 // -- Header / Footer / Title / Description --
 
-type DialogHeaderProps = ComponentProps<'div'>
+type DialogHeaderProps = HTMLAttributes<HTMLDivElement>
 
 export function DialogHeader({ className, ...props }: DialogHeaderProps) {
   return (
@@ -99,7 +99,7 @@ export function DialogHeader({ className, ...props }: DialogHeaderProps) {
   )
 }
 
-type DialogFooterProps = ComponentProps<'div'>
+type DialogFooterProps = HTMLAttributes<HTMLDivElement>
 
 export function DialogFooter({ className, ...props }: DialogFooterProps) {
   return (

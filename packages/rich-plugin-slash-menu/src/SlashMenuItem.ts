@@ -1,9 +1,10 @@
 import { MenuOption } from '@lexical/react/LexicalTypeaheadMenuPlugin'
 import type { LexicalEditor } from 'lexical'
+import type { ReactNode } from 'react'
 
 export class SlashMenuItem extends MenuOption {
   title: string
-  icon: string
+  icon: ReactNode
   description: string
   keywords: string[]
   section: string
@@ -12,7 +13,7 @@ export class SlashMenuItem extends MenuOption {
   constructor(
     title: string,
     options: {
-      icon?: string
+      icon?: ReactNode
       description?: string
       keywords?: string[]
       section?: string

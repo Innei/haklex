@@ -118,7 +118,7 @@ export const tmdbPlugin: LinkCardPlugin = {
       color: generateColor(title || originalTitle || id),
       classNames: {
         image: 'link-card__image--poster',
-        cardRoot: 'link-card--reversed',
+        cardRoot: 'link-card--poster',
       },
     }
   },

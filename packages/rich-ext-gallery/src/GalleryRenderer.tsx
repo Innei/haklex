@@ -1,11 +1,17 @@
-import './styles.css'
 import 'react-photo-view/dist/react-photo-view.css'
 
-import type { GalleryRendererProps } from '@shiro/rich-editor'
+import {
+  decodeThumbHash,
+  type GalleryImage,
+  type GalleryRendererProps,
+} from '@haklex/rich-editor'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import type { ComponentType, UIEventHandler } from 'react'
-import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { PhotoProvider, PhotoView } from 'react-photo-view'
+
+import * as css from './styles.css'
 
 const IMAGE_CONTAINER_MARGIN_INSET = 60
 const CHILD_GAP = 15
@@ -15,7 +21,7 @@ function throttle<T extends (...args: any[]) => void>(
   func: T,
   wait: number,
 ): T {
-  let timeout: NodeJS.Timeout | null = null
+  let timeout: ReturnType<typeof setTimeout> | null = null
   return ((...args: Parameters<T>) => {
     if (!timeout) {
       timeout = setTimeout(() => {
@@ -26,10 +32,21 @@ function throttle<T extends (...args: any[]) => void>(
   }) as T
 }
 
-/**
- * Enhanced Gallery Renderer for @shiro/rich-editor
- * Supports carousel mode with autoplay and photo zoom
- */
+function clsx(...classes: (string | false | undefined | null)[]): string {
+  return classes.filter(Boolean).join(' ')
+}
+
+function useThumbhashStyle(
+  image: GalleryImage,
+): React.CSSProperties | undefined {
+  return useMemo(() => {
+    if (!image.thumbhash) return
+    const url = decodeThumbHash(image.thumbhash)
+    if (!url) return
+    return { backgroundImage: `url(${url})`, backgroundSize: 'cover' }
+  }, [image.thumbhash])
+}
+
 export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
   images,
   layout,
@@ -87,7 +104,7 @@ export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
     [containerRef],
   )
 
-  const autoplayTimerRef = useRef<NodeJS.Timeout | null>(null)
+  const autoplayTimerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const isForward = useRef(true)
   const autoplayRef = useRef(true)
 
@@ -140,90 +157,75 @@ export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
 
   if (images.length === 0) return null
 
-  // Single image mode
+  const layoutClass =
+    layout === 'masonry'
+      ? css.galleryMasonry
+      : layout === 'carousel'
+        ? css.galleryCarousel
+        : css.galleryGrid
+
   if (images.length === 1 || layout === 'grid' || layout === 'masonry') {
     return (
       <PhotoProvider>
-        <div className={`gallery gallery--${layout}`}>
+        <div className={clsx(css.gallery, layoutClass)}>
           {images.map((image, index) => (
-            <PhotoView key={index} src={image.src}>
-              <figure className="gallery__item">
-                <img
-                  src={image.src}
-                  alt={image.alt || ''}
-                  width={image.width}
-                  height={image.height}
-                  loading="lazy"
-                  style={{ maxWidth: '100%', height: 'auto' }}
-                />
-              </figure>
-            </PhotoView>
+            <GalleryFigure key={index} image={image} />
           ))}
         </div>
       </PhotoProvider>
     )
   }
 
-  // Carousel mode
   return (
     <PhotoProvider>
       <div
-        className="gallery gallery--carousel"
+        className={clsx(css.gallery, css.galleryCarousel)}
         ref={ref}
         onTouchMove={handleCancelAutoplay}
         onWheel={handleCancelAutoplay}
       >
         <div
-          className="gallery__container"
+          className={css.galleryContainer}
           onTouchStart={handleCancelAutoplay}
           onScroll={handleOnScroll}
           ref={setContainerRef}
         >
           {images.map((image, index) => (
-            <PhotoView key={index} src={image.src}>
-              <figure
-                className="gallery__item"
-                style={{
-                  width: `calc(100% - ${IMAGE_CONTAINER_MARGIN_INSET}px)`,
-                  marginRight: `${CHILD_GAP}px`,
-                }}
-              >
-                <img
-                  src={image.src}
-                  alt={image.alt || ''}
-                  width={image.width}
-                  height={image.height}
-                  loading="lazy"
-                  style={{ maxWidth: '100%', height: 'auto' }}
-                />
-              </figure>
-            </PhotoView>
+            <GalleryFigure
+              key={index}
+              image={image}
+              style={{
+                width: `calc(100% - ${IMAGE_CONTAINER_MARGIN_INSET}px)`,
+                marginRight: `${CHILD_GAP}px`,
+              }}
+            />
           ))}
         </div>
 
-        {/* Navigation buttons */}
         {currentIndex > 0 && (
           <button
-            className="gallery__nav gallery__nav--prev"
+            className={clsx(css.galleryNav, css.galleryNavPrev)}
             onClick={() => handleScrollTo(currentIndex - 1)}
           >
-            ←
+            <ChevronLeft size={18} />
           </button>
         )}
         {currentIndex < images.length - 1 && (
           <button
-            className="gallery__nav gallery__nav--next"
+            className={clsx(css.galleryNav, css.galleryNavNext)}
             onClick={() => handleScrollTo(currentIndex + 1)}
           >
-            →
+            <ChevronRight size={18} />
           </button>
         )}
 
-        {/* Indicators */}
-        <div className="gallery__indicators">
+        <div className={css.galleryIndicators}>
           {images.map((_, i) => (
             <div
-              className={`gallery__indicator ${currentIndex === i ? 'gallery__indicator--active' : ''}`}
+              className={clsx(
+                css.galleryIndicator,
+                currentIndex === i && css.galleryIndicatorActive,
+              )}
               key={i}
               onClick={() => handleScrollTo(i)}
             />
@@ -233,5 +235,26 @@ export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
     </PhotoProvider>
   )
 }
+
+const GalleryFigure = memo(
+  ({ image, style }: { image: GalleryImage; style?: React.CSSProperties }) => {
+    const thumbStyle = useThumbhashStyle(image)
+
+    return (
+      <PhotoView src={image.src}>
+        <figure className={css.galleryItem} style={{ ...thumbStyle, ...style }}>
+          <img
+            src={image.src}
+            alt={image.alt || ''}
+            width={image.width}
+            height={image.height}
+            loading="lazy"
+            style={{ maxWidth: '100%', height: 'auto' }}
+          />
+        </figure>
+      </PhotoView>
+    )
+  },
+)
 
 export default memo(GalleryRenderer)

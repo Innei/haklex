@@ -1,0 +1,27 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "workspaces": {
+    "packages/*": {
+      "project": [
+        "src/**/*.{ts,tsx}"
+      ],
+      "ignore": [
+        "dist/**",
+        "**/*.css.ts"
+      ],
+      "vite": false
+    }
+  },
+  "ignore": [
+    "packages/rich-editor-demo/**"
+  ],
+  "ignoreDependencies": [
+    "@vanilla-extract/css",
+    "@vanilla-extract/recipes",
+    "@vanilla-extract/vite-plugin",
+    "vite-plugin-dts",
+    "typescript",
+    "vite",
+    "rollup-plugin-visualizer"
+  ]
+}

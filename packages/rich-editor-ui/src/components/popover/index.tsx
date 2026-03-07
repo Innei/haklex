@@ -1,5 +1,5 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover'
-import { PortalThemeWrapper } from '@shiro/rich-style-token'
+import { PortalThemeWrapper } from '@haklex/rich-style-token'
 import type { ComponentProps, ReactNode } from 'react'
 import { useEffect, useState } from 'react'
 

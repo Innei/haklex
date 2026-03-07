@@ -14,7 +14,6 @@ export {
   githubPrPlugin,
   githubRepoPlugin,
   leetcodePlugin,
-  mxSpacePlugin,
   neteaseMusicPlugin,
   qqMusicPlugin,
   tmdbPlugin,

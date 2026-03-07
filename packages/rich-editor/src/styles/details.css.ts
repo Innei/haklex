@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle } from '@vanilla-extract/css'
 
 import { richContent } from './shared.css'

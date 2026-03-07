@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 export const tableWrapper = style({
@@ -50,7 +50,7 @@ globalStyle(`${table} tr:has(${tableCell})`, {
 })
 
 globalStyle(`${table} tr:has(${tableCell}):hover`, {
-  backgroundColor: vars.color.bgTertiary,
+  backgroundColor: vars.color.fillTertiary,
 })
 
 // Reset paragraph margins inside cells

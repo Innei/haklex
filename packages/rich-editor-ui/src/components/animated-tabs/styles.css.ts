@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { style } from '@vanilla-extract/css'
 
 export const root = style({
@@ -12,7 +12,7 @@ export const tablist = style({
 export const tab = style({
   position: 'relative',
   padding: '0.625rem 1rem',
-  fontSize: '0.875rem',
+  fontSize: vars.typography.fontSizeMd,
   fontWeight: 500,
   transition: 'color 200ms',
   cursor: 'pointer',

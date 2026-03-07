@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, keyframes, style } from '@vanilla-extract/css'
 
 export const semanticClassNames = {
@@ -6,9 +6,8 @@ export const semanticClassNames = {
   cardShortDesc: 'link-card--short-desc',
   cardSkeleton: 'link-card--skeleton',
   cardError: 'link-card--error',
-  cardReversed: 'link-card--reversed',
+  cardPoster: 'link-card--poster',
   cardWide: 'link-card--wide',
-  cardFull: 'link-card--full',
   cardMedia: 'link-card--media',
   cardGithub: 'link-card--github',
   cardAcademic: 'link-card--academic',
@@ -20,15 +19,12 @@ export const semanticClassNames = {
   content: 'link-card__content',
   title: 'link-card__title',
   titleText: 'link-card__title-text',
-  external: 'link-card__external',
   desc: 'link-card__desc',
   desc2: 'link-card__desc-2',
-  favicon: 'link-card__favicon',
   editWrapper: 'rich-link-card-edit-wrapper',
   editPanel: 'rich-link-card-edit-panel',
   editUrlRow: 'rich-link-card-edit-url-row',
   editLinkIcon: 'rich-link-card-edit-link-icon',
-  editUrlText: 'rich-link-card-edit-url-text',
   editInput: 'rich-link-card-edit-input',
   editActions: 'rich-link-card-edit-actions',
   editActionButton: 'rich-link-card-edit-action-btn',
@@ -150,21 +146,6 @@ export const titleText = style({
   lineHeight: '1.25rem',
 })
 
-export const external = style({
-  flexShrink: 0,
-  marginLeft: 'auto',
-  width: '0.875rem',
-  height: '0.875rem',
-  color: vars.color.textSecondary,
-  opacity: 0,
-  transition: 'opacity 0.2s',
-  selectors: {
-    [`${card}:hover &`]: {
-      opacity: 1,
-    },
-  },
-})
-
 export const desc = style({
   display: '-webkit-box',
   WebkitBoxOrient: 'vertical',
@@ -180,29 +161,21 @@ export const desc = style({
 
 export const desc2 = style({})
 
-export const favicon = style({
-  flexShrink: 0,
-  width: '1rem',
-  height: '1rem',
-  display: 'inline',
-  verticalAlign: 'middle',
-  marginRight: '0.375rem',
-})
-
-export const cardReversed = style({
+export const cardPoster = style({
   width: '100% !important' as any,
   height: 'auto !important' as any,
   maxWidth: '40rem',
   padding: 0,
 })
 
-globalStyle(`${cardReversed} ${image}`, {
+globalStyle(`${cardPoster} ${image}`, {
   borderRadius: 0,
   alignSelf: 'stretch',
   height: 'auto !important' as any,
+  marginLeft: '0 !important' as any,
 })
 
-globalStyle(`${cardReversed} ${image}::after`, {
+globalStyle(`${cardPoster} ${image}::after`, {
   content: "''",
   position: 'absolute',
   inset: 0,
@@ -210,7 +183,7 @@ globalStyle(`${cardReversed} ${image}::after`, {
   pointerEvents: 'none',
 })
 
-globalStyle(`${cardReversed} ${content}`, {
+globalStyle(`${cardPoster} ${content}`, {
   padding: '1rem',
   display: 'flex',
   flexDirection: 'column',
@@ -218,8 +191,10 @@ globalStyle(`${cardReversed} ${content}`, {
 })
 
 export const cardWide = style({ width: '100%', maxWidth: '40rem' })
-export const cardFull = style({ width: '100%' })
-export const cardMedia = style({ width: '100%' })
+export const cardMedia = style({
+  width: '100% !important' as any,
+  maxWidth: 'unset !important' as any,
+})
 globalStyle(`${cardMedia} ${desc}`, { WebkitLineClamp: 4 })
 
 export const cardGithub = style({
@@ -338,17 +313,6 @@ export const editLinkIcon = style({
   color: vars.color.textSecondary,
 })
 
-export const editUrlText = style({
-  flex: 1,
-  color: vars.color.text,
-  fontFamily: vars.typography.fontMono,
-  fontSize: vars.typography.fontSizeSm,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  minWidth: 0,
-})
-
 export const editInput = style({
   flex: 1,
   appearance: 'none',
@@ -399,7 +363,6 @@ export const typeCardModifier = {
   github: cardGithub,
   academic: cardAcademic,
   wide: cardWide,
-  full: cardFull,
 } as const
 
 export const semanticTypeClassNames = {
@@ -407,16 +370,14 @@ export const semanticTypeClassNames = {
   github: semanticClassNames.cardGithub,
   academic: semanticClassNames.cardAcademic,
   wide: semanticClassNames.cardWide,
-  full: semanticClassNames.cardFull,
 } as const
 
 export const semanticClassToStyle: Record<string, string> = {
   [semanticClassNames.cardShortDesc]: cardShortDesc,
   [semanticClassNames.cardSkeleton]: cardSkeleton,
   [semanticClassNames.cardError]: cardError,
-  [semanticClassNames.cardReversed]: cardReversed,
+  [semanticClassNames.cardPoster]: cardPoster,
   [semanticClassNames.cardWide]: cardWide,
-  [semanticClassNames.cardFull]: cardFull,
   [semanticClassNames.cardMedia]: cardMedia,
   [semanticClassNames.cardGithub]: cardGithub,
   [semanticClassNames.cardAcademic]: cardAcademic,

@@ -1,5 +1,4 @@
-import type { ReactNode } from 'react'
-import { createContext, use, useMemo } from 'react'
+import * as React from 'react'
 
 export type PortalTheme = 'light' | 'dark'
 
@@ -8,17 +7,16 @@ type PortalThemeContextType = {
   theme: PortalTheme
 }
 
-const PortalThemeContext = createContext<PortalThemeContextType>({
+const PortalThemeContext = React.createContext<PortalThemeContextType>({
   className: '',
   theme: 'light',
 })
 
-// Portal container context — controls where floating UI (toolbar, popover) portals to.
-// Defaults to document.body. Set to a modal/dialog element to keep portals within the overlay stacking context.
-const PortalContainerContext = createContext<Element | null>(null)
+const PortalContainerContext = React.createContext<Element | null>(null)
 export const PortalContainerProvider = PortalContainerContext.Provider
+
 export function usePortalContainer(): Element {
-  return use(PortalContainerContext) ?? document.body
+  return React.useContext(PortalContainerContext) ?? document.body
 }
 
 export function PortalThemeProvider({
@@ -28,11 +26,11 @@ export function PortalThemeProvider({
 }: {
   className: string
   theme: PortalTheme
-  children?: ReactNode
+  children?: React.ReactNode
 }) {
   return (
     <PortalThemeContext.Provider
-      value={useMemo(() => ({ className, theme }), [className, theme])}
+      value={React.useMemo(() => ({ className, theme }), [className, theme])}
     >
       {children}
     </PortalThemeContext.Provider>
@@ -40,10 +38,14 @@ export function PortalThemeProvider({
 }
 
 export function usePortalTheme() {
-  return use(PortalThemeContext)
+  return React.useContext(PortalThemeContext)
 }
 
-export function PortalThemeWrapper({ children }: { children: ReactNode }) {
+export function PortalThemeWrapper({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const { className, theme } = usePortalTheme()
   if (!className) return children
   return (

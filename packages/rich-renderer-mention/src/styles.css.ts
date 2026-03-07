@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 export const semanticClassNames = {
@@ -66,6 +66,7 @@ export const mentionHandle = style({
   textDecoration: 'none',
   color: 'inherit',
   fontWeight: 500,
+  fontFamily: vars.typography.fontFamilySans,
 })
 
 // ─── Edit popover ───────────────────────────────────────
@@ -160,7 +161,7 @@ export const editActionButton = style({
   whiteSpace: 'nowrap',
   selectors: {
     '&:hover': {
-      backgroundColor: vars.color.bgSecondary,
+      backgroundColor: vars.color.fillSecondary,
     },
   },
 })

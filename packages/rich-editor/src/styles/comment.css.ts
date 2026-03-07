@@ -1,4 +1,4 @@
-import { commentTheme, vars } from '@haklex/rich-style-token'
+import { commentTheme, vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 import { richContent } from './shared.css'

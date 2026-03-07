@@ -10,6 +10,7 @@ import {
   horizontalRule,
   list,
   listItem,
+  nestedDoc,
   paragraph,
   quote,
   text,
@@ -225,6 +226,55 @@ console.log(greet('World'))`,
     indent: 0,
     version: 1,
   } as any,
+
+  heading('h2', text('Nested Document')),
+
+  nestedDoc(
+    heading('h3', text('Embedded Document')),
+    paragraph(
+      text('This is a '),
+      text('nested document', FORMAT_BOLD),
+      text(' embedded within the parent document. It supports all node types.'),
+    ),
+    paragraph(
+      text('You can include '),
+      text('rich formatting', FORMAT_ITALIC),
+      text(', code like '),
+      text('console.log()', FORMAT_CODE),
+      text(', and more.'),
+    ),
+    list(
+      'bullet',
+      listItem(paragraph(text('Collapsed by default at 400px'))),
+      listItem(paragraph(text('Expand to see full content'))),
+      listItem(paragraph(text('In edit mode, click to open modal editor'))),
+    ),
+    paragraph(
+      text(
+        'Paragraph 4: Additional content to demonstrate truncation behavior.',
+      ),
+    ),
+    paragraph(
+      text('Paragraph 5: The nested document can hold substantial content.'),
+    ),
+    paragraph(
+      text('Paragraph 6: Readers see a preview with a gradient mask overlay.'),
+    ),
+    paragraph(
+      text('Paragraph 7: Click the expand button to reveal everything.'),
+    ),
+    paragraph(
+      text('Paragraph 8: The editor modal provides full editing capabilities.'),
+    ),
+    paragraph(
+      text('Paragraph 9: Changes sync back to the parent document on save.'),
+    ),
+    paragraph(
+      text('Paragraph 10: This line should be truncated in collapsed view.'),
+    ),
+    paragraph(text('Paragraph 11: Only visible after expanding.')),
+    paragraph(text('Paragraph 12: Final paragraph of the nested document.')),
+  ) as any,
 
   heading('h2', text('Link Card')),
 

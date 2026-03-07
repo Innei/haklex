@@ -31,8 +31,10 @@ function getTextOffset(
 ): number {
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
   let offset = 0
-  let node: Text | null
-  while ((node = walker.nextNode() as Text | null)) {
+  while (true) {
+    const node = walker.nextNode() as Text | null
+    if (!node) break
+
     if (node === targetNode) {
       return offset + targetOffset
     }

@@ -133,8 +133,16 @@ export default defineConfig({
     port: 5188,
     open: true,
   },
+  define: {
+    'process.env.IS_PREACT': '"false"',
+    'process.env.NODE_ENV': JSON.stringify('development'),
+  },
   optimizeDeps: {
-    include: ['react-intersection-observer', 'react-photo-view'],
+    include: [
+      'react-intersection-observer',
+      'react-photo-view',
+      '@excalidraw/excalidraw',
+    ],
   },
   resolve: {
     dedupe: [
@@ -152,6 +160,7 @@ export default defineConfig({
 
       'react-intersection-observer',
       'react-photo-view',
+      '@excalidraw/excalidraw',
     ],
   },
 })

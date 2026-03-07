@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { style } from '@vanilla-extract/css'
 
 export const contentWrapper = style({
@@ -8,7 +8,6 @@ export const contentWrapper = style({
   flex: 1,
   minHeight: 0,
   width: '100%',
-  overflowY: 'auto',
 })
 
 export const content = style({

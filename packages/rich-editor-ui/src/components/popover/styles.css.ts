@@ -1,4 +1,4 @@
-import { vars } from '@shiro/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, keyframes, style } from '@vanilla-extract/css'
 
 const popoverIn = keyframes({
@@ -18,22 +18,22 @@ export const popup = style({
   border: `1px solid ${vars.color.border}`,
   padding: '1rem',
   backgroundColor: vars.color.bg,
-  boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
+  boxShadow: vars.boxShadow.modal,
   outline: 'none',
   transition: 'opacity 150ms ease-out, transform 150ms ease-out',
-})
-
-globalStyle(`${popup}[data-open]`, {
-  animation: `${popoverIn} 150ms ease-out`,
-})
-
-globalStyle(`${popup}[data-ending-style]`, {
-  opacity: 0,
-  transform: 'translateY(2px) scale(0.96)',
-})
-
-globalStyle(`${popup}[data-closed]`, {
-  animation: `${popoverOut} 150ms ease-in`,
+  fontFamily: vars.typography.fontFamilySans,
+  selectors: {
+    '&[data-open]': {
+      animation: `${popoverIn} 150ms ease-out`,
+    },
+    '&[data-ending-style]': {
+      opacity: 0,
+      transform: 'translateY(2px) scale(0.96)',
+    },
+    '&[data-closed]': {
+      animation: `${popoverOut} 150ms ease-in`,
+    },
+  },
 })
 
 export const arrow = style({
@@ -52,14 +52,14 @@ globalStyle(`${arrow} > polyline`, {
 })
 
 export const title = style({
-  fontSize: '0.875rem',
+  fontSize: vars.typography.fontSizeMd,
   fontWeight: 600,
   lineHeight: 1,
   color: vars.color.text,
 })
 
 export const description = style({
-  fontSize: '0.875rem',
+  fontSize: vars.typography.fontSizeMd,
   lineHeight: '1.25rem',
   color: vars.color.textSecondary,
   marginTop: '0.25rem',

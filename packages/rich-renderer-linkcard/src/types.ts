@@ -54,12 +54,7 @@ export interface LinkCardFetchContext {
 }
 
 /** 卡片类型样式 */
-export type LinkCardTypeClass =
-  | 'media'
-  | 'github'
-  | 'academic'
-  | 'wide'
-  | 'full'
+export type LinkCardTypeClass = 'media' | 'github' | 'academic' | 'wide'
 
 /**
  * 插件接口 - 每个插件自包含

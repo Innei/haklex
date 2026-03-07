@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-ext-nested-doc",
   "type": "module",
-  "version": "0.0.61",
+  "version": "0.0.64",
   "description": "Nested document extension for haklex rich editor",
   "license": "MIT",
   "exports": {

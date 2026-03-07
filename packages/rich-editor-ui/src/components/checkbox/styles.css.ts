@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { keyframes, style } from '@vanilla-extract/css'
 
 const checkboxBounce = keyframes({
@@ -101,7 +101,7 @@ export const labelArea = style({
 })
 
 export const label = style({
-  fontSize: '0.875rem',
+  fontSize: vars.typography.fontSizeMd,
   fontWeight: 500,
   lineHeight: 1.25,
   color: vars.color.text,
@@ -113,7 +113,7 @@ export const labelDisabled = style({
 })
 
 export const description = style({
-  fontSize: '0.75rem',
+  fontSize: vars.typography.fontSizeXs,
   lineHeight: 1.25,
   color: vars.color.textSecondary,
 })

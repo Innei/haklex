@@ -107,10 +107,10 @@ export function SegmentedControl<T extends string>({
       role="tablist"
       aria-orientation="horizontal"
       onKeyDown={handleKeyDown}
-      className={`${css.container} ${css.sizeVariants[size]} ${fullWidth ? css.containerFullWidth : ''} ${className || ''}`.trim()}
+      className={`${css.container({ size, fullWidth })} ${className || ''}`.trim()}
     >
       <div
-        className={`${css.indicator} ${!isReady ? css.indicatorHidden : ''}`.trim()}
+        className={css.indicator({ ready: isReady })}
         style={{
           left: indicator.left,
           width: indicator.width,
@@ -134,7 +134,12 @@ export function SegmentedControl<T extends string>({
             tabIndex={isActive ? 0 : -1}
             disabled={item.disabled}
             onClick={() => onChange(item.value)}
-            className={`${css.item} ${css.itemPaddingVariants[size]} ${isActive ? css.itemActive : ''} ${item.disabled ? css.itemDisabled : ''} ${fullWidth ? css.itemFullWidth : ''}`.trim()}
+            className={css.item({
+              size,
+              active: isActive,
+              disabled: Boolean(item.disabled),
+              fullWidth,
+            })}
           >
             {item.label}
           </button>

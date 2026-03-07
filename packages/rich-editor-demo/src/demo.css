@@ -250,7 +250,6 @@
   background: var(--demo-surface);
   border-radius: 8px;
   border: 1px solid var(--demo-border);
-  overflow: hidden;
 }
 
 .panel-header {
@@ -260,6 +259,7 @@
   padding: 12px 16px;
   border-bottom: 1px solid var(--demo-border);
   background: var(--demo-surface-alt);
+  border-radius: 8px 8px 0 0;
 }
 
 .panel-header-left {
@@ -812,6 +812,38 @@
   text-underline-offset: 2px;
 }
 
+/* ── Biz Layout ── */
+.biz-anchor-nav {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.biz-anchor-nav button {
+  padding: 4px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  font-family: inherit;
+  border: 1px solid var(--demo-border);
+  border-radius: 6px;
+  background: none;
+  color: var(--demo-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.biz-anchor-nav button:hover {
+  background: var(--demo-accent-bg);
+  border-color: var(--demo-accent);
+  color: var(--demo-accent);
+}
+
+.biz-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
 /* ── Responsive ── */
 @media (max-width: 768px) {
   .app-header-content {
@@ -839,5 +871,9 @@
 
   .comment-block-btn-wrap {
     display: none;
+  }
+
+  .biz-grid {
+    grid-template-columns: 1fr;
   }
 }

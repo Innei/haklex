@@ -1,4 +1,5 @@
-import { $isLinkCardNode, type LinkCardNodePayload } from '@haklex/rich-editor'
+import type { LinkCardNodePayload } from '@haklex/rich-editor'
+import { $isLinkCardNode } from '@haklex/rich-editor'
 import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui'
 import { $createLinkNode } from '@lexical/link'
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
@@ -23,7 +24,7 @@ export function LinkCardEditDecorator({
   const [editor] = useLexicalComposerContext()
   const editable = editor.isEditable()
 
-  const [open, setOpen] = useState(false)
+  const [open, setOpen] = useState(() => !payload.url)
 
   const [url, setUrl] = useState(payload.url)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -33,9 +34,13 @@ export function LinkCardEditDecorator({
   }, [payload.url])
 
   useEffect(() => {
-    inputRef.current?.focus()
-    inputRef.current?.select()
-  }, [])
+    if (open) {
+      requestAnimationFrame(() => {
+        inputRef.current?.focus()
+        inputRef.current?.select()
+      })
+    }
+  }, [open])
 
   const commitUrl = useCallback(() => {
     const trimmed = url.trim()

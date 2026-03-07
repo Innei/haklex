@@ -4,7 +4,14 @@ import type {
   RichEditorVariant,
 } from '@haklex/rich-editor/static'
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical'
-import type { CSSProperties } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
+
+export type BuiltinNodeRenderer = (
+  node: any,
+  key: string,
+  children: ReactNode[] | null,
+  defaultRenderer: () => ReactNode,
+) => ReactNode
 
 export interface RichRendererProps {
   value: SerializedEditorState
@@ -15,4 +22,5 @@ export interface RichRendererProps {
   as?: keyof React.JSX.IntrinsicElements
   rendererConfig?: RendererConfig
   extraNodes?: Array<Klass<LexicalNode>>
+  builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>
 }

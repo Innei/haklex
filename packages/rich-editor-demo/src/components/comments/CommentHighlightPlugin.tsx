@@ -20,8 +20,10 @@ function findDomTextNode(
 ): { node: Text; offset: number } | null {
   const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT)
   let consumed = 0
-  let textNode: Text | null
-  while ((textNode = walker.nextNode() as Text | null)) {
+  while (true) {
+    const textNode = walker.nextNode() as Text | null
+    if (!textNode) break
+
     const len = textNode.textContent?.length ?? 0
     if (consumed + len >= targetOffset) {
       return { node: textNode, offset: targetOffset - consumed }

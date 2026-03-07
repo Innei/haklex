@@ -1,0 +1,111 @@
+{
+  "rich-editor": [
+    "haklex/rich-editor",
+    "packages/rich-editor"
+  ],
+  "rich-editor-demo": [
+    "haklex/rich-editor-demo",
+    "packages/rich-editor-demo",
+    "packages/rich-editor/demo"
+  ],
+  "rich-editor-ui": [
+    "haklex/rich-editor-ui",
+    "packages/rich-editor-ui"
+  ],
+  "rich-style-token": [
+    "haklex/rich-style-token",
+    "packages/rich-style-token"
+  ],
+  "rich-headless": [
+    "haklex/rich-headless",
+    "packages/rich-headless"
+  ],
+  "cm-editor": [
+    "haklex/cm-editor",
+    "packages/cm-editor"
+  ],
+  "rich-plugin-slash-menu": [
+    "haklex/rich-plugin-slash-menu",
+    "packages/rich-plugin-slash-menu"
+  ],
+  "rich-plugin-table": [
+    "haklex/rich-plugin-table",
+    "packages/rich-plugin-table"
+  ],
+  "rich-plugin-floating-toolbar": [
+    "haklex/rich-plugin-floating-toolbar",
+    "packages/rich-plugin-floating-toolbar"
+  ],
+  "rich-plugin-toolbar": [
+    "haklex/rich-plugin-toolbar",
+    "packages/rich-plugin-toolbar"
+  ],
+  "rich-plugin-block-handle": [
+    "haklex/rich-plugin-block-handle",
+    "packages/rich-plugin-block-handle"
+  ],
+  "rich-plugin-mention": [
+    "haklex/rich-plugin-mention",
+    "packages/rich-plugin-mention"
+  ],
+  "rich-renderer-alert": [
+    "haklex/rich-renderer-alert",
+    "packages/rich-renderer-alert"
+  ],
+  "rich-renderer-codeblock": [
+    "haklex/rich-renderer-codeblock",
+    "packages/rich-renderer-codeblock"
+  ],
+  "rich-renderer-linkcard": [
+    "haklex/rich-renderer-linkcard",
+    "packages/rich-renderer-linkcard"
+  ],
+  "rich-renderer-mention": [
+    "haklex/rich-renderer-mention",
+    "packages/rich-renderer-mention"
+  ],
+  "rich-renderer-mermaid": [
+    "haklex/rich-renderer-mermaid",
+    "packages/rich-renderer-mermaid"
+  ],
+  "rich-static-renderer": [
+    "haklex/rich-static-renderer",
+    "packages/rich-static-renderer"
+  ],
+  "rich-renderers": [
+    "haklex/rich-renderers",
+    "packages/rich-renderers"
+  ],
+  "rich-renderers-edit": [
+    "haklex/rich-renderers-edit",
+    "packages/rich-renderers-edit"
+  ],
+  "rich-ext-code-snippet": [
+    "haklex/rich-ext-code-snippet",
+    "packages/rich-ext-code-snippet"
+  ],
+  "rich-ext-embed": [
+    "haklex/rich-ext-embed",
+    "packages/rich-ext-embed"
+  ],
+  "rich-ext-gallery": [
+    "haklex/rich-ext-gallery",
+    "packages/rich-ext-gallery",
+    "packages/rich-renderer-gallery"
+  ],
+  "rich-ext-nested-doc": [
+    "haklex/rich-ext-nested-doc",
+    "packages/rich-ext-nested-doc"
+  ],
+  "rich-ext-excalidraw": [
+    "haklex/rich-ext-excalidraw",
+    "haklex/rich-ext-tldraw",
+    "packages/rich-ext-excalidraw",
+    "packages/rich-ext-tldraw"
+  ],
+  "rich-kit-shiro": [
+    "haklex/rich-kit-shiro",
+    "packages/rich-kit-shiro",
+    "packages/rich-editor-shiro"
+  ]
+}

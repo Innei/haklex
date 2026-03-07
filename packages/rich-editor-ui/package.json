@@ -1,8 +1,9 @@
 {
-  "name": "@shiro/rich-editor-ui",
-  "version": "0.0.1",
-  "private": true,
+  "name": "@haklex/rich-editor-ui",
   "type": "module",
+  "version": "0.0.64",
+  "description": "UI components for haklex rich editor",
+  "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
     "./style.css": "./dist/rich-editor-ui.css"
@@ -15,28 +16,29 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "dependencies": {
-    "@base-ui/react": "^1.1.0",
-    "lucide-react": "^0.574.0"
-  },
-  "devDependencies": {
-    "@shiro/rich-style-token": "workspace:*",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vanilla-extract/css": "^1.17.1",
-    "@vanilla-extract/vite-plugin": "^4.0.20",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "typescript": "^5.9.0",
-    "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.0"
-  },
   "peerDependencies": {
-    "@shiro/rich-style-token": "workspace:*",
     "react": ">=19",
     "react-dom": ">=19"
   },
+  "dependencies": {
+    "@base-ui/react": "^1.2.0",
+    "@haklex/rich-style-token": "workspace:*",
+    "lucide-react": "^0.577.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vanilla-extract/css": "^1.18.0",
+    "@vanilla-extract/recipes": "^0.5.7",
+    "@vanilla-extract/vite-plugin": "^5.1.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
+  },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": {
         "import": "./dist/index.mjs",

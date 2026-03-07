@@ -1,8 +1,9 @@
 {
-  "name": "@shiro/rich-plugin-table",
-  "version": "0.0.1",
-  "private": true,
+  "name": "@haklex/rich-plugin-table",
   "type": "module",
+  "version": "0.0.64",
+  "description": "Table editing plugin",
+  "license": "MIT",
   "exports": {
     ".": "./src/index.ts",
     "./style.css": "./dist/rich-plugin-table.css"
@@ -15,33 +16,35 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "dependencies": {
-    "@shiro/rich-editor-ui": "workspace:*"
-  },
-  "devDependencies": {
-    "@lexical/react": "^0.39.0",
-    "@lexical/table": "^0.39.0",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@vanilla-extract/css": "^1.17.1",
-    "@vanilla-extract/vite-plugin": "^4.0.20",
-    "lexical": "^0.39.0",
-    "lucide-react": "^0.563.0",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "typescript": "^5.9.0",
-    "vite": "^6.3.0",
-    "vite-plugin-dts": "^4.5.0"
-  },
   "peerDependencies": {
-    "@lexical/react": "^0.39.0",
-    "@lexical/table": "^0.39.0",
-    "lexical": "^0.39.0",
-    "lucide-react": ">=0.400.0",
+    "@lexical/react": "^0.41.0",
+    "@lexical/table": "^0.41.0",
+    "lexical": "^0.41.0",
+    "lucide-react": "^0.574.0",
     "react": ">=19",
     "react-dom": ">=19"
   },
+  "dependencies": {
+    "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*"
+  },
+  "devDependencies": {
+    "@lexical/react": "^0.41.0",
+    "@lexical/table": "^0.41.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vanilla-extract/css": "^1.18.0",
+    "@vanilla-extract/vite-plugin": "^5.1.4",
+    "lexical": "^0.41.0",
+    "lucide-react": "^0.577.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
+  },
   "publishConfig": {
+    "access": "public",
     "exports": {
       ".": {
         "import": "./dist/index.mjs",

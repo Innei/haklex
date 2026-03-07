@@ -1,0 +1,35 @@
+# dependencies
+node_modules
+.pnpm-store
+
+# testing
+/coverage
+
+# production / builds
+dist
+build
+.turbo
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# local env files
+.env*.local
+.env
+
+# editor / ide
+.idea
+.vscode/sftp.json
+
+# typescript
+*.tsbuildinfo
+
+# benchmark compiled output
+_bench_compiled*

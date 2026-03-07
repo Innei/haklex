@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import type { StyleRule } from '@vanilla-extract/css'
 import { globalStyle, keyframes, style } from '@vanilla-extract/css'
 

@@ -1,5 +1,5 @@
-export { getDefaultItems } from './defaultItems'
+export { getBuiltinItems } from './builtinItems'
 export { SlashMenuItem } from './SlashMenuItem'
 export { SlashMenuList } from './SlashMenuList'
 export type { SlashMenuPluginProps } from './SlashMenuPlugin'
-export { SlashMenuPlugin } from './SlashMenuPlugin'
+export { collectNodeSlashItems, SlashMenuPlugin } from './SlashMenuPlugin'

@@ -1,10 +1,12 @@
-import '../styles-static.css'
+import '../styles.css.ts'
 
+import { useColorScheme } from '@haklex/rich-editor'
 import { Github } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react'
 
 import { useEmbedRenderers } from '../context/EmbedRendererContext'
+import * as styles from '../styles-static.css'
 import type { EmbedType } from '../url-matchers'
 
 const extToLang: Record<string, string> = {
@@ -75,10 +77,8 @@ const typeLabels: Record<EmbedType, string> = {
   thinking: 'Thinking',
 }
 
-// --- Lazy Tweet via react-tweet (optional peer dep) ---
-
 const LazyTweet = lazy(() =>
-  import('react-tweet').then((mod) => ({ default: mod.Tweet })),
+  import('react-tweet').then((mod) => ({ default: mod.IsolatedTweet })),
 )
 
 class EmbedErrorBoundary extends Component<
@@ -110,9 +110,11 @@ function FixedRatioContainer({
   ratio?: number
 }) {
   return (
-    <div className="embed-static-ratio-container">
+    <div
+      className={`${styles.ratioContainer} ${styles.semanticClassNames.ratioContainer}`}
+    >
       <div
-        className="embed-static-ratio-inner"
+        className={`${styles.ratioInner} ${styles.semanticClassNames.ratioInner}`}
         style={{ paddingBottom: `${ratio}%` }}
       >
         {children}
@@ -124,16 +126,23 @@ function FixedRatioContainer({
 function FallbackLink({ url, type }: { url: string; type: EmbedType | null }) {
   const label = type ? typeLabels[type] : 'Embed'
   const cssModifier = type || 'generic'
+  const fallbackTypeClass = styles.fallbackType[cssModifier]
+  const semanticModifierClass =
+    styles.semanticFallbackModifierClass[cssModifier]
   return (
     <div
-      className={`embed-static-fallback embed-static-fallback--${cssModifier}`}
+      className={`${styles.fallback} ${fallbackTypeClass} ${styles.semanticClassNames.fallback} ${semanticModifierClass}`.trim()}
     >
-      <span className="embed-static-fallback__badge">
-        <span className="embed-static-fallback__dot" />
+      <span
+        className={`${styles.fallbackBadge} ${styles.semanticClassNames.fallbackBadge}`}
+      >
+        <span
+          className={`${styles.fallbackDot} ${styles.semanticClassNames.fallbackDot}`}
+        />
         {label}
       </span>
       <a
-        className="embed-static-fallback__link"
+        className={`${styles.fallbackLink} ${styles.semanticClassNames.fallbackLink}`}
         href={url}
         target="_blank"
         rel="noreferrer"
@@ -147,6 +156,7 @@ function FallbackLink({ url, type }: { url: string; type: EmbedType | null }) {
 // --- Type-specific renderers ---
 
 function TweetRenderer({ url }: { url: string }) {
+  const colorScheme = useColorScheme()
   let parsedUrl: URL | null = null
   try {
     parsedUrl = new URL(url)
@@ -161,13 +171,21 @@ function TweetRenderer({ url }: { url: string }) {
 
   return (
     <EmbedErrorBoundary fallback={fallback}>
-      <div className="embed-static-tweet">
+      <div className={`${styles.tweet} ${styles.semanticClassNames.tweet}`}>
         <Suspense
           fallback={
-            <div className="embed-static-loading">Loading tweet...</div>
+            <div
+              className={`${styles.loading} ${styles.semanticClassNames.loading}`}
+            >
+              Loading tweet...
+            </div>
           }
         >
-          <LazyTweet id={id} />
+          <LazyTweet
+            id={id}
+            theme={colorScheme === 'dark' ? 'dark' : 'light'}
+            style={{ width: '100%' }}
+          />
         </Suspense>
       </div>
     </EmbedErrorBoundary>
@@ -175,6 +193,9 @@ function TweetRenderer({ url }: { url: string }) {
 }
 
 function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
+  const colorScheme = useColorScheme()
+  const shikiTheme = colorScheme === 'dark' ? 'github-dark' : 'github-light'
+
   const split = url.pathname.split('/')
   const [, owner, repo, , ...rest] = split
   const ref = rest[0]
@@ -231,8 +252,7 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
         shikiMod
           .codeToHtml(displayCode, {
             lang,
-            themes: { light: 'github-light', dark: 'github-dark' },
-            defaultColor: false,
+            theme: shikiTheme,
           })
           .then((html) => {
             if (!cancelled) {
@@ -253,11 +273,13 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
     return () => {
       cancelled = true
     }
-  }, [owner, repo, ref, path, lang, startLine, endLine])
+  }, [owner, repo, ref, path, lang, startLine, endLine, shikiTheme])
 
   if (loading) {
     return (
-      <div className="embed-static-loading">Loading GitHub File Preview...</div>
+      <div className={`${styles.loading} ${styles.semanticClassNames.loading}`}>
+        Loading GitHub File Preview...
+      </div>
     )
   }
 
@@ -270,13 +292,15 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
   const isLong = end - startLine > 20
 
   return (
-    <div className="embed-static-github-file">
+    <div
+      className={`${styles.githubFile} ${styles.semanticClassNames.githubFile}`}
+    >
       <div
-        className={`embed-static-github-file__code${isLong ? ' embed-static-github-file__code--long' : ''}`}
+        className={`${styles.githubFileCode} ${styles.semanticClassNames.githubFileCode} ${isLong ? `${styles.githubFileCodeLong} ${styles.semanticClassNames.githubFileCodeLong}` : ''}`.trim()}
       >
         {highlightedHtml ? (
           <div
-            className="embed-static-shiki"
+            className={`${styles.shiki} ${styles.semanticClassNames.shiki}`}
             style={{ '--start-line': startLine } as React.CSSProperties}
             dangerouslySetInnerHTML={{ __html: highlightedHtml }}
           />
@@ -284,8 +308,13 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
           <pre>
             <code>
               {lines.slice(startLine, end).map((line, i) => (
-                <span key={i} className="embed-static-github-file__line">
-                  <span className="embed-static-github-file__line-num">
+                <span
+                  key={i}
+                  className={`${styles.githubFileLine} ${styles.semanticClassNames.githubFileLine}`}
+                >
+                  <span
+                    className={`${styles.githubFileLineNum} ${styles.semanticClassNames.githubFileLineNum}`}
+                  >
                     {startLine + i + 1}
                   </span>
                   {line}
@@ -297,7 +326,7 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
         )}
       </div>
       <a
-        className="embed-static-source-link"
+        className={`${styles.sourceLink} ${styles.semanticClassNames.sourceLink}`}
         href={href}
         target="_blank"
         rel="noreferrer"
@@ -341,7 +370,7 @@ export function EmbedStaticRenderer({ type, url }: EmbedStaticRendererProps) {
         <FixedRatioContainer>
           <iframe
             src={`https://www.youtube.com/embed/${id}`}
-            className="embed-static-iframe"
+            className={`${styles.iframe} ${styles.semanticClassNames.iframe}`}
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
             title="YouTube video player"
@@ -358,7 +387,7 @@ export function EmbedStaticRenderer({ type, url }: EmbedStaticRendererProps) {
           <iframe
             src={`//player.bilibili.com/player.html?bvid=${id}&autoplay=0`}
             scrolling="no"
-            className="embed-static-iframe"
+            className={`${styles.iframe} ${styles.semanticClassNames.iframe}`}
             allowFullScreen
           />
         </FixedRatioContainer>
@@ -370,7 +399,7 @@ export function EmbedStaticRenderer({ type, url }: EmbedStaticRendererProps) {
       return (
         <FixedRatioContainer>
           <iframe
-            className="embed-static-iframe"
+            className={`${styles.iframe} ${styles.semanticClassNames.iframe}`}
             src={`https://codesandbox.io/embed/${path}?fontsize=14&hidenavigation=1&theme=dark${parsedUrl.search}`}
           />
         </FixedRatioContainer>
@@ -381,13 +410,13 @@ export function EmbedStaticRenderer({ type, url }: EmbedStaticRendererProps) {
       const [, owner, id] = parsedUrl.pathname.split('/')
       if (!owner || !id) return <FallbackLink url={url} type={type} />
       return (
-        <div className="embed-static-gist">
+        <div className={`${styles.gist} ${styles.semanticClassNames.gist}`}>
           <iframe
             src={`https://gist.github.com/${owner}/${id}.pibb`}
-            className="embed-static-gist__iframe"
+            className={`${styles.gistIframe} ${styles.semanticClassNames.gistIframe}`}
           />
           <a
-            className="embed-static-source-link"
+            className={`${styles.sourceLink} ${styles.semanticClassNames.sourceLink}`}
             href={url}
             target="_blank"
             rel="noreferrer"

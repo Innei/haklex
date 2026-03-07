@@ -58,12 +58,12 @@ const style = createThemeStyle({
 
 ### 可覆写的 CSS 变量
 
-| 分组 | 变量 |
-|------|------|
-| **Color** | `--rc-text`, `--rc-text-secondary`, `--rc-bg`, `--rc-bg-secondary`, `--rc-border`, `--rc-accent`, `--rc-accent-light`, `--rc-link`, `--rc-code-text`, `--rc-code-bg`, `--rc-quote-border`, `--rc-quote-bg`, `--rc-alert-info`, `--rc-alert-warning`, `--rc-alert-tip`, `--rc-alert-caution`, `--rc-alert-important` |
-| **Spacing** | `--rc-space-xs`, `--rc-space-sm`, `--rc-space-md`, `--rc-space-lg`, `--rc-space-xl` |
-| **Typography** | `--rc-font-family`, `--rc-font-mono`, `--rc-font-size-base`, `--rc-font-size-small`, `--rc-font-size-large`, `--rc-line-height`, `--rc-line-height-tight` |
-| **Border Radius** | `--rc-radius-sm`, `--rc-radius-md`, `--rc-radius-lg` |
+| 分组              | 变量                                                                                                                                                                                                                                                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Color**         | `--rc-text`, `--rc-text-secondary`, `--rc-bg`, `--rc-bg-secondary`, `--rc-border`, `--rc-accent`, `--rc-accent-light`, `--rc-link`, `--rc-code-text`, `--rc-code-bg`, `--rc-quote-border`, `--rc-quote-bg`, `--rc-alert-info`, `--rc-alert-warning`, `--rc-alert-tip`, `--rc-alert-caution`, `--rc-alert-important` |
+| **Spacing**       | `--rc-space-xs`, `--rc-space-sm`, `--rc-space-md`, `--rc-space-lg`, `--rc-space-xl`                                                                                                                                                                                                                                 |
+| **Typography**    | `--rc-font-family`, `--rc-font-mono`, `--rc-font-size-2xs`, `--rc-font-size-xs`, `--rc-font-size-sm`, `--rc-font-size-md`, `--rc-font-size-lg`, `--rc-font-size-base`, `--rc-font-size-small`, `--rc-line-height`, `--rc-line-height-tight`                                                                         |
+| **Border Radius** | `--rc-radius-sm`, `--rc-radius-md`, `--rc-radius-lg`                                                                                                                                                                                                                                                                |
 
 ## 导出
 
@@ -77,11 +77,15 @@ export type { ThemeTokens } from './create-theme-style'
 
 // 主题配置
 export { articleLayout, commentLayout, noteLayout } from './themes'
-export { serifFonts, sharedFonts } from './themes'
+export { fonts } from './themes'
 export { darkColors, lightArticleColors, lightCommentColors } from './themes'
 
 // Portal 主题
-export { PortalThemeProvider, PortalThemeWrapper, usePortalTheme } from './portal-theme'
+export {
+  PortalThemeProvider,
+  PortalThemeWrapper,
+  usePortalTheme,
+} from './portal-theme'
 ```
 
 ## 变量结构
@@ -89,53 +93,57 @@ export { PortalThemeProvider, PortalThemeWrapper, usePortalTheme } from './porta
 ### vars.color
 
 ```ts
-vars.color.text          // 主文本色
+vars.color.text // 主文本色
 vars.color.textSecondary // 次要文本
-vars.color.bg            // 背景色
-vars.color.bgSecondary   // 次要背景
-vars.color.border        // 边框色
-vars.color.accent        // 强调色
-vars.color.accentLight   // 浅强调色
-vars.color.link          // 链接色
-vars.color.codeText      // 代码文本
-vars.color.codeBg        // 代码背景
-vars.color.quoteBorder   // 引用边框
-vars.color.quoteBg       // 引用背景
-vars.color.alertInfo     // 提示色
-vars.color.alertWarning  // 警告色
-vars.color.alertTip      // 建议色
-vars.color.alertCaution  // 注意色
+vars.color.bg // 背景色
+vars.color.bgSecondary // 次要背景
+vars.color.border // 边框色
+vars.color.accent // 强调色
+vars.color.accentLight // 浅强调色
+vars.color.link // 链接色
+vars.color.codeText // 代码文本
+vars.color.codeBg // 代码背景
+vars.color.quoteBorder // 引用边框
+vars.color.quoteBg // 引用背景
+vars.color.alertInfo // 提示色
+vars.color.alertWarning // 警告色
+vars.color.alertTip // 建议色
+vars.color.alertCaution // 注意色
 vars.color.alertImportant // 重要色
 ```
 
 ### vars.spacing
 
 ```ts
-vars.spacing.xs  // article: 4px, comment: 2px
-vars.spacing.sm  // article: 8px, comment: 4px
-vars.spacing.md  // article: 16px, comment: 10px
-vars.spacing.lg  // article: 24px, comment: 16px
-vars.spacing.xl  // article: 32px, comment: 20px
+vars.spacing.xs // article: 4px, comment: 2px
+vars.spacing.sm // article: 8px, comment: 4px
+vars.spacing.md // article: 16px, comment: 10px
+vars.spacing.lg // article: 24px, comment: 16px
+vars.spacing.xl // article: 32px, comment: 20px
 ```
 
 ### vars.typography
 
 ```ts
-vars.typography.fontFamily     // 字体族
-vars.typography.fontMono       // 等宽字体
-vars.typography.fontSizeBase   // 基础字号
-vars.typography.fontSizeSmall  // 小字号
-vars.typography.fontSizeLarge  // 大字号
-vars.typography.lineHeight     // 行高
+vars.typography.fontFamily // 字体族
+vars.typography.fontMono // 等宽字体
+vars.typography.fontSize2xs // 超小字号（0.625em）
+vars.typography.fontSizeXs // 特小字号（0.75em）
+vars.typography.fontSizeSm // 小字号（0.8125em）
+vars.typography.fontSizeMd // 中字号（0.875em）
+vars.typography.fontSizeLg // 大字号（1.25em）
+vars.typography.fontSizeBase // 基础字号
+vars.typography.fontSizeSmall // 兼容小字号（px）
+vars.typography.lineHeight // 行高
 vars.typography.lineHeightTight // 紧行高
 ```
 
 ### vars.borderRadius
 
 ```ts
-vars.borderRadius.sm  // article: 4px, comment: 3px
-vars.borderRadius.md  // article: 8px, comment: 6px
-vars.borderRadius.lg  // article: 12px, comment: 8px
+vars.borderRadius.sm // article: 4px, comment: 3px
+vars.borderRadius.md // article: 8px, comment: 6px
+vars.borderRadius.lg // article: 12px, comment: 8px
 ```
 
 ## 预设主题
@@ -144,20 +152,20 @@ vars.borderRadius.lg  // article: 12px, comment: 8px
 import {
   lightArticleColors,
   darkColors,
-  articleLayout
+  articleLayout,
 } from '@haklex/rich-style-token'
 
 // 浅色文章主题
-lightArticleColors.text      // '#1a1a1a'
-lightArticleColors.accent    // '#33A6B8'
+lightArticleColors.text // '#1a1a1a'
+lightArticleColors.accent // '#33A6B8'
 
 // 深色主题
-darkColors.text              // '#e5e5e5'
-darkColors.accent            // '#F596AA'
+darkColors.text // '#e5e5e5'
+darkColors.accent // '#F596AA'
 
 // 布局配置
-articleLayout.typography.fontSizeBase  // '16px'
-articleLayout.typography.lineHeight    // '1.7'
+articleLayout.typography.fontSizeBase // '16px'
+articleLayout.typography.lineHeight // '1.7'
 ```
 
 ## 依赖

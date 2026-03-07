@@ -2,7 +2,7 @@
  * Demo: 业务扩展 LinkCard 插件
  *
  * 展示如何创建自定义 LinkCardPlugin 并通过 plugins prop 合并到内置插件中。
- * 传入的 plugins 会与内置 12 个插件合并（同名覆盖，按 priority 排序）。
+ * 传入的 plugins 会与内置 11 个插件合并（同名覆盖，按 priority 排序）。
  */
 import type {
   LinkCardData,
@@ -42,7 +42,7 @@ export const doubanBookPlugin: LinkCardPlugin = {
       color: '#319046',
       classNames: {
         image: 'link-card__image--poster',
-        cardRoot: 'link-card--reversed',
+        cardRoot: 'link-card--poster',
       },
     }
   },
@@ -111,7 +111,7 @@ export const customGithubRepoPlugin: LinkCardPlugin = {
 /**
  * 导出业务扩展插件列表
  * 使用方式：<LinkCardRenderer plugins={extraLinkCardPlugins} />
- * 内部会与 12 个内置插件合并（同名覆盖，按 priority 排序）
+ * 内部会与 11 个内置插件合并（同名覆盖，按 priority 排序）
  */
 export const extraLinkCardPlugins: PluginRegistry = [
   doubanBookPlugin,

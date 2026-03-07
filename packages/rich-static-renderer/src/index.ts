@@ -1,2 +1,2 @@
 export { RichRenderer } from './RichRenderer'
-export type { RichRendererProps } from './types'
+export type { BuiltinNodeRenderer, RichRendererProps } from './types'

@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, keyframes, style } from '@vanilla-extract/css'
 
 const fadeIn = keyframes({

@@ -1,0 +1,74 @@
+{
+  "name": "haklex",
+  "type": "module",
+  "private": true,
+  "packageManager": "pnpm@10.27.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "build": "turbo build",
+    "build:packages": "turbo run build --filter='./packages/*' --filter='!@haklex/rich-editor-demo'",
+    "build:rich": "pnpm run build:packages",
+    "dev": "turbo dev --filter @haklex/rich-editor-demo",
+    "lint": "turbo lint",
+    "prepare": "pnpm exec simple-git-hooks",
+    "publish:packages": "pnpm run build:packages && pnpm -r publish --no-git-checks --filter '@haklex/*' --filter '!@haklex/rich-editor-demo'",
+    "publish:rich": "pnpm run publish:packages",
+    "release": "bumpp -r",
+    "release:dry": "bumpp -r --no-commit --no-tag --no-push",
+    "release:packages": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\"",
+    "release:rich": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\""
+  },
+  "devDependencies": {
+    "@innei/prettier": "1.0.0",
+    "@types/node": "25.3.3",
+    "bumpp": "^10.4.1",
+    "eslint": "^9.39.4",
+    "eslint-config-hyoban": "6.0.0",
+    "knip": "^5.85.0",
+    "lint-staged": "16.3.2",
+    "prettier": "3.8.1",
+    "simple-git-hooks": "2.13.1",
+    "turbo": "^2.8.14",
+    "vitest": "^4.0.18"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@swc/core",
+      "esbuild",
+      "sharp",
+      "simple-git-hooks"
+    ],
+    "overrides": {
+      "array-includes": "npm:@nolyfill/array-includes@^1.0.44",
+      "array.prototype.findlastindex": "npm:@nolyfill/array.prototype.findlastindex@^1.0.44",
+      "array.prototype.flat": "npm:@nolyfill/array.prototype.flat@^1.0.44",
+      "array.prototype.flatmap": "npm:@nolyfill/array.prototype.flatmap@^1.0.44",
+      "array.prototype.tosorted": "npm:@nolyfill/array.prototype.tosorted@^1.0.44",
+      "better-auth>@better-auth/drizzle-adapter": "-",
+      "better-auth>@better-auth/prisma-adapter": "-",
+      "has": "npm:@nolyfill/has@^1.0.44",
+      "is-core-module": "npm:@nolyfill/is-core-module@^1.0.39",
+      "object.assign": "npm:@nolyfill/object.assign@^1.0.44",
+      "object.entries": "npm:@nolyfill/object.entries@^1.0.44",
+      "object.fromentries": "npm:@nolyfill/object.fromentries@^1.0.44",
+      "object.groupby": "npm:@nolyfill/object.groupby@^1.0.44",
+      "object.hasown": "npm:@nolyfill/object.hasown@^1.0.44",
+      "object.values": "npm:@nolyfill/object.values@^1.0.44",
+      "string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@^1.0.44"
+    }
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm exec lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "prettier --ignore-path ./.gitignore --write "
+    ],
+    "*.{js,ts,cjs,mjs,jsx,tsx,json}": [
+      "eslint --fix"
+    ]
+  }
+}

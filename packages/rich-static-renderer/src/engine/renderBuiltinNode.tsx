@@ -1,14 +1,23 @@
-import type { ReactNode } from 'react'
+import {
+  LinkFavicon,
+  RendererWrapper,
+  RubyRenderer,
+} from '@haklex/rich-editor/static'
+import { Link } from 'lucide-react'
+import { createElement, type ReactNode } from 'react'
 
 import * as tableStyles from '../table.css'
 
 function textToSlug(text: string): string {
-  return text
-    .toLowerCase()
-    .trim()
-    .replaceAll(/[^\w\s\u3001-\u9fff\uac00-\ud7af\uff00-\uffef-]/g, '')
-    .replaceAll(/[\s_]+/g, '-')
-    .replaceAll(/^-+|-+$/g, '')
+  return (
+    text
+      .toLowerCase()
+      .trim()
+      // eslint-disable-next-line regexp/no-dupe-characters-character-class
+      .replaceAll(/[^\w\s\u3000-\u9FFF\uAC00-\uD7AF\uFF00-\uFFEF-]/g, '')
+      .replaceAll(/[\s_]+/g, '-')
+      .replaceAll(/^-+|-+$/g, '')
+  )
 }
 
 function extractText(node: any): string {
@@ -22,6 +31,7 @@ export function renderBuiltinNode(
   key: string,
   children: ReactNode[] | null,
   headingSlugs: Map<string, number>,
+  textContent?: string,
 ): ReactNode {
   switch (node.type) {
     case 'root':
@@ -38,7 +48,7 @@ export function renderBuiltinNode(
     }
     case 'heading': {
       const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
-      const text = extractText(node)
+      const text = textContent || extractText(node)
       const baseSlug = textToSlug(text)
       let slug = baseSlug
       if (baseSlug) {
@@ -53,12 +63,9 @@ export function renderBuiltinNode(
       return (
         <Tag key={key} id={slug || undefined} className={`rich-heading-${Tag}`}>
           {slug && (
-            <a
-              className="rich-heading-anchor"
-              aria-hidden="true"
-              tabIndex={-1}
-              href={`#${slug}`}
-            />
+            <a className="rich-heading-anchor" tabIndex={0} href={`#${slug}`}>
+              <Link size={14} strokeWidth={2} aria-hidden />
+            </a>
           )}
           {children}
         </Tag>
@@ -113,9 +120,10 @@ export function renderBuiltinNode(
           key={key}
           className="rich-link"
           href={node.url}
-          target={node.target}
-          rel={node.rel}
+          target={node.target || '_blank'}
+          rel={node.rel || 'noopener'}
         >
+          <LinkFavicon href={node.url} />
           {children}
         </a>
       )
@@ -126,8 +134,9 @@ export function renderBuiltinNode(
           className="rich-link"
           href={node.url}
           target="_blank"
-          rel="noopener noreferrer"
+          rel="noopener"
         >
+          <LinkFavicon href={node.url} />
           {children}
         </a>
       )
@@ -191,6 +200,16 @@ export function renderBuiltinNode(
           {children}
         </span>
       )
+    case 'ruby':
+      return createElement(RendererWrapper as any, {
+        key,
+        rendererKey: 'Ruby',
+        defaultRenderer: RubyRenderer,
+        props: {
+          reading: node.reading ?? '',
+          children,
+        },
+      })
     case 'code':
       return (
         <pre key={key} className="rich-code-block">

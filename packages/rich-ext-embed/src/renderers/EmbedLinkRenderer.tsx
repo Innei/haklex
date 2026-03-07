@@ -1,10 +1,11 @@
-import '../styles.css'
+import '../styles.css.ts'
 
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
 import { $getNodeByKey } from 'lexical'
 import { ExternalLink, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
+import * as styles from '../styles.css'
 import type { EmbedType } from '../url-matchers'
 import { matchEmbedUrl } from '../url-matchers'
 
@@ -98,17 +99,23 @@ export function EmbedLinkRenderer({
 
   const label = type ? typeLabels[type] : 'Embed'
   const cssModifier = type || 'generic'
+  const embedModifierClass = styles.embedType[cssModifier]
+  const semanticModifierClass = styles.semanticEmbedModifierClass[cssModifier]
 
   return (
-    <div className={`rich-embed rich-embed--${cssModifier}`}>
-      <span className="rich-embed__badge">
-        <span className={`rich-embed__dot rich-embed__dot--${cssModifier}`} />
+    <div
+      className={`${styles.embed} ${embedModifierClass} ${styles.semanticClassNames.embed} ${semanticModifierClass}`.trim()}
+    >
+      <span className={`${styles.badge} ${styles.semanticClassNames.badge}`}>
+        <span className={`${styles.dot} ${styles.semanticClassNames.dot}`} />
         {label}
       </span>
-      <span className="rich-embed__divider" />
+      <span
+        className={`${styles.divider} ${styles.semanticClassNames.divider}`}
+      />
       <input
         ref={inputRef}
-        className="rich-embed__input"
+        className={`${styles.input} ${styles.semanticClassNames.input}`}
         type="url"
         value={editUrl}
         onChange={(e) => setEditUrl(e.target.value)}
@@ -116,10 +123,12 @@ export function EmbedLinkRenderer({
         onKeyDown={handleKeyDown}
         placeholder="https://..."
       />
-      <span className="rich-embed__actions">
+      <span
+        className={`${styles.actions} ${styles.semanticClassNames.actions}`}
+      >
         <button
           type="button"
-          className="rich-embed__action-btn"
+          className={`${styles.actionButton} ${styles.semanticClassNames.actionButton}`}
           onClick={handleOpen}
           title="Open in new tab"
           disabled={!url}
@@ -128,7 +137,7 @@ export function EmbedLinkRenderer({
         </button>
         <button
           type="button"
-          className="rich-embed__action-btn rich-embed__action-btn--danger"
+          className={`${styles.actionButton} ${styles.semanticClassNames.actionButton} ${styles.actionButtonDanger} ${styles.semanticClassNames.actionButtonDanger}`}
           onClick={handleDelete}
           title="Delete"
         >

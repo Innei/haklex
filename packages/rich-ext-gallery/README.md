@@ -1,103 +1,46 @@
-# @shiro/rich-renderer-gallery
+# @haklex/rich-ext-gallery
 
-Enhanced Gallery renderer for `@shiro/rich-editor` with carousel mode, autoplay, and photo zoom.
+图片画廊扩展。
 
-## Features
-
-- 🎠 **Carousel Mode** - Smooth scrolling carousel with autoplay
-- 🖼️ **Photo Zoom** - Click to zoom images with `react-photo-view`
-- 📐 **Multiple Layouts** - Grid, Masonry, Carousel
-- 🔄 **Auto-play** - Bi-directional autoplay in carousel mode
-- 📱 **Responsive** - Touch-friendly mobile support
-
-## Installation
+## 安装
 
 ```bash
-pnpm add @shiro/rich-renderer-gallery
+pnpm add @haklex/rich-ext-gallery @haklex/rich-editor
 ```
 
-## Usage
-
-### With RendererConfig
-
-```tsx
-import { RichEditor } from '@shiro/rich-editor'
-import { GalleryRenderer } from '@shiro/rich-renderer-gallery'
-import '@shiro/rich-renderer-gallery/style.css'
-
-<RichEditor
-  rendererConfig={{
-    Gallery: GalleryRenderer,
-  }}
-/>
-```
-
-### Grid Layout
-
-```tsx
-import { GalleryRenderer } from '@shiro/rich-renderer-gallery'
-
-<GalleryRenderer
-  images={[
-    { src: 'https://example.com/1.jpg', alt: 'Image 1' },
-    { src: 'https://example.com/2.jpg', alt: 'Image 2' },
-    { src: 'https://example.com/3.jpg', alt: 'Image 3' },
-  ]}
-  layout="grid"
-/>
-```
-
-### Carousel with Autoplay
-
-```tsx
-<GalleryRenderer
-  images={images}
-  layout="carousel"
-/>
-```
-
-### Masonry Layout
-
-```tsx
-<GalleryRenderer
-  images={images}
-  layout="masonry"
-/>
-```
-
-## Props
+## 导出
 
 ```ts
-interface GalleryRendererProps {
-  images: GalleryImage[]
-  layout: 'grid' | 'masonry' | 'carousel'
-}
+// 节点
+export { GalleryNode } from './GalleryNode'
+export { $createGalleryNode, $isGalleryNode } from './GalleryNode'
+export type { GalleryNodePayload, SerializedGalleryNode } from './GalleryNode'
 
-interface GalleryImage {
-  src: string
-  alt?: string
-  width?: number
-  height?: number
-}
+// 渲染器
+export { GalleryRenderer } from './GalleryRenderer'
+export { GalleryEditRenderer } from './GalleryEditRenderer'
+
+// 节点集合
+export const galleryNodes: Array<Klass<LexicalNode>>
 ```
 
-## Features Detail
+## 使用
 
-### Carousel Mode
-- Auto-scrolling with bi-directional navigation
-- Pause on touch/wheel interaction
-- Navigation buttons and indicators
-- Smooth scroll behavior
+```tsx
+import { GalleryRenderer, galleryNodes } from '@haklex/rich-ext-gallery'
+import { RichRenderer } from '@haklex/rich-editor/renderer'
+import type { RendererConfig } from '@haklex/rich-editor'
 
-### Photo Zoom
-- Powered by `react-photo-view`
-- Click any image to open lightbox
-- Keyboard navigation support
+const config: RendererConfig = {
+  Gallery: GalleryRenderer,
+}
 
-### Responsive
-- Adaptive layout for mobile/tablet
-- Touch-friendly controls
-- Optimized performance
+<RichRenderer 
+  value={content} 
+  rendererConfig={config}
+  extraNodes={[...galleryNodes]}
+/>
+```
 
 ## License
 

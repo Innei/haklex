@@ -1,87 +1,119 @@
-import { vars } from '@shiro/rich-style-token'
-import { style, styleVariants } from '@vanilla-extract/css'
+import { vars } from '@haklex/rich-style-token/styles'
+import { recipe } from '@vanilla-extract/recipes'
 
-export const container = style({
-  position: 'relative',
-  display: 'inline-flex',
-  alignItems: 'center',
-  borderRadius: '0.5rem',
-  backgroundColor: vars.color.bgSecondary,
-  padding: '0.25rem',
-})
-
-export const containerFullWidth = style({
-  width: '100%',
-})
-
-export const sizeVariants = styleVariants({
-  sm: {
-    height: '2rem',
-    fontSize: '0.75rem',
+export const container = recipe({
+  base: {
+    position: 'relative',
+    display: 'inline-flex',
+    alignItems: 'center',
+    borderRadius: '0.5rem',
+    backgroundColor: vars.color.bgTertiary,
+    padding: '0.25rem',
   },
-  md: {
-    height: '2.5rem',
-    fontSize: '0.875rem',
-  },
-})
-
-export const indicator = style({
-  position: 'absolute',
-  top: '0.25rem',
-  bottom: '0.25rem',
-  borderRadius: '0.375rem',
-  backgroundColor: vars.color.bg,
-  boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
-  transition: 'all 300ms cubic-bezier(0.25, 1, 0.5, 1)',
-  pointerEvents: 'none',
-})
-
-export const indicatorHidden = style({
-  opacity: 0,
-})
-
-export const item = style({
-  position: 'relative',
-  zIndex: 10,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  whiteSpace: 'nowrap',
-  borderRadius: '0.375rem',
-  fontWeight: 500,
-  outline: 'none',
-  border: 'none',
-  background: 'transparent',
-  cursor: 'pointer',
-  transition: 'color 200ms',
-  color: vars.color.textSecondary,
-
-  selectors: {
-    '&:focus-visible': {
-      outline: `2px solid ${vars.color.accent}`,
-      outlineOffset: '1px',
+  variants: {
+    size: {
+      sm: {
+        height: '2rem',
+        fontSize: vars.typography.fontSizeXs,
+      },
+      md: {
+        height: '2.5rem',
+        fontSize: vars.typography.fontSizeMd,
+      },
+    },
+    fullWidth: {
+      true: {
+        width: '100%',
+      },
+      false: {},
     },
   },
-})
-
-export const itemActive = style({
-  color: vars.color.text,
-})
-
-export const itemDisabled = style({
-  pointerEvents: 'none',
-  opacity: 0.4,
-})
-
-export const itemFullWidth = style({
-  flex: 1,
-})
-
-export const itemPaddingVariants = styleVariants({
-  sm: {
-    padding: '0 0.75rem',
+  defaultVariants: {
+    size: 'sm',
+    fullWidth: false,
   },
-  md: {
-    padding: '0 1rem',
+})
+
+export const indicator = recipe({
+  base: {
+    position: 'absolute',
+    top: '0.25rem',
+    bottom: '0.25rem',
+    borderRadius: '0.375rem',
+    backgroundColor: vars.color.bg,
+    boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
+    transition: 'all 300ms cubic-bezier(0.25, 1, 0.5, 1)',
+    pointerEvents: 'none',
+  },
+  variants: {
+    ready: {
+      true: {},
+      false: {
+        opacity: 0,
+      },
+    },
+  },
+  defaultVariants: {
+    ready: true,
+  },
+})
+
+export const item = recipe({
+  base: {
+    position: 'relative',
+    zIndex: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    whiteSpace: 'nowrap',
+    borderRadius: '0.375rem',
+    fontWeight: 500,
+    outline: 'none',
+    border: 'none',
+    background: 'transparent',
+    cursor: 'pointer',
+    transition: 'color 200ms',
+    color: vars.color.textSecondary,
+    selectors: {
+      '&:focus-visible': {
+        outline: `2px solid ${vars.color.accent}`,
+        outlineOffset: '1px',
+      },
+    },
+  },
+  variants: {
+    size: {
+      sm: {
+        padding: '0 0.75rem',
+      },
+      md: {
+        padding: '0 1rem',
+      },
+    },
+    active: {
+      true: {
+        color: vars.color.text,
+      },
+      false: {},
+    },
+    disabled: {
+      true: {
+        pointerEvents: 'none',
+        opacity: 0.4,
+      },
+      false: {},
+    },
+    fullWidth: {
+      true: {
+        flex: 1,
+      },
+      false: {},
+    },
+  },
+  defaultVariants: {
+    size: 'sm',
+    active: false,
+    disabled: false,
+    fullWidth: false,
   },
 })

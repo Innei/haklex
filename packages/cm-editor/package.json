@@ -1,9 +1,9 @@
 {
   "name": "@haklex/cm-editor",
-  "version": "0.0.38",
+  "type": "module",
+  "version": "0.0.64",
   "description": "Shared CodeMirror 6 editor utilities",
   "license": "MIT",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
@@ -20,7 +20,7 @@
     "@codemirror/language-data": "^6.5.2",
     "@codemirror/state": "^6.5.4",
     "@codemirror/theme-one-dark": "^6.1.3",
-    "@codemirror/view": "^6.39.15"
+    "@codemirror/view": "^6.39.16"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

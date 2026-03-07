@@ -16,12 +16,13 @@ import {
   createElement,
   isValidElement,
   type ReactNode,
+  useMemo,
 } from 'react'
 
 import { renderBuiltinNode } from './engine/renderBuiltinNode'
 import { renderTextNode } from './engine/renderTextNode'
 import { preprocessFootnotes } from './preprocess/footnote'
-import type { RichRendererProps } from './types'
+import type { BuiltinNodeRenderer, RichRendererProps } from './types'
 
 interface EditorConfig {
   namespace: string
@@ -60,12 +61,36 @@ function wrapDecoration(
   }
 }
 
+function applyBlockId(
+  element: ReactNode,
+  blockId: string | undefined,
+  nodeKey: string,
+): ReactNode {
+  if (!blockId) return element
+
+  if (isValidElement(element) && typeof element.type === 'string') {
+    return cloneElement(element as any, { 'data-block-id': blockId } as any)
+  }
+
+  return (
+    <div
+      key={`${nodeKey}-block-anchor`}
+      className="rich-block-anchor"
+      data-block-id={blockId}
+    >
+      {element}
+    </div>
+  )
+}
+
 function renderTree(
   node: any,
   editor: LexicalEditor,
   editorConfig: EditorConfig,
   headingSlugs: Map<string, number>,
   key: string,
+  blockId?: string,
+  builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>,
 ): ReactNode {
   const nodeKey = node.getKey ? node.getKey() : key
 
@@ -74,7 +99,11 @@ function renderTree(
       const decoration = node.decorate(editor, editorConfig)
       if (decoration != null) {
         const serialized = node.exportJSON ? node.exportJSON() : {}
-        return wrapDecoration(serialized, nodeKey, decoration)
+        return applyBlockId(
+          wrapDecoration(serialized, nodeKey, decoration),
+          blockId,
+          nodeKey,
+        )
       }
     } catch {
       /* fallthrough to builtin */
@@ -98,17 +127,43 @@ function renderTree(
           editorConfig,
           headingSlugs,
           `${nodeKey}-${i}`,
+          undefined,
+          builtinNodeOverrides,
         ),
       )
     }
   }
 
-  return renderBuiltinNode(serialized, nodeKey, children, headingSlugs)
+  const textContent = node.getTextContent ? node.getTextContent() : undefined
+
+  const override = builtinNodeOverrides?.[serialized.type]
+  if (override) {
+    const defaultRenderer = () =>
+      renderBuiltinNode(
+        serialized,
+        nodeKey,
+        children,
+        headingSlugs,
+        textContent,
+      )
+    return applyBlockId(
+      override(serialized, nodeKey, children, defaultRenderer),
+      blockId,
+      nodeKey,
+    )
+  }
+
+  return applyBlockId(
+    renderBuiltinNode(serialized, nodeKey, children, headingSlugs, textContent),
+    blockId,
+    nodeKey,
+  )
 }
 
 function renderEditorToReact(
   value: SerializedEditorState,
   nodes: any[],
+  builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>,
 ): {
   content: ReactNode
   footnoteData: ReturnType<typeof preprocessFootnotes>
@@ -130,6 +185,8 @@ function renderEditorToReact(
 
   const footnoteData = preprocessFootnotes(value)
 
+  const rawRootChildren = (value as any).root?.children as any[] | undefined
+
   let content: ReactNode = null
   editorState.read(() => {
     const root = $getRoot()
@@ -137,7 +194,15 @@ function renderEditorToReact(
     const children = root
       .getChildren()
       .map((child: any, i: number) =>
-        renderTree(child, editor, editorConfig, headingSlugs, `ssr-${i}`),
+        renderTree(
+          child,
+          editor,
+          editorConfig,
+          headingSlugs,
+          `ssr-${i}`,
+          rawRootChildren?.[i]?.$?.blockId,
+          builtinNodeOverrides,
+        ),
       )
     content = <>{children}</>
   })
@@ -158,6 +223,7 @@ function renderEditorToReact(
     const nestedState = nestedEditor.parseEditorState(state)
     nestedEditor.setEditorState(nestedState)
     let nested: ReactNode = null
+    const nestedRawChildren = (state as any).root?.children as any[] | undefined
     nestedState.read(() => {
       const root = $getRoot()
       const headingSlugs = new Map<string, number>()
@@ -170,6 +236,8 @@ function renderEditorToReact(
             nestedEditorConfig,
             headingSlugs,
             `nested-${i}`,
+            nestedRawChildren?.[i]?.$?.blockId,
+            builtinNodeOverrides,
           ),
         )
       nested = <>{ch}</>
@@ -189,14 +257,14 @@ export function RichRenderer({
   as: Component = 'div',
   rendererConfig,
   extraNodes,
+  builtinNodeOverrides,
 }: RichRendererProps) {
   const variantClass = getVariantClass(variant)
-  const nodes = extraNodes ? [...allNodes, ...extraNodes] : allNodes
 
-  const { content, footnoteData, renderNestedContent } = renderEditorToReact(
-    value,
-    nodes,
-  )
+  const { content, footnoteData, renderNestedContent } = useMemo(() => {
+    const nodes = extraNodes ? [...allNodes, ...extraNodes] : allNodes
+    return renderEditorToReact(value, nodes, builtinNodeOverrides)
+  }, [builtinNodeOverrides, extraNodes, value])
 
   const classes = ['rich-content', variantClass, className]
     .filter(Boolean)
@@ -215,7 +283,12 @@ export function RichRenderer({
             displayNumberMap={footnoteData.displayNumberMap}
           >
             <NestedContentRendererProvider value={renderNestedContent}>
-              <Component className={classes} style={style} data-theme={theme}>
+              <Component
+                className={classes}
+                style={style}
+                data-theme={theme}
+                suppressHydrationWarning
+              >
                 {content}
               </Component>
             </NestedContentRendererProvider>

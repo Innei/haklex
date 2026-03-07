@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 export const mentionMenu = style({
@@ -42,7 +42,7 @@ export const mentionMenuItem = style({
 globalStyle(
   `${mentionMenuItem}:hover, ${mentionMenuItem}[aria-selected="true"]`,
   {
-    background: vars.color.bgSecondary,
+    background: vars.color.fill,
   },
 )
 

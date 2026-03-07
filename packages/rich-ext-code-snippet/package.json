@@ -1,11 +1,12 @@
 {
   "name": "@haklex/rich-ext-code-snippet",
-  "version": "0.0.38",
+  "type": "module",
+  "version": "0.0.64",
   "description": "Multi-file code snippet extension",
   "license": "MIT",
-  "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./static": "./src/static.ts",
     "./style.css": "./dist/rich-ext-code-snippet.css"
   },
   "main": "./src/index.ts",
@@ -16,10 +17,14 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
+  "peerDependencies": {
+    "lexical": "^0.41.0",
+    "react": ">=19"
+  },
   "dependencies": {
     "@codemirror/commands": "^6.10.2",
     "@codemirror/state": "^6.5.4",
-    "@codemirror/view": "^6.39.15",
+    "@codemirror/view": "^6.39.16",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -29,8 +34,8 @@
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "lucide-react": "^0.574.0",
-    "shiki": "^3.22.0"
+    "lucide-react": "^0.577.0",
+    "shiki": "^4.0.1"
   },
   "devDependencies": {
     "@lexical/react": "^0.41.0",
@@ -38,7 +43,7 @@
     "@types/react-dom": "^19.2.3",
     "@vanilla-extract/css": "^1.18.0",
     "@vanilla-extract/recipes": "^0.5.7",
-    "@vanilla-extract/vite-plugin": "^4.0.20",
+    "@vanilla-extract/vite-plugin": "^5.1.4",
     "lexical": "^0.41.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -46,16 +51,16 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
-  "peerDependencies": {
-    "lexical": "^0.41.0",
-    "react": ">=19"
-  },
   "publishConfig": {
     "access": "public",
     "exports": {
       ".": {
         "import": "./dist/index.mjs",
         "types": "./dist/index.d.ts"
+      },
+      "./static": {
+        "import": "./dist/static.mjs",
+        "types": "./dist/static.d.ts"
       },
       "./style.css": "./dist/rich-ext-code-snippet.css"
     },

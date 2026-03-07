@@ -1,0 +1,1034 @@
+[
+  {
+    "id": "bootstrap-editor",
+    "message": "feat(core): bootstrap rich editor package",
+    "sourceCommit": "6574b7d1",
+    "packages": [
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "renderer-registry",
+    "message": "feat(editor): add configurable renderer registry",
+    "sourceCommit": "b923ca3c",
+    "packages": [
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "standalone-demo",
+    "message": "feat(demo): move demo into a standalone workspace package",
+    "sourceCommit": "4fa618b1",
+    "paths": [
+      {
+        "id": "rich-editor-demo",
+        "source": "packages/rich-editor-demo",
+        "target": "packages/rich-editor-demo"
+      },
+      {
+        "id": "rich-editor package manifest",
+        "source": "packages/rich-editor/package.json",
+        "target": "packages/rich-editor/package.json"
+      },
+      {
+        "id": "rich-editor tsconfig",
+        "source": "packages/rich-editor/tsconfig.json",
+        "target": "packages/rich-editor/tsconfig.json"
+      },
+      {
+        "id": "rich-editor vite config",
+        "source": "packages/rich-editor/vite.config.ts",
+        "target": "packages/rich-editor/vite.config.ts"
+      }
+    ],
+    "deletePaths": [
+      "packages/rich-editor/demo",
+      "packages/rich-editor/index.html"
+    ]
+  },
+  {
+    "id": "linkcard-renderer",
+    "message": "feat(renderer): add link card renderer package",
+    "sourceCommit": "4fa618b1",
+    "packages": [
+      "rich-renderer-linkcard"
+    ]
+  },
+  {
+    "id": "gallery-renderer",
+    "message": "feat(renderer): add gallery renderer package",
+    "sourceCommit": "4fa618b1",
+    "packages": [
+      "rich-ext-gallery"
+    ]
+  },
+  {
+    "id": "markdown-transformers",
+    "message": "feat(editor): add markdown transformers for alert, footnote and task list nodes",
+    "sourceCommit": "fea81a7a",
+    "packages": [
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "color-scheme-and-decorators",
+    "message": "feat(editor): add color scheme support and editing decorators",
+    "sourceCommit": "939eae44",
+    "packages": [
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "mermaid-and-slash-menu",
+    "message": "feat(mermaid): add diagram node and slash menu integration",
+    "sourceCommit": "614132fa",
+    "packages": [
+      "rich-editor",
+      "rich-plugin-slash-menu",
+      "rich-renderer-mermaid"
+    ]
+  },
+  {
+    "id": "tabs-and-icons",
+    "message": "feat(editor): add tabs renderer improvements and icon support",
+    "sourceCommit": "598e6f6d",
+    "packages": [
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "ui-primitives",
+    "message": "feat(ui): extract dialog, menu and popover primitives",
+    "sourceCommit": "1c1c6263",
+    "packages": [
+      "rich-editor-ui"
+    ]
+  },
+  {
+    "id": "alert-renderer",
+    "message": "feat(alert): extract alert renderer and edit decorator",
+    "sourceCommit": "1c1c6263",
+    "packages": [
+      "rich-renderer-alert",
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "codeblock-renderer",
+    "message": "feat(codeblock): extract standalone code block renderer",
+    "sourceCommit": "1c1c6263",
+    "packages": [
+      "rich-renderer-codeblock",
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "edit-static-separation",
+    "message": "feat(editor): separate edit and static rendering flows",
+    "sourceCommit": "1a4a6855",
+    "packages": [
+      "rich-editor",
+      "rich-renderers"
+    ]
+  },
+  {
+    "id": "table-plugin",
+    "message": "feat(table): add table plugin and horizontal rule support",
+    "sourceCommit": "379e0d20",
+    "packages": [
+      "rich-plugin-table",
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "floating-toolbar",
+    "message": "feat(toolbar): extract floating toolbar package",
+    "sourceCommit": "46919a99",
+    "packages": [
+      "rich-plugin-floating-toolbar",
+      "rich-editor-ui"
+    ]
+  },
+  {
+    "id": "extension-packages",
+    "message": "feat(ext): extract embed and drawing support into dedicated packages",
+    "sourceCommit": "71552e4a",
+    "packages": [
+      "rich-editor",
+      "rich-ext-embed",
+      "rich-ext-excalidraw",
+      "rich-renderers"
+    ]
+  },
+  {
+    "id": "style-tokens",
+    "message": "feat(theme): extract shared style tokens for editor theming",
+    "sourceCommit": "0e1b0a32",
+    "packages": [
+      "rich-style-token"
+    ]
+  },
+  {
+    "id": "footnote-sections",
+    "message": "feat(footnote): add section nodes and definition context",
+    "sourceCommit": "1053b41a",
+    "packages": [
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "footnote-plugin",
+    "message": "feat(footnote): add plugin wiring and markdown transformer support",
+    "sourceCommit": "dfd1416f",
+    "packages": [
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "footnote-editing",
+    "message": "feat(footnote): add editable footnote sections",
+    "sourceCommit": "a3745609",
+    "packages": [
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "footnote-tooltips",
+    "message": "feat(ui): add tooltip primitives for footnote previews",
+    "sourceCommit": "ad3d4b3c",
+    "packages": [
+      "rich-editor-ui",
+      "rich-editor"
+    ]
+  },
+  {
+    "id": "code-snippet-package",
+    "message": "feat(code-snippet): add multi-file code snippet extension package",
+    "sourceCommit": "f684cc0f",
+    "packages": [
+      "rich-ext-code-snippet"
+    ]
+  },
+  {
+    "id": "block-handle-package",
+    "message": "feat(blocks): add block handle plugin for direct block actions",
+    "sourceCommit": "b3952a7f",
+    "packages": [
+      "rich-plugin-block-handle"
+    ]
+  },
+  {
+    "id": "ui-extra-controls",
+    "message": "feat(ui): add animated tabs and checkbox controls",
+    "sourceCommit": "46173b38",
+    "paths": [
+      {
+        "id": "animated tabs",
+        "source": "packages/rich-editor-ui/src/components/animated-tabs/index.tsx",
+        "target": "packages/rich-editor-ui/src/components/animated-tabs/index.tsx"
+      },
+      {
+        "id": "animated tabs styles",
+        "source": "packages/rich-editor-ui/src/components/animated-tabs/styles.css.ts",
+        "target": "packages/rich-editor-ui/src/components/animated-tabs/styles.css.ts"
+      },
+      {
+        "id": "checkbox",
+        "source": "packages/rich-editor-ui/src/components/checkbox/index.tsx",
+        "target": "packages/rich-editor-ui/src/components/checkbox/index.tsx"
+      },
+      {
+        "id": "checkbox styles",
+        "source": "packages/rich-editor-ui/src/components/checkbox/styles.css.ts",
+        "target": "packages/rich-editor-ui/src/components/checkbox/styles.css.ts"
+      },
+      {
+        "id": "ui barrel",
+        "source": "packages/rich-editor-ui/src/index.ts",
+        "target": "packages/rich-editor-ui/src/index.ts"
+      }
+    ]
+  },
+  {
+    "id": "code-snippet-transformers",
+    "message": "feat(code-snippet): add markdown transformers for snippets and drawings",
+    "sourceCommit": "1cc2fe6b",
+    "packages": [
+      "rich-editor",
+      "rich-ext-code-snippet",
+      "rich-kit-shiro"
+    ]
+  },
+  {
+    "id": "headless-runtime",
+    "message": "feat(headless): add shared transformer runtime package",
+    "sourceCommit": "48fb6dc3",
+    "paths": [
+      {
+        "id": "headless package",
+        "source": "packages/rich-headless/package.json",
+        "target": "packages/rich-headless/package.json"
+      },
+      {
+        "id": "headless index",
+        "source": "packages/rich-headless/src/index.ts",
+        "target": "packages/rich-headless/src/index.ts"
+      },
+      {
+        "id": "headless transformers",
+        "source": "packages/rich-headless/src/transformers.ts",
+        "target": "packages/rich-headless/src/transformers.ts"
+      },
+      {
+        "id": "headless tsconfig",
+        "source": "packages/rich-headless/tsconfig.json",
+        "target": "packages/rich-headless/tsconfig.json"
+      },
+      {
+        "id": "headless vite config",
+        "source": "packages/rich-headless/vite.config.ts",
+        "target": "packages/rich-headless/vite.config.ts"
+      }
+    ]
+  },
+  {
+    "id": "headless-adoption",
+    "message": "refactor(editor): route rich markdown transforms through the headless runtime",
+    "sourceCommit": "48fb6dc3",
+    "paths": [
+      {
+        "id": "editor package",
+        "source": "packages/rich-editor/package.json",
+        "target": "packages/rich-editor/package.json"
+      },
+      {
+        "id": "editor component",
+        "source": "packages/rich-editor/src/components/RichEditor.tsx",
+        "target": "packages/rich-editor/src/components/RichEditor.tsx"
+      },
+      {
+        "id": "renderer component",
+        "source": "packages/rich-editor/src/components/RichRenderer.tsx",
+        "target": "packages/rich-editor/src/components/RichRenderer.tsx"
+      },
+      {
+        "id": "alert transformer",
+        "source": "packages/rich-editor/src/transformers/alert.ts",
+        "target": "packages/rich-editor/src/transformers/alert.ts"
+      },
+      {
+        "id": "container transformer",
+        "source": "packages/rich-editor/src/transformers/container.ts",
+        "target": "packages/rich-editor/src/transformers/container.ts"
+      },
+      {
+        "id": "footnote transformer",
+        "source": "packages/rich-editor/src/transformers/footnote.ts",
+        "target": "packages/rich-editor/src/transformers/footnote.ts"
+      },
+      {
+        "id": "grid container transformer",
+        "source": "packages/rich-editor/src/transformers/grid-container.ts",
+        "target": "packages/rich-editor/src/transformers/grid-container.ts"
+      },
+      {
+        "id": "insert transformer",
+        "source": "packages/rich-editor/src/transformers/insert.ts",
+        "target": "packages/rich-editor/src/transformers/insert.ts"
+      },
+      {
+        "id": "katex transformer",
+        "source": "packages/rich-editor/src/transformers/katex.ts",
+        "target": "packages/rich-editor/src/transformers/katex.ts"
+      },
+      {
+        "id": "mention transformer",
+        "source": "packages/rich-editor/src/transformers/mention.ts",
+        "target": "packages/rich-editor/src/transformers/mention.ts"
+      },
+      {
+        "id": "rich blocks transformer",
+        "source": "packages/rich-editor/src/transformers/rich-blocks.ts",
+        "target": "packages/rich-editor/src/transformers/rich-blocks.ts"
+      },
+      {
+        "id": "spoiler transformer",
+        "source": "packages/rich-editor/src/transformers/spoiler.ts",
+        "target": "packages/rich-editor/src/transformers/spoiler.ts"
+      },
+      {
+        "id": "editor types",
+        "source": "packages/rich-editor/src/types.ts",
+        "target": "packages/rich-editor/src/types.ts"
+      },
+      {
+        "id": "code snippet package",
+        "source": "packages/rich-ext-code-snippet/package.json",
+        "target": "packages/rich-ext-code-snippet/package.json"
+      },
+      {
+        "id": "code snippet transformer",
+        "source": "packages/rich-ext-code-snippet/src/transformer.ts",
+        "target": "packages/rich-ext-code-snippet/src/transformer.ts"
+      },
+      {
+        "id": "excalidraw package",
+        "source": "packages/rich-ext-tldraw/package.json",
+        "target": "packages/rich-ext-excalidraw/package.json"
+      },
+      {
+        "id": "excalidraw transformer",
+        "source": "packages/rich-ext-tldraw/src/transformer.ts",
+        "target": "packages/rich-ext-excalidraw/src/transformer.ts"
+      },
+      {
+        "id": "demo package",
+        "source": "packages/rich-editor-demo/package.json",
+        "target": "packages/rich-editor-demo/package.json"
+      },
+      {
+        "id": "demo editor page",
+        "source": "packages/rich-editor-demo/src/pages/EditorPage.tsx",
+        "target": "packages/rich-editor-demo/src/pages/EditorPage.tsx"
+      }
+    ]
+  },
+  {
+    "id": "theme-style-helpers",
+    "message": "feat(theme): add createThemeStyle helper APIs",
+    "sourceCommit": "48fb6dc3",
+    "paths": [
+      {
+        "id": "style token readme",
+        "source": "packages/rich-style-token/README.md",
+        "target": "packages/rich-style-token/README.md"
+      },
+      {
+        "id": "create theme style",
+        "source": "packages/rich-style-token/src/create-theme-style.ts",
+        "target": "packages/rich-style-token/src/create-theme-style.ts"
+      },
+      {
+        "id": "style token index",
+        "source": "packages/rich-style-token/src/index.ts",
+        "target": "packages/rich-style-token/src/index.ts"
+      }
+    ]
+  },
+  {
+    "id": "static-renderer-package",
+    "message": "feat(static): add standalone rich static renderer package",
+    "sourceCommit": "c42b7b55",
+    "packages": [
+      "rich-static-renderer"
+    ]
+  },
+  {
+    "id": "mention-plugin-package",
+    "message": "feat(mention): add menu plugin and platform registry package",
+    "sourceCommit": "c42b7b55",
+    "packages": [
+      "rich-plugin-mention"
+    ]
+  },
+  {
+    "id": "mention-renderers",
+    "message": "feat(mention): add renderer package and shared bundle exports",
+    "sourceCommit": "c42b7b55",
+    "packages": [
+      "rich-renderer-mention",
+      "rich-renderers"
+    ]
+  },
+  {
+    "id": "cm-editor-package",
+    "message": "feat(cm-editor): extract shared CodeMirror helpers for rich embeds",
+    "sourceCommit": "f58f6263",
+    "packages": [
+      "cm-editor"
+    ]
+  },
+  {
+    "id": "codeblock-cm6-core",
+    "message": "feat(codeblock): migrate editable code blocks to CodeMirror 6",
+    "sourceCommit": "f58f6263",
+    "paths": [
+      {
+        "id": "codeblock edit decorator",
+        "source": "packages/rich-editor/src/components/decorators/CodeBlockEditDecorator.tsx",
+        "target": "packages/rich-editor/src/components/decorators/CodeBlockEditDecorator.tsx"
+      },
+      {
+        "id": "codeblock renderer bridge",
+        "source": "packages/rich-editor/src/components/renderers/CodeBlockRenderer.tsx",
+        "target": "packages/rich-editor/src/components/renderers/CodeBlockRenderer.tsx"
+      },
+      {
+        "id": "block exit plugin",
+        "source": "packages/rich-editor/src/plugins/BlockExitPlugin.tsx",
+        "target": "packages/rich-editor/src/plugins/BlockExitPlugin.tsx"
+      },
+      {
+        "id": "codeblock selection intent",
+        "source": "packages/rich-editor/src/utils/codeBlockSelectionIntent.ts",
+        "target": "packages/rich-editor/src/utils/codeBlockSelectionIntent.ts"
+      }
+    ],
+    "packages": [
+      "rich-renderer-codeblock"
+    ]
+  },
+  {
+    "id": "code-snippet-cm6-editor",
+    "message": "refactor(code-snippet): switch snippet editing modal to CodeMirror 6",
+    "sourceCommit": "f58f6263",
+    "paths": [
+      {
+        "id": "code snippet package",
+        "source": "packages/rich-ext-code-snippet/package.json",
+        "target": "packages/rich-ext-code-snippet/package.json"
+      },
+      {
+        "id": "code editor modal",
+        "source": "packages/rich-ext-code-snippet/src/CodeEditorModal.tsx",
+        "target": "packages/rich-ext-code-snippet/src/CodeEditorModal.tsx"
+      },
+      {
+        "id": "code snippet styles",
+        "source": "packages/rich-ext-code-snippet/src/styles.css.ts",
+        "target": "packages/rich-ext-code-snippet/src/styles.css.ts"
+      }
+    ]
+  },
+  {
+    "id": "demo-workspace-watch",
+    "message": "chore(demo): improve preset permalinks and workspace hot reload",
+    "sourceCommit": "f58f6263",
+    "paths": [
+      {
+        "id": "presets page",
+        "source": "packages/rich-editor-demo/src/pages/PresetsPage.tsx",
+        "target": "packages/rich-editor-demo/src/pages/PresetsPage.tsx"
+      },
+      {
+        "id": "demo vite config",
+        "source": "packages/rich-editor-demo/vite.config.ts",
+        "target": "packages/rich-editor-demo/vite.config.ts"
+      }
+    ]
+  },
+  {
+    "id": "horizontal-rule-markdown",
+    "message": "feat(editor): add horizontal rule shortcut and markdown transformer",
+    "sourceCommit": "568fe9d8",
+    "paths": [
+      {
+        "id": "horizontal rule plugin",
+        "source": "packages/rich-editor/src/plugins/HorizontalRulePlugin.tsx",
+        "target": "packages/rich-editor/src/plugins/HorizontalRulePlugin.tsx"
+      },
+      {
+        "id": "horizontal rule transformer",
+        "source": "packages/rich-editor/src/transformers/horizontal-rule.ts",
+        "target": "packages/rich-editor/src/transformers/horizontal-rule.ts"
+      },
+      {
+        "id": "rich blocks transformer barrel",
+        "source": "packages/rich-editor/src/transformers/rich-blocks.ts",
+        "target": "packages/rich-editor/src/transformers/rich-blocks.ts"
+      }
+    ]
+  },
+  {
+    "id": "linkcard-plugin-overrides",
+    "message": "feat(linkcard): allow custom plugin registries to extend builtins",
+    "sourceCommit": "568fe9d8",
+    "packages": [
+      "rich-renderer-linkcard"
+    ]
+  },
+  {
+    "id": "linkcard-demo-page",
+    "message": "feat(demo): add custom link card plugin showcase page",
+    "sourceCommit": "568fe9d8",
+    "packages": [
+      "rich-editor-demo"
+    ]
+  },
+  {
+    "id": "viewport-gate",
+    "message": "feat(excalidraw): add viewport gate support for heavy embeds",
+    "sourceCommit": "6c90f0c0",
+    "paths": [
+      {
+        "id": "viewport gate",
+        "source": "haklex/rich-editor-ui/src/components/viewport-gate/index.tsx",
+        "target": "packages/rich-editor-ui/src/components/viewport-gate/index.tsx"
+      },
+      {
+        "id": "ui index",
+        "source": "haklex/rich-editor-ui/src/index.ts",
+        "target": "packages/rich-editor-ui/src/index.ts"
+      }
+    ],
+    "packages": [
+      "rich-ext-excalidraw"
+    ]
+  },
+  {
+    "id": "toolbar-package",
+    "message": "feat(toolbar): add standalone toolbar component package",
+    "sourceCommit": "68d2af23",
+    "packages": [
+      "rich-plugin-toolbar"
+    ]
+  },
+  {
+    "id": "toolbar-commands",
+    "message": "feat(editor): add command registry for editable nodes",
+    "sourceCommit": "68d2af23",
+    "paths": [
+      {
+        "id": "content editable",
+        "source": "haklex/rich-editor/src/components/ContentEditable.tsx",
+        "target": "packages/rich-editor/src/components/ContentEditable.tsx"
+      },
+      {
+        "id": "rich editor",
+        "source": "haklex/rich-editor/src/components/RichEditor.tsx",
+        "target": "packages/rich-editor/src/components/RichEditor.tsx"
+      },
+      {
+        "id": "editor index",
+        "source": "haklex/rich-editor/src/index.ts",
+        "target": "packages/rich-editor/src/index.ts"
+      },
+      {
+        "id": "alert edit node",
+        "source": "haklex/rich-editor/src/nodes/AlertQuoteEditNode.ts",
+        "target": "packages/rich-editor/src/nodes/AlertQuoteEditNode.ts"
+      },
+      {
+        "id": "banner edit node",
+        "source": "haklex/rich-editor/src/nodes/BannerEditNode.ts",
+        "target": "packages/rich-editor/src/nodes/BannerEditNode.ts"
+      },
+      {
+        "id": "code block edit node",
+        "source": "haklex/rich-editor/src/nodes/CodeBlockEditNode.ts",
+        "target": "packages/rich-editor/src/nodes/CodeBlockEditNode.ts"
+      },
+      {
+        "id": "code block node",
+        "source": "haklex/rich-editor/src/nodes/CodeBlockNode.ts",
+        "target": "packages/rich-editor/src/nodes/CodeBlockNode.ts"
+      },
+      {
+        "id": "image node",
+        "source": "haklex/rich-editor/src/nodes/ImageNode.ts",
+        "target": "packages/rich-editor/src/nodes/ImageNode.ts"
+      },
+      {
+        "id": "link card node",
+        "source": "haklex/rich-editor/src/nodes/LinkCardNode.ts",
+        "target": "packages/rich-editor/src/nodes/LinkCardNode.ts"
+      },
+      {
+        "id": "mermaid node",
+        "source": "haklex/rich-editor/src/nodes/MermaidNode.ts",
+        "target": "packages/rich-editor/src/nodes/MermaidNode.ts"
+      },
+      {
+        "id": "video node",
+        "source": "haklex/rich-editor/src/nodes/VideoNode.ts",
+        "target": "packages/rich-editor/src/nodes/VideoNode.ts"
+      },
+      {
+        "id": "markdown paste plugin",
+        "source": "haklex/rich-editor/src/plugins/MarkdownPastePlugin.tsx",
+        "target": "packages/rich-editor/src/plugins/MarkdownPastePlugin.tsx"
+      },
+      {
+        "id": "plugin index",
+        "source": "haklex/rich-editor/src/plugins/index.ts",
+        "target": "packages/rich-editor/src/plugins/index.ts"
+      },
+      {
+        "id": "editor types",
+        "source": "haklex/rich-editor/src/types.ts",
+        "target": "packages/rich-editor/src/types.ts"
+      },
+      {
+        "id": "slash menu types",
+        "source": "haklex/rich-editor/src/types/slash-menu.ts",
+        "target": "packages/rich-editor/src/types/slash-menu.ts"
+      },
+      {
+        "id": "command item collector",
+        "source": "haklex/rich-editor/src/utils/collect-command-items.ts",
+        "target": "packages/rich-editor/src/utils/collect-command-items.ts"
+      },
+      {
+        "id": "code snippet edit node",
+        "source": "haklex/rich-ext-code-snippet/src/nodes/CodeSnippetEditNode.ts",
+        "target": "packages/rich-ext-code-snippet/src/nodes/CodeSnippetEditNode.ts"
+      },
+      {
+        "id": "embed edit node",
+        "source": "haklex/rich-ext-embed/src/nodes/EmbedEditNode.ts",
+        "target": "packages/rich-ext-embed/src/nodes/EmbedEditNode.ts"
+      },
+      {
+        "id": "excalidraw edit node",
+        "source": "haklex/rich-ext-excalidraw/src/ExcalidrawEditNode.ts",
+        "target": "packages/rich-ext-excalidraw/src/ExcalidrawEditNode.ts"
+      },
+      {
+        "id": "gallery edit node",
+        "source": "haklex/rich-ext-gallery/src/GalleryEditNode.ts",
+        "target": "packages/rich-ext-gallery/src/GalleryEditNode.ts"
+      },
+      {
+        "id": "slash menu plugin",
+        "source": "haklex/rich-plugin-slash-menu/src/SlashMenuPlugin.tsx",
+        "target": "packages/rich-plugin-slash-menu/src/SlashMenuPlugin.tsx"
+      }
+    ]
+  },
+  {
+    "id": "toolbar-demo-integration",
+    "message": "feat(demo): wire toolbar commands into the editor showcase",
+    "sourceCommit": "68d2af23",
+    "paths": [
+      {
+        "id": "demo panel",
+        "source": "haklex/rich-editor-demo/src/components/Panel.tsx",
+        "target": "packages/rich-editor-demo/src/components/Panel.tsx"
+      },
+      {
+        "id": "demo editor page",
+        "source": "haklex/rich-editor-demo/src/pages/EditorPage.tsx",
+        "target": "packages/rich-editor-demo/src/pages/EditorPage.tsx"
+      },
+      {
+        "id": "tooltip index",
+        "source": "haklex/rich-editor-ui/src/components/tooltip/index.tsx",
+        "target": "packages/rich-editor-ui/src/components/tooltip/index.tsx"
+      },
+      {
+        "id": "ui index",
+        "source": "haklex/rich-editor-ui/src/index.ts",
+        "target": "packages/rich-editor-ui/src/index.ts"
+      },
+      {
+        "id": "kit style",
+        "source": "haklex/rich-kit-shiro/src/style.css",
+        "target": "packages/rich-kit-shiro/src/style.css"
+      }
+    ]
+  },
+  {
+    "id": "mermaid-postprocess",
+    "message": "refactor(mermaid): improve SVG post-processing for static rendering",
+    "sourceCommit": "92960038",
+    "paths": [
+      {
+        "id": "mermaid renderer",
+        "source": "haklex/rich-renderer-mermaid/src/MermaidRenderer.tsx",
+        "target": "packages/rich-renderer-mermaid/src/MermaidRenderer.tsx"
+      },
+      {
+        "id": "mermaid svg post process",
+        "source": "haklex/rich-renderer-mermaid/src/svg-post-process.ts",
+        "target": "packages/rich-renderer-mermaid/src/svg-post-process.ts"
+      },
+      {
+        "id": "mermaid utils",
+        "source": "haklex/rich-renderer-mermaid/src/utils.ts",
+        "target": "packages/rich-renderer-mermaid/src/utils.ts"
+      }
+    ]
+  },
+  {
+    "id": "toolbar-polish",
+    "message": "refactor(toolbar): streamline toolbar interactions and styling",
+    "sourceCommit": "92960038",
+    "paths": [
+      {
+        "id": "toolbar plugin",
+        "source": "haklex/rich-plugin-toolbar/src/ToolbarPlugin.tsx",
+        "target": "packages/rich-plugin-toolbar/src/ToolbarPlugin.tsx"
+      },
+      {
+        "id": "toolbar styles",
+        "source": "haklex/rich-plugin-toolbar/src/styles.css.ts",
+        "target": "packages/rich-plugin-toolbar/src/styles.css.ts"
+      }
+    ]
+  },
+  {
+    "id": "nested-doc-nodes",
+    "message": "feat(editor): add nested document nodes and renderer hooks",
+    "sourceCommit": "1ce5642d",
+    "packages": [
+      "rich-editor",
+      "rich-ext-nested-doc",
+      "rich-headless"
+    ]
+  },
+  {
+    "id": "nested-doc-dialog-context",
+    "message": "feat(nested-doc): add dialog editor context for nested document blocks",
+    "sourceCommit": "36315e72",
+    "packages": [
+      "rich-ext-nested-doc"
+    ]
+  },
+  {
+    "id": "nested-doc-kit-decoupling",
+    "message": "refactor(kit): remove nested document nodes from the generic renderer bundles",
+    "sourceCommit": "36315e72",
+    "packages": [
+      "rich-kit-shiro",
+      "rich-renderers",
+      "rich-renderers-edit"
+    ]
+  },
+  {
+    "id": "nested-doc-demo-provider",
+    "message": "feat(demo): wire nested document dialog workflows into the editor playground",
+    "sourceCommit": "36315e72",
+    "paths": [
+      {
+        "id": "demo package",
+        "source": "haklex/rich-editor-demo/package.json",
+        "target": "packages/rich-editor-demo/package.json"
+      },
+      {
+        "id": "demo editor page",
+        "source": "haklex/rich-editor-demo/src/pages/EditorPage.tsx",
+        "target": "packages/rich-editor-demo/src/pages/EditorPage.tsx"
+      },
+      {
+        "id": "content editable",
+        "source": "haklex/rich-editor/src/components/ContentEditable.tsx",
+        "target": "packages/rich-editor/src/components/ContentEditable.tsx"
+      }
+    ]
+  },
+  {
+    "id": "mobile-sheet",
+    "message": "feat(ui): add bottom sheet support to dialog primitives",
+    "sourceCommit": "b8a1f0a7",
+    "paths": [
+      {
+        "id": "dialog sheet",
+        "source": "haklex/rich-editor-ui/src/components/dialog/sheet.tsx",
+        "target": "packages/rich-editor-ui/src/components/dialog/sheet.tsx"
+      },
+      {
+        "id": "dialog stack",
+        "source": "haklex/rich-editor-ui/src/components/dialog/stack.tsx",
+        "target": "packages/rich-editor-ui/src/components/dialog/stack.tsx"
+      },
+      {
+        "id": "dialog store",
+        "source": "haklex/rich-editor-ui/src/components/dialog/store.ts",
+        "target": "packages/rich-editor-ui/src/components/dialog/store.ts"
+      },
+      {
+        "id": "dialog styles",
+        "source": "haklex/rich-editor-ui/src/components/dialog/styles.css.ts",
+        "target": "packages/rich-editor-ui/src/components/dialog/styles.css.ts"
+      }
+    ]
+  },
+  {
+    "id": "nested-doc-layout",
+    "message": "refactor(nested-doc): streamline nested content styling and portal themes",
+    "sourceCommit": "b8a1f0a7",
+    "paths": [
+      {
+        "id": "content editable styles",
+        "source": "haklex/rich-editor/src/components/ContentEditable.css.ts",
+        "target": "packages/rich-editor/src/components/ContentEditable.css.ts"
+      },
+      {
+        "id": "content editable",
+        "source": "haklex/rich-editor/src/components/ContentEditable.tsx",
+        "target": "packages/rich-editor/src/components/ContentEditable.tsx"
+      },
+      {
+        "id": "nested doc edit decorator",
+        "source": "haklex/rich-ext-nested-doc/src/NestedDocEditDecorator.tsx",
+        "target": "packages/rich-ext-nested-doc/src/NestedDocEditDecorator.tsx"
+      },
+      {
+        "id": "nested doc renderer",
+        "source": "haklex/rich-ext-nested-doc/src/NestedDocRenderer.tsx",
+        "target": "packages/rich-ext-nested-doc/src/NestedDocRenderer.tsx"
+      },
+      {
+        "id": "nested doc static decorator",
+        "source": "haklex/rich-ext-nested-doc/src/NestedDocStaticDecorator.tsx",
+        "target": "packages/rich-ext-nested-doc/src/NestedDocStaticDecorator.tsx"
+      },
+      {
+        "id": "nested doc styles",
+        "source": "haklex/rich-ext-nested-doc/src/styles.css.ts",
+        "target": "packages/rich-ext-nested-doc/src/styles.css.ts"
+      },
+      {
+        "id": "floating toolbar plugin",
+        "source": "haklex/rich-plugin-floating-toolbar/src/FloatingToolbarPlugin.tsx",
+        "target": "packages/rich-plugin-floating-toolbar/src/FloatingToolbarPlugin.tsx"
+      },
+      {
+        "id": "style token index",
+        "source": "haklex/rich-style-token/src/index.ts",
+        "target": "packages/rich-style-token/src/index.ts"
+      },
+      {
+        "id": "portal theme",
+        "source": "haklex/rich-style-token/src/portal-theme.tsx",
+        "target": "packages/rich-style-token/src/portal-theme.tsx"
+      }
+    ],
+    "deletePaths": [
+      "packages/rich-editor/src/styles/nested-doc.css.ts"
+    ]
+  },
+  {
+    "id": "ui-combobox-and-menus",
+    "message": "feat(ui): add combobox primitives and modernize dropdown menus",
+    "sourceCommit": "75a425d3",
+    "paths": [
+      {
+        "id": "combobox",
+        "source": "haklex/rich-editor-ui/src/components/combobox/index.tsx",
+        "target": "packages/rich-editor-ui/src/components/combobox/index.tsx"
+      },
+      {
+        "id": "combobox styles",
+        "source": "haklex/rich-editor-ui/src/components/combobox/styles.css.ts",
+        "target": "packages/rich-editor-ui/src/components/combobox/styles.css.ts"
+      },
+      {
+        "id": "dropdown menu",
+        "source": "haklex/rich-editor-ui/src/components/dropdown-menu/index.tsx",
+        "target": "packages/rich-editor-ui/src/components/dropdown-menu/index.tsx"
+      },
+      {
+        "id": "dropdown menu styles",
+        "source": "haklex/rich-editor-ui/src/components/dropdown-menu/styles.css.ts",
+        "target": "packages/rich-editor-ui/src/components/dropdown-menu/styles.css.ts"
+      },
+      {
+        "id": "tooltip index",
+        "source": "haklex/rich-editor-ui/src/components/tooltip/index.tsx",
+        "target": "packages/rich-editor-ui/src/components/tooltip/index.tsx"
+      },
+      {
+        "id": "tooltip styles",
+        "source": "haklex/rich-editor-ui/src/components/tooltip/styles.css.ts",
+        "target": "packages/rich-editor-ui/src/components/tooltip/styles.css.ts"
+      },
+      {
+        "id": "ui menu barrel",
+        "source": "haklex/rich-editor-ui/src/index.ts",
+        "target": "packages/rich-editor-ui/src/index.ts"
+      },
+      {
+        "id": "menu styles",
+        "source": "haklex/rich-editor-ui/src/styles/menu.css.ts",
+        "target": "packages/rich-editor-ui/src/styles/menu.css.ts"
+      }
+    ]
+  },
+  {
+    "id": "codeblock-language-picker",
+    "message": "feat(codeblock): add language picker support for editable code blocks",
+    "sourceCommit": "75a425d3",
+    "paths": [
+      {
+        "id": "code snippet renderer",
+        "source": "haklex/rich-ext-code-snippet/src/CodeSnippetRenderer.tsx",
+        "target": "packages/rich-ext-code-snippet/src/CodeSnippetRenderer.tsx"
+      },
+      {
+        "id": "code snippet styles",
+        "source": "haklex/rich-ext-code-snippet/src/styles.css.ts",
+        "target": "packages/rich-ext-code-snippet/src/styles.css.ts"
+      },
+      {
+        "id": "codeblock package",
+        "source": "haklex/rich-renderer-codeblock/package.json",
+        "target": "packages/rich-renderer-codeblock/package.json"
+      },
+      {
+        "id": "codeblock card",
+        "source": "haklex/rich-renderer-codeblock/src/CodeBlockCard.tsx",
+        "target": "packages/rich-renderer-codeblock/src/CodeBlockCard.tsx"
+      },
+      {
+        "id": "codeblock edit renderer",
+        "source": "haklex/rich-renderer-codeblock/src/CodeBlockEditRenderer.tsx",
+        "target": "packages/rich-renderer-codeblock/src/CodeBlockEditRenderer.tsx"
+      },
+      {
+        "id": "codeblock renderer",
+        "source": "haklex/rich-renderer-codeblock/src/CodeBlockRenderer.tsx",
+        "target": "packages/rich-renderer-codeblock/src/CodeBlockRenderer.tsx"
+      },
+      {
+        "id": "language combobox",
+        "source": "haklex/rich-renderer-codeblock/src/LanguageCombobox.tsx",
+        "target": "packages/rich-renderer-codeblock/src/LanguageCombobox.tsx"
+      },
+      {
+        "id": "language icon",
+        "source": "haklex/rich-renderer-codeblock/src/icons/language.tsx",
+        "target": "packages/rich-renderer-codeblock/src/icons/language.tsx"
+      }
+    ]
+  },
+  {
+    "id": "toolbar-menu-adoption",
+    "message": "refactor(toolbar): align toolbar and block actions with the new menu primitives",
+    "sourceCommit": "75a425d3",
+    "paths": [
+      {
+        "id": "block handle plugin",
+        "source": "haklex/rich-plugin-block-handle/src/BlockHandlePlugin.tsx",
+        "target": "packages/rich-plugin-block-handle/src/BlockHandlePlugin.tsx"
+      },
+      {
+        "id": "block handle styles",
+        "source": "haklex/rich-plugin-block-handle/src/styles.css.ts",
+        "target": "packages/rich-plugin-block-handle/src/styles.css.ts"
+      },
+      {
+        "id": "toolbar plugin",
+        "source": "haklex/rich-plugin-toolbar/src/ToolbarPlugin.tsx",
+        "target": "packages/rich-plugin-toolbar/src/ToolbarPlugin.tsx"
+      },
+      {
+        "id": "toolbar styles",
+        "source": "haklex/rich-plugin-toolbar/src/styles.css.ts",
+        "target": "packages/rich-plugin-toolbar/src/styles.css.ts"
+      }
+    ]
+  },
+  {
+    "id": "demo-control-showcase",
+    "message": "feat(demo): showcase advanced editor controls on the demo page",
+    "sourceCommit": "75a425d3",
+    "paths": [
+      {
+        "id": "editor demo page",
+        "source": "haklex/rich-editor-demo/src/pages/EditorPage.tsx",
+        "target": "packages/rich-editor-demo/src/pages/EditorPage.tsx"
+      }
+    ]
+  }
+]

@@ -1,19 +1,18 @@
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import {
-  $deleteTableColumn__EXPERIMENTAL,
-  $deleteTableRow__EXPERIMENTAL,
-  $getTableCellNodeFromLexicalNode,
-  $insertTableColumn__EXPERIMENTAL,
-  $insertTableRow__EXPERIMENTAL,
-  $isTableCellNode,
-} from '@lexical/table'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@shiro/rich-editor-ui'
+} from '@haklex/rich-editor-ui'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
+import {
+  $deleteTableColumn__EXPERIMENTAL,
+  $deleteTableRow__EXPERIMENTAL,
+  $getTableCellNodeFromLexicalNode,
+  $insertTableRowAtSelection,
+  $isTableCellNode,
+} from '@lexical/table'
 import {
   $createRangeSelection,
   $getNearestNodeFromDOMNode,
@@ -42,8 +41,23 @@ interface HandleState {
   colIndex: number
 }
 
+interface ActiveAnchor {
+  table: HTMLTableElement
+  rowIndex: number
+  colIndex: number
+}
+
 const HIDE_DELAY = 300
 const ICON_SIZE = 12
+const ROW_HANDLE_HEIGHT = 16
+const COL_HANDLE_WIDTH = 34
+
+function toPagePosition(rect: DOMRect) {
+  return {
+    top: rect.top + window.scrollY,
+    left: rect.left + window.scrollX,
+  }
+}
 
 function selectCellAtIndex(
   table: HTMLTableElement,
@@ -96,6 +110,7 @@ function TableRowColumnHandlesInner({
   const tableRef = useRef<HTMLTableElement | null>(null)
   const hideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hoveringHandleRef = useRef(false)
+  const activeAnchorRef = useRef<ActiveAnchor | null>(null)
 
   const clearHideTimer = useCallback(() => {
     if (hideTimerRef.current) {
@@ -108,6 +123,7 @@ function TableRowColumnHandlesInner({
     clearHideTimer()
     hideTimerRef.current = setTimeout(() => {
       if (!hoveringHandleRef.current) {
+        activeAnchorRef.current = null
         setRowHandle((s) => ({ ...s, visible: false }))
         setColHandle((s) => ({ ...s, visible: false }))
       }
@@ -123,6 +139,68 @@ function TableRowColumnHandlesInner({
     hoveringHandleRef.current = false
     scheduleHide()
   }, [scheduleHide])
+
+  const updateHandlesFromAnchor = useCallback(
+    (anchor?: ActiveAnchor | null) => {
+      if (anchor !== undefined) {
+        activeAnchorRef.current = anchor
+      }
+      const activeAnchor = activeAnchorRef.current
+      if (!activeAnchor) return
+
+      const { table, rowIndex, colIndex } = activeAnchor
+      if (!table.isConnected) {
+        activeAnchorRef.current = null
+        setRowHandle((s) => ({ ...s, visible: false }))
+        setColHandle((s) => ({ ...s, visible: false }))
+        return
+      }
+
+      const rows = table.querySelectorAll('tr')
+      const row = rows[rowIndex]
+      if (!row) {
+        activeAnchorRef.current = null
+        setRowHandle((s) => ({ ...s, visible: false }))
+        setColHandle((s) => ({ ...s, visible: false }))
+        return
+      }
+
+      const cells = row.querySelectorAll('td, th')
+      const cell = (cells[colIndex] ?? cells[0]) as
+        | HTMLTableCellElement
+        | undefined
+      if (!cell) {
+        activeAnchorRef.current = null
+        setRowHandle((s) => ({ ...s, visible: false }))
+        setColHandle((s) => ({ ...s, visible: false }))
+        return
+      }
+
+      tableRef.current = table
+      const resolvedColIndex = cell.cellIndex
+      activeAnchorRef.current = { table, rowIndex, colIndex: resolvedColIndex }
+
+      const cellRect = cell.getBoundingClientRect()
+      const tableRect = table.getBoundingClientRect()
+      const cellPage = toPagePosition(cellRect)
+      const tablePage = toPagePosition(tableRect)
+      setRowHandle({
+        visible: true,
+        top: cellPage.top + cellRect.height / 2 - ROW_HANDLE_HEIGHT / 2,
+        left: tablePage.left - 38,
+        rowIndex,
+        colIndex: resolvedColIndex,
+      })
+      setColHandle({
+        visible: true,
+        top: tablePage.top - 22,
+        left: cellPage.left + cellRect.width / 2 - COL_HANDLE_WIDTH / 2,
+        rowIndex,
+        colIndex: resolvedColIndex,
+      })
+    },
+    [],
+  )
 
   useEffect(() => {
     const rootElement = editor.getRootElement()
@@ -141,28 +219,11 @@ function TableRowColumnHandlesInner({
       }
 
       clearHideTimer()
-      tableRef.current = table
-
-      const cellRect = cell.getBoundingClientRect()
-      const tableRect = table.getBoundingClientRect()
       const rowEl = cell.parentElement as HTMLTableRowElement | null
       const rowIdx = rowEl ? rowEl.rowIndex : 0
       const colIdx = cell.cellIndex
-
-      // Row handle: left of table, vertically centered on cell
-      setRowHandle({
-        visible: true,
-        top: cellRect.top + cellRect.height / 2 - 8,
-        left: tableRect.left - 38,
-        rowIndex: rowIdx,
-        colIndex: colIdx,
-      })
-
-      // Column handle: above table, horizontally centered on cell
-      setColHandle({
-        visible: true,
-        top: tableRect.top - 22,
-        left: cellRect.left + cellRect.width / 2 - 17,
+      updateHandlesFromAnchor({
+        table,
         rowIndex: rowIdx,
         colIndex: colIdx,
       })
@@ -181,7 +242,26 @@ function TableRowColumnHandlesInner({
       rootElement.removeEventListener('mouseleave', onMouseLeave)
       clearHideTimer()
     }
-  }, [editor, scheduleHide, clearHideTimer])
+  }, [editor, scheduleHide, clearHideTimer, updateHandlesFromAnchor])
+
+  useEffect(() => {
+    const onViewportChange = () => {
+      updateHandlesFromAnchor()
+    }
+
+    window.addEventListener('scroll', onViewportChange, true)
+    window.addEventListener('resize', onViewportChange)
+    return () => {
+      window.removeEventListener('scroll', onViewportChange, true)
+      window.removeEventListener('resize', onViewportChange)
+    }
+  }, [updateHandlesFromAnchor])
+
+  useEffect(() => {
+    return editor.registerUpdateListener(() => {
+      updateHandlesFromAnchor()
+    })
+  }, [editor, updateHandlesFromAnchor])
 
   // Row actions
   const insertRowAbove = useCallback(() => {
@@ -189,7 +269,7 @@ function TableRowColumnHandlesInner({
     if (!table) return
     selectCellAtIndex(table, rowHandle.rowIndex, 0, editor)
     editor.update(() => {
-      $insertTableRow__EXPERIMENTAL(false)
+      $insertTableRowAtSelection(false)
     })
   }, [editor, rowHandle.rowIndex])
 
@@ -198,7 +278,7 @@ function TableRowColumnHandlesInner({
     if (!table) return
     selectCellAtIndex(table, rowHandle.rowIndex, 0, editor)
     editor.update(() => {
-      $insertTableRow__EXPERIMENTAL(true)
+      $insertTableRowAtSelection(true)
     })
   }, [editor, rowHandle.rowIndex])
 
@@ -217,7 +297,7 @@ function TableRowColumnHandlesInner({
     if (!table) return
     selectCellAtIndex(table, 0, colHandle.colIndex, editor)
     editor.update(() => {
-      $insertTableColumn__EXPERIMENTAL(false)
+      $insertTableRowAtSelection(false)
     })
   }, [editor, colHandle.colIndex])
 
@@ -226,7 +306,7 @@ function TableRowColumnHandlesInner({
     if (!table) return
     selectCellAtIndex(table, 0, colHandle.colIndex, editor)
     editor.update(() => {
-      $insertTableColumn__EXPERIMENTAL(true)
+      $insertTableRowAtSelection(true)
     })
   }, [editor, colHandle.colIndex])
 
@@ -245,7 +325,7 @@ function TableRowColumnHandlesInner({
     if (!table) return
     selectCellAtIndex(table, rowHandle.rowIndex, 0, editor)
     editor.update(() => {
-      $insertTableRow__EXPERIMENTAL(true)
+      $insertTableRowAtSelection(true)
     })
   }, [editor, rowHandle.rowIndex])
 
@@ -255,7 +335,7 @@ function TableRowColumnHandlesInner({
     if (!table) return
     selectCellAtIndex(table, 0, colHandle.colIndex, editor)
     editor.update(() => {
-      $insertTableColumn__EXPERIMENTAL(false)
+      $insertTableRowAtSelection(false)
     })
   }, [editor, colHandle.colIndex])
 

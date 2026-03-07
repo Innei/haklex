@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, style } from '@vanilla-extract/css'
 
 export const semanticClassNames = {
@@ -107,7 +107,7 @@ export const copyButton = style({
 export const bodyBackground = style({
   position: 'relative',
   background: 'color-mix(in srgb, var(--rr-code-accent) 5%, transparent)',
-  padding: '1rem 0',
+  padding: 0,
 })
 
 /* ---- Scroll container ---- */
@@ -160,7 +160,6 @@ globalStyle(`${body} .cm-line`, {
 })
 
 globalStyle(`${body} .cm-gutters`, {
-  background: 'transparent',
   borderRight: 'none',
   paddingLeft: '1.25rem',
 })
@@ -456,7 +455,7 @@ const contentCopyButtonStyles = {
 
 const contentCopyButtonHoverStyles = {
   color: vars.color.text,
-  backgroundColor: vars.color.bgSecondary,
+  backgroundColor: vars.color.fillSecondary,
 } as const
 
 const contentNumberedLineStyles = {

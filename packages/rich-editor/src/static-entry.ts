@@ -47,4 +47,4 @@ export {
   commentTheme,
   noteTheme,
   vars,
-} from '@haklex/rich-style-token'
+} from '@haklex/rich-style-token/styles'

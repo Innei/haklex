@@ -14,7 +14,6 @@ import {
   qqMusicPlugin,
   tmdbPlugin,
 } from './media'
-import { mxSpacePlugin } from './self'
 
 export const plugins: PluginRegistry = [
   githubRepoPlugin,
@@ -28,7 +27,6 @@ export const plugins: PluginRegistry = [
   qqMusicPlugin,
   neteaseMusicPlugin,
   leetcodePlugin,
-  mxSpacePlugin,
 ].sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0))
 
 export function getPluginByName(name: string): LinkCardPlugin | undefined {
@@ -48,7 +46,6 @@ export {
   githubPrPlugin,
   githubRepoPlugin,
   leetcodePlugin,
-  mxSpacePlugin,
   neteaseMusicPlugin,
   qqMusicPlugin,
   tmdbPlugin,

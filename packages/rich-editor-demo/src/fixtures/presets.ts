@@ -3,6 +3,7 @@ import type { SerializedEditorState } from 'lexical'
 import {
   alertQuote,
   doc,
+  excalidraw,
   footnote,
   footnoteSection,
   FORMAT_BOLD,
@@ -19,6 +20,442 @@ import {
   text,
 } from './helpers'
 import { markdownTestPreset } from './markdown-test-preset'
+
+// ── Excalidraw diagram element builders ──────────────────────────
+
+let _exSeed = 1000
+
+function _exBox(
+  id: string,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  bg: string,
+  label: string,
+) {
+  const tid = `${id}_t`
+  return [
+    {
+      id,
+      type: 'rectangle',
+      x,
+      y,
+      width: w,
+      height: h,
+      strokeColor: '#1e1e1e',
+      backgroundColor: bg,
+      fillStyle: 'solid',
+      strokeWidth: 2,
+      strokeStyle: 'solid',
+      roughness: 1,
+      opacity: 100,
+      angle: 0,
+      groupIds: [],
+      frameId: null,
+      roundness: { type: 3 },
+      seed: _exSeed++,
+      version: 1,
+      versionNonce: _exSeed++,
+      isDeleted: false,
+      boundElements: [{ id: tid, type: 'text' }],
+      updated: 1,
+      link: null,
+      locked: false,
+    },
+    {
+      id: tid,
+      type: 'text',
+      x: x + 10,
+      y: y + h / 2 - 10,
+      width: w - 20,
+      height: 20,
+      text: label,
+      fontSize: 16,
+      fontFamily: 1,
+      textAlign: 'center',
+      verticalAlign: 'middle',
+      containerId: id,
+      originalText: label,
+      autoResize: true,
+      strokeColor: '#1e1e1e',
+      backgroundColor: 'transparent',
+      fillStyle: 'solid',
+      strokeWidth: 2,
+      strokeStyle: 'solid',
+      roughness: 1,
+      opacity: 100,
+      angle: 0,
+      groupIds: [],
+      frameId: null,
+      roundness: null,
+      seed: _exSeed++,
+      version: 1,
+      versionNonce: _exSeed++,
+      isDeleted: false,
+      boundElements: null,
+      updated: 1,
+      link: null,
+      locked: false,
+      lineHeight: 1.25,
+    },
+  ]
+}
+
+function _exArrow(
+  id: string,
+  x: number,
+  y: number,
+  pts: [number, number][],
+  from?: string,
+  to?: string,
+) {
+  return {
+    id,
+    type: 'arrow',
+    x,
+    y,
+    width: 0,
+    height: 0,
+    points: pts,
+    strokeColor: '#1e1e1e',
+    backgroundColor: 'transparent',
+    fillStyle: 'solid',
+    strokeWidth: 2,
+    strokeStyle: 'solid',
+    roughness: 1,
+    opacity: 100,
+    angle: 0,
+    groupIds: [],
+    frameId: null,
+    roundness: { type: 2 },
+    seed: _exSeed++,
+    version: 1,
+    versionNonce: _exSeed++,
+    isDeleted: false,
+    boundElements: null,
+    updated: 1,
+    link: null,
+    locked: false,
+    startBinding: from
+      ? { elementId: from, focus: 0, gap: 5, fixedPoint: null }
+      : null,
+    endBinding: to
+      ? { elementId: to, focus: 0, gap: 5, fixedPoint: null }
+      : null,
+    lastCommittedPoint: null,
+    startArrowhead: null,
+    endArrowhead: 'arrow',
+  }
+}
+
+function _exDiagram(...parts: any[]) {
+  return JSON.stringify({
+    elements: parts.flat(),
+    appState: { viewBackgroundColor: '#ffffff' },
+  })
+}
+
+// Diagram 1: System architecture overview
+const diagramArchitecture = _exDiagram(
+  _exBox('c1', 30, 100, 120, 50, '#a5d8ff', 'Client'),
+  _exBox('gw', 230, 100, 150, 50, '#b2f2bb', 'API Gateway'),
+  _exBox('s1', 470, 20, 160, 50, '#ffd8a8', 'User Service'),
+  _exBox('s2', 470, 100, 160, 50, '#ffd8a8', 'Order Service'),
+  _exBox('s3', 470, 180, 160, 50, '#ffd8a8', 'Product Service'),
+  _exArrow(
+    'a1',
+    150,
+    125,
+    [
+      [0, 0],
+      [80, 0],
+    ],
+    'c1',
+    'gw',
+  ),
+  _exArrow(
+    'a2',
+    380,
+    125,
+    [
+      [0, 0],
+      [90, -80],
+    ],
+    'gw',
+    's1',
+  ),
+  _exArrow(
+    'a3',
+    380,
+    125,
+    [
+      [0, 0],
+      [90, 0],
+    ],
+    'gw',
+    's2',
+  ),
+  _exArrow(
+    'a4',
+    380,
+    125,
+    [
+      [0, 0],
+      [90, 80],
+    ],
+    'gw',
+    's3',
+  ),
+)
+
+// Diagram 2: Request lifecycle (vertical)
+const diagramRequestFlow = _exDiagram(
+  _exBox('r1', 80, 10, 180, 45, '#d0bfff', 'Client Request'),
+  _exBox('r2', 80, 95, 180, 45, '#a5d8ff', 'Load Balancer'),
+  _exBox('r3', 80, 180, 180, 45, '#b2f2bb', 'API Gateway'),
+  _exBox('r4', 80, 265, 180, 45, '#ffd8a8', 'Auth Middleware'),
+  _exBox('r5', 80, 350, 180, 45, '#ffc9c9', 'Service Handler'),
+  _exBox('r6', 80, 435, 180, 45, '#d0bfff', 'JSON Response'),
+  _exArrow(
+    'ra1',
+    170,
+    55,
+    [
+      [0, 0],
+      [0, 40],
+    ],
+    'r1',
+    'r2',
+  ),
+  _exArrow(
+    'ra2',
+    170,
+    140,
+    [
+      [0, 0],
+      [0, 40],
+    ],
+    'r2',
+    'r3',
+  ),
+  _exArrow(
+    'ra3',
+    170,
+    225,
+    [
+      [0, 0],
+      [0, 40],
+    ],
+    'r3',
+    'r4',
+  ),
+  _exArrow(
+    'ra4',
+    170,
+    310,
+    [
+      [0, 0],
+      [0, 40],
+    ],
+    'r4',
+    'r5',
+  ),
+  _exArrow(
+    'ra5',
+    170,
+    395,
+    [
+      [0, 0],
+      [0, 40],
+    ],
+    'r5',
+    'r6',
+  ),
+)
+
+// Diagram 3: Event-driven communication
+const diagramEventDriven = _exDiagram(
+  _exBox('p1', 20, 30, 140, 50, '#a5d8ff', 'Order Service'),
+  _exBox('p2', 20, 130, 140, 50, '#a5d8ff', 'Payment Service'),
+  _exBox('mq', 240, 80, 160, 50, '#ffe066', 'Message Broker'),
+  _exBox('c1x', 490, 30, 150, 50, '#b2f2bb', 'Notification'),
+  _exBox('c2x', 490, 130, 150, 50, '#b2f2bb', 'Analytics'),
+  _exArrow(
+    'ea1',
+    160,
+    55,
+    [
+      [0, 0],
+      [80, 50],
+    ],
+    'p1',
+    'mq',
+  ),
+  _exArrow(
+    'ea2',
+    160,
+    155,
+    [
+      [0, 0],
+      [80, -50],
+    ],
+    'p2',
+    'mq',
+  ),
+  _exArrow(
+    'ea3',
+    400,
+    105,
+    [
+      [0, 0],
+      [90, -50],
+    ],
+    'mq',
+    'c1x',
+  ),
+  _exArrow(
+    'ea4',
+    400,
+    105,
+    [
+      [0, 0],
+      [90, 50],
+    ],
+    'mq',
+    'c2x',
+  ),
+)
+
+// Diagram 4: Database per service
+const diagramDatabase = _exDiagram(
+  _exBox('ds1', 30, 20, 150, 50, '#a5d8ff', 'User Service'),
+  _exBox('ds2', 30, 110, 150, 50, '#a5d8ff', 'Order Service'),
+  _exBox('ds3', 30, 200, 150, 50, '#a5d8ff', 'Product Service'),
+  _exBox('db1', 280, 20, 170, 50, '#ffc9c9', 'PostgreSQL'),
+  _exBox('db2', 280, 110, 170, 50, '#ffd8a8', 'MongoDB'),
+  _exBox('db3', 280, 200, 170, 50, '#b2f2bb', 'Redis + Search'),
+  _exBox('bus', 140, 290, 220, 45, '#ffe066', 'Event Bus'),
+  _exArrow(
+    'da1',
+    180,
+    45,
+    [
+      [0, 0],
+      [100, 0],
+    ],
+    'ds1',
+    'db1',
+  ),
+  _exArrow(
+    'da2',
+    180,
+    135,
+    [
+      [0, 0],
+      [100, 0],
+    ],
+    'ds2',
+    'db2',
+  ),
+  _exArrow(
+    'da3',
+    180,
+    225,
+    [
+      [0, 0],
+      [100, 0],
+    ],
+    'ds3',
+    'db3',
+  ),
+  _exArrow(
+    'da4',
+    105,
+    250,
+    [
+      [0, 0],
+      [145, 40],
+    ],
+    'ds1',
+    'bus',
+  ),
+  _exArrow(
+    'da5',
+    105,
+    160,
+    [
+      [0, 0],
+      [145, 130],
+    ],
+    'ds2',
+    'bus',
+  ),
+  _exArrow(
+    'da6',
+    105,
+    250,
+    [
+      [0, 0],
+      [145, 40],
+    ],
+    'ds3',
+    'bus',
+  ),
+)
+
+// Diagram 5: CI/CD Pipeline
+const diagramCICD = _exDiagram(
+  _exBox('ci1', 10, 60, 110, 50, '#d0bfff', 'Git Push'),
+  _exBox('ci2', 160, 60, 110, 50, '#a5d8ff', 'Build'),
+  _exBox('ci3', 310, 60, 110, 50, '#ffe066', 'Test'),
+  _exBox('ci4', 460, 60, 120, 50, '#ffd8a8', 'Staging'),
+  _exBox('ci5', 630, 60, 130, 50, '#b2f2bb', 'Production'),
+  _exArrow(
+    'ca1',
+    120,
+    85,
+    [
+      [0, 0],
+      [40, 0],
+    ],
+    'ci1',
+    'ci2',
+  ),
+  _exArrow(
+    'ca2',
+    270,
+    85,
+    [
+      [0, 0],
+      [40, 0],
+    ],
+    'ci2',
+    'ci3',
+  ),
+  _exArrow(
+    'ca3',
+    420,
+    85,
+    [
+      [0, 0],
+      [40, 0],
+    ],
+    'ci3',
+    'ci4',
+  ),
+  _exArrow(
+    'ca4',
+    580,
+    85,
+    [
+      [0, 0],
+      [50, 0],
+    ],
+    'ci4',
+    'ci5',
+  ),
+)
 
 export interface Preset {
   key: string
@@ -113,16 +550,16 @@ export const presets: Preset[] = [
   notePreset,
   markdownTestPreset,
   {
-    key: 'tldraw-showcase',
-    label: 'Tldraw Whiteboard',
+    key: 'excalidraw-showcase',
+    label: 'Excalidraw Whiteboard',
     description:
-      'Extension node demo: interactive tldraw canvas via extraNodes + children plugin',
+      'Extension node demo: interactive excalidraw canvas via extraNodes + children plugin',
     data: doc(
-      heading('h1', text('Tldraw Whiteboard Extension')),
+      heading('h1', text('Excalidraw Whiteboard Extension')),
 
       paragraph(
         text('This preset demonstrates the '),
-        text('@haklex/rich-ext-tldraw', FORMAT_CODE),
+        text('@haklex/rich-ext-excalidraw', FORMAT_CODE),
         text(
           ' extension package, which adds an interactive whiteboard node to the editor via the ',
         ),
@@ -136,7 +573,7 @@ export const presets: Preset[] = [
         'tip',
         paragraph(
           text(
-            'The tldraw node is registered as an extension, not a built-in. It uses RichEditor children slot for the TldrawPlugin and extraNodes for node registration.',
+            'The excalidraw node is registered as an extension, not a built-in. It uses RichEditor children slot for the ExcalidrawPlugin and extraNodes for node registration.',
           ),
         ),
       ) as any,
@@ -145,12 +582,12 @@ export const presets: Preset[] = [
 
       paragraph(
         text(
-          'Below is an interactive tldraw canvas. In editor mode, you can draw, add shapes, and interact with it directly.',
+          'Below is an interactive excalidraw canvas. In editor mode, you can draw, add shapes, and interact with it directly.',
         ),
       ),
 
       {
-        type: 'tldraw',
+        type: 'excalidraw',
         snapshot: '{}',
         version: 1,
       } as any,
@@ -162,15 +599,15 @@ export const presets: Preset[] = [
       {
         type: 'code-block',
         language: 'tsx',
-        code: `import { TldrawNode, TldrawPlugin } from '@haklex/rich-ext-tldraw'
+        code: `import { ExcalidrawNode, ExcalidrawPlugin } from '@haklex/rich-ext-excalidraw'
 
 // Editor: register node + plugin
-<RichEditor extraNodes={[TldrawNode]}>
-  <TldrawPlugin />
+<RichEditor extraNodes={[ExcalidrawNode]}>
+  <ExcalidrawPlugin />
 </RichEditor>
 
 // Renderer: register node only
-<RichRenderer extraNodes={[TldrawNode]} value={state} />`,
+<RichRenderer extraNodes={[ExcalidrawNode]} value={state} />`,
         version: 1,
       } as any,
 
@@ -178,7 +615,7 @@ export const presets: Preset[] = [
         'note',
         paragraph(
           text(
-            'The snapshot is stored as a JSON string in the Lexical state. The tldraw editor auto-persists changes back to the node.',
+            'The snapshot is stored as a JSON string in the Lexical state. The excalidraw editor auto-persists changes back to the node.',
           ),
         ),
       ) as any,
@@ -1378,6 +1815,246 @@ export default async function PostsPage() {
         favicon: 'https://lexical.dev/favicon.ico',
         version: 1,
       } as any,
+    ),
+  },
+  {
+    key: 'excalidraw-multi-board',
+    label: 'Tech Article (Multi-Excalidraw)',
+    description:
+      'Technical article with multiple Excalidraw whiteboards for lazy-loading testing',
+    data: doc(
+      heading('h1', text('微服务架构设计与实践')),
+
+      paragraph(
+        text(
+          '微服务架构将单体应用拆分为一组小型、自治的服务，每个服务围绕特定业务能力构建，独立部署、独立扩展。本文结合架构图，系统阐述微服务的核心设计要点。',
+        ),
+      ),
+
+      alertQuote(
+        'tip',
+        paragraph(
+          text(
+            '本文包含多个 Excalidraw 画板，用于验证画板的懒加载能力。仅当画板滚动至视口 50% 可见时才开始加载。',
+          ),
+        ),
+      ) as any,
+
+      // ── Section 1: Architecture Overview ──
+      heading('h2', text('系统架构总览')),
+
+      paragraph(
+        text('典型的微服务系统由 '),
+        text('API Gateway', FORMAT_CODE),
+        text(
+          ' 统一对外暴露接口，内部按业务域拆分为若干独立服务。客户端的所有请求均经由网关路由至对应的下游服务。',
+        ),
+      ),
+
+      excalidraw(diagramArchitecture) as any,
+
+      paragraph(
+        text(
+          '上图展示了一个简化的微服务拓扑：客户端通过 API Gateway 访问三个核心服务——',
+        ),
+        text('User Service', FORMAT_BOLD),
+        text('、'),
+        text('Order Service', FORMAT_BOLD),
+        text(' 和 '),
+        text('Product Service', FORMAT_BOLD),
+        text('。网关负责请求路由、认证鉴权、限流熔断等横切关注点。'),
+      ),
+
+      horizontalRule(),
+
+      // ── Section 2: Request Lifecycle ──
+      heading('h2', text('请求生命周期')),
+
+      paragraph(
+        text(
+          '一个 HTTP 请求从客户端发出到最终收到响应，会经历多个中间层的处理。理解这一流程有助于定位性能瓶颈和故障点。',
+        ),
+      ),
+
+      excalidraw(diagramRequestFlow) as any,
+
+      paragraph(
+        text('请求首先到达 '),
+        text('Load Balancer', FORMAT_CODE),
+        text(' 进行流量分发，随后经过 '),
+        text('API Gateway', FORMAT_CODE),
+        text(' 的认证中间件校验身份，最终由具体的 '),
+        text('Service Handler', FORMAT_CODE),
+        text(' 处理业务逻辑并返回 JSON 响应。'),
+      ),
+
+      list(
+        'bullet',
+        listItem(
+          paragraph(
+            text('Load Balancer', FORMAT_BOLD),
+            text('：基于 Round Robin 或 Least Connections 策略分发流量'),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Auth Middleware', FORMAT_BOLD),
+            text('：JWT 令牌验证 + RBAC 权限校验'),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Service Handler', FORMAT_BOLD),
+            text('：业务逻辑执行、数据库交互、缓存查询'),
+          ),
+        ),
+      ),
+
+      horizontalRule(),
+
+      // ── Section 3: Event-Driven Communication ──
+      heading('h2', text('事件驱动通信')),
+
+      paragraph(
+        text('微服务间的通信分为 '),
+        text('同步', FORMAT_BOLD),
+        text('（HTTP/gRPC）和 '),
+        text('异步', FORMAT_BOLD),
+        text(
+          '（消息队列）两种模式。对于不需要即时响应的场景，事件驱动架构可以显著降低服务间耦合。',
+        ),
+      ),
+
+      excalidraw(diagramEventDriven) as any,
+
+      paragraph(
+        text('上图展示了事件驱动模式：Order Service 和 Payment Service 作为 '),
+        text('Producer', FORMAT_ITALIC),
+        text(' 将事件发布到 Message Broker，Notification 和 Analytics 作为 '),
+        text('Consumer', FORMAT_ITALIC),
+        text(' 订阅并异步处理这些事件。'),
+      ),
+
+      alertQuote(
+        'note',
+        paragraph(
+          text(
+            '常见的消息中间件选型包括 Kafka（高吞吐）、RabbitMQ（灵活路由）和 Redis Streams（轻量级）。选择时需权衡吞吐量、持久化、消息顺序等因素。',
+          ),
+        ),
+      ) as any,
+
+      horizontalRule(),
+
+      // ── Section 4: Data Architecture ──
+      heading('h2', text('数据架构：Database per Service')),
+
+      paragraph(
+        text('微服务的核心原则之一是 '),
+        text('数据自治', FORMAT_BOLD),
+        text(
+          '——每个服务拥有自己的数据存储，不直接访问其他服务的数据库。跨服务的数据一致性通过事件总线实现最终一致。',
+        ),
+      ),
+
+      excalidraw(diagramDatabase) as any,
+
+      paragraph(
+        text(
+          '不同服务可以根据业务特点选择最合适的数据库类型：User Service 使用 PostgreSQL 保证事务一致性，Order Service 使用 MongoDB 应对灵活的文档结构，Product Service 使用 Redis + 全文检索引擎加速查询。',
+        ),
+      ),
+
+      {
+        type: 'code-block',
+        language: 'typescript',
+        code: `// Event Bus 消息发布示例
+interface OrderCreatedEvent {
+  orderId: string
+  userId: string
+  items: Array<{ productId: string; quantity: number }>
+  total: number
+  createdAt: Date
+}
+
+await eventBus.publish('order.created', {
+  orderId: '12345',
+  userId: 'user_001',
+  items: [{ productId: 'prod_a', quantity: 2 }],
+  total: 299.0,
+  createdAt: new Date(),
+} satisfies OrderCreatedEvent)`,
+        version: 1,
+      } as any,
+
+      horizontalRule(),
+
+      // ── Section 5: CI/CD Pipeline ──
+      heading('h2', text('持续集成与部署')),
+
+      paragraph(
+        text(
+          '微服务的独立部署特性要求成熟的 CI/CD 流水线支持。每个服务从代码提交到生产发布，应经历完整的自动化构建、测试和部署阶段。',
+        ),
+      ),
+
+      excalidraw(diagramCICD) as any,
+
+      paragraph(text('流水线各阶段职责：')),
+
+      list(
+        'number',
+        listItem(
+          paragraph(
+            text('Git Push', FORMAT_BOLD),
+            text('：触发 Webhook，启动 CI 流水线'),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Build', FORMAT_BOLD),
+            text('：编译代码、构建 Docker 镜像、推送至 Registry'),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Test', FORMAT_BOLD),
+            text('：单元测试 + 集成测试 + E2E 测试，覆盖率门禁'),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Staging', FORMAT_BOLD),
+            text('：部署至预发环境，执行冒烟测试和性能基准'),
+          ),
+        ),
+        listItem(
+          paragraph(
+            text('Production', FORMAT_BOLD),
+            text('：金丝雀发布或蓝绿部署，渐进式流量切换'),
+          ),
+        ),
+      ),
+
+      horizontalRule(),
+
+      heading('h2', text('总结')),
+
+      paragraph(
+        text(
+          '微服务架构并非银弹，它用运维复杂度换取了开发灵活性和可扩展性。合理的服务拆分、清晰的通信模式、自治的数据架构以及成熟的 CI/CD 流程，是微服务成功落地的四大支柱。',
+        ),
+      ),
+
+      quote(
+        paragraph(
+          text(
+            'The microservice architectural style is an approach to developing a single application as a suite of small services, each running in its own process and communicating with lightweight mechanisms.',
+            FORMAT_ITALIC,
+          ),
+        ),
+        paragraph(text('— Martin Fowler')),
+      ),
     ),
   },
 ]

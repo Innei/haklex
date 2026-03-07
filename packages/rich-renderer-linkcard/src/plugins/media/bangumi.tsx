@@ -151,7 +151,7 @@ export const bangumiPlugin: LinkCardPlugin = {
       color: generateColor(title),
       classNames: {
         image: 'link-card__image--poster',
-        cardRoot: 'link-card--reversed',
+        cardRoot: 'link-card--poster',
       },
     }
   },

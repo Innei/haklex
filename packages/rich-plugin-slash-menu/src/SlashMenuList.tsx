@@ -1,9 +1,17 @@
-import { useMemo } from 'react'
+import {
+  autoUpdate,
+  flip,
+  offset,
+  shift,
+  useFloating,
+} from '@floating-ui/react-dom'
+import { useEffect, useMemo } from 'react'
 
 import type { SlashMenuItem } from './SlashMenuItem'
 import * as css from './styles.css'
 
 interface SlashMenuListProps {
+  anchorElement: HTMLElement
   options: SlashMenuItem[]
   selectedIndex: number | null
   selectOptionAndCleanUp: (option: SlashMenuItem) => void
@@ -34,27 +42,62 @@ function groupBySection(options: SlashMenuItem[]): SectionGroup[] {
 }
 
 export function SlashMenuList({
+  anchorElement,
   options,
   selectedIndex,
   selectOptionAndCleanUp,
   setHighlightedIndex,
 }: SlashMenuListProps) {
+  const { refs, floatingStyles } = useFloating({
+    placement: 'bottom-start',
+    strategy: 'absolute',
+    middleware: [
+      offset(8),
+      flip({
+        fallbackPlacements: ['top-start'],
+        padding: 8,
+      }),
+      shift({
+        padding: 8,
+      }),
+    ],
+    whileElementsMounted: autoUpdate,
+  })
+
+  useEffect(() => {
+    refs.setReference(anchorElement)
+  }, [anchorElement, refs])
+
   const sections = useMemo(() => groupBySection(options), [options])
 
   if (options.length === 0) {
     return (
-      <div className={css.slashMenu}>
+      <div
+        ref={refs.setFloating}
+        style={floatingStyles}
+        className={css.slashMenu}
+      >
         <div className={css.slashMenuEmpty}>No matching commands</div>
       </div>
     )
   }
 
   return (
-    <ul className={css.slashMenu} role="listbox">
-      {sections.map((section) => (
-        <li key={section.label} role="presentation">
+    <ul
+      ref={refs.setFloating}
+      style={floatingStyles}
+      className={css.slashMenu}
+      role="listbox"
+    >
+      {sections.map((section, sectionIndex) => (
+        <li
+          key={section.label}
+          role="presentation"
+          className={css.slashMenuSectionWrapper}
+        >
+          {sectionIndex > 0 && <div className={css.slashMenuSectionDivider} />}
           <div className={css.slashMenuSection}>{section.label}</div>
-          <ul style={{ listStyle: 'none', margin: 0, padding: 0 }} role="group">
+          <ul className={css.slashMenuItems} role="group">
             {section.items.map(({ item, globalIndex }) => (
               <li
                 key={item.key}

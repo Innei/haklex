@@ -1,3 +1,4 @@
+import { vars } from '@haklex/rich-style-token/styles'
 import { keyframes, style } from '@vanilla-extract/css'
 
 const fadeIn = keyframes({
@@ -11,18 +12,11 @@ export const toolbar = style({
   gap: 2,
   padding: '4px 6px',
   borderRadius: 12,
-  border: '1px solid rgba(228, 228, 231, 0.8)',
-  backgroundColor: 'rgba(255, 255, 255, 0.95)',
+  border: `1px solid ${vars.color.border}`,
+  backgroundColor: `color-mix(in srgb, ${vars.color.bg} 95%, transparent)`,
   backdropFilter: 'blur(8px)',
-  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+  boxShadow: vars.boxShadow.topBar,
   animation: `${fadeIn} 150ms ease-out`,
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      backgroundColor: 'rgba(23, 23, 23, 0.95)',
-      borderColor: 'rgba(63, 63, 70, 0.8)',
-      boxShadow: '0 8px 30px rgba(0, 0, 0, 0.3), 0 2px 8px rgba(0, 0, 0, 0.15)',
-    },
-  },
 })
 
 export const btn = style({
@@ -35,36 +29,19 @@ export const btn = style({
   border: 'none',
   background: 'none',
   borderRadius: 8,
-  color: 'rgb(113, 113, 122)',
+  color: vars.color.textSecondary,
   cursor: 'pointer',
   padding: 0,
   transition: 'color 0.1s, background-color 0.1s',
   ':hover': {
-    color: 'rgb(9, 9, 11)',
-    backgroundColor: 'rgba(0, 0, 0, 0.04)',
-  },
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      color: '#a3a3a3',
-      selectors: {
-        '&:hover': {
-          color: '#fafafa',
-          backgroundColor: 'rgba(255, 255, 255, 0.06)',
-        },
-      },
-    },
+    color: vars.color.text,
+    backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
   },
 })
 
 export const btnActive = style({
-  color: 'rgb(9, 9, 11)',
-  backgroundColor: 'rgba(0, 0, 0, 0.06)',
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      color: '#fafafa',
-      backgroundColor: 'rgba(255, 255, 255, 0.08)',
-    },
-  },
+  color: vars.color.text,
+  backgroundColor: `color-mix(in srgb, ${vars.color.text} 6%, transparent)`,
 })
 
 export const btnIndicator = style({
@@ -75,23 +52,96 @@ export const btnIndicator = style({
   height: 2,
   width: 14,
   borderRadius: 1,
-  backgroundColor: 'rgb(9, 9, 11)',
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      backgroundColor: '#fafafa',
+  backgroundColor: vars.color.text,
+})
+
+export const rubyEditor = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 8,
+  padding: '12px 16px',
+  borderRadius: 12,
+  border: `1px solid ${vars.color.border}`,
+  backgroundColor: `color-mix(in srgb, ${vars.color.bg} 95%, transparent)`,
+  backdropFilter: 'blur(8px)',
+  boxShadow: vars.boxShadow.topBar,
+  animation: `${fadeIn} 150ms ease-out`,
+  minWidth: 240,
+})
+
+export const rubyPreview = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: 2,
+  padding: '4px 16px 8px',
+})
+
+export const rubyPreviewReading = style({
+  fontSize: 12,
+  color: vars.color.textSecondary,
+  lineHeight: 1.2,
+})
+
+export const rubyPreviewBase = style({
+  fontSize: 20,
+  fontWeight: 600,
+  lineHeight: 1.3,
+})
+
+export const rubyInputRow = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  width: '100%',
+})
+
+export const rubyInput = style({
+  flex: 1,
+  padding: '6px 10px',
+  borderRadius: 8,
+  border: `1.5px solid ${vars.color.border}`,
+  backgroundColor: 'transparent',
+  color: vars.color.text,
+  fontSize: 14,
+  outline: 'none',
+  lineHeight: 1.4,
+  selectors: {
+    '&:focus': {
+      borderColor: vars.color.text,
     },
   },
+})
+
+export const rubyActionBtn = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: 28,
+  height: 28,
+  border: 'none',
+  background: 'none',
+  borderRadius: 6,
+  color: vars.color.textSecondary,
+  cursor: 'pointer',
+  padding: 0,
+  transition: 'color 0.1s, background-color 0.1s',
+  ':hover': {
+    backgroundColor: `color-mix(in srgb, ${vars.color.text} 6%, transparent)`,
+  },
+})
+
+export const rubyHint = style({
+  fontSize: 11,
+  color: vars.color.textSecondary,
+  opacity: 0.7,
 })
 
 export const separator = style({
   width: 1,
   height: 20,
-  backgroundColor: 'rgba(228, 228, 231, 0.8)',
+  backgroundColor: vars.color.border,
   marginInline: 2,
   flexShrink: 0,
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      backgroundColor: 'rgba(63, 63, 70, 0.8)',
-    },
-  },
 })

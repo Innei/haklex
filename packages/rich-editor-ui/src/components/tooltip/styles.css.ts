@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token/styles'
 import { keyframes, style } from '@vanilla-extract/css'
 
 /** Vercel-inspired line tooltip: thin border, minimal shadow, clean typography */

@@ -1,10 +1,10 @@
 import {
+  type CommandItemConfig,
   createRendererDecoration,
   LinkCardNode,
   type LinkCardNodePayload,
   LinkCardRenderer,
   type SerializedLinkCardNode,
-  type SlashMenuItemConfig,
 } from '@haklex/rich-editor'
 import type { EditorConfig, Klass, LexicalEditor, LexicalNode } from 'lexical'
 import { $insertNodes } from 'lexical'
@@ -15,7 +15,7 @@ import { createElement } from 'react'
 import { LinkCardEditDecorator } from './LinkCardEditDecorator'
 
 export class LinkCardEditNode extends LinkCardNode {
-  static slashMenuItems: SlashMenuItemConfig[] = [
+  static commandItems: CommandItemConfig[] = [
     {
       title: 'Link Card',
       icon: createElement(Link, { size: 20 }),

@@ -1,11 +1,12 @@
+import { vars } from '@haklex/rich-style-token/styles'
 import { style } from '@vanilla-extract/css'
 
 export const menuItemDestructive = style({
-  color: '#ef4444',
+  color: vars.color.alertCaution,
   selectors: {
     '&[data-highlighted]': {
-      color: '#ef4444',
-      backgroundColor: 'rgba(239, 68, 68, 0.08)',
+      color: vars.color.alertCaution,
+      backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 8%, transparent)`,
     },
   },
 })
@@ -24,12 +25,11 @@ export const resizeHandleActive = style({
   opacity: 1,
 })
 
-// Row/Column handle container
 export const rowColHandle = style({
   display: 'flex',
   alignItems: 'center',
   gap: 1,
-  position: 'fixed',
+  position: 'absolute',
   zIndex: 30,
   opacity: 0,
   pointerEvents: 'none',
@@ -41,7 +41,6 @@ export const rowColHandleVisible = style({
   pointerEvents: 'auto',
 })
 
-// Individual handle button (+ and grip)
 export const handleBtn = style({
   display: 'flex',
   alignItems: 'center',
@@ -51,23 +50,12 @@ export const handleBtn = style({
   borderRadius: 3,
   border: 'none',
   background: 'transparent',
-  color: 'rgba(0, 0, 0, 0.35)',
+  color: `color-mix(in srgb, ${vars.color.text} 35%, transparent)`,
   cursor: 'pointer',
   padding: 0,
   transition: 'background-color 0.15s, color 0.15s',
   ':hover': {
-    background: 'rgba(0, 0, 0, 0.08)',
-    color: 'rgba(0, 0, 0, 0.7)',
-  },
-  '@media': {
-    '(prefers-color-scheme: dark)': {
-      color: 'rgba(255, 255, 255, 0.35)',
-      selectors: {
-        '&:hover': {
-          background: 'rgba(255, 255, 255, 0.1)',
-          color: 'rgba(255, 255, 255, 0.7)',
-        },
-      },
-    },
+    background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+    color: `color-mix(in srgb, ${vars.color.text} 70%, transparent)`,
   },
 })

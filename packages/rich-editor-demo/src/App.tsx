@@ -1,24 +1,21 @@
 import 'modern-normalize/modern-normalize.css'
 import '@haklex/rich-kit-shiro/style.css'
 import '@haklex/rich-kit-shiro/style-renderer.css'
-import 'tldraw/tldraw.css'
 import './demo.css'
 
 import type { ColorScheme } from '@haklex/rich-editor'
 import { DialogStackProvider } from '@haklex/rich-editor-ui'
-import { TldrawConfigProvider } from '@haklex/rich-renderers/tldraw'
 import { Monitor, Moon, Sun } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { ThemeContext } from './context/ThemeContext'
+import { BizPage } from './pages/BizPage'
 import { CommentsPage } from './pages/CommentsPage'
-import { DiffPage } from './pages/DiffPage'
 import { EditorPage } from './pages/EditorPage'
-import { LinkCardPluginsPage } from './pages/LinkCardPluginsPage'
 import { NodeShowcase } from './pages/NodeShowcase'
 import { PresetsPage } from './pages/PresetsPage'
 
-type Page = 'editor' | 'comments' | 'nodes' | 'presets' | 'diff' | 'linkcard'
+type Page = 'editor' | 'comments' | 'nodes' | 'presets' | 'biz'
 type ThemeMode = 'system' | 'light' | 'dark'
 
 function useSystemColorScheme(): ColorScheme {
@@ -45,8 +42,7 @@ export function App() {
     return hash === 'comments' ||
       hash === 'nodes' ||
       hash === 'presets' ||
-      hash === 'diff' ||
-      hash === 'linkcard'
+      hash === 'biz'
       ? hash
       : 'editor'
   })
@@ -81,8 +77,7 @@ export function App() {
         hash === 'comments' ||
         hash === 'nodes' ||
         hash === 'presets' ||
-        hash === 'diff' ||
-        hash === 'linkcard'
+        hash === 'biz'
           ? hash
           : 'editor'
       setCurrentPage(validPage)
@@ -96,111 +91,88 @@ export function App() {
     window.location.hash = page
   }
 
-  const mockSaveSnapshot = useCallback(async (snapshot: object) => {
-    const json = JSON.stringify(snapshot)
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    console.log('[TldrawConfig] saveSnapshot → blob URL:', url)
-    return url
-  }, [])
-
   return (
     <ThemeContext value={resolved}>
-      <TldrawConfigProvider saveSnapshot={mockSaveSnapshot}>
-        <DialogStackProvider>
-          <div className="app" data-theme={dataTheme}>
-            <header className="app-header">
-              <div className="app-header-content">
-                <div>
-                  <h1 className="app-title">@haklex/rich-editor</h1>
-                  <p className="app-subtitle">
-                    Lexical-based rich text editor & renderer
-                  </p>
-                </div>
-                <nav className="app-nav">
-                  <button
-                    className={
-                      currentPage === 'editor'
-                        ? 'nav-tab nav-tab-active'
-                        : 'nav-tab'
-                    }
-                    onClick={() => navigate('editor')}
-                  >
-                    Editor
-                  </button>
-                  <button
-                    className={
-                      currentPage === 'comments'
-                        ? 'nav-tab nav-tab-active'
-                        : 'nav-tab'
-                    }
-                    onClick={() => navigate('comments')}
-                  >
-                    Comments
-                  </button>
-                  <button
-                    className={
-                      currentPage === 'nodes'
-                        ? 'nav-tab nav-tab-active'
-                        : 'nav-tab'
-                    }
-                    onClick={() => navigate('nodes')}
-                  >
-                    Node Showcase
-                  </button>
-                  <button
-                    className={
-                      currentPage === 'presets'
-                        ? 'nav-tab nav-tab-active'
-                        : 'nav-tab'
-                    }
-                    onClick={() => navigate('presets')}
-                  >
-                    Presets
-                  </button>
-                  <button
-                    className={
-                      currentPage === 'diff'
-                        ? 'nav-tab nav-tab-active'
-                        : 'nav-tab'
-                    }
-                    onClick={() => navigate('diff')}
-                  >
-                    Diff
-                  </button>
-                  <button
-                    className={
-                      currentPage === 'linkcard'
-                        ? 'nav-tab nav-tab-active'
-                        : 'nav-tab'
-                    }
-                    onClick={() => navigate('linkcard')}
-                  >
-                    LinkCard
-                  </button>
-                  <div className="nav-divider" />
-                  <button
-                    className="nav-theme-toggle"
-                    onClick={cycleTheme}
-                    title={themeLabel}
-                  >
-                    <ThemeIcon size={18} />
-                  </button>
-                </nav>
+      <DialogStackProvider>
+        <div className="app" data-theme={dataTheme}>
+          <header className="app-header">
+            <div className="app-header-content">
+              <div>
+                <h1 className="app-title">@haklex/rich-editor</h1>
+                <p className="app-subtitle">
+                  Lexical-based rich text editor & renderer
+                </p>
               </div>
-            </header>
+              <nav className="app-nav">
+                <button
+                  className={
+                    currentPage === 'editor'
+                      ? 'nav-tab nav-tab-active'
+                      : 'nav-tab'
+                  }
+                  onClick={() => navigate('editor')}
+                >
+                  Editor
+                </button>
+                <button
+                  className={
+                    currentPage === 'comments'
+                      ? 'nav-tab nav-tab-active'
+                      : 'nav-tab'
+                  }
+                  onClick={() => navigate('comments')}
+                >
+                  Comments
+                </button>
+                <button
+                  className={
+                    currentPage === 'nodes'
+                      ? 'nav-tab nav-tab-active'
+                      : 'nav-tab'
+                  }
+                  onClick={() => navigate('nodes')}
+                >
+                  Node Showcase
+                </button>
+                <button
+                  className={
+                    currentPage === 'presets'
+                      ? 'nav-tab nav-tab-active'
+                      : 'nav-tab'
+                  }
+                  onClick={() => navigate('presets')}
+                >
+                  Presets
+                </button>
+                <button
+                  className={
+                    currentPage === 'biz' ? 'nav-tab nav-tab-active' : 'nav-tab'
+                  }
+                  onClick={() => navigate('biz')}
+                >
+                  Biz
+                </button>
+                <div className="nav-divider" />
+                <button
+                  className="nav-theme-toggle"
+                  onClick={cycleTheme}
+                  title={themeLabel}
+                >
+                  <ThemeIcon size={18} />
+                </button>
+              </nav>
+            </div>
+          </header>
 
-            <main className="app-main">
-              {currentPage === 'editor' && <EditorPage />}
-              {currentPage === 'comments' && <CommentsPage />}
-              {currentPage === 'nodes' && <NodeShowcase />}
-              {currentPage === 'presets' && <PresetsPage />}
-              {currentPage === 'diff' && <DiffPage />}
-              {currentPage === 'linkcard' && <LinkCardPluginsPage />}
-            </main>
-          </div>
-        </DialogStackProvider>
-      </TldrawConfigProvider>
+          <main className="app-main">
+            {currentPage === 'editor' && <EditorPage />}
+            {currentPage === 'comments' && <CommentsPage />}
+            {currentPage === 'nodes' && <NodeShowcase />}
+            {currentPage === 'presets' && <PresetsPage />}
+            {currentPage === 'biz' && <BizPage />}
+          </main>
+        </div>
+      </DialogStackProvider>
     </ThemeContext>
   )
 }
