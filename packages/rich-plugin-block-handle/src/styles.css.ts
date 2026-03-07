@@ -1,5 +1,5 @@
 import { vars } from '@haklex/rich-style-token'
-import { style } from '@vanilla-extract/css'
+import { globalStyle, style } from '@vanilla-extract/css'
 
 // ─── Handle container ──────────────────────────────────
 export const handleContainer = style({
@@ -55,7 +55,7 @@ export const dragPreview = style({
   backgroundColor: vars.color.bg,
   border: `1px solid ${vars.color.border}`,
   borderRadius: vars.borderRadius.sm,
-  boxShadow: `0 10px 28px color-mix(in srgb, ${vars.color.text} 18%, transparent)`,
+  boxShadow: vars.boxShadow.topBar,
 })
 
 // ─── Drop indicator ────────────────────────────────────
@@ -77,4 +77,12 @@ export const menuItemDestructive = style({
       backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 8%, transparent)`,
     },
   },
+})
+
+globalStyle(`${menuItemDestructive} svg`, {
+  color: vars.color.alertCaution,
+})
+
+globalStyle(`${menuItemDestructive}[data-highlighted] svg`, {
+  color: vars.color.alertCaution,
 })

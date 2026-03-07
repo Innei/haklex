@@ -2,9 +2,14 @@ import { collectCommandItems } from '@haklex/rich-editor'
 import type { TooltipRootProps } from '@haklex/rich-editor-ui'
 import {
   createTooltipHandle,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
   TooltipContent,
   TooltipProvider,
   TooltipRoot,
+  TooltipTrigger,
 } from '@haklex/rich-editor-ui'
 import {
   $isListNode,
@@ -42,6 +47,7 @@ import {
   AlignRight,
   Bold,
   Code,
+  Ellipsis,
   Heading1,
   Heading2,
   Heading3,
@@ -57,7 +63,7 @@ import {
   Undo,
 } from 'lucide-react'
 import type { CSSProperties, ReactElement } from 'react'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as css from './styles.css'
 import { ToolbarButton } from './ToolbarButton'
@@ -176,25 +182,36 @@ function getBlockType(anchorNode: ElementNode): BlockType {
 
 // ─── Component ──────────────────────────────────────────
 
+const DEFAULT_MAX_VISIBLE_INSERT_ITEMS = 5
+
 export interface ToolbarPluginProps {
   className?: string
+  maxVisibleInsertItems?: number
+  insertItemOrder?: string[]
 }
 
-export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
+export function ToolbarPlugin({
+  className,
+  maxVisibleInsertItems = DEFAULT_MAX_VISIBLE_INSERT_ITEMS,
+  insertItemOrder,
+}: ToolbarPluginProps): ReactElement {
   const [editor] = useLexicalComposerContext()
   const [state, setState] = useState<ToolbarState>(INITIAL_STATE)
   const [tooltipHandle] = useState(() =>
     createTooltipHandle<ToolbarTooltipPayload>(),
   )
 
-  const toolbarItems = useMemo(
-    () =>
-      collectCommandItems(editor).filter(
-        (item) =>
-          item.placement?.includes('toolbar') && item.group === 'insert',
-      ),
-    [editor],
-  )
+  const toolbarItems = useMemo(() => {
+    const items = collectCommandItems(editor).filter(
+      (item) => item.placement?.includes('toolbar') && item.group === 'insert',
+    )
+    if (!insertItemOrder || insertItemOrder.length === 0) return items
+    return items.sort((a, b) => {
+      const ai = insertItemOrder.indexOf(a.title)
+      const bi = insertItemOrder.indexOf(b.title)
+      return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi)
+    })
+  }, [editor, insertItemOrder])
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection()
@@ -567,7 +584,7 @@ export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
           {toolbarItems.length > 0 && (
             <>
               <ToolbarSeparator />
-              {toolbarItems.map((item) => (
+              {toolbarItems.slice(0, maxVisibleInsertItems).map((item) => (
                 <ToolbarButton
                   key={item.title}
                   icon={item.icon}
@@ -577,6 +594,44 @@ export function ToolbarPlugin({ className }: ToolbarPluginProps): ReactElement {
                   tooltipHandle={h}
                 />
               ))}
+              {toolbarItems.length > maxVisibleInsertItems && (
+                <DropdownMenu modal={false}>
+                  <TooltipTrigger
+                    handle={h}
+                    payload={{ title: 'More' } satisfies ToolbarTooltipPayload}
+                    render={
+                      <DropdownMenuTrigger
+                        className={css.toolbarButton}
+                        render={<button type="button" />}
+                      />
+                    }
+                  >
+                    <Ellipsis size={ICON_SIZE} strokeWidth={ICON_STROKE} />
+                  </TooltipTrigger>
+                  <DropdownMenuContent positionMethod="fixed" sideOffset={4}>
+                    {toolbarItems.slice(maxVisibleInsertItems).map((item) => (
+                      <DropdownMenuItem
+                        key={item.title}
+                        onClick={() => item.onSelect(editor, '')}
+                      >
+                        {item.icon && (
+                          <span
+                            style={{
+                              marginRight: 8,
+                              display: 'inline-flex',
+                              transform: 'scale(0.8)',
+                              transformOrigin: 'left center',
+                            }}
+                          >
+                            {item.icon}
+                          </span>
+                        )}
+                        {item.title}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </>
           )}
         </div>

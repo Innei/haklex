@@ -81,7 +81,7 @@ interface DropLineState {
 interface TurnIntoItem {
   key: string
   label: string
-  icon: ComponentType<{ size: number }>
+  icon: ComponentType<{ size?: number }>
 }
 
 const TURN_INTO_ITEMS: TurnIntoItem[] = [
@@ -110,6 +110,72 @@ function getBlockElement(
     current = current.parentElement
   }
   return null
+}
+
+function getNearestBlockByY(
+  rootElement: HTMLElement,
+  clientY: number,
+): HTMLElement | null {
+  const blocks = Array.from(rootElement.children).filter(
+    (child): child is HTMLElement => child instanceof HTMLElement,
+  )
+  if (!blocks.length) return null
+
+  let nearestBlock: HTMLElement | null = null
+  let nearestDistance = Number.POSITIVE_INFINITY
+
+  for (const block of blocks) {
+    const rect = block.getBoundingClientRect()
+    if (rect.height <= 0) continue
+    if (clientY >= rect.top && clientY <= rect.bottom) return block
+
+    const distance =
+      clientY < rect.top ? rect.top - clientY : clientY - rect.bottom
+    if (distance < nearestDistance) {
+      nearestDistance = distance
+      nearestBlock = block
+    }
+  }
+
+  return nearestBlock
+}
+
+function getDropTargetBlock(
+  editor: LexicalEditor,
+  rootElement: HTMLElement,
+  event: DragEvent,
+): HTMLElement | null {
+  const rootRect = rootElement.getBoundingClientRect()
+  if (rootRect.width <= 0 || rootRect.height <= 0) return null
+  if (event.clientY < rootRect.top || event.clientY > rootRect.bottom) {
+    return null
+  }
+
+  const points: Array<{ x: number; y: number }> = [
+    { x: event.clientX, y: event.clientY },
+  ]
+  const clampedX = Math.min(
+    rootRect.right - 1,
+    Math.max(rootRect.left + 1, event.clientX),
+  )
+  if (clampedX !== event.clientX) {
+    points.unshift({ x: clampedX, y: event.clientY })
+  }
+
+  for (const point of points) {
+    const element = document.elementFromPoint(point.x, point.y)
+    if (!(element instanceof HTMLElement)) continue
+    const block = getBlockElement(editor, element)
+    if (block) return block
+  }
+
+  const { target } = event
+  if (target instanceof HTMLElement) {
+    const block = getBlockElement(editor, target)
+    if (block) return block
+  }
+
+  return getNearestBlockByY(rootElement, event.clientY)
 }
 
 function toPagePosition(rect: DOMRect) {
@@ -300,7 +366,7 @@ function BlockHandleInner({
   // ── Turn into handler ──
   const handleTurnInto = useCallback(
     (type: string) => {
-      const {nodeKey} = handle
+      const { nodeKey } = handle
       if (!nodeKey) return
 
       if (['bullet', 'numbered', 'todo', 'divider'].includes(type)) {
@@ -483,20 +549,22 @@ function BlockHandleInner({
         event.preventDefault()
         event.dataTransfer.dropEffect = 'move'
 
-        const target = event.target as HTMLElement
-        const block = getBlockElement(editor, target)
-        if (block) {
-          const rect = block.getBoundingClientRect()
-          const rootRect = rootElement.getBoundingClientRect()
-          const midY = rect.top + rect.height / 2
-          const y = event.clientY < midY ? rect.top : rect.bottom
-          setDropLine({
-            visible: true,
-            top: y + window.scrollY,
-            left: rootRect.left + window.scrollX,
-            width: rootRect.width,
-          })
+        const block = getDropTargetBlock(editor, rootElement, event)
+        if (!block) {
+          setDropLine((s) => (s.visible ? { ...s, visible: false } : s))
+          return true
         }
+
+        const rect = block.getBoundingClientRect()
+        const rootRect = rootElement.getBoundingClientRect()
+        const midY = rect.top + rect.height / 2
+        const y = event.clientY < midY ? rect.top : rect.bottom
+        setDropLine({
+          visible: true,
+          top: y + window.scrollY,
+          left: rootRect.left + window.scrollX,
+          width: rootRect.width,
+        })
         return true
       },
       COMMAND_PRIORITY_HIGH,
@@ -511,8 +579,7 @@ function BlockHandleInner({
         setDropLine((s) => ({ ...s, visible: false }))
         clearDragVisualState()
 
-        const target = event.target as HTMLElement
-        const block = getBlockElement(editor, target)
+        const block = getDropTargetBlock(editor, rootElement, event)
         if (!block) return false
 
         editor.update(() => {
@@ -611,7 +678,7 @@ function BlockHandleInner({
                   key={item.key}
                   onClick={() => handleTurnInto(item.key)}
                 >
-                  <item.icon size={14} />
+                  <item.icon />
                   {item.label}
                 </DropdownMenuItem>
               ))}
@@ -620,15 +687,15 @@ function BlockHandleInner({
             <DropdownMenuGroup>
               <DropdownMenuLabel>ACTIONS</DropdownMenuLabel>
               <DropdownMenuItem onClick={handleDuplicate}>
-                <Copy size={14} />
+                <Copy />
                 Duplicate
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleMoveUp}>
-                <ArrowUp size={14} />
+                <ArrowUp />
                 Move Up
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleMoveDown}>
-                <ArrowDown size={14} />
+                <ArrowDown />
                 Move Down
               </DropdownMenuItem>
             </DropdownMenuGroup>
@@ -637,7 +704,7 @@ function BlockHandleInner({
               className={css.menuItemDestructive}
               onClick={handleDelete}
             >
-              <Trash2 size={14} />
+              <Trash2 />
               Delete
             </DropdownMenuItem>
           </DropdownMenuContent>

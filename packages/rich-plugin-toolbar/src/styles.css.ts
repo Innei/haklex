@@ -50,6 +50,10 @@ export const toolbarButton = style({
     '&:active': {
       backgroundColor: vars.color.fillTertiary,
     },
+    '&[data-popup-open]': {
+      backgroundColor: vars.color.fillTertiary,
+      color: vars.color.text,
+    },
     '&:disabled': {
       opacity: 0.35,
       cursor: 'default',
