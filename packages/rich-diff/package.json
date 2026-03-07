@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-diff",
-  "version": "0.0.67",
+  "version": "0.0.68",
   "description": "Rich diff editor",
   "repository": {
     "type": "git",

@@ -97,7 +97,7 @@ export function NestedDocEditDecorator({
         }
       }}
     >
-      <div className="rich-nested-doc-content">
+      <div className={`${css.rendererContent} rich-nested-doc-content`}>
         {hasPreview ? (
           <div className={css.previewSurface}>
             <NestedDocRenderer value={previewState} />

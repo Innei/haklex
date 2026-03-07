@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-codeblock",
-  "version": "0.0.67",
+  "version": "0.0.68",
   "description": "Code block renderer with Shiki syntax highlighting",
   "repository": {
     "type": "git",

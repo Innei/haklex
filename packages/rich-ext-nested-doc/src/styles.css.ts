@@ -1,5 +1,5 @@
-import { richContent, vars } from '@haklex/rich-editor/styles'
-import { globalStyle, style } from '@vanilla-extract/css'
+import { richContent, vars } from '@haklex/rich-editor/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
 export const editOverlayRoot = style({
   position: 'relative',
@@ -9,7 +9,7 @@ export const editOverlayRoot = style({
   borderRadius: vars.borderRadius.md,
   border: `1px solid ${vars.color.border}`,
   overflow: 'clip',
-})
+});
 
 export const editOverlay = style({
   position: 'absolute',
@@ -28,16 +28,16 @@ export const editOverlay = style({
       background: 'rgba(0, 0, 0, 0.5)',
     },
   },
-})
+});
 
-globalStyle(`${richContent} .rich-nested-doc-content`, {
+export const rendererContent = style({
   paddingBlock: vars.spacing.md,
   paddingInline: vars.spacing.xl,
-  maxHeight: '400px',
+  maxHeight: '300px',
   overflow: 'clip',
-})
+});
 
-export const dialogPopup = style({})
+export const dialogPopup = style({});
 
 globalStyle(`${dialogPopup}${dialogPopup}`, {
   padding: 0,
@@ -46,14 +46,14 @@ globalStyle(`${dialogPopup}${dialogPopup}`, {
   maxWidth: '90vw',
   maxHeight: 'min(900px, calc(100vh - 1rem))',
   overflow: 'hidden',
-})
+});
 
 export const dialogShell = style({
   display: 'grid',
   gridTemplateRows: 'auto minmax(0, 1fr) auto',
   height: 'min(800px, calc(100vh - 1rem))',
   background: vars.color.bg,
-})
+});
 
 export const dialogHeader = style({
   display: 'grid',
@@ -61,13 +61,13 @@ export const dialogHeader = style({
   padding: '0.75rem 3rem 0.75rem 0.875rem',
   borderBottom: `1px solid ${vars.color.border}`,
   background: `linear-gradient(180deg, color-mix(in srgb, ${vars.color.text} 3%, transparent), transparent)`,
-})
+});
 
 export const dialogHeaderMain = style({
   display: 'flex',
   alignItems: 'center',
   gap: '0.75rem',
-})
+});
 
 export const dialogHeaderIcon = style({
   display: 'inline-flex',
@@ -79,11 +79,11 @@ export const dialogHeaderIcon = style({
   background: `color-mix(in srgb, ${vars.color.accent} 14%, transparent)`,
   color: vars.color.text,
   flexShrink: 0,
-})
+});
 
 export const dialogHeaderText = style({
   minWidth: 0,
-})
+});
 
 export const dialogTitle = style({
   margin: 0,
@@ -91,13 +91,13 @@ export const dialogTitle = style({
   fontWeight: 700,
   lineHeight: 1.1,
   color: vars.color.text,
-})
+});
 
 export const dialogToolbarSection = style({
   padding: '0 0.75rem 0.5rem',
   borderBottom: `1px solid ${vars.color.border}`,
   background: vars.color.bg,
-})
+});
 
 export const dialogToolbar = style({
   margin: 0,
@@ -105,45 +105,45 @@ export const dialogToolbar = style({
   borderRadius: 0,
   position: 'sticky',
   top: 0,
-})
+});
 
 globalStyle(`${dialogToolbar}`, {
   border: 'none',
   boxShadow: 'none',
   backgroundColor: 'transparent',
   backdropFilter: 'none',
-})
+});
 
 globalStyle(`${dialogToolbar} > div`, {
   paddingInline: 0,
-})
+});
 
 export const editorArea = style({
   minHeight: 0,
 
   overflow: 'hidden',
   background: `linear-gradient(180deg, color-mix(in srgb, ${vars.color.text} 2%, transparent), transparent)`,
-})
+});
 
 globalStyle(`${editorArea} .rich-editor`, {
   display: 'flex',
   flexDirection: 'column',
   height: '100%',
-})
+});
 
 globalStyle(`${editorArea} .rich-editor__content-wrapper`, {
   maxWidth: 'none',
   overflowY: 'auto',
-})
+});
 
 globalStyle(`${editorArea} .rich-editor__content`, {
   paddingLeft: '1.5rem',
   paddingRight: '1.5rem',
-})
+});
 
 globalStyle(`${editorArea} .rich-editor__placeholder`, {
   left: '1.5rem',
-})
+});
 
 globalStyle(`${editorArea} ${richContent} > *:first-child`, {
   borderTop: 'none',
@@ -155,21 +155,21 @@ globalStyle(`${editorArea} ${richContent} > *:first-child`, {
   maxWidth: 'none',
   backdropFilter: 'none',
   backgroundColor: 'transparent',
-})
+});
 
 export const editorScrollContainer = style({
   height: '100%',
   overflowY: 'auto',
   overflowX: 'hidden',
   scrollbarGutter: 'stable both-edges',
-})
+});
 
 export const editorCard = style({
   display: 'flex',
   minHeight: '100%',
   background: vars.color.bg,
   overflow: 'hidden',
-})
+});
 
 export const editorEditable = style({
   flex: 1,
@@ -177,7 +177,7 @@ export const editorEditable = style({
   padding: '1.25rem 1.5rem 1.75rem',
   outline: 'none',
   overflow: 'visible',
-})
+});
 
 export const dialogFooter = style({
   display: 'flex',
@@ -187,7 +187,7 @@ export const dialogFooter = style({
   padding: '0.875rem 1.25rem 1rem',
   borderTop: `1px solid ${vars.color.border}`,
   background: `color-mix(in srgb, ${vars.color.text} 2%, transparent)`,
-})
+});
 
 export const staticOverlayRoot = style({
   position: 'relative',
@@ -197,7 +197,7 @@ export const staticOverlayRoot = style({
   borderRadius: vars.borderRadius.md,
   border: `1px solid ${vars.color.border}`,
   overflow: 'clip',
-})
+});
 
 export const staticOverlay = style({
   position: 'absolute',
@@ -216,7 +216,7 @@ export const staticOverlay = style({
       opacity: 1,
     },
   },
-})
+});
 
 export const staticGradientMask = style({
   position: 'absolute',
@@ -226,9 +226,9 @@ export const staticGradientMask = style({
   height: '4rem',
   background: `linear-gradient(to bottom, transparent, ${vars.color.bg})`,
   pointerEvents: 'none',
-})
+});
 
-export const staticDialogPopup = style({})
+export const staticDialogPopup = style({});
 
 globalStyle(`${staticDialogPopup}${staticDialogPopup}`, {
   display: 'flex',
@@ -238,7 +238,7 @@ globalStyle(`${staticDialogPopup}${staticDialogPopup}`, {
   height: 'min(800px, calc(100vh - 2rem))',
   maxHeight: 'min(800px, calc(100vh - 2rem))',
   overflow: 'hidden',
-})
+});
 
 export const staticDialogBody = style({
   flex: 1,
@@ -247,27 +247,27 @@ export const staticDialogBody = style({
   padding: '1.5rem',
   overflowY: 'auto',
   overflowX: 'hidden',
-})
+});
 
 export const previewSurface = style({
   pointerEvents: 'none',
-})
+});
 
 export const previewEmpty = style({
   margin: 0,
   color: vars.color.textSecondary,
   fontSize: vars.typography.fontSizeMd,
   opacity: 0.72,
-})
+});
 
 globalStyle(`${editorEditable} .rich-paragraph:first-child`, {
   marginTop: 0,
-})
+});
 
 globalStyle(`${previewSurface} .rich-paragraph:first-child`, {
   marginTop: 0,
-})
+});
 
 globalStyle(`${previewSurface} .rich-paragraph:last-child`, {
   marginBottom: 0,
-})
+});

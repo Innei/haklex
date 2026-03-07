@@ -62,7 +62,7 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
         }
       }}
     >
-      <div className="rich-nested-doc-content">
+      <div className={`${css.rendererContent} rich-nested-doc-content`}>
         <div className={css.previewSurface}>
           <NestedDocRenderer value={previewState} />
         </div>
