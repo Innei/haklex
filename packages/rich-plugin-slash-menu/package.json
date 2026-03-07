@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-slash-menu",
-  "version": "0.0.68",
+  "version": "0.0.69",
   "description": "Slash command menu plugin",
   "repository": {
     "type": "git",

@@ -1,7 +1,7 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { globalStyle, keyframes, style } from '@vanilla-extract/css'
+import { vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
-const ASPECT_RATIO = '16 / 10'
+const ASPECT_RATIO = '16 / 10';
 
 export const excalidrawStaticContainer = style({
   position: 'relative',
@@ -11,7 +11,7 @@ export const excalidrawStaticContainer = style({
   borderRadius: '0.5rem',
   overflow: 'hidden',
   backgroundColor: vars.color.bg,
-})
+});
 
 export const excalidrawEditorContainer = style({
   position: 'relative',
@@ -21,7 +21,7 @@ export const excalidrawEditorContainer = style({
   borderRadius: '0.5rem',
   overflow: 'hidden',
   border: `1px solid ${vars.color.border}`,
-})
+});
 
 export const excalidrawPlaceholder = style({
   position: 'relative',
@@ -35,7 +35,7 @@ export const excalidrawPlaceholder = style({
   border: `1px solid ${vars.color.border}`,
   color: vars.color.textSecondary,
   fontSize: vars.typography.fontSizeMd,
-})
+});
 
 export const excalidrawLoading = style({
   display: 'flex',
@@ -45,11 +45,11 @@ export const excalidrawLoading = style({
   inset: 0,
   color: vars.color.textSecondary,
   fontSize: vars.typography.fontSizeMd,
-})
+});
 
 const spin = keyframes({
   to: { transform: 'rotate(360deg)' },
-})
+});
 
 globalStyle(`${excalidrawLoading}::after`, {
   content: '""',
@@ -61,7 +61,7 @@ globalStyle(`${excalidrawLoading}::after`, {
   borderRightColor: 'transparent',
   borderRadius: '50%',
   animation: `${spin} 0.6s linear infinite`,
-})
+});
 
 export const excalidrawError = style({
   display: 'flex',
@@ -73,16 +73,16 @@ export const excalidrawError = style({
   backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
   color: vars.color.alertCaution,
   fontSize: vars.typography.fontSizeMd,
-})
+});
 
 // Hide excalidraw's built-in bottom toolbar in readonly containers
-globalStyle(`${excalidrawStaticContainer} .App-toolbar`, { display: 'none' })
+globalStyle(`${excalidrawStaticContainer} .App-toolbar`, { display: 'none' });
 globalStyle(`${excalidrawEditorContainer} .Island`, {
   display: 'none !important',
-})
+});
 globalStyle(`.excalidraw--view-mode .dropdown-menu-button`, {
   display: 'none !important',
-})
+});
 
 export const excalidrawActionGroup = style({
   position: 'absolute',
@@ -95,34 +95,34 @@ export const excalidrawActionGroup = style({
   padding: 2,
   backgroundColor: 'color-mix(in srgb, currentColor 8%, transparent)',
   backdropFilter: 'blur(8px)',
-})
+});
 
 export const excalidrawActionButton = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 28,
-  height: 28,
-  borderRadius: 4,
-  border: 'none',
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  transition: 'background 0.15s, color 0.15s',
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 28,
+  'height': 28,
+  'borderRadius': 4,
+  'border': 'none',
+  'background': 'transparent',
+  'color': vars.color.textSecondary,
+  'cursor': 'pointer',
+  'transition': 'background 0.15s, color 0.15s',
   ':hover': {
     background: 'color-mix(in srgb, currentColor 12%, transparent)',
     color: vars.color.text,
   },
-})
+});
 
 globalStyle(`${excalidrawActionButton} svg`, {
   width: 16,
   height: 16,
-})
+});
 
 // ── Fullscreen popup (overrides editor-ui dialog popup) ─────────
 
-const _excalidrawFullscreenPopup = style({})
+const _excalidrawFullscreenPopup = style({});
 globalStyle(`${_excalidrawFullscreenPopup}${_excalidrawFullscreenPopup}`, {
   position: 'fixed',
   inset: 0,
@@ -142,20 +142,14 @@ globalStyle(`${_excalidrawFullscreenPopup}${_excalidrawFullscreenPopup}`, {
   flexDirection: 'column',
   background: vars.color.bg,
   overflow: 'hidden',
-})
-globalStyle(
-  `${_excalidrawFullscreenPopup}${_excalidrawFullscreenPopup}[data-open]`,
-  {
-    animation: 'none',
-  },
-)
-globalStyle(
-  `${_excalidrawFullscreenPopup}${_excalidrawFullscreenPopup}[data-closed]`,
-  {
-    animation: 'none',
-  },
-)
-export { _excalidrawFullscreenPopup as excalidrawFullscreenPopup }
+});
+globalStyle(`${_excalidrawFullscreenPopup}${_excalidrawFullscreenPopup}[data-open]`, {
+  animation: 'none',
+});
+globalStyle(`${_excalidrawFullscreenPopup}${_excalidrawFullscreenPopup}[data-closed]`, {
+  animation: 'none',
+});
+export { _excalidrawFullscreenPopup as excalidrawFullscreenPopup };
 
 // ── Dialog header ───────────────────────────────────────────────
 
@@ -167,14 +161,14 @@ export const excalidrawDialogHeader = style({
   padding: '0 12px 0 16px',
   borderBottom: `1px solid ${vars.color.border}`,
   gap: 10,
-})
+});
 
 export const excalidrawDialogHeaderTitle = style({
   display: 'flex',
   alignItems: 'center',
   gap: 4,
   flex: 1,
-})
+});
 
 export const excalidrawStatusDot = style({
   width: 8,
@@ -182,14 +176,14 @@ export const excalidrawStatusDot = style({
   borderRadius: '50%',
   flexShrink: 0,
   transition: 'background-color 0.3s',
-})
+});
 
 export const excalidrawDialogTitle = style({
   fontSize: vars.typography.fontSizeMd,
   fontWeight: 600,
   color: vars.color.text,
   lineHeight: 1,
-})
+});
 
 export const excalidrawDialogMeta = style({
   fontSize: vars.typography.fontSizeSm,
@@ -197,67 +191,67 @@ export const excalidrawDialogMeta = style({
   lineHeight: 1,
   paddingLeft: 10,
   borderLeft: `1px solid ${vars.color.border}`,
-})
+});
 
 export const excalidrawHeaderActions = style({
   marginLeft: 'auto',
   display: 'flex',
   alignItems: 'center',
   gap: 2,
-})
+});
 
 export const excalidrawHeaderClose = style({
-  marginLeft: 8,
-  flexShrink: 0,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 32,
-  height: 32,
-  borderRadius: 6,
-  border: 'none',
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  transition: 'background 0.15s, color 0.15s',
+  'marginLeft': 8,
+  'flexShrink': 0,
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 32,
+  'height': 32,
+  'borderRadius': 6,
+  'border': 'none',
+  'background': 'transparent',
+  'color': vars.color.textSecondary,
+  'cursor': 'pointer',
+  'transition': 'background 0.15s, color 0.15s',
   ':hover': {
     background: 'color-mix(in srgb, currentColor 8%, transparent)',
     color: vars.color.text,
   },
-})
+});
 
 // ── Header action buttons ────────────────────────────────────────
 
 export const excalidrawActionBarBtn = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: 4,
-  padding: '4px 10px',
-  borderRadius: 4,
-  border: 'none',
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  fontSize: vars.typography.fontSizeSm,
-  whiteSpace: 'nowrap',
-  transition: 'background 0.15s, color 0.15s',
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'gap': 4,
+  'padding': '4px 10px',
+  'borderRadius': 4,
+  'border': 'none',
+  'background': 'transparent',
+  'color': vars.color.textSecondary,
+  'cursor': 'pointer',
+  'fontSize': vars.typography.fontSizeSm,
+  'whiteSpace': 'nowrap',
+  'transition': 'background 0.15s, color 0.15s',
   ':hover': {
     background: 'color-mix(in srgb, currentColor 8%, transparent)',
     color: vars.color.text,
   },
-  selectors: {
+  'selectors': {
     '&:disabled': {
       opacity: 0.4,
       pointerEvents: 'none',
     },
   },
-})
+});
 
 globalStyle(`${excalidrawActionBarBtn} svg`, {
   width: 14,
   height: 14,
   flexShrink: 0,
-})
+});
 
 export const excalidrawActionBarSep = style({
   width: 1,
@@ -265,25 +259,25 @@ export const excalidrawActionBarSep = style({
   margin: '0 4px',
   background: vars.color.border,
   flexShrink: 0,
-})
+});
 
 export const excalidrawActionBarUrl = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  padding: '3px 10px',
-  borderRadius: 4,
-  background: 'color-mix(in srgb, currentColor 4%, transparent)',
-  color: vars.color.textSecondary,
-  fontSize: vars.typography.fontSizeXs,
-  fontFamily: vars.typography.fontMono,
-  width: 200,
-  maxWidth: '50%',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-  border: `1px solid transparent`,
-  outline: 'none',
-  transition: 'background 0.15s, border-color 0.15s',
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'padding': '3px 10px',
+  'borderRadius': 4,
+  'background': 'color-mix(in srgb, currentColor 4%, transparent)',
+  'color': vars.color.textSecondary,
+  'fontSize': vars.typography.fontSizeXs,
+  'fontFamily': vars.typography.fontMono,
+  'width': 200,
+  'maxWidth': '50%',
+  'overflow': 'hidden',
+  'textOverflow': 'ellipsis',
+  'whiteSpace': 'nowrap',
+  'border': `1px solid transparent`,
+  'outline': 'none',
+  'transition': 'background 0.15s, border-color 0.15s',
   ':hover': {
     background: 'color-mix(in srgb, currentColor 8%, transparent)',
   },
@@ -291,7 +285,7 @@ export const excalidrawActionBarUrl = style({
     borderColor: vars.color.accent,
     background: 'color-mix(in srgb, currentColor 6%, transparent)',
   },
-})
+});
 
 // ── Dialog canvas area ──────────────────────────────────────────
 
@@ -299,7 +293,7 @@ export const excalidrawDialogCanvas = style({
   flex: 1,
   position: 'relative',
   minHeight: 0,
-})
+});
 
 // ── Unsaved-changes confirmation (used inside presentDialog) ────
 
@@ -307,70 +301,71 @@ export const excalidrawConfirmActions = style({
   display: 'flex',
   justifyContent: 'flex-end',
   gap: 8,
-})
+  padding: '0 1.5rem 1.25rem',
+});
 
 export const excalidrawConfirmBtn = style({
-  padding: '6px 14px',
-  borderRadius: 6,
-  border: `1px solid ${vars.color.border}`,
-  background: 'transparent',
-  fontSize: vars.typography.fontSizeSm,
-  fontWeight: 500,
-  cursor: 'pointer',
-  transition: 'background 0.15s',
-  color: vars.color.text,
+  'padding': '6px 14px',
+  'borderRadius': 6,
+  'border': `1px solid ${vars.color.border}`,
+  'background': 'transparent',
+  'fontSize': vars.typography.fontSizeSm,
+  'fontWeight': 500,
+  'cursor': 'pointer',
+  'transition': 'background 0.15s',
+  'color': vars.color.text,
   ':hover': {
     background: 'color-mix(in srgb, currentColor 6%, transparent)',
   },
-})
+});
 
 export const excalidrawConfirmBtnPrimary = style({
-  padding: '6px 14px',
-  borderRadius: 6,
-  border: `1px solid ${vars.color.accent}`,
-  background: vars.color.accent,
-  fontSize: vars.typography.fontSizeSm,
-  fontWeight: 500,
-  cursor: 'pointer',
-  transition: 'opacity 0.15s',
-  color: '#fff',
+  'padding': '6px 14px',
+  'borderRadius': 6,
+  'border': `1px solid ${vars.color.accent}`,
+  'background': vars.color.accent,
+  'fontSize': vars.typography.fontSizeSm,
+  'fontWeight': 500,
+  'cursor': 'pointer',
+  'transition': 'opacity 0.15s',
+  'color': '#fff',
   ':hover': {
     opacity: 0.9,
   },
-})
+});
 
 export const excalidrawConfirmBtnDanger = style({
-  padding: '6px 14px',
-  borderRadius: 6,
-  border: `1px solid ${vars.color.alertCaution}`,
-  background: 'transparent',
-  fontSize: vars.typography.fontSizeSm,
-  fontWeight: 500,
-  cursor: 'pointer',
-  transition: 'background 0.15s',
-  color: vars.color.alertCaution,
+  'padding': '6px 14px',
+  'borderRadius': 6,
+  'border': `1px solid ${vars.color.alertCaution}`,
+  'background': 'transparent',
+  'fontSize': vars.typography.fontSizeSm,
+  'fontWeight': 500,
+  'cursor': 'pointer',
+  'transition': 'background 0.15s',
+  'color': vars.color.alertCaution,
   ':hover': {
     background: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
   },
-})
+});
 
 // ── Edit overlay ────────────────────────────────────────────────
 
 export const excalidrawEditOverlay = style({
-  position: 'absolute',
-  inset: 0,
-  zIndex: 5,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-  background: 'transparent',
-  border: 'none',
-  transition: 'background 0.2s',
+  'position': 'absolute',
+  'inset': 0,
+  'zIndex': 5,
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'cursor': 'pointer',
+  'background': 'transparent',
+  'border': 'none',
+  'transition': 'background 0.2s',
   ':hover': {
     background: 'color-mix(in srgb, currentColor 6%, transparent)',
   },
-})
+});
 
 export const excalidrawEditLabel = style({
   display: 'flex',
@@ -390,4 +385,4 @@ export const excalidrawEditLabel = style({
       opacity: 1,
     },
   },
-})
+});

@@ -42,7 +42,7 @@ export const dialogPopup = style({});
 globalStyle(`${dialogPopup}${dialogPopup}`, {
   padding: 0,
   gap: 0,
-  width: '700px',
+  width: '900px',
   maxWidth: '90vw',
   maxHeight: 'min(900px, calc(100vh - 1rem))',
   overflow: 'hidden',
@@ -56,41 +56,52 @@ export const dialogShell = style({
 });
 
 export const dialogHeader = style({
-  display: 'grid',
-  gap: 0,
-  padding: '0.75rem 3rem 0.75rem 0.875rem',
-  borderBottom: `1px solid ${vars.color.border}`,
-  background: `linear-gradient(180deg, color-mix(in srgb, ${vars.color.text} 3%, transparent), transparent)`,
-});
-
-export const dialogHeaderMain = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.75rem',
-});
-
-export const dialogHeaderIcon = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 28,
-  height: 28,
-  borderRadius: vars.borderRadius.sm,
-  background: `color-mix(in srgb, ${vars.color.accent} 14%, transparent)`,
-  color: vars.color.text,
+  justifyContent: 'space-between',
+  padding: '0 0.5rem 0 1rem',
+  height: 48,
+  borderBottom: `1px solid ${vars.color.border}`,
   flexShrink: 0,
 });
 
-export const dialogHeaderText = style({
-  minWidth: 0,
+export const dialogHeaderLeft = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
 });
 
 export const dialogTitle = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.5rem',
   margin: 0,
-  fontSize: '1.125rem',
-  fontWeight: 700,
-  lineHeight: 1.1,
+  fontSize: vars.typography.fontSizeMd,
+  fontWeight: 500,
   color: vars.color.text,
+});
+
+export const dialogHeaderRight = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
+});
+
+export const dialogHeaderCloseBtn = style({
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 28,
+  'height': 28,
+  'borderRadius': '0.25rem',
+  'border': 'none',
+  'background': 'none',
+  'cursor': 'pointer',
+  'color': vars.color.textSecondary,
+  'transition': 'color 0.15s',
+  ':hover': {
+    color: vars.color.text,
+  },
 });
 
 export const dialogToolbarSection = style({
@@ -120,7 +131,6 @@ globalStyle(`${dialogToolbar} > div`, {
 
 export const editorArea = style({
   minHeight: 0,
-
   overflow: 'hidden',
   background: `linear-gradient(180deg, color-mix(in srgb, ${vars.color.text} 2%, transparent), transparent)`,
 });
@@ -132,7 +142,7 @@ globalStyle(`${editorArea} .rich-editor`, {
 });
 
 globalStyle(`${editorArea} .rich-editor__content-wrapper`, {
-  maxWidth: 'none',
+  maxWidth: '75ch',
   overflowY: 'auto',
 });
 
@@ -183,10 +193,8 @@ export const dialogFooter = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
-  gap: '1rem',
-  padding: '0.875rem 1.25rem 1rem',
+  padding: '0.5rem 0.75rem',
   borderTop: `1px solid ${vars.color.border}`,
-  background: `color-mix(in srgb, ${vars.color.text} 2%, transparent)`,
 });
 
 export const staticOverlayRoot = style({
@@ -243,8 +251,7 @@ globalStyle(`${staticDialogPopup}${staticDialogPopup}`, {
 export const staticDialogBody = style({
   flex: 1,
   minHeight: 0,
-  margin: '-1.5rem',
-  padding: '1.5rem',
+  padding: '0 1.5rem 1.5rem',
   overflowY: 'auto',
   overflowX: 'hidden',
 });

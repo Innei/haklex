@@ -79,24 +79,28 @@ const DialogStackEntry: FC<{
               data-theme={theme}
               style={{ zIndex: zIndex + 1 }}
             >
-              {(title || description) && (
+              {(title || description || showCloseButton) && (
                 <div className={css.header}>
-                  {title && (
-                    <DialogPrimitive.Title className={css.title}>{title}</DialogPrimitive.Title>
+                  {(title || description) && (
+                    <div className={css.headerContent}>
+                      {title && (
+                        <DialogPrimitive.Title className={css.title}>{title}</DialogPrimitive.Title>
+                      )}
+                      {description && (
+                        <DialogPrimitive.Description className={css.description}>
+                          {description}
+                        </DialogPrimitive.Description>
+                      )}
+                    </div>
                   )}
-                  {description && (
-                    <DialogPrimitive.Description className={css.description}>
-                      {description}
-                    </DialogPrimitive.Description>
+                  {showCloseButton && (
+                    <DialogPrimitive.Close className={css.headerCloseButton}>
+                      <CloseIcon />
+                    </DialogPrimitive.Close>
                   )}
                 </div>
               )}
               {createElement(content, { dismiss })}
-              {showCloseButton && (
-                <DialogPrimitive.Close className={css.closeButton}>
-                  <CloseIcon />
-                </DialogPrimitive.Close>
-              )}
             </DialogPrimitive.Popup>
           </PortalThemeWrapper>
         </PortalThemeProvider>

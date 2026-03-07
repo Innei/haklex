@@ -4,7 +4,7 @@ import { PortalContainerProvider, usePortalTheme } from '@haklex/rich-style-toke
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { LexicalEditor, SerializedEditorState } from 'lexical';
 import { $getNodeByKey } from 'lexical';
-import { FileText, Pencil, Save, X } from 'lucide-react';
+import { FileText, Pencil, X } from 'lucide-react';
 import { type KeyboardEvent, useCallback, useMemo, useRef, useState } from 'react';
 
 import { useNestedDocDialogEditor } from './NestedDocDialogEditorContext';
@@ -78,7 +78,7 @@ export function NestedDocEditDecorator({
       className: css.dialogPopup,
       portalClassName,
       theme: colorScheme,
-      showCloseButton: true,
+      showCloseButton: false,
       clickOutsideToDismiss: false,
     });
   }, [DialogEditor, colorScheme, contentEditor, editor, nodeKey, portalClassName]);
@@ -173,13 +173,21 @@ function NestedDocDialogContent({
   return (
     <div className={css.dialogShell} ref={setShellEl} onKeyDownCapture={handleKeyDownCapture}>
       <div className={css.dialogHeader}>
-        <div className={css.dialogHeaderMain}>
-          <span className={css.dialogHeaderIcon}>
+        <div className={css.dialogHeaderLeft}>
+          <h3 className={css.dialogTitle}>
             <FileText size={18} />
-          </span>
-          <div className={css.dialogHeaderText}>
-            <h3 className={css.dialogTitle}>Nested document</h3>
-          </div>
+            <span>Nested document</span>
+          </h3>
+        </div>
+        <div className={css.dialogHeaderRight}>
+          <button
+            className={css.dialogHeaderCloseBtn}
+            title="Close"
+            type="button"
+            onClick={onDismiss}
+          >
+            <X size={14} />
+          </button>
         </div>
       </div>
 
@@ -192,13 +200,11 @@ function NestedDocDialogContent({
       </div>
 
       <div className={css.dialogFooter}>
-        <ActionBar gap="0.625rem">
-          <ActionButton size="lg" variant="outline" onClick={onDismiss}>
-            <X size={15} />
+        <ActionBar>
+          <ActionButton size="md" variant="ghost" onClick={onDismiss}>
             Cancel
           </ActionButton>
-          <ActionButton size="lg" variant="accent" onClick={handleDone}>
-            <Save size={15} />
+          <ActionButton size="md" variant="accent" onClick={handleDone}>
             Save
           </ActionButton>
         </ActionBar>

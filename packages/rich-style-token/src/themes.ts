@@ -5,7 +5,7 @@ export const fonts = {
     '"Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif", "source-han-serif-sc", "Songti SC", STSong, "华文宋体", serif',
   fontMono:
     '"SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace',
-}
+};
 
 // Zinc palette (aligned with web app) + blue accent
 export const lightArticleColors = {
@@ -34,13 +34,13 @@ export const lightArticleColors = {
   alertTip: '#11cc00',
   alertCaution: '#cc0011',
   alertImportant: '#5500cc',
-}
+};
 
 export const lightCommentColors = {
   ...lightArticleColors,
   quoteBorder: '#a1a1aa', // zinc-400
   quoteBg: '#fafafa', // zinc-50
-}
+};
 
 export const darkColors = {
   text: '#fafafa',
@@ -68,7 +68,7 @@ export const darkColors = {
   alertTip: '#54da48',
   alertCaution: '#e16973',
   alertImportant: '#9966e0',
-}
+};
 
 // Shared layout tokens (merge overrides per layout)
 const sharedSpacing = {
@@ -77,18 +77,18 @@ const sharedSpacing = {
   md: '16px',
   lg: '24px',
   xl: '32px',
-}
-const sharedBorderRadius = { sm: '4px', md: '8px', lg: '12px' }
+};
+const sharedBorderRadius = { sm: '4px', md: '8px', lg: '12px' };
 const sharedBoxShadow = {
   topBar: '0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
   modal: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
   menu: '0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.08)',
-}
+};
 export const darkBoxShadow = {
   topBar: '0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3)',
   modal: '0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.35)',
   menu: '0 1px 4px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.4)',
-}
+};
 const baseTypography = {
   fontFamilySans: fonts.fontFamilySans,
   fontFamilySerif: fonts.fontFamilySerif,
@@ -102,7 +102,7 @@ const baseTypography = {
   fontSizeSmall: '14px',
   lineHeight: '1.7',
   lineHeightTight: '1.4',
-}
+};
 
 export const articleLayout = {
   layout: { maxWidth: '700px' },
@@ -113,7 +113,7 @@ export const articleLayout = {
     fontFamily: fonts.fontFamilySans,
   },
   borderRadius: sharedBorderRadius,
-}
+};
 
 export const noteLayout = {
   layout: { maxWidth: '700px' },
@@ -125,7 +125,7 @@ export const noteLayout = {
     lineHeight: '1.8',
   },
   borderRadius: sharedBorderRadius,
-}
+};
 
 export const commentLayout = {
   layout: { maxWidth: 'none' },
@@ -139,5 +139,5 @@ export const commentLayout = {
     lineHeight: '1.5',
     lineHeightTight: '1.3',
   },
-  borderRadius: { sm: '3px', md: '6px', lg: '8px' },
-}
+  borderRadius: { sm: '3px', md: '6px', lg: '12px' },
+};

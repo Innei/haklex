@@ -1,6 +1,6 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { style } from '@vanilla-extract/css'
-import { recipe } from '@vanilla-extract/recipes'
+import { vars } from '@haklex/rich-style-token/styles';
+import { style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 
 export const semanticClassNames = {
   actionBar: 're-ui-action-bar',
@@ -8,18 +8,18 @@ export const semanticClassNames = {
   actionButtonEnd: 're-ui-action-btn--end',
   actionButtonDanger: 're-ui-action-btn--danger',
   actionButtonIcon: 're-ui-action-btn--icon',
-} as const
+} as const;
 
 export const actionBar = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'flex-end',
   gap: '4px',
-})
+});
 
-const transition = 'color 0.15s ease, background-color 0.15s ease'
+const transition = 'color 0.15s ease, background-color 0.15s ease';
 const transitionWithBorder =
-  'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease'
+  'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease';
 
 export const actionButton = recipe({
   base: {
@@ -94,14 +94,14 @@ export const actionButton = recipe({
         fontSize: vars.typography.fontSizeSm,
         fontWeight: 500,
         padding: '4px 8px',
-        borderRadius: vars.borderRadius.sm,
+        borderRadius: vars.borderRadius.md,
         whiteSpace: 'nowrap',
       },
       md: {
         fontSize: vars.typography.fontSizeXs,
         fontWeight: 500,
         padding: '4px 10px',
-        borderRadius: vars.borderRadius.sm,
+        borderRadius: vars.borderRadius.md,
         height: '28px',
         lineHeight: 1.4,
         whiteSpace: 'nowrap',
@@ -111,7 +111,7 @@ export const actionButton = recipe({
         fontSize: vars.typography.fontSizeXs,
         fontWeight: 600,
         padding: '0 0.875rem',
-        borderRadius: vars.borderRadius.sm,
+        borderRadius: vars.borderRadius.md,
         height: 36,
         whiteSpace: 'nowrap',
       },
@@ -154,7 +154,7 @@ export const actionButton = recipe({
       variants: { icon: true, size: 'md' },
       style: {
         padding: 6,
-        borderRadius: 6,
+        borderRadius: vars.borderRadius.md,
         height: 'auto',
         width: 'auto',
         gap: 0,
@@ -194,4 +194,4 @@ export const actionButton = recipe({
     end: false,
     danger: false,
   },
-})
+});

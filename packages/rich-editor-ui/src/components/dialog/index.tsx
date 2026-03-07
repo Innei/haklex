@@ -1,41 +1,41 @@
-import { Dialog as DialogPrimitive } from '@base-ui/react/dialog'
-import { PortalThemeWrapper } from '@haklex/rich-style-token'
-import { X } from 'lucide-react'
-import type { ComponentProps, HTMLAttributes, ReactNode } from 'react'
+import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
+import { PortalThemeWrapper } from '@haklex/rich-style-token';
+import { X } from 'lucide-react';
+import type { ComponentProps, HTMLAttributes, ReactNode } from 'react';
 
-import * as css from './styles.css'
+import * as css from './styles.css';
 
 // -- Dialog Root --
 
-type DialogProps = ComponentProps<typeof DialogPrimitive.Root>
+type DialogProps = ComponentProps<typeof DialogPrimitive.Root>;
 
 export function Dialog(props: DialogProps) {
-  return <DialogPrimitive.Root {...props} />
+  return <DialogPrimitive.Root {...props} />;
 }
 
 // -- Trigger --
 
-type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger>
+type DialogTriggerProps = ComponentProps<typeof DialogPrimitive.Trigger>;
 
 export function DialogTrigger(props: DialogTriggerProps) {
-  return <DialogPrimitive.Trigger {...props} />
+  return <DialogPrimitive.Trigger {...props} />;
 }
 
 // -- Portal --
 
-type DialogPortalProps = ComponentProps<typeof DialogPrimitive.Portal>
+type DialogPortalProps = ComponentProps<typeof DialogPrimitive.Portal>;
 
 export function DialogPortal({ children, ...props }: DialogPortalProps) {
   return (
     <DialogPrimitive.Portal {...props}>
       <PortalThemeWrapper>{children}</PortalThemeWrapper>
     </DialogPrimitive.Portal>
-  )
+  );
 }
 
 // -- Backdrop --
 
-type DialogBackdropProps = ComponentProps<typeof DialogPrimitive.Backdrop>
+type DialogBackdropProps = ComponentProps<typeof DialogPrimitive.Backdrop>;
 
 export function DialogBackdrop({ className, ...props }: DialogBackdropProps) {
   return (
@@ -43,16 +43,16 @@ export function DialogBackdrop({ className, ...props }: DialogBackdropProps) {
       className={`${css.backdrop}${className ? ` ${className}` : ''}`}
       {...props}
     />
-  )
+  );
 }
 
 // -- Popup --
 
 type DialogPopupProps = ComponentProps<typeof DialogPrimitive.Popup> & {
-  showCloseButton?: boolean
-  className?: string
-  children?: ReactNode
-}
+  showCloseButton?: boolean;
+  className?: string;
+  children?: ReactNode;
+};
 
 export function DialogPopup({
   showCloseButton = true,
@@ -75,42 +75,36 @@ export function DialogPopup({
         )}
       </DialogPrimitive.Popup>
     </DialogPortal>
-  )
+  );
 }
 
 // -- Close --
 
-type DialogCloseProps = ComponentProps<typeof DialogPrimitive.Close>
+type DialogCloseProps = ComponentProps<typeof DialogPrimitive.Close>;
 
 export function DialogClose(props: DialogCloseProps) {
-  return <DialogPrimitive.Close {...props} />
+  return <DialogPrimitive.Close {...props} />;
 }
 
 // -- Header / Footer / Title / Description --
 
-type DialogHeaderProps = HTMLAttributes<HTMLDivElement>
+type DialogHeaderProps = HTMLAttributes<HTMLDivElement>;
 
-export function DialogHeader({ className, ...props }: DialogHeaderProps) {
+export function DialogHeader({ className, children, ...props }: DialogHeaderProps) {
   return (
-    <div
-      className={`${css.header}${className ? ` ${className}` : ''}`}
-      {...props}
-    />
-  )
+    <div className={`${css.header}${className ? ` ${className}` : ''}`} {...props}>
+      <div className={css.headerContent}>{children}</div>
+    </div>
+  );
 }
 
-type DialogFooterProps = HTMLAttributes<HTMLDivElement>
+type DialogFooterProps = HTMLAttributes<HTMLDivElement>;
 
 export function DialogFooter({ className, ...props }: DialogFooterProps) {
-  return (
-    <div
-      className={`${css.footer}${className ? ` ${className}` : ''}`}
-      {...props}
-    />
-  )
+  return <div className={`${css.footer}${className ? ` ${className}` : ''}`} {...props} />;
 }
 
-type DialogTitleProps = ComponentProps<typeof DialogPrimitive.Title>
+type DialogTitleProps = ComponentProps<typeof DialogPrimitive.Title>;
 
 export function DialogTitle({ className, ...props }: DialogTitleProps) {
   return (
@@ -118,21 +112,18 @@ export function DialogTitle({ className, ...props }: DialogTitleProps) {
       className={`${css.title}${className ? ` ${className}` : ''}`}
       {...props}
     />
-  )
+  );
 }
 
-type DialogDescriptionProps = ComponentProps<typeof DialogPrimitive.Description>
+type DialogDescriptionProps = ComponentProps<typeof DialogPrimitive.Description>;
 
-export function DialogDescription({
-  className,
-  ...props
-}: DialogDescriptionProps) {
+export function DialogDescription({ className, ...props }: DialogDescriptionProps) {
   return (
     <DialogPrimitive.Description
       className={`${css.description}${className ? ` ${className}` : ''}`}
       {...props}
     />
-  )
+  );
 }
 
 export type {
@@ -146,4 +137,4 @@ export type {
   DialogProps,
   DialogTitleProps,
   DialogTriggerProps,
-}
+};
