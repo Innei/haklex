@@ -39,6 +39,7 @@
     "@haklex/rich-ext-code-snippet": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
+    "@haklex/rich-ext-nested-doc": "workspace:*",
     "@haklex/rich-plugin-block-handle": "workspace:*",
     "@haklex/rich-plugin-floating-toolbar": "workspace:*",
     "@haklex/rich-plugin-link-edit": "workspace:*",

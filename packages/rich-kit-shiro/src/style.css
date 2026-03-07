@@ -12,4 +12,5 @@
 @import '@haklex/rich-ext-code-snippet/style.css';
 @import '@haklex/rich-ext-embed/style.css';
 @import '@haklex/rich-ext-excalidraw/style.css';
+@import '@haklex/rich-ext-nested-doc/style.css';
 @import 'katex/dist/katex.min.css';
