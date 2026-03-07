@@ -1,9 +1,14 @@
 {
   "name": "@haklex/rich-renderer-alert",
-  "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "description": "Alert renderer for haklex rich editor",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-renderer-alert"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./static": "./src/static.ts",
@@ -16,10 +21,6 @@
   "scripts": {
     "build": "vite build",
     "dev:build": "vite build --watch"
-  },
-  "peerDependencies": {
-    "react": ">=19",
-    "react-dom": ">=19"
   },
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
@@ -39,6 +40,10 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -54,10 +59,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-renderer-alert"
   }
 }

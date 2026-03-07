@@ -1,9 +1,14 @@
 {
   "name": "@haklex/rich-plugin-table",
-  "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "description": "Table editing plugin",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-plugin-table"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./style.css": "./dist/rich-plugin-table.css"
@@ -15,14 +20,6 @@
   "scripts": {
     "build": "vite build",
     "dev:build": "vite build --watch"
-  },
-  "peerDependencies": {
-    "@lexical/react": "^0.41.0",
-    "@lexical/table": "^0.41.0",
-    "lexical": "^0.41.0",
-    "lucide-react": "^0.574.0",
-    "react": ">=19",
-    "react-dom": ">=19"
   },
   "dependencies": {
     "@haklex/rich-editor-ui": "workspace:*",
@@ -43,6 +40,14 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
+  "peerDependencies": {
+    "@lexical/react": "^0.41.0",
+    "@lexical/table": "^0.41.0",
+    "lexical": "^0.41.0",
+    "lucide-react": "^0.574.0",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -54,10 +59,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-plugin-table"
   }
 }

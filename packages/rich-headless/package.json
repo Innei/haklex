@@ -1,9 +1,14 @@
 {
   "name": "@haklex/rich-headless",
-  "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "description": "Headless Lexical node registry for server-side parsing (no React)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-headless"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./transformers": "./src/transformers.ts"
@@ -15,9 +20,6 @@
   "scripts": {
     "build": "vite build",
     "dev:build": "vite build --watch"
-  },
-  "peerDependencies": {
-    "lexical": "^0.41.0"
   },
   "dependencies": {
     "@lexical/code": "^0.41.0",
@@ -34,6 +36,9 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
+  "peerDependencies": {
+    "lexical": "^0.41.0"
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -48,10 +53,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-headless"
   }
 }

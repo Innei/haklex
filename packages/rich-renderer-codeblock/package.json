@@ -1,9 +1,14 @@
 {
   "name": "@haklex/rich-renderer-codeblock",
-  "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "description": "Code block renderer with Shiki syntax highlighting",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-renderer-codeblock"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./constants": "./src/constants.ts",
@@ -19,10 +24,6 @@
   "scripts": {
     "build": "vite build",
     "dev:build": "vite build --watch"
-  },
-  "peerDependencies": {
-    "react": ">=19",
-    "react-dom": ">=19"
   },
   "dependencies": {
     "@codemirror/commands": "^6.10.2",
@@ -47,6 +48,10 @@
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
   },
   "publishConfig": {
     "access": "public",
@@ -75,10 +80,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-renderer-codeblock"
   }
 }

@@ -1,9 +1,14 @@
 {
   "name": "@haklex/rich-renderer-katex",
-  "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "description": "KaTeX math renderer for haklex rich editor",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-renderer-katex"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./style.css": "./dist/rich-renderer-katex.css"
@@ -15,18 +20,6 @@
   "scripts": {
     "build": "vite build",
     "dev:build": "vite build --watch"
-  },
-  "peerDependencies": {
-    "@lexical/react": "^0.41.0",
-    "katex": ">=0.16.0",
-    "lexical": "^0.41.0",
-    "react": ">=19",
-    "react-dom": ">=19"
-  },
-  "peerDependenciesMeta": {
-    "katex": {
-      "optional": true
-    }
   },
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
@@ -49,6 +42,18 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
+  "peerDependencies": {
+    "@lexical/react": "^0.41.0",
+    "katex": ">=0.16.0",
+    "lexical": "^0.41.0",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "peerDependenciesMeta": {
+    "katex": {
+      "optional": true
+    }
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -60,10 +65,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-renderer-katex"
   }
 }

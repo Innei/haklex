@@ -1,9 +1,14 @@
 {
   "name": "@haklex/rich-static-renderer",
-  "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "description": "Headless SSR engine for Lexical rich content",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-static-renderer"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
@@ -14,17 +19,6 @@
   "scripts": {
     "bench": "node benchmark/build-and-run.mjs",
     "build": "vite build"
-  },
-  "peerDependencies": {
-    "@lexical/code": "^0.41.0",
-    "@lexical/extension": "^0.41.0",
-    "@lexical/link": "^0.41.0",
-    "@lexical/list": "^0.41.0",
-    "@lexical/rich-text": "^0.41.0",
-    "@lexical/table": "^0.41.0",
-    "lexical": "^0.41.0",
-    "react": ">=19",
-    "react-dom": ">=19"
   },
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
@@ -49,6 +43,17 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
+  "peerDependencies": {
+    "@lexical/code": "^0.41.0",
+    "@lexical/extension": "^0.41.0",
+    "@lexical/link": "^0.41.0",
+    "@lexical/list": "^0.41.0",
+    "@lexical/rich-text": "^0.41.0",
+    "@lexical/table": "^0.41.0",
+    "lexical": "^0.41.0",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -59,10 +64,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-static-renderer"
   }
 }

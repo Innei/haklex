@@ -1,9 +1,14 @@
 {
   "name": "@haklex/rich-style-token",
-  "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "description": "Style tokens and CSS variables for haklex rich editor",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-style-token"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./styles": "./src/styles.ts"
@@ -16,9 +21,6 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "peerDependencies": {
-    "react": ">=19"
-  },
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@vanilla-extract/css": "^1.18.0",
@@ -27,6 +29,9 @@
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
+  },
+  "peerDependencies": {
+    "react": ">=19"
   },
   "publishConfig": {
     "access": "public",
@@ -42,10 +47,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-style-token"
   }
 }

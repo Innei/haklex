@@ -1,9 +1,14 @@
 {
   "name": "@haklex/rich-diff",
-  "type": "module",
-  "version": "0.0.65",
+  "version": "0.0.66",
   "description": "Rich diff editor",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-diff"
+  },
   "license": "MIT",
+  "type": "module",
   "exports": {
     ".": "./src/index.ts",
     "./style.css": "./dist/rich-diff.css"
@@ -15,10 +20,6 @@
   "scripts": {
     "build": "vite build",
     "dev:build": "vite build --watch"
-  },
-  "peerDependencies": {
-    "react": ">=19",
-    "react-dom": ">=19"
   },
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
@@ -37,6 +38,10 @@
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
   "publishConfig": {
     "access": "public",
     "exports": {
@@ -48,10 +53,5 @@
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-diff"
   }
 }
