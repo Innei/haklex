@@ -741,6 +741,9 @@ importers:
       '@haklex/rich-ext-excalidraw':
         specifier: workspace:*
         version: link:../rich-ext-excalidraw
+      '@haklex/rich-ext-nested-doc':
+        specifier: workspace:*
+        version: link:../rich-ext-nested-doc
       '@haklex/rich-plugin-block-handle':
         specifier: workspace:*
         version: link:../rich-plugin-block-handle
