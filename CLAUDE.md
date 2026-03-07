@@ -75,21 +75,47 @@ RichRenderer (read-only display)          RichEditor (full editing)
 @haklex/rich-editor-demo (dev playground, depends on all)
 ```
 
+## Toolchain
+
+- **Package manager**: pnpm 10 (`pnpm-workspace.yaml`, all packages under `packages/*`)
+- **Node**: >= 20
+- **Task runner**: Turborepo (`turbo.json`). `build` tasks respect `^build` dependency order.
+- **ESLint**: `eslint-config-hyoban` (flat config). Key rule: `react/no-use-context: 'error'` — use React 19's `use(Context)` instead of `useContext(Context)`.
+- **Prettier**: `@innei/prettier` factory (`importSort: false`)
+- **Pre-commit**: `simple-git-hooks` + `lint-staged` — runs prettier + eslint on staged files
+- **Versioning**: All `@haklex/*` packages share a single version (based on `packages/rich-editor/package.json`). Managed by `bumpp` (`bump.config.ts`).
+- **Dead-code analysis**: `knip` (`knip.json`), ignores `*.css.ts` files and demo package
+
 ## Commands
 
 ```bash
-# Build
-pnpm --filter @haklex/rich-editor build            # BUILD_LIB=1 vite build
-pnpm --filter @haklex/rich-static-renderer build
-pnpm --filter @haklex/rich-kit-shiro build
-pnpm --filter @haklex/rich-renderers build
-pnpm --filter @haklex/rich-renderers-edit build     # depends on rich-renderers
-
 # Dev playground (hot reload, all features)
-pnpm --filter @haklex/rich-editor-demo dev
+pnpm dev                                            # alias: turbo dev --filter @haklex/rich-editor-demo
 
 # Watch mode for core iteration
 pnpm --filter @haklex/rich-editor dev:build
+
+# Build
+pnpm build                                          # turbo build (all packages)
+pnpm build:packages                                 # all packages except demo
+pnpm --filter @haklex/rich-editor build             # single package
+
+# Lint (eslint, includes type-aware rules)
+pnpm lint                                           # turbo lint (all packages)
+npx eslint path/to/file.ts                          # lint single file
+
+# Format
+npx prettier --write path/to/file.ts                # format single file
+
+# Test (vitest 4, no root config — run from package dir)
+npx vitest run packages/rich-renderer-katex/tests/  # run specific tests
+
+# Dead-code check
+npx knip                                            # find unused exports/deps
+
+# Release
+pnpm release                                        # bumpp: interactive version bump
+pnpm release:rich                                   # bump + build + publish @haklex/*
 ```
 
 ## Foundation Packages
@@ -305,6 +331,20 @@ Shared Vite config factory in `haklex/vite.shared.ts` (`createViteConfig()`). Ea
 - Vanilla Extract plugin for CSS-in-TS → static CSS (zero runtime)
 - Output: ESM `.mjs` + `.d.ts` declarations (via `vite-plugin-dts`)
 - Target: ES2020, no minification for JS, CSS minified
+
+## Downstream Consumers
+
+haklex packages are published to npm as `@haklex/*`, consumed by three downstream projects:
+
+| Consumer | Path | Packages Used | Integration |
+|----------|------|---------------|-------------|
+| **Shiroi** (Next.js frontend) | `../Shiroi` | `@haklex/rich-kit-shiro` (workspace link via `haklex/*`) | Native React — `ShiroEditor` / `ShiroRenderer` |
+| **admin-vue3** (Vue 3 dashboard) | `../admin-vue3` | `rich-editor`, `rich-editor-ui`, `rich-kit-shiro`, `rich-plugin-toolbar`, `rich-style-token`, `rich-diff`, `rich-ext-nested-doc` | React-in-Vue bridge: `createRoot()` inside Vue `defineComponent` |
+| **mx-core** (NestJS backend) | `../mx-core` | `@haklex/rich-headless` | Server-side only: `createHeadlessEditor()` + `allHeadlessNodes` + `$toMarkdown()` for Lexical JSON → Markdown |
+
+**Shiroi is the original host** — `haklex/` lives inside `Shiroi/` as a pnpm workspace member (`haklex/*` in `pnpm-workspace.yaml`). This standalone repo (`../haklex`) is the extracted version for independent development.
+
+**Release flow**: `pnpm release:rich` bumps all `@haklex/*` versions → builds → publishes to npm. Then update pinned versions in `admin-vue3/package.json` and `mx-core/apps/core/package.json`.
 
 ## Styling
 
