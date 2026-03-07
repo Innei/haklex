@@ -91,7 +91,12 @@ export function TooltipContent({
 }: TooltipContentProps) {
   return (
     <TooltipPortal>
-      <TooltipPositioner side={side} sideOffset={sideOffset} align={align}>
+      <TooltipPositioner
+        side={side}
+        sideOffset={sideOffset}
+        align={align}
+        className={css.positioner}
+      >
         <TooltipPopup className={className} {...popupProps}>
           {children}
         </TooltipPopup>

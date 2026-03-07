@@ -1,5 +1,5 @@
 import { Menu as MenuPrimitive } from '@base-ui/react/menu'
-import { PortalThemeWrapper } from '@shiro/rich-style-token'
+import { PortalThemeWrapper } from '@haklex/rich-style-token'
 import { Check } from 'lucide-react'
 import type { ComponentProps, ReactNode } from 'react'
 
@@ -10,7 +10,7 @@ import * as css from './styles.css'
 type DropdownMenuProps = ComponentProps<typeof MenuPrimitive.Root>
 
 export function DropdownMenu(props: DropdownMenuProps) {
-  return <MenuPrimitive.Root {...props} />
+  return <MenuPrimitive.Root data-slot="dropdown-menu" {...props} />
 }
 
 // -- Trigger --
@@ -18,7 +18,7 @@ export function DropdownMenu(props: DropdownMenuProps) {
 type DropdownMenuTriggerProps = ComponentProps<typeof MenuPrimitive.Trigger>
 
 export function DropdownMenuTrigger(props: DropdownMenuTriggerProps) {
-  return <MenuPrimitive.Trigger {...props} />
+  return <MenuPrimitive.Trigger data-slot="dropdown-menu-trigger" {...props} />
 }
 
 // -- Portal --
@@ -43,6 +43,9 @@ type DropdownMenuContentProps = Omit<
   sideOffset?: ComponentProps<typeof MenuPrimitive.Positioner>['sideOffset']
   className?: string
   children?: ReactNode
+  positionMethod?: ComponentProps<
+    typeof MenuPrimitive.Positioner
+  >['positionMethod']
 }
 
 export function DropdownMenuContent({
@@ -51,18 +54,24 @@ export function DropdownMenuContent({
   side = 'bottom',
   sideOffset = 4,
   className,
+  positionMethod = 'absolute',
   children,
   ...popupProps
 }: DropdownMenuContentProps) {
   return (
     <DropdownMenuPortal>
       <MenuPrimitive.Positioner
+        className={css.positioner}
+        data-slot="dropdown-menu-positioner"
+        positionMethod={positionMethod}
         align={align}
         alignOffset={alignOffset}
         side={side}
         sideOffset={sideOffset}
+        style={{ zIndex: 50 }}
       >
         <MenuPrimitive.Popup
+          data-slot="dropdown-menu-content"
           className={`${css.popup}${className ? ` ${className}` : ''}`}
           {...popupProps}
         >
@@ -78,7 +87,7 @@ export function DropdownMenuContent({
 type DropdownMenuGroupProps = ComponentProps<typeof MenuPrimitive.Group>
 
 export function DropdownMenuGroup(props: DropdownMenuGroupProps) {
-  return <MenuPrimitive.Group {...props} />
+  return <MenuPrimitive.Group data-slot="dropdown-menu-group" {...props} />
 }
 
 // -- GroupLabel --
@@ -91,6 +100,7 @@ export function DropdownMenuLabel({
 }: DropdownMenuLabelProps) {
   return (
     <MenuPrimitive.GroupLabel
+      data-slot="dropdown-menu-label"
       className={`${css.label}${className ? ` ${className}` : ''}`}
       {...props}
     />
@@ -109,6 +119,7 @@ export function DropdownMenuItem({
 }: DropdownMenuItemProps) {
   return (
     <MenuPrimitive.Item
+      data-slot="dropdown-menu-item"
       className={`${css.item}${className ? ` ${className}` : ''}`}
       {...props}
     />
@@ -125,6 +136,7 @@ export function DropdownMenuSeparator({
 }: DropdownMenuSeparatorProps) {
   return (
     <MenuPrimitive.Separator
+      data-slot="dropdown-menu-separator"
       className={`${css.separator}${className ? ` ${className}` : ''}`}
       {...props}
     />
@@ -138,7 +150,12 @@ type DropdownMenuRadioGroupProps = ComponentProps<
 >
 
 export function DropdownMenuRadioGroup(props: DropdownMenuRadioGroupProps) {
-  return <MenuPrimitive.RadioGroup {...props} />
+  return (
+    <MenuPrimitive.RadioGroup
+      data-slot="dropdown-menu-radio-group"
+      {...props}
+    />
+  )
 }
 
 // -- RadioItem --
@@ -156,13 +173,17 @@ export function DropdownMenuRadioItem({
 }: DropdownMenuRadioItemProps) {
   return (
     <MenuPrimitive.RadioItem
-      className={`${css.item}${className ? ` ${className}` : ''}`}
+      data-slot="dropdown-menu-radio-item"
+      className={`${css.item} ${css.radioItem}${className ? ` ${className}` : ''}`}
       {...props}
     >
-      <MenuPrimitive.RadioItemIndicator className={css.radioIndicator}>
+      {children}
+      <MenuPrimitive.RadioItemIndicator
+        data-slot="dropdown-menu-radio-item-indicator"
+        className={css.radioIndicator}
+      >
         <CheckIcon />
       </MenuPrimitive.RadioItemIndicator>
-      {children}
     </MenuPrimitive.RadioItem>
   )
 }
@@ -182,13 +203,17 @@ export function DropdownMenuCheckboxItem({
 }: DropdownMenuCheckboxItemProps) {
   return (
     <MenuPrimitive.CheckboxItem
-      className={`${css.item}${className ? ` ${className}` : ''}`}
+      data-slot="dropdown-menu-checkbox-item"
+      className={`${css.item} ${css.checkboxItem}${className ? ` ${className}` : ''}`}
       {...props}
     >
-      <MenuPrimitive.CheckboxItemIndicator className={css.checkboxIndicator}>
+      {children}
+      <MenuPrimitive.CheckboxItemIndicator
+        data-slot="dropdown-menu-checkbox-item-indicator"
+        className={css.checkboxIndicator}
+      >
         <CheckIcon />
       </MenuPrimitive.CheckboxItemIndicator>
-      {children}
     </MenuPrimitive.CheckboxItem>
   )
 }

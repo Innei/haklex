@@ -8,6 +8,27 @@ export { AnimatedCheckbox } from './components/checkbox'
 export type { ColorPickerProps } from './components/color-picker'
 export { ColorPicker } from './components/color-picker'
 export type {
+  ComboboxContentProps,
+  ComboboxEmptyProps,
+  ComboboxGroupLabelProps,
+  ComboboxGroupProps,
+  ComboboxInputProps,
+  ComboboxItemIndicatorProps,
+  ComboboxItemProps,
+  ComboboxListProps,
+} from './components/combobox'
+export {
+  Combobox,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxGroup,
+  ComboboxGroupLabel,
+  ComboboxInput,
+  ComboboxItem,
+  ComboboxItemIndicator,
+  ComboboxList,
+} from './components/combobox'
+export type {
   DialogBackdropProps,
   DialogCloseProps,
   DialogDescriptionProps,

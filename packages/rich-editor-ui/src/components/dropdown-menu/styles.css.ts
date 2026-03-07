@@ -1,88 +1,75 @@
-import { vars } from '@shiro/rich-style-token'
-import { globalStyle, style } from '@vanilla-extract/css'
+import { vars } from '@haklex/rich-style-token'
+import { style } from '@vanilla-extract/css'
+
+import {
+  applyItemSvgStyles,
+  itemBase,
+  label as sharedLabel,
+  popupBase,
+  separator as sharedSeparator,
+} from '../../styles/menu.css'
 
 export const popup = style({
-  minWidth: '8rem',
-  borderRadius: '0.5rem',
-  padding: '0.25rem',
-  backgroundColor: vars.color.bg,
-  boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1)',
+  ...popupBase,
+  maxWidth: 'min(20rem, calc(100vw - 0.75rem))',
+})
+
+export const positioner = style({
   outline: 'none',
-  border: `1px solid ${vars.color.border}`,
   zIndex: 50,
-  maxHeight: 'var(--available-height)',
-  overflowY: 'auto',
-  transformOrigin: 'var(--transform-origin)',
-  transition: 'opacity 100ms, transform 100ms',
+  isolation: 'isolate',
   selectors: {
-    '&[data-open]': {
-      opacity: 1,
-      transform: 'scale(1)',
+    '&[data-side="bottom"]': {
+      transform: 'translateY(2px)',
     },
-    '&[data-closed]': {
-      opacity: 0,
-      transform: 'scale(0.95)',
+    '&[data-side="top"]': {
+      transform: 'translateY(-2px)',
+    },
+    '&[data-side="left"]': {
+      transform: 'translateX(-2px)',
+    },
+    '&[data-side="right"]': {
+      transform: 'translateX(2px)',
     },
   },
 })
 
-export const item = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.375rem',
-  borderRadius: '0.375rem',
-  padding: '0.25rem 0.375rem',
-  fontSize: '0.875rem',
-  lineHeight: '1.25rem',
-  outline: 'none',
-  userSelect: 'none',
-  cursor: 'default',
-  color: vars.color.text,
-  selectors: {
-    '&[data-highlighted]': {
-      backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
-    },
-    '&[data-disabled]': {
-      opacity: 0.5,
-      pointerEvents: 'none',
-    },
-  },
+export const item = style(itemBase)
+
+applyItemSvgStyles(item)
+
+export const separator = sharedSeparator
+export const label = sharedLabel
+
+const itemWithIndicator = style({
+  paddingRight: '2rem',
 })
 
-globalStyle(`${item} svg`, {
-  pointerEvents: 'none',
-  flexShrink: 0,
-  width: '16px',
-  height: '16px',
-})
-
-export const separator = style({
-  height: '1px',
-  backgroundColor: vars.color.border,
-  margin: '0.25rem -0.25rem',
-})
-
-export const label = style({
-  fontSize: '0.75rem',
-  fontWeight: 500,
-  color: vars.color.textSecondary,
-  padding: '0.25rem 0.375rem',
-})
+export const checkboxItem = itemWithIndicator
+export const radioItem = itemWithIndicator
 
 export const checkboxIndicator = style({
+  position: 'absolute',
+  right: '0.5rem',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '16px',
-  height: '16px',
+  width: '1rem',
+  height: '1rem',
   flexShrink: 0,
+  pointerEvents: 'none',
+  color: vars.color.textSecondary,
 })
 
 export const radioIndicator = style({
+  position: 'absolute',
+  right: '0.5rem',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '16px',
-  height: '16px',
+  width: '1rem',
+  height: '1rem',
   flexShrink: 0,
+  pointerEvents: 'none',
+  color: vars.color.textSecondary,
 })
