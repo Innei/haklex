@@ -21,6 +21,21 @@ import { useTheme } from '../context/ThemeContext'
 import { extraMentionPlatforms } from '../fixtures/extra-mention-platforms'
 import { initialContent } from '../fixtures/initial-content'
 
+const insertItemOrder = [
+  'Image',
+  'Code Block',
+  'Link Card',
+  'Callout',
+  'Banner',
+  'Gallery',
+  'Video',
+  'Mermaid Diagram',
+  'Code Snippet',
+  'Embed',
+  'Whiteboard',
+  'Nested Document',
+]
+
 interface ColorSet {
   accent: string
   text: string
@@ -42,7 +57,12 @@ function NestedDocDialogEditor({
       initialValue={initialValue}
       onEditorReady={onEditorReady}
       extraNodes={nestedDocEditNodes}
-      header={<ToolbarPlugin />}
+      header={
+        <ToolbarPlugin
+          maxVisibleInsertItems={5}
+          insertItemOrder={insertItemOrder}
+        />
+      }
     />
   )
 }
@@ -282,7 +302,12 @@ export function EditorPage() {
               style={themeOverrideStyle}
               placeholder="Start typing... Try markdown shortcuts like # heading, **bold**, *italic*, > quote, ||spoiler||"
               onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
-              header={<ToolbarPlugin />}
+              header={
+                <ToolbarPlugin
+                  maxVisibleInsertItems={5}
+                  insertItemOrder={insertItemOrder}
+                />
+              }
               autoFocus
               extraNodes={nestedDocEditNodes}
               extraMentionPlatforms={
