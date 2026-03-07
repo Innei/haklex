@@ -1,10 +1,9 @@
 import type { CodeSnippetRendererProps } from '@haklex/rich-editor'
-import { useColorScheme } from '@haklex/rich-editor'
 import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants'
 import { FileIcon } from '@haklex/rich-renderer-codeblock/icons'
 import {
   getHighlighterWithLang,
-  SHIKI_THEMES,
+  SHIKI_DUAL_THEMES,
 } from '@haklex/rich-renderer-codeblock/shiki'
 import { Check, Copy } from 'lucide-react'
 import type { ComponentType, FC } from 'react'
@@ -39,8 +38,6 @@ const CopyButton: FC<{ text: string }> = ({ text }) => {
 export const CodeSnippetRenderer: ComponentType<CodeSnippetRendererProps> = ({
   files,
 }) => {
-  const colorScheme = useColorScheme()
-
   const [activeIndex, setActiveIndex] = useState(0)
   const [htmlMap, setHtmlMap] = useState<Record<string, string>>({})
 
@@ -65,7 +62,7 @@ export const CodeSnippetRenderer: ComponentType<CodeSnippetRendererProps> = ({
 
         newHtmlMap[file.filename] = highlighter.codeToHtml(file.code, {
           lang: resolvedLang,
-          theme: SHIKI_THEMES[colorScheme],
+          themes: SHIKI_DUAL_THEMES,
         })
       }
 
@@ -75,7 +72,7 @@ export const CodeSnippetRenderer: ComponentType<CodeSnippetRendererProps> = ({
     return () => {
       cancelled = true
     }
-  }, [files, colorScheme])
+  }, [files])
 
   if (!activeFile) return null
 
@@ -136,41 +133,45 @@ export const CodeSnippetRenderer: ComponentType<CodeSnippetRendererProps> = ({
         className={`${styles.separator} ${styles.semanticClassNames.separator}`}
       />
 
-      {/* Code panels */}
-      {files.map((file, index) => {
-        const html = htmlMap[file.filename]
-        return (
-          <div
-            key={file.filename}
-            role={isMultiFile ? 'tabpanel' : undefined}
-            className={styles.semanticClassNames.codePanel}
-            style={{ display: index === activeIndex ? 'block' : 'none' }}
-          >
+      {/* Code panels - allow-discrete + @starting-style for height transition */}
+      <div
+        className={`${styles.codePanelsWrapper} ${styles.semanticClassNames.codePanelsWrapper}`}
+      >
+        {files.map((file, index) => {
+          const html = htmlMap[file.filename]
+          return (
             <div
-              className={`${styles.codeScroll} ${styles.semanticClassNames.codeScroll}`}
+              key={file.filename}
+              role={isMultiFile ? 'tabpanel' : undefined}
+              data-active={index === activeIndex}
+              className={`${styles.codePanel} ${styles.semanticClassNames.codePanel}`}
             >
-              {html ? (
-                <div
-                  className={`${styles.codeBody} ${styles.semanticClassNames.codeBody}`}
-                  dangerouslySetInnerHTML={{ __html: html }}
-                />
-              ) : (
-                <pre
-                  className={`${styles.codeBody} ${styles.semanticClassNames.codeBody}`}
-                >
-                  <code>
-                    {file.code.split('\n').map((line, i) => (
-                      <span key={i} className="line">
-                        {line}
-                      </span>
-                    ))}
-                  </code>
-                </pre>
-              )}
+              <div
+                className={`${styles.codeScroll} ${styles.semanticClassNames.codeScroll}`}
+              >
+                {html ? (
+                  <div
+                    className={`${styles.codeBody} ${styles.semanticClassNames.codeBody}`}
+                    dangerouslySetInnerHTML={{ __html: html }}
+                  />
+                ) : (
+                  <pre
+                    className={`${styles.codeBody} ${styles.semanticClassNames.codeBody}`}
+                  >
+                    <code>
+                      {file.code.split('\n').map((line, i) => (
+                        <span key={i} className="line">
+                          {line}
+                        </span>
+                      ))}
+                    </code>
+                  </pre>
+                )}
+              </div>
             </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
     </div>
   )
 }

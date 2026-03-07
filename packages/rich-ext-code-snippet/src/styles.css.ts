@@ -12,6 +12,7 @@ export const semanticClassNames = {
   headerActions: 'rcs-header-actions',
   copyButton: 'rcs-copy-btn',
   separator: 'rcs-separator',
+  codePanelsWrapper: 'rcs-code-panels-wrapper',
   codePanel: 'rcs-code-panel',
   codeScroll: 'rcs-code-scroll',
   codeBody: 'rcs-code-body',
@@ -104,7 +105,7 @@ export const tab = recipe({
     active: {
       true: {
         color: vars.color.text,
-        background: vars.color.bgTertiary,
+        background: vars.color.fill,
       },
       false: {},
     },
@@ -163,14 +164,36 @@ export const separator = style({
   opacity: 0.6,
 })
 
+/** Wrapper for tab panels; overflow hidden for height transition */
+export const codePanelsWrapper = style({
+  position: 'relative',
+})
+
+/** Panel: grid-template-rows 0fr/1fr for smooth bidirectional height transition */
+export const codePanel = style({
+  display: 'grid',
+  gridTemplateRows: '0fr',
+  transition: 'grid-template-rows 0.3s ease',
+  selectors: {
+    '&[data-active="true"]': {
+      gridTemplateRows: '1fr',
+    },
+  },
+})
+
 export const codeScroll = style({
-  overflowX: 'auto',
+  overflow: 'hidden',
+  selectors: {
+    [`${codePanel}[data-active="true"] &`]: {
+      overflowX: 'auto',
+    },
+  },
 })
 
 export const codeBody = style({
   padding: '12px 16px',
   margin: 0,
-  fontSize: vars.typography.fontSizeSm,
+  fontSize: vars.typography.fontSizeSmall,
   lineHeight: 1.7,
   fontFamily: vars.typography.fontMono,
 })
@@ -548,7 +571,6 @@ globalStyle(`${editorContainer} .cm-line`, {
 })
 
 globalStyle(`${editorContainer} .cm-gutters`, {
-  background: 'transparent',
   borderRight: 'none',
   paddingLeft: '1rem',
 })
@@ -562,7 +584,7 @@ globalStyle(`${editorContainer} .cm-lineNumbers .cm-gutterElement`, {
 })
 
 export const dragOverlay = style({
-  background: vars.color.bgSecondary,
+  background: vars.color.fillQuaternary,
   borderRadius: 6,
   boxShadow: vars.boxShadow.modal,
 })

@@ -18,8 +18,7 @@ interface CodeBlockCardProps {
   code: string
   language: string
   collapsible?: boolean
-  editable?: boolean
-  onLanguageChange?: (language: string) => void
+  langSlot?: ReactNode
   children: ReactNode
 }
 
@@ -27,8 +26,7 @@ export function CodeBlockCard({
   code,
   language,
   collapsible = true,
-  editable = false,
-  onLanguageChange,
+  langSlot,
   children,
 }: CodeBlockCardProps) {
   const normalizedLanguage = normalizeLanguage(language)
@@ -95,26 +93,8 @@ export function CodeBlockCard({
       className={`${styles.card} ${styles.semanticClassNames.card}`}
       style={cardStyle}
     >
-      {editable ? (
-        <div className={`${styles.lang} ${styles.semanticClassNames.lang}`}>
-          {hasLanguageIcon(normalizedLanguage) && (
-            <LanguageIcon language={normalizedLanguage} size={14} />
-          )}
-          <input
-            className={styles.langInput}
-            value={language}
-            placeholder="language"
-            onChange={(e) => onLanguageChange?.(e.target.value)}
-            onKeyDown={(e) => {
-              e.stopPropagation()
-              if (e.key === 'Escape' || e.key === 'Enter') {
-                e.currentTarget.blur()
-              }
-            }}
-          />
-        </div>
-      ) : (
-        normalizedLanguage !== 'text' && (
+      {langSlot ??
+        (normalizedLanguage !== 'text' && (
           <div
             className={`${styles.lang} ${styles.semanticClassNames.lang}`}
             aria-hidden
@@ -125,8 +105,7 @@ export function CodeBlockCard({
               <span>{languageLabel}</span>
             )}
           </div>
-        )
-      )}
+        ))}
 
       <button
         type="button"

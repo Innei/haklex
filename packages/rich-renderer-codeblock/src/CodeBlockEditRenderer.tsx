@@ -24,6 +24,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 
 import { CodeBlockCard } from './CodeBlockCard'
 import { normalizeLanguage } from './constants'
+import { LanguageCombobox } from './LanguageCombobox'
 import * as styles from './styles.css'
 
 function stopHandledEvent(event: KeyboardEvent) {
@@ -274,8 +275,14 @@ export const CodeBlockEditRenderer: ComponentType<CodeBlockRendererProps> = ({
       code={code}
       language={language}
       collapsible={!editable}
-      editable={editable}
-      onLanguageChange={onLanguageChange}
+      langSlot={
+        editable ? (
+          <LanguageCombobox
+            language={language}
+            onLanguageChange={onLanguageChange}
+          />
+        ) : undefined
+      }
     >
       {!mounted && (
         <pre className={fallbackClassName}>

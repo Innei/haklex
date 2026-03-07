@@ -1,5 +1,4 @@
 import type { CodeBlockRendererProps } from '@haklex/rich-editor'
-import { useVariant } from '@haklex/rich-editor'
 import type { ComponentType } from 'react'
 import { useEffect, useMemo, useState } from 'react'
 
@@ -13,8 +12,7 @@ export const CodeBlockRenderer: ComponentType<CodeBlockRendererProps> = ({
   language,
   showLineNumbers: showLineNumbersProp,
 }) => {
-  const variant = useVariant()
-  const showLineNumbers = showLineNumbersProp ?? variant !== 'comment'
+  const showLineNumbers = showLineNumbersProp ?? false
   const normalizedLanguage = normalizeLanguage(language)
   const [html, setHtml] = useState<string | null>(null)
 
