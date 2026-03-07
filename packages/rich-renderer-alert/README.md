@@ -1,36 +1,61 @@
 # @haklex/rich-renderer-alert
 
-GitHub 风格提示块渲染器。
+Alert/callout block renderer supporting five severity levels: note, tip, important, warning, and caution.
 
-## 安装
+## Installation
 
 ```bash
 pnpm add @haklex/rich-renderer-alert
 ```
 
-## 导出
+## Peer Dependencies
 
-```ts
-export { AlertRenderer } from './AlertRenderer'
-export { AlertEditRenderer } from './AlertEditRenderer'
-```
+| Package | Version |
+| --- | --- |
+| `react` | `>=19` |
+| `react-dom` | `>=19` |
 
-## 类型
-
-Alert 类型：`'note' | 'tip' | 'important' | 'warning' | 'caution'`
-
-## 使用
-
-渲染器通过 `rendererConfig` 传入：
+## Usage
 
 ```tsx
-import { AlertRenderer } from '@haklex/rich-renderer-alert'
-import type { RendererConfig } from '@haklex/rich-editor'
+import { AlertRenderer } from '@haklex/rich-renderer-alert/static'
 
-const config: RendererConfig = {
+// Register in a static RendererConfig
+const rendererConfig = {
+  // ...other renderers
   Alert: AlertRenderer,
 }
 ```
+
+For edit mode:
+
+```tsx
+import { AlertEditRenderer } from '@haklex/rich-renderer-alert'
+
+const editRendererConfig = {
+  // ...other renderers
+  Alert: AlertEditRenderer,
+}
+```
+
+## Exports
+
+### Components
+
+- `AlertRenderer` — Static (read-only) renderer for alert/callout blocks
+- `AlertEditRenderer` — Edit (interactive) renderer with severity selection
+
+### Sub-path Exports
+
+| Path | Description |
+| --- | --- |
+| `@haklex/rich-renderer-alert` | Full exports (edit + static) |
+| `@haklex/rich-renderer-alert/static` | Static-only renderer |
+| `@haklex/rich-renderer-alert/style.css` | Stylesheet |
+
+## Part of Haklex
+
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

@@ -1,110 +1,83 @@
 # @haklex/rich-kit-shiro
 
-生产就绪的编辑器包，包含所有渲染器、插件和扩展。
+Pre-configured integration bundle for Shiroi (Next.js blog). Provides `ShiroEditor` and `ShiroRenderer` with all plugins, extensions, and renderers pre-loaded.
 
-## 安装
+## Installation
 
 ```bash
-pnpm add @haklex/rich-kit-shiro lexical @lexical/react
+pnpm add @haklex/rich-kit-shiro
 ```
 
-## 使用
+## Peer Dependencies
 
-### 编辑器
+| Package | Version |
+| --- | --- |
+| `@lexical/react` | `^0.41.0` |
+| `lexical` | `^0.41.0` |
+| `react` | `>=19` |
+| `react-dom` | `>=19` |
+
+## Usage
+
+### Editor
 
 ```tsx
 import { ShiroEditor } from '@haklex/rich-kit-shiro/editor'
 import '@haklex/rich-kit-shiro/style.css'
 
-function Editor() {
-  const [state, setState] = useState()
-
-  return (
-    <ShiroEditor
-      initialValue={state}
-      onChange={setState}
-      variant="article"
-    />
-  )
-}
+<ShiroEditor
+  initialValue={savedState}
+  onChange={(value) => save(value)}
+  variant="article"
+/>
 ```
 
-### 渲染器
+### Renderer
 
 ```tsx
 import { ShiroRenderer } from '@haklex/rich-kit-shiro/renderer'
-import '@haklex/rich-kit-shiro/style.css'
+import '@haklex/rich-kit-shiro/style-renderer.css'
 
-function Article({ content }) {
-  return <ShiroRenderer value={content} variant="article" />
-}
+<ShiroRenderer value={editorState} variant="article" theme="light" />
 ```
 
-## 内置功能
+## Exports
 
-ShiroEditor 自动包含：
+### Components
 
-- 所有编辑渲染器
-- SlashMenuPlugin
-- FloatingToolbarPlugin
-- FloatingLinkEditorPlugin
-- TldrawPlugin
-- EmbedPlugin
-- 表格单元格调整
+| Export | Description |
+| --- | --- |
+| `ShiroEditor` | Fully configured editor with all plugins and extensions |
+| `ShiroRenderer` | Fully configured static renderer with all renderers |
 
-## API
+### Types
 
-### ShiroEditorProps
+| Export | Description |
+| --- | --- |
+| `ShiroEditorProps` | Props for `ShiroEditor` |
+| `ShiroRendererProps` | Props for `ShiroRenderer` |
 
-继承 `RichEditorProps`，但省略 `rendererConfig`、`extraNodes`：
+### Sub-path Exports
 
-```ts
-interface ShiroEditorProps extends Omit<RichEditorProps, 'rendererConfig' | 'extraNodes' | 'actions'> {
-  extraNodes?: Array<Klass<LexicalNode>>
-  actions?: ReactNode
-  selfHostnames?: string[]  // EmbedPlugin 用
-}
-```
+| Import Path | Description |
+| --- | --- |
+| `@haklex/rich-kit-shiro` | Main entry (ShiroEditor + ShiroRenderer + all re-exports) |
+| `@haklex/rich-kit-shiro/editor` | Editor component only |
+| `@haklex/rich-kit-shiro/editor-core` | Core editor re-exports |
+| `@haklex/rich-kit-shiro/excalidraw` | Excalidraw extension re-exports |
+| `@haklex/rich-kit-shiro/markdown` | Markdown conversion utilities |
+| `@haklex/rich-kit-shiro/nodes` | All node classes |
+| `@haklex/rich-kit-shiro/plugins` | All plugin re-exports |
+| `@haklex/rich-kit-shiro/renderer` | Renderer component only |
+| `@haklex/rich-kit-shiro/renderers` | Static renderer configs |
+| `@haklex/rich-kit-shiro/renderers-edit` | Edit-mode renderer configs |
+| `@haklex/rich-kit-shiro/style` | Style/theme utilities |
+| `@haklex/rich-kit-shiro/style.css` | Compiled editor stylesheet |
+| `@haklex/rich-kit-shiro/style-renderer.css` | Compiled renderer stylesheet |
 
-### ShiroRendererProps
+## Part of Haklex
 
-继承 `RichRendererProps`，但省略 `rendererConfig`、`extraNodes`：
-
-```ts
-interface ShiroRendererProps extends Omit<RichRendererProps, 'rendererConfig' | 'extraNodes'> {
-  extraNodes?: Array<Klass<LexicalNode>>
-}
-```
-
-## 导出
-
-```ts
-// 组件
-export { ShiroEditor } from './ShiroEditor'
-export { ShiroRenderer } from './ShiroRenderer'
-
-// 类型
-export type { ShiroEditorProps } from './ShiroEditor'
-export type { ShiroRendererProps } from './ShiroRenderer'
-
-// 重新导出常用类型
-export type { ColorScheme, RendererConfig, RichEditorVariant } from '@haklex/rich-editor'
-
-// 重新导出配置（高级用法）
-export { enhancedRendererConfig } from '@haklex/rich-renderers'
-export { enhancedEditRendererConfig } from '@haklex/rich-renderers-edit'
-```
-
-## 依赖
-
-```json
-{
-  "lexical": "^0.41.0",
-  "@lexical/react": "^0.41.0",
-  "react": ">=19",
-  "react-dom": ">=19"
-}
-```
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

@@ -1,151 +1,85 @@
 # @haklex/rich-editor-ui
 
-基于 @base-ui/react 的无头 UI 组件，用于富文本编辑器。
+Headless UI primitives for the Haklex rich editor, built on Base UI (`@base-ui/react`).
 
-## 安装
+## Installation
 
 ```bash
 pnpm add @haklex/rich-editor-ui
 ```
 
-## 组件
+## Peer Dependencies
 
-### Dialog
+| Package | Version |
+| --- | --- |
+| `react` | `>=19` |
+| `react-dom` | `>=19` |
+
+## Usage
 
 ```tsx
-import { Dialog, presentDialog } from '@haklex/rich-editor-ui'
+import { Dialog, DialogTrigger, DialogPopup, presentDialog } from '@haklex/rich-editor-ui'
+import '@haklex/rich-editor-ui/style.css'
 
-// 声明式
-<Dialog.Root>
-  <Dialog.Trigger>打开</Dialog.Trigger>
-  <Dialog.Portal>
-    <Dialog.Backdrop />
-    <Dialog.Popup>
-      <Dialog.Header>
-        <Dialog.Title>标题</Dialog.Title>
-      </Dialog.Header>
-      <Dialog.Description>内容</Dialog.Description>
-      <Dialog.Footer>
-        <Dialog.Close>关闭</Dialog.Close>
-      </Dialog.Footer>
-    </Dialog.Popup>
-  </Dialog.Portal>
-</Dialog.Root>
+// Declarative usage
+<Dialog>
+  <DialogTrigger>Open</DialogTrigger>
+  <DialogPopup>Dialog content here</DialogPopup>
+</Dialog>
 
-// 命令式
-const result = await presentDialog({
-  title: '确认',
-  content: <MyForm />,
+// Imperative usage
+presentDialog({
+  title: 'Confirm',
+  content: ({ dismiss }) => <p>Are you sure? <button onClick={dismiss}>Close</button></p>,
 })
 ```
 
+## Exports
+
+### Dialog
+
+`Dialog`, `DialogTrigger`, `DialogPopup`, `DialogBackdrop`, `DialogPortal`, `DialogHeader`, `DialogTitle`, `DialogDescription`, `DialogFooter`, `DialogClose`, `DialogStackProvider`
+
+Imperative API: `presentDialog`, `dismissDialog`, `dismissTopDialog`, `dismissAllDialogs`
+
 ### DropdownMenu
 
-```tsx
-import { DropdownMenu } from '@haklex/rich-editor-ui'
-
-<DropdownMenu.Root>
-  <DropdownMenu.Trigger>菜单</DropdownMenu.Trigger>
-  <DropdownMenu.Portal>
-    <DropdownMenu.Content>
-      <DropdownMenu.Item>操作 1</DropdownMenu.Item>
-      <DropdownMenu.Separator />
-      <DropdownMenu.Item>操作 2</DropdownMenu.Item>
-    </DropdownMenu.Content>
-  </DropdownMenu.Portal>
-</DropdownMenu.Root>
-```
+`DropdownMenu`, `DropdownMenuTrigger`, `DropdownMenuContent`, `DropdownMenuItem`, `DropdownMenuCheckboxItem`, `DropdownMenuRadioItem`, `DropdownMenuGroup`, `DropdownMenuLabel`, `DropdownMenuSeparator`, `DropdownMenuRadioGroup`
 
 ### Popover
 
-```tsx
-import { Popover } from '@haklex/rich-editor-ui'
+`Popover`, `PopoverTrigger`, `PopoverPopup`, `PopoverPortal`, `PopoverPositioner`, `PopoverPanel`, `PopoverArrow`, `PopoverTitle`, `PopoverDescription`, `PopoverClose`, `usePopover`
 
-<Popover.Root>
-  <Popover.Trigger>触发</Popover.Trigger>
-  <Popover.Portal>
-    <Popover.Positioner>
-      <Popover.Popup>
-        <Popover.Title>标题</Popover.Title>
-        <Popover.Description>描述</Popover.Description>
-      </Popover.Popup>
-    </Popover.Positioner>
-  </Popover.Portal>
-</Popover.Root>
-```
+### Combobox
 
-### Tooltip
+`Combobox`, `ComboboxInput`, `ComboboxContent`, `ComboboxList`, `ComboboxItem`, `ComboboxItemIndicator`, `ComboboxGroup`, `ComboboxGroupLabel`, `ComboboxEmpty`
 
-```tsx
-import { Tooltip } from '@haklex/rich-editor-ui'
+### Other Components
 
-<Tooltip.Provider>
-  <Tooltip.Root>
-    <Tooltip.Trigger>悬停</Tooltip.Trigger>
-    <Tooltip.Portal>
-      <Tooltip.Positioner>
-        <Tooltip.Popup>提示文本</Tooltip.Popup>
-      </Tooltip.Positioner>
-    </Tooltip.Portal>
-  </Tooltip.Root>
-</Tooltip.Provider>
-```
+| Export | Description |
+| --- | --- |
+| `AnimatedTabs` | Tab bar with animated active indicator |
+| `AnimatedCheckbox` | Checkbox with animation |
+| `ColorPicker` | Color picker input |
+| `SegmentedControl` | Segmented control / toggle group |
+| `TooltipRoot`, `TooltipTrigger`, `TooltipContent`, `TooltipPopup`, `TooltipPortal`, `TooltipPositioner`, `TooltipProvider` | Tooltip components |
+| `createTooltipHandle` | Imperative tooltip control |
+| `ViewportGate` | Render children only when visible in viewport |
 
-### SegmentedControl
+### Theme Utilities
 
-```tsx
-import { SegmentedControl } from '@haklex/rich-editor-ui'
+`PortalThemeProvider`, `PortalThemeWrapper`, `usePortalTheme` (re-exported from `@haklex/rich-style-token`)
 
-<SegmentedControl.Root value={value} onValueChange={setValue}>
-  <SegmentedControl.Item value="a">A</SegmentedControl.Item>
-  <SegmentedControl.Item value="b">B</SegmentedControl.Item>
-</SegmentedControl.Root>
-```
+### Sub-path Exports
 
-### ColorPicker
+| Import Path | Description |
+| --- | --- |
+| `@haklex/rich-editor-ui` | All components and utilities |
+| `@haklex/rich-editor-ui/style.css` | Compiled stylesheet |
 
-```tsx
-import { ColorPicker } from '@haklex/rich-editor-ui'
+## Part of Haklex
 
-<ColorPicker value={color} onChange={setColor} />
-```
-
-## 导出
-
-```ts
-// Dialog
-export { Dialog, DialogBackdrop, DialogClose, ... } from './components/dialog'
-export { presentDialog, dismissDialog, dismissAllDialogs } from './components/dialog/store'
-
-// DropdownMenu
-export { DropdownMenu, DropdownMenuItem, ... } from './components/dropdown-menu'
-
-// Popover
-export { Popover, PopoverPopup, PopoverTrigger, ... } from './components/popover'
-
-// Tooltip
-export { TooltipRoot, TooltipTrigger, TooltipPopup, ... } from './components/tooltip'
-
-// SegmentedControl
-export { SegmentedControl } from './components/segmented-control'
-
-// ColorPicker
-export { ColorPicker } from './components/color-picker'
-
-// Portal 主题
-export { PortalThemeProvider, PortalThemeWrapper, usePortalTheme } from '@haklex/rich-style-token'
-```
-
-## 依赖
-
-```json
-{
-  "@base-ui/react": "^1.1.0",
-  "lucide-react": "^0.574.0",
-  "react": ">=19",
-  "react-dom": ">=19"
-}
-```
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

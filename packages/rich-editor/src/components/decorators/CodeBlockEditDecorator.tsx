@@ -4,8 +4,10 @@ import {
   $createNodeSelection,
   $createParagraphNode,
   $getNodeByKey,
+  $getSelection,
   $isDecoratorNode,
   $isElementNode,
+  $isNodeSelection,
   $setSelection,
 } from 'lexical'
 import { useCallback, useEffect, useState } from 'react'
@@ -31,15 +33,43 @@ export function CodeBlockEditDecorator({
 }: CodeBlockEditDecoratorProps) {
   const [editor] = useLexicalComposerContext()
   const [isSelected] = useLexicalNodeSelection(nodeKey)
+  const [shouldFocusEditor, setShouldFocusEditor] = useState(false)
   const [cursorPlacement, setCursorPlacement] = useState<'start' | 'end'>(
     'start',
   )
   const editable = editor.isEditable()
 
   useEffect(() => {
-    if (!editable || !isSelected) return
-    setCursorPlacement(consumeCodeBlockCursorIntent(nodeKey) ?? 'start')
-  }, [editable, isSelected, nodeKey])
+    if (!editable || !isSelected) {
+      setShouldFocusEditor(false)
+      return
+    }
+
+    let nextShouldFocus = false
+    let nextCursorPlacement: 'start' | 'end' = 'start'
+
+    editor.getEditorState().read(() => {
+      const selection = $getSelection()
+      const selectedNodes = $isNodeSelection(selection)
+        ? selection.getNodes()
+        : null
+
+      nextShouldFocus =
+        selectedNodes !== null &&
+        selectedNodes.length === 1 &&
+        selectedNodes[0]?.getKey() === nodeKey
+
+      if (nextShouldFocus) {
+        nextCursorPlacement = consumeCodeBlockCursorIntent(nodeKey) ?? 'start'
+      }
+    })
+
+    setShouldFocusEditor(nextShouldFocus)
+
+    if (nextShouldFocus) {
+      setCursorPlacement(nextCursorPlacement)
+    }
+  }, [editable, editor, isSelected, nodeKey])
 
   const handleCodeChange = useCallback(
     (newCode: string) => {
@@ -170,7 +200,7 @@ export function CodeBlockEditDecorator({
         onLanguageChange: editable ? handleLanguageChange : undefined,
         onDelete: editable ? handleDelete : undefined,
         onExitBlock: editable ? handleExitBlock : undefined,
-        selected: editable ? isSelected : false,
+        selected: editable ? shouldFocusEditor : false,
         cursorPlacement: editable ? cursorPlacement : 'start',
       }}
     />

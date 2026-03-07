@@ -1,34 +1,65 @@
 # @haklex/rich-plugin-table
 
-表格编辑插件。
+Table editing plugin with cell resizing and row/column manipulation.
 
-## 安装
+## Installation
 
 ```bash
-pnpm add @haklex/rich-plugin-table @haklex/rich-editor
+pnpm add @haklex/rich-plugin-table
 ```
 
-## 导出
+## Peer Dependencies
 
-```ts
-export { TableCellResizerPlugin } from './TableCellResizerPlugin'
-export { TableRowColumnHandlesPlugin } from './TableRowColumnHandlesPlugin'
-```
+| Package | Version |
+| --- | --- |
+| `@lexical/react` | `^0.41.0` |
+| `@lexical/table` | `^0.41.0` |
+| `lexical` | `^0.41.0` |
+| `lucide-react` | `^0.574.0` |
+| `react` | `>= 19` |
+| `react-dom` | `>= 19` |
 
-## 使用
+## Usage
 
 ```tsx
-import { 
-  TableCellResizerPlugin, 
-  TableRowColumnHandlesPlugin 
+import {
+  TableCellResizerPlugin,
+  TableRowColumnHandlesPlugin,
 } from '@haklex/rich-plugin-table'
-import { RichEditor } from '@haklex/rich-editor'
+import '@haklex/rich-plugin-table/style.css'
 
-<RichEditor>
-  <TableRowColumnHandlesPlugin />
-  <TableCellResizerPlugin />
-</RichEditor>
+function Editor() {
+  return (
+    <RichEditor>
+      <TableCellResizerPlugin />
+      <TableRowColumnHandlesPlugin />
+    </RichEditor>
+  )
+}
 ```
+
+This plugin provides two complementary components:
+
+- **TableCellResizerPlugin** -- Allows users to resize table columns by dragging cell borders.
+- **TableRowColumnHandlesPlugin** -- Renders handles for inserting, deleting, and reordering rows and columns.
+
+## Exports
+
+| Export | Type | Description |
+| --- | --- | --- |
+| `TableCellResizerPlugin` | Component | Cell border drag-to-resize plugin |
+| `TableRowColumnHandlesPlugin` | Component | Row/column insert, delete, and reorder handles |
+
+## Sub-path Exports
+
+| Path | Description |
+| --- | --- |
+| `@haklex/rich-plugin-table` | Plugin components |
+| `@haklex/rich-plugin-table/style.css` | Stylesheet |
+
+## Part of Haklex
+
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

@@ -1,47 +1,64 @@
 # @haklex/rich-renderer-codeblock
 
-基于 Shiki 的代码块渲染器。
+Code block renderer with Shiki syntax highlighting for static display and CodeMirror for interactive editing.
 
-## 安装
+## Installation
 
 ```bash
-pnpm add @haklex/rich-renderer-codeblock @haklex/rich-editor shiki
+pnpm add @haklex/rich-renderer-codeblock
 ```
 
-## 导出
+## Peer Dependencies
 
-```ts
-export { CodeBlockRenderer } from './CodeBlockRenderer'
-export { CodeBlockEditRenderer } from './CodeBlockEditRenderer'
-```
+| Package | Version |
+| --- | --- |
+| `react` | `>=19` |
+| `react-dom` | `>=19` |
 
-## 功能
-
-- Shiki 语法高亮
-- 自动检测语言
-- 行号显示
-- 复制按钮
-- 自动适配深浅主题
-
-## 使用
+## Usage
 
 ```tsx
-import { CodeBlockRenderer } from '@haklex/rich-renderer-codeblock'
-import type { RendererConfig } from '@haklex/rich-editor'
+import { CodeBlockRenderer } from '@haklex/rich-renderer-codeblock/static'
 
-const config: RendererConfig = {
+// Register in a static RendererConfig
+const rendererConfig = {
+  // ...other renderers
   CodeBlock: CodeBlockRenderer,
 }
 ```
 
-## 依赖
+For edit mode:
 
-```json
-{
-  "@haklex/rich-editor": "workspace:*",
-  "shiki": "^3.0.0"
+```tsx
+import { CodeBlockEditRenderer } from '@haklex/rich-renderer-codeblock'
+
+const editRendererConfig = {
+  // ...other renderers
+  CodeBlock: CodeBlockEditRenderer,
 }
 ```
+
+## Exports
+
+### Components
+
+- `CodeBlockRenderer` — Static (read-only) renderer with Shiki syntax highlighting
+- `CodeBlockEditRenderer` — Edit (interactive) renderer with CodeMirror editor
+
+### Sub-path Exports
+
+| Path | Description |
+| --- | --- |
+| `@haklex/rich-renderer-codeblock` | Full exports (edit + static) |
+| `@haklex/rich-renderer-codeblock/static` | Static-only renderer |
+| `@haklex/rich-renderer-codeblock/shiki` | Shiki highlighting utilities |
+| `@haklex/rich-renderer-codeblock/constants` | Language and theme constants |
+| `@haklex/rich-renderer-codeblock/icons` | Language icons |
+| `@haklex/rich-renderer-codeblock/style.css` | Stylesheet |
+
+## Part of Haklex
+
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

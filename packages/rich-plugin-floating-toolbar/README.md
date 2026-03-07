@@ -1,29 +1,58 @@
 # @haklex/rich-plugin-floating-toolbar
 
-浮动工具栏插件，选中文本时显示。
+Floating toolbar plugin that appears on text selection for inline formatting.
 
-## 安装
+## Installation
 
 ```bash
-pnpm add @haklex/rich-plugin-floating-toolbar @haklex/rich-editor
+pnpm add @haklex/rich-plugin-floating-toolbar
 ```
 
-## 导出
+## Peer Dependencies
 
-```ts
-export { FloatingToolbarPlugin } from './FloatingToolbarPlugin'
-```
+| Package | Version |
+| --- | --- |
+| `@lexical/link` | `^0.41.0` |
+| `@lexical/react` | `^0.41.0` |
+| `@lexical/selection` | `^0.41.0` |
+| `lexical` | `^0.41.0` |
+| `lucide-react` | `^0.574.0` |
+| `react` | `>= 19` |
+| `react-dom` | `>= 19` |
 
-## 使用
+## Usage
 
 ```tsx
 import { FloatingToolbarPlugin } from '@haklex/rich-plugin-floating-toolbar'
-import { RichEditor } from '@haklex/rich-editor'
+import '@haklex/rich-plugin-floating-toolbar/style.css'
 
-<RichEditor>
-  <FloatingToolbarPlugin />
-</RichEditor>
+function Editor() {
+  return (
+    <RichEditor>
+      <FloatingToolbarPlugin />
+    </RichEditor>
+  )
+}
 ```
+
+When the user selects text, a floating toolbar appears near the selection with inline formatting controls such as bold, italic, underline, strikethrough, code, and link insertion.
+
+## Exports
+
+| Export | Type | Description |
+| --- | --- | --- |
+| `FloatingToolbarPlugin` | Component | Main plugin component to render inside `RichEditor` |
+
+## Sub-path Exports
+
+| Path | Description |
+| --- | --- |
+| `@haklex/rich-plugin-floating-toolbar` | Plugin component |
+| `@haklex/rich-plugin-floating-toolbar/style.css` | Stylesheet |
+
+## Part of Haklex
+
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

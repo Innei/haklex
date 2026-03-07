@@ -1,45 +1,62 @@
 # @haklex/rich-renderer-mermaid
 
-Mermaid 图表渲染器。
+Mermaid diagram renderer with interactive zoom and pan controls.
 
-## 安装
+## Installation
 
 ```bash
-pnpm add @haklex/rich-renderer-mermaid @haklex/rich-editor mermaid
+pnpm add @haklex/rich-renderer-mermaid
 ```
 
-## 导出
+## Peer Dependencies
 
-```ts
-export { MermaidRenderer } from './MermaidRenderer'
-export { MermaidEditRenderer } from './MermaidEditRenderer'
-```
+| Package | Version |
+| --- | --- |
+| `react` | `>=19` |
+| `react-dom` | `>=19` |
 
-## 功能
-
-- Mermaid 图表渲染
-- 缩放平移
-- 编辑对话框
-
-## 使用
+## Usage
 
 ```tsx
-import { MermaidRenderer } from '@haklex/rich-renderer-mermaid'
-import type { RendererConfig } from '@haklex/rich-editor'
+import { MermaidRenderer } from '@haklex/rich-renderer-mermaid/static'
 
-const config: RendererConfig = {
+// Register in a static RendererConfig
+const rendererConfig = {
+  // ...other renderers
   Mermaid: MermaidRenderer,
 }
 ```
 
-## 依赖
+For edit mode:
 
-```json
-{
-  "@haklex/rich-editor": "workspace:*",
-  "mermaid": "^11.0.0"
+```tsx
+import { MermaidEditRenderer } from '@haklex/rich-renderer-mermaid'
+
+const editRendererConfig = {
+  // ...other renderers
+  Mermaid: MermaidEditRenderer,
 }
 ```
+
+## Exports
+
+### Components
+
+- `MermaidRenderer` — Static (read-only) renderer with zoom and pan
+- `MermaidEditRenderer` — Edit (interactive) renderer
+
+### Sub-path Exports
+
+| Path | Description |
+| --- | --- |
+| `@haklex/rich-renderer-mermaid` | Full exports (edit + static) |
+| `@haklex/rich-renderer-mermaid/static` | Static-only renderer |
+| `@haklex/rich-renderer-mermaid/utils` | Mermaid utility functions |
+| `@haklex/rich-renderer-mermaid/style.css` | Stylesheet |
+
+## Part of Haklex
+
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

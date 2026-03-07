@@ -2,6 +2,12 @@
   "name": "haklex",
   "type": "module",
   "private": true,
+  "description": "A modular rich text editor ecosystem built on Lexical",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git"
+  },
   "packageManager": "pnpm@10.27.0",
   "engines": {
     "node": ">=20"

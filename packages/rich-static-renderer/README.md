@@ -1,167 +1,56 @@
 # @haklex/rich-static-renderer
 
-Lexical 富文本的只读渲染引擎（Headless + React 输出）。  
-用于把 `SerializedEditorState` 渲染成可展示的 React 内容。
+SSR-ready renderer engine for Lexical rich content. Renders Lexical editor state JSON to React without loading the full editor runtime.
 
-## 包定位
-
-- 不提供编辑能力
-- 适合文章详情页、评论展示、SSR 输出
-- 默认支持 `@haklex/rich-editor` 内置节点（`allNodes`）
-
-## 安装
+## Installation
 
 ```bash
-pnpm add @haklex/rich-static-renderer @haklex/rich-editor lexical react react-dom
+pnpm add @haklex/rich-static-renderer
 ```
 
-## 快速开始
+## Peer Dependencies
+
+| Package | Version |
+| --- | --- |
+| `@lexical/code` | `^0.41.0` |
+| `@lexical/extension` | `^0.41.0` |
+| `@lexical/link` | `^0.41.0` |
+| `@lexical/list` | `^0.41.0` |
+| `@lexical/rich-text` | `^0.41.0` |
+| `@lexical/table` | `^0.41.0` |
+| `lexical` | `^0.41.0` |
+| `react` | `>=19` |
+| `react-dom` | `>=19` |
+
+## Usage
 
 ```tsx
 import { RichRenderer } from '@haklex/rich-static-renderer'
-import type { SerializedEditorState } from 'lexical'
 import '@haklex/rich-editor/style.css'
 
-export function Article({
-  value,
-}: {
-  value: SerializedEditorState
-}) {
-  return <RichRenderer value={value} variant="article" theme="light" />
-}
+<RichRenderer value={editorState} variant="article" theme="light" />
 ```
 
-## API
+The `value` prop accepts a Lexical `SerializedEditorState` JSON object. The renderer parses it into React elements without instantiating a Lexical editor, making it suitable for SSR and static rendering.
 
-```ts
-interface RichRendererProps {
-  value: SerializedEditorState
-  variant?: 'article' | 'comment' | 'note'
-  theme?: 'light' | 'dark'
-  className?: string
-  style?: CSSProperties
-  as?: keyof React.JSX.IntrinsicElements
-  rendererConfig?: RendererConfig
-  extraNodes?: Array<Klass<LexicalNode>>
-  builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>
-}
+## Exports
 
-type BuiltinNodeRenderer = (
-  node: any,
-  key: string,
-  children: ReactNode[] | null,
-  defaultRenderer: () => ReactNode,
-) => ReactNode
-```
+### Components
 
-字段说明：
+| Export | Description |
+| --- | --- |
+| `RichRenderer` | Main static renderer component |
 
-- `value`：Lexical JSON（必填）
-- `as`：渲染容器标签，默认 `div`
-- `rendererConfig`：覆写某些节点的渲染组件（Image/CodeBlock/...）
-- `extraNodes`：注册扩展节点（如 Tldraw、Embed、Gallery、CodeSnippet）
-- `builtinNodeOverrides`：覆写内置节点的渲染（paragraph/heading/link/...），按 `node.type` 匹配
+### Types
 
-## 与增强渲染器一起用
+| Export | Description |
+| --- | --- |
+| `RichRendererProps` | Props for `RichRenderer` |
+| `BuiltinNodeRenderer` | Type for builtin node renderer functions |
 
-```tsx
-import { RichRenderer } from '@haklex/rich-static-renderer'
-import {
-  codeSnippetNodes,
-  embedNodes,
-  enhancedRendererConfig,
-  galleryNodes,
-  TldrawNode,
-} from '@haklex/rich-renderers'
+## Part of Haklex
 
-import '@haklex/rich-editor/style.css'
-import '@haklex/rich-renderers/style.css'
-import '@haklex/rich-ext-code-snippet/style.css'
-import '@haklex/rich-ext-embed/style.css'
-import 'katex/dist/katex.min.css'
-import 'tldraw/tldraw.css'
-
-const extraNodes = [
-  TldrawNode,
-  ...embedNodes,
-  ...galleryNodes,
-  ...codeSnippetNodes,
-]
-
-<RichRenderer
-  value={value}
-  rendererConfig={enhancedRendererConfig}
-  extraNodes={extraNodes}
-/>
-```
-
-## 覆写内置节点渲染
-
-通过 `builtinNodeOverrides` 可按 `node.type` 覆写 paragraph、heading、link 等内置节点的渲染逻辑。回调提供 `defaultRenderer` 用于回退默认渲染。
-
-```tsx
-<RichRenderer
-  value={value}
-  builtinNodeOverrides={{
-    link: (node, key, children) => (
-      <a key={key} href={node.url} className="custom-link" target="_blank">
-        {children}
-      </a>
-    ),
-    heading: (node, key, children, defaultRenderer) => {
-      // 仅覆写 h1，其余回退默认
-      if (node.tag === 'h1') {
-        return <h1 key={key} className="custom-h1">{children}</h1>
-      }
-      return defaultRenderer()
-    },
-  }}
-/>
-```
-
-支持的 type：`root`、`paragraph`、`heading`、`quote`、`list`、`listitem`、`link`、`autolink`、`horizontalrule`、`table`、`tablerow`、`tablecell`、`details`、`spoiler`、`ruby`、`code`、`code-highlight`、`linebreak`、`tab`。
-
-## 渲染行为说明
-
-- 内部使用 `@lexical/headless` 构建只读 editor，再将节点树转为 React
-- 标题会自动生成 slug 与锚点（重复标题自动去重）
-- 脚注会先预处理编号，再统一渲染引用与定义
-- `Alert/Banner/Grid` 等嵌套内容通过 `NestedContentRendererProvider` 递归渲染
-
-## 设计模式
-
-### 1) 节点注册与渲染器覆写解耦
-
-- 节点协议（JSON 结构）由 Node class 决定
-- 显示层由 `rendererConfig` 决定
-- 扩展节点只需通过 `extraNodes` 注册，不要求侵入核心渲染器
-
-### 2) Static / Edit 拆分协作
-
-`@haklex/rich-static-renderer` 只消费静态节点。  
-编辑态重依赖（Popover、Dialog 等）应该放在 edit 节点/编辑包里，不进入只读包。
-
-## 常见问题
-
-### Q1: 为什么有些节点不显示？
-
-通常是忘了注册扩展节点（`extraNodes`），例如 `embed`、`tldraw`、`gallery`、`code-snippet`。
-
-### Q2: 为什么公式样式不对？
-
-需要手动引入：
-
-```ts
-import 'katex/dist/katex.min.css'
-```
-
-### Q3: 为什么 tldraw 画布样式错乱？
-
-需要手动引入：
-
-```ts
-import 'tldraw/tldraw.css'
-```
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

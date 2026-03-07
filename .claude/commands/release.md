@@ -74,15 +74,16 @@ If new features are found, ask the user whether to integrate them into specific 
 
 ### 8. Commit and push in downstream projects
 
-For each downstream project with changes, stage and commit:
-```
-chore(deps): bump @haklex/* to $NEW_VERSION
-```
-Then push each project to remote:
+For each downstream project with changes, stage, commit, and push immediately:
 ```bash
-cd /Users/innei/git/innei-repo/Shiroi && git push
-cd /Users/innei/git/innei-repo/admin-vue3 && git push
-cd /Users/innei/git/innei-repo/mx-core && git push
+# Shiroi
+cd /Users/innei/git/innei-repo/Shiroi && git add -A && git commit -m "chore(deps): bump @haklex/* to $NEW_VERSION" && git push
+
+# admin-vue3
+cd /Users/innei/git/innei-repo/admin-vue3 && git add -A && git commit -m "chore(deps): bump @haklex/* to $NEW_VERSION" && git push
+
+# mx-core
+cd /Users/innei/git/innei-repo/mx-core && git add -A && git commit -m "chore(deps): bump @haklex/* to $NEW_VERSION" && git push
 ```
 
 ### 9. Summary

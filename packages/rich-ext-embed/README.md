@@ -1,59 +1,151 @@
 # @haklex/rich-ext-embed
 
-嵌入内容扩展（Twitter、YouTube、Bilibili 等）。
+URL embed extension supporting Twitter, YouTube, Bilibili, CodeSandbox, and GitHub Gist.
 
-## 安装
+## Installation
 
 ```bash
-pnpm add @haklex/rich-ext-embed @haklex/rich-editor
+pnpm add @haklex/rich-ext-embed
 ```
 
-## 导出
+## Peer Dependencies
+
+| Package | Version | Required |
+| --- | --- | --- |
+| `@lexical/react` | `^0.41.0` | Yes |
+| `lexical` | `^0.41.0` | Yes |
+| `react` | `>= 19` | Yes |
+| `react-dom` | `>= 19` | Yes |
+| `shiki` | `>= 3` | Optional |
+
+## Usage
+
+### Register nodes in your editor config
 
 ```ts
-// 节点
-export { EmbedNode } from './nodes/EmbedNode'
-export { $createEmbedNode, $isEmbedNode } from './nodes/EmbedNode'
-export type { SerializedEmbedNode } from './nodes/EmbedNode'
+import { embedEditNodes } from '@haklex/rich-ext-embed'
 
-export { EmbedEditNode } from './nodes/EmbedEditNode'
-export { $createEmbedEditNode, $isEmbedEditNode } from './nodes/EmbedEditNode'
-
-export { embedNodes, embedEditNodes } from './nodes'
-
-// 插件
-export { EmbedPlugin, INSERT_EMBED_COMMAND } from './EmbedPlugin'
-export type { EmbedPluginProps } from './EmbedPlugin'
-
-// 渲染器
-export { EmbedStaticRenderer } from './renderers/EmbedStaticRenderer'
-export type { EmbedStaticRendererProps } from './renderers/EmbedStaticRenderer'
-export { EmbedLinkRenderer } from './renderers/EmbedLinkRenderer'
-export type { EmbedLinkRendererProps } from './renderers/EmbedLinkRenderer'
-
-// 上下文
-export { EmbedRendererProvider, useEmbedRenderers } from './context/EmbedRendererContext'
-export type { EmbedRendererComponent, EmbedRendererMap } from './context/EmbedRendererContext'
-
-// URL 匹配器
-export type { EmbedType } from './url-matchers'
-export { 
-  matchEmbedUrl, isTweetUrl, isYoutubeUrl, 
-  isBilibiliVideoUrl, isGistUrl, isCodesandboxUrl,
-  isGithubFilePreviewUrl, createSelfThinkingMatcher 
-} from './url-matchers'
+const editorConfig = {
+  nodes: [...embedEditNodes],
+}
 ```
 
-## 使用
+For static/read-only rendering:
+
+```ts
+import { embedNodes } from '@haklex/rich-ext-embed/static'
+
+const staticConfig = {
+  nodes: [...embedNodes],
+}
+```
+
+### Use the embed plugin
 
 ```tsx
-import { EmbedPlugin, embedEditNodes } from '@haklex/rich-ext-embed'
-import { RichEditor } from '@haklex/rich-editor'
+import { EmbedPlugin } from '@haklex/rich-ext-embed'
 
-<RichEditor extraNodes={[...embedEditNodes]}>
-  <EmbedPlugin />
-</RichEditor>
+function EditorPlugins() {
+  return <EmbedPlugin />
+}
 ```
+
+### Insert embeds programmatically
+
+```ts
+import { INSERT_EMBED_COMMAND } from '@haklex/rich-ext-embed'
+
+editor.dispatchCommand(INSERT_EMBED_COMMAND, { url: 'https://youtube.com/watch?v=...' })
+```
+
+### Use renderers
+
+```tsx
+import { EmbedLinkRenderer } from '@haklex/rich-ext-embed'
+import { EmbedStaticRenderer } from '@haklex/rich-ext-embed/static'
+```
+
+### Provide custom embed renderers
+
+```tsx
+import { EmbedRendererProvider, useEmbedRenderers } from '@haklex/rich-ext-embed'
+
+function App() {
+  return (
+    <EmbedRendererProvider>
+      <Editor />
+    </EmbedRendererProvider>
+  )
+}
+```
+
+### URL matching utilities
+
+```ts
+import {
+  matchEmbedUrl,
+  isTweetUrl,
+  isYoutubeUrl,
+  isBilibiliVideoUrl,
+  isCodesandboxUrl,
+  isGistUrl,
+  isGithubFilePreviewUrl,
+  createSelfThinkingMatcher,
+} from '@haklex/rich-ext-embed'
+```
+
+### Import styles
+
+```ts
+import '@haklex/rich-ext-embed/style.css'
+```
+
+## Exports
+
+### Nodes
+
+- `EmbedNode` -- static (read-only) node
+- `EmbedEditNode` -- edit node with interactive UI
+- `$createEmbedNode()` / `$isEmbedNode()` -- Lexical helpers
+- `embedNodes` -- array of static nodes for config registration
+- `embedEditNodes` -- array of edit nodes for config registration
+
+### Renderers
+
+- `EmbedStaticRenderer` -- static renderer
+- `EmbedLinkRenderer` -- link-style embed renderer
+
+### Plugin
+
+- `EmbedPlugin` -- editor plugin for embed insertion
+- `INSERT_EMBED_COMMAND` -- Lexical command for programmatic insertion
+
+### Context
+
+- `EmbedRendererProvider` -- context provider for custom embed renderers
+- `useEmbedRenderers` -- hook to access embed renderer context
+
+### URL Matchers
+
+- `matchEmbedUrl` -- match a URL against all supported embed types
+- `isTweetUrl`, `isYoutubeUrl`, `isBilibiliVideoUrl`, `isCodesandboxUrl`, `isGistUrl`, `isGithubFilePreviewUrl` -- individual URL matchers
+- `createSelfThinkingMatcher` -- factory for custom URL matchers
+
+### Types
+
+- `EmbedType` -- enum of supported embed types
+
+### Sub-path Exports
+
+| Path | Description |
+| --- | --- |
+| `@haklex/rich-ext-embed` | Full exports (edit + static) |
+| `@haklex/rich-ext-embed/static` | Static-only (no heavy UI deps) |
+| `@haklex/rich-ext-embed/style.css` | Stylesheet |
+
+## Part of Haklex
+
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 
