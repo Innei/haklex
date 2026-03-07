@@ -12,10 +12,10 @@ import { defineConfig } from 'vite'
 // - Fall back to src/styles.css.ts for VE packages when imported from JS.
 // - If imported from CSS (@import), VE entries resolve to empty CSS.
 function watchWorkspacePlugin(): Plugin {
-  const packagesDir = resolve(__dirname, '..')
+  const packagesDir = resolve(__dirname, '../packages')
   const srcDirs: string[] = []
   for (const entry of readdirSync(packagesDir)) {
-    if (entry.startsWith('rich-') && entry !== 'rich-editor-demo') {
+    if (entry.startsWith('rich-')) {
       const srcDir = resolve(packagesDir, entry, 'src')
       if (existsSync(srcDir)) {
         srcDirs.push(srcDir)
@@ -64,7 +64,7 @@ function workspaceCssPlugin(): Plugin {
         if (scopes.has(scope)) {
           const srcRendererTs = resolve(
             __dirname,
-            `../${pkgDir}/src/style-renderer.ts`,
+            `../packages/${pkgDir}/src/style-renderer.ts`,
           )
           if (existsSync(srcRendererTs)) {
             return `${RENDERER_STYLE_PREFIX}${srcRendererTs}`
@@ -79,9 +79,12 @@ function workspaceCssPlugin(): Plugin {
       if (!scopes.has(scope)) return null
 
       const pkgDir = m[2]
-      const srcIndex = resolve(__dirname, `../${pkgDir}/src/index.ts`)
-      const srcCss = resolve(__dirname, `../${pkgDir}/src/style.css`)
-      const srcVeCss = resolve(__dirname, `../${pkgDir}/src/styles.css.ts`)
+      const srcIndex = resolve(__dirname, `../packages/${pkgDir}/src/index.ts`)
+      const srcCss = resolve(__dirname, `../packages/${pkgDir}/src/style.css`)
+      const srcVeCss = resolve(
+        __dirname,
+        `../packages/${pkgDir}/src/styles.css.ts`,
+      )
 
       if (existsSync(srcIndex)) {
         if (importer?.endsWith('.css')) {

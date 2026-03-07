@@ -6,7 +6,8 @@
   "rich-editor-demo": [
     "haklex/rich-editor-demo",
     "packages/rich-editor-demo",
-    "packages/rich-editor/demo"
+    "packages/rich-editor/demo",
+    "demo"
   ],
   "rich-editor-ui": [
     "haklex/rich-editor-ui",

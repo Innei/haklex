@@ -23,7 +23,7 @@
       {
         "id": "rich-editor-demo",
         "source": "packages/rich-editor-demo",
-        "target": "packages/rich-editor-demo"
+        "target": "demo"
       },
       {
         "id": "rich-editor package manifest",
@@ -384,12 +384,12 @@
       {
         "id": "demo package",
         "source": "packages/rich-editor-demo/package.json",
-        "target": "packages/rich-editor-demo/package.json"
+        "target": "demo/package.json"
       },
       {
         "id": "demo editor page",
         "source": "packages/rich-editor-demo/src/pages/EditorPage.tsx",
-        "target": "packages/rich-editor-demo/src/pages/EditorPage.tsx"
+        "target": "demo/src/pages/EditorPage.tsx"
       }
     ]
   },
@@ -508,12 +508,12 @@
       {
         "id": "presets page",
         "source": "packages/rich-editor-demo/src/pages/PresetsPage.tsx",
-        "target": "packages/rich-editor-demo/src/pages/PresetsPage.tsx"
+        "target": "demo/src/pages/PresetsPage.tsx"
       },
       {
         "id": "demo vite config",
         "source": "packages/rich-editor-demo/vite.config.ts",
-        "target": "packages/rich-editor-demo/vite.config.ts"
+        "target": "demo/vite.config.ts"
       }
     ]
   },
@@ -703,12 +703,12 @@
       {
         "id": "demo panel",
         "source": "haklex/rich-editor-demo/src/components/Panel.tsx",
-        "target": "packages/rich-editor-demo/src/components/Panel.tsx"
+        "target": "demo/src/components/Panel.tsx"
       },
       {
         "id": "demo editor page",
         "source": "haklex/rich-editor-demo/src/pages/EditorPage.tsx",
-        "target": "packages/rich-editor-demo/src/pages/EditorPage.tsx"
+        "target": "demo/src/pages/EditorPage.tsx"
       },
       {
         "id": "tooltip index",
@@ -802,12 +802,12 @@
       {
         "id": "demo package",
         "source": "haklex/rich-editor-demo/package.json",
-        "target": "packages/rich-editor-demo/package.json"
+        "target": "demo/package.json"
       },
       {
         "id": "demo editor page",
         "source": "haklex/rich-editor-demo/src/pages/EditorPage.tsx",
-        "target": "packages/rich-editor-demo/src/pages/EditorPage.tsx"
+        "target": "demo/src/pages/EditorPage.tsx"
       },
       {
         "id": "content editable",
@@ -1027,7 +1027,7 @@
       {
         "id": "editor demo page",
         "source": "haklex/rich-editor-demo/src/pages/EditorPage.tsx",
-        "target": "packages/rich-editor-demo/src/pages/EditorPage.tsx"
+        "target": "demo/src/pages/EditorPage.tsx"
       }
     ]
   }

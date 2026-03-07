@@ -21,6 +21,8 @@ After bumpp completes, read the new version from `packages/rich-editor/package.j
 cd /Users/innei/git/innei-repo/haklex && pnpm build:packages && pnpm -r publish --no-git-checks --filter '@haklex/*' --filter '!@haklex/rich-editor-demo'
 ```
 
+`build:packages` only builds workspace packages under `packages/`; the dev playground now lives in top-level `demo/` and remains excluded from publish.
+
 If publish fails, stop and report.
 
 ### 4. Commit and push the version bump in haklex

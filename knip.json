@@ -13,7 +13,7 @@
     }
   },
   "ignore": [
-    "packages/rich-editor-demo/**"
+    "demo/**"
   ],
   "ignoreDependencies": [
     "@vanilla-extract/css",

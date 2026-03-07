@@ -6,7 +6,7 @@ import { compiler, Priority } from 'markdown-to-jsx'
 import { createElement } from 'react'
 import { renderToString } from 'react-dom/server'
 
-import { presets } from '../../rich-editor-demo/src/fixtures/presets'
+import { presets } from '../../../demo/src/fixtures/presets'
 import { RichRenderer } from '../src/index'
 
 // ── Config ──────────────────────────────────────────────────────────────────

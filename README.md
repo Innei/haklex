@@ -68,7 +68,7 @@ pnpm install
 pnpm dev
 ```
 
-This launches the demo app at [http://localhost:5188](http://localhost:5188) with all editor features, plugins, and extensions loaded. Hot module replacement is enabled across all workspace packages — edits to any `@haklex/*` source file reflect immediately.
+This launches the demo app from `demo/` at [http://localhost:5188](http://localhost:5188) with all editor features, plugins, and extensions loaded. Hot module replacement is enabled across all workspace packages — edits to any `@haklex/*` source file reflect immediately.
 
 ### 4. Build All Packages
 
@@ -93,6 +93,7 @@ Only split when the edit path introduces heavy imports absent from the static pa
 
 ```
 haklex/
+├── demo/                        # Development playground
 ├── packages/
 │   ├── rich-editor/              # Core editor (nodes, plugins, styles, contexts)
 │   ├── rich-editor-ui/           # UI primitives (Dialog, Dropdown, Popover, Combobox)
@@ -106,8 +107,7 @@ haklex/
 │   ├── rich-ext-*/               # Heavy extensions (code-snippet, embed, excalidraw, gallery, nested-doc)
 │   ├── rich-kit-shiro/           # Integration bundle for Shiroi (ShiroEditor + ShiroRenderer)
 │   ├── rich-diff/                # Diff viewer
-│   ├── cm-editor/                # Shared CodeMirror 6 utilities
-│   └── rich-editor-demo/         # Development playground
+│   └── cm-editor/                # Shared CodeMirror 6 utilities
 ├── vite.shared.ts                # Shared Vite config factory
 ├── turbo.json                    # Build orchestration
 ├── bump.config.ts                # Version sync (bumpp)
@@ -277,7 +277,7 @@ import '@haklex/rich-kit-shiro/style.css'
 | --- | --- |
 | `pnpm dev` | Start development playground on port 5188 |
 | `pnpm build` | Build all packages (Turbo, dependency-ordered) |
-| `pnpm build:packages` | Build all packages except demo |
+| `pnpm build:packages` | Build all workspace packages under `packages/` |
 | `pnpm --filter @haklex/rich-editor build` | Build a single package |
 | `pnpm --filter @haklex/rich-editor dev:build` | Watch mode for a single package |
 | `pnpm lint` | Lint all packages |

@@ -14,9 +14,9 @@
   },
   "scripts": {
     "build": "turbo build",
-    "build:packages": "turbo run build --filter='./packages/*' --filter='!@haklex/rich-editor-demo'",
+    "build:packages": "turbo run build --filter='./packages/*'",
     "build:rich": "pnpm run build:packages",
-    "dev": "turbo dev --filter @haklex/rich-editor-demo",
+    "dev": "turbo dev --filter=./demo",
     "lint": "turbo lint",
     "prepare": "pnpm exec simple-git-hooks",
     "publish:packages": "pnpm run build:packages && pnpm -r publish --no-git-checks --filter '@haklex/*' --filter '!@haklex/rich-editor-demo'",

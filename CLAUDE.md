@@ -11,10 +11,10 @@ Lexical-based rich editor ecosystem. Modular packages: core editor, UI primitive
 ## Commands
 
 ```bash
-pnpm dev                                            # dev playground (all features)
+pnpm dev                                            # demo/ dev playground (all features)
 pnpm --filter @haklex/rich-editor dev:build         # watch mode for core
 pnpm build                                          # turbo build (all)
-pnpm build:packages                                 # all except demo
+pnpm build:packages                                 # workspace packages under packages/
 pnpm --filter @haklex/rich-editor build             # single package
 pnpm lint                                           # turbo lint (all)
 npx eslint path/to/file.ts                          # lint single file
@@ -63,7 +63,7 @@ Registration:
 └── @haklex/rich-renderer-katex (KaTeX edit nodes)
 
 @haklex/rich-diff (standalone diff viewer)
-@haklex/rich-editor-demo (dev playground)
+@haklex/rich-editor-demo (dev playground, workspace at demo/)
 ```
 
 ## Key Conventions
