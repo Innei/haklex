@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-renderer-mention",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "description": "Social mention renderer with platform badges",
   "license": "MIT",
   "exports": {

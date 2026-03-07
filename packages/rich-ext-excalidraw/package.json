@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-ext-excalidraw",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "description": "Excalidraw whiteboard extension",
   "license": "MIT",
   "exports": {

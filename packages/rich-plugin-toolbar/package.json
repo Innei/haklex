@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-plugin-toolbar",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "description": "Top toolbar plugin for rich editor",
   "license": "MIT",
   "exports": {

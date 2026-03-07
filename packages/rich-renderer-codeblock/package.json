@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-renderer-codeblock",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "description": "Code block renderer with Shiki syntax highlighting",
   "license": "MIT",
   "exports": {

@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-plugin-mention",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "description": "Mention typeahead plugin with platform selection",
   "license": "MIT",
   "exports": {

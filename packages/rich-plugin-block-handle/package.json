@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-plugin-block-handle",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "description": "Block handle plugin with add button and context menu",
   "license": "MIT",
   "exports": {

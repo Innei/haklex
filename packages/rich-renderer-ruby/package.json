@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-renderer-ruby",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "description": "Ruby annotation renderer for haklex rich editor",
   "license": "MIT",
   "exports": {

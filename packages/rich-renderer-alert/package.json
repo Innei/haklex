@@ -1,7 +1,7 @@
 {
   "name": "@haklex/rich-renderer-alert",
   "type": "module",
-  "version": "0.0.64",
+  "version": "0.0.65",
   "description": "Alert renderer for haklex rich editor",
   "license": "MIT",
   "exports": {
