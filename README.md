@@ -30,17 +30,17 @@ A modular rich text editor ecosystem built on [Lexical](https://lexical.dev/). D
 
 ## Tech Stack
 
-| Category | Technology |
-| --- | --- |
-| **Language** | TypeScript 5.9 |
-| **Editor Core** | Lexical 0.41 |
-| **UI Framework** | React 19 |
-| **UI Primitives** | Base UI (`@base-ui/react`) |
-| **Build** | Vite 7, Turbo |
-| **Styling** | Vanilla Extract (CSS-in-TS) |
-| **Code Highlighting** | Shiki 4, CodeMirror 6 |
-| **Package Manager** | pnpm 10 |
-| **Module Format** | ESM only (`.mjs`) |
+| Category              | Technology                  |
+| --------------------- | --------------------------- |
+| **Language**          | TypeScript 5.9              |
+| **Editor Core**       | Lexical 0.41                |
+| **UI Framework**      | React 19                    |
+| **UI Primitives**     | Base UI (`@base-ui/react`)  |
+| **Build**             | Vite 7, Turbo               |
+| **Styling**           | Vanilla Extract (CSS-in-TS) |
+| **Code Highlighting** | Shiki 4, CodeMirror 6       |
+| **Package Manager**   | pnpm 10                     |
+| **Module Format**     | ESM only (`.mjs`)           |
 
 ## Prerequisites
 
@@ -111,7 +111,7 @@ haklex/
 ├── vite.shared.ts                # Shared Vite config factory
 ├── turbo.json                    # Build orchestration
 ├── bump.config.ts                # Version sync (bumpp)
-└── eslint.config.mjs             # Lint config (eslint-config-hyoban)
+└── eslint.config.mjs             # Lint config (@lobehub/eslint-config)
 ```
 
 ### Dependency Graph
@@ -136,72 +136,72 @@ haklex/
 
 ### Core
 
-| Package | Description |
-| --- | --- |
-| `@haklex/rich-editor` | Core editor component, all builtin + custom Lexical nodes, built-in plugins, editor contexts |
-| `@haklex/rich-editor-ui` | Headless UI primitives — Dialog, Dropdown, Popover, Combobox, Tooltip, ColorPicker, AnimatedTabs |
-| `@haklex/rich-headless` | Zero-React node registry for server-side Lexical JSON → Markdown conversion |
-| `@haklex/rich-style-token` | Design tokens, CSS variables, and variant presets |
-| `@haklex/rich-static-renderer` | `RichRenderer` — renders Lexical JSON to React without loading the editor |
+| Package                        | Description                                                                                      |
+| ------------------------------ | ------------------------------------------------------------------------------------------------ |
+| `@haklex/rich-editor`          | Core editor component, all builtin + custom Lexical nodes, built-in plugins, editor contexts     |
+| `@haklex/rich-editor-ui`       | Headless UI primitives — Dialog, Dropdown, Popover, Combobox, Tooltip, ColorPicker, AnimatedTabs |
+| `@haklex/rich-headless`        | Zero-React node registry for server-side Lexical JSON → Markdown conversion                      |
+| `@haklex/rich-style-token`     | Design tokens, CSS variables, and variant presets                                                |
+| `@haklex/rich-static-renderer` | `RichRenderer` — renders Lexical JSON to React without loading the editor                        |
 
 ### Renderers
 
 Each renderer has a **static** variant (display-only) and an **edit** variant (interactive controls):
 
-| Package | What it renders |
-| --- | --- |
-| `rich-renderer-alert` | Alert / callout blocks (note, tip, important, warning, caution) |
-| `rich-renderer-banner` | Banner blocks (info, success, warning, error) |
-| `rich-renderer-codeblock` | Syntax-highlighted code with Shiki |
-| `rich-renderer-image` | Images with blurhash placeholder and lightbox |
-| `rich-renderer-video` | Video player |
-| `rich-renderer-linkcard` | Rich link previews with metadata |
-| `rich-renderer-mention` | Social mention badges with platform icons |
-| `rich-renderer-mermaid` | Mermaid diagrams with zoom/pan |
-| `rich-renderer-ruby` | Ruby annotations for CJK text |
-| `rich-renderer-katex` | KaTeX math (inline and block) |
+| Package                   | What it renders                                                 |
+| ------------------------- | --------------------------------------------------------------- |
+| `rich-renderer-alert`     | Alert / callout blocks (note, tip, important, warning, caution) |
+| `rich-renderer-banner`    | Banner blocks (info, success, warning, error)                   |
+| `rich-renderer-codeblock` | Syntax-highlighted code with Shiki                              |
+| `rich-renderer-image`     | Images with blurhash placeholder and lightbox                   |
+| `rich-renderer-video`     | Video player                                                    |
+| `rich-renderer-linkcard`  | Rich link previews with metadata                                |
+| `rich-renderer-mention`   | Social mention badges with platform icons                       |
+| `rich-renderer-mermaid`   | Mermaid diagrams with zoom/pan                                  |
+| `rich-renderer-ruby`      | Ruby annotations for CJK text                                   |
+| `rich-renderer-katex`     | KaTeX math (inline and block)                                   |
 
 Aggregated by `@haklex/rich-renderers` (static) and `@haklex/rich-renderers-edit` (edit).
 
 ### Plugins
 
-| Package | Description |
-| --- | --- |
-| `rich-plugin-block-handle` | Drag handle with add button and context menu |
-| `rich-plugin-floating-toolbar` | Selection-based floating formatting toolbar |
-| `rich-plugin-link-edit` | Link editing popover |
-| `rich-plugin-mention` | @mention typeahead with platform support (GitHub, Twitter, etc.) |
-| `rich-plugin-slash-menu` | `/` command menu for content insertion |
-| `rich-plugin-table` | Table row/column resize and manipulation |
-| `rich-plugin-toolbar` | Top toolbar for formatting controls |
+| Package                        | Description                                                      |
+| ------------------------------ | ---------------------------------------------------------------- |
+| `rich-plugin-block-handle`     | Drag handle with add button and context menu                     |
+| `rich-plugin-floating-toolbar` | Selection-based floating formatting toolbar                      |
+| `rich-plugin-link-edit`        | Link editing popover                                             |
+| `rich-plugin-mention`          | @mention typeahead with platform support (GitHub, Twitter, etc.) |
+| `rich-plugin-slash-menu`       | `/` command menu for content insertion                           |
+| `rich-plugin-table`            | Table row/column resize and manipulation                         |
+| `rich-plugin-toolbar`          | Top toolbar for formatting controls                              |
 
 ### Extensions
 
-| Package | Description |
-| --- | --- |
-| `rich-ext-code-snippet` | Multi-file tabbed code display with drag-and-drop |
-| `rich-ext-embed` | URL embeds — YouTube, Twitter, Bilibili, CodeSandbox, GitHub Gist |
-| `rich-ext-excalidraw` | Excalidraw whiteboard integration |
-| `rich-ext-gallery` | Image gallery with grid and carousel layouts |
-| `rich-ext-nested-doc` | Nested document / card content blocks |
+| Package                 | Description                                                       |
+| ----------------------- | ----------------------------------------------------------------- |
+| `rich-ext-code-snippet` | Multi-file tabbed code display with drag-and-drop                 |
+| `rich-ext-embed`        | URL embeds — YouTube, Twitter, Bilibili, CodeSandbox, GitHub Gist |
+| `rich-ext-excalidraw`   | Excalidraw whiteboard integration                                 |
+| `rich-ext-gallery`      | Image gallery with grid and carousel layouts                      |
+| `rich-ext-nested-doc`   | Nested document / card content blocks                             |
 
 ### Integration & Utilities
 
-| Package | Description |
-| --- | --- |
+| Package                  | Description                                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------- |
 | `@haklex/rich-kit-shiro` | Pre-configured bundle — `ShiroEditor` and `ShiroRenderer` with all plugins and extensions |
-| `@haklex/rich-diff` | Diff viewer for comparing two editor states |
-| `@haklex/cm-editor` | Shared CodeMirror 6 editor utilities |
+| `@haklex/rich-diff`      | Diff viewer for comparing two editor states                                               |
+| `@haklex/cm-editor`      | Shared CodeMirror 6 editor utilities                                                      |
 
 ## Variant System
 
 Three typographic presets control font family, size, and spacing:
 
-| Variant | Font | Base Size | Use Case |
-| --- | --- | --- | --- |
-| `article` | Sans-serif | 16px | Blog posts, documentation |
-| `note` | CJK serif | 16px | Personal notes, journals |
-| `comment` | Sans-serif | 14px | Comments, compact content |
+| Variant   | Font       | Base Size | Use Case                  |
+| --------- | ---------- | --------- | ------------------------- |
+| `article` | Sans-serif | 16px      | Blog posts, documentation |
+| `note`    | CJK serif  | 16px      | Personal notes, journals  |
+| `comment` | Sans-serif | 14px      | Comments, compact content |
 
 Set via the `variant` prop on `RichEditor` or `RichRenderer`. Color scheme (light/dark) is managed through `ColorSchemeContext`.
 
@@ -210,8 +210,8 @@ Set via the `variant` prop on `RichEditor` or `RichRenderer`. Color scheme (ligh
 ### Editor (Full Editing Experience)
 
 ```tsx
-import { RichEditor } from '@haklex/rich-editor'
-import '@haklex/rich-editor/style.css'
+import { RichEditor } from '@haklex/rich-editor';
+import '@haklex/rich-editor/style.css';
 
 function MyEditor() {
   return (
@@ -222,40 +222,34 @@ function MyEditor() {
       imageUpload={uploadHandler}
       placeholder="Start writing..."
     />
-  )
+  );
 }
 ```
 
 ### Static Renderer (Read-Only Display)
 
 ```tsx
-import { RichRenderer } from '@haklex/rich-static-renderer'
-import '@haklex/rich-editor/style.css'
+import { RichRenderer } from '@haklex/rich-static-renderer';
+import '@haklex/rich-editor/style.css';
 
 function MyArticle({ content }) {
-  return (
-    <RichRenderer
-      value={content}
-      variant="article"
-      theme="light"
-    />
-  )
+  return <RichRenderer value={content} variant="article" theme="light" />;
 }
 ```
 
 ### Server-Side Parsing (Lexical JSON → Markdown)
 
 ```ts
-import { createHeadlessEditor } from '@lexical/headless'
-import { allHeadlessNodes, $toMarkdown } from '@haklex/rich-headless'
+import { createHeadlessEditor } from '@lexical/headless';
+import { allHeadlessNodes, $toMarkdown } from '@haklex/rich-headless';
 
-const editor = createHeadlessEditor({ nodes: allHeadlessNodes })
+const editor = createHeadlessEditor({ nodes: allHeadlessNodes });
 
-editor.setEditorState(editor.parseEditorState(lexicalJsonString))
+editor.setEditorState(editor.parseEditorState(lexicalJsonString));
 editor.read(() => {
-  const markdown = $toMarkdown()
-  console.log(markdown)
-})
+  const markdown = $toMarkdown();
+  console.log(markdown);
+});
 ```
 
 ### Integration Bundle (Shiroi)
@@ -273,49 +267,52 @@ import '@haklex/rich-kit-shiro/style.css'
 
 ## Available Scripts
 
-| Command | Description |
-| --- | --- |
-| `pnpm dev` | Start development playground on port 5188 |
-| `pnpm build` | Build all packages (Turbo, dependency-ordered) |
-| `pnpm build:packages` | Build all workspace packages under `packages/` |
-| `pnpm --filter @haklex/rich-editor build` | Build a single package |
-| `pnpm --filter @haklex/rich-editor dev:build` | Watch mode for a single package |
-| `pnpm lint` | Lint all packages |
-| `npx eslint path/to/file.ts` | Lint a single file |
-| `npx prettier --write path/to/file.ts` | Format a single file |
-| `npx vitest run packages/rich-renderer-katex/tests/` | Run tests for a specific package |
-| `pnpm release:rich` | Bump version, build, and publish all `@haklex/*` to npm |
-
-## Testing
-
-Tests use [Vitest](https://vitest.dev/). Run specific package tests:
-
-```bash
-npx vitest run packages/rich-renderer-katex/tests/
-```
+| Command                                              | Description                                             |
+| ---------------------------------------------------- | ------------------------------------------------------- |
+| `pnpm dev`                                           | Start development playground on port 5188               |
+| `pnpm build`                                         | Build all packages (Turbo, dependency-ordered)          |
+| `pnpm build:packages`                                | Build all workspace packages under `packages/`          |
+| `pnpm --filter @haklex/rich-editor build`            | Build a single package                                  |
+| `pnpm --filter @haklex/rich-editor dev:build`        | Watch mode for a single package                         |
+| `pnpm lint`                                          | Lint all packages                                       |
+| `npx eslint path/to/file.ts`                         | Lint a single file                                      |
+| `npx prettier --write path/to/file.ts`               | Format a single file                                    |
+| `npx vitest run packages/rich-renderer-katex/tests/` | Run tests for a specific package                        |
+| `pnpm release:rich`                                  | Bump version, build, and publish all `@haklex/*` to npm |
 
 ## Downstream Consumers
 
-| Project | Stack | Package | Integration |
-| --- | --- | --- | --- |
-| **Shiroi** | Next.js | `@haklex/rich-kit-shiro` | Native React |
-| **admin-vue3** | Vue 3 | Multiple `@haklex/*` | React-in-Vue bridge (`createRoot()` inside Vue `defineComponent`) |
-| **mx-core** | NestJS | `@haklex/rich-headless` | Server-side Lexical JSON → Markdown |
+| Project                                                  | Stack   | Package                  | Integration                                                       |
+| -------------------------------------------------------- | ------- | ------------------------ | ----------------------------------------------------------------- |
+| **[Shiroi](https://github.com/innei-dev/Shiroi)**        | Next.js | `@haklex/rich-kit-shiro` | Native React                                                      |
+| **[admin-vue3](https://github.com/mx-space/admin-vue3)** | Vue 3   | Multiple `@haklex/*`     | React-in-Vue bridge (`createRoot()` inside Vue `defineComponent`) |
+| **[mx-core](https://github.com/mx-space/core)**          | NestJS  | `@haklex/rich-headless`  | Server-side Lexical JSON → Markdown                               |
 
 ## Contributing
 
-All `@haklex/*` packages share a single version number (currently managed by [bumpp](https://github.com/antfu-collective/bumpp)). The version source of truth is `packages/rich-editor/package.json`.
+Contributions are welcome. Please open an issue or PR on [GitHub](https://github.com/Innei/haklex).
 
-Key conventions:
+### Key Conventions
 
-- **React 19**: Use `use(Context)` instead of `useContext()` (enforced by ESLint rule `react/no-use-context`)
-- **Styling**: Vanilla Extract (`.css.ts`) only — no Tailwind in editor packages
-- **Neutral colors**: `#737373` / `#a3a3a3` (neutral-500/400) for muted text and borders
-- **Context stability**: Never pass object literals as context `value` — primitives OK, objects must be `useMemo`'d
-- **Pre-commit**: `simple-git-hooks` + `lint-staged` runs Prettier and ESLint on staged files
+- **React 19** — Use `use(Context)` instead of `useContext()` (enforced by ESLint)
+- **Styling** — Vanilla Extract (`.css.ts`) only; no Tailwind in editor packages
+- **Neutral colors** — Use `#737373` / `#a3a3a3` (neutral-500/400) for muted text and borders
+- **Context stability** — Never pass object literals as context `value`; use `useMemo` for objects
+
+### Toolchain
+
+- **ESLint** — [@lobehub/eslint-config](https://github.com/lobehub/eslint-config)
+- **Pre-commit** — `simple-git-hooks` + `lint-staged` (ESLint `--fix` + Prettier on staged files)
+- **Versioning** — All `@haklex/*` packages share one version; source of truth is `packages/rich-editor/package.json`, managed by [bumpp](https://github.com/antfu-collective/bumpp)
+
+### Before Submitting
+
+1. Run `pnpm lint` and fix any issues
+2. Run `pnpm build` to ensure the project builds
+3. Run tests for affected packages (e.g. `npx vitest run packages/rich-renderer-katex/tests/`)
 
 ## License
 
-2026 © Innei, Released under the MIT License.
+2026 © Innei. Released under the MIT License.
 
 > [Personal Website](https://innei.in/) · GitHub [@Innei](https://github.com/innei/)
