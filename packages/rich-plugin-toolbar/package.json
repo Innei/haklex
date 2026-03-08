@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-toolbar",
-  "version": "0.0.70",
+  "version": "0.0.71",
   "description": "Top toolbar plugin for rich editor",
   "repository": {
     "type": "git",
