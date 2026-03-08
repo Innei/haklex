@@ -19,6 +19,7 @@ import {
   quote,
   text,
 } from './helpers';
+import { inneiAboutPreset } from './innei-about-preset';
 import { markdownTestPreset } from './markdown-test-preset';
 
 // ── Excalidraw diagram element builders ──────────────────────────
@@ -531,6 +532,7 @@ const notePreset: Preset = {
 
 export const presets: Preset[] = [
   notePreset,
+  inneiAboutPreset,
   markdownTestPreset,
   {
     key: 'excalidraw-showcase',
