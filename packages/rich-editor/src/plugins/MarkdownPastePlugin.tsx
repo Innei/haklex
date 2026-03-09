@@ -103,12 +103,13 @@ function _debugPastePayload(event: Event, clipboardData: DataTransfer): void {
   console.info('payloadByType', typePayload);
 }
 
-function convertAndInsert(markdown: string): void {
+function convertAndInsert(markdown: string): boolean {
+  let conversionError: Error | null = null;
   const tempEditor = createEditor({
     namespace: 'markdown-paste-temp',
     nodes: getResolvedEditNodes(),
     onError: (error) => {
-      console.error('MarkdownPastePlugin: convertAndInsert error', error);
+      conversionError = error;
     },
   });
 
@@ -119,10 +120,17 @@ function convertAndInsert(markdown: string): void {
     { discrete: true },
   );
 
+  if (conversionError) {
+    console.error('MarkdownPastePlugin: convertAndInsert error', conversionError);
+    return false;
+  }
+
   const serializedChildren = tempEditor.getEditorState().toJSON().root.children;
+  if (!serializedChildren.length) return false;
 
   const nodes = serializedChildren.map((s: SerializedLexicalNode) => $parseSerializedNode(s));
   $insertNodes(nodes);
+  return true;
 }
 
 export function MarkdownPastePlugin() {
@@ -167,11 +175,13 @@ export function MarkdownPastePlugin() {
         if (!text || !detectMarkdown(text)) return false;
 
         try {
-          console.info('MarkdownPastePlugin: convertAndInsert', text);
+          if (!convertAndInsert(text)) {
+            return false;
+          }
           event.preventDefault();
-          convertAndInsert(text);
           return true;
-        } catch {
+        } catch (error) {
+          console.error('MarkdownPastePlugin: paste error', error);
           return false;
         }
       },

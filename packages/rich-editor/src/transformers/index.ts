@@ -1,13 +1,13 @@
-import { CHECK_LIST, CODE, QUOTE, TRANSFORMERS } from '@lexical/markdown'
+import { CHECK_LIST, CODE, QUOTE, TRANSFORMERS } from '@lexical/markdown';
 
-import { GIT_ALERT_TRANSFORMER } from './alert'
-import { CODE_BLOCK_MULTILINE_TRANSFORMER } from './code-block'
-import { CONTAINER_TRANSFORMER } from './container'
-import { FOOTNOTE_SECTION_TRANSFORMER, FOOTNOTE_TRANSFORMER } from './footnote'
-import { INSERT_TRANSFORMER } from './insert'
-import { KATEX_BLOCK_TRANSFORMER, KATEX_INLINE_TRANSFORMER } from './katex'
-import { MENTION_TRANSFORMER } from './mention'
-import { QUOTE_TRANSFORMER } from './quote'
+import { GIT_ALERT_TRANSFORMER } from './alert';
+import { CODE_BLOCK_MULTILINE_TRANSFORMER } from './code-block';
+import { CONTAINER_TRANSFORMER } from './container';
+import { FOOTNOTE_SECTION_TRANSFORMER, FOOTNOTE_TRANSFORMER } from './footnote';
+import { INSERT_TRANSFORMER } from './insert';
+import { KATEX_BLOCK_TRANSFORMER, KATEX_INLINE_TRANSFORMER } from './katex';
+import { MENTION_TRANSFORMER } from './mention';
+import { QUOTE_TRANSFORMER } from './quote';
 import {
   CODE_BLOCK_NODE_TRANSFORMER,
   GRID_CONTAINER_BLOCK_TRANSFORMER,
@@ -17,13 +17,11 @@ import {
   MERMAID_BLOCK_TRANSFORMER,
   TABLE_BLOCK_TRANSFORMER,
   VIDEO_BLOCK_TRANSFORMER,
-} from './rich-blocks'
-import { RUBY_TRANSFORMER } from './ruby'
-import { SPOILER_TRANSFORMER } from './spoiler'
-import {
-  SUBSCRIPT_TRANSFORMER,
-  SUPERSCRIPT_TRANSFORMER,
-} from './superscript-subscript'
+} from './rich-blocks';
+import { RUBY_TRANSFORMER } from './ruby';
+import { SPOILER_TRANSFORMER } from './spoiler';
+import { SUBSCRIPT_TRANSFORMER, SUPERSCRIPT_TRANSFORMER } from './superscript-subscript';
+import { TABLE_IMPORT_TRANSFORMER } from './table';
 
 export const ALL_TRANSFORMERS = [
   // Inline transformers
@@ -49,18 +47,19 @@ export const ALL_TRANSFORMERS = [
   MERMAID_BLOCK_TRANSFORMER,
   GRID_CONTAINER_BLOCK_TRANSFORMER,
   HORIZONTAL_RULE_BLOCK_TRANSFORMER,
+  TABLE_IMPORT_TRANSFORMER,
   TABLE_BLOCK_TRANSFORMER,
   QUOTE_TRANSFORMER,
   ...TRANSFORMERS.filter((t) => t !== QUOTE && t !== CODE),
-]
+];
 
-export { GIT_ALERT_TRANSFORMER } from './alert'
-export { CODE_BLOCK_MULTILINE_TRANSFORMER } from './code-block'
-export { CONTAINER_TRANSFORMER } from './container'
-export { FOOTNOTE_SECTION_TRANSFORMER, FOOTNOTE_TRANSFORMER } from './footnote'
-export { INSERT_TRANSFORMER } from './insert'
-export { KATEX_BLOCK_TRANSFORMER, KATEX_INLINE_TRANSFORMER } from './katex'
-export { MENTION_TRANSFORMER } from './mention'
+export { GIT_ALERT_TRANSFORMER } from './alert';
+export { CODE_BLOCK_MULTILINE_TRANSFORMER } from './code-block';
+export { CONTAINER_TRANSFORMER } from './container';
+export { FOOTNOTE_SECTION_TRANSFORMER, FOOTNOTE_TRANSFORMER } from './footnote';
+export { INSERT_TRANSFORMER } from './insert';
+export { KATEX_BLOCK_TRANSFORMER, KATEX_INLINE_TRANSFORMER } from './katex';
+export { MENTION_TRANSFORMER } from './mention';
 export {
   CODE_BLOCK_NODE_TRANSFORMER,
   GRID_CONTAINER_BLOCK_TRANSFORMER,
@@ -70,10 +69,8 @@ export {
   MERMAID_BLOCK_TRANSFORMER,
   TABLE_BLOCK_TRANSFORMER,
   VIDEO_BLOCK_TRANSFORMER,
-} from './rich-blocks'
-export { RUBY_TRANSFORMER } from './ruby'
-export { SPOILER_TRANSFORMER } from './spoiler'
-export {
-  SUBSCRIPT_TRANSFORMER,
-  SUPERSCRIPT_TRANSFORMER,
-} from './superscript-subscript'
+} from './rich-blocks';
+export { RUBY_TRANSFORMER } from './ruby';
+export { SPOILER_TRANSFORMER } from './spoiler';
+export { SUBSCRIPT_TRANSFORMER, SUPERSCRIPT_TRANSFORMER } from './superscript-subscript';
+export { TABLE_IMPORT_TRANSFORMER } from './table';

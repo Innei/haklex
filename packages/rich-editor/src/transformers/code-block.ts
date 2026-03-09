@@ -1,6 +1,6 @@
 import type { MultilineElementTransformer } from '@lexical/markdown';
 import type { Klass, LexicalNode } from 'lexical';
-import { $createNodeSelection, $setSelection } from 'lexical';
+import { $createNodeSelection, $isRootNode, $setSelection } from 'lexical';
 
 import { getResolvedEditNodes } from '../node-registry';
 import { CodeBlockNode } from '../nodes/CodeBlockNode';
@@ -16,7 +16,7 @@ export const CODE_BLOCK_MULTILINE_TRANSFORMER: MultilineElementTransformer = {
     regExp: /[\t ]*```$/,
   },
   regExpStart: /^[\t ]*```([\w-]+)?/,
-  replace: (rootNode, _children, startMatch, _endMatch, linesInBetween) => {
+  replace: (rootNode, _children, startMatch, _endMatch, linesInBetween, isImport) => {
     const lang = startMatch[1] || '';
     let code = '';
 
@@ -29,7 +29,12 @@ export const CODE_BLOCK_MULTILINE_TRANSFORMER: MultilineElementTransformer = {
 
     const Klass = findCodeBlockKlass(getResolvedEditNodes());
     const node = new (Klass as any)(code, lang);
-    rootNode.replace(node);
+
+    if (isImport || $isRootNode(rootNode)) {
+      rootNode.append(node);
+    } else {
+      rootNode.replace(node);
+    }
 
     const selection = $createNodeSelection();
     selection.add(node.getKey());
