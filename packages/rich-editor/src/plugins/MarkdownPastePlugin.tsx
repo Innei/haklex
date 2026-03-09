@@ -107,7 +107,9 @@ function convertAndInsert(markdown: string): void {
   const tempEditor = createEditor({
     namespace: 'markdown-paste-temp',
     nodes: getResolvedEditNodes(),
-    onError: () => {},
+    onError: (error) => {
+      console.error('MarkdownPastePlugin: convertAndInsert error', error);
+    },
   });
 
   tempEditor.update(
@@ -165,6 +167,7 @@ export function MarkdownPastePlugin() {
         if (!text || !detectMarkdown(text)) return false;
 
         try {
+          console.info('MarkdownPastePlugin: convertAndInsert', text);
           event.preventDefault();
           convertAndInsert(text);
           return true;

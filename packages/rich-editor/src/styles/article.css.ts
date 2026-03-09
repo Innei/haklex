@@ -117,6 +117,13 @@ globalStyle(`${articleBase} .rich-text-code::before, ${articleBase} .rich-text-c
   opacity: 0.5,
 });
 
+globalStyle(
+  `${articleBase} [contenteditable="true"] .rich-text-code::before, ${articleBase} [contenteditable="true"] .rich-text-code::after`,
+  {
+    content: '',
+  },
+);
+
 globalStyle(`${articleBase} .rich-code-block`, {
   color: vars.color.text,
   backgroundColor: vars.color.codeBg,
