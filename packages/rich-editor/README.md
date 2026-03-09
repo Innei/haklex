@@ -10,10 +10,11 @@ pnpm add @haklex/rich-editor lexical @lexical/react react react-dom
 
 ## Peer Dependencies
 
+`@lexical/code` is provided transitively via `lexical-code-no-prism`. You only need to install it yourself if your app imports `@lexical/code` directly.
+
 | Package | Version | Required |
 | --- | --- | --- |
 | `@base-ui/react` | `^1.1.0` | Yes |
-| `@lexical/code` | `^0.41.0` | Yes |
 | `@lexical/extension` | `^0.41.0` | Yes |
 | `@lexical/link` | `^0.41.0` | Yes |
 | `@lexical/list` | `^0.41.0` | Yes |

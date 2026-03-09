@@ -435,6 +435,14 @@ export function nestedDoc(...children: SerializedLexicalNode[]) {
   }
 }
 
+export function tag(text: string) {
+  return {
+    type: 'tag',
+    text,
+    version: 1,
+  }
+}
+
 export function doc(
   ...children: SerializedLexicalNode[]
 ): SerializedEditorState {

@@ -32,11 +32,11 @@
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
+    "@lexical/code": "npm:lexical-code-no-prism@0.41.0",
     "nanoid": "^5.1.6",
     "thumbhash": "^0.1.1"
   },
   "devDependencies": {
-    "@lexical/code": "^0.41.0",
     "@lexical/extension": "^0.41.0",
     "@lexical/link": "^0.41.0",
     "@lexical/list": "^0.41.0",
@@ -60,7 +60,6 @@
   },
   "peerDependencies": {
     "@base-ui/react": "^1.1.0",
-    "@lexical/code": "^0.41.0",
     "@lexical/extension": "^0.41.0",
     "@lexical/link": "^0.41.0",
     "@lexical/list": "^0.41.0",

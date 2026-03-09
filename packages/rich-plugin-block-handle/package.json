@@ -22,11 +22,11 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
+    "@lexical/code": "npm:lexical-code-no-prism@0.41.0",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*"
   },
   "devDependencies": {
-    "@lexical/code": "^0.41.0",
     "@lexical/list": "^0.41.0",
     "@lexical/react": "^0.41.0",
     "@lexical/rich-text": "^0.41.0",
@@ -44,7 +44,6 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "@lexical/code": "^0.41.0",
     "@lexical/list": "^0.41.0",
     "@lexical/react": "^0.41.0",
     "@lexical/rich-text": "^0.41.0",

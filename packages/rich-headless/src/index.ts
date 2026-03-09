@@ -331,6 +331,8 @@ export const ExcalidrawNode = headlessDecorator('excalidraw', ['snapshot'], {
   snapshot: '',
 })
 
+export const TagNode = headlessDecorator('tag', ['text'], { text: '' }, true)
+
 // ── Nested content nodes ──
 
 export class BannerNode extends DecoratorNode<null> {
@@ -548,6 +550,7 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   CodeSnippetNode,
   GalleryNode,
   ExcalidrawNode,
+  TagNode,
   BannerNode,
   AlertQuoteNode,
   NestedDocNode,

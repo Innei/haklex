@@ -23,11 +23,11 @@
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
+    "@lexical/code": "npm:lexical-code-no-prism@0.41.0",
     "@lexical/headless": "^0.41.0",
     "lucide-react": "^0.577.0"
   },
   "devDependencies": {
-    "@lexical/code": "^0.41.0",
     "@lexical/extension": "^0.41.0",
     "@lexical/link": "^0.41.0",
     "@lexical/list": "^0.41.0",
@@ -44,7 +44,6 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "@lexical/code": "^0.41.0",
     "@lexical/extension": "^0.41.0",
     "@lexical/link": "^0.41.0",
     "@lexical/list": "^0.41.0",

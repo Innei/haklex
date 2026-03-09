@@ -16,6 +16,7 @@ import { MentionNode } from './nodes/MentionNode'
 import { MermaidNode } from './nodes/MermaidNode'
 import { RubyNode } from './nodes/RubyNode'
 import { SpoilerNode } from './nodes/SpoilerNode'
+import { TagNode } from './nodes/TagNode'
 import { VideoNode } from './nodes/VideoNode'
 
 export const customEditNodes: Array<Klass<LexicalNode>> = [
@@ -35,6 +36,7 @@ export const customEditNodes: Array<Klass<LexicalNode>> = [
   BannerEditNode,
   MermaidNode,
   RubyNode,
+  TagNode,
 ]
 
 export const allEditNodes: Array<Klass<LexicalNode>> = [

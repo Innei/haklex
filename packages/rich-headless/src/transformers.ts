@@ -134,6 +134,17 @@ export const SUBSCRIPT_TRANSFORMER: TextFormatTransformer = {
   type: 'text-format',
 };
 
+export const TAG_TRANSFORMER: TextMatchTransformer = {
+  dependencies: [],
+  export: (node) =>
+    node.getType() === 'tag' ? `<tag>${(node as any).__text ?? ''}</tag>` : null,
+  importRegExp: /<tag>([^<]+)<\/tag>/,
+  regExp: /<tag>([^<]+)<\/tag>$/,
+  replace: NOOP as any,
+  trigger: '>',
+  type: 'text-match',
+};
+
 // ── Element (block) ──
 
 export const FOOTNOTE_SECTION_TRANSFORMER: ElementTransformer = {
@@ -394,6 +405,7 @@ export const allHeadlessTransformers = [
   SUBSCRIPT_TRANSFORMER,
   RUBY_TRANSFORMER,
   KATEX_INLINE_TRANSFORMER,
+  TAG_TRANSFORMER,
   // Block (specific first)
   FOOTNOTE_SECTION_TRANSFORMER,
   CONTAINER_TRANSFORMER,

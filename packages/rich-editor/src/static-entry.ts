@@ -2,6 +2,8 @@
 export { LinkFavicon } from './components/LinkFavicon';
 export type { RubyRendererProps } from './components/renderers/RubyRenderer';
 export { RubyRenderer } from './components/renderers/RubyRenderer';
+export type { TagRendererProps } from './components/renderers/TagRenderer';
+export { getTagBgColor, TagRenderer } from './components/renderers/TagRenderer';
 export type { RendererKey } from './components/RendererWrapper';
 export { createRendererDecoration, RendererWrapper } from './components/RendererWrapper';
 export { getVariantClass } from './components/utils';

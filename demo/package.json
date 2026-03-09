@@ -21,7 +21,7 @@
     "@haklex/rich-static-renderer": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "@icons-pack/react-simple-icons": "^13.12.0",
-    "@lexical/code": "^0.41.0",
+    "@lexical/code": "npm:lexical-code-no-prism@0.41.0",
     "@lexical/link": "^0.41.0",
     "@lexical/list": "^0.41.0",
     "@lexical/markdown": "^0.41.0",

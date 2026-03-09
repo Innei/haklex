@@ -51,6 +51,10 @@ export {
 export type { AlertType } from './nodes/AlertQuoteNode';
 export { ALERT_LABELS, ALERT_TYPES } from './nodes/AlertQuoteNode';
 
+// TagNode
+export type { SerializedTagNode } from './nodes/TagNode';
+export { $createTagNode, $isTagNode, TagNode } from './nodes/TagNode';
+
 // BannerNode
 export type { BannerType } from './nodes/BannerNode';
 export { BANNER_LABELS, BANNER_TYPES } from './nodes/BannerNode';

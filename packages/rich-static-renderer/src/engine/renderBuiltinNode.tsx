@@ -1,4 +1,4 @@
-import { LinkFavicon, RendererWrapper, RubyRenderer } from '@haklex/rich-editor/static';
+import { getTagBgColor, LinkFavicon, RendererWrapper, RubyRenderer } from '@haklex/rich-editor/static';
 import { Link } from 'lucide-react';
 import { createElement, type ReactNode } from 'react';
 
@@ -179,6 +179,13 @@ export function renderBuiltinNode(
       return (
         <span className="rich-spoiler" key={key} role="button" tabIndex={0}>
           {children}
+        </span>
+      );
+    }
+    case 'tag': {
+      return (
+        <span className="rich-tag" key={key} style={{ backgroundColor: getTagBgColor(node.text) }}>
+          {node.text}
         </span>
       );
     }

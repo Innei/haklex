@@ -46,7 +46,8 @@ export const ImageRenderer: ComponentType<ImageRendererProps> = ({
   if (!src) return null;
 
   const frameStyle: CSSProperties = {
-    backgroundColor: !placeholderUrl ? accent || vars.color.bgTertiary : undefined,
+    backgroundColor:
+      state !== 'loaded' && !placeholderUrl ? accent || vars.color.bgTertiary : 'transparent',
     backgroundImage: placeholderUrl && state !== 'loaded' ? `url(${placeholderUrl})` : undefined,
     backgroundSize: 'cover',
     width: width ? Math.min(width, 1200) : undefined,

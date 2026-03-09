@@ -16,6 +16,7 @@ export { ImageEditRenderer } from '@haklex/rich-renderer-image'
 export { MentionEditRenderer } from '@haklex/rich-renderer-mention'
 export { MermaidEditRenderer } from '@haklex/rich-renderer-mermaid'
 export { RubyEditRenderer } from '@haklex/rich-renderer-ruby'
+export { TagEditRenderer } from './TagEditRenderer'
 export { VideoEditRenderer } from '@haklex/rich-renderer-video'
 
 // Excalidraw (edit-only)

@@ -21,6 +21,7 @@ import { MentionNode } from './nodes/MentionNode'
 import { MermaidNode } from './nodes/MermaidNode'
 import { RubyNode } from './nodes/RubyNode'
 import { SpoilerNode } from './nodes/SpoilerNode'
+import { TagNode } from './nodes/TagNode'
 import { VideoNode } from './nodes/VideoNode'
 
 export const builtinNodes: Array<Klass<LexicalNode>> = [
@@ -54,6 +55,7 @@ export const customNodes: Array<Klass<LexicalNode>> = [
   BannerNode,
   MermaidNode,
   RubyNode,
+  TagNode,
 ]
 
 export const allNodes: Array<Klass<LexicalNode>> = [

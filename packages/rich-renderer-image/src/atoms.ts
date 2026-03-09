@@ -73,7 +73,8 @@ export const frameStyleAtom = atom<CSSProperties>((get) => {
   const width = get(widthAtom);
   const height = get(heightAtom);
   return {
-    backgroundColor: !placeholderUrl ? accent || '#f5f5f5' : undefined,
+    backgroundColor:
+      loadState !== 'loaded' && !placeholderUrl ? accent || '#f5f5f5' : 'transparent',
     backgroundImage:
       placeholderUrl && loadState !== 'loaded' ? `url(${placeholderUrl})` : undefined,
     backgroundSize: 'cover',

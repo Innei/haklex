@@ -10,6 +10,7 @@ import { FootnoteNode } from './FootnoteNode'
 import { KaTeXInlineNode } from './KaTeXInlineNode'
 import { MentionNode } from './MentionNode'
 import { SpoilerNode } from './SpoilerNode'
+import { TagNode } from './TagNode'
 
 export const NESTED_EDITOR_NODES: Array<Klass<LexicalNode>> = [
   HeadingNode,
@@ -27,4 +28,5 @@ export const NESTED_EDITOR_NODES: Array<Klass<LexicalNode>> = [
   MentionNode,
   FootnoteNode,
   KaTeXInlineNode,
+  TagNode,
 ]

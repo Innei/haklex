@@ -12,6 +12,8 @@ import { RubyEditRenderer } from '@haklex/rich-renderer-ruby';
 import { VideoEditRenderer } from '@haklex/rich-renderer-video';
 import { enhancedRendererConfig } from '@haklex/rich-renderers';
 
+import { TagEditRenderer } from './TagEditRenderer';
+
 export const enhancedEditRendererConfig: RendererConfig = {
   ...enhancedRendererConfig,
   Alert: AlertEditRenderer,
@@ -23,6 +25,7 @@ export const enhancedEditRendererConfig: RendererConfig = {
   Mention: MentionEditRenderer,
   Ruby: RubyEditRenderer,
   Mermaid: MermaidEditRenderer,
+  Tag: TagEditRenderer,
   Video: VideoEditRenderer,
   CodeSnippet: CodeSnippetEditRenderer,
 };

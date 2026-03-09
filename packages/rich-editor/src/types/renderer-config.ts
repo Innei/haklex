@@ -11,6 +11,7 @@ import type { LinkCardRendererProps } from '../components/renderers/LinkCardRend
 import type { MentionRendererProps } from '../components/renderers/MentionRenderer';
 import type { MermaidRendererProps } from '../components/renderers/MermaidRenderer';
 import type { RubyRendererProps } from '../components/renderers/RubyRenderer';
+import type { TagRendererProps } from '../components/renderers/TagRenderer';
 import type { VideoRendererProps } from '../components/renderers/VideoRenderer';
 
 export interface CodeFile {
@@ -70,6 +71,8 @@ export interface RendererConfig {
   Mermaid?: ComponentType<MermaidRendererProps>;
   /** Custom renderer for ruby annotations */
   Ruby?: ComponentType<RubyRendererProps>;
+  /** Custom renderer for inline tag badges */
+  Tag?: ComponentType<TagRendererProps>;
   /** Custom renderer for video embeds */
   Video?: ComponentType<VideoRendererProps>;
 }

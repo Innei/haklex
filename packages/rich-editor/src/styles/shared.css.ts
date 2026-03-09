@@ -32,6 +32,7 @@ globalStyle(`${richContent} .rich-text-underline`, {
 
 globalStyle(`${richContent} .rich-text-strikethrough`, {
   textDecoration: 'line-through',
+  opacity: 0.65,
 })
 
 globalStyle(`${richContent} .rich-text-superscript`, {
@@ -549,6 +550,16 @@ globalStyle(`${richContent} .rich-spoiler-revealed`, {
   backgroundColor: 'transparent',
   color: 'inherit',
   userSelect: 'auto',
+})
+
+// ─── Tag ────────────────────────────────────────────────
+globalStyle(`${richContent} .rich-tag`, {
+  display: 'inline-block',
+  borderRadius: '999px',
+  paddingInline: '0.75em',
+  fontSize: vars.typography.fontSizeSmall,
+  lineHeight: '1.6',
+  verticalAlign: 'baseline',
 })
 
 // ─── Ruby ───────────────────────────────────────────────

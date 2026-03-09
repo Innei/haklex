@@ -10,9 +10,10 @@ pnpm add @haklex/rich-static-renderer
 
 ## Peer Dependencies
 
+`@lexical/code` is provided transitively via `lexical-code-no-prism`. Install it separately only if your app imports `@lexical/code` directly.
+
 | Package | Version |
 | --- | --- |
-| `@lexical/code` | `^0.41.0` |
 | `@lexical/extension` | `^0.41.0` |
 | `@lexical/link` | `^0.41.0` |
 | `@lexical/list` | `^0.41.0` |
