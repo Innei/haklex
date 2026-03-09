@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-katex",
-  "version": "0.0.72",
+  "version": "0.0.73",
   "description": "KaTeX math renderer for haklex rich editor",
   "repository": {
     "type": "git",

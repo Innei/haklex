@@ -136,8 +136,7 @@ export const SUBSCRIPT_TRANSFORMER: TextFormatTransformer = {
 
 export const TAG_TRANSFORMER: TextMatchTransformer = {
   dependencies: [],
-  export: (node) =>
-    node.getType() === 'tag' ? `<tag>${(node as any).__text ?? ''}</tag>` : null,
+  export: (node) => (node.getType() === 'tag' ? `<tag>${(node as any).__text ?? ''}</tag>` : null),
   importRegExp: /<tag>([^<]+)<\/tag>/,
   regExp: /<tag>([^<]+)<\/tag>$/,
   replace: NOOP as any,
@@ -248,6 +247,22 @@ export const CODE_BLOCK_NODE_TRANSFORMER: ElementTransformer = {
     const j = node.exportJSON() as any;
     const f = fence(j.code || '');
     return `${f}${j.language || ''}\n${j.code || ''}\n${f}`;
+  },
+  regExp: NEVER,
+  replace: NOOP,
+  type: 'element',
+};
+
+// Handle legacy Lexical CodeNode (type 'code') directly by type check,
+// bypassing $isCodeNode which fails due to @lexical/code vs lexical-code-no-prism class mismatch.
+export const LEGACY_CODE_NODE_TRANSFORMER: ElementTransformer = {
+  dependencies: [],
+  export: (node) => {
+    if (node.getType() !== 'code') return null;
+    const lang = (node as any).getLanguage?.() ?? '';
+    const text = node.getTextContent();
+    const f = fence(text);
+    return `${f}${lang}\n${text}\n${f}`;
   },
   regExp: NEVER,
   replace: NOOP,
@@ -415,6 +430,7 @@ export const allHeadlessTransformers = [
   IMAGE_BLOCK_TRANSFORMER,
   VIDEO_BLOCK_TRANSFORMER,
   CODE_BLOCK_NODE_TRANSFORMER,
+  LEGACY_CODE_NODE_TRANSFORMER,
   LINK_CARD_BLOCK_TRANSFORMER,
   MERMAID_BLOCK_TRANSFORMER,
   NESTED_DOC_BLOCK_TRANSFORMER,
