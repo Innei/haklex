@@ -1,7 +1,7 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token';
 
-import type { LinkCardData, LinkCardPlugin, UrlMatchResult } from '../../types'
-import { camelcaseKeys, fetchGitHubApi } from '../../utils'
+import type { LinkCardData, LinkCardPlugin, UrlMatchResult } from '../../types';
+import { camelcaseKeys, fetchGitHubApi } from '../../utils';
 
 export const githubDiscussionPlugin: LinkCardPlugin = {
   name: 'gh-discussion',
@@ -11,36 +11,32 @@ export const githubDiscussionPlugin: LinkCardPlugin = {
   provider: 'github',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'github.com') return null
-    if (!url.pathname.includes('/discussions/')) return null
-    const parts = url.pathname.split('/').filter(Boolean)
-    if (parts.length < 4 || parts[2] !== 'discussions') return null
-    const discussionNumber = parts[3]
-    if (!/^\d+$/.test(discussionNumber)) return null
-    const [owner, repo] = parts
+    if (url.hostname !== 'github.com') return null;
+    if (!url.pathname.includes('/discussions/')) return null;
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts.length < 4 || parts[2] !== 'discussions') return null;
+    const discussionNumber = parts[3];
+    if (!/^\d+$/.test(discussionNumber)) return null;
+    const [owner, repo] = parts;
     return {
       id: `${owner}/${repo}/${discussionNumber}`,
       fullUrl: url.toString(),
-    }
+    };
   },
 
   isValidId(id: string): boolean {
-    const parts = id.split('/')
-    return (
-      parts.length === 3 &&
-      parts.every((p) => p.length > 0) &&
-      /^\d+$/.test(parts[2])
-    )
+    const parts = id.split('/');
+    return parts.length === 3 && parts.every((p) => p.length > 0) && /^\d+$/.test(parts[2]);
   },
 
   async fetch(id: string, _meta, context): Promise<LinkCardData> {
-    const [owner, repo, discussionNumber] = id.split('/')
+    const [owner, repo, discussionNumber] = id.split('/');
     const response = await fetchGitHubApi(
       `https://api.github.com/repos/${owner}/${repo}/discussions/${discussionNumber}`,
       context,
-    )
-    const data = camelcaseKeys(response)
-    const categoryName = data.category?.name || 'Discussion'
+    );
+    const data = camelcaseKeys(response);
+    const categoryName = data.category?.name || 'Discussion';
 
     return {
       title: `Discussion: ${data.title}`,
@@ -70,6 +66,6 @@ export const githubDiscussionPlugin: LinkCardPlugin = {
         </span>
       ),
       image: data.user?.avatarUrl,
-    }
+    };
   },
-}
+};
