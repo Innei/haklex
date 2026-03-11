@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-headless",
-  "version": "0.0.81",
+  "version": "0.0.82",
   "description": "Headless Lexical node registry for server-side parsing (no React)",
   "repository": {
     "type": "git",
