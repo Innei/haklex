@@ -1,26 +1,26 @@
-import type { SerializedEditorState } from 'lexical'
-import type { ReactNode } from 'react'
-import { createContext, use } from 'react'
+import type { SerializedEditorState } from 'lexical';
+import type { ReactNode } from 'react';
+import { createContext, use } from 'react';
 
-export type RenderEditorStateFn = (state: SerializedEditorState) => ReactNode
+import type { RichEditorVariant } from '../types';
 
-const NestedContentRendererContext = createContext<RenderEditorStateFn | null>(
-  null,
-)
+export type RenderEditorStateFn = (
+  state: SerializedEditorState,
+  variant?: RichEditorVariant,
+) => ReactNode;
 
-export const NestedContentRendererProvider =
-  NestedContentRendererContext.Provider
+const NestedContentRendererContext = createContext<RenderEditorStateFn | null>(null);
+
+export const NestedContentRendererProvider = NestedContentRendererContext.Provider;
 
 export function useOptionalNestedContentRenderer(): RenderEditorStateFn | null {
-  return use(NestedContentRendererContext)
+  return use(NestedContentRendererContext);
 }
 
 export function useNestedContentRenderer(): RenderEditorStateFn {
-  const fn = use(NestedContentRendererContext)
+  const fn = use(NestedContentRendererContext);
   if (!fn) {
-    throw new Error(
-      'useNestedContentRenderer must be used within a NestedContentRendererProvider',
-    )
+    throw new Error('useNestedContentRenderer must be used within a NestedContentRendererProvider');
   }
-  return fn
+  return fn;
 }

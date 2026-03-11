@@ -61,8 +61,8 @@ export function ShiroEditor({
   );
 
   const renderNestedContent = useCallback(
-    (value: SerializedEditorState) => (
-      <ShiroRenderer theme={theme} value={value} variant={variant} />
+    (value: SerializedEditorState, overrideVariant?: typeof variant) => (
+      <ShiroRenderer theme={theme} value={value} variant={overrideVariant ?? variant} />
     ),
     [theme, variant],
   );

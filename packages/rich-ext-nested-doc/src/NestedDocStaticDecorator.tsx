@@ -1,6 +1,8 @@
 import {
   ColorSchemeProvider,
+  NestedContentRendererProvider,
   useColorScheme,
+  useOptionalNestedContentRenderer,
   usePresentDialog,
   useVariant,
 } from '@haklex/rich-editor/static';
@@ -23,6 +25,7 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
   const colorScheme = useColorScheme();
   const { className: portalClassName } = usePortalTheme();
   const presentDialogFromCtx = usePresentDialog();
+  const renderNestedContent = useOptionalNestedContentRenderer();
 
   const children = contentState.root?.children ?? [];
   const needsTruncation = children.length > PREVIEW_NODE_LIMIT;
@@ -51,9 +54,11 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
       title: title || undefined,
       content: () => (
         <ColorSchemeProvider colorScheme={colorScheme}>
-          <div className={css.staticDialogBody}>
-            <NestedDocRenderer value={contentState} variant={contextVariant} />
-          </div>
+          <NestedContentRendererProvider value={renderNestedContent}>
+            <div className={css.staticDialogBody}>
+              <NestedDocRenderer value={contentState} variant={contextVariant} />
+            </div>
+          </NestedContentRendererProvider>
         </ColorSchemeProvider>
       ),
       className: css.staticDialogPopup,
@@ -63,7 +68,15 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
       clickOutsideToDismiss: true,
       sheet: 'auto',
     });
-  }, [colorScheme, contentState, portalClassName, presentDialogFromCtx, title, contextVariant]);
+  }, [
+    colorScheme,
+    contentState,
+    portalClassName,
+    presentDialogFromCtx,
+    renderNestedContent,
+    title,
+    contextVariant,
+  ]);
 
   if (!hasPreview) {
     return null;

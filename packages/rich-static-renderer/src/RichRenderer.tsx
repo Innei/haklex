@@ -6,6 +6,7 @@ import {
   getVariantClass,
   NestedContentRendererProvider,
   RendererConfigProvider,
+  useOptionalNestedContentRenderer,
 } from '@haklex/rich-editor/static';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { createHeadlessEditor } from '@lexical/headless';
@@ -229,6 +230,8 @@ export function RichRenderer({
 }: RichRendererProps) {
   const variantClass = getVariantClass(variant);
 
+  const outerRenderNestedContent = useOptionalNestedContentRenderer();
+
   const { content, footnoteData, renderNestedContent } = useMemo(() => {
     const nodes = extraNodes ? [...allNodes, ...extraNodes] : allNodes;
     return renderEditorToReact(value, nodes, builtinNodeOverrides);
@@ -244,7 +247,7 @@ export function RichRenderer({
             definitions={footnoteData.definitions}
             displayNumberMap={footnoteData.displayNumberMap}
           >
-            <NestedContentRendererProvider value={renderNestedContent}>
+            <NestedContentRendererProvider value={outerRenderNestedContent ?? renderNestedContent}>
               <Component
                 suppressHydrationWarning
                 className={classes}

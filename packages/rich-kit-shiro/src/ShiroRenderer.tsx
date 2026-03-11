@@ -1,4 +1,5 @@
-import type { RendererConfig } from '@haklex/rich-editor';
+import type { RendererConfig, RichEditorVariant } from '@haklex/rich-editor';
+import { NestedContentRendererProvider } from '@haklex/rich-editor';
 import { nestedDocNodes } from '@haklex/rich-ext-nested-doc/static';
 import {
   codeSnippetNodes,
@@ -9,8 +10,8 @@ import {
 } from '@haklex/rich-renderers';
 import type { RichRendererProps } from '@haklex/rich-static-renderer';
 import { RichRenderer } from '@haklex/rich-static-renderer';
-import type { Klass, LexicalNode } from 'lexical';
-import { useMemo } from 'react';
+import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
+import { useCallback, useMemo } from 'react';
 
 const defaultExtraNodes = [
   ExcalidrawNode,
@@ -40,5 +41,22 @@ export function ShiroRenderer({ extraNodes, rendererConfig, ...props }: ShiroRen
     [rendererConfig],
   );
 
-  return <RichRenderer {...props} extraNodes={mergedNodes} rendererConfig={mergedConfig} />;
+  const renderNestedContent = useCallback(
+    (value: SerializedEditorState, overrideVariant?: RichEditorVariant) => (
+      <ShiroRenderer
+        extraNodes={extraNodes}
+        rendererConfig={rendererConfig}
+        theme={props.theme}
+        value={value}
+        variant={overrideVariant ?? props.variant}
+      />
+    ),
+    [extraNodes, props.theme, props.variant, rendererConfig],
+  );
+
+  return (
+    <NestedContentRendererProvider value={renderNestedContent}>
+      <RichRenderer {...props} extraNodes={mergedNodes} rendererConfig={mergedConfig} />
+    </NestedContentRendererProvider>
+  );
 }

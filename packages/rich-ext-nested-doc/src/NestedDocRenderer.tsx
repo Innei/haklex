@@ -1,6 +1,7 @@
 import {
   type RichEditorVariant,
   useColorScheme,
+  useOptionalNestedContentRenderer,
   useRendererConfig,
 } from '@haklex/rich-editor/static';
 import { RichRenderer } from '@haklex/rich-static-renderer';
@@ -13,8 +14,13 @@ export function NestedDocRenderer({
   value: SerializedEditorState;
   variant?: RichEditorVariant;
 }) {
+  const renderNestedContent = useOptionalNestedContentRenderer();
   const theme = useColorScheme();
   const rendererConfig = useRendererConfig();
+
+  if (renderNestedContent) {
+    return <>{renderNestedContent(value, variant)}</>;
+  }
 
   return (
     <RichRenderer rendererConfig={rendererConfig} theme={theme} value={value} variant={variant} />
