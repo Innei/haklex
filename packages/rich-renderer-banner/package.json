@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-banner",
-  "version": "0.0.77",
+  "version": "0.0.78",
   "description": "Banner renderer for haklex rich editor",
   "repository": {
     "type": "git",
