@@ -143,11 +143,12 @@ export const titleText = style({
   minWidth: 0,
   display: '-webkit-box',
   WebkitBoxOrient: 'vertical',
-  WebkitLineClamp: 2,
+  lineClamp: 1,
+  WebkitLineClamp: 1,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   fontSize: vars.typography.fontSizeMd,
-  fontWeight: 600,
+  fontWeight: 500,
   lineHeight: '1.25rem',
 });
 

@@ -312,13 +312,14 @@ globalStyle(
     paddingLeft: '2em',
     listStyleType: 'none',
     outline: 'none',
+    transition: 'color 0.25s ease',
     vars: {
       '--rc-cb-size': '1.125rem',
     },
   },
 );
 
-// Checkbox box
+// Checkbox box (line-style, thin border)
 globalStyle(
   `${richContent} .rich-list-item.rich-list-item-unchecked::before, ${richContent} .rich-list-item.rich-list-item-checked::before`,
   {
@@ -328,14 +329,13 @@ globalStyle(
     top: 'calc((1lh - var(--rc-cb-size)) / 2)',
     width: 'var(--rc-cb-size)',
     height: 'var(--rc-cb-size)',
-    border: `2px solid color-mix(in oklab, ${vars.color.textSecondary} 60%, transparent)`,
+    border: `1.5px solid ${vars.color.textQuaternary}`,
     borderRadius: vars.borderRadius.sm,
     boxSizing: 'border-box',
     cursor: 'pointer',
-    verticalAlign: 'middle',
-    color: vars.color.text,
     backgroundColor: 'transparent',
-    transition: 'background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease',
+    transition:
+      'background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s ease',
   },
 );
 
@@ -343,49 +343,80 @@ globalStyle(
 globalStyle(
   `[contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-unchecked:hover::before`,
   {
-    borderColor: `color-mix(in oklab, ${vars.color.textSecondary} 80%, transparent)`,
+    borderColor: vars.color.textTertiary,
   },
 );
 
-// Checkmark (clip-path animation, rotated to form check shape)
+// Active state: scale down (editor only)
+globalStyle(
+  `[contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-unchecked:active::before, [contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-checked:active::before`,
+  {
+    transform: 'scale(0.94)',
+  },
+);
+
+// Checkmark (border-based stroke-style checkmark)
 globalStyle(
   `${richContent} .rich-list-item.rich-list-item-unchecked::after, ${richContent} .rich-list-item.rich-list-item-checked::after`,
   {
     content: '""',
     position: 'absolute',
-    left: 0,
-    top: 'calc((1lh - var(--rc-cb-size)) / 2)',
-    width: 'var(--rc-cb-size)',
-    height: 'var(--rc-cb-size)',
-    opacity: 0,
-    clipPath: 'polygon(20% 100%, 20% 80%, 50% 80%, 50% 80%, 70% 80%, 70% 100%)',
-    backgroundColor: 'white',
+    left: 'calc(var(--rc-cb-size) * 0.32)',
+    top: 'calc((1lh - var(--rc-cb-size)) / 2 + var(--rc-cb-size) * 0.14)',
+    width: 'calc(var(--rc-cb-size) * 0.28)',
+    height: 'calc(var(--rc-cb-size) * 0.55)',
+    borderRight: `2px solid ${vars.color.accent}`,
+    borderBottom: `2px solid ${vars.color.accent}`,
     boxSizing: 'border-box',
     display: 'block',
     pointerEvents: 'none',
-    transform: 'rotate(45deg)',
+    transform: 'rotate(45deg) scale(0)',
     transformOrigin: 'center',
-    transition: 'clip-path 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s',
+    opacity: 0,
+    transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s, opacity 0.15s ease',
   },
 );
 
-// Checked state: box
+// Checked state: box (outline style with light tint fill)
 globalStyle(`${richContent} .rich-list-item.rich-list-item-checked::before`, {
-  backgroundColor: vars.color.accent,
   borderColor: vars.color.accent,
-  boxShadow: `0 0 0 1px ${vars.color.accent}`,
+  backgroundColor: vars.color.accentLight,
 });
 
-// Checked state: checkmark (scale 0.7 for smaller appearance)
+// Hover state for checked checkbox (editor only)
+globalStyle(
+  `[contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-checked:hover::before`,
+  {
+    backgroundColor: `color-mix(in oklab, ${vars.color.accent} 12%, transparent)`,
+  },
+);
+
+// Checked state: checkmark (pop-in with spring easing)
 globalStyle(`${richContent} .rich-list-item.rich-list-item-checked::after`, {
-  clipPath: 'polygon(20% 100%, 20% 80%, 50% 80%, 50% 0%, 70% 0%, 70% 100%)',
+  transform: 'rotate(45deg) scale(1)',
   opacity: 1,
-  transform: 'rotate(45deg) scale(0.7)',
 });
 
 globalStyle(`${richContent} .rich-list-item-checked`, {
-  textDecoration: 'line-through',
   color: vars.color.textSecondary,
+});
+
+// Strikethrough line setup on direct children (inline elements → line only covers text)
+globalStyle(
+  `${richContent} .rich-list-item.rich-list-item-checked > *, ${richContent} .rich-list-item.rich-list-item-unchecked > *`,
+  {
+    backgroundImage: `linear-gradient(${vars.color.textSecondary}, ${vars.color.textSecondary})`,
+    backgroundSize: '0% 1.5px',
+    backgroundPosition: 'left center',
+    backgroundRepeat: 'no-repeat',
+    transition: 'background-size 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.15s, opacity 0.15s ease',
+  },
+);
+
+// Checked state: animate strikethrough left-to-right
+globalStyle(`${richContent} .rich-list-item.rich-list-item-checked > *`, {
+  backgroundSize: '100% 1.5px',
+  opacity: 0.5,
 });
 
 // ─── Blockquote ──────────────────────────────────────────
