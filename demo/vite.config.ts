@@ -131,6 +131,7 @@ export default defineConfig({
     port: 5188,
     open: true,
   },
+
   define: {
     'process.env.IS_PREACT': '"false"',
     'process.env.NODE_ENV': JSON.stringify('development'),

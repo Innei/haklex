@@ -1,4 +1,4 @@
-import type { SerializedEditorState } from 'lexical'
+import type { SerializedEditorState } from 'lexical';
 
 import {
   alertQuote,
@@ -13,8 +13,11 @@ import {
   nestedDoc,
   paragraph,
   quote,
+  table,
+  tableCell,
+  tableRow,
   text,
-} from './helpers'
+} from './helpers';
 
 export const initialContent: SerializedEditorState = doc(
   heading('h1', text('Rich Editor Demo')),
@@ -62,18 +65,11 @@ export const initialContent: SerializedEditorState = doc(
 
   heading('h2', text('Alerts')),
 
-  alertQuote(
-    'note',
-    paragraph(text('This is a note alert for additional context.')),
-  ) as any,
+  alertQuote('note', paragraph(text('This is a note alert for additional context.'))) as any,
 
   alertQuote(
     'tip',
-    paragraph(
-      text('Pro tip: Use '),
-      text('pnpm', FORMAT_CODE),
-      text(' for faster installs.'),
-    ),
+    paragraph(text('Pro tip: Use '), text('pnpm', FORMAT_CODE), text(' for faster installs.')),
   ) as any,
 
   heading('h2', text('Code Block')),
@@ -249,29 +245,79 @@ console.log(greet('World'))`,
       listItem(paragraph(text('Expand to see full content'))),
       listItem(paragraph(text('In edit mode, click to open modal editor'))),
     ),
-    paragraph(
-      text(
-        'Paragraph 4: Additional content to demonstrate truncation behavior.',
+    heading('h4', text('Code Block')),
+    {
+      type: 'code-block',
+      language: 'typescript',
+      code: `// Nested doc supports code blocks
+const greet = (name: string) => \`Hello, \${name}!\`
+console.log(greet('nested'))`,
+      version: 1,
+    } as any,
+    heading('h4', text('Table')),
+    table(
+      tableRow(
+        tableCell(1, paragraph(text('Node'))),
+        tableCell(1, paragraph(text('Support'))),
+        tableCell(1, paragraph(text('Edit'))),
+        tableCell(1, paragraph(text('Render'))),
+        tableCell(1, paragraph(text('Nested'))),
+        tableCell(1, paragraph(text('SSR'))),
+        tableCell(1, paragraph(text('Note'))),
+      ),
+      tableRow(
+        tableCell(0, paragraph(text('Table'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Resize, add/remove rows'))),
+      ),
+      tableRow(
+        tableCell(0, paragraph(text('Code Block'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Syntax highlight'))),
+      ),
+      tableRow(
+        tableCell(0, paragraph(text('Image'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Thumbhash placeholder'))),
+      ),
+      tableRow(
+        tableCell(0, paragraph(text('Mermaid'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Diagram render'))),
+      ),
+      tableRow(
+        tableCell(0, paragraph(text('KaTeX'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Yes'))),
+        tableCell(0, paragraph(text('Inline & block math'))),
       ),
     ),
-    paragraph(
-      text('Paragraph 5: The nested document can hold substantial content.'),
-    ),
-    paragraph(
-      text('Paragraph 6: Readers see a preview with a gradient mask overlay.'),
-    ),
-    paragraph(
-      text('Paragraph 7: Click the expand button to reveal everything.'),
-    ),
-    paragraph(
-      text('Paragraph 8: The editor modal provides full editing capabilities.'),
-    ),
-    paragraph(
-      text('Paragraph 9: Changes sync back to the parent document on save.'),
-    ),
-    paragraph(
-      text('Paragraph 10: This line should be truncated in collapsed view.'),
-    ),
+    paragraph(text('Paragraph 4: Additional content to demonstrate truncation behavior.')),
+    paragraph(text('Paragraph 5: The nested document can hold substantial content.')),
+    paragraph(text('Paragraph 6: Readers see a preview with a gradient mask overlay.')),
+    paragraph(text('Paragraph 7: Click the expand button to reveal everything.')),
+    paragraph(text('Paragraph 8: The editor modal provides full editing capabilities.')),
+    paragraph(text('Paragraph 9: Changes sync back to the parent document on save.')),
+    paragraph(text('Paragraph 10: This line should be truncated in collapsed view.')),
     paragraph(text('Paragraph 11: Only visible after expanding.')),
     paragraph(text('Paragraph 12: Final paragraph of the nested document.')),
   ) as any,
@@ -287,7 +333,5 @@ console.log(greet('World'))`,
     version: 1,
   } as any,
 
-  paragraph(
-    text('Start editing above, or import JSON via the toolbar.', FORMAT_ITALIC),
-  ),
-)
+  paragraph(text('Start editing above, or import JSON via the toolbar.', FORMAT_ITALIC)),
+);

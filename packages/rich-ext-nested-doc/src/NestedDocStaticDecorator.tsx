@@ -1,4 +1,9 @@
-import { useColorScheme, usePresentDialog, useVariant } from '@haklex/rich-editor/static';
+import {
+  ColorSchemeProvider,
+  useColorScheme,
+  usePresentDialog,
+  useVariant,
+} from '@haklex/rich-editor/static';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import type { SerializedEditorState } from 'lexical';
 import { Maximize2 } from 'lucide-react';
@@ -45,9 +50,11 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
     present({
       title: title || undefined,
       content: () => (
-        <div className={css.staticDialogBody}>
-          <NestedDocRenderer value={contentState} variant={contextVariant} />
-        </div>
+        <ColorSchemeProvider colorScheme={colorScheme}>
+          <div className={css.staticDialogBody}>
+            <NestedDocRenderer value={contentState} variant={contextVariant} />
+          </div>
+        </ColorSchemeProvider>
       ),
       className: css.staticDialogPopup,
       portalClassName,

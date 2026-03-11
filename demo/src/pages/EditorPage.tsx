@@ -20,6 +20,7 @@ import { initialContent } from '../fixtures/initial-content';
 const insertItemOrder = [
   'Image',
   'Code Block',
+  'Table',
   'Link Card',
   'Callout',
   'Banner',
