@@ -375,7 +375,14 @@ export const MermaidEditRenderer: FC<MermaidRendererProps> = ({ content, onConte
           Edit
         </span>
       )}
-      <TransformWrapper initialScale={1} maxScale={4} minScale={0.5}>
+      <TransformWrapper
+        initialScale={1}
+        maxScale={4}
+        minScale={0.5}
+        wheel={{
+          disabled: true,
+        }}
+      >
         <ZoomControls />
         <TransformComponent
           wrapperStyle={{ width: '100%' }}

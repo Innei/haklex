@@ -1,6 +1,6 @@
 'use client';
 
-import { Globe } from 'lucide-react';
+import { Globe, Mail } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { getHostname, probeFavicon } from '../utils/favicon';
@@ -68,9 +68,11 @@ export function LinkFavicon({
     );
   }
 
+  const isMailto = href?.toLowerCase().startsWith('mailto:');
+
   return (
     <span className={`rich-link-favicon ${className ?? ''}`.trim()}>
-      <Globe aria-hidden size={14} />
+      {isMailto ? <Mail aria-hidden size={14} /> : <Globe aria-hidden size={14} />}
     </span>
   );
 }

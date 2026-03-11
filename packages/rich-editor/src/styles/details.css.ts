@@ -59,7 +59,7 @@ globalStyle(`${richContent} .rich-details-chevron`, {
   width: '1.25rem',
   height: '1.25rem',
   position: 'relative',
-  top: '0.125rem',
+  top: '0.25rem',
   flexShrink: 0,
   color: vars.color.textTertiary,
   transformOrigin: 'center',
