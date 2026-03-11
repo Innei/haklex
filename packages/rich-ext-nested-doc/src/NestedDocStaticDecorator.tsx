@@ -1,4 +1,4 @@
-import { useColorScheme, usePresentDialog } from '@haklex/rich-editor/static';
+import { useColorScheme, usePresentDialog, useVariant } from '@haklex/rich-editor/static';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import type { SerializedEditorState } from 'lexical';
 import { Maximize2 } from 'lucide-react';
@@ -38,6 +38,7 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
     return walk(firstChild).slice(0, 80);
   }, [children]);
 
+  const contextVariant = useVariant();
   const handleOpen = useCallback(async () => {
     const present = presentDialogFromCtx ?? (await import('@haklex/rich-editor-ui')).presentDialog;
 
@@ -45,7 +46,7 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
       title: title || undefined,
       content: () => (
         <div className={css.staticDialogBody}>
-          <NestedDocRenderer value={contentState} />
+          <NestedDocRenderer value={contentState} variant={contextVariant} />
         </div>
       ),
       className: css.staticDialogPopup,
@@ -55,7 +56,7 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
       clickOutsideToDismiss: true,
       sheet: 'auto',
     });
-  }, [colorScheme, contentState, portalClassName, presentDialogFromCtx, title]);
+  }, [colorScheme, contentState, portalClassName, presentDialogFromCtx, title, contextVariant]);
 
   if (!hasPreview) {
     return null;
