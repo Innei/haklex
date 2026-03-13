@@ -49,7 +49,7 @@ export function renderBuiltinNode(
   key: string,
   children: ReactNode[] | null,
   headingSlugs: Map<string, number>,
-  _textContent?: string,
+  textContent?: string,
 ): ReactNode {
   switch (node.type) {
     case 'root': {
@@ -65,7 +65,7 @@ export function renderBuiltinNode(
     }
     case 'heading': {
       const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-      const text = extractText(node);
+      const text = textContent || extractText(node);
       const baseSlug = textToSlug(text);
       let slug = baseSlug;
       if (baseSlug) {
