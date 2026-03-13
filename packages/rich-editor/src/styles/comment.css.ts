@@ -1,140 +1,139 @@
-import { commentTheme, vars } from '@haklex/rich-style-token/styles'
-import { globalStyle, style } from '@vanilla-extract/css'
+import { commentTheme, vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
-import { richContent } from './shared.css'
+import { katexStyles } from './katex.css';
+import { richContent, sharedStyles } from './shared.css';
 
 const commentBase = style({
   fontSize: vars.typography.fontSizeBase,
   lineHeight: vars.typography.lineHeight,
-})
+});
 
-export const commentVariant = style([richContent, commentTheme, commentBase])
+export const commentVariant = style([richContent, commentTheme, commentBase]);
+const comment = (selector: string) => `${commentBase} ${selector}`;
 
 // ─── Paragraphs (tighter) ───────────────────────────────
-globalStyle(`${commentBase} .rich-paragraph`, {
+globalStyle(comment(sharedStyles.paragraph), {
   marginBottom: '0.6em',
-})
+});
 
 // ─── Headings (smaller, compact) ────────────────────────
-globalStyle(`${commentBase} .rich-heading-h1`, {
+globalStyle(comment(sharedStyles.headingH1), {
   fontSize: '1.35em',
   fontWeight: 700,
   marginTop: '0.8em',
   marginBottom: '0.3em',
-})
+});
 
-globalStyle(`${commentBase} .rich-heading-h2`, {
+globalStyle(comment(sharedStyles.headingH2), {
   fontSize: '1.2em',
   fontWeight: 700,
   marginTop: '0.7em',
   marginBottom: '0.25em',
-})
+});
 
-globalStyle(`${commentBase} .rich-heading-h3`, {
+globalStyle(comment(sharedStyles.headingH3), {
   fontSize: '1.1em',
   fontWeight: 600,
   marginTop: '0.6em',
   marginBottom: '0.2em',
-})
+});
 
-globalStyle(`${commentBase} .rich-heading-h4`, {
+globalStyle(comment(sharedStyles.headingH4), {
   fontSize: '1em',
   fontWeight: 600,
   marginTop: '0.5em',
   marginBottom: '0.15em',
-})
+});
 
-globalStyle(`${commentBase} .rich-heading-h5`, {
+globalStyle(comment(sharedStyles.headingH5), {
   fontSize: '0.9em',
   fontWeight: 600,
   marginTop: '0.45em',
   marginBottom: '0.1em',
-})
+});
 
-globalStyle(`${commentBase} .rich-heading-h6`, {
+globalStyle(comment(sharedStyles.headingH6), {
   fontSize: '0.85em',
   fontWeight: 600,
   marginTop: '0.4em',
   marginBottom: '0.1em',
-})
+});
 
 // ─── Blockquote (compact) ───────────────────────────────
-globalStyle(`${commentBase} .rich-quote`, {
+globalStyle(comment(sharedStyles.quote), {
   padding: `${vars.spacing.sm} ${vars.spacing.md}`,
   paddingLeft: `calc(${vars.spacing.md} + 3px)`,
   margin: `${vars.spacing.sm} 0`,
   fontSize: '0.95em',
-})
+});
 
-globalStyle(`${commentBase} .rich-quote::before`, {
+globalStyle(`${comment(sharedStyles.quote)}::before`, {
   width: '3px',
-})
+});
 
 // ─── Lists (compact) ───────────────────────────────────
-globalStyle(`${commentBase} .rich-list-ol, ${commentBase} .rich-list-ul`, {
+globalStyle(`${comment(sharedStyles.listOl)}, ${comment(sharedStyles.listUl)}`, {
   marginBottom: '0.6em',
   paddingLeft: vars.spacing.md,
-})
+});
 
-globalStyle(`${commentBase} .rich-list-item`, {
+globalStyle(comment(sharedStyles.listItem), {
   marginBottom: '0.1em',
-})
+});
 
 // ─── Code block (compact) ──────────────────────────────
 globalStyle(`${commentBase} .rich-code-block`, {
   margin: `${vars.spacing.sm} 0`,
   borderRadius: vars.borderRadius.sm,
   fontSize: vars.typography.fontSizeSmall,
-})
+});
 
 globalStyle(`${commentBase} .rich-code-block pre`, {
   padding: vars.spacing.sm,
-})
+});
 
 // Hide line numbers in comment variant (covers both shikicode and fallback)
 globalStyle(`${commentBase} .line::before`, {
   display: 'none !important' as any,
-})
+});
 
 // ─── Table (compact cells) ─────────────────────────────
-globalStyle(`${commentBase} .rich-table`, {
+globalStyle(comment(sharedStyles.table), {
   margin: `${vars.spacing.sm} 0`,
   fontSize: vars.typography.fontSizeSmall,
-})
+});
 
-globalStyle(
-  `${commentBase} .rich-table-cell, ${commentBase} .rich-table-cell-header`,
-  {
-    padding: `${vars.spacing.xs} ${vars.spacing.sm}`,
-  },
-)
+globalStyle(`${comment(sharedStyles.tableCell)}, ${comment(sharedStyles.tableCellHeader)}`, {
+  padding: `${vars.spacing.xs} ${vars.spacing.sm}`,
+});
 
 // ─── Images (less margin) ──────────────────────────────
 globalStyle(`${commentBase} .rich-image`, {
   margin: `${vars.spacing.sm} 0`,
-})
+});
 
 globalStyle(`${commentBase} .rich-image figcaption`, {
   fontSize: vars.typography.fontSizeSmall,
-})
+});
 
 // ─── HR (compact, match markdown short centered line) ───
-globalStyle(`${commentBase} .rich-hr`, {
+globalStyle(comment(sharedStyles.hr), {
   border: 'none',
   borderTop: `1px solid ${vars.color.hrBorder}`,
   margin: `${vars.spacing.lg} auto`,
   width: 60,
-})
+});
 
 // ─── Alert (compact) ───────────────────────────────────
-globalStyle(`${commentBase} .rich-alert`, {
+globalStyle(comment(sharedStyles.alert), {
   padding: `${vars.spacing.sm} ${vars.spacing.md}`,
   paddingLeft: vars.spacing.lg,
   margin: `${vars.spacing.sm} 0`,
-})
+});
 
 // ─── KaTeX block (compact) ─────────────────────────────
-globalStyle(`${commentBase} .rich-katex-block`, {
+globalStyle(comment(katexStyles.block), {
   padding: `${vars.spacing.sm} 0`,
   margin: `${vars.spacing.sm} 0`,
-})
+});

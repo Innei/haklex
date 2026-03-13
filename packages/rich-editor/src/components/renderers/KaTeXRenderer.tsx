@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 
+import { katexClassNames, katexStyles } from '../../styles/katex.css';
+import { clsx } from '../utils';
+
 export interface KaTeXRendererProps {
   displayMode: boolean;
   equation: string;
@@ -53,17 +56,21 @@ export function KaTeXRenderer({ equation, displayMode }: KaTeXRendererProps) {
   }, [equation, displayMode]);
 
   if (error) {
-    return <code className="rich-katex-fallback">{equation}</code>;
+    return <code className={clsx(katexClassNames.fallback, katexStyles.fallback)}>{equation}</code>;
   }
 
   if (html) {
     return (
       <span
-        className={displayMode ? 'rich-katex-block' : 'rich-katex-inline'}
         dangerouslySetInnerHTML={{ __html: html }}
+        className={
+          displayMode
+            ? clsx(katexClassNames.block, katexStyles.block)
+            : clsx(katexClassNames.inline, katexStyles.inline)
+        }
       />
     );
   }
 
-  return <code className="rich-katex-fallback">{equation}</code>;
+  return <code className={clsx(katexClassNames.fallback, katexStyles.fallback)}>{equation}</code>;
 }

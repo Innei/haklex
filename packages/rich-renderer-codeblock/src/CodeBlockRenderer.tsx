@@ -50,7 +50,7 @@ export const CodeBlockRenderer: ComponentType<CodeBlockRendererProps> = ({
     .join(' ');
 
   return (
-    <CodeBlockCard code={code} language={language}>
+    <CodeBlockCard static code={code} language={language}>
       {html ? (
         <div className={linedClassName} dangerouslySetInnerHTML={{ __html: html }} />
       ) : (

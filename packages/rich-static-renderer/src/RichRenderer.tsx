@@ -4,6 +4,8 @@ import {
   editorTheme,
   FootnoteDefinitionsProvider,
   getVariantClass,
+  gridClassNames,
+  gridStyles,
   NestedContentRendererProvider,
   RendererConfigProvider,
   semanticClassNames,
@@ -46,7 +48,14 @@ function wrapDecoration(serialized: any, key: string, decoration: ReactNode): Re
       );
     }
     case 'grid-container': {
-      return createElement('div', { key, className: 'rich-grid-container' }, decoration);
+      return createElement(
+        'div',
+        {
+          key,
+          className: `${gridClassNames.container} ${gridStyles.container}`,
+        },
+        decoration,
+      );
     }
     default: {
       if (isValidElement(decoration)) {
@@ -229,6 +238,7 @@ export function RichRenderer({
   className,
   style,
   as: Component = 'div',
+  nested = false,
   rendererConfig,
   extraNodes,
   builtinNodeOverrides,
@@ -256,6 +266,7 @@ export function RichRenderer({
               <Component
                 suppressHydrationWarning
                 className={classes}
+                data-rich-nested={nested ? 'true' : undefined}
                 data-theme={theme}
                 style={style}
               >

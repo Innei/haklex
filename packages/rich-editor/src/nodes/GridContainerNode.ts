@@ -12,6 +12,7 @@ import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
 import { GridStaticDecorator } from '../components/renderers/GridStaticDecorator';
+import { gridClassNames, gridStyles } from '../styles/grid.css';
 import { extractTextContent } from '../utils/extractTextContent';
 
 export type SerializedGridContainerNode = Spread<
@@ -79,7 +80,7 @@ export class GridContainerNode extends DecoratorNode<ReactElement> {
 
   createDOM(_config: EditorConfig): HTMLElement {
     const div = document.createElement('div');
-    div.className = 'rich-grid-container';
+    div.className = `${gridClassNames.container} ${gridStyles.container}`;
     return div;
   }
 

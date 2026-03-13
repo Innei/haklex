@@ -1,4 +1,6 @@
 import {
+  detailsClassNames,
+  detailsStyles,
   getTagBgColor,
   LinkFavicon,
   RendererWrapper,
@@ -110,6 +112,7 @@ export function renderBuiltinNode(
     case 'listitem': {
       const isChecklist = node.checked !== undefined;
       const hasNestedList = node.children?.some((c: any) => c.type === 'list');
+      const value = typeof node.value === 'number' && node.value > 1 ? node.value : undefined;
       let cls: string;
       if (hasNestedList) {
         cls = shared('listNestedItem');
@@ -121,7 +124,7 @@ export function renderBuiltinNode(
         cls = shared('listItem');
       }
       return (
-        <li className={cls} key={key} value={node.value}>
+        <li className={cls} key={key} value={value}>
           {children}
         </li>
       );
@@ -173,9 +176,16 @@ export function renderBuiltinNode(
     case 'details': {
       const summary = node.summary || '';
       return (
-        <details className="rich-details" key={key} open={node.open || undefined}>
-          <summary className="rich-details-summary">
-            <span aria-hidden="true" className="rich-details-chevron">
+        <details
+          className={`${detailsClassNames.details} ${detailsStyles.details}`}
+          key={key}
+          open={node.open || undefined}
+        >
+          <summary className={`${detailsClassNames.summary} ${detailsStyles.summary}`}>
+            <span
+              aria-hidden="true"
+              className={`${detailsClassNames.chevron} ${detailsStyles.chevron}`}
+            >
               <svg
                 fill="none"
                 height="20"
@@ -189,9 +199,11 @@ export function renderBuiltinNode(
                 <path d="M8 6L12 10L8 14" />
               </svg>
             </span>
-            <span className="rich-details-summary-text">{summary}</span>
+            <span className={`${detailsClassNames.summaryText} ${detailsStyles.summaryText}`}>
+              {summary}
+            </span>
           </summary>
-          <div className="rich-details-content">{children}</div>
+          <div className={`${detailsClassNames.content} ${detailsStyles.content}`}>{children}</div>
         </details>
       );
     }

@@ -34,6 +34,9 @@ export {
 } from './context/RendererConfigContext';
 export { articleVariant } from './styles/article.css';
 export { commentVariant } from './styles/comment.css';
+export { detailsClassNames, detailsStyles } from './styles/details.css';
+export { gridClassNames, gridStyles } from './styles/grid.css';
+export { katexClassNames, katexStyles } from './styles/katex.css';
 export { noteVariant } from './styles/note.css';
 export {
   richContent,

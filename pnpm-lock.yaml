@@ -40,6 +40,9 @@ importers:
       '@types/unist':
         specifier: ^3.0.3
         version: 3.0.3
+      '@vanilla-extract/css':
+        specifier: ^1.18.0
+        version: 1.18.0
       bumpp:
         specifier: ^10.4.1
         version: 10.4.1

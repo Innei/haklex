@@ -16,6 +16,8 @@ interface CodeBlockCardProps {
   collapsible?: boolean;
   langSlot?: ReactNode;
   language: string;
+  /** Use bodyBackgroundStatic (with paddingBlock) when true. Set by static CodeBlockRenderer. */
+  static?: boolean;
 }
 
 export function CodeBlockCard({
@@ -24,6 +26,7 @@ export function CodeBlockCard({
   collapsible = true,
   langSlot,
   children,
+  static: staticMode = false,
 }: CodeBlockCardProps) {
   const normalizedLanguage = normalizeLanguage(language);
   const [copied, setCopied] = useState(false);
@@ -100,7 +103,9 @@ export function CodeBlockCard({
         {copied ? CheckIcon : CopyIcon}
       </button>
 
-      <div className={`${styles.bodyBackground} ${styles.semanticClassNames.bodyBackground}`}>
+      <div
+        className={`${staticMode ? styles.bodyBackgroundStatic : styles.bodyBackground} ${styles.semanticClassNames.bodyBackground}`}
+      >
         <div className={scrollClassName} ref={scrollRef}>
           {children}
         </div>

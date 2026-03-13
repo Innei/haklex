@@ -1,32 +1,27 @@
-import type {
-  EditorConfig,
-  LexicalNode,
-  NodeKey,
-  SerializedElementNode,
-  Spread,
-} from 'lexical'
-import { $insertNodes, ElementNode } from 'lexical'
-import { ChevronRight } from 'lucide-react'
-import { createElement } from 'react'
+import type { EditorConfig, LexicalNode, NodeKey, SerializedElementNode, Spread } from 'lexical';
+import { $insertNodes, ElementNode } from 'lexical';
+import { ChevronRight } from 'lucide-react';
+import { createElement } from 'react';
 
-import type { SlashMenuItemConfig } from '../types/slash-menu'
-import { createLucideSvg } from '../utils/lucide-dom'
+import { detailsClassNames, detailsStyles } from '../styles/details.css';
+import type { SlashMenuItemConfig } from '../types/slash-menu';
+import { createLucideSvg } from '../utils/lucide-dom';
 
-type IconNode = [string, Record<string, string>][]
+type IconNode = [string, Record<string, string>][];
 
-const ChevronRightIconNode: IconNode = [['path', { d: 'M8 6L12 10L8 14' }]]
+const ChevronRightIconNode: IconNode = [['path', { d: 'M8 6L12 10L8 14' }]];
 
 export type SerializedDetailsNode = Spread<
   {
-    summary: string
-    open: boolean
+    summary: string;
+    open: boolean;
   },
   SerializedElementNode
->
+>;
 
 export class DetailsNode extends ElementNode {
-  __summary: string
-  __open: boolean
+  __summary: string;
+  __open: boolean;
 
   static slashMenuItems: SlashMenuItemConfig[] = [
     {
@@ -37,77 +32,77 @@ export class DetailsNode extends ElementNode {
       section: 'ADVANCED',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createDetailsNode('Details')])
-        })
+          $insertNodes([$createDetailsNode('Details')]);
+        });
       },
     },
-  ]
+  ];
 
   static getType(): string {
-    return 'details'
+    return 'details';
   }
 
   static clone(node: DetailsNode): DetailsNode {
-    return new DetailsNode(node.__summary, node.__open, node.__key)
+    return new DetailsNode(node.__summary, node.__open, node.__key);
   }
 
   constructor(summary: string, open = false, key?: NodeKey) {
-    super(key)
-    this.__summary = summary
-    this.__open = open
+    super(key);
+    this.__summary = summary;
+    this.__open = open;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const details = document.createElement('details')
-    details.className = 'rich-details'
+    const details = document.createElement('details');
+    details.className = `${detailsClassNames.details} ${detailsStyles.details}`;
     if (this.__open) {
-      details.open = true
+      details.open = true;
     }
 
-    const summary = document.createElement('summary')
-    summary.className = 'rich-details-summary'
+    const summary = document.createElement('summary');
+    summary.className = `${detailsClassNames.summary} ${detailsStyles.summary}`;
 
-    const chevron = document.createElement('span')
-    chevron.className = 'rich-details-chevron'
-    chevron.setAttribute('aria-hidden', 'true')
+    const chevron = document.createElement('span');
+    chevron.className = `${detailsClassNames.chevron} ${detailsStyles.chevron}`;
+    chevron.setAttribute('aria-hidden', 'true');
     chevron.append(
       createLucideSvg(ChevronRightIconNode, {
-        width: '20',
-        height: '20',
-        viewBox: '0 0 20 20',
+        'width': '20',
+        'height': '20',
+        'viewBox': '0 0 20 20',
         'stroke-width': '1.5',
       }),
-    )
-    summary.append(chevron)
+    );
+    summary.append(chevron);
 
-    const label = document.createElement('span')
-    label.className = 'rich-details-summary-text'
-    label.textContent = this.__summary
-    summary.append(label)
+    const label = document.createElement('span');
+    label.className = `${detailsClassNames.summaryText} ${detailsStyles.summaryText}`;
+    label.textContent = this.__summary;
+    summary.append(label);
 
-    const content = document.createElement('div')
-    content.className = 'rich-details-content'
-    details.append(summary, content)
+    const content = document.createElement('div');
+    content.className = `${detailsClassNames.content} ${detailsStyles.content}`;
+    details.append(summary, content);
 
-    return details
+    return details;
   }
 
   updateDOM(prevNode: DetailsNode, dom: HTMLElement): boolean {
-    const details = dom as HTMLDetailsElement
+    const details = dom as HTMLDetailsElement;
     if (prevNode.__open !== this.__open) {
-      details.open = this.__open
+      details.open = this.__open;
     }
     if (prevNode.__summary !== this.__summary) {
-      const label = dom.querySelector('.rich-details-summary-text')
+      const label = dom.querySelector(`.${detailsClassNames.summaryText}`);
       if (label) {
-        label.textContent = this.__summary
+        label.textContent = this.__summary;
       }
     }
-    return false
+    return false;
   }
 
   static importJSON(serializedNode: SerializedDetailsNode): DetailsNode {
-    return $createDetailsNode(serializedNode.summary, serializedNode.open)
+    return $createDetailsNode(serializedNode.summary, serializedNode.open);
   }
 
   exportJSON(): SerializedDetailsNode {
@@ -117,49 +112,45 @@ export class DetailsNode extends ElementNode {
       summary: this.__summary,
       open: this.__open,
       version: 1,
-    }
+    };
   }
 
   getSummary(): string {
-    return this.getLatest().__summary
+    return this.getLatest().__summary;
   }
 
   setSummary(summary: string): void {
-    const writable = this.getWritable()
-    writable.__summary = summary
+    const writable = this.getWritable();
+    writable.__summary = summary;
   }
 
   getOpen(): boolean {
-    return this.getLatest().__open
+    return this.getLatest().__open;
   }
 
   setOpen(open: boolean): void {
-    const writable = this.getWritable()
-    writable.__open = open
+    const writable = this.getWritable();
+    writable.__open = open;
   }
 
   toggleOpen(): void {
-    this.setOpen(!this.getOpen())
+    this.setOpen(!this.getOpen());
   }
 
   getDOMSlot(element: HTMLElement) {
-    const content = element.querySelector(
-      '.rich-details-content',
-    ) as HTMLElement
-    return super.getDOMSlot(element).withElement(content)
+    const content = element.querySelector(`.${detailsClassNames.content}`) as HTMLElement;
+    return super.getDOMSlot(element).withElement(content);
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 }
 
 export function $createDetailsNode(summary: string, open = false): DetailsNode {
-  return new DetailsNode(summary, open)
+  return new DetailsNode(summary, open);
 }
 
-export function $isDetailsNode(
-  node: LexicalNode | null | undefined,
-): node is DetailsNode {
-  return node instanceof DetailsNode
+export function $isDetailsNode(node: LexicalNode | null | undefined): node is DetailsNode {
+  return node instanceof DetailsNode;
 }

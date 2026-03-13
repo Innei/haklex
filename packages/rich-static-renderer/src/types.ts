@@ -14,6 +14,7 @@ export interface RichRendererProps {
   builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>;
   className?: string;
   extraNodes?: Array<Klass<LexicalNode>>;
+  nested?: boolean;
   rendererConfig?: RendererConfig;
   style?: CSSProperties;
   theme?: ColorScheme;

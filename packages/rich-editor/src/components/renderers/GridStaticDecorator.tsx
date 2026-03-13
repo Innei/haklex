@@ -1,6 +1,8 @@
 import type { SerializedEditorState } from 'lexical';
 
 import { useNestedContentRenderer } from '../../context/NestedContentRendererContext';
+import { gridClassNames, gridStyles } from '../../styles/grid.css';
+import { clsx } from '../utils';
 
 interface GridStaticDecoratorProps {
   cellStates: SerializedEditorState[];
@@ -13,7 +15,7 @@ export function GridStaticDecorator({ cols, gap, cellStates }: GridStaticDecorat
 
   return (
     <div
-      className="rich-grid-inner"
+      className={clsx(gridClassNames.inner, gridStyles.inner)}
       style={{
         display: 'grid',
         gridTemplateColumns: `repeat(${cols}, 1fr)`,
@@ -21,7 +23,7 @@ export function GridStaticDecorator({ cols, gap, cellStates }: GridStaticDecorat
       }}
     >
       {cellStates.map((state, i) => (
-        <div className="rich-grid-cell" key={i}>
+        <div className={clsx(gridClassNames.cell, gridStyles.cell)} key={i}>
           {renderContent(state)}
         </div>
       ))}

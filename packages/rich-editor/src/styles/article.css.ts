@@ -1,7 +1,8 @@
 import { articleTheme, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
-import { richContent } from './shared.css';
+import { detailsStyles } from './details.css';
+import { richContent, sharedStyles } from './shared.css';
 
 // Helper for em calculation (based on 16px base)
 const em = (target: number, context = 16) => `${target / context}em`;
@@ -21,16 +22,18 @@ const articleBase = style({
 });
 
 export const articleVariant = style([richContent, articleTheme, articleBase]);
+const article = (selector: string) => `${articleBase} ${selector}`;
+const plainListItem = `${sharedStyles.listItem}:not(${sharedStyles.listItemChecked}):not(${sharedStyles.listItemUnchecked})`;
 
 // ─── Tailwind Prose LG Styles ───────────────────────────
 // Reference: https://github.com/tailwindlabs/tailwindcss-typography/blob/master/src/styles.js
 
-globalStyle(`${articleBase} .rich-paragraph`, {
+globalStyle(article(sharedStyles.paragraph), {
   marginTop: em(24, 16),
   marginBottom: em(24, 16),
 });
 
-globalStyle(`${articleBase} .rich-heading-h1`, {
+globalStyle(article(sharedStyles.headingH1), {
   color: vars.color.text,
   fontWeight: 800,
   fontSize: em(48, 16),
@@ -39,7 +42,7 @@ globalStyle(`${articleBase} .rich-heading-h1`, {
   lineHeight: 1,
 });
 
-globalStyle(`${articleBase} .rich-heading-h2`, {
+globalStyle(article(sharedStyles.headingH2), {
   color: vars.color.text,
   fontWeight: 700,
   fontSize: em(30, 16),
@@ -48,7 +51,7 @@ globalStyle(`${articleBase} .rich-heading-h2`, {
   lineHeight: round(40 / 30), // 1.3333333
 });
 
-globalStyle(`${articleBase} .rich-heading-h3`, {
+globalStyle(article(sharedStyles.headingH3), {
   color: vars.color.text,
   fontWeight: 600,
   fontSize: em(24, 16),
@@ -57,7 +60,7 @@ globalStyle(`${articleBase} .rich-heading-h3`, {
   lineHeight: round(36 / 24), // 1.5
 });
 
-globalStyle(`${articleBase} .rich-heading-h4`, {
+globalStyle(article(sharedStyles.headingH4), {
   color: vars.color.text,
   fontWeight: 600,
   marginTop: em(32, 16),
@@ -67,13 +70,13 @@ globalStyle(`${articleBase} .rich-heading-h4`, {
 
 // Heading + * resets
 globalStyle(
-  `${articleBase} .rich-heading-h2 + *, ${articleBase} .rich-heading-h3 + *, ${articleBase} .rich-heading-h4 + *`,
+  `${article(sharedStyles.headingH2)} + *, ${article(sharedStyles.headingH3)} + *, ${article(sharedStyles.headingH4)} + *`,
   {
     marginTop: '0',
   },
 );
 
-globalStyle(`${articleBase} .rich-quote`, {
+globalStyle(article(sharedStyles.quote), {
   fontWeight: 500,
   fontStyle: 'italic',
   color: vars.color.text,
@@ -85,23 +88,23 @@ globalStyle(`${articleBase} .rich-quote`, {
   quotes: '"\\201C""\\201D""\\2018""\\2019"',
 });
 
-globalStyle(`${articleBase} .rich-quote .rich-paragraph:first-of-type::before`, {
+globalStyle(article(`${sharedStyles.quote} ${sharedStyles.paragraph}:first-of-type::before`), {
   content: 'open-quote',
 });
 
-globalStyle(`${articleBase} .rich-quote .rich-paragraph:last-of-type::after`, {
+globalStyle(article(`${sharedStyles.quote} ${sharedStyles.paragraph}:last-of-type::after`), {
   content: 'close-quote',
 });
 
-globalStyle(`${articleBase} .rich-quote .rich-paragraph:first-child`, {
+globalStyle(article(`${sharedStyles.quote} ${sharedStyles.paragraph}:first-child`), {
   marginTop: 0,
 });
 
-globalStyle(`${articleBase} .rich-quote .rich-paragraph:last-child`, {
+globalStyle(article(`${sharedStyles.quote} ${sharedStyles.paragraph}:last-child`), {
   marginBottom: 0,
 });
 
-globalStyle(`${articleBase} .rich-text-code`, {
+globalStyle(article(sharedStyles.textCode), {
   color: vars.color.text,
   fontWeight: 600,
   fontSize: em(14, 16),
@@ -111,14 +114,14 @@ globalStyle(`${articleBase} .rich-text-code`, {
   fontFamily: vars.typography.fontMono,
 });
 
-globalStyle(`${articleBase} .rich-text-code::before, ${articleBase} .rich-text-code::after`, {
+globalStyle(`${article(sharedStyles.textCode)}::before, ${article(sharedStyles.textCode)}::after`, {
   content: '"`"',
   color: vars.color.textSecondary,
   opacity: 0.5,
 });
 
 globalStyle(
-  `${articleBase} [contenteditable="true"] .rich-text-code::before, ${articleBase} [contenteditable="true"] .rich-text-code::after`,
+  `${articleBase} [contenteditable="true"] ${sharedStyles.textCode}::before, ${articleBase} [contenteditable="true"] ${sharedStyles.textCode}::after`,
   {
     content: '',
   },
@@ -142,48 +145,51 @@ globalStyle(`${articleBase} .rich-code-block pre`, {
   margin: 0, // Reset default pre margin
 });
 
-globalStyle(`${articleBase} .rich-list-ul, ${articleBase} .rich-list-ol`, {
+globalStyle(`${article(sharedStyles.listUl)}, ${article(sharedStyles.listOl)}`, {
   marginTop: em(24, 16),
   marginBottom: em(24, 16),
   paddingLeft: em(28, 16), // 1.5555556em
 });
 
-globalStyle(`${articleBase} .rich-list-item`, {
+globalStyle(article(sharedStyles.listItem), {
   marginTop: em(12, 16),
   marginBottom: em(12, 16),
-  paddingLeft: em(8, 16), // LG padding inline start for li
 });
 
-globalStyle(`${articleBase} .rich-list-item .rich-paragraph`, {
+globalStyle(article(plainListItem), {
+  paddingLeft: em(8, 16), // LG padding inline start for plain li
+});
+
+globalStyle(article(`${sharedStyles.listItem} ${sharedStyles.paragraph}`), {
   marginTop: em(16, 16),
   marginBottom: em(16, 16),
 });
 
-globalStyle(`${articleBase} .rich-list-item > .rich-paragraph:first-child`, {
+globalStyle(article(`${sharedStyles.listItem} > ${sharedStyles.paragraph}:first-child`), {
   marginTop: em(24, 16),
 });
 
-globalStyle(`${articleBase} .rich-list-item > .rich-paragraph:last-child`, {
+globalStyle(article(`${sharedStyles.listItem} > ${sharedStyles.paragraph}:last-child`), {
   marginBottom: em(24, 16),
 });
 
 // Nested lists
 globalStyle(
-  `${articleBase} .rich-list-ul .rich-list-ul, ${articleBase} .rich-list-ul .rich-list-ol, ${articleBase} .rich-list-ol .rich-list-ul, ${articleBase} .rich-list-ol .rich-list-ol`,
+  `${article(sharedStyles.listUl)} ${sharedStyles.listUl}, ${article(sharedStyles.listUl)} ${sharedStyles.listOl}, ${article(sharedStyles.listOl)} ${sharedStyles.listUl}, ${article(sharedStyles.listOl)} ${sharedStyles.listOl}`,
   {
     marginTop: em(16, 16),
     marginBottom: em(16, 16),
   },
 );
 
-globalStyle(`${articleBase} .rich-table`, {
+globalStyle(article(sharedStyles.table), {
   marginTop: em(32, 16),
   marginBottom: em(32, 16),
   fontSize: em(14, 16),
   lineHeight: round(24 / 16),
 });
 
-globalStyle(`${articleBase} .rich-table .rich-paragraph`, {
+globalStyle(article(`${sharedStyles.table} ${sharedStyles.paragraph}`), {
   margin: 0,
   padding: 0,
   lineHeight: 'inherit',
@@ -206,7 +212,7 @@ globalStyle(`${articleBase} .rich-image figcaption`, {
   marginTop: em(16, 16),
 });
 
-globalStyle(`${articleBase} .rich-hr`, {
+globalStyle(article(sharedStyles.hr), {
   borderColor: vars.color.hrBorder,
   borderTopWidth: '1px',
   marginTop: em(56, 16),
@@ -216,11 +222,11 @@ globalStyle(`${articleBase} .rich-hr`, {
   marginRight: 'auto',
 });
 
-globalStyle(`${articleBase} .rich-hr + *`, {
+globalStyle(`${article(sharedStyles.hr)} + *`, {
   marginTop: '0',
 });
 
-globalStyle(`${articleBase} .rich-link`, {
+globalStyle(article(sharedStyles.link), {
   fontWeight: 500,
   textDecoration: 'underline',
 });
@@ -236,7 +242,7 @@ globalStyle(`${articleBase} .rich-code-snippet`, {
 });
 
 // ─── Details ────────────────────────────────────────────
-globalStyle(`${articleBase} .rich-details`, {
+globalStyle(article(detailsStyles.details), {
   margin: `${em(32, 16)} 0`,
 });
 

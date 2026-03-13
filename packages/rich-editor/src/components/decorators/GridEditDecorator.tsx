@@ -12,6 +12,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { $isGridContainerNode } from '../../nodes/GridContainerNode';
 import { $isGridEditNode } from '../../nodes/GridEditNode';
+import { gridClassNames, gridStyles } from '../../styles/grid.css';
+import { clsx } from '../utils';
 
 interface GridEditDecoratorProps {
   cellEditors: LexicalEditor[];
@@ -82,25 +84,33 @@ export function GridEditDecorator({
 
   return (
     <>
-      <div className="rich-grid-toolbar" onMouseDown={(e) => e.preventDefault()}>
-        <span className="rich-grid-toolbar-icon">
+      <div
+        className={clsx(gridClassNames.toolbar, gridStyles.toolbar)}
+        onMouseDown={(e) => e.preventDefault()}
+      >
+        <span className={clsx(gridClassNames.toolbarIcon, gridStyles.toolbarIcon)}>
           <LayoutGrid size={14} />
         </span>
         {COL_OPTIONS.map((n) => (
           <button
             aria-label={`${n} columns`}
-            className={`rich-grid-col-btn${n === currentCols ? ' rich-grid-col-btn-active' : ''}`}
             key={n}
             type="button"
+            className={clsx(
+              gridClassNames.colButton,
+              gridStyles.colButton,
+              n === currentCols && gridClassNames.colButtonActive,
+              n === currentCols && gridStyles.colButtonActive,
+            )}
             onClick={() => handleSetCols(n)}
           >
             {n}
           </button>
         ))}
-        <div className="rich-grid-toolbar-divider" />
+        <div className={clsx(gridClassNames.toolbarDivider, gridStyles.toolbarDivider)} />
         <button
           aria-label="Add row"
-          className="rich-grid-action-btn"
+          className={clsx(gridClassNames.actionButton, gridStyles.actionButton)}
           type="button"
           onClick={handleAddRow}
         >
@@ -108,7 +118,7 @@ export function GridEditDecorator({
         </button>
         <button
           aria-label="Remove row"
-          className="rich-grid-action-btn"
+          className={clsx(gridClassNames.actionButton, gridStyles.actionButton)}
           type="button"
           onClick={handleRemoveRow}
         >
@@ -116,21 +126,21 @@ export function GridEditDecorator({
         </button>
       </div>
       <div
-        className="rich-grid-inner"
+        className={clsx(gridClassNames.inner, gridStyles.inner)}
         style={{
           gridTemplateColumns: `repeat(${currentCols}, 1fr)`,
           gap,
         }}
       >
         {cellEditors.map((cellEditor, i) => (
-          <div className="rich-grid-cell" key={i}>
+          <div className={clsx(gridClassNames.cell, gridStyles.cell)} key={i}>
             <LexicalNestedComposer initialEditor={cellEditor}>
               <RichTextPlugin
                 ErrorBoundary={LexicalErrorBoundary}
                 contentEditable={
                   <ContentEditable
                     aria-placeholder=""
-                    className="rich-grid-cell-editable"
+                    className={clsx(gridClassNames.cellEditable, gridStyles.cellEditable)}
                     placeholder={<span style={{ display: 'none' }} />}
                   />
                 }

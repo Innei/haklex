@@ -44,6 +44,7 @@ export function ShiroRenderer({ extraNodes, rendererConfig, ...props }: ShiroRen
   const renderNestedContent = useCallback(
     (value: SerializedEditorState, overrideVariant?: RichEditorVariant) => (
       <ShiroRenderer
+        nested
         extraNodes={extraNodes}
         rendererConfig={rendererConfig}
         theme={props.theme}
