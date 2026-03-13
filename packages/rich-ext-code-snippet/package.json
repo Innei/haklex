@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-code-snippet",
-  "version": "0.0.83",
+  "version": "0.0.84",
   "description": "Multi-file code snippet extension",
   "repository": {
     "type": "git",

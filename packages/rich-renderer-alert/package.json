@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-alert",
-  "version": "0.0.83",
+  "version": "0.0.84",
   "description": "Alert renderer for haklex rich editor",
   "repository": {
     "type": "git",
