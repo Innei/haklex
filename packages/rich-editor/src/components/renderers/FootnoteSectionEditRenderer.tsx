@@ -4,6 +4,8 @@ import { useCallback } from 'react';
 
 import { useFootnoteDefinitions } from '../../context/FootnoteDefinitionsContext';
 import { FootnoteSectionNode } from '../../nodes/FootnoteSectionNode';
+import { semanticClassNames, sharedStyles } from '../../styles/shared.css';
+import { clsx } from '../utils';
 
 export interface FootnoteSectionEditRendererProps {
   definitions: Record<string, string>;
@@ -45,29 +47,62 @@ export function FootnoteSectionEditRenderer({ definitions }: FootnoteSectionEdit
   if (sortedEntries.length === 0) return null;
 
   return (
-    <div className="rich-footnote-section-content rich-footnote-section-edit" role="doc-endnotes">
-      <hr className="rich-footnote-section-divider" />
-      <ol className="rich-footnote-section-list">
+    <div
+      role="doc-endnotes"
+      className={clsx(
+        'rich-footnote-section-content',
+        'rich-footnote-section-edit',
+        semanticClassNames.footnoteSection,
+        sharedStyles.footnoteSection,
+      )}
+    >
+      <hr
+        className={clsx(
+          semanticClassNames.footnoteSectionDivider,
+          sharedStyles.footnoteSectionDivider,
+        )}
+      />
+      <ol
+        className={clsx(semanticClassNames.footnoteSectionList, sharedStyles.footnoteSectionList)}
+      >
         {sortedEntries.map(([identifier, content]) => {
           const displayNum = displayNumberMap[identifier] ?? identifier;
           return (
             <li
-              className="rich-footnote-section-item rich-footnote-section-item-edit"
               id={`footnote-${identifier}`}
               key={identifier}
+              className={clsx(
+                semanticClassNames.footnoteSectionItem,
+                sharedStyles.footnoteSectionItem,
+                semanticClassNames.footnoteSectionItemEdit,
+                sharedStyles.footnoteSectionItemEdit,
+              )}
             >
-              <span className="rich-footnote-section-item-num">{displayNum}.</span>
+              <span
+                className={clsx(
+                  semanticClassNames.footnoteSectionItemNum,
+                  sharedStyles.footnoteSectionItemNum,
+                )}
+              >
+                {displayNum}.
+              </span>
               <input
-                className="rich-footnote-section-item-input"
                 placeholder={`Footnote content for [^${identifier}]`}
                 type="text"
                 value={content}
+                className={clsx(
+                  semanticClassNames.footnoteSectionItemInput,
+                  sharedStyles.footnoteSectionItemInput,
+                )}
                 onChange={(e) => handleContentChange(identifier, e.target.value)}
               />
               <button
                 aria-label={`Remove footnote ${identifier}`}
-                className="rich-footnote-section-item-remove"
                 type="button"
+                className={clsx(
+                  semanticClassNames.footnoteSectionItemRemove,
+                  sharedStyles.footnoteSectionItemRemove,
+                )}
                 onClick={() => handleRemove(identifier)}
               >
                 ×

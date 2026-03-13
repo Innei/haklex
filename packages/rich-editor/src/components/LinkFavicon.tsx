@@ -3,7 +3,9 @@
 import { Globe, Mail } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
+import { semanticClassNames, sharedStyles } from '../styles/shared.css';
 import { getHostname, probeFavicon } from '../utils/favicon';
+import { clsx } from './utils';
 
 export type LinkFaviconProps = {
   href?: string;
@@ -24,6 +26,11 @@ export function LinkFavicon({
   platformIconMap,
   getPlatformFromUrl,
 }: LinkFaviconProps) {
+  const faviconClassName = clsx(
+    semanticClassNames.linkFavicon,
+    sharedStyles.linkFavicon,
+    className,
+  );
   const [faviconUrl, setFaviconUrl] = useState<string | null>(null);
 
   useEffect(() => {
@@ -53,16 +60,12 @@ export function LinkFavicon({
   }
 
   if (platformType && platformIconMap?.[platformType]) {
-    return (
-      <span className={`rich-link-favicon ${className ?? ''}`.trim()}>
-        {platformIconMap[platformType]}
-      </span>
-    );
+    return <span className={faviconClassName}>{platformIconMap[platformType]}</span>;
   }
 
   if (faviconUrl) {
     return (
-      <span className={`rich-link-favicon ${className ?? ''}`.trim()}>
+      <span className={faviconClassName}>
         <img alt="" aria-hidden="true" height={14} src={faviconUrl} width={14} />
       </span>
     );
@@ -71,7 +74,7 @@ export function LinkFavicon({
   const isMailto = href?.toLowerCase().startsWith('mailto:');
 
   return (
-    <span className={`rich-link-favicon ${className ?? ''}`.trim()}>
+    <span className={faviconClassName}>
       {isMailto ? <Mail aria-hidden size={14} /> : <Globe aria-hidden size={14} />}
     </span>
   );

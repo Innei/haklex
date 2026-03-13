@@ -1,57 +1,55 @@
-import type {
-  EditorConfig,
-  LexicalNode,
-  NodeKey,
-  SerializedElementNode,
-} from 'lexical'
-import { ElementNode } from 'lexical'
+import type { EditorConfig, LexicalNode, NodeKey, SerializedElementNode } from 'lexical';
+import { ElementNode } from 'lexical';
+
+import { semanticClassNames, sharedStyles } from '../styles/shared.css';
 
 export class SpoilerNode extends ElementNode {
   static getType(): string {
-    return 'spoiler'
+    return 'spoiler';
   }
 
   static clone(node: SpoilerNode): SpoilerNode {
-    return new SpoilerNode(node.__key)
+    return new SpoilerNode(node.__key);
   }
 
   constructor(key?: NodeKey) {
-    super(key)
+    super(key);
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const span = document.createElement('span')
-    span.className = 'rich-spoiler'
-    span.setAttribute('role', 'button')
-    span.setAttribute('tabindex', '0')
-    span.setAttribute('aria-label', 'Spoiler (click to reveal)')
+    const span = document.createElement('span');
+    span.className = `${semanticClassNames.spoiler} ${sharedStyles.spoiler}`;
+    span.setAttribute('role', 'button');
+    span.setAttribute('tabindex', '0');
+    span.setAttribute('aria-label', 'Spoiler (click to reveal)');
 
     const toggle = () => {
-      if (span.isContentEditable) return
-      const revealed = span.classList.toggle('rich-spoiler-revealed')
+      if (span.isContentEditable) return;
+      span.classList.toggle(semanticClassNames.spoilerRevealed);
+      const revealed = span.classList.toggle(sharedStyles.spoilerRevealed);
       span.setAttribute(
         'aria-label',
         revealed ? 'Spoiler (revealed)' : 'Spoiler (click to reveal)',
-      )
-    }
+      );
+    };
 
-    span.addEventListener('click', toggle)
+    span.addEventListener('click', toggle);
     span.addEventListener('keydown', (e) => {
       if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault()
-        toggle()
+        e.preventDefault();
+        toggle();
       }
-    })
+    });
 
-    return span
+    return span;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   static importJSON(_serializedNode: SerializedElementNode): SpoilerNode {
-    return $createSpoilerNode()
+    return $createSpoilerNode();
   }
 
   exportJSON(): SerializedElementNode {
@@ -59,28 +57,26 @@ export class SpoilerNode extends ElementNode {
       ...super.exportJSON(),
       type: 'spoiler',
       version: 1,
-    }
+    };
   }
 
   canInsertTextBefore(): boolean {
-    return true
+    return true;
   }
 
   canInsertTextAfter(): boolean {
-    return true
+    return true;
   }
 
   isInline(): boolean {
-    return true
+    return true;
   }
 }
 
 export function $createSpoilerNode(): SpoilerNode {
-  return new SpoilerNode()
+  return new SpoilerNode();
 }
 
-export function $isSpoilerNode(
-  node: LexicalNode | null | undefined,
-): node is SpoilerNode {
-  return node instanceof SpoilerNode
+export function $isSpoilerNode(node: LexicalNode | null | undefined): node is SpoilerNode {
+  return node instanceof SpoilerNode;
 }

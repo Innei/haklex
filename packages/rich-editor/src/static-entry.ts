@@ -35,7 +35,12 @@ export {
 export { articleVariant } from './styles/article.css';
 export { commentVariant } from './styles/comment.css';
 export { noteVariant } from './styles/note.css';
-export { richContent } from './styles/shared.css';
+export {
+  richContent,
+  semanticClassNames,
+  type SharedStyleKey,
+  sharedStyles,
+} from './styles/shared.css';
 export { editorTheme } from './styles/theme';
 export type { RichEditorVariant } from './types';
 export type { RendererConfig } from './types/renderer-config';

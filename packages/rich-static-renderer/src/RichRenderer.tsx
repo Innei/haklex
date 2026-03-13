@@ -6,6 +6,8 @@ import {
   getVariantClass,
   NestedContentRendererProvider,
   RendererConfigProvider,
+  semanticClassNames,
+  sharedStyles,
   useOptionalNestedContentRenderer,
 } from '@haklex/rich-editor/static';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
@@ -24,12 +26,15 @@ interface EditorConfig {
   theme: Record<string, any>;
 }
 
+const alertClassName = (type: string) =>
+  `${semanticClassNames.alert} ${sharedStyles.alert} rich-alert-${type}`;
+
 function wrapDecoration(serialized: any, key: string, decoration: ReactNode): ReactNode {
   switch (serialized.type) {
     case 'alert-quote': {
       return createElement(
         'div',
-        { key, className: `rich-alert rich-alert-${serialized.alertType}` },
+        { key, className: alertClassName(serialized.alertType) },
         decoration,
       );
     }

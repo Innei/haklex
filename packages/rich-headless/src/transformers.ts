@@ -144,6 +144,17 @@ export const TAG_TRANSFORMER: TextMatchTransformer = {
   type: 'text-match',
 };
 
+export const COMMENT_TRANSFORMER: TextMatchTransformer = {
+  dependencies: [],
+  export: (node) =>
+    node.getType() === 'comment' ? `<!--${(node.exportJSON() as any).text ?? ''}-->` : null,
+  importRegExp: /<!--([\s\S]*?)-->/,
+  regExp: /<!--([\s\S]*?)-->$/,
+  replace: NOOP as any,
+  trigger: '>',
+  type: 'text-match',
+};
+
 // ── Element (block) ──
 
 export const FOOTNOTE_SECTION_TRANSFORMER: ElementTransformer = {
@@ -421,6 +432,7 @@ export const allHeadlessTransformers = [
   RUBY_TRANSFORMER,
   KATEX_INLINE_TRANSFORMER,
   TAG_TRANSFORMER,
+  COMMENT_TRANSFORMER,
   // Block (specific first)
   FOOTNOTE_SECTION_TRANSFORMER,
   CONTAINER_TRANSFORMER,

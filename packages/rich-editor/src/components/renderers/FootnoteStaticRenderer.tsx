@@ -5,6 +5,8 @@ import {
   useFootnoteContent,
   useFootnoteDisplayNumber,
 } from '../../context/FootnoteDefinitionsContext';
+import { semanticClassNames, sharedStyles } from '../../styles/shared.css';
+import { clsx } from '../utils';
 
 export interface FootnoteStaticRendererProps {
   identifier: string;
@@ -25,10 +27,13 @@ export function FootnoteStaticRenderer({ identifier }: FootnoteStaticRendererPro
 
       e.preventDefault();
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      target.classList.add('rich-footnote-highlight');
+      target.classList.add(semanticClassNames.footnoteHighlight, sharedStyles.footnoteHighlight);
 
       window.setTimeout(() => {
-        target.classList.remove('rich-footnote-highlight');
+        target.classList.remove(
+          semanticClassNames.footnoteHighlight,
+          sharedStyles.footnoteHighlight,
+        );
       }, 1200);
     },
     [identifier, targetId],
@@ -37,10 +42,10 @@ export function FootnoteStaticRenderer({ identifier }: FootnoteStaticRendererPro
   const label = displayNumber ?? identifier;
 
   return (
-    <span className="rich-footnote-ref-wrapper">
+    <span className={clsx(semanticClassNames.footnoteRefWrapper, sharedStyles.footnoteRefWrapper)}>
       <a
         aria-label={content ? `Footnote ${label}: ${content}` : `Footnote ${label}`}
-        className="rich-footnote-ref"
+        className={clsx(semanticClassNames.footnoteRef, sharedStyles.footnoteRef)}
         data-footnote-ref={identifier}
         href={`#${targetId}`}
         id={referenceId}

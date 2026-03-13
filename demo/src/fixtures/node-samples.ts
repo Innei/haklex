@@ -98,6 +98,29 @@ export const nodeSamples: NodeSample[] = [
     ),
   },
   {
+    key: 'comment',
+    label: 'HTML Comment',
+    description: 'Editable in editor mode and rendered as an actual HTML comment in readonly mode',
+    category: 'inline',
+    data: doc(
+      paragraph(
+        text('Visible before'),
+        text(' '),
+        {
+          type: 'comment',
+          text: 'draft-note: hidden in static renderer output',
+          format: 0,
+          detail: 0,
+          mode: 'normal',
+          style: '',
+          version: 1,
+        } as any,
+        text(' '),
+        text('visible after.'),
+      ),
+    ),
+  },
+  {
     key: 'footnote',
     label: 'Footnote Reference',
     description: 'Footnote marker [^1] with definitions section',

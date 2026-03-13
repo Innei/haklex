@@ -1,43 +1,48 @@
-import type { EditorThemeClasses } from 'lexical'
+import type { EditorThemeClasses } from 'lexical';
+
+import { semanticClassNames, sharedStyles } from './shared.css';
+
+const shared = <K extends keyof typeof sharedStyles>(key: K): string =>
+  `${semanticClassNames[key]} ${sharedStyles[key]}`;
 
 export const editorTheme: EditorThemeClasses = {
   text: {
-    bold: 'rich-text-bold',
-    italic: 'rich-text-italic',
-    underline: 'rich-text-underline',
-    strikethrough: 'rich-text-strikethrough',
-    superscript: 'rich-text-superscript',
-    subscript: 'rich-text-subscript',
-    code: 'rich-text-code',
-    highlight: 'rich-text-highlight',
+    bold: shared('textBold'),
+    italic: shared('textItalic'),
+    underline: shared('textUnderline'),
+    strikethrough: shared('textStrikethrough'),
+    superscript: shared('textSuperscript'),
+    subscript: shared('textSubscript'),
+    code: shared('textCode'),
+    highlight: shared('textHighlight'),
   },
   heading: {
-    h1: 'rich-heading-h1',
-    h2: 'rich-heading-h2',
-    h3: 'rich-heading-h3',
-    h4: 'rich-heading-h4',
-    h5: 'rich-heading-h5',
-    h6: 'rich-heading-h6',
+    h1: shared('headingH1'),
+    h2: shared('headingH2'),
+    h3: shared('headingH3'),
+    h4: shared('headingH4'),
+    h5: shared('headingH5'),
+    h6: shared('headingH6'),
   },
   list: {
-    ol: 'rich-list-ol',
-    ul: 'rich-list-ul',
-    listitem: 'rich-list-item',
-    listitemChecked: 'rich-list-item-checked',
-    listitemUnchecked: 'rich-list-item-unchecked',
-    checklist: 'rich-checklist',
+    ol: shared('listOl'),
+    ul: shared('listUl'),
+    listitem: shared('listItem'),
+    listitemChecked: shared('listItemChecked'),
+    listitemUnchecked: shared('listItemUnchecked'),
+    checklist: shared('checklist'),
     nested: {
-      listitem: 'rich-list-nested-item',
+      listitem: shared('listNestedItem'),
     },
   },
-  quote: 'rich-quote',
-  link: 'rich-link',
-  paragraph: 'rich-paragraph',
+  quote: shared('quote'),
+  link: shared('link'),
+  paragraph: shared('paragraph'),
   code: 'rich-code-block',
-  table: 'rich-table',
-  tableCell: 'rich-table-cell',
-  tableCellHeader: 'rich-table-cell-header',
-  tableScrollableWrapper: 'rich-table-scrollable-wrapper',
+  table: shared('table'),
+  tableCell: shared('tableCell'),
+  tableCellHeader: shared('tableCellHeader'),
+  tableScrollableWrapper: shared('tableScrollableWrapper'),
   /** Used by @lexical/extension HorizontalRuleNode */
-  hr: 'rich-hr',
-}
+  hr: shared('hr'),
+};

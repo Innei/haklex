@@ -10,12 +10,12 @@
  *   const editor = createHeadlessEditor({ nodes: allHeadlessNodes })
  */
 
-import { CodeHighlightNode, CodeNode } from '@lexical/code'
-import { HorizontalRuleNode } from '@lexical/extension'
-import { AutoLinkNode, LinkNode } from '@lexical/link'
-import { ListItemNode, ListNode } from '@lexical/list'
-import { HeadingNode, QuoteNode } from '@lexical/rich-text'
-import { TableCellNode, TableNode, TableRowNode } from '@lexical/table'
+import { CodeHighlightNode, CodeNode } from '@lexical/code';
+import { HorizontalRuleNode } from '@lexical/extension';
+import { AutoLinkNode, LinkNode } from '@lexical/link';
+import { ListItemNode, ListNode } from '@lexical/list';
+import { HeadingNode, QuoteNode } from '@lexical/rich-text';
+import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
 import {
   DecoratorNode,
   type EditorConfig,
@@ -26,7 +26,7 @@ import {
   type NodeKey,
   type SerializedElementNode,
   type SerializedLexicalNode,
-} from 'lexical'
+} from 'lexical';
 
 // ── Builtin nodes ──
 
@@ -43,80 +43,76 @@ export const builtinNodes: Klass<LexicalNode>[] = [
   TableRowNode,
   CodeNode,
   CodeHighlightNode,
-]
+];
 
 // ── Helpers ──
 
 function stubDOM(): HTMLElement {
-  return document.createElement('span')
+  return document.createElement('span');
 }
 
 function extractText(state: unknown): string {
-  if (!state || typeof state !== 'object') return ''
-  const root = (state as Record<string, unknown>).root as
-    | Record<string, unknown>
-    | undefined
-  if (!root) return ''
-  return walkChildren(root)
+  if (!state || typeof state !== 'object') return '';
+  const root = (state as Record<string, unknown>).root as Record<string, unknown> | undefined;
+  if (!root) return '';
+  return walkChildren(root);
 }
 
 function walkChildren(node: Record<string, unknown>): string {
-  const children = node.children as Record<string, unknown>[] | undefined
-  if (!children) return (node.text as string) ?? ''
-  return children.map(walkChildren).join('\n')
+  const children = node.children as Record<string, unknown>[] | undefined;
+  if (!children) return (node.text as string) ?? '';
+  return children.map(walkChildren).join('\n');
 }
 
 // ── SpoilerNode (ElementNode, inline) ──
 
 export class SpoilerNode extends ElementNode {
   static getType(): string {
-    return 'spoiler'
+    return 'spoiler';
   }
   static clone(node: SpoilerNode): SpoilerNode {
-    return new SpoilerNode((node as any).__key)
+    return new SpoilerNode((node as any).__key);
   }
   constructor(key?: NodeKey) {
-    super(key)
+    super(key);
   }
   static importJSON(_json: SerializedElementNode): SpoilerNode {
-    return new SpoilerNode()
+    return new SpoilerNode();
   }
   exportJSON(): SerializedElementNode {
-    return { ...super.exportJSON(), type: 'spoiler', version: 1 }
+    return { ...super.exportJSON(), type: 'spoiler', version: 1 };
   }
   createDOM(): HTMLElement {
-    return stubDOM()
+    return stubDOM();
   }
   updateDOM(): boolean {
-    return false
+    return false;
   }
   isInline(): boolean {
-    return true
+    return true;
   }
 }
 
 // ── RubyNode (ElementNode, inline) ──
 
 export class RubyNode extends ElementNode {
-  __reading = ''
+  __reading = '';
 
   static getType(): string {
-    return 'ruby'
+    return 'ruby';
   }
   static clone(node: RubyNode): RubyNode {
-    const n = new RubyNode((node as any).__key)
-    n.__reading = node.__reading
-    return n
+    const n = new RubyNode((node as any).__key);
+    n.__reading = node.__reading;
+    return n;
   }
   constructor(key?: NodeKey) {
-    super(key)
+    super(key);
   }
-  static importJSON(
-    json: SerializedElementNode & { reading?: string },
-  ): RubyNode {
-    const node = new RubyNode()
-    node.__reading = json.reading ?? ''
-    return node
+  static importJSON(json: SerializedElementNode & { reading?: string }): RubyNode {
+    const node = new RubyNode();
+    node.__reading = json.reading ?? '';
+    return node;
   }
   exportJSON(): SerializedElementNode & { reading: string } {
     return {
@@ -124,44 +120,44 @@ export class RubyNode extends ElementNode {
       type: 'ruby',
       reading: this.__reading,
       version: 1,
-    }
+    };
   }
   createDOM(): HTMLElement {
-    return stubDOM()
+    return stubDOM();
   }
   updateDOM(): boolean {
-    return false
+    return false;
   }
   isInline(): boolean {
-    return true
+    return true;
   }
 }
 
 // ── DetailsNode (ElementNode, block) ──
 
 export class DetailsNode extends ElementNode {
-  __summary = ''
-  __open = false
+  __summary = '';
+  __open = false;
 
   static getType(): string {
-    return 'details'
+    return 'details';
   }
   static clone(node: DetailsNode): DetailsNode {
-    const n = new DetailsNode((node as any).__key)
-    n.__summary = node.__summary
-    n.__open = node.__open
-    return n
+    const n = new DetailsNode((node as any).__key);
+    n.__summary = node.__summary;
+    n.__open = node.__open;
+    return n;
   }
   constructor(key?: NodeKey) {
-    super(key)
+    super(key);
   }
   static importJSON(
     json: SerializedElementNode & { summary?: string; open?: boolean },
   ): DetailsNode {
-    const node = new DetailsNode()
-    node.__summary = json.summary ?? ''
-    node.__open = json.open ?? false
-    return node
+    const node = new DetailsNode();
+    node.__summary = json.summary ?? '';
+    node.__open = json.open ?? false;
+    return node;
   }
   exportJSON(): SerializedElementNode & { summary: string; open: boolean } {
     return {
@@ -169,71 +165,66 @@ export class DetailsNode extends ElementNode {
       type: 'details',
       summary: this.__summary,
       open: this.__open,
-    }
+    };
   }
   createDOM(): HTMLElement {
-    return stubDOM()
+    return stubDOM();
   }
   updateDOM(): boolean {
-    return false
+    return false;
   }
 }
 
 // ── Generic headless DecoratorNode ──
 
-type Props = Record<string, unknown>
+type Props = Record<string, unknown>;
 
-function headlessDecorator(
-  type: string,
-  propKeys: string[],
-  defaults: Props,
-  inline = false,
-) {
+function headlessDecorator(type: string, propKeys: string[], defaults: Props, inline = false) {
   class Node extends DecoratorNode<null> {
     constructor(key?: NodeKey) {
-      super(key)
+      super(key);
       for (const k of propKeys) {
-        ;(this as any)[`__${k}`] = defaults[k]
+        (this as any)[`__${k}`] = defaults[k];
       }
     }
     static getType(): string {
-      return type
+      return type;
     }
     static clone(node: Node): Node {
-      const n = new Node((node as any).__key)
+      const n = new Node((node as any).__key);
       for (const k of propKeys) {
-        ;(n as any)[`__${k}`] = (node as any)[`__${k}`]
+        (n as any)[`__${k}`] = (node as any)[`__${k}`];
       }
-      return n
+      return n;
     }
     static importJSON(json: SerializedLexicalNode & Props): Node {
-      const node = new Node()
+      const node = new Node();
       for (const k of propKeys) {
-        ;(node as any)[`__${k}`] = json[k] ?? defaults[k]
+        (node as any)[`__${k}`] = json[k] ?? defaults[k];
       }
-      return node
+      return node;
     }
     exportJSON(): SerializedLexicalNode & Props {
-      const out: Props = { type, version: 1 }
+      const out: Props = { type, version: 1 };
       for (const k of propKeys) {
-        out[k] = (this as any)[`__${k}`]
+        out[k] = (this as any)[`__${k}`];
       }
-      return out as SerializedLexicalNode & Props
+      return out as SerializedLexicalNode & Props;
     }
     createDOM(_config: EditorConfig): HTMLElement {
-      return stubDOM()
+      return stubDOM();
     }
     updateDOM(): boolean {
-      return false
+      return false;
     }
     decorate(_editor: LexicalEditor, _config: EditorConfig): null {
-      return null
+      return null;
     }
     isInline(): boolean {
-      return inline
+      return inline;
     }
   }
-  return Node as unknown as Klass<LexicalNode>
+  return Node as unknown as Klass<LexicalNode>;
 }
 
 // ── Simple property-based nodes ──
@@ -250,13 +241,14 @@ export const ImageNode = headlessDecorator(
     thumbhash: undefined,
     accent: undefined,
   },
-)
+);
 
-export const VideoNode = headlessDecorator(
-  'video',
-  ['src', 'poster', 'width', 'height'],
-  { src: '', poster: undefined, width: undefined, height: undefined },
-)
+export const VideoNode = headlessDecorator('video', ['src', 'poster', 'width', 'height'], {
+  src: '',
+  poster: undefined,
+  width: undefined,
+  height: undefined,
+});
 
 export const LinkCardNode = headlessDecorator(
   'link-card',
@@ -270,97 +262,91 @@ export const LinkCardNode = headlessDecorator(
     favicon: undefined,
     image: undefined,
   },
-)
+);
 
 export const KaTeXInlineNode = headlessDecorator(
   'katex-inline',
   ['equation'],
   { equation: '' },
   true,
-)
+);
 
 export const KaTeXBlockNode = headlessDecorator('katex-block', ['equation'], {
   equation: '',
-})
+});
 
 export const MermaidNode = headlessDecorator('mermaid', ['diagram'], {
   diagram: '',
-})
+});
 
 export const MentionNode = headlessDecorator(
   'mention',
   ['platform', 'handle', 'displayName'],
   { platform: '', handle: '', displayName: undefined },
   true,
-)
+);
 
-export const CodeBlockNode = headlessDecorator(
-  'code-block',
-  ['code', 'language'],
-  { code: '', language: '' },
-)
+export const CodeBlockNode = headlessDecorator('code-block', ['code', 'language'], {
+  code: '',
+  language: '',
+});
 
-export const FootnoteNode = headlessDecorator(
-  'footnote',
-  ['identifier'],
-  { identifier: '' },
-  true,
-)
+export const FootnoteNode = headlessDecorator('footnote', ['identifier'], { identifier: '' }, true);
 
-export const FootnoteSectionNode = headlessDecorator(
-  'footnote-section',
-  ['definitions'],
-  { definitions: {} },
-)
+export const FootnoteSectionNode = headlessDecorator('footnote-section', ['definitions'], {
+  definitions: {},
+});
 
 export const EmbedNode = headlessDecorator('embed', ['url', 'source'], {
   url: '',
   source: null,
-})
+});
 
 export const CodeSnippetNode = headlessDecorator('code-snippet', ['files'], {
   files: [],
-})
+});
 
 export const GalleryNode = headlessDecorator('gallery', ['images', 'layout'], {
   images: [],
   layout: 'grid',
-})
+});
 
 export const ExcalidrawNode = headlessDecorator('excalidraw', ['snapshot'], {
   snapshot: '',
-})
+});
 
-export const TagNode = headlessDecorator('tag', ['text'], { text: '' }, true)
+export const TagNode = headlessDecorator('tag', ['text'], { text: '' }, true);
+
+export const CommentNode = headlessDecorator('comment', ['text'], { text: '' }, true);
 
 // ── Nested content nodes ──
 
 export class BannerNode extends DecoratorNode<null> {
-  __bannerType = 'note'
-  __contentState: unknown = null
+  __bannerType = 'note';
+  __contentState: unknown = null;
 
   static getType(): string {
-    return 'banner'
+    return 'banner';
   }
   constructor(key?: NodeKey) {
-    super(key)
+    super(key);
   }
   static clone(node: BannerNode): BannerNode {
-    const n = new BannerNode((node as any).__key)
-    n.__bannerType = node.__bannerType
-    n.__contentState = node.__contentState
-    return n
+    const n = new BannerNode((node as any).__key);
+    n.__bannerType = node.__bannerType;
+    n.__contentState = node.__contentState;
+    return n;
   }
   static importJSON(
     json: SerializedLexicalNode & {
-      bannerType?: string
-      content?: unknown
+      bannerType?: string;
+      content?: unknown;
     },
   ): BannerNode {
-    const node = new BannerNode()
-    node.__bannerType = json.bannerType ?? 'note'
-    node.__contentState = json.content ?? null
-    return node
+    const node = new BannerNode();
+    node.__bannerType = json.bannerType ?? 'note';
+    node.__contentState = json.content ?? null;
+    return node;
   }
   exportJSON(): SerializedLexicalNode {
     return {
@@ -368,48 +354,48 @@ export class BannerNode extends DecoratorNode<null> {
       version: 1,
       bannerType: this.__bannerType,
       content: this.__contentState,
-    } as SerializedLexicalNode
+    } as SerializedLexicalNode;
   }
   createDOM(): HTMLElement {
-    return stubDOM()
+    return stubDOM();
   }
   updateDOM(): boolean {
-    return false
+    return false;
   }
   decorate(): null {
-    return null
+    return null;
   }
   getTextContent(): string {
-    return extractText(this.__contentState)
+    return extractText(this.__contentState);
   }
 }
 
 export class AlertQuoteNode extends DecoratorNode<null> {
-  __alertType = 'note'
-  __contentState: unknown = null
+  __alertType = 'note';
+  __contentState: unknown = null;
 
   static getType(): string {
-    return 'alert-quote'
+    return 'alert-quote';
   }
   constructor(key?: NodeKey) {
-    super(key)
+    super(key);
   }
   static clone(node: AlertQuoteNode): AlertQuoteNode {
-    const n = new AlertQuoteNode((node as any).__key)
-    n.__alertType = node.__alertType
-    n.__contentState = node.__contentState
-    return n
+    const n = new AlertQuoteNode((node as any).__key);
+    n.__alertType = node.__alertType;
+    n.__contentState = node.__contentState;
+    return n;
   }
   static importJSON(
     json: SerializedLexicalNode & {
-      alertType?: string
-      content?: unknown
+      alertType?: string;
+      content?: unknown;
     },
   ): AlertQuoteNode {
-    const node = new AlertQuoteNode()
-    node.__alertType = json.alertType ?? 'note'
-    node.__contentState = json.content ?? null
-    return node
+    const node = new AlertQuoteNode();
+    node.__alertType = json.alertType ?? 'note';
+    node.__contentState = json.content ?? null;
+    return node;
   }
   exportJSON(): SerializedLexicalNode {
     return {
@@ -417,95 +403,93 @@ export class AlertQuoteNode extends DecoratorNode<null> {
       version: 1,
       alertType: this.__alertType,
       content: this.__contentState,
-    } as SerializedLexicalNode
+    } as SerializedLexicalNode;
   }
   createDOM(): HTMLElement {
-    return stubDOM()
+    return stubDOM();
   }
   updateDOM(): boolean {
-    return false
+    return false;
   }
   decorate(): null {
-    return null
+    return null;
   }
   getTextContent(): string {
-    return extractText(this.__contentState)
+    return extractText(this.__contentState);
   }
 }
 
 export class NestedDocNode extends DecoratorNode<null> {
-  __contentState: unknown = null
+  __contentState: unknown = null;
 
   static getType(): string {
-    return 'nested-doc'
+    return 'nested-doc';
   }
   constructor(key?: NodeKey) {
-    super(key)
+    super(key);
   }
   static clone(node: NestedDocNode): NestedDocNode {
-    const n = new NestedDocNode((node as any).__key)
-    n.__contentState = node.__contentState
-    return n
+    const n = new NestedDocNode((node as any).__key);
+    n.__contentState = node.__contentState;
+    return n;
   }
-  static importJSON(
-    json: SerializedLexicalNode & { content?: unknown },
-  ): NestedDocNode {
-    const node = new NestedDocNode()
-    node.__contentState = json.content ?? null
-    return node
+  static importJSON(json: SerializedLexicalNode & { content?: unknown }): NestedDocNode {
+    const node = new NestedDocNode();
+    node.__contentState = json.content ?? null;
+    return node;
   }
   exportJSON(): SerializedLexicalNode {
     return {
       type: 'nested-doc',
       version: 1,
       content: this.__contentState,
-    } as SerializedLexicalNode
+    } as SerializedLexicalNode;
   }
   createDOM(): HTMLElement {
-    return stubDOM()
+    return stubDOM();
   }
   updateDOM(): boolean {
-    return false
+    return false;
   }
   decorate(): null {
-    return null
+    return null;
   }
   getTextContent(): string {
-    return extractText(this.__contentState)
+    return extractText(this.__contentState);
   }
 }
 
 export class GridContainerNode extends DecoratorNode<null> {
-  __cols = 2
-  __gap = '16px'
-  __cells: unknown[] = []
+  __cols = 2;
+  __gap = '16px';
+  __cells: unknown[] = [];
 
   static getType(): string {
-    return 'grid-container'
+    return 'grid-container';
   }
   constructor(key?: NodeKey) {
-    super(key)
+    super(key);
   }
   static clone(node: GridContainerNode): GridContainerNode {
-    const n = new GridContainerNode((node as any).__key)
-    n.__cols = node.__cols
-    n.__gap = node.__gap
-    n.__cells = node.__cells
-    return n
+    const n = new GridContainerNode((node as any).__key);
+    n.__cols = node.__cols;
+    n.__gap = node.__gap;
+    n.__cells = node.__cells;
+    return n;
   }
   static importJSON(
     json: SerializedLexicalNode & {
-      cols?: number
-      gap?: string | number
-      cells?: unknown[]
+      cols?: number;
+      gap?: string | number;
+      cells?: unknown[];
     },
   ): GridContainerNode {
-    const node = new GridContainerNode()
-    node.__cols = json.cols ?? 2
-    const rawGap = json.gap
-    node.__gap = typeof rawGap === 'number' ? `${rawGap}px` : (rawGap ?? '16px')
-    node.__cells = json.cells ?? []
-    return node
+    const node = new GridContainerNode();
+    node.__cols = json.cols ?? 2;
+    const rawGap = json.gap;
+    node.__gap = typeof rawGap === 'number' ? `${rawGap}px` : (rawGap ?? '16px');
+    node.__cells = json.cells ?? [];
+    return node;
   }
   exportJSON(): SerializedLexicalNode {
     return {
@@ -514,19 +498,19 @@ export class GridContainerNode extends DecoratorNode<null> {
       cols: this.__cols,
       gap: this.__gap,
       cells: this.__cells,
-    } as SerializedLexicalNode
+    } as SerializedLexicalNode;
   }
   createDOM(): HTMLElement {
-    return stubDOM()
+    return stubDOM();
   }
   updateDOM(): boolean {
-    return false
+    return false;
   }
   decorate(): null {
-    return null
+    return null;
   }
   getTextContent(): string {
-    return this.__cells.map((cell) => extractText(cell)).join('\n')
+    return this.__cells.map((cell) => extractText(cell)).join('\n');
   }
 }
 
@@ -551,17 +535,15 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   GalleryNode,
   ExcalidrawNode,
   TagNode,
+  CommentNode,
   BannerNode,
   AlertQuoteNode,
   NestedDocNode,
   GridContainerNode,
-]
+];
 
-export const allHeadlessNodes: Klass<LexicalNode>[] = [
-  ...builtinNodes,
-  ...customHeadlessNodes,
-]
+export const allHeadlessNodes: Klass<LexicalNode>[] = [...builtinNodes, ...customHeadlessNodes];
 
 // ── Transformers (Lexical → Markdown) ──
 
-export { $toMarkdown, allHeadlessTransformers } from './transformers'
+export { $toMarkdown, allHeadlessTransformers } from './transformers';

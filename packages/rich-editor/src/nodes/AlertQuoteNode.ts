@@ -6,23 +6,18 @@ import type {
   SerializedEditorState,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { DecoratorNode } from 'lexical'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { DecoratorNode } from 'lexical';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { AlertStaticDecorator } from '../components/renderers/AlertStaticDecorator'
-import { extractTextContent } from '../utils/extractTextContent'
+import { AlertStaticDecorator } from '../components/renderers/AlertStaticDecorator';
+import { semanticClassNames, sharedStyles } from '../styles/shared.css';
+import { extractTextContent } from '../utils/extractTextContent';
 
-export type AlertType = 'note' | 'tip' | 'important' | 'warning' | 'caution'
+export type AlertType = 'note' | 'tip' | 'important' | 'warning' | 'caution';
 
-export const ALERT_TYPES: AlertType[] = [
-  'note',
-  'tip',
-  'important',
-  'warning',
-  'caution',
-]
+export const ALERT_TYPES: AlertType[] = ['note', 'tip', 'important', 'warning', 'caution'];
 
 export const ALERT_LABELS: Record<AlertType, string> = {
   note: 'Note',
@@ -30,35 +25,31 @@ export const ALERT_LABELS: Record<AlertType, string> = {
   important: 'Important',
   warning: 'Warning',
   caution: 'Caution',
-}
+};
 
 export type SerializedAlertQuoteNode = Spread<
   {
-    alertType: AlertType
-    content: SerializedEditorState
+    alertType: AlertType;
+    content: SerializedEditorState;
   },
   SerializedLexicalNode
->
+>;
 
 export class AlertQuoteNode extends DecoratorNode<ReactElement> {
-  __alertType: AlertType
-  __contentState: SerializedEditorState
+  __alertType: AlertType;
+  __contentState: SerializedEditorState;
 
   static getType(): string {
-    return 'alert-quote'
+    return 'alert-quote';
   }
 
   static clone(node: AlertQuoteNode): AlertQuoteNode {
-    return new AlertQuoteNode(node.__alertType, node.__contentState, node.__key)
+    return new AlertQuoteNode(node.__alertType, node.__contentState, node.__key);
   }
 
-  constructor(
-    alertType: AlertType,
-    contentState?: SerializedEditorState,
-    key?: NodeKey,
-  ) {
-    super(key)
-    this.__alertType = alertType
+  constructor(alertType: AlertType, contentState?: SerializedEditorState, key?: NodeKey) {
+    super(key);
+    this.__alertType = alertType;
     this.__contentState =
       contentState ||
       ({
@@ -81,50 +72,50 @@ export class AlertQuoteNode extends DecoratorNode<ReactElement> {
           type: 'root',
           version: 1,
         },
-      } as unknown as SerializedEditorState)
+      } as unknown as SerializedEditorState);
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = `rich-alert rich-alert-${this.__alertType}`
-    return div
+    const div = document.createElement('div');
+    div.className = `${semanticClassNames.alert} ${sharedStyles.alert} rich-alert-${this.__alertType}`;
+    return div;
   }
 
   updateDOM(prevNode: AlertQuoteNode, dom: HTMLElement): boolean {
     if (prevNode.__alertType !== this.__alertType) {
-      dom.className = `rich-alert rich-alert-${this.__alertType}`
+      dom.className = `${semanticClassNames.alert} ${sharedStyles.alert} rich-alert-${this.__alertType}`;
     }
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
   getAlertType(): AlertType {
-    return this.__alertType
+    return this.__alertType;
   }
 
   setAlertType(alertType: AlertType): void {
-    const writable = this.getWritable()
-    writable.__alertType = alertType
+    const writable = this.getWritable();
+    writable.__alertType = alertType;
   }
 
   getContentState(): SerializedEditorState {
-    return this.getLatest().__contentState
+    return this.getLatest().__contentState;
   }
 
   setContentState(state: SerializedEditorState): void {
-    const writable = this.getWritable()
-    writable.__contentState = state
+    const writable = this.getWritable();
+    writable.__contentState = state;
   }
 
   getTextContent(): string {
-    return extractTextContent(this.__contentState)
+    return extractTextContent(this.__contentState);
   }
 
   static importJSON(serializedNode: SerializedAlertQuoteNode): AlertQuoteNode {
-    return new AlertQuoteNode(serializedNode.alertType, serializedNode.content)
+    return new AlertQuoteNode(serializedNode.alertType, serializedNode.content);
   }
 
   exportJSON(): SerializedAlertQuoteNode {
@@ -134,14 +125,14 @@ export class AlertQuoteNode extends DecoratorNode<ReactElement> {
       alertType: this.__alertType,
       content: this.__contentState,
       version: 1,
-    }
+    };
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createElement(AlertStaticDecorator, {
       alertType: this.__alertType,
       contentState: this.__contentState,
-    })
+    });
   }
 }
 
@@ -149,11 +140,9 @@ export function $createAlertQuoteNode(
   alertType: AlertType,
   contentState?: SerializedEditorState,
 ): AlertQuoteNode {
-  return new AlertQuoteNode(alertType, contentState)
+  return new AlertQuoteNode(alertType, contentState);
 }
 
-export function $isAlertQuoteNode(
-  node: LexicalNode | null | undefined,
-): node is AlertQuoteNode {
-  return node instanceof AlertQuoteNode
+export function $isAlertQuoteNode(node: LexicalNode | null | undefined): node is AlertQuoteNode {
+  return node instanceof AlertQuoteNode;
 }

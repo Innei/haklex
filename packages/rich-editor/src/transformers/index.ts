@@ -2,6 +2,7 @@ import { CHECK_LIST, CODE, QUOTE, TRANSFORMERS } from '@lexical/markdown';
 
 import { GIT_ALERT_TRANSFORMER } from './alert';
 import { CODE_BLOCK_MULTILINE_TRANSFORMER } from './code-block';
+import { COMMENT_OPEN_TRANSFORMER, COMMENT_TRANSFORMER } from './comment';
 import { CONTAINER_TRANSFORMER } from './container';
 import { FOOTNOTE_SECTION_TRANSFORMER, FOOTNOTE_TRANSFORMER } from './footnote';
 import { INSERT_TRANSFORMER } from './insert';
@@ -32,6 +33,8 @@ export const ALL_TRANSFORMERS = [
   SUPERSCRIPT_TRANSFORMER,
   SUBSCRIPT_TRANSFORMER,
   RUBY_TRANSFORMER,
+  COMMENT_OPEN_TRANSFORMER,
+  COMMENT_TRANSFORMER,
   KATEX_INLINE_TRANSFORMER,
   // Block transformers (order matters - more specific first)
   FOOTNOTE_SECTION_TRANSFORMER,
@@ -55,6 +58,7 @@ export const ALL_TRANSFORMERS = [
 
 export { GIT_ALERT_TRANSFORMER } from './alert';
 export { CODE_BLOCK_MULTILINE_TRANSFORMER } from './code-block';
+export { COMMENT_OPEN_TRANSFORMER, COMMENT_TRANSFORMER } from './comment';
 export { CONTAINER_TRANSFORMER } from './container';
 export { FOOTNOTE_SECTION_TRANSFORMER, FOOTNOTE_TRANSFORMER } from './footnote';
 export { INSERT_TRANSFORMER } from './insert';

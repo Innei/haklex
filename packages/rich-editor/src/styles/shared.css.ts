@@ -1,6 +1,86 @@
 import { vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
+export const semanticClassNames = {
+  paragraph: 'rich-paragraph',
+  textBold: 'rich-text-bold',
+  textItalic: 'rich-text-italic',
+  textUnderline: 'rich-text-underline',
+  textStrikethrough: 'rich-text-strikethrough',
+  textSuperscript: 'rich-text-superscript',
+  textSubscript: 'rich-text-subscript',
+  textCode: 'rich-text-code',
+  textHighlight: 'rich-text-highlight',
+  headingAnchor: 'rich-heading-anchor',
+  headingH1: 'rich-heading-h1',
+  headingH2: 'rich-heading-h2',
+  headingH3: 'rich-heading-h3',
+  headingH4: 'rich-heading-h4',
+  headingH5: 'rich-heading-h5',
+  headingH6: 'rich-heading-h6',
+  link: 'rich-link',
+  linkFavicon: 'rich-link-favicon',
+  listOl: 'rich-list-ol',
+  listUl: 'rich-list-ul',
+  listItem: 'rich-list-item',
+  listNestedItem: 'rich-list-nested-item',
+  checklist: 'rich-checklist',
+  listItemChecked: 'rich-list-item-checked',
+  listItemUnchecked: 'rich-list-item-unchecked',
+  quote: 'rich-quote',
+  hr: 'rich-hr',
+  tableScrollableWrapper: 'rich-table-scrollable-wrapper',
+  table: 'rich-table',
+  tableCell: 'rich-table-cell',
+  tableCellHeader: 'rich-table-cell-header',
+  spoiler: 'rich-spoiler',
+  spoilerRevealed: 'rich-spoiler-revealed',
+  tag: 'rich-tag',
+  comment: 'rich-comment',
+  ruby: 'rich-ruby',
+  rubyRt: 'rich-ruby-rt',
+  footnote: 'rich-footnote',
+  footnoteRef: 'rich-footnote-ref',
+  footnoteHighlight: 'rich-footnote-highlight',
+  footnoteRefWrapper: 'rich-footnote-ref-wrapper',
+  footnoteSection: 'rich-footnote-section',
+  footnoteSectionDivider: 'rich-footnote-section-divider',
+  footnoteSectionList: 'rich-footnote-section-list',
+  footnoteSectionItem: 'rich-footnote-section-item',
+  footnoteBackRef: 'rich-footnote-back-ref',
+  footnoteSectionItemEdit: 'rich-footnote-section-item-edit',
+  footnoteSectionItemNum: 'rich-footnote-section-item-num',
+  footnoteSectionItemInput: 'rich-footnote-section-item-input',
+  footnoteSectionItemRemove: 'rich-footnote-section-item-remove',
+  dragHandle: 'rich-drag-handle',
+  dropIndicator: 'rich-drop-indicator',
+  alert: 'rich-alert',
+} as const;
+
+const highlightKf = keyframes({
+  to: { '--rc-hl-highlighted': '1' } as Record<string, string>,
+});
+
+const footnoteFlash = keyframes({
+  '0%': { backgroundColor: 'rgba(239, 68, 68, 0.24)' },
+  '100%': { backgroundColor: 'transparent' },
+});
+
+const headingLevelBadge = {
+  position: 'absolute',
+  left: '-1.5rem',
+  bottom: '0.5rem',
+  display: 'flex',
+  fontSize: '0.5rem',
+  fontWeight: 600,
+  color: vars.color.textSecondary,
+  opacity: 0.6,
+  pointerEvents: 'none',
+  fontFamily: vars.typography.fontMono,
+} as const;
+
+const quoteBarWidth = 4;
+
 export const richContent = style({
   fontFamily: vars.typography.fontFamily,
   fontSize: vars.typography.fontSizeBase,
@@ -10,42 +90,40 @@ export const richContent = style({
   overflowWrap: 'break-word',
 });
 
-// ─── Paragraphs ──────────────────────────────────────────
-globalStyle(`${richContent} .rich-paragraph`, {
+export const paragraph = style({
   margin: 0,
   marginBottom: '1em',
   lineHeight: vars.typography.lineHeight,
 });
 
-// ─── Inline text formats ─────────────────────────────────
-globalStyle(`${richContent} .rich-text-bold`, {
+export const textBold = style({
   fontWeight: 700,
 });
 
-globalStyle(`${richContent} .rich-text-italic`, {
+export const textItalic = style({
   fontStyle: 'italic',
 });
 
-globalStyle(`${richContent} .rich-text-underline`, {
+export const textUnderline = style({
   textDecoration: 'underline',
 });
 
-globalStyle(`${richContent} .rich-text-strikethrough`, {
+export const textStrikethrough = style({
   textDecoration: 'line-through',
   opacity: 0.65,
 });
 
-globalStyle(`${richContent} .rich-text-superscript`, {
+export const textSuperscript = style({
   verticalAlign: 'super',
   fontSize: '0.8em',
 });
 
-globalStyle(`${richContent} .rich-text-subscript`, {
+export const textSubscript = style({
   verticalAlign: 'sub',
   fontSize: '0.8em',
 });
 
-globalStyle(`${richContent} .rich-text-code`, {
+export const textCode = style({
   fontFamily: vars.typography.fontMono,
   fontSize: '0.9em',
   backgroundColor: vars.color.codeBg,
@@ -53,28 +131,21 @@ globalStyle(`${richContent} .rich-text-code`, {
   padding: '2px 6px',
   borderRadius: vars.borderRadius.sm,
   border: `1px solid ${vars.color.border}`,
+  selectors: {
+    '[contenteditable="true"] &': {
+      paddingRight: 0,
+    },
+  },
 });
 
-globalStyle(`[contenteditable="true"] .rich-text-code`, {
-  paddingRight: 0,
-});
-
-// ─── Highlight (mark-style) ─────────────────────────────
-globalStyle(`${richContent} mark`, {
-  background: 'transparent',
-});
-
-const highlightKf = keyframes({
-  to: { '--rc-hl-highlighted': '1' } as Record<string, string>,
-});
-
-globalStyle(`${richContent} .rich-text-highlight`, {
+export const textHighlight = style({
   'vars': {
     '--rc-hl-lightness': '0.3',
     '--rc-hl-highlighted': '1',
     '--rc-hl-color': `oklch(from ${vars.color.accent} l c h / var(--rc-hl-lightness))`,
   },
-  'background': `linear-gradient(120deg, var(--rc-hl-color, lightblue) 50%, transparent 50%) 110% 0 / 200% 100% no-repeat`,
+  'background':
+    'linear-gradient(120deg, var(--rc-hl-color, lightblue) 50%, transparent 50%) 110% 0 / 200% 100% no-repeat',
   'backgroundPosition': 'calc((1 - var(--rc-hl-highlighted)) * 110%) 0',
   'color': vars.color.text,
   'transition': 'background-position 1s',
@@ -88,30 +159,22 @@ globalStyle(`${richContent} .rich-text-highlight`, {
       animationRange: 'entry 100% cover 10%',
     } as any,
   },
-});
-
-globalStyle(`[contenteditable="true"] .rich-text-highlight`, {
-  vars: {
-    '--rc-hl-highlighted': '1',
+  'selectors': {
+    '[contenteditable="true"] &': {
+      vars: {
+        '--rc-hl-highlighted': '1',
+      },
+      animation: 'none',
+    },
+    "[data-theme='dark'] &": {
+      vars: {
+        '--rc-hl-lightness': '0.35',
+      },
+    },
   },
-  animation: 'none',
 });
 
-globalStyle(`[data-theme='dark'] ${richContent} .rich-text-highlight`, {
-  vars: {
-    '--rc-hl-lightness': '0.35',
-  },
-});
-
-// ─── Headings (base) ─────────────────────────────────────
-
-const headingSelector = `:is(.rich-heading-h1, .rich-heading-h2, .rich-heading-h3, .rich-heading-h4, .rich-heading-h5, .rich-heading-h6)`;
-
-globalStyle(`${richContent} ${headingSelector}`, {
-  position: 'relative',
-});
-
-globalStyle(`${richContent} .rich-heading-anchor`, {
+export const headingAnchor = style({
   position: 'absolute',
   left: '-1.25rem',
   top: 0,
@@ -125,304 +188,233 @@ globalStyle(`${richContent} .rich-heading-anchor`, {
   fontSize: '0.8rem',
 });
 
-globalStyle(`${richContent} .rich-heading-anchor svg`, {
-  flexShrink: 0,
-});
-
-globalStyle(`${richContent} ${headingSelector}:hover .rich-heading-anchor`, {
-  opacity: 0.5,
-});
-
-globalStyle(`${richContent} ${headingSelector}:hover .rich-heading-anchor:hover`, {
-  opacity: 1,
-});
-
-// Heading level badge (editor only): show H1–H6 for hierarchy awareness
-const headingLevelBadge = `
-  [contenteditable="true"] .rich-heading-h1::before,
-  [contenteditable="true"] .rich-heading-h2::before,
-  [contenteditable="true"] .rich-heading-h3::before,
-  [contenteditable="true"] .rich-heading-h4::before,
-  [contenteditable="true"] .rich-heading-h5::before,
-  [contenteditable="true"] .rich-heading-h6::before
-`;
-globalStyle(headingLevelBadge, {
-  position: 'absolute',
-  left: '-1.5rem',
-  bottom: '0.5rem',
-  display: 'flex',
-  fontSize: '0.5rem',
-  fontWeight: 600,
-  color: vars.color.textSecondary,
-  opacity: 0.6,
-  pointerEvents: 'none',
-  fontFamily: vars.typography.fontMono,
-});
-globalStyle(`[contenteditable="true"] .rich-heading-h1::before`, {
-  content: '"H1"',
-});
-globalStyle(`[contenteditable="true"] .rich-heading-h2::before`, {
-  content: '"H2"',
-});
-globalStyle(`[contenteditable="true"] .rich-heading-h3::before`, {
-  content: '"H3"',
-});
-globalStyle(`[contenteditable="true"] .rich-heading-h4::before`, {
-  content: '"H4"',
-});
-globalStyle(`[contenteditable="true"] .rich-heading-h5::before`, {
-  content: '"H5"',
-});
-globalStyle(`[contenteditable="true"] .rich-heading-h6::before`, {
-  content: '"H6"',
-});
-
-globalStyle(`${richContent} .rich-heading-h1`, {
+export const headingH1 = style({
+  position: 'relative',
   fontSize: '2em',
   fontWeight: 700,
   lineHeight: vars.typography.lineHeightTight,
   marginTop: '1.5em',
   marginBottom: '0.5em',
+  selectors: {
+    '[contenteditable="true"] &::before': {
+      ...headingLevelBadge,
+      content: '"H1"',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-heading-h2`, {
+export const headingH2 = style({
+  position: 'relative',
   fontSize: '1.5em',
   fontWeight: 700,
   lineHeight: vars.typography.lineHeightTight,
   marginTop: '1.4em',
   marginBottom: '0.45em',
+  selectors: {
+    '[contenteditable="true"] &::before': {
+      ...headingLevelBadge,
+      content: '"H2"',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-heading-h3`, {
+export const headingH3 = style({
+  position: 'relative',
   fontSize: '1.25em',
   fontWeight: 600,
   lineHeight: vars.typography.lineHeightTight,
   marginTop: '1.3em',
   marginBottom: '0.4em',
+  selectors: {
+    '[contenteditable="true"] &::before': {
+      ...headingLevelBadge,
+      content: '"H3"',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-heading-h4`, {
+export const headingH4 = style({
+  position: 'relative',
   fontSize: '1.125em',
   fontWeight: 600,
   lineHeight: vars.typography.lineHeightTight,
   marginTop: '1.2em',
   marginBottom: '0.35em',
+  selectors: {
+    '[contenteditable="true"] &::before': {
+      ...headingLevelBadge,
+      content: '"H4"',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-heading-h5`, {
+export const headingH5 = style({
+  position: 'relative',
   fontSize: '1em',
   fontWeight: 600,
   lineHeight: vars.typography.lineHeightTight,
   marginTop: '1.1em',
   marginBottom: '0.3em',
+  selectors: {
+    '[contenteditable="true"] &::before': {
+      ...headingLevelBadge,
+      content: '"H5"',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-heading-h6`, {
+export const headingH6 = style({
+  position: 'relative',
   fontSize: '0.875em',
   fontWeight: 600,
   lineHeight: vars.typography.lineHeightTight,
   marginTop: '1em',
   marginBottom: '0.25em',
   color: vars.color.text,
+  selectors: {
+    '[contenteditable="true"] &::before': {
+      ...headingLevelBadge,
+      content: '"H6"',
+    },
+  },
 });
 
-// ─── Links ───────────────────────────────────────────────
-globalStyle(`${richContent} .rich-link`, {
+export const link = style({
   color: vars.color.link,
   textDecoration: 'none',
   transition: 'color 0.2s ease',
+  selectors: {
+    '&:hover': {
+      textDecoration: 'underline',
+    },
+    '&[data-favicon="loaded"]::before': {
+      content: '""',
+      display: 'inline-block',
+      width: '1em',
+      height: '1em',
+      marginRight: '0.2em',
+      verticalAlign: '-0.125em',
+      backgroundImage: 'var(--rc-link-favicon)',
+      backgroundSize: 'contain',
+      backgroundRepeat: 'no-repeat',
+      backgroundPosition: 'center',
+      borderRadius: '2px',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-link:hover`, {
-  textDecoration: 'underline',
-});
-
-// Link favicon (editor: CSS custom property via plugin)
-globalStyle(`${richContent} .rich-link[data-favicon="loaded"]::before`, {
-  content: '""',
-  display: 'inline-block',
-  width: '1em',
-  height: '1em',
-  marginRight: '0.2em',
-  verticalAlign: '-0.125em',
-  backgroundImage: 'var(--rc-link-favicon)',
-  backgroundSize: 'contain',
-  backgroundRepeat: 'no-repeat',
-  backgroundPosition: 'center',
-  borderRadius: '2px',
-});
-
-// Link favicon (wrapper for img, platform icon, or Globe fallback)
-globalStyle(`${richContent} .rich-link-favicon`, {
+export const linkFavicon = style({
   display: 'inline-flex',
   alignItems: 'center',
   marginRight: '0.15em',
   verticalAlign: '-0.125em',
 });
-globalStyle(`${richContent} .rich-link-favicon img`, {
-  width: '1em',
-  height: '1em',
-  borderRadius: '2px',
-  objectFit: 'contain',
-});
-globalStyle(`${richContent} .rich-link-favicon svg`, {
-  width: '0.9em',
-  height: '0.9em',
-});
 
-// ─── Lists ───────────────────────────────────────────────
-globalStyle(`${richContent} .rich-list-ol`, {
+export const listOl = style({
   listStyleType: 'decimal',
   paddingLeft: vars.spacing.lg,
   marginBottom: '1em',
 });
 
-globalStyle(`${richContent} .rich-list-ul`, {
+export const listUl = style({
   listStyleType: 'disc',
   paddingLeft: vars.spacing.lg,
   marginBottom: '1em',
 });
 
-globalStyle(`${richContent} .rich-list-item`, {
+export const listItem = style({
   marginBottom: '0.25em',
 });
 
-globalStyle(`${richContent} .rich-list-nested-item`, {
+export const listNestedItem = style({
   listStyleType: 'none',
 });
 
-globalStyle(`${richContent} .rich-list-nested-item .rich-list-ol`, {
-  listStyleType: 'lower-alpha',
-});
-
-globalStyle(`${richContent} .rich-list-nested-item .rich-list-ul`, {
-  listStyleType: 'circle',
-});
-
-// ─── Check List ─────────────────────────────────────────
-globalStyle(`${richContent} .rich-checklist`, {
+export const checklist = style({
   listStyleType: 'none',
   paddingLeft: 0,
 });
 
-globalStyle(
-  `${richContent} .rich-list-item.rich-list-item-checked, ${richContent} .rich-list-item.rich-list-item-unchecked`,
-  {
-    position: 'relative',
-    paddingLeft: '2em',
-    listStyleType: 'none',
-    outline: 'none',
-    transition: 'color 0.25s ease',
-    vars: {
-      '--rc-cb-size': '1.125rem',
+const checklistItemBase = {
+  position: 'relative',
+  paddingLeft: '2em',
+  listStyleType: 'none',
+  outline: 'none',
+  transition: 'color 0.25s ease',
+  vars: {
+    '--rc-cb-size': '1.125rem',
+  },
+  selectors: {
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      left: 0,
+      top: 'calc((1lh - var(--rc-cb-size)) / 2)',
+      width: 'var(--rc-cb-size)',
+      height: 'var(--rc-cb-size)',
+      border: `1.5px solid ${vars.color.textQuaternary}`,
+      borderRadius: vars.borderRadius.sm,
+      boxSizing: 'border-box',
+      cursor: 'pointer',
+      backgroundColor: 'transparent',
+      transition:
+        'background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s ease',
+    },
+    '&::after': {
+      content: '""',
+      position: 'absolute',
+      left: 'calc(var(--rc-cb-size) * 0.32)',
+      top: 'calc((1lh - var(--rc-cb-size)) / 2 + var(--rc-cb-size) * 0.14)',
+      width: 'calc(var(--rc-cb-size) * 0.28)',
+      height: 'calc(var(--rc-cb-size) * 0.55)',
+      borderRight: `2px solid ${vars.color.accent}`,
+      borderBottom: `2px solid ${vars.color.accent}`,
+      boxSizing: 'border-box',
+      display: 'block',
+      pointerEvents: 'none',
+      transform: 'rotate(45deg) scale(0)',
+      transformOrigin: 'center',
+      opacity: 0,
+      transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s, opacity 0.15s ease',
+    },
+    '[contenteditable="true"] &:active::before': {
+      transform: 'scale(0.94)',
     },
   },
-);
+} as const;
 
-// Checkbox box (line-style, thin border)
-globalStyle(
-  `${richContent} .rich-list-item.rich-list-item-unchecked::before, ${richContent} .rich-list-item.rich-list-item-checked::before`,
-  {
-    content: '""',
-    position: 'absolute',
-    left: 0,
-    top: 'calc((1lh - var(--rc-cb-size)) / 2)',
-    width: 'var(--rc-cb-size)',
-    height: 'var(--rc-cb-size)',
-    border: `1.5px solid ${vars.color.textQuaternary}`,
-    borderRadius: vars.borderRadius.sm,
-    boxSizing: 'border-box',
-    cursor: 'pointer',
-    backgroundColor: 'transparent',
-    transition:
-      'background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s ease',
+export const listItemUnchecked = style({
+  ...checklistItemBase,
+  selectors: {
+    ...checklistItemBase.selectors,
+    '[contenteditable="true"] &:hover::before': {
+      borderColor: vars.color.textTertiary,
+    },
   },
-);
-
-// Hover state for checkbox (editor only)
-globalStyle(
-  `[contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-unchecked:hover::before`,
-  {
-    borderColor: vars.color.textTertiary,
-  },
-);
-
-// Active state: scale down (editor only)
-globalStyle(
-  `[contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-unchecked:active::before, [contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-checked:active::before`,
-  {
-    transform: 'scale(0.94)',
-  },
-);
-
-// Checkmark (border-based stroke-style checkmark)
-globalStyle(
-  `${richContent} .rich-list-item.rich-list-item-unchecked::after, ${richContent} .rich-list-item.rich-list-item-checked::after`,
-  {
-    content: '""',
-    position: 'absolute',
-    left: 'calc(var(--rc-cb-size) * 0.32)',
-    top: 'calc((1lh - var(--rc-cb-size)) / 2 + var(--rc-cb-size) * 0.14)',
-    width: 'calc(var(--rc-cb-size) * 0.28)',
-    height: 'calc(var(--rc-cb-size) * 0.55)',
-    borderRight: `2px solid ${vars.color.accent}`,
-    borderBottom: `2px solid ${vars.color.accent}`,
-    boxSizing: 'border-box',
-    display: 'block',
-    pointerEvents: 'none',
-    transform: 'rotate(45deg) scale(0)',
-    transformOrigin: 'center',
-    opacity: 0,
-    transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s, opacity 0.15s ease',
-  },
-);
-
-// Checked state: box (outline style with light tint fill)
-globalStyle(`${richContent} .rich-list-item.rich-list-item-checked::before`, {
-  borderColor: vars.color.accent,
-  backgroundColor: vars.color.accentLight,
 });
 
-// Hover state for checked checkbox (editor only)
-globalStyle(
-  `[contenteditable="true"] ${richContent} .rich-list-item.rich-list-item-checked:hover::before`,
-  {
-    backgroundColor: `color-mix(in oklab, ${vars.color.accent} 12%, transparent)`,
-  },
-);
-
-// Checked state: checkmark (pop-in with spring easing)
-globalStyle(`${richContent} .rich-list-item.rich-list-item-checked::after`, {
-  transform: 'rotate(45deg) scale(1)',
-  opacity: 1,
-});
-
-globalStyle(`${richContent} .rich-list-item-checked`, {
+export const listItemChecked = style({
+  ...checklistItemBase,
   color: vars.color.textSecondary,
-});
-
-// Strikethrough line setup on direct children (inline elements → line only covers text)
-globalStyle(
-  `${richContent} .rich-list-item.rich-list-item-checked > *, ${richContent} .rich-list-item.rich-list-item-unchecked > *`,
-  {
-    backgroundImage: `linear-gradient(${vars.color.textSecondary}, ${vars.color.textSecondary})`,
-    backgroundSize: '0% 1.5px',
-    backgroundPosition: 'left center',
-    backgroundRepeat: 'no-repeat',
-    transition: 'background-size 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.15s, opacity 0.15s ease',
+  selectors: {
+    ...checklistItemBase.selectors,
+    '&::before': {
+      ...checklistItemBase.selectors['&::before'],
+      borderColor: vars.color.accent,
+      backgroundColor: vars.color.accentLight,
+    },
+    '&::after': {
+      ...checklistItemBase.selectors['&::after'],
+      transform: 'rotate(45deg) scale(1)',
+      opacity: 1,
+    },
+    '[contenteditable="true"] &:hover::before': {
+      backgroundColor: `color-mix(in oklab, ${vars.color.accent} 12%, transparent)`,
+    },
   },
-);
-
-// Checked state: animate strikethrough left-to-right
-globalStyle(`${richContent} .rich-list-item.rich-list-item-checked > *`, {
-  backgroundSize: '100% 1.5px',
-  opacity: 0.5,
 });
 
-// ─── Blockquote ──────────────────────────────────────────
-const quoteBarWidth = 4;
-
-globalStyle(`${richContent} .rich-quote`, {
+export const quote = style({
   position: 'relative',
   backgroundColor: vars.color.quoteBg,
   margin: `${vars.spacing.md} 0`,
@@ -431,52 +423,32 @@ globalStyle(`${richContent} .rich-quote`, {
   fontStyle: 'italic',
   color: vars.color.textSecondary,
   borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
+  selectors: {
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      left: '0',
+      top: '0',
+      bottom: '0',
+      width: `${quoteBarWidth}px`,
+      borderRadius: vars.borderRadius.sm,
+      backgroundColor: vars.color.quoteBorder,
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-quote::before`, {
-  content: '""',
-  position: 'absolute',
-  left: '0',
-  top: '0',
-  bottom: '0',
-  width: `${quoteBarWidth}px`,
-  borderRadius: vars.borderRadius.sm,
-  backgroundColor: vars.color.quoteBorder,
-});
-
-globalStyle(`${richContent} .rich-quote > .rich-paragraph:first-child`, {
-  marginTop: 0,
-});
-
-globalStyle(`${richContent} .rich-quote > .rich-paragraph:last-child`, {
-  marginBottom: 0,
-});
-
-// ─── Horizontal rule (match markdown: 60px centered line) ─
-globalStyle(`${richContent} .rich-hr`, {
+export const hr = style({
   border: 'none',
   borderTop: `1px solid ${vars.color.hrBorder}`,
   margin: `${vars.spacing.lg} auto`,
   width: 60,
 });
 
-// ─── Table ───────────────────────────────────────────────
-globalStyle(`${richContent} .rich-table-scrollable-wrapper`, {
+export const tableScrollableWrapper = style({
   overflowX: 'auto',
 });
 
-globalStyle(`${richContent} .rich-table`, {
-  width: '100%',
-  borderCollapse: 'separate',
-  borderSpacing: 0,
-  margin: `${vars.spacing.lg} 0`,
-  fontSize: vars.typography.fontSizeSmall,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: vars.borderRadius.md,
-  overflow: 'hidden',
-});
-
-globalStyle(`${richContent} .rich-table-cell`, {
+export const tableCell = style({
   border: 'none',
   borderBottom: `1px solid ${vars.color.border}`,
   borderRight: `1px solid ${vars.color.border}`,
@@ -484,31 +456,14 @@ globalStyle(`${richContent} .rich-table-cell`, {
   textAlign: 'left',
   verticalAlign: 'middle',
   lineHeight: '1.5',
+  selectors: {
+    '&:last-child': {
+      borderRight: 'none',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-table-cell:last-child`, {
-  borderRight: 'none',
-});
-
-globalStyle(`${richContent} .rich-table tbody tr:last-child .rich-table-cell`, {
-  borderBottom: 'none',
-});
-
-globalStyle(`${richContent} .rich-table-cell .rich-paragraph`, {
-  margin: 0,
-  padding: 0,
-  lineHeight: 'inherit',
-});
-
-globalStyle(`${richContent} .rich-table-cell > :first-child`, {
-  marginTop: 0,
-});
-
-globalStyle(`${richContent} .rich-table-cell > :last-child`, {
-  marginBottom: 0,
-});
-
-globalStyle(`${richContent} .rich-table-cell-header`, {
+export const tableCellHeader = style({
   border: 'none',
   borderBottom: `1px solid ${vars.color.border}`,
   borderRight: `1px solid ${vars.color.border}`,
@@ -525,35 +480,25 @@ globalStyle(`${richContent} .rich-table-cell-header`, {
   position: 'sticky',
   top: 0,
   zIndex: 1,
+  selectors: {
+    '&:last-child': {
+      borderRight: 'none',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-table-cell-header:last-child`, {
-  borderRight: 'none',
-});
-
-globalStyle(`${richContent} .rich-table-cell-header .rich-paragraph`, {
-  margin: 0,
-  padding: 0,
-  lineHeight: 'inherit',
-});
-
-globalStyle(`${richContent} .rich-table-cell-header > :first-child`, {
-  marginTop: 0,
-});
-
-globalStyle(`${richContent} .rich-table-cell-header > :last-child`, {
-  marginBottom: 0,
-});
-
-// ─── Images ──────────────────────────────────────────────
-globalStyle(`${richContent} img`, {
-  maxWidth: '100%',
-  height: 'auto',
+export const table = style({
+  width: '100%',
+  borderCollapse: 'separate',
+  borderSpacing: 0,
+  margin: `${vars.spacing.lg} 0`,
+  fontSize: vars.typography.fontSizeSmall,
+  border: `1px solid ${vars.color.border}`,
   borderRadius: vars.borderRadius.md,
+  overflow: 'hidden',
 });
 
-// ─── Spoiler ─────────────────────────────────────────────
-globalStyle(`${richContent} .rich-spoiler`, {
+export const spoiler = style({
   backgroundColor: vars.color.text,
   color: 'transparent',
   borderRadius: vars.borderRadius.sm,
@@ -561,29 +506,28 @@ globalStyle(`${richContent} .rich-spoiler`, {
   cursor: 'pointer',
   transition: 'background-color 0.3s ease, color 0.3s ease',
   userSelect: 'none',
+  selectors: {
+    '[contenteditable="true"] &': {
+      backgroundColor: `color-mix(in srgb, ${vars.color.text} 30%, transparent)`,
+      color: 'inherit',
+      userSelect: 'auto',
+      cursor: 'text',
+    },
+    '&:hover': {
+      backgroundColor: 'transparent',
+      color: 'inherit',
+      userSelect: 'auto',
+    },
+  },
 });
 
-globalStyle(`[contenteditable="true"] .rich-spoiler`, {
-  backgroundColor: `color-mix(in srgb, ${vars.color.text} 30%, transparent)`,
-  color: 'inherit',
-  userSelect: 'auto',
-  cursor: 'text',
-});
-
-globalStyle(`${richContent} .rich-spoiler:hover`, {
+export const spoilerRevealed = style({
   backgroundColor: 'transparent',
   color: 'inherit',
   userSelect: 'auto',
 });
 
-globalStyle(`${richContent} .rich-spoiler-revealed`, {
-  backgroundColor: 'transparent',
-  color: 'inherit',
-  userSelect: 'auto',
-});
-
-// ─── Tag ────────────────────────────────────────────────
-globalStyle(`${richContent} .rich-tag`, {
+export const tag = style({
   display: 'inline-block',
   borderRadius: '999px',
   paddingInline: '0.75em',
@@ -592,48 +536,68 @@ globalStyle(`${richContent} .rich-tag`, {
   verticalAlign: 'baseline',
 });
 
-// ─── Ruby ───────────────────────────────────────────────
-globalStyle(`${richContent} .rich-ruby`, {
-  rubyPosition: 'over',
-  rubyAlign: 'center',
+export const comment = style({
+  display: 'inline-block',
+  fontFamily: vars.typography.fontMono,
+  fontSize: vars.typography.fontSizeSmall,
+  color: vars.color.textSecondary,
+  backgroundColor: vars.color.codeBg,
+  border: `1px dashed ${vars.color.border}`,
+  borderRadius: vars.borderRadius.sm,
+  padding: '2px 6px',
+  whiteSpace: 'break-spaces',
+  selectors: {
+    '&::before': {
+      content: '"<!--"',
+      opacity: 0.7,
+    },
+    '&::after': {
+      content: '"-->"',
+      opacity: 0.7,
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-ruby-rt`, {
+export const ruby = style({
+  rubyPosition: 'over',
+  rubyAlign: 'center',
+  selectors: {
+    '[contenteditable="true"] &[data-ruby]': {
+      position: 'relative',
+      display: 'inline-block',
+      paddingTop: '0.72em',
+      lineHeight: 1.2,
+    },
+    '[contenteditable="true"] &[data-ruby]::before': {
+      content: 'attr(data-ruby)',
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      top: 0,
+      transform: 'translateY(-0.68em)',
+      fontSize: '0.58em',
+      lineHeight: 1,
+      textAlign: 'center',
+      color: vars.color.textSecondary,
+      pointerEvents: 'none',
+      whiteSpace: 'nowrap',
+    },
+  },
+});
+
+export const rubyRt = style({
   fontSize: '0.58em',
   lineHeight: 1,
   color: vars.color.textSecondary,
   userSelect: 'none',
 });
 
-globalStyle(`[contenteditable="true"] .rich-ruby[data-ruby]`, {
-  position: 'relative',
-  display: 'inline-block',
-  paddingTop: '0.72em',
-  lineHeight: 1.2,
-});
-
-globalStyle(`[contenteditable="true"] .rich-ruby[data-ruby]::before`, {
-  content: 'attr(data-ruby)',
-  position: 'absolute',
-  left: 0,
-  right: 0,
-  top: 0,
-  transform: 'translateY(-0.68em)',
-  fontSize: '0.58em',
-  lineHeight: 1,
-  textAlign: 'center',
-  color: vars.color.textSecondary,
-  pointerEvents: 'none',
-  whiteSpace: 'nowrap',
-});
-
-// ─── Footnote ───────────────────────────────────────────
-globalStyle(`${richContent} .rich-footnote`, {
+export const footnote = style({
   verticalAlign: 'super',
   fontSize: '0.8em',
 });
 
-globalStyle(`${richContent} .rich-footnote-ref`, {
+export const footnoteRef = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -647,38 +611,33 @@ globalStyle(`${richContent} .rich-footnote-ref`, {
   fontWeight: 600,
   fontSize: '0.82em',
   transition: 'filter 0.15s ease',
+  selectors: {
+    '&:hover': {
+      filter: 'brightness(0.96)',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-footnote-ref:hover`, {
-  filter: 'brightness(0.96)',
-});
-
-const footnoteFlash = keyframes({
-  '0%': { backgroundColor: 'rgba(239, 68, 68, 0.24)' },
-  '100%': { backgroundColor: 'transparent' },
-});
-
-globalStyle(`${richContent} .rich-footnote-highlight`, {
+export const footnoteHighlight = style({
   animation: `${footnoteFlash} 1.2s ease-out`,
 });
 
-globalStyle(`${richContent} .rich-footnote-ref-wrapper`, {
+export const footnoteRefWrapper = style({
   position: 'relative',
   display: 'inline',
 });
 
-// ─── Footnote Section ──────────────────────────────────
-globalStyle(`${richContent} .rich-footnote-section`, {
+export const footnoteSection = style({
   marginTop: vars.spacing.lg,
 });
 
-globalStyle(`${richContent} .rich-footnote-section-divider`, {
+export const footnoteSectionDivider = style({
   border: 'none',
   borderTop: `1px solid ${vars.color.border}`,
   margin: `${vars.spacing.lg} 0 ${vars.spacing.md}`,
 });
 
-globalStyle(`${richContent} .rich-footnote-section-list`, {
+export const footnoteSectionList = style({
   listStyleType: 'decimal',
   paddingLeft: vars.spacing.lg,
   fontSize: vars.typography.fontSizeSmall,
@@ -686,12 +645,12 @@ globalStyle(`${richContent} .rich-footnote-section-list`, {
   lineHeight: '1.6',
 });
 
-globalStyle(`${richContent} .rich-footnote-section-item`, {
+export const footnoteSectionItem = style({
   marginBottom: vars.spacing.sm,
   paddingLeft: vars.spacing.xs,
 });
 
-globalStyle(`${richContent} .rich-footnote-back-ref`, {
+export const footnoteBackRef = style({
   display: 'inline-flex',
   alignItems: 'center',
   marginLeft: vars.spacing.xs,
@@ -700,21 +659,21 @@ globalStyle(`${richContent} .rich-footnote-back-ref`, {
   fontSize: '0.85em',
   transition: 'opacity 0.15s ease',
   fontFamily: vars.typography.fontMono,
+  selectors: {
+    '&:hover': {
+      opacity: 0.7,
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-footnote-back-ref:hover`, {
-  opacity: 0.7,
-});
-
-// ─── Footnote Section Edit ─────────────────────────────
-globalStyle(`${richContent} .rich-footnote-section-item-edit`, {
+export const footnoteSectionItemEdit = style({
   display: 'flex',
   alignItems: 'center',
   gap: vars.spacing.sm,
   listStyleType: 'none',
 });
 
-globalStyle(`${richContent} .rich-footnote-section-item-num`, {
+export const footnoteSectionItemNum = style({
   flexShrink: 0,
   color: vars.color.textSecondary,
   fontSize: vars.typography.fontSizeSmall,
@@ -722,7 +681,7 @@ globalStyle(`${richContent} .rich-footnote-section-item-num`, {
   minWidth: '1.5em',
 });
 
-globalStyle(`${richContent} .rich-footnote-section-item-input`, {
+export const footnoteSectionItemInput = style({
   flex: 1,
   border: `1px solid ${vars.color.border}`,
   borderRadius: vars.borderRadius.sm,
@@ -732,13 +691,14 @@ globalStyle(`${richContent} .rich-footnote-section-item-input`, {
   backgroundColor: 'transparent',
   outline: 'none',
   transition: 'border-color 0.15s ease',
+  selectors: {
+    '&:focus': {
+      borderColor: vars.color.accent,
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-footnote-section-item-input:focus`, {
-  borderColor: vars.color.accent,
-});
-
-globalStyle(`${richContent} .rich-footnote-section-item-remove`, {
+export const footnoteSectionItemRemove = style({
   flexShrink: 0,
   display: 'inline-flex',
   alignItems: 'center',
@@ -752,15 +712,15 @@ globalStyle(`${richContent} .rich-footnote-section-item-remove`, {
   borderRadius: vars.borderRadius.sm,
   fontSize: '14px',
   transition: 'color 0.15s ease, background-color 0.15s ease',
+  selectors: {
+    '&:hover': {
+      color: '#ef4444',
+      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+    },
+  },
 });
 
-globalStyle(`${richContent} .rich-footnote-section-item-remove:hover`, {
-  color: '#ef4444',
-  backgroundColor: 'rgba(239, 68, 68, 0.1)',
-});
-
-// ─── Drag & Drop ──────────────────────────────────────────
-globalStyle(`.rich-drag-handle`, {
+export const dragHandle = style({
   position: 'absolute',
   display: 'flex',
   alignItems: 'center',
@@ -773,18 +733,18 @@ globalStyle(`.rich-drag-handle`, {
   opacity: 0.4,
   transition: 'opacity 0.15s ease, background-color 0.15s ease',
   zIndex: 10,
+  selectors: {
+    '&:hover': {
+      opacity: 1,
+      backgroundColor: vars.color.fillSecondary,
+    },
+    '&:active': {
+      cursor: 'grabbing',
+    },
+  },
 });
 
-globalStyle(`.rich-drag-handle:hover`, {
-  opacity: 1,
-  backgroundColor: vars.color.fillSecondary,
-});
-
-globalStyle(`.rich-drag-handle:active`, {
-  cursor: 'grabbing',
-});
-
-globalStyle(`.rich-drop-indicator`, {
+export const dropIndicator = style({
   position: 'absolute',
   height: '2px',
   backgroundColor: vars.color.accent,
@@ -793,8 +753,7 @@ globalStyle(`.rich-drop-indicator`, {
   zIndex: 10,
 });
 
-// ─── Alert (unified across variants) ────────────────────
-globalStyle(`${richContent} .rich-alert`, {
+export const alert = style({
   margin: '2em 0',
   padding: '0 1em',
   backgroundColor: 'transparent',
@@ -802,9 +761,16 @@ globalStyle(`${richContent} .rich-alert`, {
   borderRadius: 0,
 });
 
-// ─── First-child reset ──────────────────────────────────
-// Editor mode adds a `.rich-editor__content-wrapper` between variant root and blocks.
-// Keep first/last child margin reset working for both renderer and editor trees.
+globalStyle(`${richContent} mark`, {
+  background: 'transparent',
+});
+
+globalStyle(`${richContent} img`, {
+  maxWidth: '100%',
+  height: 'auto',
+  borderRadius: vars.borderRadius.md,
+});
+
 globalStyle(
   `${richContent} > *:first-child, ${richContent} .rich-editor__content > *:first-child`,
   {
@@ -815,3 +781,186 @@ globalStyle(
 globalStyle(`${richContent} > *:last-child, ${richContent} .rich-editor__content > *:last-child`, {
   marginBottom: 0,
 });
+
+globalStyle(`${headingAnchor} svg`, {
+  flexShrink: 0,
+});
+
+globalStyle(`${headingH1}:hover ${headingAnchor}`, {
+  opacity: 0.5,
+});
+
+globalStyle(`${headingH1}:hover ${headingAnchor}:hover`, {
+  opacity: 1,
+});
+
+globalStyle(`${headingH2}:hover ${headingAnchor}`, {
+  opacity: 0.5,
+});
+
+globalStyle(`${headingH2}:hover ${headingAnchor}:hover`, {
+  opacity: 1,
+});
+
+globalStyle(`${headingH3}:hover ${headingAnchor}`, {
+  opacity: 0.5,
+});
+
+globalStyle(`${headingH3}:hover ${headingAnchor}:hover`, {
+  opacity: 1,
+});
+
+globalStyle(`${headingH4}:hover ${headingAnchor}`, {
+  opacity: 0.5,
+});
+
+globalStyle(`${headingH4}:hover ${headingAnchor}:hover`, {
+  opacity: 1,
+});
+
+globalStyle(`${headingH5}:hover ${headingAnchor}`, {
+  opacity: 0.5,
+});
+
+globalStyle(`${headingH5}:hover ${headingAnchor}:hover`, {
+  opacity: 1,
+});
+
+globalStyle(`${headingH6}:hover ${headingAnchor}`, {
+  opacity: 0.5,
+});
+
+globalStyle(`${headingH6}:hover ${headingAnchor}:hover`, {
+  opacity: 1,
+});
+
+globalStyle(`${linkFavicon} img`, {
+  width: '1em',
+  height: '1em',
+  borderRadius: '2px',
+  objectFit: 'contain',
+});
+
+globalStyle(`${linkFavicon} svg`, {
+  width: '0.9em',
+  height: '0.9em',
+});
+
+globalStyle(`${listNestedItem} ${listOl}`, {
+  listStyleType: 'lower-alpha',
+});
+
+globalStyle(`${listNestedItem} ${listUl}`, {
+  listStyleType: 'circle',
+});
+
+globalStyle(`${listItemChecked} > *, ${listItemUnchecked} > *`, {
+  backgroundImage: `linear-gradient(${vars.color.textSecondary}, ${vars.color.textSecondary})`,
+  backgroundSize: '0% 1.5px',
+  backgroundPosition: 'left center',
+  backgroundRepeat: 'no-repeat',
+  transition: 'background-size 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.15s, opacity 0.15s ease',
+});
+
+globalStyle(`${listItemChecked} > *`, {
+  backgroundSize: '100% 1.5px',
+  opacity: 0.5,
+});
+
+globalStyle(`${quote} > ${paragraph}:first-child`, {
+  marginTop: 0,
+});
+
+globalStyle(`${quote} > ${paragraph}:last-child`, {
+  marginBottom: 0,
+});
+
+globalStyle(`${table} tbody tr:last-child ${tableCell}`, {
+  borderBottom: 'none',
+});
+
+globalStyle(`${tableCell} ${paragraph}`, {
+  margin: 0,
+  padding: 0,
+  lineHeight: 'inherit',
+});
+
+globalStyle(`${tableCell} > :first-child`, {
+  marginTop: 0,
+});
+
+globalStyle(`${tableCell} > :last-child`, {
+  marginBottom: 0,
+});
+
+globalStyle(`${tableCellHeader} ${paragraph}`, {
+  margin: 0,
+  padding: 0,
+  lineHeight: 'inherit',
+});
+
+globalStyle(`${tableCellHeader} > :first-child`, {
+  marginTop: 0,
+});
+
+globalStyle(`${tableCellHeader} > :last-child`, {
+  marginBottom: 0,
+});
+
+export const sharedStyles = {
+  paragraph,
+  textBold,
+  textItalic,
+  textUnderline,
+  textStrikethrough,
+  textSuperscript,
+  textSubscript,
+  textCode,
+  textHighlight,
+  headingAnchor,
+  headingH1,
+  headingH2,
+  headingH3,
+  headingH4,
+  headingH5,
+  headingH6,
+  link,
+  linkFavicon,
+  listOl,
+  listUl,
+  listItem,
+  listNestedItem,
+  checklist,
+  listItemChecked,
+  listItemUnchecked,
+  quote,
+  hr,
+  tableScrollableWrapper,
+  table,
+  tableCell,
+  tableCellHeader,
+  spoiler,
+  spoilerRevealed,
+  tag,
+  comment,
+  ruby,
+  rubyRt,
+  footnote,
+  footnoteRef,
+  footnoteHighlight,
+  footnoteRefWrapper,
+  footnoteSection,
+  footnoteSectionDivider,
+  footnoteSectionList,
+  footnoteSectionItem,
+  footnoteBackRef,
+  footnoteSectionItemEdit,
+  footnoteSectionItemNum,
+  footnoteSectionItemInput,
+  footnoteSectionItemRemove,
+  dragHandle,
+  dropIndicator,
+  alert,
+} satisfies Record<keyof typeof semanticClassNames, string>;
+
+export type SharedStyleKey = keyof typeof sharedStyles;

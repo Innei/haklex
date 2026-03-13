@@ -1,5 +1,8 @@
 import type { ReactNode } from 'react';
 
+import { semanticClassNames, sharedStyles } from '../../styles/shared.css';
+import { clsx } from '../utils';
+
 export interface RubyRendererProps {
   children?: ReactNode;
   reading: string;
@@ -11,9 +14,9 @@ export function RubyRenderer({ reading, children }: RubyRendererProps) {
   }
 
   return (
-    <ruby className="rich-ruby">
+    <ruby className={clsx(semanticClassNames.ruby, sharedStyles.ruby)}>
       {children}
-      <rt className="rich-ruby-rt">{reading}</rt>
+      <rt className={clsx(semanticClassNames.rubyRt, sharedStyles.rubyRt)}>{reading}</rt>
     </ruby>
   );
 }

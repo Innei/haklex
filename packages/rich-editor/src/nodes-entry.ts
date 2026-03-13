@@ -58,3 +58,7 @@ export { $createTagNode, $isTagNode, TagNode } from './nodes/TagNode';
 // BannerNode
 export type { BannerType } from './nodes/BannerNode';
 export { BANNER_LABELS, BANNER_TYPES } from './nodes/BannerNode';
+
+// CommentNode
+export type { SerializedCommentNode } from './nodes/CommentNode';
+export { $createCommentNode, $isCommentNode, CommentNode } from './nodes/CommentNode';

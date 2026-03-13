@@ -1,8 +1,27 @@
-import { getTagBgColor, LinkFavicon, RendererWrapper, RubyRenderer } from '@haklex/rich-editor/static';
+import {
+  getTagBgColor,
+  LinkFavicon,
+  RendererWrapper,
+  RubyRenderer,
+  semanticClassNames,
+  type SharedStyleKey,
+  sharedStyles,
+} from '@haklex/rich-editor/static';
 import { Link } from 'lucide-react';
 import { createElement, type ReactNode } from 'react';
 
+import { HtmlComment } from '../components/HtmlComment';
 import * as tableStyles from '../table.css';
+
+const shared = (key: SharedStyleKey): string => `${semanticClassNames[key]} ${sharedStyles[key]}`;
+const headingClassNames = {
+  h1: shared('headingH1'),
+  h2: shared('headingH2'),
+  h3: shared('headingH3'),
+  h4: shared('headingH4'),
+  h5: shared('headingH5'),
+  h6: shared('headingH6'),
+} as const;
 
 function textToSlug(text: string): string {
   return (
@@ -17,6 +36,7 @@ function textToSlug(text: string): string {
 }
 
 function extractText(node: any): string {
+  if (node.type === 'comment') return '';
   if (node.text) return node.text;
   if (node.children) return node.children.map(extractText).join('');
   return '';
@@ -27,7 +47,7 @@ export function renderBuiltinNode(
   key: string,
   children: ReactNode[] | null,
   headingSlugs: Map<string, number>,
-  textContent?: string,
+  _textContent?: string,
 ): ReactNode {
   switch (node.type) {
     case 'root': {
@@ -36,14 +56,14 @@ export function renderBuiltinNode(
     case 'paragraph': {
       const align = node.format ? ({ textAlign: node.format } as const) : undefined;
       return (
-        <p className="rich-paragraph" key={key} style={align}>
+        <p className={shared('paragraph')} key={key} style={align}>
           {children}
         </p>
       );
     }
     case 'heading': {
       const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
-      const text = textContent || extractText(node);
+      const text = extractText(node);
       const baseSlug = textToSlug(text);
       let slug = baseSlug;
       if (baseSlug) {
@@ -56,9 +76,9 @@ export function renderBuiltinNode(
         }
       }
       return (
-        <Tag className={`rich-heading-${Tag}`} id={slug || undefined} key={key}>
+        <Tag className={headingClassNames[Tag]} id={slug || undefined} key={key}>
           {slug && (
-            <a className="rich-heading-anchor" href={`#${slug}`} tabIndex={0}>
+            <a className={shared('headingAnchor')} href={`#${slug}`} tabIndex={0}>
               <Link aria-hidden size={14} strokeWidth={2} />
             </a>
           )}
@@ -68,7 +88,7 @@ export function renderBuiltinNode(
     }
     case 'quote': {
       return (
-        <blockquote className="rich-quote" key={key}>
+        <blockquote className={shared('quote')} key={key}>
           {children}
         </blockquote>
       );
@@ -77,10 +97,10 @@ export function renderBuiltinNode(
       const Tag = node.listType === 'number' ? 'ol' : 'ul';
       const cls =
         node.listType === 'number'
-          ? 'rich-list-ol'
+          ? shared('listOl')
           : node.listType === 'check'
-            ? 'rich-checklist rich-list-ul'
-            : 'rich-list-ul';
+            ? `${shared('checklist')} ${shared('listUl')}`
+            : shared('listUl');
       return (
         <Tag className={cls} key={key} start={node.start !== 1 ? node.start : undefined}>
           {children}
@@ -92,13 +112,13 @@ export function renderBuiltinNode(
       const hasNestedList = node.children?.some((c: any) => c.type === 'list');
       let cls: string;
       if (hasNestedList) {
-        cls = 'rich-list-nested-item';
+        cls = shared('listNestedItem');
       } else if (isChecklist) {
         cls = node.checked
-          ? 'rich-list-item rich-list-item-checked'
-          : 'rich-list-item rich-list-item-unchecked';
+          ? `${shared('listItem')} ${shared('listItemChecked')}`
+          : `${shared('listItem')} ${shared('listItemUnchecked')}`;
       } else {
-        cls = 'rich-list-item';
+        cls = shared('listItem');
       }
       return (
         <li className={cls} key={key} value={node.value}>
@@ -109,7 +129,7 @@ export function renderBuiltinNode(
     case 'link': {
       return (
         <a
-          className="rich-link"
+          className={shared('link')}
           href={node.url}
           key={key}
           rel={node.rel || 'noopener'}
@@ -122,14 +142,14 @@ export function renderBuiltinNode(
     }
     case 'autolink': {
       return (
-        <a className="rich-link" href={node.url} key={key} rel="noopener" target="_blank">
+        <a className={shared('link')} href={node.url} key={key} rel="noopener" target="_blank">
           <LinkFavicon href={node.url} />
           {children}
         </a>
       );
     }
     case 'horizontalrule': {
-      return <hr className="rich-hr" key={key} />;
+      return <hr className={shared('hr')} key={key} />;
     }
     case 'table': {
       return (
@@ -177,17 +197,24 @@ export function renderBuiltinNode(
     }
     case 'spoiler': {
       return (
-        <span className="rich-spoiler" key={key} role="button" tabIndex={0}>
+        <span className={shared('spoiler')} key={key} role="button" tabIndex={0}>
           {children}
         </span>
       );
     }
     case 'tag': {
       return (
-        <span className="rich-tag" key={key} style={{ backgroundColor: getTagBgColor(node.text) }}>
+        <span
+          className={shared('tag')}
+          key={key}
+          style={{ backgroundColor: getTagBgColor(node.text) }}
+        >
           {node.text}
         </span>
       );
+    }
+    case 'comment': {
+      return <HtmlComment key={key} text={node.text ?? ''} />;
     }
     case 'ruby': {
       return createElement(RendererWrapper as any, {

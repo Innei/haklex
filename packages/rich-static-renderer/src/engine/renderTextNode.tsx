@@ -1,14 +1,17 @@
+import { semanticClassNames, type SharedStyleKey,sharedStyles } from '@haklex/rich-editor/static';
 import type { CSSProperties, ReactNode } from 'react';
 
-const FORMAT_FLAGS: [number, string][] = [
-  [1, 'rich-text-bold'],
-  [2, 'rich-text-italic'],
-  [4, 'rich-text-strikethrough'],
-  [8, 'rich-text-underline'],
-  [16, 'rich-text-code'],
-  [32, 'rich-text-subscript'],
-  [64, 'rich-text-superscript'],
-  [128, 'rich-text-highlight'],
+const shared = (key: SharedStyleKey): string => `${semanticClassNames[key]} ${sharedStyles[key]}`;
+
+const FORMAT_FLAGS: [number, SharedStyleKey][] = [
+  [1, 'textBold'],
+  [2, 'textItalic'],
+  [4, 'textStrikethrough'],
+  [8, 'textUnderline'],
+  [16, 'textCode'],
+  [32, 'textSubscript'],
+  [64, 'textSuperscript'],
+  [128, 'textHighlight'],
 ];
 
 function parseCSSText(cssText: string): CSSProperties {
@@ -29,10 +32,10 @@ export function renderTextNode(node: any, key: string): ReactNode {
   let element: ReactNode = node.text;
   const format = node.format || 0;
 
-  for (const [flag, className] of FORMAT_FLAGS) {
+  for (const [flag, styleKey] of FORMAT_FLAGS) {
     if (format & flag) {
       element = (
-        <span className={className} key={`${key}-${flag}`}>
+        <span className={shared(styleKey)} key={`${key}-${flag}`}>
           {element}
         </span>
       );
