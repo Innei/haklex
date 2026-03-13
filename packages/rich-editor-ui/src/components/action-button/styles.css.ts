@@ -1,5 +1,5 @@
 import { vars } from '@haklex/rich-style-token/styles';
-import { style } from '@vanilla-extract/css';
+import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
 export const semanticClassNames = {
@@ -133,6 +133,7 @@ export const actionButton = recipe({
     {
       variants: { icon: true, size: 'sm' },
       style: {
+        fontSize: vars.typography.fontSizeSmall,
         width: '24px',
         height: '24px',
         padding: 0,
@@ -153,7 +154,34 @@ export const actionButton = recipe({
     {
       variants: { icon: true, size: 'md' },
       style: {
+        fontSize: vars.typography.fontSizeBase,
         padding: 6,
+        borderRadius: vars.borderRadius.md,
+        height: 'auto',
+        width: 'auto',
+        gap: 0,
+        color: vars.color.textSecondary,
+        selectors: {
+          '&:hover:not(:disabled)': {
+            color: vars.color.text,
+            backgroundColor: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+          },
+          '&:disabled': {
+            opacity: 0.3,
+            cursor: 'default',
+          },
+          '&:disabled:hover': {
+            background: 'none',
+            color: vars.color.textSecondary,
+          },
+        },
+      },
+    },
+    {
+      variants: { icon: true, size: 'lg' },
+      style: {
+        fontSize: '20px',
+        padding: 8,
         borderRadius: vars.borderRadius.md,
         height: 'auto',
         width: 'auto',
@@ -194,4 +222,9 @@ export const actionButton = recipe({
     end: false,
     danger: false,
   },
+});
+
+globalStyle(`.${semanticClassNames.actionButtonIcon} svg`, {
+  width: '1em',
+  height: '1em',
 });

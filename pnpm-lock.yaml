@@ -5,7 +5,6 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  vite: beta
   array-includes: npm:@nolyfill/array-includes@^1.0.44
   array.prototype.findlastindex: npm:@nolyfill/array.prototype.findlastindex@^1.0.44
   array.prototype.flat: npm:@nolyfill/array.prototype.flat@^1.0.44
@@ -52,7 +51,7 @@ importers:
         version: 9.39.4(jiti@2.6.1)
       eslint-config-hyoban:
         specifier: 6.0.0
-        version: 6.0.0(@next/eslint-plugin-next@16.1.6)(@typescript-eslint/rule-tester@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/typescript-estree@8.56.1(typescript@5.9.3))(@typescript-eslint/utils@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.29)(eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(tailwindcss@4.2.1)(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 6.0.0(@next/eslint-plugin-next@16.1.6)(@typescript-eslint/rule-tester@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/typescript-estree@8.56.1(typescript@5.9.3))(@typescript-eslint/utils@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.29)(eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(tailwindcss@4.2.1)(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
       knip:
         specifier: ^5.85.0
         version: 5.85.0(@types/node@25.3.3)(typescript@5.9.3)
@@ -100,7 +99,7 @@ importers:
         version: 11.0.5
       vitest:
         specifier: ^4.0.18
-        version: 4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        version: 4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
 
   demo:
     dependencies:
@@ -200,10 +199,10 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       '@vitejs/plugin-react':
         specifier: ^5.1.4
-        version: 5.1.4(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 5.1.4(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
       code-inspector-plugin:
         specifier: 1.4.2
         version: 1.4.2
@@ -211,8 +210,8 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/cm-editor:
     dependencies:
@@ -236,11 +235,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-diff:
     dependencies:
@@ -265,7 +264,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -279,11 +278,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-editor:
     dependencies:
@@ -341,7 +340,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       katex:
         specifier: ^0.16.37
         version: 0.16.37
@@ -364,11 +363,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-editor-ui:
     dependencies:
@@ -396,7 +395,7 @@ importers:
         version: 0.5.7(@vanilla-extract/css@1.18.0)
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -407,11 +406,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-ext-code-snippet:
     dependencies:
@@ -475,7 +474,7 @@ importers:
         version: 0.5.7(@vanilla-extract/css@1.18.0)
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -489,11 +488,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-ext-embed:
     dependencies:
@@ -527,7 +526,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -544,11 +543,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-ext-excalidraw:
     dependencies:
@@ -585,7 +584,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -602,11 +601,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-ext-gallery:
     dependencies:
@@ -646,7 +645,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -663,11 +662,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-ext-nested-doc:
     dependencies:
@@ -698,7 +697,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -715,11 +714,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-headless:
     dependencies:
@@ -752,11 +751,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-kit-shiro:
     dependencies:
@@ -832,7 +831,7 @@ importers:
         version: 19.2.3(@types/react@19.2.14)
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -849,11 +848,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-plugin-block-handle:
     dependencies:
@@ -890,7 +889,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -907,11 +906,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-plugin-floating-toolbar:
     dependencies:
@@ -945,7 +944,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -962,11 +961,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-plugin-link-edit:
     dependencies:
@@ -994,7 +993,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1011,11 +1010,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-plugin-mention:
     dependencies:
@@ -1043,7 +1042,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1057,11 +1056,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-plugin-slash-menu:
     dependencies:
@@ -1101,7 +1100,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1118,11 +1117,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-plugin-table:
     dependencies:
@@ -1150,7 +1149,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1167,11 +1166,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-plugin-toolbar:
     dependencies:
@@ -1211,7 +1210,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1228,11 +1227,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-alert:
     dependencies:
@@ -1263,7 +1262,7 @@ importers:
         version: 0.5.7(@vanilla-extract/css@1.18.0)
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1274,11 +1273,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-banner:
     dependencies:
@@ -1309,7 +1308,7 @@ importers:
         version: 0.5.7(@vanilla-extract/css@1.18.0)
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1320,11 +1319,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-codeblock:
     dependencies:
@@ -1373,7 +1372,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1384,11 +1383,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-image:
     dependencies:
@@ -1425,7 +1424,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1439,11 +1438,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-katex:
     dependencies:
@@ -1477,7 +1476,7 @@ importers:
         version: 0.5.7(@vanilla-extract/css@1.18.0)
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       katex:
         specifier: ^0.16.37
         version: 0.16.37
@@ -1494,11 +1493,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-linkcard:
     dependencies:
@@ -1535,7 +1534,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1549,11 +1548,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-mention:
     dependencies:
@@ -1587,7 +1586,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1601,11 +1600,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-mermaid:
     dependencies:
@@ -1639,7 +1638,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1650,11 +1649,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-ruby:
     dependencies:
@@ -1676,7 +1675,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1687,11 +1686,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderer-video:
     dependencies:
@@ -1725,7 +1724,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1739,11 +1738,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderers:
     dependencies:
@@ -1812,11 +1811,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-renderers-edit:
     dependencies:
@@ -1900,11 +1899,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-static-renderer:
     dependencies:
@@ -1947,7 +1946,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       lexical:
         specifier: ^0.41.0
         version: 0.41.0
@@ -1961,11 +1960,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
   packages/rich-style-token:
     devDependencies:
@@ -1977,7 +1976,7 @@ importers:
         version: 1.18.0
       '@vanilla-extract/vite-plugin':
         specifier: ^5.1.4
-        version: 5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
+        version: 5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -1985,11 +1984,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
       vite:
-        specifier: beta
-        version: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+        specifier: ^7.3.1
+        version: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       vite-plugin-dts:
         specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+        version: 4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
 
 packages:
   '@antfu/eslint-config@7.7.0':
@@ -4082,13 +4081,6 @@ packages:
         integrity: sha512-XRO0zi2NIUKq2lUk3T1ecFSld1fMWRKE6naRFGkgkdeosx7IslyUKNv5Dcb5PJTja9tHJoFu0v/7yEpAkrkrTg==,
       }
     engines: { node: ^20.19.0 || ^22.13.0 || >=24 }
-
-  '@oxc-project/runtime@0.115.0':
-    resolution:
-      {
-        integrity: sha512-Rg8Wlt5dCbXhQnsXPrkOjL1DTSvXLgb2R/KYfnf1/K+R0k6UMLEmbQXPM+kwrWqSmWA2t0B1EtHy2/3zikQpvQ==,
-      }
-    engines: { node: ^20.19.0 || >=22.12.0 }
 
   '@oxc-project/types@0.115.0':
     resolution:
@@ -11316,19 +11308,18 @@ packages:
       vite:
         optional: true
 
-  vite@8.0.0-beta.18:
+  vite@7.3.1:
     resolution:
       {
-        integrity: sha512-azgNbWdsO/WBqHQxwSCy+zd+Fq+37Fix2hn64cQuiUvaaGGSUac7f8RGQhI1aQl9OKbfWblrCFLWs+tln06c2A==,
+        integrity: sha512-w+N7Hifpc3gRjZ63vYBXA56dvvRlNWRczTdmCBBa+CotUzAPf5b7YMdMR/8CQoeYE5LX3W4wj6RYTgonm1b9DA==,
       }
     engines: { node: ^20.19.0 || >=22.12.0 }
     hasBin: true
     peerDependencies:
       '@types/node': ^20.19.0 || >=22.12.0
-      '@vitejs/devtools': ^0.0.0-alpha.31
-      esbuild: ^0.27.0
       jiti: '>=1.21.0'
       less: ^4.0.0
+      lightningcss: ^1.21.0
       sass: ^1.70.0
       sass-embedded: ^1.70.0
       stylus: '>=0.54.8'
@@ -11339,13 +11330,11 @@ packages:
     peerDependenciesMeta:
       '@types/node':
         optional: true
-      '@vitejs/devtools':
-        optional: true
-      esbuild:
-        optional: true
       jiti:
         optional: true
       less:
+        optional: true
+      lightningcss:
         optional: true
       sass:
         optional: true
@@ -11687,7 +11676,7 @@ packages:
       }
 
 snapshots:
-  '@antfu/eslint-config@7.7.0(@eslint-react/eslint-plugin@2.13.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@next/eslint-plugin-next@16.1.6)(@typescript-eslint/rule-tester@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/typescript-estree@8.56.1(typescript@5.9.3))(@typescript-eslint/utils@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.29)(eslint-plugin-format@2.0.1(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-react-hooks@7.0.1(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-react-refresh@0.5.2(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@antfu/eslint-config@7.7.0(@eslint-react/eslint-plugin@2.13.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@next/eslint-plugin-next@16.1.6)(@typescript-eslint/rule-tester@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/typescript-estree@8.56.1(typescript@5.9.3))(@typescript-eslint/utils@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.29)(eslint-plugin-format@2.0.1(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-react-hooks@7.0.1(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-react-refresh@0.5.2(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@antfu/install-pkg': 1.1.0
       '@clack/prompts': 1.1.0
@@ -11697,7 +11686,7 @@ snapshots:
       '@stylistic/eslint-plugin': 5.10.0(eslint@9.39.4(jiti@2.6.1))
       '@typescript-eslint/eslint-plugin': 8.56.1(@typescript-eslint/parser@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       '@typescript-eslint/parser': 8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
-      '@vitest/eslint-plugin': 1.6.9(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@vitest/eslint-plugin': 1.6.9(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
       ansis: 4.2.0
       cac: 7.0.0
       eslint: 9.39.4(jiti@2.6.1)
@@ -13320,9 +13309,8 @@ snapshots:
 
   '@ota-meshi/ast-token-store@0.3.0': {}
 
-  '@oxc-project/runtime@0.115.0': {}
-
-  '@oxc-project/types@0.115.0': {}
+  '@oxc-project/types@0.115.0':
+    optional: true
 
   '@oxc-resolver/binding-android-arm-eabi@11.19.1':
     optional: true
@@ -13496,7 +13484,8 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.0-rc.3': {}
 
-  '@rolldown/pluginutils@1.0.0-rc.8': {}
+  '@rolldown/pluginutils@1.0.0-rc.8':
+    optional: true
 
   '@rollup/pluginutils@5.3.0(rollup@4.59.0)':
     dependencies:
@@ -14057,19 +14046,18 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vanilla-extract/compiler@0.3.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)':
+  '@vanilla-extract/compiler@0.3.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)':
     dependencies:
       '@vanilla-extract/css': 1.18.0
       '@vanilla-extract/integration': 8.0.7
-      vite: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
-      vite-node: 3.2.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
+      vite-node: 3.2.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - '@types/node'
-      - '@vitejs/devtools'
       - babel-plugin-macros
-      - esbuild
       - jiti
       - less
+      - lightningcss
       - sass
       - sass-embedded
       - stylus
@@ -14118,18 +14106,17 @@ snapshots:
     dependencies:
       '@vanilla-extract/css': 1.18.0
 
-  '@vanilla-extract/vite-plugin@5.1.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)':
+  '@vanilla-extract/vite-plugin@5.1.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))(yaml@2.8.2)':
     dependencies:
-      '@vanilla-extract/compiler': 0.3.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      '@vanilla-extract/compiler': 0.3.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       '@vanilla-extract/integration': 8.0.7
-      vite: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - '@types/node'
-      - '@vitejs/devtools'
       - babel-plugin-macros
-      - esbuild
       - jiti
       - less
+      - lightningcss
       - sass
       - sass-embedded
       - stylus
@@ -14139,7 +14126,7 @@ snapshots:
       - tsx
       - yaml
 
-  '@vitejs/plugin-react@5.1.4(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitejs/plugin-react@5.1.4(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@babel/core': 7.29.0
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.29.0)
@@ -14147,18 +14134,18 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-rc.3
       '@types/babel__core': 7.20.5
       react-refresh: 0.18.0
-      vite: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/eslint-plugin@1.6.9(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/eslint-plugin@1.6.9(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@typescript-eslint/scope-manager': 8.56.1
       '@typescript-eslint/utils': 8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       eslint: 9.39.4(jiti@2.6.1)
     optionalDependencies:
       typescript: 5.9.3
-      vitest: 4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - supports-color
 
@@ -14171,13 +14158,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.0.3
 
-  '@vitest/mocker@4.0.18(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/mocker@4.0.18(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))':
     dependencies:
       '@vitest/spy': 4.0.18
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
 
   '@vitest/pretty-format@4.0.18':
     dependencies:
@@ -15127,9 +15114,9 @@ snapshots:
       '@eslint/compat': 2.0.3(eslint@9.39.4(jiti@2.6.1))
       eslint: 9.39.4(jiti@2.6.1)
 
-  eslint-config-hyoban@6.0.0(@next/eslint-plugin-next@16.1.6)(@typescript-eslint/rule-tester@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/typescript-estree@8.56.1(typescript@5.9.3))(@typescript-eslint/utils@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.29)(eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(tailwindcss@4.2.1)(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)):
+  eslint-config-hyoban@6.0.0(@next/eslint-plugin-next@16.1.6)(@typescript-eslint/rule-tester@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/typescript-estree@8.56.1(typescript@5.9.3))(@typescript-eslint/utils@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.29)(eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(tailwindcss@4.2.1)(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
-      '@antfu/eslint-config': 7.7.0(@eslint-react/eslint-plugin@2.13.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@next/eslint-plugin-next@16.1.6)(@typescript-eslint/rule-tester@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/typescript-estree@8.56.1(typescript@5.9.3))(@typescript-eslint/utils@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.29)(eslint-plugin-format@2.0.1(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-react-hooks@7.0.1(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-react-refresh@0.5.2(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@antfu/eslint-config': 7.7.0(@eslint-react/eslint-plugin@2.13.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@next/eslint-plugin-next@16.1.6)(@typescript-eslint/rule-tester@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@typescript-eslint/typescript-estree@8.56.1(typescript@5.9.3))(@typescript-eslint/utils@8.56.1(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3))(@vue/compiler-sfc@3.5.29)(eslint-plugin-format@2.0.1(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-jsx-a11y@6.10.2(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-react-hooks@7.0.1(eslint@9.39.4(jiti@2.6.1)))(eslint-plugin-react-refresh@0.5.2(eslint@9.39.4(jiti@2.6.1)))(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)(vitest@4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
       '@eslint-react/eslint-plugin': 2.13.0(eslint@9.39.4(jiti@2.6.1))(typescript@5.9.3)
       defu: 6.1.4
       eslint-flat-config-utils: 3.0.1
@@ -16430,6 +16417,7 @@ snapshots:
       lightningcss-linux-x64-musl: 1.32.0
       lightningcss-win32-arm64-msvc: 1.32.0
       lightningcss-win32-x64-msvc: 1.32.0
+    optional: true
 
   lines-and-columns@1.2.4: {}
 
@@ -17423,6 +17411,7 @@ snapshots:
       '@rolldown/binding-wasm32-wasi': 1.0.0-rc.8
       '@rolldown/binding-win32-arm64-msvc': 1.0.0-rc.8
       '@rolldown/binding-win32-x64-msvc': 1.0.0-rc.8
+    optional: true
 
   rollup-plugin-visualizer@7.0.1(rolldown@1.0.0-rc.8)(rollup@4.59.0):
     dependencies:
@@ -17464,7 +17453,6 @@ snapshots:
       '@rollup/rollup-win32-x64-gnu': 4.59.0
       '@rollup/rollup-win32-x64-msvc': 4.59.0
       fsevents: 2.3.3
-    optional: true
 
   roughjs@4.6.6:
     dependencies:
@@ -18115,19 +18103,18 @@ snapshots:
       '@types/unist': 3.0.3
       vfile-message: 4.0.3
 
-  vite-node@3.2.4(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2):
+  vite-node@3.2.4(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       cac: 6.7.14
       debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - '@types/node'
-      - '@vitejs/devtools'
-      - esbuild
       - jiti
       - less
+      - lightningcss
       - sass
       - sass-embedded
       - stylus
@@ -18137,7 +18124,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite-plugin-dts@4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)):
+  vite-plugin-dts@4.5.4(@types/node@25.3.3)(rollup@4.59.0)(typescript@5.9.3)(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)):
     dependencies:
       '@microsoft/api-extractor': 7.57.6(@types/node@25.3.3)
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
@@ -18150,32 +18137,32 @@ snapshots:
       magic-string: 0.30.21
       typescript: 5.9.3
     optionalDependencies:
-      vite: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
     transitivePeerDependencies:
       - '@types/node'
       - rollup
       - supports-color
 
-  vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2):
+  vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
-      '@oxc-project/runtime': 0.115.0
-      lightningcss: 1.32.0
+      esbuild: 0.27.3
+      fdir: 6.5.0(picomatch@4.0.3)
       picomatch: 4.0.3
       postcss: 8.5.8
-      rolldown: 1.0.0-rc.8
+      rollup: 4.59.0
       tinyglobby: 0.2.15
     optionalDependencies:
       '@types/node': 25.3.3
-      esbuild: 0.27.3
       fsevents: 2.3.3
       jiti: 2.6.1
+      lightningcss: 1.32.0
       tsx: 4.21.0
       yaml: 2.8.2
 
-  vitest@4.0.18(@types/node@25.3.3)(esbuild@0.27.3)(happy-dom@20.8.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2):
+  vitest@4.0.18(@types/node@25.3.3)(happy-dom@20.8.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2):
     dependencies:
       '@vitest/expect': 4.0.18
-      '@vitest/mocker': 4.0.18(vite@8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2))
+      '@vitest/mocker': 4.0.18(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2))
       '@vitest/pretty-format': 4.0.18
       '@vitest/runner': 4.0.18
       '@vitest/snapshot': 4.0.18
@@ -18192,16 +18179,15 @@ snapshots:
       tinyexec: 1.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 3.0.3
-      vite: 8.0.0-beta.18(@types/node@25.3.3)(esbuild@0.27.3)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@25.3.3)(jiti@2.6.1)(lightningcss@1.32.0)(tsx@4.21.0)(yaml@2.8.2)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 25.3.3
       happy-dom: 20.8.3
     transitivePeerDependencies:
-      - '@vitejs/devtools'
-      - esbuild
       - jiti
       - less
+      - lightningcss
       - msw
       - sass
       - sass-embedded

@@ -1,12 +1,12 @@
-import type { ButtonHTMLAttributes, HTMLAttributes } from 'react'
+import type { ButtonHTMLAttributes, HTMLAttributes } from 'react';
 
-import * as css from './styles.css'
+import * as css from './styles.css';
 
 // -- ActionBar --
 
 type ActionBarProps = HTMLAttributes<HTMLDivElement> & {
-  gap?: string | number
-}
+  gap?: string | number;
+};
 
 export function ActionBar({ className, gap, style, ...props }: ActionBarProps) {
   return (
@@ -15,18 +15,18 @@ export function ActionBar({ className, gap, style, ...props }: ActionBarProps) {
       style={gap != null ? { ...style, gap } : style}
       {...props}
     />
-  )
+  );
 }
 
 // -- ActionButton --
 
 type ActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'ghost' | 'solid' | 'outline' | 'accent'
-  size?: 'sm' | 'md' | 'lg'
-  end?: boolean
-  danger?: boolean
-  icon?: boolean
-}
+  variant?: 'ghost' | 'solid' | 'outline' | 'accent';
+  size?: 'sm' | 'md' | 'lg';
+  end?: boolean;
+  danger?: boolean;
+  icon?: boolean;
+};
 
 export function ActionButton({
   variant,
@@ -38,12 +38,12 @@ export function ActionButton({
   type = 'button',
   ...props
 }: ActionButtonProps) {
-  const semanticParts: string[] = [css.semanticClassNames.actionButton]
-  if (end) semanticParts.push(css.semanticClassNames.actionButtonEnd)
-  if (danger) semanticParts.push(css.semanticClassNames.actionButtonDanger)
-  if (icon) semanticParts.push(css.semanticClassNames.actionButtonIcon)
+  const semanticParts: string[] = [css.semanticClassNames.actionButton];
+  if (end) semanticParts.push(css.semanticClassNames.actionButtonEnd);
+  if (danger) semanticParts.push(css.semanticClassNames.actionButtonDanger);
+  if (icon) semanticParts.push(css.semanticClassNames.actionButtonIcon);
 
-  const recipeClass = css.actionButton({ variant, size, end, danger, icon })
+  const recipeClass = css.actionButton({ variant, size, end, danger, icon });
 
   return (
     <button
@@ -51,14 +51,14 @@ export function ActionButton({
       type={type}
       {...props}
     />
-  )
+  );
 }
 
 export function getActionButtonClassName(options?: {
-  variant?: 'ghost' | 'solid' | 'outline' | 'accent'
-  size?: 'sm' | 'md' | 'lg'
+  variant?: 'ghost' | 'solid' | 'outline' | 'accent';
+  size?: 'sm' | 'md' | 'lg';
 }) {
-  return `${css.actionButton(options)} ${css.semanticClassNames.actionButton}`
+  return `${css.actionButton(options)} ${css.semanticClassNames.actionButton}`;
 }
 
-export type { ActionBarProps, ActionButtonProps }
+export type { ActionBarProps, ActionButtonProps };
