@@ -64,6 +64,7 @@ function detectMarkdown(text: string): boolean {
   return score >= 5;
 }
 
+// @ts-ignore -- retained for manual paste debugging when needed
 function _debugPastePayload(event: Event, clipboardData: DataTransfer): void {
   const itemDetails = Array.from(clipboardData.items).map((item, index) => ({
     index,

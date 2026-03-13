@@ -683,6 +683,9 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
     devDependencies:
+      '@lexical/markdown':
+        specifier: ^0.41.0
+        version: 0.41.0
       '@lexical/react':
         specifier: ^0.41.0
         version: 0.41.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(yjs@13.6.29)

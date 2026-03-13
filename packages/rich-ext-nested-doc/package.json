@@ -29,6 +29,7 @@
     "@haklex/rich-style-token": "workspace:*"
   },
   "devDependencies": {
+    "@lexical/markdown": "^0.41.0",
     "@lexical/react": "^0.41.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -43,6 +44,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@lexical/markdown": "^0.41.0",
     "@lexical/react": "^0.41.0",
     "lexical": "^0.41.0",
     "lucide-react": "^0.574.0",
