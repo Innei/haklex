@@ -15,9 +15,9 @@ export const noteVariant = style([richContent, noteTheme, noteBase]);
 const note = (selector: string) => `${noteBase} ${selector}`;
 const plainListItem = `${sharedStyles.listItem}:not(${sharedStyles.listItemChecked}):not(${sharedStyles.listItemUnchecked})`;
 
-// ─── Paragraphs (prose-style with text-indent) ──────────
-// Use direct-child selectors so text-indent / drop-cap only affect
-// top-level paragraphs, not paragraphs nested inside alerts, quotes, tables, etc.
+// ─── Paragraphs ─────────────────────────────────────────
+// Use direct-child selectors so first-line indent only affects
+// top-level prose paragraphs, not paragraphs nested inside alerts, quotes, tables, etc.
 const editorTopParagraph = `${noteBase} .rich-editor__content > ${sharedStyles.paragraph}`;
 const rendererTopParagraph = `${noteBase}.rich-content:not([data-rich-nested='true']) > ${sharedStyles.paragraph}`;
 
@@ -27,22 +27,25 @@ globalStyle(`${editorTopParagraph}, ${rendererTopParagraph}`, {
   lineHeight: '1.8',
 });
 
+globalStyle(`${rendererTopParagraph}:not(:first-of-type)`, {
+  textIndent: '2em',
+});
+
 globalStyle(`${editorTopParagraph}:first-of-type, ${rendererTopParagraph}:first-of-type`, {
   marginTop: 0,
-  marginBottom: '2rem',
 });
 
 // Instead of text-indent (which indents the entire first line including
 // inline decorators like mention/katex), apply margin on the first text
 // child only. If the paragraph starts with a decorator, no indent is added.
 globalStyle(
-  `${editorTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child, ${rendererTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child`,
+  `${editorTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child`,
   {
-    marginInlineStart: '2rem',
+    marginInlineStart: '2em',
   },
 );
 
-// Drop cap on first paragraph — renderer only (float disrupts editing)
+// Keep the note lead-paragraph treatment while preserving the new indent rules.
 globalStyle(`${rendererTopParagraph}:first-of-type::first-letter`, {
   float: 'left',
   fontSize: '2.4em',
@@ -50,7 +53,6 @@ globalStyle(`${rendererTopParagraph}:first-of-type::first-letter`, {
   lineHeight: '1',
 });
 
-// Editor: subtle first-letter accent without float
 globalStyle(`${editorTopParagraph}:first-of-type::first-letter`, {
   fontSize: '1.5em',
   fontWeight: 700,

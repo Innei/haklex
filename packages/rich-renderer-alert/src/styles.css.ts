@@ -1,3 +1,4 @@
+import { noteVariant } from '@haklex/rich-editor/styles'
 import { vars } from '@haklex/rich-style-token/styles'
 import { createVar, globalStyle, style } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
@@ -199,6 +200,13 @@ globalStyle(`.${semanticClassNames.content} .rich-paragraph`, {
 globalStyle(`.${semanticClassNames.content} .rich-paragraph:last-child`, {
   marginBottom: 0,
 })
+
+globalStyle(
+  `.${noteVariant} .${semanticClassNames.content} > .rich-paragraph`,
+  {
+    textIndent: '2em',
+  },
+)
 
 for (const type of Object.keys(alertTypeColors) as Array<
   keyof typeof alertTypeColors

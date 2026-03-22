@@ -1,3 +1,4 @@
+import { noteVariant } from '@haklex/rich-editor/styles'
 import { vars } from '@haklex/rich-style-token/styles'
 import { globalStyle, style } from '@vanilla-extract/css'
 import { recipe } from '@vanilla-extract/recipes'
@@ -170,6 +171,13 @@ globalStyle(`.${semanticClassNames.content} .rich-paragraph`, {
 globalStyle(`.${semanticClassNames.content} .rich-paragraph:last-child`, {
   marginBottom: 0,
 })
+
+globalStyle(
+  `.${noteVariant} .${semanticClassNames.content} > .rich-paragraph`,
+  {
+    textIndent: '2em',
+  },
+)
 
 for (const type of Object.keys(bannerTypeColors) as Array<
   keyof typeof bannerTypeColors
