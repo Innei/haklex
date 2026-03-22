@@ -22,22 +22,22 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@lexical/code": "npm:lexical-code-no-prism@0.41.0",
-    "@lexical/extension": "^0.41.0",
-    "@lexical/link": "^0.41.0",
-    "@lexical/list": "^0.41.0",
-    "@lexical/markdown": "^0.41.0",
-    "@lexical/rich-text": "^0.41.0",
-    "@lexical/table": "^0.41.0"
+    "@lexical/code-core": "^0.42.0",
+    "@lexical/extension": "^0.42.0",
+    "@lexical/link": "^0.42.0",
+    "@lexical/list": "^0.42.0",
+    "@lexical/markdown": "^0.42.0",
+    "@lexical/rich-text": "^0.42.0",
+    "@lexical/table": "^0.42.0"
   },
   "devDependencies": {
-    "lexical": "^0.41.0",
+    "lexical": "^0.42.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "lexical": "^0.41.0"
+    "lexical": "^0.42.0"
   },
   "publishConfig": {
     "access": "public",

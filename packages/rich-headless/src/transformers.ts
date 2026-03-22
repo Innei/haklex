@@ -265,7 +265,7 @@ export const CODE_BLOCK_NODE_TRANSFORMER: ElementTransformer = {
 };
 
 // Handle legacy Lexical CodeNode (type 'code') directly by type check,
-// bypassing $isCodeNode which fails due to @lexical/code vs lexical-code-no-prism class mismatch.
+// bypassing $isCodeNode when multiple code implementations are bundled (class identity mismatch).
 export const LEGACY_CODE_NODE_TRANSFORMER: ElementTransformer = {
   dependencies: [],
   export: (node) => {

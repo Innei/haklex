@@ -6,21 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Lexical-based rich editor ecosystem. Modular packages: core editor, UI primitives, content renderers, plugins, extensions, and integration bundles.
 
-**Build**: Vite 7 + Vanilla Extract CSS-in-TS. ESM only (`.mjs`). TypeScript 5.9. Lexical 0.41. pnpm 10. Node >= 20.
+**Build**: Vite 7 + Vanilla Extract CSS-in-TS. ESM only (`.mjs`). TypeScript 5.9. Lexical 0.42. pnpm 10. Node >= 20.
 
 ## Commands
 
 ```bash
-pnpm dev                                            # demo/ dev playground (all features)
-pnpm --filter @haklex/rich-editor dev:build         # watch mode for core
-pnpm build                                          # turbo build (all)
-pnpm build:packages                                 # workspace packages under packages/
-pnpm --filter @haklex/rich-editor build             # single package
-pnpm lint                                           # turbo lint (all)
-npx eslint path/to/file.ts                          # lint single file
-npx prettier --write path/to/file.ts                # format single file
-npx vitest run packages/rich-renderer-katex/tests/  # run specific tests
-pnpm release:rich                                   # bump + build + publish @haklex/*
+pnpm dev                                           # demo/ dev playground (all features)
+pnpm --filter @haklex/rich-editor dev:build        # watch mode for core
+pnpm build                                         # turbo build (all)
+pnpm build:packages                                # workspace packages under packages/
+pnpm --filter @haklex/rich-editor build            # single package
+pnpm lint                                          # turbo lint (all)
+npx eslint path/to/file.ts                         # lint single file
+npx prettier --write path/to/file.ts               # format single file
+npx vitest run packages/rich-renderer-katex/tests/ # run specific tests
+pnpm release:rich                                  # bump + build + publish @haklex/*
 ```
 
 ## Toolchain
@@ -40,6 +40,7 @@ The ecosystem splits **nodes** and **renderers** into static (read-only) and edi
 **Split criteria**: Only split when the edit path introduces heavy imports absent from the static path.
 
 Registration:
+
 - `@haklex/rich-editor` `src/config.ts` → static nodes → `RichRenderer`
 - `@haklex/rich-editor` `src/config-edit.ts` → edit nodes → `RichEditor`
 - `@haklex/rich-renderers` `src/config.ts` → `enhancedRendererConfig` (static renderers)

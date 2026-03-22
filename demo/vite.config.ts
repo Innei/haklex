@@ -142,7 +142,7 @@ export default defineConfig({
   resolve: {
     dedupe: [
       'lexical',
-      '@lexical/code',
+      '@lexical/code-core',
       '@lexical/link',
       '@lexical/list',
       '@lexical/markdown',

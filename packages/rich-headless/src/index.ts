@@ -10,7 +10,7 @@
  *   const editor = createHeadlessEditor({ nodes: allHeadlessNodes })
  */
 
-import { CodeHighlightNode, CodeNode } from '@lexical/code';
+import { CodeHighlightNode, CodeNode } from '@lexical/code-core';
 import { HorizontalRuleNode } from '@lexical/extension';
 import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';

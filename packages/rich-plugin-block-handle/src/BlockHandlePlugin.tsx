@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
-import { $createCodeNode } from '@lexical/code';
+import { $createCodeNode } from '@lexical/code-core';
 import {
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,

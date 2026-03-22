@@ -1,7 +1,14 @@
 {
   "name": "@haklex/rich-editor-demo",
-  "type": "module",
   "private": true,
+  "description": "Development playground for the Haklex rich editor ecosystem",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "demo"
+  },
+  "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "vite build",
     "dev": "vite",
@@ -21,14 +28,14 @@
     "@haklex/rich-static-renderer": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "@icons-pack/react-simple-icons": "^13.12.0",
-    "@lexical/code": "npm:lexical-code-no-prism@0.41.0",
-    "@lexical/link": "^0.41.0",
-    "@lexical/list": "^0.41.0",
-    "@lexical/markdown": "^0.41.0",
-    "@lexical/react": "^0.41.0",
-    "@lexical/rich-text": "^0.41.0",
-    "@lexical/table": "^0.41.0",
-    "lexical": "^0.41.0",
+    "@lexical/code-core": "^0.42.0",
+    "@lexical/link": "^0.42.0",
+    "@lexical/list": "^0.42.0",
+    "@lexical/markdown": "^0.42.0",
+    "@lexical/react": "^0.42.0",
+    "@lexical/rich-text": "^0.42.0",
+    "@lexical/table": "^0.42.0",
+    "lexical": "^0.42.0",
     "lucide-react": "^0.577.0",
     "modern-normalize": "^3.0.1",
     "nanoid": "^5.1.6",
@@ -46,12 +53,5 @@
     "code-inspector-plugin": "1.4.2",
     "typescript": "^5.9.3",
     "vite": "^7.3.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Innei/haklex.git",
-    "directory": "demo"
-  },
-  "license": "MIT",
-  "description": "Development playground for the Haklex rich editor ecosystem"
+  }
 }
