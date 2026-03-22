@@ -10,31 +10,31 @@ pnpm add @haklex/rich-plugin-block-handle
 
 ## Peer Dependencies
 
-`@lexical/code` is provided transitively via `lexical-code-no-prism`. Install it separately only if your app imports `@lexical/code` directly.
+This plugin depends on `@lexical/code-core` (Lexical 0.42+). Add `@lexical/code-core` yourself only if your app imports it directly.
 
-| Package | Version |
-| --- | --- |
-| `@lexical/list` | `^0.41.0` |
-| `@lexical/react` | `^0.41.0` |
-| `@lexical/rich-text` | `^0.41.0` |
-| `@lexical/selection` | `^0.41.0` |
-| `lexical` | `^0.41.0` |
-| `lucide-react` | `^0.574.0` |
-| `react` | `>= 19` |
-| `react-dom` | `>= 19` |
+| Package              | Version    |
+| -------------------- | ---------- |
+| `@lexical/list`      | `^0.42.0`  |
+| `@lexical/react`     | `^0.42.0`  |
+| `@lexical/rich-text` | `^0.42.0`  |
+| `@lexical/selection` | `^0.42.0`  |
+| `lexical`            | `^0.42.0`  |
+| `lucide-react`       | `^0.574.0` |
+| `react`              | `>= 19`    |
+| `react-dom`          | `>= 19`    |
 
 ## Usage
 
 ```tsx
-import { BlockHandlePlugin } from '@haklex/rich-plugin-block-handle'
-import '@haklex/rich-plugin-block-handle/style.css'
+import { BlockHandlePlugin } from '@haklex/rich-plugin-block-handle';
+import '@haklex/rich-plugin-block-handle/style.css';
 
 function Editor() {
   return (
     <RichEditor>
       <BlockHandlePlugin />
     </RichEditor>
-  )
+  );
 }
 ```
 
@@ -46,16 +46,16 @@ The plugin renders a drag handle and an add button on the left side of each bloc
 
 ## Exports
 
-| Export | Type | Description |
-| --- | --- | --- |
+| Export              | Type      | Description                                         |
+| ------------------- | --------- | --------------------------------------------------- |
 | `BlockHandlePlugin` | Component | Main plugin component to render inside `RichEditor` |
 
 ## Sub-path Exports
 
-| Path | Description |
-| --- | --- |
-| `@haklex/rich-plugin-block-handle` | Plugin component |
-| `@haklex/rich-plugin-block-handle/style.css` | Stylesheet |
+| Path                                         | Description      |
+| -------------------------------------------- | ---------------- |
+| `@haklex/rich-plugin-block-handle`           | Plugin component |
+| `@haklex/rich-plugin-block-handle/style.css` | Stylesheet       |
 
 ## Part of Haklex
 

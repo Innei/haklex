@@ -10,26 +10,26 @@ pnpm add @haklex/rich-static-renderer
 
 ## Peer Dependencies
 
-`@lexical/code` is provided transitively via `lexical-code-no-prism`. Install it separately only if your app imports `@lexical/code` directly.
+This package depends on `@lexical/code-core` (Lexical 0.42+ code blocks, no Prism). Add `@lexical/code-core` yourself only if your app imports it directly.
 
-| Package | Version |
-| --- | --- |
-| `@lexical/extension` | `^0.41.0` |
-| `@lexical/link` | `^0.41.0` |
-| `@lexical/list` | `^0.41.0` |
-| `@lexical/rich-text` | `^0.41.0` |
-| `@lexical/table` | `^0.41.0` |
-| `lexical` | `^0.41.0` |
-| `react` | `>=19` |
-| `react-dom` | `>=19` |
+| Package              | Version   |
+| -------------------- | --------- |
+| `@lexical/extension` | `^0.42.0` |
+| `@lexical/link`      | `^0.42.0` |
+| `@lexical/list`      | `^0.42.0` |
+| `@lexical/rich-text` | `^0.42.0` |
+| `@lexical/table`     | `^0.42.0` |
+| `lexical`            | `^0.42.0` |
+| `react`              | `>=19`    |
+| `react-dom`          | `>=19`    |
 
 ## Usage
 
 ```tsx
-import { RichRenderer } from '@haklex/rich-static-renderer'
-import '@haklex/rich-editor/style.css'
+import { RichRenderer } from '@haklex/rich-static-renderer';
+import '@haklex/rich-editor/style.css';
 
-<RichRenderer value={editorState} variant="article" theme="light" />
+<RichRenderer value={editorState} variant="article" theme="light" />;
 ```
 
 The `value` prop accepts a Lexical `SerializedEditorState` JSON object. The renderer parses it into React elements without instantiating a Lexical editor, making it suitable for SSR and static rendering.
@@ -38,15 +38,15 @@ The `value` prop accepts a Lexical `SerializedEditorState` JSON object. The rend
 
 ### Components
 
-| Export | Description |
-| --- | --- |
+| Export         | Description                    |
+| -------------- | ------------------------------ |
 | `RichRenderer` | Main static renderer component |
 
 ### Types
 
-| Export | Description |
-| --- | --- |
-| `RichRendererProps` | Props for `RichRenderer` |
+| Export                | Description                              |
+| --------------------- | ---------------------------------------- |
+| `RichRendererProps`   | Props for `RichRenderer`                 |
 | `BuiltinNodeRenderer` | Type for builtin node renderer functions |
 
 ## Part of Haklex
