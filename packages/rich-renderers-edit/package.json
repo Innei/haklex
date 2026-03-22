@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderers-edit",
-  "version": "0.0.86",
+  "version": "0.0.87",
   "description": "Edit renderers aggregator for haklex rich editor",
   "repository": {
     "type": "git",
