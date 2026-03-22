@@ -1,3 +1,4 @@
+import { $selectionTouchesSpoiler, $toggleSpoilerSelection } from '@haklex/rich-editor/commands';
 import { $createRubyNode, $isRubyNode } from '@haklex/rich-editor/nodes';
 import { ColorPicker } from '@haklex/rich-editor-ui';
 import { usePortalContainer, usePortalTheme, vars } from '@haklex/rich-style-token';
@@ -19,6 +20,7 @@ import {
   Bold,
   Check,
   Code,
+  EyeOff,
   Highlighter,
   Italic,
   Languages,
@@ -70,6 +72,7 @@ interface ToolbarState {
   isItalic: boolean;
   isLink: boolean;
   isRuby: boolean;
+  isSpoiler: boolean;
   isStrikethrough: boolean;
   isSubscript: boolean;
   isSuperscript: boolean;
@@ -87,6 +90,7 @@ const INITIAL_STATE: ToolbarState = {
   isHighlight: false,
   isLink: false,
   isRuby: false,
+  isSpoiler: false,
   fontColor: '',
 };
 
@@ -133,6 +137,7 @@ function getSelectionState(selection: RangeSelection): ToolbarState {
     isHighlight: selection.hasFormat('highlight'),
     isLink: hasLink,
     isRuby: hasRuby,
+    isSpoiler: $selectionTouchesSpoiler(selection),
     fontColor: $getSelectionStyleValueForProperty(selection, 'color', ''),
   };
 }
@@ -634,6 +639,13 @@ export function FloatingToolbarPlugin(): ReactElement | null {
               onClick={() => handleFormat('highlight')}
             >
               <Highlighter size={ICON_SIZE} strokeWidth={ICON_STROKE} />
+            </ToolbarButton>
+            <ToolbarButton
+              active={state.isSpoiler}
+              ariaLabel="Spoiler"
+              onClick={() => editor.update($toggleSpoilerSelection)}
+            >
+              <EyeOff size={ICON_SIZE} strokeWidth={ICON_STROKE} />
             </ToolbarButton>
             <ToolbarButton active={state.isLink} ariaLabel="Link" onClick={handleLink}>
               <LinkIcon size={ICON_SIZE} strokeWidth={ICON_STROKE} />

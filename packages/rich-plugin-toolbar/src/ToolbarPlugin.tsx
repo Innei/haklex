@@ -1,4 +1,8 @@
-import { collectCommandItems } from '@haklex/rich-editor/commands';
+import {
+  $selectionTouchesSpoiler,
+  $toggleSpoilerSelection,
+  collectCommandItems,
+} from '@haklex/rich-editor/commands';
 import type { TooltipRootProps } from '@haklex/rich-editor-ui';
 import {
   createTooltipHandle,
@@ -48,6 +52,7 @@ import {
   Bold,
   Code,
   Ellipsis,
+  EyeOff,
   Heading1,
   Heading2,
   Heading3,
@@ -136,6 +141,7 @@ interface ToolbarState {
   isCode: boolean;
   isHighlight: boolean;
   isItalic: boolean;
+  isSpoiler: boolean;
   isStrikethrough: boolean;
   isUnderline: boolean;
 }
@@ -152,6 +158,7 @@ const INITIAL_STATE: ToolbarState = {
   isStrikethrough: false,
   isCode: false,
   isHighlight: false,
+  isSpoiler: false,
 };
 
 function getBlockType(anchorNode: ElementNode): BlockType {
@@ -240,6 +247,7 @@ export function ToolbarPlugin({
       isStrikethrough: selection.hasFormat('strikethrough'),
       isCode: selection.hasFormat('code'),
       isHighlight: selection.hasFormat('highlight'),
+      isSpoiler: $selectionTouchesSpoiler(selection),
     }));
   }, []);
 
@@ -468,6 +476,13 @@ export function ToolbarPlugin({
             title="Highlight"
             tooltipHandle={h}
             onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'highlight')}
+          />
+          <ToolbarButton
+            active={state.isSpoiler}
+            icon={<EyeOff size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
+            title="Spoiler"
+            tooltipHandle={h}
+            onClick={() => editor.update($toggleSpoilerSelection)}
           />
 
           <ToolbarSeparator />

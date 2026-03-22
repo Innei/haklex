@@ -11,3 +11,4 @@ export type {
 } from './types/slash-menu';
 export { collectCommandItems } from './utils/collect-command-items';
 export { extractTextContent } from './utils/extractTextContent';
+export { $selectionTouchesSpoiler, $toggleSpoilerSelection } from './utils/toggle-spoiler';
