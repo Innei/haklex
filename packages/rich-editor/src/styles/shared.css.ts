@@ -521,6 +521,18 @@ export const spoiler = style({
   },
 });
 
+/** RichRenderer root (`.rich-content`): neutral gray mask — default uses body `text` and reads too heavy when not editing */
+globalStyle(`.rich-content ${spoiler}`, {
+  backgroundColor: vars.color.textTertiary,
+  color: 'transparent',
+});
+
+globalStyle(`.rich-content ${spoiler}:hover`, {
+  backgroundColor: 'transparent',
+  color: 'inherit',
+  userSelect: 'auto',
+});
+
 export const spoilerRevealed = style({
   backgroundColor: 'transparent',
   color: 'inherit',
