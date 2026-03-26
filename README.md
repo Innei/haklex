@@ -31,22 +31,24 @@ A modular rich text editor ecosystem built on [Lexical](https://lexical.dev/). D
 
 ## Tech Stack
 
-| Category              | Technology                  |
-| --------------------- | --------------------------- |
-| **Language**          | TypeScript 5.9              |
-| **Editor Core**       | Lexical 0.41                |
-| **UI Framework**      | React 19                    |
-| **UI Primitives**     | Base UI (`@base-ui/react`)  |
-| **Build**             | Vite 7, Turbo               |
-| **Styling**           | Vanilla Extract (CSS-in-TS) |
-| **Code Highlighting** | Shiki 4, CodeMirror 6       |
-| **Package Manager**   | pnpm 10                     |
-| **Module Format**     | ESM only (`.mjs`)           |
+| Category              | Technology                    |
+| --------------------- | ----------------------------- |
+| **Language**          | TypeScript 5                  |
+| **Editor Core**       | Lexical 0.42                  |
+| **UI Framework**      | React 19                      |
+| **UI Primitives**     | Base UI 1 (`@base-ui/react`)  |
+| **Build**             | Vite 7, Turbo 2               |
+| **Styling**           | Vanilla Extract 1 (CSS-in-TS) |
+| **Code Highlighting** | Shiki 4, CodeMirror 6         |
+| **Package Manager**   | pnpm 10                       |
+| **Module Format**     | ESM only (`.mjs`)             |
+
+Lexical stays on **0.x** releases: the **minor** (e.g. **0.42**) is what must align across `lexical` and `@lexical/*`, not the patch number.
 
 ## Prerequisites
 
 - **Node.js** 20 or higher
-- **pnpm** 10 (install via `corepack enable && corepack prepare pnpm@latest --activate`)
+- **pnpm** 10 (`corepack enable && corepack prepare pnpm@latest --activate`, or match `packageManager` in the repo root)
 
 ## Getting Started
 
