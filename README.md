@@ -13,6 +13,7 @@ A modular rich text editor ecosystem built on [Lexical](https://lexical.dev/). D
 - [Variant System](#variant-system)
 - [Usage](#usage)
 - [Available Scripts](#available-scripts)
+- [Open Source, AI, and Dialogue](#open-source-ai-and-dialogue)
 - [Testing](#testing)
 - [Contributing](#contributing)
 - [License](#license)
@@ -279,6 +280,14 @@ import '@haklex/rich-kit-shiro/style.css'
 | `npx prettier --write path/to/file.ts`               | Format a single file                                    |
 | `npx vitest run packages/rich-renderer-katex/tests/` | Run tests for a specific package                        |
 | `pnpm release:rich`                                  | Bump version, build, and publish all `@haklex/*` to npm |
+
+## Open Source, AI, and Dialogue
+
+Traditional open source shares **code**; in the era of AI-assisted development, it is just as valuable to share the **dialogue** behind that code: prompts, constraints, trade-offs, and the iterative back-and-forth with assistants. This repository includes **SpecStory** exports under [`.specstory/`](.specstory/) — searchable transcripts of how Haklex was designed, refactored, and shipped. Code is the artifact; the conversation is part of its provenance.
+
+> 当代意义上的开源不应止于代码，也应包括与 AI 协作时的对话与过程。我们把这些会话一并公开，作为真正的开源形态之一。
+
+See [`.specstory/README.md`](.specstory/README.md) for a session index and notes on redacted paths.
 
 ## Downstream Consumers
 
