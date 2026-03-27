@@ -170,8 +170,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       modern-normalize:
         specifier: ^3.0.1
         version: 3.0.1
@@ -351,8 +351,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: ^19.2.4
         version: 19.2.4
@@ -381,8 +381,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -454,8 +454,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       shiki:
         specifier: ^4.0.1
         version: 4.0.1
@@ -508,9 +508,12 @@ importers:
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../rich-style-token
+      '@icons-pack/react-simple-icons':
+        specifier: ^13.12.0
+        version: 13.12.0(react@19.2.4)
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react-tweet:
         specifier: npm:@innei/react-tweet@3.4.2
         version: '@innei/react-tweet@3.4.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)'
@@ -592,8 +595,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -653,8 +656,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -708,8 +711,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -900,8 +903,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -955,8 +958,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1004,8 +1007,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1111,8 +1114,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1160,8 +1163,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1221,8 +1224,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react:
         specifier: 19.2.4
         version: 19.2.4
@@ -1251,8 +1254,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -1297,8 +1300,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -1361,8 +1364,8 @@ importers:
         specifier: ^3.1.0
         version: 3.1.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       shiki:
         specifier: ^4.0.1
         version: 4.0.1
@@ -1410,8 +1413,8 @@ importers:
         specifier: 2.18.0
         version: 2.18.0(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.4)
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react-photo-view:
         specifier: ^1.2.7
         version: 1.2.7(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1462,8 +1465,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
     devDependencies:
       '@lexical/react':
         specifier: ^0.42.0
@@ -1517,8 +1520,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       react-intersection-observer:
         specifier: ^10.0.3
         version: 10.0.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -1575,8 +1578,8 @@ importers:
         specifier: ^13.12.0
         version: 13.12.0(react@19.2.4)
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
     devDependencies:
       '@lexical/react':
         specifier: ^0.42.0
@@ -1624,8 +1627,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
       mermaid:
         specifier: ^11.12.3
         version: 11.12.3
@@ -1713,8 +1716,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-style-token
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
     devDependencies:
       '@lexical/react':
         specifier: ^0.42.0
@@ -1926,8 +1929,8 @@ importers:
         specifier: ^0.42.0
         version: 0.42.0
       lucide-react:
-        specifier: ^0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: ^1.0.0
+        version: 1.7.0(react@19.2.4)
     devDependencies:
       '@lexical/extension':
         specifier: ^0.42.0
@@ -9111,10 +9114,10 @@ packages:
       }
     engines: { node: '>=10' }
 
-  lucide-react@0.577.0:
+  lucide-react@1.7.0:
     resolution:
       {
-        integrity: sha512-4LjoFv2eEPwYDPg/CUdBJQSDfPyzXCRrVW1X7jrx/trgxnxkHFjnVZINbzvzxjN70dxychOfg+FTYwBiS3pQ5A==,
+        integrity: sha512-yI7BeItCLZJTXikmK4KNUGCKoGzSvbKlfCvw44bU4fXAL6v3gYS4uHD1jzsLkfwODYwI6Drw5Tu9Z5ulDe0TSg==,
       }
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -16476,7 +16479,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  lucide-react@0.577.0(react@19.2.4):
+  lucide-react@1.7.0(react@19.2.4):
     dependencies:
       react: 19.2.4
 

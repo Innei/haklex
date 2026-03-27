@@ -27,7 +27,7 @@
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "jotai": "2.18.0",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.0.0",
     "react-photo-view": "^1.2.7"
   },
   "devDependencies": {

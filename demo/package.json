@@ -36,7 +36,7 @@
     "@lexical/rich-text": "^0.42.0",
     "@lexical/table": "^0.42.0",
     "lexical": "^0.42.0",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.0.0",
     "modern-normalize": "^3.0.1",
     "nanoid": "^5.1.6",
     "react": "^19.2.4",

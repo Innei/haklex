@@ -1,7 +1,7 @@
 import '../styles.css.ts';
 
 import { useColorScheme } from '@haklex/rich-editor';
-import { Github } from 'lucide-react';
+import { SiGithub } from '@icons-pack/react-simple-icons';
 import type { ReactNode } from 'react';
 import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react';
 
@@ -97,7 +97,7 @@ class EmbedErrorBoundary extends Component<
 // --- Shared helpers ---
 
 function GitHubSvg() {
-  return <Github size={16} />;
+  return <SiGithub size={16} />;
 }
 
 function FixedRatioContainer({

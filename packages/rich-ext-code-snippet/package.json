@@ -35,7 +35,7 @@
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.0.0",
     "shiki": "^4.0.1"
   },
   "devDependencies": {

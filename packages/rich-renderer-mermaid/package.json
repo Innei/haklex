@@ -27,7 +27,7 @@
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "lucide-react": "^0.577.0",
+    "lucide-react": "^1.0.0",
     "mermaid": "^11.12.3",
     "react-zoom-pan-pinch": "^3.7.0"
   },
