@@ -43,7 +43,7 @@ export function CodeBlock({
 }: CodeBlockProps): ReactElement {
   const [html, setHtml] = useState<string>('');
   const [copied, setCopied] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>();
+  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     if (!language) return;
