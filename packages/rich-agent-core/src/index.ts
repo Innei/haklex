@@ -1,3 +1,5 @@
+export type { AgentExecutorConfig, AgentExecutorResult } from './agent-executor';
+export { createAgentExecutor } from './agent-executor';
 export {
   acceptAllDiffs,
   acceptDiff,
