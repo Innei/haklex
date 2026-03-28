@@ -5,11 +5,12 @@ export type ChatBubble =
   | { type: 'assistant'; content: string; streaming?: boolean }
   | { type: 'tool_call'; toolName: string; params: Record<string, unknown> }
   | { type: 'tool_result'; toolName: string; success: boolean; summary: string }
+  | { type: 'thinking'; content: string }
   | { type: 'error'; message: string }
   | { type: 'diff_summary'; accepted: number; rejected: number; pending: number };
 
 export type AgentStoreState = {
-  status: 'idle' | 'running' | 'done';
+  status: 'idle' | 'running' | 'thinking' | 'calling_tool' | 'writing' | 'done';
   bubbles: ChatBubble[];
   diffState: DiffState | null;
 };

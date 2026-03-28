@@ -64,8 +64,11 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
       const messages: ChatMessage[] = [...config.systemMessages, actionPrompt, ...turns];
 
       let textAccum = '';
+      let thinkingAccum = '';
+      let hasThinking = false;
       const toolCalls: Array<{ id: string; name: string; arguments: string }> = [];
 
+      store.dispatch({ type: 'set_status', status: 'thinking' });
       store.dispatch({
         type: 'add_bubble',
         bubble: { type: 'assistant', content: '', streaming: true },
@@ -74,13 +77,47 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
       for await (const chunk of provider.chat(messages, toolSchemas)) {
         signal?.throwIfAborted();
 
+        if (chunk.type === 'thinking') {
+          thinkingAccum += chunk.text;
+          if (!hasThinking) {
+            hasThinking = true;
+            store.dispatch({
+              type: 'update_last_bubble',
+              bubble: { type: 'thinking', content: thinkingAccum },
+            });
+          } else {
+            store.dispatch({
+              type: 'update_last_bubble',
+              bubble: { type: 'thinking', content: thinkingAccum },
+            });
+          }
+          continue;
+        }
+
         if (chunk.type === 'text') {
+          if (hasThinking && textAccum === '') {
+            store.dispatch({
+              type: 'add_bubble',
+              bubble: { type: 'assistant', content: chunk.text, streaming: true },
+            });
+            store.dispatch({ type: 'set_status', status: 'writing' });
+          } else if (textAccum === '') {
+            store.dispatch({ type: 'set_status', status: 'writing' });
+            store.dispatch({
+              type: 'update_last_bubble',
+              bubble: { type: 'assistant', content: chunk.text, streaming: true },
+            });
+          } else {
+            store.dispatch({
+              type: 'update_last_bubble',
+              bubble: { type: 'assistant', content: textAccum + chunk.text, streaming: true },
+            });
+          }
           textAccum += chunk.text;
-          store.dispatch({
-            type: 'update_last_bubble',
-            bubble: { type: 'assistant', content: textAccum, streaming: true },
-          });
-        } else if (chunk.type === 'tool_call') {
+          continue;
+        }
+
+        if (chunk.type === 'tool_call') {
           toolCalls.push({ id: chunk.id, name: chunk.name, arguments: chunk.arguments });
         }
       }
@@ -93,6 +130,8 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
       if (toolCalls.length === 0) break;
 
       turns.push({ role: 'assistant_tool_call', toolCalls });
+
+      store.dispatch({ type: 'set_status', status: 'calling_tool' });
 
       for (const tc of toolCalls) {
         store.dispatch({
