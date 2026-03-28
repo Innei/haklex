@@ -23,7 +23,10 @@
   },
   "dependencies": {
     "@haklex/rich-agent-core": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*"
+    "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*",
+    "@streamdown/code": "^2.5.0",
+    "streamdown": "^2.5.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
