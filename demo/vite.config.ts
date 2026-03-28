@@ -7,6 +7,8 @@ import { codeInspectorPlugin } from 'code-inspector-plugin';
 import type { Alias, Plugin } from 'vite';
 import { defineConfig } from 'vite';
 
+import { apiProxyPlugin } from './server/proxy';
+
 // Dev-only: resolve workspace style entry to source instead of dist output.
 // - Prefer src/style.css for plain CSS packages.
 // - Fall back to src/styles.css.ts for VE packages when imported from JS.
@@ -152,6 +154,7 @@ function workspaceBuildStyleAliases(): Alias[] {
 
 export default defineConfig(({ command }) => ({
   plugins: [
+    apiProxyPlugin(),
     watchWorkspacePlugin(),
     workspaceCssPlugin(),
     vanillaExtractPlugin(),
