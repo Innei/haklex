@@ -109,6 +109,12 @@ importers:
       '@excalidraw/excalidraw':
         specifier: 0.17.0
         version: 0.17.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@haklex/rich-agent-chat':
+        specifier: workspace:*
+        version: link:../packages/rich-agent-chat
+      '@haklex/rich-agent-core':
+        specifier: workspace:*
+        version: link:../packages/rich-agent-core
       '@haklex/rich-diff':
         specifier: workspace:*
         version: link:../packages/rich-diff
@@ -118,6 +124,9 @@ importers:
       '@haklex/rich-editor-ui':
         specifier: workspace:*
         version: link:../packages/rich-editor-ui
+      '@haklex/rich-ext-ai-agent':
+        specifier: workspace:*
+        version: link:../packages/rich-ext-ai-agent
       '@haklex/rich-ext-excalidraw':
         specifier: workspace:*
         version: link:../packages/rich-ext-excalidraw

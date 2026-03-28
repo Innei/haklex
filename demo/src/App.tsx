@@ -9,13 +9,14 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ThemeContext } from './context/ThemeContext';
+import { AgentPage } from './pages/AgentPage';
 import { BizPage } from './pages/BizPage';
 import { CommentsPage } from './pages/CommentsPage';
 import { EditorPage } from './pages/EditorPage';
 import { NodeShowcase } from './pages/NodeShowcase';
 import { PresetsPage } from './pages/PresetsPage';
 
-type Page = 'editor' | 'comments' | 'nodes' | 'presets' | 'biz';
+type Page = 'editor' | 'comments' | 'nodes' | 'presets' | 'biz' | 'agent';
 type ThemeMode = 'system' | 'light' | 'dark';
 
 function useSystemColorScheme(): ColorScheme {
@@ -36,7 +37,11 @@ function useSystemColorScheme(): ColorScheme {
 export function App() {
   const [currentPage, setCurrentPage] = useState<Page>(() => {
     const hash = window.location.hash.slice(1) as Page;
-    return hash === 'comments' || hash === 'nodes' || hash === 'presets' || hash === 'biz'
+    return hash === 'comments' ||
+      hash === 'nodes' ||
+      hash === 'presets' ||
+      hash === 'biz' ||
+      hash === 'agent'
       ? hash
       : 'editor';
   });
@@ -65,7 +70,11 @@ export function App() {
     const handleHashChange = () => {
       const hash = window.location.hash.slice(1) as Page;
       const validPage =
-        hash === 'comments' || hash === 'nodes' || hash === 'presets' || hash === 'biz'
+        hash === 'comments' ||
+        hash === 'nodes' ||
+        hash === 'presets' ||
+        hash === 'biz' ||
+        hash === 'agent'
           ? hash
           : 'editor';
       setCurrentPage(validPage);
@@ -120,6 +129,12 @@ export function App() {
                 >
                   Biz
                 </button>
+                <button
+                  className={currentPage === 'agent' ? 'nav-tab nav-tab-active' : 'nav-tab'}
+                  onClick={() => navigate('agent')}
+                >
+                  AI Agent
+                </button>
                 <div className="nav-divider" />
                 <button className="nav-theme-toggle" title={themeLabel} onClick={cycleTheme}>
                   <ThemeIcon size={18} />
@@ -134,6 +149,7 @@ export function App() {
             {currentPage === 'nodes' && <NodeShowcase />}
             {currentPage === 'presets' && <PresetsPage />}
             {currentPage === 'biz' && <BizPage />}
+            {currentPage === 'agent' && <AgentPage />}
           </main>
         </div>
       </DialogStackProvider>

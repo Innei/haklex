@@ -16,9 +16,12 @@
   },
   "dependencies": {
     "@excalidraw/excalidraw": "0.17.0",
+    "@haklex/rich-agent-chat": "workspace:*",
+    "@haklex/rich-agent-core": "workspace:*",
     "@haklex/rich-diff": "workspace:*",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-ext-ai-agent": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
     "@haklex/rich-kit-shiro": "workspace:*",
