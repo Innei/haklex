@@ -236,18 +236,26 @@ export function ToolbarPlugin({
       ? element.getFormatType()
       : 'left';
 
+    const isBold = selection.hasFormat('bold');
+    const isItalic = selection.hasFormat('italic');
+    const isUnderline = selection.hasFormat('underline');
+    const isStrikethrough = selection.hasFormat('strikethrough');
+    const isCode = selection.hasFormat('code');
+    const isHighlight = selection.hasFormat('highlight');
+    const isSpoiler = $selectionTouchesSpoiler(selection);
+
     setState((prev) => ({
       ...prev,
       blockType,
       fontFamily,
       elementFormat,
-      isBold: selection.hasFormat('bold'),
-      isItalic: selection.hasFormat('italic'),
-      isUnderline: selection.hasFormat('underline'),
-      isStrikethrough: selection.hasFormat('strikethrough'),
-      isCode: selection.hasFormat('code'),
-      isHighlight: selection.hasFormat('highlight'),
-      isSpoiler: $selectionTouchesSpoiler(selection),
+      isBold,
+      isItalic,
+      isUnderline,
+      isStrikethrough,
+      isCode,
+      isHighlight,
+      isSpoiler,
     }));
   }, []);
 
