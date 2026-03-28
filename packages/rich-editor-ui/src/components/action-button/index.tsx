@@ -26,6 +26,7 @@ type ActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   end?: boolean;
   danger?: boolean;
   icon?: boolean;
+  rounded?: boolean;
 };
 
 export function ActionButton({
@@ -34,6 +35,7 @@ export function ActionButton({
   end = false,
   danger = false,
   icon = false,
+  rounded = false,
   className,
   type = 'button',
   ...props
@@ -43,7 +45,7 @@ export function ActionButton({
   if (danger) semanticParts.push(css.semanticClassNames.actionButtonDanger);
   if (icon) semanticParts.push(css.semanticClassNames.actionButtonIcon);
 
-  const recipeClass = css.actionButton({ variant, size, end, danger, icon });
+  const recipeClass = css.actionButton({ variant, size, end, danger, icon, rounded });
 
   return (
     <button

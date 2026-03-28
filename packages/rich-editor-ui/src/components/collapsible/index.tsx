@@ -1,4 +1,4 @@
-import * as CollapsiblePrimitive from '@base-ui/react/collapsible';
+import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible';
 import { ChevronRight } from 'lucide-react';
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
 

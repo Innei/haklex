@@ -128,6 +128,10 @@ export const actionButton = recipe({
       true: {},
       false: {},
     },
+    rounded: {
+      true: {},
+      false: {},
+    },
   },
   compoundVariants: [
     {
@@ -204,6 +208,10 @@ export const actionButton = recipe({
       },
     },
     {
+      variants: { rounded: true, icon: true },
+      style: { borderRadius: '50%' },
+    },
+    {
       variants: { danger: true },
       style: {
         selectors: {
@@ -221,6 +229,7 @@ export const actionButton = recipe({
     icon: false,
     end: false,
     danger: false,
+    rounded: false,
   },
 });
 

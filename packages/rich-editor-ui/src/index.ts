@@ -1,9 +1,23 @@
 export type { ActionBarProps, ActionButtonProps } from './components/action-button';
 export { ActionBar, ActionButton, getActionButtonClassName } from './components/action-button';
+export type { AlertProps } from './components/alert';
+export { Alert } from './components/alert';
 export type { AnimatedTabsProps, Tab as AnimatedTabsTab } from './components/animated-tabs';
 export { AnimatedTabs } from './components/animated-tabs';
+export type { AutoResizeTextAreaProps } from './components/auto-resize-textarea';
+export { AutoResizeTextArea } from './components/auto-resize-textarea';
+export type { BadgeProps } from './components/badge';
+export { Badge } from './components/badge';
 export type { AnimatedCheckboxProps } from './components/checkbox';
 export { AnimatedCheckbox } from './components/checkbox';
+export type { CodeBlockProps } from './components/code-block';
+export { CodeBlock } from './components/code-block';
+export type {
+  CollapsiblePanelProps,
+  CollapsibleProps,
+  CollapsibleTriggerProps,
+} from './components/collapsible';
+export { Collapsible, CollapsiblePanel, CollapsibleTrigger } from './components/collapsible';
 export type { ColorPickerProps } from './components/color-picker';
 export { ColorPicker } from './components/color-picker';
 export type {
@@ -112,6 +126,30 @@ export type { ScrollAreaProps } from './components/scroll-area';
 export { ScrollArea } from './components/scroll-area';
 export type { SegmentedControlItem, SegmentedControlProps } from './components/segmented-control';
 export { SegmentedControl } from './components/segmented-control';
+export type {
+  SelectContentProps,
+  SelectGroupLabelProps,
+  SelectGroupProps,
+  SelectItemProps,
+  SelectProps,
+  SelectSeparatorProps,
+  SelectTriggerProps,
+  SelectValueProps,
+} from './components/select';
+export {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectGroupLabel,
+  SelectItem,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from './components/select';
+export type { SpinnerProps } from './components/spinner';
+export { Spinner } from './components/spinner';
+export type { StatusDotProps } from './components/status-dot';
+export { StatusDot } from './components/status-dot';
 export type {
   TooltipContentProps,
   TooltipPopupProps,
