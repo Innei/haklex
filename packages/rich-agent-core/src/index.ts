@@ -5,6 +5,7 @@ export {
   rejectAllDiffs,
   rejectDiff,
 } from './diff-engine';
+export { createDocumentTools } from './document-tools';
 export { buildDocumentContext, buildMessages } from './pipeline';
 export type {
   AgentToolConfig,
