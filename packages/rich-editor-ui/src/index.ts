@@ -1,21 +1,11 @@
-export type {
-  ActionBarProps,
-  ActionButtonProps,
-} from './components/action-button'
-export {
-  ActionBar,
-  ActionButton,
-  getActionButtonClassName,
-} from './components/action-button'
-export type {
-  AnimatedTabsProps,
-  Tab as AnimatedTabsTab,
-} from './components/animated-tabs'
-export { AnimatedTabs } from './components/animated-tabs'
-export type { AnimatedCheckboxProps } from './components/checkbox'
-export { AnimatedCheckbox } from './components/checkbox'
-export type { ColorPickerProps } from './components/color-picker'
-export { ColorPicker } from './components/color-picker'
+export type { ActionBarProps, ActionButtonProps } from './components/action-button';
+export { ActionBar, ActionButton, getActionButtonClassName } from './components/action-button';
+export type { AnimatedTabsProps, Tab as AnimatedTabsTab } from './components/animated-tabs';
+export { AnimatedTabs } from './components/animated-tabs';
+export type { AnimatedCheckboxProps } from './components/checkbox';
+export { AnimatedCheckbox } from './components/checkbox';
+export type { ColorPickerProps } from './components/color-picker';
+export { ColorPicker } from './components/color-picker';
 export type {
   ComboboxContentProps,
   ComboboxEmptyProps,
@@ -25,7 +15,7 @@ export type {
   ComboboxItemIndicatorProps,
   ComboboxItemProps,
   ComboboxListProps,
-} from './components/combobox'
+} from './components/combobox';
 export {
   Combobox,
   ComboboxContent,
@@ -36,7 +26,7 @@ export {
   ComboboxItem,
   ComboboxItemIndicator,
   ComboboxList,
-} from './components/combobox'
+} from './components/combobox';
 export type {
   DialogBackdropProps,
   DialogCloseProps,
@@ -48,7 +38,7 @@ export type {
   DialogProps,
   DialogTitleProps,
   DialogTriggerProps,
-} from './components/dialog'
+} from './components/dialog';
 export {
   Dialog,
   DialogBackdrop,
@@ -60,18 +50,15 @@ export {
   DialogPortal,
   DialogTitle,
   DialogTrigger,
-} from './components/dialog'
-export { DialogStackProvider } from './components/dialog/stack'
-export type {
-  DialogStackItem,
-  DialogStackItemProps,
-} from './components/dialog/store'
+} from './components/dialog';
+export { DialogStackProvider } from './components/dialog/stack';
+export type { DialogStackItem, DialogStackItemProps } from './components/dialog/store';
 export {
   dismissAllDialogs,
   dismissDialog,
   dismissTopDialog,
   presentDialog,
-} from './components/dialog/store'
+} from './components/dialog/store';
 export type {
   DropdownMenuCheckboxItemProps,
   DropdownMenuContentProps,
@@ -83,7 +70,7 @@ export type {
   DropdownMenuRadioItemProps,
   DropdownMenuSeparatorProps,
   DropdownMenuTriggerProps,
-} from './components/dropdown-menu'
+} from './components/dropdown-menu';
 export {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -95,7 +82,7 @@ export {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './components/dropdown-menu'
+} from './components/dropdown-menu';
 export type {
   PopoverArrowProps,
   PopoverCloseProps,
@@ -107,7 +94,7 @@ export type {
   PopoverProps,
   PopoverTitleProps,
   PopoverTriggerProps,
-} from './components/popover'
+} from './components/popover';
 export {
   Popover,
   PopoverArrow,
@@ -120,12 +107,11 @@ export {
   PopoverTitle,
   PopoverTrigger,
   usePopover,
-} from './components/popover'
-export type {
-  SegmentedControlItem,
-  SegmentedControlProps,
-} from './components/segmented-control'
-export { SegmentedControl } from './components/segmented-control'
+} from './components/popover';
+export type { ScrollAreaProps } from './components/scroll-area';
+export { ScrollArea } from './components/scroll-area';
+export type { SegmentedControlItem, SegmentedControlProps } from './components/segmented-control';
+export { SegmentedControl } from './components/segmented-control';
 export type {
   TooltipContentProps,
   TooltipPopupProps,
@@ -134,7 +120,7 @@ export type {
   TooltipProviderProps,
   TooltipRootProps,
   TooltipTriggerProps,
-} from './components/tooltip'
+} from './components/tooltip';
 export {
   createTooltipHandle,
   TooltipContent,
@@ -144,11 +130,7 @@ export {
   TooltipProvider,
   TooltipRoot,
   TooltipTrigger,
-} from './components/tooltip'
-export type { ViewportGateProps } from './components/viewport-gate'
-export { ViewportGate } from './components/viewport-gate'
-export {
-  PortalThemeProvider,
-  PortalThemeWrapper,
-  usePortalTheme,
-} from '@haklex/rich-style-token'
+} from './components/tooltip';
+export type { ViewportGateProps } from './components/viewport-gate';
+export { ViewportGate } from './components/viewport-gate';
+export { PortalThemeProvider, PortalThemeWrapper, usePortalTheme } from '@haklex/rich-style-token';
