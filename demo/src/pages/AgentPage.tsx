@@ -7,8 +7,6 @@ import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import type { SerializedEditorState } from 'lexical';
 import { useCallback, useMemo, useRef } from 'react';
 
-import { Panel } from '../components/Panel';
-
 const initialContent: SerializedEditorState = {
   root: {
     type: 'root',
@@ -88,7 +86,6 @@ function createMockProvider(): LLMProvider {
       const lastUserMsg = [...messages].reverse().find((m) => m.role === 'user');
       const content = lastUserMsg && 'content' in lastUserMsg ? lastUserMsg.content : '';
 
-      // Simulate streaming delay
       await new Promise((r) => setTimeout(r, 300));
 
       if (content.toLowerCase().includes('delete')) {
@@ -133,14 +130,12 @@ function createMockProvider(): LLMProvider {
         };
         yield { type: 'done' };
 
-        // Second turn — done
         await new Promise((r) => setTimeout(r, 200));
         yield { type: 'text', text: 'Inserted a new paragraph at the top of the document.' };
         yield { type: 'done' };
         return;
       }
 
-      // Default: echo response
       const response = `I received your message: "${content}". I can help you edit the document. Try saying "insert a paragraph" or "delete" to see tool calling in action.`;
       for (const word of response.split(' ')) {
         yield { type: 'text', text: `${word} ` };
@@ -175,21 +170,17 @@ function AgentEditorWithChat({
   );
 
   return (
-    <div style={{ display: 'flex', gap: '16px', minHeight: '500px' }}>
-      <div style={{ flex: 1 }}>
-        <Panel title="Editor">
-          <MentionPlatformProvider platforms={{}}>
-            <ShiroEditor header={<ToolbarPlugin />} initialValue={initialContent}>
-              <AgentPanelPlugin provider={provider} store={store} />
-              <AgentLoopCapture loopRef={agentLoopRef} provider={provider} store={store} />
-            </ShiroEditor>
-          </MentionPlatformProvider>
-        </Panel>
+    <div className="agent-split">
+      <div className="agent-pane-editor">
+        <MentionPlatformProvider platforms={{}}>
+          <ShiroEditor header={<ToolbarPlugin />} initialValue={initialContent}>
+            <AgentPanelPlugin provider={provider} store={store} />
+            <AgentLoopCapture loopRef={agentLoopRef} provider={provider} store={store} />
+          </ShiroEditor>
+        </MentionPlatformProvider>
       </div>
-      <div style={{ width: '360px', minWidth: '360px' }}>
-        <Panel title="Agent Chat">
-          <ChatPanel store={store} onSend={handleSend} />
-        </Panel>
+      <div className="agent-pane-chat">
+        <ChatPanel store={store} onSend={handleSend} />
       </div>
     </div>
   );
@@ -213,17 +204,5 @@ export function AgentPage() {
   const store = useMemo(() => createAgentStore(), []);
   const provider = useMemo(() => createMockProvider(), []);
 
-  return (
-    <div className="page">
-      <div className="toolbar">
-        <div className="toolbar-group">
-          <span className="toolbar-label">AI Agent Extension Demo</span>
-          <span style={{ color: '#737373', fontSize: '13px' }}>
-            Mock LLM provider — try "insert a paragraph" in the chat
-          </span>
-        </div>
-      </div>
-      <AgentEditorWithChat provider={provider} store={store} />
-    </div>
-  );
+  return <AgentEditorWithChat provider={provider} store={store} />;
 }

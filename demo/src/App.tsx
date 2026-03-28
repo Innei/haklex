@@ -7,6 +7,7 @@ import type { ColorScheme } from '@haklex/rich-editor';
 import { DialogStackProvider } from '@haklex/rich-editor-ui';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { ThemeContext } from './context/ThemeContext';
 import { AgentPage } from './pages/AgentPage';
@@ -16,8 +17,16 @@ import { EditorPage } from './pages/EditorPage';
 import { NodeShowcase } from './pages/NodeShowcase';
 import { PresetsPage } from './pages/PresetsPage';
 
-type Page = 'editor' | 'comments' | 'nodes' | 'presets' | 'biz' | 'agent';
 type ThemeMode = 'system' | 'light' | 'dark';
+
+const navItems = [
+  { path: '/editor', label: 'Editor' },
+  { path: '/comments', label: 'Comments' },
+  { path: '/nodes', label: 'Node Showcase' },
+  { path: '/presets', label: 'Presets' },
+  { path: '/biz', label: 'Biz' },
+  { path: '/agent', label: 'AI Agent' },
+] as const;
 
 function useSystemColorScheme(): ColorScheme {
   const [scheme, setScheme] = useState<ColorScheme>(() =>
@@ -34,17 +43,8 @@ function useSystemColorScheme(): ColorScheme {
   return scheme;
 }
 
-export function App() {
-  const [currentPage, setCurrentPage] = useState<Page>(() => {
-    const hash = window.location.hash.slice(1) as Page;
-    return hash === 'comments' ||
-      hash === 'nodes' ||
-      hash === 'presets' ||
-      hash === 'biz' ||
-      hash === 'agent'
-      ? hash
-      : 'editor';
-  });
+function Layout() {
+  const location = useLocation();
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
   const systemScheme = useSystemColorScheme();
 
@@ -66,28 +66,6 @@ export function App() {
   const themeLabel = themeMode === 'system' ? 'System' : themeMode === 'light' ? 'Light' : 'Dark';
   const ThemeIcon = themeMode === 'system' ? Monitor : themeMode === 'light' ? Sun : Moon;
 
-  useEffect(() => {
-    const handleHashChange = () => {
-      const hash = window.location.hash.slice(1) as Page;
-      const validPage =
-        hash === 'comments' ||
-        hash === 'nodes' ||
-        hash === 'presets' ||
-        hash === 'biz' ||
-        hash === 'agent'
-          ? hash
-          : 'editor';
-      setCurrentPage(validPage);
-    };
-
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
-  }, []);
-
-  const navigate = (page: Page) => {
-    window.location.hash = page;
-  };
-
   return (
     <ThemeContext value={resolved}>
       <DialogStackProvider>
@@ -99,42 +77,17 @@ export function App() {
                 <p className="app-subtitle">Lexical-based rich text editor & renderer</p>
               </div>
               <nav className="app-nav">
-                <button
-                  className={currentPage === 'editor' ? 'nav-tab nav-tab-active' : 'nav-tab'}
-                  onClick={() => navigate('editor')}
-                >
-                  Editor
-                </button>
-                <button
-                  className={currentPage === 'comments' ? 'nav-tab nav-tab-active' : 'nav-tab'}
-                  onClick={() => navigate('comments')}
-                >
-                  Comments
-                </button>
-                <button
-                  className={currentPage === 'nodes' ? 'nav-tab nav-tab-active' : 'nav-tab'}
-                  onClick={() => navigate('nodes')}
-                >
-                  Node Showcase
-                </button>
-                <button
-                  className={currentPage === 'presets' ? 'nav-tab nav-tab-active' : 'nav-tab'}
-                  onClick={() => navigate('presets')}
-                >
-                  Presets
-                </button>
-                <button
-                  className={currentPage === 'biz' ? 'nav-tab nav-tab-active' : 'nav-tab'}
-                  onClick={() => navigate('biz')}
-                >
-                  Biz
-                </button>
-                <button
-                  className={currentPage === 'agent' ? 'nav-tab nav-tab-active' : 'nav-tab'}
-                  onClick={() => navigate('agent')}
-                >
-                  AI Agent
-                </button>
+                {navItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={
+                      location.pathname === item.path ? 'nav-tab nav-tab-active' : 'nav-tab'
+                    }
+                  >
+                    {item.label}
+                  </Link>
+                ))}
                 <div className="nav-divider" />
                 <button className="nav-theme-toggle" title={themeLabel} onClick={cycleTheme}>
                   <ThemeIcon size={18} />
@@ -144,15 +97,25 @@ export function App() {
           </header>
 
           <main className="app-main">
-            {currentPage === 'editor' && <EditorPage />}
-            {currentPage === 'comments' && <CommentsPage />}
-            {currentPage === 'nodes' && <NodeShowcase />}
-            {currentPage === 'presets' && <PresetsPage />}
-            {currentPage === 'biz' && <BizPage />}
-            {currentPage === 'agent' && <AgentPage />}
+            <Outlet />
           </main>
         </div>
       </DialogStackProvider>
     </ThemeContext>
   );
 }
+
+export const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      { path: '/editor', element: <EditorPage /> },
+      { path: '/comments', element: <CommentsPage /> },
+      { path: '/nodes', element: <NodeShowcase /> },
+      { path: '/presets', element: <PresetsPage /> },
+      { path: '/biz', element: <BizPage /> },
+      { path: '/agent', element: <AgentPage /> },
+      { path: '*', element: <Navigate replace to="/editor" /> },
+    ],
+  },
+]);
