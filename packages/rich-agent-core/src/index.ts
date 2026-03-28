@@ -1,3 +1,11 @@
+export {
+  acceptAllDiffs,
+  acceptDiff,
+  createDiffEngine,
+  rejectAllDiffs,
+  rejectDiff,
+} from './diff-engine';
+export { buildDocumentContext, buildMessages } from './pipeline';
 export type {
   AgentToolConfig,
   AgentToolResult,
@@ -10,6 +18,10 @@ export type {
   ToolError,
   ToolSchema,
 } from './protocol';
+export type { EditorSnapshot } from './snapshot';
+export { compareBlockContent, createSnapshot } from './snapshot';
+export type { AgentStore, AgentStoreAction, AgentStoreState, ChatBubble } from './store';
+export { createAgentStore } from './store';
 export type {
   AgentContext,
   AgentOperation,
