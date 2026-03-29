@@ -142,11 +142,30 @@ function Layout() {
           <main
             className="app-main"
             style={{
-              minHeight: `calc(100dvh - ${headerHeight}px)`,
-              paddingTop: `calc(${headerHeight}px + 24px)`,
+              bottom: 0,
+              left: 0,
+              margin: 0,
+              maxWidth: 'none',
+              overflowY: 'auto',
+              padding: 0,
+              position: 'fixed',
+              right: 0,
+              top: `${headerHeight}px`,
+              width: 'auto',
             }}
           >
-            <Outlet />
+            <div
+              style={{
+                boxSizing: 'border-box',
+                margin: '0 auto',
+                maxWidth: '1400px',
+                minHeight: '100%',
+                padding: '24px',
+                width: '100%',
+              }}
+            >
+              <Outlet />
+            </div>
           </main>
         </div>
       </DialogStackProvider>
