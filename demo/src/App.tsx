@@ -99,7 +99,11 @@ function Layout() {
           data-theme={dataTheme}
           style={{ ['--app-header-height' as string]: `${headerHeight}px` }}
         >
-          <header className="app-header" ref={headerRef}>
+          <header
+            className="app-header"
+            ref={headerRef}
+            style={{ left: 0, position: 'fixed', right: 0, top: 0 }}
+          >
             <div className="app-header-content">
               <div>
                 <h1 className="app-title">@haklex/rich-editor</h1>
@@ -127,7 +131,10 @@ function Layout() {
 
           <main
             className="app-main"
-            style={{ minHeight: `calc(100dvh - ${headerHeight}px)` }}
+            style={{
+              minHeight: `calc(100dvh - ${headerHeight}px)`,
+              paddingTop: `calc(${headerHeight}px + 24px)`,
+            }}
           >
             <Outlet />
           </main>
