@@ -1,15 +1,49 @@
-import { ChatPanel, getProviderFromModel } from '@haklex/rich-agent-chat';
+import type { ProviderConfig, SelectedModel } from '@haklex/rich-agent-chat';
+import { ChatPanel } from '@haklex/rich-agent-chat';
 import type { LLMProvider } from '@haklex/rich-agent-core';
 import { createAgentStore } from '@haklex/rich-agent-core';
 import { AgentPanelPlugin, builtInActions, useAgentLoop } from '@haklex/rich-ext-ai-agent';
 import { MentionPlatformProvider, ShiroEditor } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import type { SerializedEditorState } from 'lexical';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTheme } from '../context/ThemeContext';
 import { createClaudeProvider } from '../providers/claude-provider';
 import { createOpenAIProvider } from '../providers/openai-provider';
+
+const STORAGE_KEY_PROVIDERS = 'agent-providers';
+const STORAGE_KEY_MODEL = 'agent-selected-model';
+
+function loadProviders(): ProviderConfig[] {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_PROVIDERS);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveProviders(providers: ProviderConfig[]) {
+  localStorage.setItem(STORAGE_KEY_PROVIDERS, JSON.stringify(providers));
+}
+
+function loadSelectedModel(): SelectedModel | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY_MODEL);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSelectedModel(model: SelectedModel | null) {
+  if (model) {
+    localStorage.setItem(STORAGE_KEY_MODEL, JSON.stringify(model));
+  } else {
+    localStorage.removeItem(STORAGE_KEY_MODEL);
+  }
+}
 
 const initialContent: SerializedEditorState = {
   root: {
@@ -84,22 +118,43 @@ const initialContent: SerializedEditorState = {
   },
 } as any;
 
-function createProvider(model: string): LLMProvider {
-  const provider = getProviderFromModel(model);
-  return provider === 'claude' ? createClaudeProvider(model) : createOpenAIProvider(model);
-}
-
 function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentStore> }) {
   const theme = useTheme();
-  const [model, setModel] = useState('claude-sonnet-4-20250514');
-  const providerRef = useRef<LLMProvider>(createProvider(model));
+  const [providers, setProviders] = useState<ProviderConfig[]>(loadProviders);
+  const [selectedModel, setSelectedModel] = useState<SelectedModel | null>(loadSelectedModel);
+
+  const providerRef = useRef<LLMProvider | null>(null);
   const agentLoopRef = useRef<ReturnType<typeof useAgentLoop> | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const handleModelChange = useCallback((newModel: string) => {
-    setModel(newModel);
-    providerRef.current = createProvider(newModel);
-  }, []);
+  useEffect(() => {
+    if (!selectedModel) {
+      providerRef.current = null;
+      return;
+    }
+    const providerConfig = providers.find((p) => p.id === selectedModel.providerId);
+    if (!providerConfig) {
+      providerRef.current = null;
+      return;
+    }
+    const opts = {
+      model: selectedModel.modelId,
+      apiKey: providerConfig.apiKey,
+      baseUrl: providerConfig.baseUrl,
+    };
+    providerRef.current =
+      providerConfig.type === 'claude' ? createClaudeProvider(opts) : createOpenAIProvider(opts);
+  }, [selectedModel, providers]);
+
+  function handleProvidersChange(next: ProviderConfig[]) {
+    setProviders(next);
+    saveProviders(next);
+  }
+
+  function handleSelectModel(selected: SelectedModel) {
+    setSelectedModel(selected);
+    saveSelectedModel(selected);
+  }
 
   const handleSend = useCallback(
     (message: string) => {
@@ -135,18 +190,22 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
       <div className="agent-pane-editor">
         <MentionPlatformProvider platforms={{}}>
           <ShiroEditor header={<ToolbarPlugin />} initialValue={initialContent}>
-            <AgentPanelPlugin provider={providerRef.current} store={store} />
+            {providerRef.current && (
+              <AgentPanelPlugin provider={providerRef.current} store={store} />
+            )}
             <AgentLoopCapture loopRef={agentLoopRef} provider={providerRef.current} store={store} />
           </ShiroEditor>
         </MentionPlatformProvider>
       </div>
       <div className="agent-pane-chat" data-theme={theme}>
         <ChatPanel
-          model={model}
+          providers={providers}
+          selectedModel={selectedModel}
           store={store}
           onAbort={handleAbort}
-          onModelChange={handleModelChange}
+          onProvidersChange={handleProvidersChange}
           onRetry={handleRetry}
+          onSelectModel={handleSelectModel}
           onSend={handleSend}
         />
       </div>
@@ -155,6 +214,22 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
 }
 
 function AgentLoopCapture({
+  loopRef,
+  provider,
+  store,
+}: {
+  loopRef: React.RefObject<ReturnType<typeof useAgentLoop> | null>;
+  provider: LLMProvider | null;
+  store: ReturnType<typeof createAgentStore>;
+}) {
+  if (!provider) {
+    loopRef.current = null;
+    return null;
+  }
+  return <AgentLoopCaptureInner loopRef={loopRef} provider={provider} store={store} />;
+}
+
+function AgentLoopCaptureInner({
   loopRef,
   provider,
   store,
