@@ -183,7 +183,6 @@ const NAV_GROUPS = [
 const SECTION_IDS = NAV_GROUPS.flatMap((group) => group.items.map((item) => item.id));
 const ACTIVE_SIDEBAR_ITEM_STYLE = {
   background: vars.color.accentLight,
-  boxShadow: `inset 2px 0 0 ${vars.color.accent}`,
   color: vars.color.accent,
   fontWeight: 700,
 } as const;
