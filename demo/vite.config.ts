@@ -4,7 +4,7 @@ import path from 'node:path';
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import react from '@vitejs/plugin-react';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
-import type { Plugin } from 'vite';
+import type { Alias, Plugin } from 'vite';
 import { defineConfig } from 'vite';
 
 // Dev-only: resolve workspace style entry to source instead of dist output.
@@ -50,7 +50,6 @@ function workspaceCssPlugin(): Plugin {
 
   return {
     name: 'workspace-css-dev',
-    apply: 'serve',
     enforce: 'pre',
     resolveId(id, importer) {
       // style-renderer.css: plain CSS @import breaks HMR for upstream VE packages.
@@ -119,7 +118,39 @@ function workspaceCssPlugin(): Plugin {
   };
 }
 
-export default defineConfig({
+function workspaceBuildStyleAliases(): Alias[] {
+  const packagesDir = path.resolve(__dirname, '../packages');
+  const aliases: Alias[] = [];
+
+  for (const entry of readdirSync(packagesDir)) {
+    const pkgDir = path.resolve(packagesDir, entry);
+    const styleEntryCandidates = [
+      path.resolve(pkgDir, 'src/style.ts'),
+      path.resolve(pkgDir, 'src/styles-entry.ts'),
+      path.resolve(pkgDir, 'src/index.ts'),
+      path.resolve(pkgDir, 'src/index.tsx'),
+    ];
+    const styleEntry = styleEntryCandidates.find((candidate) => existsSync(candidate));
+    if (styleEntry) {
+      aliases.push({
+        find: `@haklex/${entry}/style.css`,
+        replacement: styleEntry,
+      });
+    }
+
+    const rendererStyleEntry = path.resolve(pkgDir, 'src/style-renderer.ts');
+    if (existsSync(rendererStyleEntry)) {
+      aliases.push({
+        find: `@haklex/${entry}/style-renderer.css`,
+        replacement: rendererStyleEntry,
+      });
+    }
+  }
+
+  return aliases;
+}
+
+export default defineConfig(({ command }) => ({
   plugins: [
     watchWorkspacePlugin(),
     workspaceCssPlugin(),
@@ -140,6 +171,7 @@ export default defineConfig({
     include: ['react-intersection-observer', 'react-photo-view', '@excalidraw/excalidraw'],
   },
   resolve: {
+    alias: command === 'build' ? workspaceBuildStyleAliases() : [],
     dedupe: [
       'lexical',
       '@lexical/code-core',
@@ -158,4 +190,4 @@ export default defineConfig({
       '@excalidraw/excalidraw',
     ],
   },
-});
+}));
