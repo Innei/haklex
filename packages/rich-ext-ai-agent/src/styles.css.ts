@@ -1,3 +1,4 @@
+import { vars } from '@haklex/rich-style-token';
 import { createVar, style } from '@vanilla-extract/css';
 
 export const diffInsertBg = createVar();
@@ -44,11 +45,18 @@ export const diffActions = style({
   gap: '4px',
 });
 
+export const diffMarker = style({
+  position: 'absolute',
+  left: '-20px',
+  fontWeight: 'bold',
+  color: vars.color.textTertiary,
+});
+
 export const actionBar = style({
   display: 'flex',
   gap: '8px',
   padding: '8px 12px',
-  borderBottom: '1px solid #e5e5e5',
+  borderBottom: `1px solid ${vars.color.border}`,
   alignItems: 'center',
   fontSize: '13px',
 });

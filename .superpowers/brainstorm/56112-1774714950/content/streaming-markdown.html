@@ -1,0 +1,61 @@
+<h2>Streaming Markdown 渲染策略</h2>
+<p class="subtitle">流式 Markdown 渲染有几种常见方案，各有取舍</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>基于 Lexical 的流式渲染</h3>
+      <p>复用项目已有的 Lexical 节点体系，流式 token 增量解析 Markdown → 插入 Lexical 节点。Chat bubble 本身即一个只读 Lexical editor。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>与 haklex 生态完全一致，复用现有 renderer</li>
+          <li>代码高亮、KaTeX 等扩展天然可用</li>
+          <li>未来可直接将 AI 输出插入编辑器</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>Lexical 编辑器实例开销（每条消息一个）</li>
+          <li>流式增量更新 Lexical state 较复杂</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>轻量 Markdown → HTML（react-markdown / marked）</h3>
+      <p>每次收到新 chunk 拼接完整文本，用 react-markdown 或 marked 重新渲染。简单直接。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>实现简单，成熟生态</li>
+          <li>无额外 Lexical 实例开销</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>每次 chunk 全量重渲染（可优化但有限）</li>
+          <li>与 haklex 节点体系割裂</li>
+          <li>代码高亮等需额外配置</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>混合：文本流用轻量方案，完成后转 Lexical</h3>
+      <p>流式阶段用简单 DOM 追加（带基础 Markdown 解析），流结束后将完整文本转为 Lexical state 渲染最终版。兼顾性能与一致性。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>流式阶段性能好，无 Lexical 开销</li>
+          <li>最终渲染与编辑器一致</li>
+          <li>过渡自然（流式→最终态）</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>两套渲染逻辑，流式→最终态有闪烁风险</li>
+          <li>实现量较大</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</div>

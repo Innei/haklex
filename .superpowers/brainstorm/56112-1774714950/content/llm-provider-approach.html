@@ -1,0 +1,59 @@
+<h2>LLM Provider 接入方案</h2>
+<p class="subtitle">Demo 中接入真实 Claude / OpenAI，须择其架构</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>纯前端直连（API Key in browser）</h3>
+      <p>用户在 demo UI 输入 API Key，前端直接调用 Claude/OpenAI API。无需后端。Key 仅存 localStorage，不落盘。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>零部署，纯静态 demo</li>
+          <li>实现最简，仅需 fetch + SSE 解析</li>
+          <li>与现有 mock provider 同构</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>API Key 暴露于浏览器（demo 场景可接受）</li>
+          <li>CORS：OpenAI 允许浏览器直连，Claude API 需 proxy 或 CORS header</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>轻量 proxy（Vite dev server middleware）</h3>
+      <p>Vite dev server 加一层 proxy middleware，前端 POST /api/chat → proxy 转发至 Claude/OpenAI。API Key 存 .env，不进浏览器。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>Key 不暴露于前端</li>
+          <li>无 CORS 问题，统一 proxy</li>
+          <li>可同时支持 Claude + OpenAI</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>仅 dev 模式可用，非纯静态</li>
+          <li>需写 proxy middleware（约 100 行）</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>混合方案（前端直连 + 可选 proxy）</h3>
+      <p>默认前端直连（用户填 Key），同时提供 Vite proxy 路径。UI 中可切换 provider 来源。适合不同测试场景。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>灵活，覆盖两种场景</li>
+          <li>Claude 走 proxy（解决 CORS），OpenAI 可直连</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>实现略复杂</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,14 +1,16 @@
 import { Select as SelectPrimitive } from '@base-ui/react/select';
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
 
 import { PortalThemeWrapper } from '../../index';
 import {
+  group,
   groupLabel,
   item,
   itemIndicator,
   popup,
   positioner,
+  scrollButton,
   separator,
   triggerButton,
   triggerIcon,
@@ -31,7 +33,7 @@ export function SelectTrigger({ children, className, ...props }: SelectTriggerPr
     >
       {children}
       <SelectPrimitive.Icon className={triggerIcon}>
-        <ChevronDown />
+        <ChevronDown size={16} />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -44,6 +46,7 @@ export function SelectValue(props: SelectValueProps): ReactElement {
 
 export type SelectContentProps = Omit<ComponentProps<typeof SelectPrimitive.Popup>, 'render'> & {
   align?: ComponentProps<typeof SelectPrimitive.Positioner>['align'];
+  alignItemWithTrigger?: ComponentProps<typeof SelectPrimitive.Positioner>['alignItemWithTrigger'];
   children?: ReactNode;
   className?: string;
   side?: ComponentProps<typeof SelectPrimitive.Positioner>['side'];
@@ -52,8 +55,9 @@ export type SelectContentProps = Omit<ComponentProps<typeof SelectPrimitive.Popu
 export function SelectContent({
   children,
   className,
-  align,
-  side,
+  align = 'center',
+  alignItemWithTrigger = true,
+  side = 'bottom',
   sideOffset = 4,
   ...props
 }: SelectContentProps): ReactElement {
@@ -62,6 +66,7 @@ export function SelectContent({
       <PortalThemeWrapper>
         <SelectPrimitive.Positioner
           align={align}
+          alignItemWithTrigger={alignItemWithTrigger}
           className={positioner}
           side={side}
           sideOffset={sideOffset}
@@ -70,7 +75,13 @@ export function SelectContent({
             {...props}
             className={`${popup}${className ? ` ${className}` : ''}`}
           >
-            {children}
+            <SelectPrimitive.ScrollUpArrow className={scrollButton}>
+              <ChevronUp size={16} />
+            </SelectPrimitive.ScrollUpArrow>
+            <SelectPrimitive.List>{children}</SelectPrimitive.List>
+            <SelectPrimitive.ScrollDownArrow className={scrollButton}>
+              <ChevronDown size={16} />
+            </SelectPrimitive.ScrollDownArrow>
           </SelectPrimitive.Popup>
         </SelectPrimitive.Positioner>
       </PortalThemeWrapper>
@@ -84,17 +95,21 @@ export type SelectItemProps = ComponentProps<typeof SelectPrimitive.Item> & {
 export function SelectItem({ className, children, ...props }: SelectItemProps): ReactElement {
   return (
     <SelectPrimitive.Item {...props} className={`${item}${className ? ` ${className}` : ''}`}>
-      <SelectPrimitive.ItemIndicator className={itemIndicator}>
-        <Check />
-      </SelectPrimitive.ItemIndicator>
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+      <SelectPrimitive.ItemIndicator className={itemIndicator}>
+        <Check size={16} />
+      </SelectPrimitive.ItemIndicator>
     </SelectPrimitive.Item>
   );
 }
 
-export type SelectGroupProps = ComponentProps<typeof SelectPrimitive.Group>;
-export function SelectGroup(props: SelectGroupProps): ReactElement {
-  return <SelectPrimitive.Group {...props} />;
+export type SelectGroupProps = ComponentProps<typeof SelectPrimitive.Group> & {
+  className?: string;
+};
+export function SelectGroup({ className, ...props }: SelectGroupProps): ReactElement {
+  return (
+    <SelectPrimitive.Group {...props} className={`${group}${className ? ` ${className}` : ''}`} />
+  );
 }
 
 export type SelectGroupLabelProps = ComponentProps<typeof SelectPrimitive.GroupLabel> & {

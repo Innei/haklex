@@ -17,9 +17,9 @@ export const actionBar = style({
   gap: '4px',
 });
 
-const transition = 'color 0.15s ease, background-color 0.15s ease';
+const transition = 'color 150ms ease, background-color 150ms ease';
 const transitionWithBorder =
-  'background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease';
+  'background-color 150ms ease, border-color 150ms ease, color 150ms ease';
 
 export const actionButton = recipe({
   base: {
@@ -32,7 +32,11 @@ export const actionButton = recipe({
     cursor: 'pointer',
     fontFamily: 'inherit',
     transition,
+    outline: 'none',
     selectors: {
+      '&:focus-visible': {
+        boxShadow: `0 0 0 2px ${vars.color.accentLight}`,
+      },
       '&:disabled': {
         opacity: 0.45,
         cursor: 'not-allowed',
@@ -60,7 +64,6 @@ export const actionButton = recipe({
         },
       },
       outline: {
-        borderColor: vars.color.border,
         background: vars.color.bg,
         color: vars.color.textSecondary,
         border: `1px solid ${vars.color.border}`,
@@ -77,7 +80,6 @@ export const actionButton = recipe({
         color: '#fff',
         selectors: {
           '&:hover:not(:disabled)': {
-            backgroundColor: vars.color.accent,
             filter: 'brightness(0.9)',
           },
           '&:disabled': {
@@ -94,11 +96,13 @@ export const actionButton = recipe({
         fontSize: vars.typography.fontSizeSm,
         fontWeight: 500,
         padding: '4px 8px',
-        borderRadius: vars.borderRadius.md,
+        borderRadius: vars.borderRadius.sm,
+        height: '24px',
         whiteSpace: 'nowrap',
       },
       md: {
-        fontSize: vars.typography.fontSizeXs,
+        gap: '6px',
+        fontSize: vars.typography.fontSizeSm,
         fontWeight: 500,
         padding: '4px 10px',
         borderRadius: vars.borderRadius.md,
@@ -107,12 +111,12 @@ export const actionButton = recipe({
         whiteSpace: 'nowrap',
       },
       lg: {
-        gap: '0.45rem',
-        fontSize: vars.typography.fontSizeXs,
+        gap: '8px',
+        fontSize: vars.typography.fontSizeSmall,
         fontWeight: 600,
-        padding: '0 0.875rem',
+        padding: '0 14px',
         borderRadius: vars.borderRadius.md,
-        height: 36,
+        height: '36px',
         whiteSpace: 'nowrap',
       },
     },

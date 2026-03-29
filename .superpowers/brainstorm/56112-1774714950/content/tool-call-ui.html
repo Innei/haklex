@@ -1,0 +1,82 @@
+<h2>Tool Call 可视化样式</h2>
+<p class="subtitle">工具调用过程在 chat 中如何呈现？</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>卡片式（参数可折叠）</h3>
+      <p>每个 tool call 独立卡片：工具名 + 状态图标，点击展开参数 JSON 与返回结果。</p>
+      <div class="mockup">
+        <div class="mockup-body" style="font-family: system-ui; font-size: 13px;">
+          <div style="border: 1px solid #e5e5e5; border-radius: 8px; margin: 8px 0; overflow: hidden;">
+            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: #fafafa;">
+              <span style="font-size: 14px;">🔍</span>
+              <code style="font-size: 12px; color: #525252;">search_document</code>
+              <span style="color: #22c55e; font-size: 11px; margin-left: auto;">✓ 完成</span>
+            </div>
+            <div style="padding: 8px 12px; border-top: 1px solid #e5e5e5; font-size: 11px;">
+              <div style="color: #737373; margin-bottom: 4px;">参数</div>
+              <pre style="background: #f5f5f5; padding: 6px; border-radius: 4px; margin: 0; font-size: 11px; overflow-x: auto;">{"query": "introduction paragraph", "type": "text"}</pre>
+              <div style="color: #737373; margin: 8px 0 4px;">结果</div>
+              <pre style="background: #f0fdf4; padding: 6px; border-radius: 4px; margin: 0; font-size: 11px; overflow-x: auto;">Found 2 blocks matching "introduction"</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>紧凑行内式</h3>
+      <p>一行展示：工具名 + 状态。不展示参数细节，hover 显示 tooltip。占空间最小。</p>
+      <div class="mockup">
+        <div class="mockup-body" style="font-family: system-ui; font-size: 13px;">
+          <div style="display: flex; align-items: center; gap: 6px; padding: 4px 0; color: #737373; font-size: 12px;">
+            <span style="width: 14px; height: 14px; border-radius: 50%; background: #22c55e; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 9px;">✓</span>
+            <code style="font-size: 11px;">search_document</code>
+            <span style="color: #a3a3a3;">→ Found 2 blocks</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px; padding: 4px 0; color: #737373; font-size: 12px;">
+            <span style="width: 14px; height: 14px; border-radius: 50%; background: #22c55e; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 9px;">✓</span>
+            <code style="font-size: 11px;">insert_node</code>
+            <span style="color: #a3a3a3;">→ Inserted code block</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>混合：紧凑行 + 可展开详情</h3>
+      <p>默认紧凑一行（工具名 + 状态 + 结果摘要），点击可展开完整参数与结果 JSON。</p>
+      <div class="mockup">
+        <div class="mockup-body" style="font-family: system-ui; font-size: 13px;">
+          <div style="padding: 4px 0;">
+            <div style="display: flex; align-items: center; gap: 6px; color: #737373; font-size: 12px; cursor: pointer;">
+              <span style="color: #a3a3a3;">▶</span>
+              <span style="width: 14px; height: 14px; border-radius: 50%; background: #22c55e; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 9px;">✓</span>
+              <code style="font-size: 11px;">search_document</code>
+              <span style="color: #a3a3a3;">→ Found 2 blocks</span>
+            </div>
+          </div>
+          <div style="padding: 4px 0;">
+            <div style="display: flex; align-items: center; gap: 6px; color: #737373; font-size: 12px;">
+              <span style="color: #a3a3a3;">▼</span>
+              <span style="width: 14px; height: 14px; border-radius: 50%; background: #22c55e; display: inline-flex; align-items: center; justify-content: center; color: white; font-size: 9px;">✓</span>
+              <code style="font-size: 11px;">insert_node</code>
+              <span style="color: #a3a3a3;">→ Inserted code block</span>
+            </div>
+            <div style="margin-left: 36px; margin-top: 4px; font-size: 11px;">
+              <pre style="background: #f5f5f5; padding: 6px; border-radius: 4px; margin: 0; overflow-x: auto;">{"position": "after", "targetId": "block_3", "content": "```js\nconsole.log('hello')\n```"}</pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<h2>rich-editor-ui 缺失组件分析</h2>
+<p class="subtitle">Chat UI 所需而现有包中未提供的基础组件</p>
+
+<div class="section">
+  <h3>现有组件（已可用）</h3>
+  <p style="color: #737373; font-size: 13px;">ActionButton, Dialog, Popover, Tooltip, DropdownMenu, Combobox, SegmentedControl, AnimatedTabs, Checkbox, ColorPicker, ViewportGate</p>
+</div>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="collapsible" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>Collapsible（折叠面板）</h3>
+      <p>Tool call 展开/收起、thinking block 展开详情。@base-ui/react 提供 Collapsible primitive。</p>
+      <p style="color: #737373; font-size: 12px;">用途：ToolCallBubble 参数展开、未来 thinking 可切换折叠</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="spinner" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>Spinner / LoadingIndicator</h3>
+      <p>Agent 状态指示、tool call loading 状态、streaming 中指示器。可设尺寸（sm/md）。</p>
+      <p style="color: #737373; font-size: 12px;">用途：StatusBar、ToolCallBubble loading 态、ChatInput 生成中</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="icon-button" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>IconButton（圆形图标按钮）</h3>
+      <p>Stop 按钮、Send 按钮、Accept/Reject 等。ActionButton icon 模式已有，但缺圆形变体和状态色（success/error/warning）。</p>
+      <p style="color: #737373; font-size: 12px;">用途：Stop generation、Send message、tool call 状态圆点</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="badge" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>Badge / Tag</h3>
+      <p>Tool 名称标签、状态标签（success/error/pending）、model 名称标识。</p>
+      <p style="color: #737373; font-size: 12px;">用途：tool call 工具名、error 类型标签、model indicator</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="select" onclick="toggleSelect(this)">
+    <div class="letter">5</div>
+    <div class="content">
+      <h3>Select（下拉选择）</h3>
+      <p>Model 选择器、Provider 切换。DropdownMenu 是菜单语义，Select 是表单语义。@base-ui/react 提供 Select primitive。</p>
+      <p style="color: #737373; font-size: 12px;">用途：ModelSelector（provider + model 二级选择）</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="textarea" onclick="toggleSelect(this)">
+    <div class="letter">6</div>
+    <div class="content">
+      <h3>AutoResizeTextArea</h3>
+      <p>Chat 输入框，自动扩展高度，max-rows 限制。ChatInput 中已有类似逻辑但未抽为组件。</p>
+      <p style="color: #737373; font-size: 12px;">用途：ChatInput 输入框</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="status-dot" onclick="toggleSelect(this)">
+    <div class="letter">7</div>
+    <div class="content">
+      <h3>StatusDot（状态圆点）</h3>
+      <p>Tool call 状态（绿/红/黄/灰）、agent 运行状态。小圆点 + 可选动画（pulse）。</p>
+      <p style="color: #737373; font-size: 12px;">用途：ToolCallBubble 状态指示、StatusBar 状态</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="code-block" onclick="toggleSelect(this)">
+    <div class="letter">8</div>
+    <div class="content">
+      <h3>CodeBlock（代码块）</h3>
+      <p>Streamdown components 覆写用。语法高亮 + copy 按钮 + 语言标签。独立于 Lexical CodeNode。</p>
+      <p style="color: #737373; font-size: 12px;">用途：Streamdown 中的代码块渲染</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="scroll-area" onclick="toggleSelect(this)">
+    <div class="letter">9</div>
+    <div class="content">
+      <h3>ScrollArea（自定义滚动条）</h3>
+      <p>Chat 消息列表滚动容器，自定义滚动条样式，auto-scroll-to-bottom。</p>
+      <p style="color: #737373; font-size: 12px;">用途：ChatMessageList 滚动容器</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="alert" onclick="toggleSelect(this)">
+    <div class="letter">10</div>
+    <div class="content">
+      <h3>Alert / InlineMessage</h3>
+      <p>错误提示 + 重试按钮。info/warning/error 三种变体。</p>
+      <p style="color: #737373; font-size: 12px;">用途：错误恢复 UI、rate limit 提示</p>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top: 24px;">可多选。亦可提出其他所需组件。</p>

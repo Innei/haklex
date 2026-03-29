@@ -2,7 +2,13 @@ import { ActionButton } from '@haklex/rich-editor-ui';
 import { Check, X } from 'lucide-react';
 import type { ReactElement } from 'react';
 
-import { diffActions, diffDeleteBlock, diffInsertBlock, diffReplaceOriginal } from '../styles.css';
+import {
+  diffActions,
+  diffDeleteBlock,
+  diffInsertBlock,
+  diffMarker,
+  diffReplaceOriginal,
+} from '../styles.css';
 
 interface AgentDiffEditRendererProps {
   diffEntryId: string;
@@ -29,9 +35,7 @@ export function AgentDiffEditRenderer({
 
   return (
     <div className={className} style={{ position: 'relative' }}>
-      <span style={{ position: 'absolute', left: '-20px', fontWeight: 'bold', color: '#737373' }}>
-        {marker}
-      </span>
+      <span className={diffMarker}>{marker}</span>
       <div className={diffActions}>
         <ActionButton title="Accept" onClick={() => onAccept?.(diffEntryId)}>
           <Check size={14} />

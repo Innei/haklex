@@ -1,0 +1,59 @@
+<h2>Thinking Block 呈现方式</h2>
+<p class="subtitle">Claude extended thinking 内容如何展示于 chat 中？</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>折叠面板（Collapsible）</h3>
+      <p>默认收起，显示 "思考中..." 或 "思考完成 (1.2s)"。点击展开查看推理全文。流式阶段显示 spinner + 已用时间。</p>
+      <div class="mockup">
+        <div class="mockup-body" style="font-family: system-ui; font-size: 13px;">
+          <div style="background: var(--bg-muted, #f5f5f5); border-radius: 8px; padding: 8px 12px; margin: 8px 0; cursor: pointer;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="color: #a3a3a3;">▶</span>
+              <span style="color: #737373;">思考中...</span>
+              <span style="color: #a3a3a3; font-size: 11px; margin-left: auto;">2.3s</span>
+            </div>
+          </div>
+          <div style="background: var(--bg-muted, #f5f5f5); border-radius: 8px; padding: 8px 12px; margin: 8px 0;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="color: #a3a3a3;">▼</span>
+              <span style="color: #737373;">思考完成</span>
+              <span style="color: #a3a3a3; font-size: 11px; margin-left: auto;">1.8s</span>
+            </div>
+            <div style="color: #737373; font-size: 12px; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e5e5;">
+              用户要求在段落后插入代码块。需要先搜索文档找到目标段落，然后使用 insert_node 在其后方插入...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>内联淡化文本</h3>
+      <p>思考内容以较浅颜色、较小字号直接显示在回复上方，不可折叠。简单但占空间。</p>
+      <div class="mockup">
+        <div class="mockup-body" style="font-family: system-ui; font-size: 13px;">
+          <div style="color: #a3a3a3; font-size: 11px; font-style: italic; margin: 8px 0; padding: 8px; border-left: 2px solid #e5e5e5;">
+            用户要求在段落后插入代码块。需要先搜索文档找到目标段落，然后使用 insert_node 在其后方插入...
+          </div>
+          <div style="margin: 8px 0;">
+            好的，我来帮你在段落后面插入一个代码块。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>仅状态指示，不展示内容</h3>
+      <p>流式阶段显示 "思考中..." + spinner，完成后直接显示回复。思考内容不暴露给用户。最简洁。</p>
+    </div>
+  </div>
+</div>

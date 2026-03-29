@@ -1,0 +1,68 @@
+<h2>Chat UI 元素清单</h2>
+<p class="subtitle">君欲于 agent chat 中呈现哪些 UI 元素？可多选。</p>
+
+<div class="options" data-multiselect>
+  <div class="option" data-choice="streaming-markdown" onclick="toggleSelect(this)">
+    <div class="letter">1</div>
+    <div class="content">
+      <h3>Streaming Markdown 渲染</h3>
+      <p>流式输出时实时渲染 Markdown（代码高亮、列表、链接等），而非纯文本追加。类似 ChatGPT/Claude 的打字效果。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="tool-call-ui" onclick="toggleSelect(this)">
+    <div class="letter">2</div>
+    <div class="content">
+      <h3>Tool Call 可视化</h3>
+      <p>展示 tool 调用过程：工具名、参数（可折叠 JSON）、执行状态（loading/success/error）、返回结果。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="thinking-block" onclick="toggleSelect(this)">
+    <div class="letter">3</div>
+    <div class="content">
+      <h3>Thinking / Reasoning 块</h3>
+      <p>Claude extended thinking 或 chain-of-thought 的折叠展示区，默认收起，可展开查看推理过程。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="user-intervention" onclick="toggleSelect(this)">
+    <div class="letter">4</div>
+    <div class="content">
+      <h3>用户干预控制</h3>
+      <p>Stop 按钮中断生成、tool call 执行前用户确认、diff 逐条 accept/reject（已有）。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="diff-inline" onclick="toggleSelect(this)">
+    <div class="letter">5</div>
+    <div class="content">
+      <h3>Diff 内联预览（Chat 侧）</h3>
+      <p>在 chat bubble 中直接展示代码/文档 diff，而非仅在编辑器侧标记。用户可在 chat 中快速审阅变更。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="status-indicator" onclick="toggleSelect(this)">
+    <div class="letter">6</div>
+    <div class="content">
+      <h3>Agent 状态指示</h3>
+      <p>顶部或底部状态栏：thinking → calling tool → writing → idle。带 spinner 动画。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="model-selector" onclick="toggleSelect(this)">
+    <div class="letter">7</div>
+    <div class="content">
+      <h3>Model / Provider 选择器</h3>
+      <p>下拉切换 Claude / OpenAI，选择具体 model（claude-sonnet-4-20250514, gpt-4o 等）。</p>
+    </div>
+  </div>
+
+  <div class="option" data-choice="error-recovery" onclick="toggleSelect(this)">
+    <div class="letter">8</div>
+    <div class="content">
+      <h3>错误恢复 UI</h3>
+      <p>API 错误、rate limit、网络断开时的友好提示 + 重试按钮。</p>
+    </div>
+  </div>
+</div>

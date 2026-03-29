@@ -1,0 +1,40 @@
+<h2>CodeBlock 语法高亮方案</h2>
+<p class="subtitle">独立 CodeBlock 组件用于 Streamdown 中的代码块渲染</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Shiki（@streamdown/code 已用）</h3>
+      <p>与 Streamdown 的 @streamdown/code 插件一致，Shiki 做高亮。高质量 TextMate 语法，主题丰富。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>与 Streamdown code plugin 天然兼容</li>
+          <li>高亮质量最佳（VS Code 级别）</li>
+          <li>支持主题自定义</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>WASM 加载，首次较重（~2MB）</li>
+          <li>需异步初始化</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>复用项目现有高亮方案</h3>
+      <p>haklex 编辑器中 CodeNode 已有语法高亮实现，直接复用其逻辑抽为独立组件。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>与编辑器风格一致</li>
+          <li>不引入新依赖</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>可能与 Lexical 耦合，需解耦</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</div>

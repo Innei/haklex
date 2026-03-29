@@ -137,12 +137,14 @@ createGlobalTheme(':root', vars, {
   ...articleLayout,
 })
 
-// :root dark fallback (for elements without a variant theme class)
-createGlobalTheme(':root.dark', vars, {
+// Global dark fallback (for elements without a variant theme class)
+const darkGlobalConfig = {
   color: darkColors,
   ...articleLayout,
   boxShadow: darkBoxShadow,
-})
+} as const
+createGlobalTheme(':root.dark', vars, darkGlobalConfig)
+createGlobalTheme('[data-theme="dark"]', vars, darkGlobalConfig)
 
 // Three variant theme classes (light colors only; dark handled by CSS override)
 export const articleTheme = createTheme(vars, {
@@ -160,15 +162,13 @@ export const commentTheme = createTheme(vars, {
   ...commentLayout,
 })
 
-// Dark override: ancestor .dark or [data-theme="dark"] overrides color and shadow vars
+// Per-variant dark override (higher specificity for variant-specific color tweaks)
 const darkColorOverrides = assignVars(vars.color, darkColors)
 const darkShadowOverrides = assignVars(vars.boxShadow, darkBoxShadow)
-
 for (const themeClass of [articleTheme, noteTheme, commentTheme]) {
   globalStyle(`.dark .${themeClass}, [data-theme="dark"] .${themeClass}`, {
     vars: { ...darkColorOverrides, ...darkShadowOverrides },
   })
-  // Also handle when the theme class is on the element itself (not a descendant)
   globalStyle(`.dark.${themeClass}, [data-theme="dark"].${themeClass}`, {
     vars: { ...darkColorOverrides, ...darkShadowOverrides },
   })

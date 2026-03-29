@@ -1,0 +1,40 @@
+<h2>Streamdown 集成方式</h2>
+<p class="subtitle">Streamdown 依赖 Tailwind CSS，haklex 用 Vanilla Extract。如何共存？</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>仅 demo 引入 Tailwind（隔离层）</h3>
+      <p>demo/ 工程独立加 Tailwind（仅用于 Streamdown），haklex packages 不受影响。Chat bubble 中 Streamdown 组件用 Tailwind 渲染，外部容器仍用 Vanilla Extract。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>haklex 包体不引入 Tailwind 依赖</li>
+          <li>demo 自由使用 Streamdown 全部功能</li>
+          <li>隔离清晰，不污染包</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>demo 中两套 CSS 方案共存</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>将 Streamdown 作为 rich-agent-chat 的可选 peer dependency</h3>
+      <p>rich-agent-chat 包提供 StreamdownBubble 组件，声明 streamdown 为 peerDependency。消费者自行决定是否引入。</p>
+      <div class="pros-cons">
+        <div class="pros"><h4>Pros</h4><ul>
+          <li>包级别可复用</li>
+          <li>不强制 Tailwind</li>
+        </ul></div>
+        <div class="cons"><h4>Cons</h4><ul>
+          <li>rich-agent-chat 需处理有/无 Streamdown 两种路径</li>
+          <li>Tailwind 与 Vanilla Extract 在包内混用</li>
+        </ul></div>
+      </div>
+    </div>
+  </div>
+</div>

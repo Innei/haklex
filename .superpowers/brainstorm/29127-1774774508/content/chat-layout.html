@@ -1,0 +1,120 @@
+<h2>ChatPanel 布局：ModelSelector + Settings</h2>
+<p class="subtitle">ModelSelector 移至 ChatInput 左下角，Settings 内嵌于 ModelSelector Popover</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Popover 分区式</h3>
+      <p>Popover 上半部为 model list（从 API fetch），下半部为分割线 + 齿轮图标「Provider Settings」入口，点击展开配置表单（API Key, Base URL）。配置与选模型在同一 popover 内切换。</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-header">ChatInput 区域</div>
+        <div class="mockup-body" style="background:#1a1a1a;color:#e5e5e5;padding:0;font-family:system-ui">
+          <!-- Chat input area -->
+          <div style="padding:10px 12px;border-bottom:1px solid #333;min-height:60px;color:#888;font-size:14px">
+            Type a message...
+          </div>
+          <!-- Bottom bar -->
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 8px">
+            <div style="position:relative">
+              <!-- Model button -->
+              <div style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:6px;background:#2a2a2a;border:1px solid #444;font-size:12px;color:#ccc;cursor:pointer">
+                <span style="color:#888">⬬</span> claude-sonnet-4
+                <span style="color:#666;font-size:10px">▼</span>
+              </div>
+              <!-- Popover -->
+              <div style="position:absolute;bottom:calc(100% + 6px);left:0;width:280px;background:#1e1e1e;border:1px solid #333;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.4);overflow:hidden">
+                <!-- Model list -->
+                <div style="padding:8px">
+                  <div style="font-size:11px;color:#666;padding:4px 8px;text-transform:uppercase">Models</div>
+                  <div style="padding:6px 8px;border-radius:6px;background:#333;color:#e5e5e5;font-size:13px;margin:2px 0">✓ claude-sonnet-4</div>
+                  <div style="padding:6px 8px;border-radius:6px;color:#aaa;font-size:13px;margin:2px 0">claude-opus-4</div>
+                  <div style="padding:6px 8px;border-radius:6px;color:#aaa;font-size:13px;margin:2px 0">gpt-4o</div>
+                </div>
+                <!-- Divider + Settings -->
+                <div style="border-top:1px solid #333;padding:6px 8px">
+                  <div style="display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:6px;color:#888;font-size:13px;cursor:pointer">
+                    <span>⚙</span> Provider Settings
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Send button -->
+            <div style="width:28px;height:28px;border-radius:8px;background:#555;display:flex;align-items:center;justify-content:center;color:#999;font-size:14px">↑</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Popover 标签页式</h3>
+      <p>Popover 顶部有两个 tab：「Models」和「Settings」。Models tab 显示 model list，Settings tab 显示 provider 配置表单。未配置时 Models tab 显示空状态提示。</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-header">Popover 内部 - Settings Tab</div>
+        <div class="mockup-body" style="background:#1e1e1e;color:#e5e5e5;padding:0;font-family:system-ui;width:280px">
+          <!-- Tabs -->
+          <div style="display:flex;border-bottom:1px solid #333">
+            <div style="flex:1;padding:8px 12px;font-size:12px;color:#666;text-align:center;cursor:pointer">Models</div>
+            <div style="flex:1;padding:8px 12px;font-size:12px;color:#e5e5e5;text-align:center;border-bottom:2px solid #e5e5e5">Settings</div>
+          </div>
+          <!-- Settings form -->
+          <div style="padding:12px">
+            <div style="margin-bottom:12px">
+              <div style="font-size:11px;color:#666;margin-bottom:4px">Provider</div>
+              <div style="padding:6px 8px;background:#2a2a2a;border:1px solid #444;border-radius:6px;font-size:13px;color:#ccc">OpenAI Compatible ▼</div>
+            </div>
+            <div style="margin-bottom:12px">
+              <div style="font-size:11px;color:#666;margin-bottom:4px">API Key</div>
+              <div style="padding:6px 8px;background:#2a2a2a;border:1px solid #444;border-radius:6px;font-size:13px;color:#555">sk-••••••••</div>
+            </div>
+            <div style="margin-bottom:12px">
+              <div style="font-size:11px;color:#666;margin-bottom:4px">Base URL</div>
+              <div style="padding:6px 8px;background:#2a2a2a;border:1px solid #444;border-radius:6px;font-size:13px;color:#888">https://api.openai.com/v1</div>
+            </div>
+            <div style="padding:6px 12px;background:#333;border-radius:6px;text-align:center;font-size:12px;color:#ccc;cursor:pointer">
+              Fetch Models
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>单层 Popover + 内联折叠</h3>
+      <p>Popover 默认显示 model list。底部有可折叠的配置区域（chevron toggle），展开后在同一 popover 内显示表单。最紧凑，无 tab 切换开销。</p>
+      <div class="mockup" style="margin-top:12px">
+        <div class="mockup-header">Popover - 配置区展开态</div>
+        <div class="mockup-body" style="background:#1e1e1e;color:#e5e5e5;padding:0;font-family:system-ui;width:280px">
+          <!-- Model list -->
+          <div style="padding:8px">
+            <div style="padding:6px 8px;border-radius:6px;background:#333;color:#e5e5e5;font-size:13px;margin:2px 0">✓ claude-sonnet-4</div>
+            <div style="padding:6px 8px;border-radius:6px;color:#aaa;font-size:13px;margin:2px 0">claude-opus-4</div>
+          </div>
+          <!-- Collapsible config -->
+          <div style="border-top:1px solid #333">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;cursor:pointer;color:#888;font-size:12px">
+              <span>⚙ Provider Config</span>
+              <span>▲</span>
+            </div>
+            <div style="padding:0 12px 12px">
+              <div style="margin-bottom:8px">
+                <div style="font-size:11px;color:#666;margin-bottom:3px">API Key</div>
+                <div style="padding:5px 8px;background:#2a2a2a;border:1px solid #444;border-radius:5px;font-size:12px;color:#555">sk-••••••••</div>
+              </div>
+              <div style="margin-bottom:8px">
+                <div style="font-size:11px;color:#666;margin-bottom:3px">Base URL</div>
+                <div style="padding:5px 8px;background:#2a2a2a;border:1px solid #444;border-radius:5px;font-size:12px;color:#888">https://api.anthropic.com</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
