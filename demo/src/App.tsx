@@ -91,6 +91,16 @@ function Layout() {
     };
   }, []);
 
+  useEffect(() => {
+    const previousBodyMargin = document.body.style.margin;
+
+    document.body.style.margin = '0';
+
+    return () => {
+      document.body.style.margin = previousBodyMargin;
+    };
+  }, []);
+
   return (
     <ThemeContext value={resolved}>
       <DialogStackProvider>
