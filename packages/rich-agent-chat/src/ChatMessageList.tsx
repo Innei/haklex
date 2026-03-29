@@ -14,42 +14,53 @@ interface ChatMessageListProps {
   onRetry?: () => void;
 }
 
-type MergedBubble =
-  | ChatBubble
-  | {
-      type: 'tool_call_merged';
-      toolName: string;
-      params: Record<string, unknown>;
-      result?: { success: boolean; summary: string };
-    };
+interface ToolCallItem {
+  name: string;
+  params: Record<string, unknown>;
+  result?: { success: boolean; summary: string };
+}
+
+type MergedBubble = ChatBubble | { type: 'tool_call_group'; items: ToolCallItem[] };
 
 function mergeBubbles(bubbles: ChatBubble[]): MergedBubble[] {
   const result: MergedBubble[] = [];
+  let currentGroup: ToolCallItem[] | null = null;
+
+  function flushGroup() {
+    if (currentGroup && currentGroup.length > 0) {
+      result.push({ type: 'tool_call_group', items: currentGroup });
+      currentGroup = null;
+    }
+  }
+
   for (let i = 0; i < bubbles.length; i++) {
     const b = bubbles[i];
+
     if (b.type === 'tool_call') {
+      if (!currentGroup) currentGroup = [];
       const next = bubbles[i + 1];
       if (next?.type === 'tool_result' && next.toolName === b.toolName) {
-        result.push({
-          type: 'tool_call_merged',
-          toolName: b.toolName,
+        currentGroup.push({
+          name: b.toolName,
           params: b.params,
           result: { success: next.success, summary: next.summary },
         });
-        i++;
+        i++; // skip tool_result
       } else {
-        result.push({
-          type: 'tool_call_merged',
-          toolName: b.toolName,
+        currentGroup.push({
+          name: b.toolName,
           params: b.params,
         });
       }
     } else if (b.type === 'tool_result') {
-      result.push(b);
+      // orphaned tool_result — skip
+      flushGroup();
     } else {
+      flushGroup();
       result.push(b);
     }
   }
+  flushGroup();
   return result;
 }
 
@@ -83,15 +94,8 @@ export function ChatMessageList({ bubbles, onRetry }: ChatMessageListProps): Rea
             );
           }
 
-          case 'tool_call_merged': {
-            return (
-              <ToolCallBubble
-                key={i}
-                name={item.toolName}
-                params={item.params}
-                result={item.result}
-              />
-            );
+          case 'tool_call_group': {
+            return <ToolCallBubble items={item.items} key={i} />;
           }
 
           case 'error': {
