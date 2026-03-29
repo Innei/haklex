@@ -1,11 +1,22 @@
 import type { ChatMessage, LLMChunk, LLMProvider, ToolSchema } from '@haklex/rich-agent-core';
 
-export function createClaudeProvider(model: string): LLMProvider {
+interface ProviderOptions {
+  apiKey: string;
+  baseUrl: string;
+  model: string;
+}
+
+export function createClaudeProvider({ model, apiKey, baseUrl }: ProviderOptions): LLMProvider {
   return {
     async *chat(messages: ChatMessage[], tools?: ToolSchema[]): AsyncIterable<LLMChunk> {
       const res = await fetch('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'x-base-url': baseUrl,
+          'x-provider-type': 'claude',
+        },
         body: JSON.stringify({ provider: 'claude', model, messages, tools }),
       });
 
