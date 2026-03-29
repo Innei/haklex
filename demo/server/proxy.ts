@@ -1,10 +1,68 @@
 import type { Plugin } from 'vite';
 
+function extractProviderHeaders(req: any): {
+  apiKey: string;
+  baseUrl: string;
+  providerType: 'claude' | 'openai-compatible';
+} {
+  const apiKey = req.headers['x-api-key'] as string;
+  const baseUrl = req.headers['x-base-url'] as string;
+  const providerType = req.headers['x-provider-type'] as 'claude' | 'openai-compatible';
+  return { apiKey, baseUrl, providerType };
+}
+
 export function apiProxyPlugin(): Plugin {
   return {
     name: 'api-proxy',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
+        if (req.url === '/api/models' && req.method === 'POST') {
+          const { apiKey, baseUrl, providerType } = extractProviderHeaders(req);
+
+          if (!apiKey || !baseUrl) {
+            res.writeHead(400, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ error: 'Missing x-api-key or x-base-url header' }));
+            return;
+          }
+
+          try {
+            let response: Response;
+            if (providerType === 'claude') {
+              response = await fetch(`${baseUrl}/v1/models`, {
+                headers: {
+                  'x-api-key': apiKey,
+                  'anthropic-version': '2023-06-01',
+                },
+              });
+            } else {
+              response = await fetch(`${baseUrl}/v1/models`, {
+                headers: {
+                  Authorization: `Bearer ${apiKey}`,
+                },
+              });
+            }
+
+            if (!response.ok) {
+              res.writeHead(response.status, { 'Content-Type': 'text/plain' });
+              res.end(await response.text());
+              return;
+            }
+
+            const data = await response.json();
+            const models = (data.data || []).map((m: any) => ({
+              id: m.id,
+              name: m.display_name || m.id,
+            }));
+
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify({ models }));
+          } catch (err: any) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end(err.message || 'Failed to fetch models');
+          }
+          return;
+        }
+
         if (req.method !== 'POST' || req.url !== '/api/chat') {
           return next();
         }
@@ -15,7 +73,6 @@ export function apiProxyPlugin(): Plugin {
         }
 
         let parsed: {
-          provider: 'claude' | 'openai';
           model: string;
           messages: any[];
           tools?: any[];
@@ -28,16 +85,19 @@ export function apiProxyPlugin(): Plugin {
           return;
         }
 
-        const { provider, model, messages, tools } = parsed;
+        const { apiKey, baseUrl, providerType } = extractProviderHeaders(req);
+
+        if (!apiKey) {
+          res.writeHead(400, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'Missing x-api-key header' }));
+          return;
+        }
 
         try {
-          if (provider === 'claude') {
-            await proxyClaude(res, model, messages, tools);
-          } else if (provider === 'openai') {
-            await proxyOpenAI(res, model, messages, tools);
+          if (providerType === 'claude') {
+            await proxyClaude(parsed, res, apiKey, baseUrl || 'https://api.anthropic.com');
           } else {
-            res.writeHead(400, { 'Content-Type': 'application/json' });
-            res.end(JSON.stringify({ error: `Unknown provider: ${provider}` }));
+            await proxyOpenAI(parsed, res, apiKey, baseUrl || 'https://api.openai.com');
           }
         } catch (err: any) {
           if (!res.headersSent) {
@@ -50,13 +110,8 @@ export function apiProxyPlugin(): Plugin {
   };
 }
 
-async function proxyClaude(res: any, model: string, messages: any[], tools?: any[]) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'ANTHROPIC_API_KEY not set' }));
-    return;
-  }
+async function proxyClaude(body: any, res: any, apiKey: string, baseUrl: string) {
+  const { model, messages, tools } = body;
 
   const systemMsgs = messages.filter((m: any) => m.role === 'system');
   const nonSystemMsgs = messages.filter((m: any) => m.role !== 'system');
@@ -113,7 +168,7 @@ async function proxyClaude(res: any, model: string, messages: any[], tools?: any
     claudeBody.thinking = { type: 'enabled', budget_tokens: 2048 };
   }
 
-  const upstream = await fetch('https://api.anthropic.com/v1/messages', {
+  const upstream = await fetch(`${baseUrl}/v1/messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -150,13 +205,8 @@ async function proxyClaude(res: any, model: string, messages: any[], tools?: any
   }
 }
 
-async function proxyOpenAI(res: any, model: string, messages: any[], tools?: any[]) {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    res.writeHead(500, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ error: 'OPENAI_API_KEY not set' }));
-    return;
-  }
+async function proxyOpenAI(body: any, res: any, apiKey: string, baseUrl: string) {
+  const { model, messages, tools } = body;
 
   const openaiMessages = messages.map((m: any) => {
     if (m.role === 'system') return { role: 'system', content: m.content };
@@ -197,7 +247,7 @@ async function proxyOpenAI(res: any, model: string, messages: any[], tools?: any
     openaiBody.tools = openaiTools;
   }
 
-  const upstream = await fetch('https://api.openai.com/v1/chat/completions', {
+  const upstream = await fetch(`${baseUrl}/v1/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
