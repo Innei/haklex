@@ -12,6 +12,9 @@ export const sidebar = style({
   position: 'sticky',
   top: 24,
   alignSelf: 'start',
+  height: 'calc(100dvh - 48px)',
+  minHeight: 0,
+  overflow: 'hidden',
 })
 
 export const sidebarInner = style({
@@ -19,6 +22,9 @@ export const sidebarInner = style({
   flexDirection: 'column',
   gap: 24,
   padding: 20,
+  height: '100%',
+  minHeight: 0,
+  overflowY: 'auto',
   borderRadius: vars.borderRadius.lg,
   background: vars.color.bg,
   border: `1px solid ${vars.color.border}`,
