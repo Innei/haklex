@@ -16,7 +16,7 @@ export const triggerButton = style({
   'fontFamily': 'inherit',
   'lineHeight': 1.4,
   ':hover': {
-    background: vars.color.bgQuaternary,
+    background: vars.color.bgTertiary,
   },
 });
 

@@ -135,7 +135,7 @@ export const actionButton = style({
   'flex': 1,
   'textAlign': 'center',
   ':hover': {
-    background: vars.color.bgQuaternary,
+    background: vars.color.bgTertiary,
   },
 });
 
