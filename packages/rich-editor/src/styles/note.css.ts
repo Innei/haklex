@@ -38,12 +38,9 @@ globalStyle(`${editorTopParagraph}:first-of-type, ${rendererTopParagraph}:first-
 // Instead of text-indent (which indents the entire first line including
 // inline decorators like mention/katex), apply margin on the first text
 // child only. If the paragraph starts with a decorator, no indent is added.
-globalStyle(
-  `${editorTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child`,
-  {
-    marginInlineStart: '2em',
-  },
-);
+globalStyle(`${editorTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child`, {
+  marginInlineStart: '2em',
+});
 
 // Keep the note lead-paragraph treatment while preserving the new indent rules.
 globalStyle(`${rendererTopParagraph}:first-of-type::first-letter`, {
@@ -149,25 +146,37 @@ globalStyle(`${note(sharedStyles.headingH6)} + *`, {
   marginTop: 0,
 });
 
-// ─── Blockquote (accent bg, no left border) ──────────────
+// ─── Blockquote (sticky-note style) ─────────────────────
 globalStyle(note(sharedStyles.quote), {
   fontStyle: 'normal',
-  lineHeight: '1.8',
-  color: 'inherit',
-  backgroundColor: `color-mix(in srgb, ${vars.color.accent} 10%, transparent)`,
+  lineHeight: '1.75',
+  color: `color-mix(in srgb, ${vars.color.accent} 60%, ${vars.color.text})`,
+  backgroundColor: `color-mix(in srgb, ${vars.color.accent} 12%, ${vars.color.bg})`,
   marginTop: '1.6em',
   marginBottom: '1.6em',
-  marginLeft: '-1rem',
-  marginRight: '-1rem',
-  paddingTop: '1em',
-  paddingBottom: '1em',
-  paddingLeft: '2em',
-  paddingRight: '2em',
-  borderRadius: 0,
+  marginLeft: 0,
+  marginRight: 0,
+  paddingTop: '1.2em',
+  paddingBottom: '1.2em',
+  paddingLeft: '1.5em',
+  paddingRight: '1.5em',
+  borderRadius: '2px',
+  boxShadow: '2px 3px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
+  transform: 'rotate(-0.6deg)',
+  textIndent: 0,
 });
 
 globalStyle(`${note(sharedStyles.quote)}::before`, {
-  display: 'none',
+  content: '""',
+  position: 'absolute',
+  top: 0,
+  left: '50%',
+  transform: 'translateX(-50%)',
+  width: '40px',
+  height: '12px',
+  background: `color-mix(in srgb, ${vars.color.accent} 15%, rgba(0,0,0,0.06))`,
+  borderRadius: '0 0 3px 3px',
+  bottom: 'auto',
 });
 
 globalStyle(note(`${sharedStyles.quote} ${sharedStyles.paragraph}:first-child::first-letter`), {
