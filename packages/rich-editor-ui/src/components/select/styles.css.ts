@@ -20,6 +20,13 @@ export const triggerButton = style({
   ':focus-visible': {
     borderColor: vars.color.accent,
   },
+  'selectors': {
+    '&[data-popup-open]': {
+      background: vars.color.fillQuaternary,
+      borderColor: vars.color.accent,
+      boxShadow: `0 0 0 3px ${vars.color.accentLight}`,
+    },
+  },
 });
 
 export const triggerIcon = style({
@@ -40,8 +47,8 @@ export const popup = style({
   borderRadius: vars.borderRadius.md,
   boxShadow: vars.boxShadow.menu,
   padding: '4px',
-  minWidth: '120px',
-  maxWidth: 'min(20rem, calc(100vw - 0.75rem))',
+  width: 'min(var(--anchor-width), calc(100vw - 0.75rem))',
+  maxWidth: 'calc(100vw - 0.75rem)',
   maxHeight: '240px',
   overflowY: 'auto',
   outline: 'none',
