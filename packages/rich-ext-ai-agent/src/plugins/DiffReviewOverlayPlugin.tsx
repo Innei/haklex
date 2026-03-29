@@ -1,31 +1,37 @@
-import type { AgentStore, ReviewEntry } from '@haklex/rich-agent-core';
+import type { AgentStore } from '@haklex/rich-agent-core';
+import { decorateSubtree, diffModifiedNode } from '@haklex/rich-diff-core';
 import { blockIdState } from '@haklex/rich-editor/plugins';
+import { RichRenderer } from '@haklex/rich-static-renderer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getRoot, $getState } from 'lexical';
+import { $getRoot, $getState, type SerializedLexicalNode } from 'lexical';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import {
   deleteOverlay,
-  ghostPreview,
+  diffPanel,
+  diffPanelDelete,
   insertMarker,
   overlayContainer,
   replaceOverlay,
 } from './diff-review-overlay.css';
 
-function extractText(node: any): string {
-  if (node.text) return node.text;
-  if (node.children) return node.children.map(extractText).join('');
-  return '';
+function getBlockId(node: SerializedLexicalNode): string | undefined {
+  return (node as any).$?.blockId as string | undefined;
 }
 
-function getPreviewText(entry: ReviewEntry): string {
-  const { op } = entry;
-  if (op.op === 'insert' || op.op === 'replace') {
-    return op.node ? extractText(op.node) : '';
-  }
-  return '';
+function wrapDoc(nodes: SerializedLexicalNode[]) {
+  return {
+    root: {
+      children: nodes,
+      direction: 'ltr' as const,
+      format: '' as const,
+      indent: 0,
+      type: 'root',
+      version: 1,
+    },
+  };
 }
 
 type OverlayEntry = {
@@ -33,7 +39,8 @@ type OverlayEntry = {
   type: 'insert' | 'delete' | 'replace';
   top: number;
   height: number;
-  previewText: string;
+  oldNode?: SerializedLexicalNode;
+  newNode?: SerializedLexicalNode;
 };
 
 export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): ReactElement | null {
@@ -65,6 +72,13 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       const children = root.getChildren();
 
       for (const batch of pendingBatches) {
+        const baseChildren = (batch.baseSnapshot.root as any).children as SerializedLexicalNode[];
+        const blockMap = new Map<string, SerializedLexicalNode>();
+        for (const c of baseChildren) {
+          const bid = getBlockId(c);
+          if (bid) blockMap.set(bid, c);
+        }
+
         for (const entry of batch.entries) {
           const blockId = entry.targetBlockId;
           if (!blockId) continue;
@@ -77,12 +91,20 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           if (!domEl) continue;
 
           const rect = domEl.getBoundingClientRect();
+          const oldNode = blockMap.get(blockId);
+
+          let newNode: SerializedLexicalNode | undefined;
+          if (entry.op.op === 'insert' || entry.op.op === 'replace') {
+            newNode = entry.op.node;
+          }
+
           entries.push({
             id: entry.id,
             type: entry.op.op as 'insert' | 'delete' | 'replace',
             top: rect.top - rootRect.top,
             height: rect.height,
-            previewText: getPreviewText(entry),
+            oldNode,
+            newNode,
           });
         }
       }
@@ -116,36 +138,49 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   return createPortal(
     <div className={overlayContainer}>
       {overlays.map((o) => {
-        if (o.type === 'delete') {
-          return (
-            <div className={deleteOverlay} key={o.id} style={{ top: o.top, height: o.height }} />
-          );
-        }
-
-        if (o.type === 'insert') {
+        if (o.type === 'delete' && o.oldNode) {
+          const decorated = decorateSubtree(o.oldNode, 'delete');
           return (
             <div key={o.id}>
-              <div className={insertMarker} style={{ top: o.top, height: 3 }} />
-              {o.previewText && (
-                <div className={ghostPreview} style={{ top: o.top + 3 }}>
-                  {o.previewText}
-                </div>
-              )}
+              <div className={deleteOverlay} style={{ top: o.top, height: o.height }} />
+              <div className={diffPanelDelete} style={{ top: o.top, height: o.height }}>
+                <RichRenderer value={wrapDoc([decorated])} />
+              </div>
             </div>
           );
         }
 
-        // replace
-        return (
-          <div key={o.id}>
-            <div className={replaceOverlay} style={{ top: o.top, height: o.height }} />
-            {o.previewText && (
-              <div className={ghostPreview} style={{ top: o.top + o.height }}>
-                {o.previewText}
+        if (o.type === 'insert' && o.newNode) {
+          const decorated = decorateSubtree(o.newNode, 'insert');
+          return (
+            <div key={o.id}>
+              <div className={insertMarker} style={{ top: o.top, height: 3 }} />
+              <div className={diffPanel} style={{ top: o.top + 3 }}>
+                <RichRenderer value={wrapDoc([decorated])} />
               </div>
-            )}
-          </div>
-        );
+            </div>
+          );
+        }
+
+        if (o.type === 'replace' && o.oldNode && o.newNode) {
+          const { oldNode: decoratedOld, newNode: decoratedNew } = diffModifiedNode(
+            o.oldNode,
+            o.newNode,
+          );
+          return (
+            <div key={o.id}>
+              <div className={replaceOverlay} style={{ top: o.top, height: o.height }} />
+              <div className={diffPanelDelete} style={{ top: o.top, height: o.height }}>
+                <RichRenderer value={wrapDoc([decoratedOld])} />
+              </div>
+              <div className={diffPanel} style={{ top: o.top + o.height }}>
+                <RichRenderer value={wrapDoc([decoratedNew])} />
+              </div>
+            </div>
+          );
+        }
+
+        return null;
       })}
     </div>,
     containerEl,

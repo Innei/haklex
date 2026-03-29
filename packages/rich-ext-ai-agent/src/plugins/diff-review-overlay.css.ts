@@ -37,18 +37,20 @@ export const replaceOverlay = style({
   pointerEvents: 'none',
 });
 
-export const ghostPreview = style({
+export const diffPanel = style({
   position: 'absolute',
   left: 0,
   right: 0,
-  padding: '4px 8px',
-  background: 'rgba(34, 197, 94, 0.08)',
-  borderLeft: '3px solid rgb(34, 197, 94)',
   pointerEvents: 'none',
-  fontSize: 'inherit',
-  lineHeight: 'inherit',
-  color: 'rgb(34, 197, 94)',
-  opacity: 0.85,
-  whiteSpace: 'pre-wrap',
-  wordBreak: 'break-word',
+  overflow: 'hidden',
+  borderLeft: '3px solid rgb(34, 197, 94)',
+  background: 'rgba(34, 197, 94, 0.04)',
+});
+
+export const diffPanelDelete = style({
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  pointerEvents: 'none',
+  overflow: 'hidden',
 });
