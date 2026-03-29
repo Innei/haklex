@@ -7,6 +7,7 @@ export const diffReviewRoot = style({
   borderRadius: 8,
   overflow: 'hidden',
   fontSize: '13px',
+  flexShrink: 0,
 });
 
 export const diffReviewHeader = style({

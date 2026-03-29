@@ -1,4 +1,4 @@
-import type { AgentStore } from '@haklex/rich-agent-core';
+import type { AgentStore, ReviewEntry } from '@haklex/rich-agent-core';
 import { blockIdState } from '@haklex/rich-editor/plugins';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getRoot, $getState } from 'lexical';
@@ -8,16 +8,32 @@ import { createPortal } from 'react-dom';
 
 import {
   deleteOverlay,
+  ghostPreview,
   insertMarker,
   overlayContainer,
   replaceOverlay,
 } from './diff-review-overlay.css';
+
+function extractText(node: any): string {
+  if (node.text) return node.text;
+  if (node.children) return node.children.map(extractText).join('');
+  return '';
+}
+
+function getPreviewText(entry: ReviewEntry): string {
+  const { op } = entry;
+  if (op.op === 'insert' || op.op === 'replace') {
+    return op.node ? extractText(op.node) : '';
+  }
+  return '';
+}
 
 type OverlayEntry = {
   id: string;
   type: 'insert' | 'delete' | 'replace';
   top: number;
   height: number;
+  previewText: string;
 };
 
 export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): ReactElement | null {
@@ -66,6 +82,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
             type: entry.op.op as 'insert' | 'delete' | 'replace',
             top: rect.top - rootRect.top,
             height: rect.height,
+            previewText: getPreviewText(entry),
           });
         }
       }
@@ -99,17 +116,35 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   return createPortal(
     <div className={overlayContainer}>
       {overlays.map((o) => {
-        const cls =
-          o.type === 'delete' ? deleteOverlay : o.type === 'insert' ? insertMarker : replaceOverlay;
+        if (o.type === 'delete') {
+          return (
+            <div className={deleteOverlay} key={o.id} style={{ top: o.top, height: o.height }} />
+          );
+        }
+
+        if (o.type === 'insert') {
+          return (
+            <div key={o.id}>
+              <div className={insertMarker} style={{ top: o.top, height: 3 }} />
+              {o.previewText && (
+                <div className={ghostPreview} style={{ top: o.top + 3 }}>
+                  {o.previewText}
+                </div>
+              )}
+            </div>
+          );
+        }
+
+        // replace
         return (
-          <div
-            className={cls}
-            key={o.id}
-            style={{
-              top: o.top,
-              height: o.type === 'insert' ? 3 : o.height,
-            }}
-          />
+          <div key={o.id}>
+            <div className={replaceOverlay} style={{ top: o.top, height: o.height }} />
+            {o.previewText && (
+              <div className={ghostPreview} style={{ top: o.top + o.height }}>
+                {o.previewText}
+              </div>
+            )}
+          </div>
         );
       })}
     </div>,

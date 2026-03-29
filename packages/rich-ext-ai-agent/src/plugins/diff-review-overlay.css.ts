@@ -23,7 +23,6 @@ export const insertMarker = style({
   position: 'absolute',
   left: 0,
   right: 0,
-  height: 3,
   background: 'rgb(34, 197, 94)',
   pointerEvents: 'none',
   borderRadius: 1,
@@ -36,4 +35,20 @@ export const replaceOverlay = style({
   background: 'rgba(239, 68, 68, 0.08)',
   borderLeft: '3px solid rgb(239, 68, 68)',
   pointerEvents: 'none',
+});
+
+export const ghostPreview = style({
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  padding: '4px 8px',
+  background: 'rgba(34, 197, 94, 0.08)',
+  borderLeft: '3px solid rgb(34, 197, 94)',
+  pointerEvents: 'none',
+  fontSize: 'inherit',
+  lineHeight: 'inherit',
+  color: 'rgb(34, 197, 94)',
+  opacity: 0.85,
+  whiteSpace: 'pre-wrap',
+  wordBreak: 'break-word',
 });
