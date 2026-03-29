@@ -4,7 +4,7 @@ import {
   createGlobalThemeContract,
   createTheme,
   globalStyle,
-} from '@vanilla-extract/css'
+} from '@vanilla-extract/css';
 
 import {
   articleLayout,
@@ -14,33 +14,33 @@ import {
   lightArticleColors,
   lightCommentColors,
   noteLayout,
-} from './themes'
+} from './themes';
 
 export const vars = createGlobalThemeContract({
   color: {
     /** 默认值: '#000' */
     text: 'rc-text',
-    /** 默认值: '#27272a' */
+    /** 默认值: '#262626' */
     textSecondary: 'rc-text-secondary',
-    /** 默认值: '#71717a' */
+    /** 默认值: '#737373' */
     textTertiary: 'rc-text-tertiary',
-    /** 默认值: '#a1a1aa' */
+    /** 默认值: '#a3a3a3' */
     textQuaternary: 'rc-text-quaternary',
     /** 默认值: '#ffffff' */
     bg: 'rc-bg',
     /** 默认值: '#fafafa' */
     bgSecondary: 'rc-bg-secondary',
-    /** 默认值: '#f4f4f5' */
+    /** 默认值: '#f5f5f5' */
     bgTertiary: 'rc-bg-tertiary',
-    /** 默认值: '#e8e8ec' — 交互态填充色 1 (list selected/hover) */
+    /** 默认值: '#e8e8e8' — 交互态填充色 1 (list selected/hover) */
     fill: 'rc-fill',
-    /** 默认值: '#eeeeef' — 交互态填充色 2 (button hover) */
+    /** 默认值: '#eeeeee' — 交互态填充色 2 (button hover) */
     fillSecondary: 'rc-fill-secondary',
-    /** 默认值: '#f4f4f6' — 交互态填充色 3 (large area hover) */
+    /** 默认值: '#f5f5f5' — 交互态填充色 3 (large area hover) */
     fillTertiary: 'rc-fill-tertiary',
-    /** 默认值: '#f9f9fa' — 交互态填充色 4 (most subtle) */
+    /** 默认值: '#fafafa' — 交互态填充色 4 (most subtle) */
     fillQuaternary: 'rc-fill-quaternary',
-    /** 默认值: '#f4f4f5' */
+    /** 默认值: '#f5f5f5' */
     border: 'rc-border',
     /** 默认值: '#2563eb' */
     accent: 'rc-accent',
@@ -48,15 +48,15 @@ export const vars = createGlobalThemeContract({
     accentLight: 'rc-accent-light',
     /** 默认值: '#2563eb' */
     link: 'rc-link',
-    /** 默认值: '#3f3f46' */
+    /** 默认值: '#404040' */
     codeText: 'rc-code-text',
-    /** 默认值: '#f4f4f5' */
+    /** 默认值: '#f5f5f5' */
     codeBg: 'rc-code-bg',
-    /** 默认值: '#e4e4e7' */
+    /** 默认值: '#e5e5e5' */
     hrBorder: 'rc-hr-border',
     /** 默认值: '#2563eb' */
     quoteBorder: 'rc-quote-border',
-    /** 默认值: '#eff6ff' */
+    /** 默认值: '#f5f5f5' */
     quoteBg: 'rc-quote-bg',
     /** 默认值: '#006bb7' */
     alertInfo: 'rc-alert-info',
@@ -129,47 +129,47 @@ export const vars = createGlobalThemeContract({
     /** 默认值: '0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.08)' */
     menu: 'rc-shadow-menu',
   },
-})
+});
 
 // :root default (light article)
 createGlobalTheme(':root', vars, {
   color: lightArticleColors,
   ...articleLayout,
-})
+});
 
 // Global dark fallback (for elements without a variant theme class)
 const darkGlobalConfig = {
   color: darkColors,
   ...articleLayout,
   boxShadow: darkBoxShadow,
-} as const
-createGlobalTheme(':root.dark', vars, darkGlobalConfig)
-createGlobalTheme('[data-theme="dark"]', vars, darkGlobalConfig)
+} as const;
+createGlobalTheme(':root.dark', vars, darkGlobalConfig);
+createGlobalTheme('[data-theme="dark"]', vars, darkGlobalConfig);
 
 // Three variant theme classes (light colors only; dark handled by CSS override)
 export const articleTheme = createTheme(vars, {
   color: lightArticleColors,
   ...articleLayout,
-})
+});
 
 export const noteTheme = createTheme(vars, {
   color: lightArticleColors,
   ...noteLayout,
-})
+});
 
 export const commentTheme = createTheme(vars, {
   color: lightCommentColors,
   ...commentLayout,
-})
+});
 
 // Per-variant dark override (higher specificity for variant-specific color tweaks)
-const darkColorOverrides = assignVars(vars.color, darkColors)
-const darkShadowOverrides = assignVars(vars.boxShadow, darkBoxShadow)
+const darkColorOverrides = assignVars(vars.color, darkColors);
+const darkShadowOverrides = assignVars(vars.boxShadow, darkBoxShadow);
 for (const themeClass of [articleTheme, noteTheme, commentTheme]) {
   globalStyle(`.dark .${themeClass}, [data-theme="dark"] .${themeClass}`, {
     vars: { ...darkColorOverrides, ...darkShadowOverrides },
-  })
+  });
   globalStyle(`.dark.${themeClass}, [data-theme="dark"].${themeClass}`, {
     vars: { ...darkColorOverrides, ...darkShadowOverrides },
-  })
+  });
 }

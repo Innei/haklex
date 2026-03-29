@@ -7,28 +7,28 @@ export const fonts = {
     '"SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace',
 };
 
-// Zinc palette (aligned with web app) + blue accent
+// Neutral palette (Tailwind neutral) + blue accent
 export const lightArticleColors = {
   text: '#000',
-  textSecondary: '#27272a', // zinc-800
-  textTertiary: '#71717a', // zinc-500
-  textQuaternary: '#a1a1aa', // zinc-400
+  textSecondary: '#262626', // neutral-800
+  textTertiary: '#737373', // neutral-500
+  textQuaternary: '#a3a3a3', // neutral-400
   bg: '#ffffff',
-  bgSecondary: '#fafafa', // zinc-50
-  bgTertiary: '#f4f4f5', // zinc-100
-  fill: '#e8e8ec', // interactive fill 1 — list item selected/hover
-  fillSecondary: '#eeeeef', // interactive fill 2 — button/control hover
-  fillTertiary: '#f4f4f6', // interactive fill 3 — large area hover (card, table row)
-  fillQuaternary: '#f9f9fa', // interactive fill 4 — most subtle feedback
-  border: '#f4f4f5', // zinc-100 - lighter, less prominent
+  bgSecondary: '#fafafa', // neutral-50
+  bgTertiary: '#f5f5f5', // neutral-100
+  fill: '#e8e8e8', // interactive fill 1 — list item selected/hover
+  fillSecondary: '#eeeeee', // interactive fill 2 — button/control hover
+  fillTertiary: '#f5f5f5', // interactive fill 3 — large area hover (card, table row)
+  fillQuaternary: '#fafafa', // interactive fill 4 — most subtle feedback
+  border: '#f5f5f5', // neutral-100 - lighter, less prominent
   accent: '#2563eb',
   accentLight: '#2563eb20',
   link: '#2563eb',
-  codeText: '#3f3f46', // zinc-700
-  codeBg: '#f4f4f5', // zinc-100
-  hrBorder: '#e4e4e7', // zinc-200 - one step darker than border
+  codeText: '#404040', // neutral-700
+  codeBg: '#f5f5f5', // neutral-100
+  hrBorder: '#e5e5e5', // neutral-200 - one step darker than border
   quoteBorder: '#2563eb',
-  quoteBg: '#eff6ff',
+  quoteBg: '#f5f5f5', // neutral-100
   alertInfo: '#006bb7',
   alertWarning: '#cc5500',
   alertTip: '#11cc00',
@@ -38,31 +38,31 @@ export const lightArticleColors = {
 
 export const lightCommentColors = {
   ...lightArticleColors,
-  quoteBorder: '#a1a1aa', // zinc-400
-  quoteBg: '#fafafa', // zinc-50
+  quoteBorder: '#a3a3a3', // neutral-400
+  quoteBg: '#fafafa', // neutral-50
 };
 
 export const darkColors = {
   text: '#fafafa',
-  textSecondary: '#a1a1aa', // zinc-400
-  textTertiary: '#71717a', // zinc-500
-  textQuaternary: '#52525b', // zinc-600
-  bg: '#09090b', // zinc-950
-  bgSecondary: '#18181b', // zinc-900
-  bgTertiary: '#27272a', // zinc-800
-  fill: '#2a2a2f', // interactive fill 1 — list item selected/hover
-  fillSecondary: '#222226', // interactive fill 2 — button/control hover
-  fillTertiary: '#1b1b1f', // interactive fill 3 — large area hover
-  fillQuaternary: '#131316', // interactive fill 4 — most subtle feedback
-  border: '#27272a', // zinc-800 - lighter/less prominent
+  textSecondary: '#a3a3a3', // neutral-400
+  textTertiary: '#737373', // neutral-500
+  textQuaternary: '#525252', // neutral-600
+  bg: '#0a0a0a', // neutral-950
+  bgSecondary: '#171717', // neutral-900
+  bgTertiary: '#262626', // neutral-800
+  fill: '#2a2a2a', // interactive fill 1 — list item selected/hover
+  fillSecondary: '#222222', // interactive fill 2 — button/control hover
+  fillTertiary: '#1a1a1a', // interactive fill 3 — large area hover
+  fillQuaternary: '#141414', // interactive fill 4 — most subtle feedback
+  border: '#262626', // neutral-800 - lighter/less prominent
   accent: '#60a5fa',
   accentLight: '#60a5fa20',
   link: '#60a5fa',
-  codeText: '#e4e4e7', // zinc-200
-  codeBg: '#27272a', // zinc-800
-  hrBorder: '#27272a', // zinc-800 - same as border
+  codeText: '#d4d4d4', // neutral-300
+  codeBg: '#262626', // neutral-800
+  hrBorder: '#262626', // neutral-800 - same as border
   quoteBorder: '#60a5fa',
-  quoteBg: '#1e3a5f',
+  quoteBg: '#262626', // neutral-800
   alertInfo: '#7db9e5',
   alertWarning: '#da864a',
   alertTip: '#54da48',

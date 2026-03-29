@@ -224,11 +224,11 @@ function buildTheme(bg: string, fg: string): MermaidThemeConfig {
   };
 }
 
-// Zinc Light: clean white bg with dark neutral fg
-export const lightTheme = buildTheme('#ffffff', '#27272a');
+// Neutral light: white bg, neutral-800 fg
+export const lightTheme = buildTheme('#ffffff', '#262626');
 
-// Zinc Dark: dark bg with near-white fg
-export const darkTheme = buildTheme('#18181b', '#fafafa');
+// Neutral dark: neutral-900 bg, near-white fg
+export const darkTheme = buildTheme('#171717', '#fafafa');
 
-export const lightTokens = deriveTokens('#ffffff', '#27272a');
-export const darkTokens = deriveTokens('#18181b', '#fafafa');
+export const lightTokens = deriveTokens('#ffffff', '#262626');
+export const darkTokens = deriveTokens('#171717', '#fafafa');

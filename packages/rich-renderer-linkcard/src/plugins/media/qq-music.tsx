@@ -1,12 +1,12 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token';
 
 import type {
   LinkCardData,
   LinkCardFetchContext,
   LinkCardPlugin,
   UrlMatchResult,
-} from '../../types'
-import { fetchJsonWithContext } from '../../utils'
+} from '../../types';
+import { fetchJsonWithContext } from '../../utils';
 
 export const qqMusicPlugin: LinkCardPlugin = {
   name: 'qq-music-song',
@@ -16,16 +16,16 @@ export const qqMusicPlugin: LinkCardPlugin = {
   provider: 'qq-music',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'y.qq.com') return null
-    if (!url.pathname.includes('/songDetail/')) return null
-    const parts = url.pathname.split('/')
-    const songDetailIndex = parts.indexOf('songDetail')
-    if (songDetailIndex === -1 || !parts[songDetailIndex + 1]) return null
-    return { id: parts[songDetailIndex + 1], fullUrl: url.toString() }
+    if (url.hostname !== 'y.qq.com') return null;
+    if (!url.pathname.includes('/songDetail/')) return null;
+    const parts = url.pathname.split('/');
+    const songDetailIndex = parts.indexOf('songDetail');
+    if (songDetailIndex === -1 || !parts[songDetailIndex + 1]) return null;
+    return { id: parts[songDetailIndex + 1], fullUrl: url.toString() };
   },
 
   isValidId(id: string): boolean {
-    return typeof id === 'string' && id.length > 0
+    return typeof id === 'string' && id.length > 0;
   },
 
   async fetch(
@@ -33,14 +33,10 @@ export const qqMusicPlugin: LinkCardPlugin = {
     _meta?: Record<string, unknown>,
     context?: LinkCardFetchContext,
   ): Promise<LinkCardData> {
-    const songData = await fetchJsonWithContext(
-      `https://y.qq.com/song/${id}`,
-      context,
-      'qq-music',
-    )
+    const songData = await fetchJsonWithContext(`https://y.qq.com/song/${id}`, context, 'qq-music');
 
-    const songInfo = songData.data[0]
-    const albumId = songInfo.album.mid
+    const songInfo = songData.data[0];
+    const albumId = songInfo.album.mid;
 
     return {
       title: (
@@ -51,7 +47,7 @@ export const qqMusicPlugin: LinkCardPlugin = {
               style={{
                 marginLeft: '8px',
                 fontSize: vars.typography.fontSizeMd,
-                color: '#a1a1aa',
+                color: '#a3a3a3',
               }}
             >
               {songInfo.subtitle}
@@ -73,6 +69,6 @@ export const qqMusicPlugin: LinkCardPlugin = {
       ),
       image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${albumId}.jpg?max_age=2592000`,
       color: '#31c27c',
-    }
+    };
   },
-}
+};

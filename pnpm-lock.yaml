@@ -539,12 +539,18 @@ importers:
       '@haklex/rich-agent-core':
         specifier: workspace:*
         version: link:../rich-agent-core
+      '@haklex/rich-diff-core':
+        specifier: workspace:*
+        version: link:../rich-diff-core
       '@haklex/rich-editor':
         specifier: workspace:*
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
         specifier: workspace:*
         version: link:../rich-editor-ui
+      '@haklex/rich-static-renderer':
+        specifier: workspace:*
+        version: link:../rich-static-renderer
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../rich-style-token

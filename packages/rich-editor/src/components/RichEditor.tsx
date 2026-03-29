@@ -1,4 +1,5 @@
 import { allEditNodes } from '../config-edit';
+import { ExtraNodesProvider } from '../context/ExtraNodesContext';
 import { ImageUploadProvider } from '../context/ImageUploadContext';
 import { AlertPlugin } from '../plugins/AlertPlugin';
 import { BlockIdPlugin } from '../plugins/BlockIdPlugin';
@@ -17,17 +18,19 @@ export function RichEditor({ extraNodes, imageUpload, children, ...shellProps }:
 
   return (
     <ImageUploadProvider upload={resolvedImageUpload}>
-      <RichEditorShell nodes={nodes} {...shellProps}>
-        <CorePlugins />
-        <ImagePlugin />
-        <ImageUploadPlugin onUpload={resolvedImageUpload} />
-        <KaTeXPlugin />
-        <AlertPlugin />
-        <MermaidPlugin />
-        <LinkFaviconPlugin />
-        <BlockIdPlugin />
-        {children}
-      </RichEditorShell>
+      <ExtraNodesProvider extraNodes={extraNodes}>
+        <RichEditorShell nodes={nodes} {...shellProps}>
+          <CorePlugins />
+          <ImagePlugin />
+          <ImageUploadPlugin onUpload={resolvedImageUpload} />
+          <KaTeXPlugin />
+          <AlertPlugin />
+          <MermaidPlugin />
+          <LinkFaviconPlugin />
+          <BlockIdPlugin />
+          {children}
+        </RichEditorShell>
+      </ExtraNodesProvider>
     </ImageUploadProvider>
   );
 }

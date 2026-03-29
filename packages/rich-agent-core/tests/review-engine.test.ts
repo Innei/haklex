@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { applyOpsToSnapshot } from '../src/review-engine';
+import { applyOpsToSnapshot, createReviewBatch } from '../src/review-engine';
 import type { AgentOperation } from '../src/types';
 
 function makeDoc(children: any[]) {
@@ -83,5 +83,62 @@ describe('applyOpsToSnapshot', () => {
     expect(children).toHaveLength(2);
     expect(children[0].children[0].text).toBe('World');
     expect(children[1].children[0].text).toBe('New');
+  });
+});
+
+describe('createReviewBatch', () => {
+  const base = makeDoc([makeParagraph('Hello', 'b1'), makeParagraph('World', 'b2')]);
+
+  it('captures an anchor after the insertion point for root prepends', () => {
+    const ops: AgentOperation[] = [
+      {
+        op: 'insert',
+        position: { type: 'root', index: 0 },
+        node: makeParagraph('Intro', 'b0') as any,
+      },
+    ];
+
+    const batch = createReviewBatch(ops, base, 3);
+    const [entry] = batch.entries;
+
+    expect(entry.anchorBeforeId).toBeUndefined();
+    expect(entry.anchorAfterId).toBe('b1');
+    expect(entry.targetBlockId).toBe('b1');
+    expect(batch.touchedBlockIds).toEqual(['b1']);
+  });
+
+  it('captures an anchor before the insertion point for root appends', () => {
+    const ops: AgentOperation[] = [
+      {
+        op: 'insert',
+        position: { type: 'root', index: 99 },
+        node: makeParagraph('Outro', 'b3') as any,
+      },
+    ];
+
+    const batch = createReviewBatch(ops, base, 3);
+    const [entry] = batch.entries;
+
+    expect(entry.anchorBeforeId).toBe('b2');
+    expect(entry.anchorAfterId).toBeUndefined();
+    expect(entry.targetBlockId).toBe('b2');
+    expect(batch.touchedBlockIds).toEqual(['b2']);
+  });
+
+  it('captures both adjacent anchors for between-block inserts', () => {
+    const ops: AgentOperation[] = [
+      {
+        op: 'insert',
+        position: { type: 'after', blockId: 'b1' },
+        node: makeParagraph('Middle', 'b1-5') as any,
+      },
+    ];
+
+    const batch = createReviewBatch(ops, base, 3);
+    const [entry] = batch.entries;
+
+    expect(entry.anchorBeforeId).toBe('b1');
+    expect(entry.anchorAfterId).toBe('b2');
+    expect(entry.targetBlockId).toBe('b1');
   });
 });

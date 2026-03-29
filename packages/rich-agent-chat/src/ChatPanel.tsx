@@ -6,6 +6,7 @@ import { ChatInput } from './ChatInput';
 import { ChatMessageList } from './ChatMessageList';
 import { ModelSelector } from './components/ModelSelector';
 import { SettingsModal } from './components/SettingsModal';
+import { DirectToolBar } from './DirectToolBar';
 import * as css from './styles.css';
 import type { ProviderConfig, SelectedModel } from './types';
 
@@ -76,6 +77,7 @@ export function ChatPanel({
 
   return (
     <div className={css.chatPanel}>
+      <DirectToolBar onExecute={(name, params) => onRetryToolCall?.(name, params)} />
       <ChatMessageList
         bubbles={bubbles}
         getBatch={getBatch}

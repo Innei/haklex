@@ -9,6 +9,8 @@ export type ReviewEntry = {
   id: string;
   op: AgentOperation;
   targetBlockId?: string;
+  anchorBeforeId?: string;
+  anchorAfterId?: string;
   originalFingerprint: string;
   status: ReviewEntryStatus;
 };

@@ -7,6 +7,7 @@ export { RichEditorShell } from './components/RichEditorShell';
 export { getVariantClass } from './components/utils';
 export type { ColorScheme } from './context/ColorSchemeContext';
 export { ColorSchemeProvider, useColorScheme } from './context/ColorSchemeContext';
+export { ExtraNodesProvider, useExtraNodes } from './context/ExtraNodesContext';
 export type { FootnoteDefinitionsContextValue } from './context/FootnoteDefinitionsContext';
 export {
   FootnoteDefinitionsProvider,

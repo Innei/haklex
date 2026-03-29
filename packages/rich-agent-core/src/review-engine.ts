@@ -8,6 +8,55 @@ function getBlockId(node: SerializedLexicalNode): string | undefined {
   return (node as any).$?.blockId as string | undefined;
 }
 
+function resolveRootInsertIndex(index: number | undefined, length: number): number {
+  const resolved = index ?? length;
+  return Math.min(Math.max(resolved, 0), length);
+}
+
+function getChildBlockId(children: SerializedLexicalNode[], index: number): string | undefined {
+  const child = children[index];
+  return child ? getBlockId(child) : undefined;
+}
+
+function getInsertAnchors(
+  children: SerializedLexicalNode[],
+  position: Extract<AgentOperation, { op: 'insert' }>['position'],
+): Pick<ReviewEntry, 'anchorAfterId' | 'anchorBeforeId' | 'targetBlockId'> {
+  if (position.type === 'root') {
+    const index = resolveRootInsertIndex(position.index, children.length);
+    const anchorBeforeId = getChildBlockId(children, index - 1);
+    const anchorAfterId = getChildBlockId(children, index);
+    return {
+      targetBlockId: anchorAfterId ?? anchorBeforeId,
+      anchorBeforeId,
+      anchorAfterId,
+    };
+  }
+
+  const index = children.findIndex((child) => getBlockId(child) === position.blockId);
+  if (index === -1) {
+    return {
+      targetBlockId: position.blockId,
+      anchorBeforeId: position.type === 'after' ? position.blockId : undefined,
+      anchorAfterId: position.type === 'before' ? position.blockId : undefined,
+    };
+  }
+
+  if (position.type === 'after') {
+    return {
+      targetBlockId: position.blockId,
+      anchorBeforeId: getChildBlockId(children, index),
+      anchorAfterId: getChildBlockId(children, index + 1),
+    };
+  }
+
+  return {
+    targetBlockId: position.blockId,
+    anchorBeforeId: getChildBlockId(children, index - 1),
+    anchorAfterId: getChildBlockId(children, index),
+  };
+}
+
 function cloneChildren(root: SerializedLexicalNode): SerializedLexicalNode[] {
   return [...((root as any).children ?? [])].map((c: any) => ({ ...c }));
 }
@@ -23,7 +72,7 @@ export function applyOpsToSnapshot(
       if (!op.node?.type) continue;
       const pos = op.position;
       if (pos.type === 'root') {
-        const idx = pos.index ?? children.length;
+        const idx = resolveRootInsertIndex(pos.index, children.length);
         children.splice(idx, 0, op.node);
       } else {
         const idx = children.findIndex((c) => getBlockId(c) === pos.blockId);
@@ -50,11 +99,10 @@ function fingerprint(node: SerializedLexicalNode): string {
   return JSON.stringify(node);
 }
 
-function extractTouchedBlockIds(ops: AgentOperation[]): string[] {
+function extractTouchedBlockIds(entries: ReviewEntry[]): string[] {
   const ids = new Set<string>();
-  for (const op of ops) {
-    if (op.op === 'replace' || op.op === 'delete') ids.add(op.blockId);
-    if (op.op === 'insert' && op.position.type !== 'root') ids.add(op.position.blockId);
+  for (const entry of entries) {
+    if (entry.targetBlockId) ids.add(entry.targetBlockId);
   }
   return [...ids];
 }
@@ -68,8 +116,9 @@ export function createReviewBatch(
   const root = baseSnapshot.root as unknown as SerializedLexicalNode & {
     children?: SerializedLexicalNode[];
   };
+  const baseChildren = root.children ?? [];
   const blockMap = new Map<string, SerializedLexicalNode>();
-  for (const child of root.children ?? []) {
+  for (const child of baseChildren) {
     const id = getBlockId(child);
     if (id) blockMap.set(id, child);
   }
@@ -81,18 +130,25 @@ export function createReviewBatch(
     })
     .map((op) => {
       let targetBlockId: string | undefined;
+      let anchorBeforeId: string | undefined;
+      let anchorAfterId: string | undefined;
       let fp = '';
       if (op.op === 'replace' || op.op === 'delete') {
         targetBlockId = op.blockId;
         const orig = blockMap.get(op.blockId);
         if (orig) fp = fingerprint(orig);
-      } else if (op.op === 'insert' && op.position.type !== 'root') {
-        targetBlockId = op.position.blockId;
+      } else if (op.op === 'insert') {
+        ({ targetBlockId, anchorBeforeId, anchorAfterId } = getInsertAnchors(
+          baseChildren,
+          op.position,
+        ));
       }
       return {
         id: nanoid(8),
         op,
         targetBlockId,
+        anchorBeforeId,
+        anchorAfterId,
         originalFingerprint: fp,
         status: 'pending' as const,
       };
@@ -105,7 +161,7 @@ export function createReviewBatch(
     previewSnapshot,
     status: 'pending',
     entries,
-    touchedBlockIds: extractTouchedBlockIds(ops),
+    touchedBlockIds: extractTouchedBlockIds(entries),
   };
 }
 
