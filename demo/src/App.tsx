@@ -69,6 +69,10 @@ function Layout() {
 
   const themeLabel = themeMode === 'system' ? 'System' : themeMode === 'light' ? 'Light' : 'Dark';
   const ThemeIcon = themeMode === 'system' ? Monitor : themeMode === 'light' ? Sun : Moon;
+  const isActivePath = useCallback(
+    (path: string) => location.pathname === path || location.pathname.startsWith(`${path}/`),
+    [location.pathname],
+  );
 
   useEffect(() => {
     const headerNode = headerRef.current;
@@ -124,9 +128,7 @@ function Layout() {
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={
-                      location.pathname === item.path ? 'nav-tab nav-tab-active' : 'nav-tab'
-                    }
+                    className={isActivePath(item.path) ? 'nav-tab nav-tab-active' : 'nav-tab'}
                   >
                     {item.label}
                   </Link>
@@ -184,6 +186,7 @@ export const router = createBrowserRouter([
       { path: '/biz', element: <BizPage /> },
       { path: '/agent', element: <AgentPage /> },
       { path: '/design', element: <DesignPage /> },
+      { path: '/design/:section', element: <DesignPage /> },
       { path: '*', element: <Navigate replace to="/editor" /> },
     ],
   },

@@ -33,7 +33,8 @@ import {
 } from '@haklex/rich-editor-ui';
 import { PortalThemeProvider, vars } from '@haklex/rich-style-token';
 import { Heart, Plus, Settings, Trash2 } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
+import { Link, NavLink, useParams } from 'react-router-dom';
 
 import { useTheme } from '../context/ThemeContext';
 import * as css from './DesignPage.css';
@@ -179,6 +180,18 @@ const NAV_GROUPS = [
   },
 ] as const;
 
+const SECTION_IDS = NAV_GROUPS.flatMap((group) => group.items.map((item) => item.id));
+const ACTIVE_SIDEBAR_ITEM_STYLE = {
+  background: vars.color.accentLight,
+  boxShadow: `inset 2px 0 0 ${vars.color.accent}`,
+  color: vars.color.accent,
+  fontWeight: 700,
+} as const;
+
+function isSectionId(value: string | undefined): value is (typeof SECTION_IDS)[number] {
+  return value != null && SECTION_IDS.includes(value as (typeof SECTION_IDS)[number]);
+}
+
 function SectionFrame(props: {
   id: string;
   eyebrow: string;
@@ -227,8 +240,8 @@ function PageHero() {
           content blocks, so the visual language can be scanned in one pass.
         </p>
         <div className={css.heroActions}>
-          <a className={css.heroLink} href="#tokens">Jump to foundations</a>
-          <a className={css.heroLinkSecondary} href="#action-button">Review controls</a>
+          <Link className={css.heroLink} to="/design/tokens">Jump to foundations</Link>
+          <Link className={css.heroLinkSecondary} to="/design/action-button">Review controls</Link>
         </div>
       </div>
       <div className={css.heroStats}>
@@ -253,6 +266,9 @@ function PageHero() {
 }
 
 function SideNav() {
+  const { section } = useParams();
+  const activeSection = isSectionId(section) ? section : undefined;
+
   return (
     <aside className={css.sidebar}>
       <div className={css.sidebarInner}>
@@ -265,9 +281,14 @@ function SideNav() {
             </div>
             <div className={css.sidebarList}>
               {group.items.map((item) => (
-                <a className={css.sidebarItem} href={`#${item.id}`} key={item.id}>
+                <NavLink
+                  className={css.sidebarItem}
+                  key={item.id}
+                  style={activeSection === item.id ? ACTIVE_SIDEBAR_ITEM_STYLE : undefined}
+                  to={`/design/${item.id}`}
+                >
                   {item.label}
-                </a>
+                </NavLink>
               ))}
             </div>
           </div>
@@ -865,6 +886,30 @@ function CodeBlockSection() {
 
 export function DesignPage() {
   const theme = useTheme();
+  const { section } = useParams();
+
+  useEffect(() => {
+    const scrollPane = document.querySelector('.app-main');
+
+    if (!(scrollPane instanceof HTMLElement)) {
+      return;
+    }
+
+    if (!isSectionId(section)) {
+      scrollPane.scrollTo({ top: 0, behavior: 'auto' });
+      return;
+    }
+
+    const nextSection = document.getElementById(section);
+
+    if (!nextSection) {
+      return;
+    }
+
+    requestAnimationFrame(() => {
+      nextSection.scrollIntoView({ block: 'start', behavior: 'auto' });
+    });
+  }, [section]);
 
   return (
     <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
