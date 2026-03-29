@@ -1,4 +1,4 @@
-import { type AgentStore, agentStoreSelectors } from '@haklex/rich-agent-core';
+import { type AgentStore, agentStoreSelectors, type ReviewBatch } from '@haklex/rich-agent-core';
 import { useCallback, useState } from 'react';
 import { useStore } from 'zustand';
 
@@ -11,7 +11,9 @@ import type { ProviderConfig, SelectedModel } from './types';
 
 interface ChatPanelProps {
   onAbort?: () => void;
+  onAcceptBatch?: (batchId: string) => void;
   onProvidersChange: (providers: ProviderConfig[]) => void;
+  onRejectBatch?: (batchId: string) => void;
   onRetry?: () => void;
   onRetryToolCall?: (name: string, params: Record<string, unknown>) => void;
   onSelectModel: (selected: SelectedModel) => void;
@@ -29,6 +31,8 @@ const STATUS_LABELS: Record<string, string> = {
 
 export function ChatPanel({
   onAbort,
+  onAcceptBatch,
+  onRejectBatch,
   onRetry,
   onRetryToolCall,
   onSend,
@@ -40,6 +44,12 @@ export function ChatPanel({
 }: ChatPanelProps) {
   const bubbles = useStore(store, agentStoreSelectors.bubbles);
   const status = useStore(store, agentStoreSelectors.status);
+  const reviewState = useStore(store, agentStoreSelectors.reviewState);
+
+  const getBatch = useCallback(
+    (batchId: string) => reviewState?.batches.find((b: ReviewBatch) => b.id === batchId),
+    [reviewState],
+  );
 
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -66,7 +76,14 @@ export function ChatPanel({
 
   return (
     <div className={css.chatPanel}>
-      <ChatMessageList bubbles={bubbles} onRetry={onRetry} onRetryToolCall={onRetryToolCall} />
+      <ChatMessageList
+        bubbles={bubbles}
+        getBatch={getBatch}
+        onAcceptBatch={onAcceptBatch}
+        onRejectBatch={onRejectBatch}
+        onRetry={onRetry}
+        onRetryToolCall={onRetryToolCall}
+      />
       <ChatInput
         disabled={!hasModel}
         isRunning={isRunning}

@@ -261,6 +261,9 @@ importers:
       '@haklex/rich-agent-core':
         specifier: workspace:*
         version: link:../rich-agent-core
+      '@haklex/rich-diff':
+        specifier: workspace:*
+        version: link:../rich-diff
       '@haklex/rich-editor-ui':
         specifier: workspace:*
         version: link:../rich-editor-ui

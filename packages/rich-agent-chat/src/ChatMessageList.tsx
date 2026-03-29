@@ -1,8 +1,9 @@
-import type { ChatBubble } from '@haklex/rich-agent-core';
+import type { ChatBubble, ReviewBatch } from '@haklex/rich-agent-core';
 import { ScrollArea } from '@haklex/rich-editor-ui';
 import type { ReactElement } from 'react';
 import { useRef } from 'react';
 
+import { DiffReviewBubble } from './components/DiffReviewBubble';
 import { ErrorBubble } from './components/ErrorBubble';
 import { StreamdownBubble } from './components/StreamdownBubble';
 import { ThinkingBlock } from './components/ThinkingBlock';
@@ -11,6 +12,9 @@ import { bubbleTool, bubbleUser, messageList } from './styles.css';
 
 interface ChatMessageListProps {
   bubbles: ChatBubble[];
+  getBatch?: (batchId: string) => ReviewBatch | undefined;
+  onAcceptBatch?: (batchId: string) => void;
+  onRejectBatch?: (batchId: string) => void;
   onRetry?: () => void;
   onRetryToolCall?: (name: string, params: Record<string, unknown>) => void;
 }
@@ -67,6 +71,9 @@ function mergeBubbles(bubbles: ChatBubble[]): MergedBubble[] {
 
 export function ChatMessageList({
   bubbles,
+  getBatch,
+  onAcceptBatch,
+  onRejectBatch,
   onRetry,
   onRetryToolCall,
 }: ChatMessageListProps): ReactElement {
@@ -112,6 +119,19 @@ export function ChatMessageList({
               <div className={bubbleTool} key={i}>
                 Diff: {item.accepted} accepted, {item.rejected} rejected, {item.pending} pending
               </div>
+            );
+          }
+
+          case 'diff_review': {
+            const batch = getBatch?.(item.batchId);
+            if (!batch) return null;
+            return (
+              <DiffReviewBubble
+                batch={batch}
+                key={i}
+                onAccept={onAcceptBatch}
+                onReject={onRejectBatch}
+              />
             );
           }
 
