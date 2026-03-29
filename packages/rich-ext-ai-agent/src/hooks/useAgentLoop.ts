@@ -3,7 +3,7 @@ import {
   type AgentToolConfig,
   type ChatMessage,
   createAgentExecutor,
-  createDiffEngine,
+  createReviewBatch,
   createSnapshot,
   type LLMProvider,
 } from '@haklex/rich-agent-core';
@@ -71,8 +71,10 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
       const result = await executor.run(actionPrompt, documentMessage);
 
       if (result.operations.length > 0) {
-        const diffState = createDiffEngine(result.operations, serialized);
-        options.store.getState().setDiffState(diffState);
+        const revision = options.store.getState().reviewState?.documentRevision ?? 0;
+        const batch = createReviewBatch(result.operations, serialized, revision);
+        options.store.getState().addReviewBatch(batch);
+        options.store.getState().addBubble({ type: 'diff_review', batchId: batch.id });
       }
 
       return result;
