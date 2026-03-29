@@ -23,8 +23,6 @@ export const triggerButton = style({
   'selectors': {
     '&[data-popup-open]': {
       background: vars.color.fillQuaternary,
-      borderColor: vars.color.accent,
-      boxShadow: `0 0 0 3px ${vars.color.accentLight}`,
     },
   },
 });
