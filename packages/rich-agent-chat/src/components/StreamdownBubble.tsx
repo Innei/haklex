@@ -3,7 +3,7 @@ import { code } from '@streamdown/code';
 import type { ReactElement } from 'react';
 import { Streamdown } from 'streamdown';
 
-import { bubbleAssistant } from '../styles.css';
+import { proseAssistant } from '../styles.css';
 
 interface StreamdownBubbleProps {
   content: string;
@@ -26,7 +26,7 @@ const components = {
 
 export function StreamdownBubble({ content, isStreaming }: StreamdownBubbleProps): ReactElement {
   return (
-    <div className={bubbleAssistant}>
+    <div className={proseAssistant}>
       <Streamdown components={components} isAnimating={isStreaming} plugins={plugins}>
         {content}
       </Streamdown>
