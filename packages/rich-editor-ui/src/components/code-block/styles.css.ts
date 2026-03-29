@@ -11,6 +11,7 @@ export const card = style({
   overflow: 'hidden',
   fontSize: vars.typography.fontSizeMd,
   fontFamily: vars.typography.fontMono,
+  lineHeight: 1.65,
 });
 
 export const lang = style({
@@ -146,10 +147,12 @@ globalStyle(`${card} pre code`, {
   display: 'flex',
   flexDirection: 'column',
   fontFamily: `${vars.typography.fontMono} !important` as any,
+  lineHeight: 'inherit',
 });
 
 globalStyle(`${card} .shiki, ${card} code, ${card} pre`, {
   background: 'transparent !important' as any,
+  lineHeight: 'inherit',
 });
 
 globalStyle(
