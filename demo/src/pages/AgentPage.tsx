@@ -2,9 +2,11 @@ import type { ProviderConfig, SelectedModel } from '@haklex/rich-agent-chat';
 import { ChatPanel } from '@haklex/rich-agent-chat';
 import type { LLMProvider } from '@haklex/rich-agent-core';
 import { createAgentStore } from '@haklex/rich-agent-core';
+import { getVariantClass } from '@haklex/rich-editor';
 import { AgentPanelPlugin, builtInActions, useAgentLoop } from '@haklex/rich-ext-ai-agent';
 import { MentionPlatformProvider, ShiroEditor } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
+import { PortalThemeProvider } from '@haklex/rich-style-token';
 import type { SerializedEditorState } from 'lexical';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -198,16 +200,18 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
         </MentionPlatformProvider>
       </div>
       <div className="agent-pane-chat" data-theme={theme}>
-        <ChatPanel
-          providers={providers}
-          selectedModel={selectedModel}
-          store={store}
-          onAbort={handleAbort}
-          onProvidersChange={handleProvidersChange}
-          onRetry={handleRetry}
-          onSelectModel={handleSelectModel}
-          onSend={handleSend}
-        />
+        <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
+          <ChatPanel
+            providers={providers}
+            selectedModel={selectedModel}
+            store={store}
+            onAbort={handleAbort}
+            onProvidersChange={handleProvidersChange}
+            onRetry={handleRetry}
+            onSelectModel={handleSelectModel}
+            onSend={handleSend}
+          />
+        </PortalThemeProvider>
       </div>
     </div>
   );
