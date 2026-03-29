@@ -1,4 +1,4 @@
-import { ActionButton, AutoResizeTextArea } from '@haklex/rich-editor-ui';
+import { AutoResizeTextArea, Spinner } from '@haklex/rich-editor-ui';
 import { ArrowUp, Square } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
@@ -11,14 +11,25 @@ interface ChatInputProps {
   modelSelector?: ReactNode;
   onAbort?: () => void;
   onSend: (message: string) => void;
+  statusLabel?: string;
 }
 
-export function ChatInput({ disabled, isRunning, modelSelector, onAbort, onSend }: ChatInputProps) {
+export function ChatInput({
+  disabled,
+  isRunning,
+  modelSelector,
+  onAbort,
+  onSend,
+  statusLabel,
+}: ChatInputProps) {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const trimmed = input.trim();
+  const placeholder = disabled
+    ? 'Configure a model to start an agent task.'
+    : 'Ask a follow-up question...';
 
   function handleSend() {
-    const trimmed = input.trim();
     if (!trimmed) return;
     onSend(trimmed);
     setInput('');
@@ -32,28 +43,48 @@ export function ChatInput({ disabled, isRunning, modelSelector, onAbort, onSend 
   }
 
   return (
-    <div className={css.inputContainer}>
-      <AutoResizeTextArea
-        className={css.inputTextArea}
-        disabled={disabled}
-        maxRows={6}
-        placeholder="Ask AI to edit..."
-        ref={textareaRef}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <div className={css.inputBottomBar}>
-        {modelSelector ?? <div />}
-        {isRunning ? (
-          <ActionButton size="sm" onClick={onAbort}>
-            <Square size={16} />
-          </ActionButton>
-        ) : (
-          <ActionButton disabled={disabled || !input.trim()} size="sm" onClick={handleSend}>
-            <ArrowUp size={16} />
-          </ActionButton>
+    <div className={css.composerContainer}>
+      <div className={css.composerCard}>
+        {isRunning && statusLabel && (
+          <div className={css.composerStatusLine}>
+            <Spinner size="sm" />
+            <span>{statusLabel}</span>
+          </div>
         )}
+        <AutoResizeTextArea
+          className={css.composerTextArea}
+          disabled={disabled}
+          maxRows={10}
+          minRows={2}
+          placeholder={placeholder}
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
+        <div className={css.composerBottomBar}>
+          <div>{modelSelector ?? <div />}</div>
+          {isRunning ? (
+            <button
+              aria-label="Abort agent run"
+              className={css.composerAbortButton}
+              type="button"
+              onClick={onAbort}
+            >
+              <Square size={14} />
+            </button>
+          ) : (
+            <button
+              aria-label="Send message"
+              className={css.composerSendButton}
+              disabled={disabled || !trimmed}
+              type="button"
+              onClick={handleSend}
+            >
+              <ArrowUp size={16} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
