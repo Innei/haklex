@@ -3,22 +3,30 @@ import { ChatPanel } from '@haklex/rich-agent-chat';
 import type { AgentOperation, LLMProvider } from '@haklex/rich-agent-core';
 import {
   createAgentStore,
-  createDiffEngine,
   createDocumentTools,
+  createReviewBatch,
   createSnapshot,
 } from '@haklex/rich-agent-core';
 import { getVariantClass } from '@haklex/rich-editor';
+import { blockIdState } from '@haklex/rich-editor/plugins';
 import {
   AgentPanelPlugin,
   builtInActions,
-  DiffApplyPlugin,
+  DiffReviewOverlayPlugin,
   useAgentLoop,
 } from '@haklex/rich-ext-ai-agent';
 import { MentionPlatformProvider, ShiroEditor } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import type { LexicalEditor, SerializedEditorState } from 'lexical';
+import {
+  $getRoot,
+  $getState,
+  $parseSerializedNode,
+  type LexicalEditor,
+  type LexicalNode,
+  type SerializedEditorState,
+} from 'lexical';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTheme } from '../context/ThemeContext';
@@ -131,6 +139,16 @@ const initialContent: SerializedEditorState = {
   },
 } as any;
 
+function $findBlockByBlockId(blockId: string): LexicalNode | null {
+  const root = $getRoot();
+  for (const child of root.getChildren()) {
+    if ($getState(child, blockIdState) === blockId) {
+      return child;
+    }
+  }
+  return null;
+}
+
 function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentStore> }) {
   const theme = useTheme();
   const [providers, setProviders] = useState<ProviderConfig[]>(loadProviders);
@@ -220,9 +238,60 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
       });
 
       if (operations.length > 0) {
-        const diffState = createDiffEngine(operations, serialized);
-        store.getState().setDiffState(diffState);
+        const revision = store.getState().reviewState?.documentRevision ?? 0;
+        const batch = createReviewBatch(operations, serialized, revision);
+        store.getState().addReviewBatch(batch);
+        store.getState().addBubble({ type: 'diff_review', batchId: batch.id });
       }
+    },
+    [store],
+  );
+
+  const handleAcceptBatch = useCallback(
+    (batchId: string) => {
+      store.getState().acceptReviewBatch(batchId);
+      const reviewState = store.getState().reviewState;
+      const batch = reviewState?.batches.find((b) => b.id === batchId);
+      if (!batch || !editorRef.current) return;
+
+      const editor = editorRef.current;
+      editor.update(() => {
+        const root = $getRoot();
+        for (const entry of batch.entries) {
+          const { op } = entry;
+          if (op.op === 'insert') {
+            if (!op.node?.type) continue;
+            const newNode = $parseSerializedNode(op.node);
+            if (op.position.type === 'root') {
+              const idx = op.position.index ?? root.getChildrenSize();
+              const children = root.getChildren();
+              if (idx >= children.length) root.append(newNode);
+              else children[idx].insertBefore(newNode);
+            } else {
+              const target = $findBlockByBlockId(op.position.blockId);
+              if (!target) continue;
+              if (op.position.type === 'after') target.insertAfter(newNode);
+              else target.insertBefore(newNode);
+            }
+          } else if (op.op === 'replace') {
+            if (!op.node?.type) continue;
+            const target = $findBlockByBlockId(op.blockId);
+            if (!target) continue;
+            target.replace($parseSerializedNode(op.node));
+          } else if (op.op === 'delete') {
+            const target = $findBlockByBlockId(op.blockId);
+            if (!target) continue;
+            target.remove();
+          }
+        }
+      });
+    },
+    [store],
+  );
+
+  const handleRejectBatch = useCallback(
+    (batchId: string) => {
+      store.getState().rejectReviewBatch(batchId);
     },
     [store],
   );
@@ -233,7 +302,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
         <MentionPlatformProvider platforms={{}}>
           <ShiroEditor header={<ToolbarPlugin />} initialValue={initialContent}>
             {provider && <AgentPanelPlugin provider={provider} store={store} />}
-            <DiffApplyPlugin store={store} />
+            <DiffReviewOverlayPlugin store={store} />
             <AgentLoopCapture
               editorRef={editorRef}
               loopRef={agentLoopRef}
@@ -250,7 +319,9 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
             selectedModel={selectedModel}
             store={store}
             onAbort={handleAbort}
+            onAcceptBatch={handleAcceptBatch}
             onProvidersChange={handleProvidersChange}
+            onRejectBatch={handleRejectBatch}
             onRetry={handleRetry}
             onRetryToolCall={handleRetryToolCall}
             onSelectModel={handleSelectModel}
