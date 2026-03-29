@@ -14,7 +14,7 @@
     "./constants": "./src/constants.ts",
     "./icons": "./src/icons/index.ts",
     "./shiki": "./src/shiki.ts",
-    "./static": "./src/static.ts",
+    "./static": "./src/static.tsx",
     "./style.css": "./dist/rich-renderer-codeblock.css"
   },
   "main": "./src/index.ts",
