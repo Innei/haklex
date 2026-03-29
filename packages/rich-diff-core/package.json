@@ -1,0 +1,44 @@
+{
+  "name": "@haklex/rich-diff-core",
+  "version": "0.0.90",
+  "description": "Lexical diff engine — character-level and structural diff with node decoration",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-diff-core"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "main": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev:build": "vite build --watch"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "lexical": "^0.42.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "peerDependencies": {
+    "lexical": "^0.42.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "import": "./dist/index.mjs",
+        "types": "./dist/index.d.ts"
+      }
+    },
+    "main": "./dist/index.mjs",
+    "types": "./dist/index.d.ts"
+  }
+}
