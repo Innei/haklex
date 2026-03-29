@@ -10,47 +10,13 @@ export const overlayContainer = style({
   zIndex: 10,
 });
 
-export const deleteOverlay = style({
-  position: 'absolute',
-  left: 0,
-  right: 0,
-  background: 'rgba(239, 68, 68, 0.08)',
-  borderLeft: '3px solid rgb(239, 68, 68)',
-  pointerEvents: 'none',
-});
-
-export const insertMarker = style({
-  position: 'absolute',
-  left: 0,
-  right: 0,
-  background: 'rgb(34, 197, 94)',
-  pointerEvents: 'none',
-  borderRadius: 1,
-});
-
-export const replaceOverlay = style({
-  position: 'absolute',
-  left: 0,
-  right: 0,
-  background: 'rgba(239, 68, 68, 0.08)',
-  borderLeft: '3px solid rgb(239, 68, 68)',
-  pointerEvents: 'none',
-});
-
 export const diffPanel = style({
-  position: 'absolute',
-  left: 0,
-  right: 0,
   pointerEvents: 'none',
-  overflow: 'hidden',
   borderLeft: '3px solid rgb(34, 197, 94)',
   background: 'rgba(34, 197, 94, 0.04)',
 });
 
 export const diffPanelDelete = style({
-  position: 'absolute',
-  left: 0,
-  right: 0,
   pointerEvents: 'none',
-  overflow: 'hidden',
+  opacity: 0.7,
 });
