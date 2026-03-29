@@ -72,7 +72,7 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
 
       if (result.operations.length > 0) {
         const diffState = createDiffEngine(result.operations, serialized);
-        options.store.dispatch({ type: 'set_diff_state', diffState });
+        options.store.getState().setDiffState(diffState);
       }
 
       return result;

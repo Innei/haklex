@@ -12,6 +12,16 @@ export function Combobox<Value, Multiple extends boolean | undefined = false>(
   return <ComboboxPrimitive.Root {...props} />;
 }
 
+// -- Trigger --
+
+type ComboboxTriggerProps = ComponentProps<typeof ComboboxPrimitive.Trigger> & {
+  className?: string;
+};
+
+export function ComboboxTrigger({ className, ...props }: ComboboxTriggerProps) {
+  return <ComboboxPrimitive.Trigger className={className} {...props} />;
+}
+
 // -- Input --
 
 type ComboboxInputProps = ComponentProps<typeof ComboboxPrimitive.Input> & {
@@ -148,4 +158,5 @@ export type {
   ComboboxItemIndicatorProps,
   ComboboxItemProps,
   ComboboxListProps,
+  ComboboxTriggerProps,
 };

@@ -53,7 +53,9 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
     actionPrompt: ChatMessage,
     documentMessage: ChatMessage,
   ): Promise<AgentExecutorResult> {
-    store.dispatch({ type: 'set_status', status: 'running' });
+    const { addBubble, setStatus, updateLastBubble } = store.getState();
+
+    setStatus('running');
 
     const turns: ChatMessage[] = [documentMessage];
 
@@ -68,49 +70,31 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
       let hasThinking = false;
       const toolCalls: Array<{ id: string; name: string; arguments: string }> = [];
 
-      store.dispatch({ type: 'set_status', status: 'thinking' });
-      store.dispatch({
-        type: 'add_bubble',
-        bubble: { type: 'assistant', content: '', streaming: true },
-      });
+      setStatus('thinking');
+      addBubble({ type: 'assistant', content: '', streaming: true });
 
       for await (const chunk of provider.chat(messages, toolSchemas)) {
         signal?.throwIfAborted();
 
         if (chunk.type === 'thinking') {
           thinkingAccum += chunk.text;
-          if (!hasThinking) {
-            hasThinking = true;
-            store.dispatch({
-              type: 'update_last_bubble',
-              bubble: { type: 'thinking', content: thinkingAccum },
-            });
-          } else {
-            store.dispatch({
-              type: 'update_last_bubble',
-              bubble: { type: 'thinking', content: thinkingAccum },
-            });
-          }
+          hasThinking = true;
+          updateLastBubble({ type: 'thinking', content: thinkingAccum });
           continue;
         }
 
         if (chunk.type === 'text') {
           if (hasThinking && textAccum === '') {
-            store.dispatch({
-              type: 'add_bubble',
-              bubble: { type: 'assistant', content: chunk.text, streaming: true },
-            });
-            store.dispatch({ type: 'set_status', status: 'writing' });
+            addBubble({ type: 'assistant', content: chunk.text, streaming: true });
+            setStatus('writing');
           } else if (textAccum === '') {
-            store.dispatch({ type: 'set_status', status: 'writing' });
-            store.dispatch({
-              type: 'update_last_bubble',
-              bubble: { type: 'assistant', content: chunk.text, streaming: true },
-            });
+            setStatus('writing');
+            updateLastBubble({ type: 'assistant', content: chunk.text, streaming: true });
           } else {
-            store.dispatch({
-              type: 'update_last_bubble',
-              bubble: { type: 'assistant', content: textAccum + chunk.text, streaming: true },
+            updateLastBubble({
+              type: 'assistant',
+              content: textAccum + chunk.text,
+              streaming: true,
             });
           }
           textAccum += chunk.text;
@@ -122,30 +106,26 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
         }
       }
 
-      store.dispatch({
-        type: 'update_last_bubble',
-        bubble: { type: 'assistant', content: textAccum, streaming: false },
-      });
+      updateLastBubble({ type: 'assistant', content: textAccum, streaming: false });
 
       if (toolCalls.length === 0) break;
 
       turns.push({ role: 'assistant_tool_call', toolCalls });
 
-      store.dispatch({ type: 'set_status', status: 'calling_tool' });
+      setStatus('calling_tool');
 
       for (const tc of toolCalls) {
-        store.dispatch({
-          type: 'add_bubble',
-          bubble: { type: 'tool_call', toolName: tc.name, params: JSON.parse(tc.arguments) },
-        });
+        addBubble({ type: 'tool_call', toolName: tc.name, params: JSON.parse(tc.arguments) });
 
         const result = await executeTool(tc.name, tc.arguments);
 
         const content = result.ok ? result.content : JSON.stringify(result.error);
 
-        store.dispatch({
-          type: 'add_bubble',
-          bubble: { type: 'tool_result', toolName: tc.name, success: result.ok, summary: content },
+        addBubble({
+          type: 'tool_result',
+          toolName: tc.name,
+          success: result.ok,
+          summary: content,
         });
 
         turns.push({
@@ -157,7 +137,7 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
       }
     }
 
-    store.dispatch({ type: 'set_status', status: 'done' });
+    setStatus('done');
     return { operations };
   }
 

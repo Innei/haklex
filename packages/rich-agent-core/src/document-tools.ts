@@ -57,6 +57,16 @@ export function createDocumentTools(
     },
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { position, node } = params as { position: any; node: SerializedLexicalNode };
+      if (!node || typeof node !== 'object' || !node.type) {
+        return {
+          ok: false,
+          error: {
+            error: 'invalid_node',
+            message:
+              'Missing or invalid "node" parameter. Must be a serialized Lexical node with at least a "type" field (e.g. {"type":"paragraph","children":[{"type":"text","text":"...","version":1}],"direction":"ltr","format":"","indent":0,"version":1,"textFormat":0,"textStyle":""}).',
+          },
+        };
+      }
       if (position.type !== 'root' && !snapshot.getBlock(position.blockId)) {
         return {
           ok: false,
@@ -89,6 +99,16 @@ export function createDocumentTools(
     },
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { blockId, node } = params as { blockId: string; node: SerializedLexicalNode };
+      if (!node || typeof node !== 'object' || !node.type) {
+        return {
+          ok: false,
+          error: {
+            error: 'invalid_node',
+            message:
+              'Missing or invalid "node" parameter. Must be a serialized Lexical node with at least a "type" field.',
+          },
+        };
+      }
       const existing = snapshot.getBlock(blockId);
       if (!existing) {
         return {

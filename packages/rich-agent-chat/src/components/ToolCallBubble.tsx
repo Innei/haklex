@@ -6,6 +6,7 @@ import {
   Spinner,
   StatusDot,
 } from '@haklex/rich-editor-ui';
+import { RotateCcw } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { useState } from 'react';
 
@@ -16,6 +17,7 @@ import {
   collapsedBarExpanded,
   collapsedBarPanel,
   toolCallJson,
+  toolCallRetryButton,
   toolCallRow,
 } from '../styles.css';
 
@@ -27,9 +29,10 @@ interface ToolCallItem {
 
 interface ToolCallBubbleProps {
   items: ToolCallItem[];
+  onRetryToolCall?: (name: string, params: Record<string, unknown>) => void;
 }
 
-export function ToolCallBubble({ items }: ToolCallBubbleProps): ReactElement {
+export function ToolCallBubble({ items, onRetryToolCall }: ToolCallBubbleProps): ReactElement {
   const [open, setOpen] = useState(false);
 
   const total = items.length;
@@ -93,11 +96,21 @@ export function ToolCallBubble({ items }: ToolCallBubbleProps): ReactElement {
                     <code>{item.name}</code>
                   </Badge>
                   {item.result && (
-                    <span style={{ color: item.result.success ? '#22c55e' : '#ef4444' }}>
+                    <span style={{ color: item.result.success ? '#22c55e' : '#ef4444', flex: 1 }}>
                       {item.result.summary.length > 60
                         ? `${item.result.summary.slice(0, 60)}...`
                         : item.result.summary}
                     </span>
+                  )}
+                  {item.result && onRetryToolCall && (
+                    <button
+                      className={toolCallRetryButton}
+                      title="Retry"
+                      type="button"
+                      onClick={() => onRetryToolCall(item.name, item.params)}
+                    >
+                      <RotateCcw size={12} />
+                    </button>
                   )}
                 </div>
                 {open && (

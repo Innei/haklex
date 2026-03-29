@@ -16,7 +16,7 @@ export function apiProxyPlugin(): Plugin {
     name: 'api-proxy',
     configureServer(server) {
       server.middlewares.use(async (req, res, next) => {
-        if (req.url === '/api/models' && req.method === 'POST') {
+        if (req.method === 'POST' && req.url?.startsWith('/api/models')) {
           const { apiKey, baseUrl, providerType } = extractProviderHeaders(req);
 
           if (!apiKey || !baseUrl) {
@@ -28,14 +28,14 @@ export function apiProxyPlugin(): Plugin {
           try {
             let response: Response;
             if (providerType === 'claude') {
-              response = await fetch(`${baseUrl}/v1/models`, {
+              response = await fetch(`${baseUrl}/models`, {
                 headers: {
                   'x-api-key': apiKey,
                   'anthropic-version': '2023-06-01',
                 },
               });
             } else {
-              response = await fetch(`${baseUrl}/v1/models`, {
+              response = await fetch(`${baseUrl}/models`, {
                 headers: {
                   Authorization: `Bearer ${apiKey}`,
                 },
@@ -63,7 +63,7 @@ export function apiProxyPlugin(): Plugin {
           return;
         }
 
-        if (req.method !== 'POST' || req.url !== '/api/chat') {
+        if (req.method !== 'POST' || !req.url?.startsWith('/api/chat')) {
           return next();
         }
 
@@ -95,9 +95,9 @@ export function apiProxyPlugin(): Plugin {
 
         try {
           if (providerType === 'claude') {
-            await proxyClaude(parsed, res, apiKey, baseUrl || 'https://api.anthropic.com');
+            await proxyClaude(parsed, res, apiKey, baseUrl || 'https://api.anthropic.com/v1');
           } else {
-            await proxyOpenAI(parsed, res, apiKey, baseUrl || 'https://api.openai.com');
+            await proxyOpenAI(parsed, res, apiKey, baseUrl || 'https://api.openai.com/v1');
           }
         } catch (err: any) {
           if (!res.headersSent) {
@@ -168,7 +168,7 @@ async function proxyClaude(body: any, res: any, apiKey: string, baseUrl: string)
     claudeBody.thinking = { type: 'enabled', budget_tokens: 2048 };
   }
 
-  const upstream = await fetch(`${baseUrl}/v1/messages`, {
+  const upstream = await fetch(`${baseUrl}/messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -247,7 +247,7 @@ async function proxyOpenAI(body: any, res: any, apiKey: string, baseUrl: string)
     openaiBody.tools = openaiTools;
   }
 
-  const upstream = await fetch(`${baseUrl}/v1/chat/completions`, {
+  const upstream = await fetch(`${baseUrl}/chat/completions`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

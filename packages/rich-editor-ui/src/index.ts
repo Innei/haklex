@@ -29,6 +29,7 @@ export type {
   ComboboxItemIndicatorProps,
   ComboboxItemProps,
   ComboboxListProps,
+  ComboboxTriggerProps,
 } from './components/combobox';
 export {
   Combobox,
@@ -40,6 +41,7 @@ export {
   ComboboxItem,
   ComboboxItemIndicator,
   ComboboxList,
+  ComboboxTrigger,
 } from './components/combobox';
 export type {
   DialogBackdropProps,

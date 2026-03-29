@@ -1,5 +1,6 @@
-import type { AgentStore } from '@haklex/rich-agent-core';
+import { type AgentStore, agentStoreSelectors } from '@haklex/rich-agent-core';
 import { useCallback, useState } from 'react';
+import { useStore } from 'zustand';
 
 import { ChatInput } from './ChatInput';
 import { ChatMessageList } from './ChatMessageList';
@@ -12,6 +13,7 @@ interface ChatPanelProps {
   onAbort?: () => void;
   onProvidersChange: (providers: ProviderConfig[]) => void;
   onRetry?: () => void;
+  onRetryToolCall?: (name: string, params: Record<string, unknown>) => void;
   onSelectModel: (selected: SelectedModel) => void;
   onSend?: (message: string) => void;
   providers: ProviderConfig[];
@@ -28,6 +30,7 @@ const STATUS_LABELS: Record<string, string> = {
 export function ChatPanel({
   onAbort,
   onRetry,
+  onRetryToolCall,
   onSend,
   providers,
   onProvidersChange,
@@ -35,14 +38,14 @@ export function ChatPanel({
   onSelectModel,
   store,
 }: ChatPanelProps) {
-  const { bubbles, status } = store.getState();
-  store.subscribe(() => {});
+  const bubbles = useStore(store, agentStoreSelectors.bubbles);
+  const status = useStore(store, agentStoreSelectors.status);
 
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleSend = useCallback(
     (message: string) => {
-      store.dispatch({ type: 'add_bubble', bubble: { type: 'user', content: message } });
+      store.getState().addBubble({ type: 'user', content: message });
       onSend?.(message);
     },
     [onSend, store],
@@ -63,7 +66,7 @@ export function ChatPanel({
 
   return (
     <div className={css.chatPanel}>
-      <ChatMessageList bubbles={bubbles} onRetry={onRetry} />
+      <ChatMessageList bubbles={bubbles} onRetry={onRetry} onRetryToolCall={onRetryToolCall} />
       <ChatInput
         disabled={!hasModel}
         isRunning={isRunning}

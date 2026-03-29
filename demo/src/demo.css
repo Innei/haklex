@@ -459,7 +459,9 @@
   border: 1px solid var(--demo-border);
   padding: 16px;
   position: sticky;
-  top: 88px;
+  top: 24px;
+  max-height: calc(100dvh - var(--app-header-height, 0px) - 48px);
+  overflow-y: auto;
 }
 
 .presets-sidebar h3 {
@@ -556,7 +558,9 @@
   width: 320px;
   flex-shrink: 0;
   position: sticky;
-  top: 88px;
+  top: 24px;
+  max-height: calc(100dvh - var(--app-header-height, 0px) - 48px);
+  overflow-y: auto;
 }
 
 /* ── Comment Block Button ── */
@@ -866,6 +870,7 @@
 .agent-split {
   flex: 1;
   display: flex;
+  height: calc(100dvh - var(--app-header-height, 0px));
   min-height: 0;
   margin: -24px;
 }
@@ -879,11 +884,14 @@
 }
 
 .agent-pane-chat {
-  width: 360px;
+  width: 400px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   min-height: 0;
+  box-sizing: border-box;
+  padding: 0;
+  background: var(--demo-surface-alt);
   border-left: 1px solid var(--demo-border);
 }
 
@@ -918,5 +926,18 @@
 
   .biz-grid {
     grid-template-columns: 1fr;
+  }
+
+  .agent-split {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .agent-pane-chat {
+    width: 100%;
+    min-height: 360px;
+    padding: 0;
+    border-left: none;
+    border-top: 1px solid var(--demo-border);
   }
 }

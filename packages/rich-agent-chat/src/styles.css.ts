@@ -135,6 +135,26 @@ export const toolCallRow = style({
   padding: '2px 0',
 });
 
+export const toolCallRetryButton = style({
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 20,
+  'height': 20,
+  'flexShrink': 0,
+  'border': 'none',
+  'borderRadius': 4,
+  'background': 'transparent',
+  'color': vars.color.textQuaternary,
+  'cursor': 'pointer',
+  'padding': 0,
+  'transition': 'color 120ms ease, background 120ms ease',
+  ':hover': {
+    color: vars.color.textSecondary,
+    background: vars.color.fillTertiary,
+  },
+});
+
 export const toolCallJson = style({
   margin: 0,
   overflowX: 'auto',

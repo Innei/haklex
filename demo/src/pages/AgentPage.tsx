@@ -1,13 +1,24 @@
 import type { ProviderConfig, SelectedModel } from '@haklex/rich-agent-chat';
 import { ChatPanel } from '@haklex/rich-agent-chat';
-import type { LLMProvider } from '@haklex/rich-agent-core';
-import { createAgentStore } from '@haklex/rich-agent-core';
+import type { AgentOperation, LLMProvider } from '@haklex/rich-agent-core';
+import {
+  createAgentStore,
+  createDiffEngine,
+  createDocumentTools,
+  createSnapshot,
+} from '@haklex/rich-agent-core';
 import { getVariantClass } from '@haklex/rich-editor';
-import { AgentPanelPlugin, builtInActions, useAgentLoop } from '@haklex/rich-ext-ai-agent';
+import {
+  AgentPanelPlugin,
+  builtInActions,
+  DiffApplyPlugin,
+  useAgentLoop,
+} from '@haklex/rich-ext-ai-agent';
 import { MentionPlatformProvider, ShiroEditor } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
-import type { SerializedEditorState } from 'lexical';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import type { LexicalEditor, SerializedEditorState } from 'lexical';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useTheme } from '../context/ThemeContext';
@@ -125,18 +136,19 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
   const [providers, setProviders] = useState<ProviderConfig[]>(loadProviders);
   const [selectedModel, setSelectedModel] = useState<SelectedModel | null>(loadSelectedModel);
 
-  const providerRef = useRef<LLMProvider | null>(null);
+  const [provider, setProvider] = useState<LLMProvider | null>(null);
   const agentLoopRef = useRef<ReturnType<typeof useAgentLoop> | null>(null);
+  const editorRef = useRef<LexicalEditor | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (!selectedModel) {
-      providerRef.current = null;
+      setProvider(null);
       return;
     }
     const providerConfig = providers.find((p) => p.id === selectedModel.providerId);
     if (!providerConfig) {
-      providerRef.current = null;
+      setProvider(null);
       return;
     }
     const opts = {
@@ -144,8 +156,9 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
       apiKey: providerConfig.apiKey,
       baseUrl: providerConfig.baseUrl,
     };
-    providerRef.current =
-      providerConfig.type === 'claude' ? createClaudeProvider(opts) : createOpenAIProvider(opts);
+    setProvider(
+      providerConfig.type === 'claude' ? createClaudeProvider(opts) : createOpenAIProvider(opts),
+    );
   }, [selectedModel, providers]);
 
   function handleProvidersChange(next: ProviderConfig[]) {
@@ -165,10 +178,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
       abortRef.current = new AbortController();
       loop.run(builtInActions[1], message).catch((err: unknown) => {
         if ((err as Error).name === 'AbortError') return;
-        store.dispatch({
-          type: 'add_bubble',
-          bubble: { type: 'error', message: String(err) },
-        });
+        store.getState().addBubble({ type: 'error', message: String(err) });
       });
     },
     [store],
@@ -176,7 +186,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
 
   const handleAbort = useCallback(() => {
     abortRef.current?.abort();
-    store.dispatch({ type: 'set_status', status: 'idle' });
+    store.getState().setStatus('idle');
   }, [store]);
 
   const handleRetry = useCallback(() => {
@@ -187,15 +197,49 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
     }
   }, [store, handleSend]);
 
+  const handleRetryToolCall = useCallback(
+    async (toolName: string, params: Record<string, unknown>) => {
+      const editor = editorRef.current;
+      if (!editor) return;
+
+      const serialized = editor.getEditorState().toJSON() as SerializedEditorState;
+      const snapshot = createSnapshot(serialized);
+      const operations: AgentOperation[] = [];
+      const tools = createDocumentTools(snapshot, operations);
+      const tool = tools.find((t) => t.name === toolName);
+      if (!tool) return;
+
+      store.getState().addBubble({ type: 'tool_call', toolName, params });
+      const result = await tool.execute(params);
+      const content = result.ok ? result.content : JSON.stringify(result.error);
+      store.getState().addBubble({
+        type: 'tool_result',
+        toolName,
+        success: result.ok,
+        summary: content,
+      });
+
+      if (operations.length > 0) {
+        const diffState = createDiffEngine(operations, serialized);
+        store.getState().setDiffState(diffState);
+      }
+    },
+    [store],
+  );
+
   return (
     <div className="agent-split">
       <div className="agent-pane-editor">
         <MentionPlatformProvider platforms={{}}>
           <ShiroEditor header={<ToolbarPlugin />} initialValue={initialContent}>
-            {providerRef.current && (
-              <AgentPanelPlugin provider={providerRef.current} store={store} />
-            )}
-            <AgentLoopCapture loopRef={agentLoopRef} provider={providerRef.current} store={store} />
+            {provider && <AgentPanelPlugin provider={provider} store={store} />}
+            <DiffApplyPlugin store={store} />
+            <AgentLoopCapture
+              editorRef={editorRef}
+              loopRef={agentLoopRef}
+              provider={provider}
+              store={store}
+            />
           </ShiroEditor>
         </MentionPlatformProvider>
       </div>
@@ -208,6 +252,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
             onAbort={handleAbort}
             onProvidersChange={handleProvidersChange}
             onRetry={handleRetry}
+            onRetryToolCall={handleRetryToolCall}
             onSelectModel={handleSelectModel}
             onSend={handleSend}
           />
@@ -218,10 +263,12 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
 }
 
 function AgentLoopCapture({
+  editorRef,
   loopRef,
   provider,
   store,
 }: {
+  editorRef: React.RefObject<LexicalEditor | null>;
   loopRef: React.RefObject<ReturnType<typeof useAgentLoop> | null>;
   provider: LLMProvider | null;
   store: ReturnType<typeof createAgentStore>;
@@ -230,20 +277,33 @@ function AgentLoopCapture({
     loopRef.current = null;
     return null;
   }
-  return <AgentLoopCaptureInner loopRef={loopRef} provider={provider} store={store} />;
+  return (
+    <AgentLoopCaptureInner
+      editorRef={editorRef}
+      loopRef={loopRef}
+      provider={provider}
+      store={store}
+    />
+  );
 }
 
 function AgentLoopCaptureInner({
+  editorRef,
   loopRef,
   provider,
   store,
 }: {
+  editorRef: React.RefObject<LexicalEditor | null>;
   loopRef: React.RefObject<ReturnType<typeof useAgentLoop> | null>;
   provider: LLMProvider;
   store: ReturnType<typeof createAgentStore>;
 }) {
   const loop = useAgentLoop({ provider, store });
   loopRef.current = loop;
+
+  const [editor] = useLexicalComposerContext();
+  editorRef.current = editor;
+
   return null;
 }
 

@@ -12,6 +12,7 @@ import { bubbleTool, bubbleUser, messageList } from './styles.css';
 interface ChatMessageListProps {
   bubbles: ChatBubble[];
   onRetry?: () => void;
+  onRetryToolCall?: (name: string, params: Record<string, unknown>) => void;
 }
 
 interface ToolCallItem {
@@ -64,7 +65,11 @@ function mergeBubbles(bubbles: ChatBubble[]): MergedBubble[] {
   return result;
 }
 
-export function ChatMessageList({ bubbles, onRetry }: ChatMessageListProps): ReactElement {
+export function ChatMessageList({
+  bubbles,
+  onRetry,
+  onRetryToolCall,
+}: ChatMessageListProps): ReactElement {
   const scrollRef = useRef<HTMLDivElement>(null);
   const mergedBubbles = mergeBubbles(bubbles);
 
@@ -95,7 +100,7 @@ export function ChatMessageList({ bubbles, onRetry }: ChatMessageListProps): Rea
           }
 
           case 'tool_call_group': {
-            return <ToolCallBubble items={item.items} key={i} />;
+            return <ToolCallBubble items={item.items} key={i} onRetryToolCall={onRetryToolCall} />;
           }
 
           case 'error': {

@@ -1,14 +1,19 @@
 import { vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
+export const dialogPopup = style({
+  width: 620,
+  maxWidth: 'calc(100vw - 2rem)',
+});
+
 export const modalBody = style({
   display: 'flex',
   height: 420,
-  width: 580,
+  borderTop: `1px solid ${vars.color.border}`,
 });
 
 export const sidebar = style({
-  width: 180,
+  width: 200,
   borderRight: `1px solid ${vars.color.border}`,
   padding: 12,
   flexShrink: 0,
@@ -25,11 +30,12 @@ export const sidebarLabel = style({
 });
 
 export const providerItem = style({
-  'padding': 8,
+  'padding': '8px 10px',
   'borderRadius': 6,
   'fontSize': 13,
   'cursor': 'pointer',
-  'marginBottom': 4,
+  'marginBottom': 2,
+  'border': '1px solid transparent',
   ':hover': {
     background: vars.color.bgTertiary,
   },
@@ -37,11 +43,12 @@ export const providerItem = style({
 
 export const providerItemActive = style({
   background: vars.color.bgTertiary,
-  border: `1px solid ${vars.color.border}`,
+  borderColor: vars.color.border,
 });
 
 export const providerItemName = style({
   color: vars.color.text,
+  fontWeight: 500,
 });
 
 export const providerItemType = style({
@@ -51,7 +58,7 @@ export const providerItemType = style({
 });
 
 export const addButton = style({
-  'padding': 8,
+  'padding': '8px 10px',
   'borderRadius': 6,
   'marginTop': 8,
   'border': `1px dashed ${vars.color.border}`,
@@ -67,7 +74,7 @@ export const addButton = style({
 
 export const formPane = style({
   flex: 1,
-  padding: 16,
+  padding: '20px 24px',
   overflowY: 'auto',
 });
 
@@ -75,7 +82,8 @@ export const formHeader = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  marginBottom: 16,
+  gap: 12,
+  marginBottom: 20,
 });
 
 export const formTitle = style({
@@ -84,27 +92,40 @@ export const formTitle = style({
   color: vars.color.text,
 });
 
+export const formTitleInput = style({
+  fontSize: 15,
+  fontWeight: 600,
+  color: vars.color.text,
+  background: 'transparent',
+  border: 'none',
+  outline: 'none',
+  padding: 0,
+  width: '100%',
+});
+
 export const typeBadge = style({
   fontSize: 11,
   padding: '3px 8px',
   borderRadius: 4,
   background: vars.color.bgTertiary,
   color: vars.color.textTertiary,
+  whiteSpace: 'nowrap',
+  flexShrink: 0,
 });
 
 export const fieldGroup = style({
-  marginBottom: 14,
+  marginBottom: 16,
 });
 
 export const fieldLabel = style({
   fontSize: 12,
   color: vars.color.textTertiary,
-  marginBottom: 4,
+  marginBottom: 6,
 });
 
 export const fieldInput = style({
   'width': '100%',
-  'padding': '7px 10px',
+  'padding': '8px 10px',
   'background': vars.color.bgSecondary,
   'border': `1px solid ${vars.color.border}`,
   'borderRadius': 6,
@@ -116,46 +137,55 @@ export const fieldInput = style({
   ':focus': {
     borderColor: vars.color.textTertiary,
   },
+  '::placeholder': {
+    color: vars.color.textQuaternary,
+  },
 });
 
 export const actions = style({
   display: 'flex',
   gap: 8,
-  marginTop: 20,
+  marginTop: 24,
 });
 
 export const actionButton = style({
-  'padding': '6px 14px',
+  'padding': '7px 14px',
   'background': vars.color.bgTertiary,
   'borderRadius': 6,
   'fontSize': 12,
   'color': vars.color.textSecondary,
   'cursor': 'pointer',
-  'border': 'none',
+  'border': `1px solid ${vars.color.border}`,
   'flex': 1,
   'textAlign': 'center',
   ':hover': {
-    background: vars.color.bgTertiary,
+    borderColor: vars.color.textTertiary,
+    color: vars.color.text,
+  },
+  ':disabled': {
+    opacity: 0.5,
+    cursor: 'not-allowed',
   },
 });
 
 export const deleteButton = style({
-  'padding': '6px 14px',
-  'background': 'rgb(239, 68, 68)',
+  'padding': '7px 14px',
+  'background': 'transparent',
   'borderRadius': 6,
   'fontSize': 12,
-  'color': '#fff',
+  'color': 'rgb(239, 68, 68)',
   'cursor': 'pointer',
-  'border': 'none',
+  'border': '1px solid rgb(239, 68, 68)',
   ':hover': {
-    background: 'rgb(220, 38, 38)',
+    background: 'rgb(239, 68, 68)',
+    color: '#fff',
   },
 });
 
 export const modelTags = style({
-  marginTop: 16,
+  marginTop: 20,
   borderTop: `1px solid ${vars.color.border}`,
-  paddingTop: 12,
+  paddingTop: 14,
 });
 
 export const modelTagsLabel = style({
@@ -163,13 +193,13 @@ export const modelTagsLabel = style({
   color: vars.color.textQuaternary,
   textTransform: 'uppercase' as const,
   letterSpacing: '0.05em',
-  marginBottom: 6,
+  marginBottom: 8,
 });
 
 export const modelTagList = style({
   display: 'flex',
   flexWrap: 'wrap',
-  gap: 4,
+  gap: 6,
 });
 
 export const modelTag = style({
@@ -183,26 +213,29 @@ export const modelTag = style({
 export const typeSelector = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: 8,
-  padding: 16,
-  alignItems: 'center',
-  justifyContent: 'center',
   height: '100%',
+  padding: 4,
 });
 
 export const typeSelectorTitle = style({
-  fontSize: 14,
-  color: vars.color.text,
-  marginBottom: 8,
+  fontSize: 13,
+  fontWeight: 500,
+  color: vars.color.textTertiary,
+  marginBottom: 12,
+});
+
+export const presetGrid = style({
+  display: 'grid',
+  gridTemplateColumns: 'repeat(2, 1fr)',
+  gap: 8,
 });
 
 export const typeOption = style({
-  'padding': '12px 16px',
+  'padding': '12px 14px',
   'borderRadius': 8,
   'border': `1px solid ${vars.color.border}`,
   'cursor': 'pointer',
-  'width': '100%',
-  'maxWidth': 260,
+  'transition': 'border-color 0.15s, background 0.15s',
   ':hover': {
     background: vars.color.bgTertiary,
     borderColor: vars.color.textTertiary,
@@ -213,7 +246,7 @@ export const typeOptionName = style({
   fontSize: 14,
   fontWeight: 600,
   color: vars.color.text,
-  marginBottom: 2,
+  marginBottom: 3,
 });
 
 export const typeOptionDesc = style({

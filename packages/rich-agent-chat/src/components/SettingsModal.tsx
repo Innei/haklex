@@ -1,4 +1,4 @@
-import { Dialog, DialogPopup, DialogTitle } from '@haklex/rich-editor-ui';
+import { Dialog, DialogHeader, DialogPopup, DialogTitle } from '@haklex/rich-editor-ui';
 import { useState } from 'react';
 
 import type { ProviderConfig } from '../types';
@@ -16,10 +16,51 @@ const TYPE_LABELS: Record<ProviderConfig['type'], string> = {
   'openai-compatible': 'OpenAI Compatible',
 };
 
-const DEFAULT_URLS: Record<ProviderConfig['type'], string> = {
-  'claude': 'https://api.anthropic.com',
-  'openai-compatible': '',
-};
+interface ProviderPreset {
+  baseUrl: string;
+  description: string;
+  name: string;
+  type: ProviderConfig['type'];
+}
+
+const PROVIDER_PRESETS: ProviderPreset[] = [
+  {
+    name: 'Anthropic',
+    type: 'claude',
+    baseUrl: 'https://api.anthropic.com/v1',
+    description: 'Claude models via Anthropic native API',
+  },
+  {
+    name: 'OpenAI',
+    type: 'openai-compatible',
+    baseUrl: 'https://api.openai.com/v1',
+    description: 'GPT models via OpenAI API',
+  },
+  {
+    name: 'OpenRouter',
+    type: 'openai-compatible',
+    baseUrl: 'https://openrouter.ai/api/v1',
+    description: 'Multi-provider gateway',
+  },
+  {
+    name: 'DeepSeek',
+    type: 'openai-compatible',
+    baseUrl: 'https://api.deepseek.com/v1',
+    description: 'DeepSeek models',
+  },
+  {
+    name: 'Ollama',
+    type: 'openai-compatible',
+    baseUrl: 'http://localhost:11434/v1',
+    description: 'Local models via Ollama',
+  },
+  {
+    name: 'Custom',
+    type: 'openai-compatible',
+    baseUrl: '',
+    description: 'OpenAI-compatible endpoint',
+  },
+];
 
 export function SettingsModal({
   open,
@@ -37,13 +78,13 @@ export function SettingsModal({
     onProvidersChange(providers.map((p) => (p.id === id ? { ...p, ...patch } : p)));
   }
 
-  function addProvider(type: ProviderConfig['type']) {
+  function addProvider(preset: ProviderPreset) {
     const newProvider: ProviderConfig = {
       id: crypto.randomUUID(),
-      type,
-      name: type === 'claude' ? 'Anthropic' : 'New Provider',
+      type: preset.type,
+      name: preset.name,
       apiKey: '',
-      baseUrl: DEFAULT_URLS[type],
+      baseUrl: preset.baseUrl,
       models: [],
     };
     onProvidersChange([...providers, newProvider]);
@@ -86,8 +127,10 @@ export function SettingsModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogPopup showCloseButton>
-        <DialogTitle>Provider Settings</DialogTitle>
+      <DialogPopup showCloseButton className={css.dialogPopup}>
+        <DialogHeader>
+          <DialogTitle>Provider Settings</DialogTitle>
+        </DialogHeader>
         <div className={css.modalBody}>
           <div className={css.sidebar}>
             <div className={css.sidebarLabel}>Providers</div>
@@ -118,29 +161,26 @@ export function SettingsModal({
           <div className={css.formPane}>
             {addingType ? (
               <div className={css.typeSelector}>
-                <div className={css.typeSelectorTitle}>Choose Provider Type</div>
-                <div className={css.typeOption} onClick={() => addProvider('claude')}>
-                  <div className={css.typeOptionName}>Claude API</div>
-                  <div className={css.typeOptionDesc}>Anthropic native API</div>
-                </div>
-                <div className={css.typeOption} onClick={() => addProvider('openai-compatible')}>
-                  <div className={css.typeOptionName}>OpenAI Compatible</div>
-                  <div className={css.typeOptionDesc}>OpenAI, DeepSeek, Ollama, etc.</div>
+                <div className={css.typeSelectorTitle}>Choose Provider</div>
+                <div className={css.presetGrid}>
+                  {PROVIDER_PRESETS.map((preset) => (
+                    <div
+                      className={css.typeOption}
+                      key={preset.name}
+                      onClick={() => addProvider(preset)}
+                    >
+                      <div className={css.typeOptionName}>{preset.name}</div>
+                      <div className={css.typeOptionDesc}>{preset.description}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             ) : selectedProvider ? (
               <>
                 <div className={css.formHeader}>
                   <input
-                    className={css.formTitle}
+                    className={css.formTitleInput}
                     value={selectedProvider.name}
-                    style={{
-                      background: 'transparent',
-                      border: 'none',
-                      outline: 'none',
-                      padding: 0,
-                      width: '100%',
-                    }}
                     onChange={(e) =>
                       updateProvider(selectedProvider.id, {
                         name: e.target.value,

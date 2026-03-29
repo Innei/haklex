@@ -11,37 +11,32 @@ describe('createAgentStore', () => {
     expect(state.diffState).toBeNull();
   });
 
-  it('dispatch updates state and notifies subscribers', () => {
+  it('actions update state and notify subscribers', () => {
     const store = createAgentStore();
     const listener = vi.fn();
     store.subscribe(listener);
 
-    store.dispatch({ type: 'set_status', status: 'running' });
+    store.getState().setStatus('running');
 
     expect(store.getState().status).toBe('running');
     expect(listener).toHaveBeenCalledTimes(1);
-    expect(listener).toHaveBeenCalledWith(store.getState());
+    expect(listener.mock.calls[0][0].status).toBe('running');
   });
 
   it('add_bubble appends to bubbles array', () => {
     const store = createAgentStore();
-    store.dispatch({
-      type: 'add_bubble',
-      bubble: { type: 'user', content: 'hello' },
-    });
+    store.getState().addBubble({ type: 'user', content: 'hello' });
     expect(store.getState().bubbles).toHaveLength(1);
     expect(store.getState().bubbles[0]).toEqual({ type: 'user', content: 'hello' });
   });
 
   it('update_last_bubble modifies the last bubble', () => {
     const store = createAgentStore();
-    store.dispatch({
-      type: 'add_bubble',
-      bubble: { type: 'assistant', content: 'hel', streaming: true },
-    });
-    store.dispatch({
-      type: 'update_last_bubble',
-      bubble: { type: 'assistant', content: 'hello world', streaming: false },
+    store.getState().addBubble({ type: 'assistant', content: 'hel', streaming: true });
+    store.getState().updateLastBubble({
+      type: 'assistant',
+      content: 'hello world',
+      streaming: false,
     });
     expect(store.getState().bubbles).toHaveLength(1);
     expect(store.getState().bubbles[0]).toEqual({
@@ -58,18 +53,15 @@ describe('createAgentStore', () => {
       getByBlockId: () => undefined,
       getPending: () => [],
     };
-    store.dispatch({ type: 'set_diff_state', diffState: diff });
+    store.getState().setDiffState(diff);
     expect(store.getState().diffState).toBe(diff);
   });
 
   it('reset clears everything', () => {
     const store = createAgentStore();
-    store.dispatch({ type: 'set_status', status: 'running' });
-    store.dispatch({
-      type: 'add_bubble',
-      bubble: { type: 'user', content: 'hi' },
-    });
-    store.dispatch({ type: 'reset' });
+    store.getState().setStatus('running');
+    store.getState().addBubble({ type: 'user', content: 'hi' });
+    store.getState().reset();
 
     const state = store.getState();
     expect(state.status).toBe('idle');
@@ -82,7 +74,7 @@ describe('createAgentStore', () => {
     const listener = vi.fn();
     const unsub = store.subscribe(listener);
     unsub();
-    store.dispatch({ type: 'set_status', status: 'running' });
+    store.getState().setStatus('running');
     expect(listener).not.toHaveBeenCalled();
   });
 });
