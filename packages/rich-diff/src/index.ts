@@ -1,6 +1,6 @@
-import './style.css.ts'
+import './style.css.ts';
 
-export type { DiffHunk, DiffOpType } from './compute-diff'
-export { computeDiff } from './compute-diff'
-export type { RichDiffProps } from './RichDiff'
-export { RichDiff } from './RichDiff'
+export type { RichDiffProps } from './RichDiff';
+export { RichDiff } from './RichDiff';
+export type { DiffHunk, DiffOpType } from '@haklex/rich-diff-core';
+export { computeDiff } from '@haklex/rich-diff-core';

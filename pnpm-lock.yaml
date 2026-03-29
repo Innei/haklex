@@ -344,6 +344,9 @@ importers:
 
   packages/rich-diff:
     dependencies:
+      '@haklex/rich-diff-core':
+        specifier: workspace:*
+        version: link:../rich-diff-core
       '@haklex/rich-editor':
         specifier: workspace:*
         version: link:../rich-editor

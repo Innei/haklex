@@ -22,6 +22,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
+    "@haklex/rich-diff-core": "workspace:*",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-static-renderer": "workspace:*",
     "@haklex/rich-style-token": "workspace:*"

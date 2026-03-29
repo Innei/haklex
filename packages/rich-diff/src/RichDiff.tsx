@@ -1,3 +1,5 @@
+import type { DiffHunk } from '@haklex/rich-diff-core';
+import { computeDiff } from '@haklex/rich-diff-core';
 import { ColorSchemeProvider, getVariantClass } from '@haklex/rich-editor';
 import type { RichRendererProps } from '@haklex/rich-static-renderer';
 import { RichRenderer } from '@haklex/rich-static-renderer';
@@ -5,8 +7,6 @@ import { PortalThemeProvider } from '@haklex/rich-style-token';
 import type { SerializedEditorState, SerializedLexicalNode } from 'lexical';
 import { useMemo } from 'react';
 
-import type { DiffHunk } from './compute-diff';
-import { computeDiff } from './compute-diff';
 import * as diffStyles from './style.css.ts';
 
 export interface RichDiffProps {
