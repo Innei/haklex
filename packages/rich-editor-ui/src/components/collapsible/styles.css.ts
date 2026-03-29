@@ -33,4 +33,27 @@ export const chevron = style({
 
 export const panel = style({
   overflow: 'hidden',
+  interpolateSize: 'allow-keywords',
+  height: 'var(--collapsible-panel-height)',
+  opacity: 1,
+  contentVisibility: 'visible',
+  transition:
+    'height 0.24s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, content-visibility 0.24s cubic-bezier(0.4, 0, 0.2, 1) allow-discrete',
+  selectors: {
+    '&[data-closed]': {
+      height: 0,
+      opacity: 0,
+      contentVisibility: 'hidden',
+    },
+    '&[data-starting-style]': {
+      height: 0,
+      opacity: 0,
+      contentVisibility: 'hidden',
+    },
+    '&[data-ending-style]': {
+      height: 0,
+      opacity: 0,
+      contentVisibility: 'hidden',
+    },
+  },
 });
