@@ -22,6 +22,20 @@ export type {
   ToolError,
   ToolSchema,
 } from './protocol';
+export {
+  acceptBatch,
+  applyOpsToSnapshot,
+  createReviewBatch,
+  detectConflicts,
+  rejectBatch,
+} from './review-engine';
+export type {
+  ReviewBatch,
+  ReviewBatchStatus,
+  ReviewEntry,
+  ReviewEntryStatus,
+  ReviewState,
+} from './review-types';
 export { agentStoreSelectors } from './selectors';
 export type { EditorSnapshot } from './snapshot';
 export { compareBlockContent, createSnapshot } from './snapshot';

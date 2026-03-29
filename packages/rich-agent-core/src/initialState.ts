@@ -1,3 +1,4 @@
+import type { ReviewState } from './review-types';
 import type { DiffState } from './types';
 
 export type ChatBubble =
@@ -7,7 +8,8 @@ export type ChatBubble =
   | { type: 'tool_result'; toolName: string; success: boolean; summary: string }
   | { type: 'thinking'; content: string }
   | { type: 'error'; message: string }
-  | { type: 'diff_summary'; accepted: number; rejected: number; pending: number };
+  | { type: 'diff_summary'; accepted: number; rejected: number; pending: number }
+  | { type: 'diff_review'; batchId: string };
 
 export type AgentStoreStatus =
   | 'idle'
@@ -21,6 +23,7 @@ export type AgentStoreState = {
   status: AgentStoreStatus;
   bubbles: ChatBubble[];
   diffState: DiffState | null;
+  reviewState: ReviewState | null;
 };
 
 export function createInitialAgentStoreState(): AgentStoreState {
@@ -28,5 +31,6 @@ export function createInitialAgentStoreState(): AgentStoreState {
     status: 'idle',
     bubbles: [],
     diffState: null,
+    reviewState: null,
   };
 }
