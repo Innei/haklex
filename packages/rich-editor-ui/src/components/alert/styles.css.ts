@@ -10,23 +10,23 @@ export const alert = recipe({
     borderRadius: '8px',
     fontSize: '13px',
     lineHeight: '1.5',
-    borderLeft: '3px solid',
+    border: '1px solid transparent',
   },
   variants: {
     variant: {
       info: {
         backgroundColor: 'rgba(59, 130, 246, 0.06)',
-        borderLeftColor: '#3b82f6',
+        borderColor: 'rgba(59, 130, 246, 0.24)',
         color: '#1e40af',
       },
       warning: {
         backgroundColor: 'rgba(245, 158, 11, 0.06)',
-        borderLeftColor: '#f59e0b',
+        borderColor: 'rgba(245, 158, 11, 0.24)',
         color: '#92400e',
       },
       error: {
         backgroundColor: 'rgba(239, 68, 68, 0.06)',
-        borderLeftColor: '#ef4444',
+        borderColor: 'rgba(239, 68, 68, 0.24)',
         color: '#991b1b',
       },
     },
