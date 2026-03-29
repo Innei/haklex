@@ -117,6 +117,19 @@ function normalizeRootBlockIds(
   );
 }
 
+function syncBlockIdAttributes(editor: ReturnType<typeof useLexicalComposerContext>[0]) {
+  editor.getEditorState().read(() => {
+    for (const child of $getRoot().getChildren()) {
+      const id = $getState(child, blockIdState);
+      if (!id) continue;
+      const dom = editor.getElementByKey(child.getKey());
+      if (dom && dom.getAttribute('data-block-id') !== id) {
+        dom.setAttribute('data-block-id', id);
+      }
+    }
+  });
+}
+
 export function BlockIdPlugin() {
   const [editor] = useLexicalComposerContext();
 
@@ -126,12 +139,19 @@ export function BlockIdPlugin() {
     if (hasDuplicateOrMissingId(initialChildren)) {
       normalizeRootBlockIds(editor, new Map());
     }
+    syncBlockIdAttributes(editor);
 
     return editor.registerUpdateListener(({ tags, editorState, prevEditorState }) => {
-      if (tags.has(NORMALIZATION_TAG)) return;
+      if (tags.has(NORMALIZATION_TAG)) {
+        syncBlockIdAttributes(editor);
+        return;
+      }
 
       const children = collectRootChildren(editorState);
-      if (!hasDuplicateOrMissingId(children)) return;
+      if (!hasDuplicateOrMissingId(children)) {
+        syncBlockIdAttributes(editor);
+        return;
+      }
 
       const previousIdIndex = buildPreviousIdIndex(prevEditorState);
       normalizeRootBlockIds(editor, previousIdIndex);
