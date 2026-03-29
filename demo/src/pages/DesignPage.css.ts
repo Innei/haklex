@@ -10,9 +10,9 @@ export const pageLayout = style({
 
 export const sidebar = style({
   position: 'sticky',
-  top: 88,
+  top: 'calc(var(--app-header-height, 0px) + 24px)',
   alignSelf: 'start',
-  height: 'calc(100dvh - 88px)',
+  height: 'calc(100dvh - var(--app-header-height, 0px) - 24px)',
   minHeight: 0,
   overflow: 'hidden',
 })

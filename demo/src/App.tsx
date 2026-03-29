@@ -6,13 +6,14 @@ import './demo.css';
 import type { ColorScheme } from '@haklex/rich-editor';
 import { DialogStackProvider } from '@haklex/rich-editor-ui';
 import { Monitor, Moon, Sun } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { ThemeContext } from './context/ThemeContext';
 import { AgentPage } from './pages/AgentPage';
 import { BizPage } from './pages/BizPage';
 import { CommentsPage } from './pages/CommentsPage';
+import { DesignPage } from './pages/DesignPage';
 import { EditorPage } from './pages/EditorPage';
 import { NodeShowcase } from './pages/NodeShowcase';
 import { PresetsPage } from './pages/PresetsPage';
@@ -26,6 +27,7 @@ const navItems = [
   { path: '/presets', label: 'Presets' },
   { path: '/biz', label: 'Biz' },
   { path: '/agent', label: 'AI Agent' },
+  { path: '/design', label: 'Design System' },
 ] as const;
 
 function useSystemColorScheme(): ColorScheme {
@@ -47,6 +49,8 @@ function Layout() {
   const location = useLocation();
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
   const systemScheme = useSystemColorScheme();
+  const headerRef = useRef<HTMLElement | null>(null);
+  const [headerHeight, setHeaderHeight] = useState(88);
 
   const resolved: ColorScheme = themeMode === 'system' ? systemScheme : themeMode;
 
@@ -66,11 +70,36 @@ function Layout() {
   const themeLabel = themeMode === 'system' ? 'System' : themeMode === 'light' ? 'Light' : 'Dark';
   const ThemeIcon = themeMode === 'system' ? Monitor : themeMode === 'light' ? Sun : Moon;
 
+  useEffect(() => {
+    const headerNode = headerRef.current;
+
+    if (!headerNode) {
+      return;
+    }
+
+    const updateHeaderHeight = () => {
+      setHeaderHeight(headerNode.offsetHeight);
+    };
+
+    updateHeaderHeight();
+
+    const observer = new ResizeObserver(updateHeaderHeight);
+    observer.observe(headerNode);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
     <ThemeContext value={resolved}>
       <DialogStackProvider>
-        <div className="app" data-theme={dataTheme}>
-          <header className="app-header">
+        <div
+          className="app"
+          data-theme={dataTheme}
+          style={{ ['--app-header-height' as string]: `${headerHeight}px` }}
+        >
+          <header className="app-header" ref={headerRef}>
             <div className="app-header-content">
               <div>
                 <h1 className="app-title">@haklex/rich-editor</h1>
@@ -96,7 +125,10 @@ function Layout() {
             </div>
           </header>
 
-          <main className="app-main">
+          <main
+            className="app-main"
+            style={{ minHeight: `calc(100dvh - ${headerHeight}px)` }}
+          >
             <Outlet />
           </main>
         </div>
@@ -115,6 +147,7 @@ export const router = createBrowserRouter([
       { path: '/presets', element: <PresetsPage /> },
       { path: '/biz', element: <BizPage /> },
       { path: '/agent', element: <AgentPage /> },
+      { path: '/design', element: <DesignPage /> },
       { path: '*', element: <Navigate replace to="/editor" /> },
     ],
   },
