@@ -5,15 +5,15 @@ export const pageLayout = style({
   display: 'grid',
   gridTemplateColumns: '280px minmax(0, 1fr)',
   gap: '32px',
-  alignItems: 'stretch',
-  height: '100%',
-  minHeight: 0,
-  overflow: 'hidden',
+  alignItems: 'start',
+  minHeight: '100%',
 })
 
 export const sidebar = style({
-  alignSelf: 'stretch',
-  height: '100%',
+  position: 'sticky',
+  top: 0,
+  alignSelf: 'start',
+  height: 'var(--design-page-pane-height, 100%)',
   minHeight: 0,
   overflow: 'hidden',
 })
@@ -93,9 +93,6 @@ export const content = style({
   flexDirection: 'column',
   gap: 32,
   minWidth: 0,
-  minHeight: 0,
-  overflowY: 'auto',
-  paddingRight: 8,
 })
 
 export const hero = style({
