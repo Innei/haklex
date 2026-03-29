@@ -43,48 +43,46 @@ export function ChatInput({
   }
 
   return (
-    <div className={css.composerContainer}>
-      <div className={css.composerCard}>
-        {isRunning && statusLabel && (
-          <div className={css.composerStatusLine}>
-            <Spinner size="sm" />
-            <span>{statusLabel}</span>
-          </div>
-        )}
-        <AutoResizeTextArea
-          className={css.composerTextArea}
-          disabled={disabled}
-          maxRows={10}
-          minRows={2}
-          placeholder={placeholder}
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-        />
-        <div className={css.composerBottomBar}>
-          <div>{modelSelector ?? <div />}</div>
-          {isRunning ? (
-            <button
-              aria-label="Abort agent run"
-              className={css.composerAbortButton}
-              type="button"
-              onClick={onAbort}
-            >
-              <Square size={14} />
-            </button>
-          ) : (
-            <button
-              aria-label="Send message"
-              className={css.composerSendButton}
-              disabled={disabled || !trimmed}
-              type="button"
-              onClick={handleSend}
-            >
-              <ArrowUp size={16} />
-            </button>
-          )}
+    <div className={css.composerDock}>
+      {isRunning && statusLabel && (
+        <div className={css.composerStatusLine}>
+          <Spinner size="sm" />
+          <span>{statusLabel}</span>
         </div>
+      )}
+      <AutoResizeTextArea
+        className={css.composerTextArea}
+        disabled={disabled}
+        maxRows={10}
+        minRows={2}
+        placeholder={placeholder}
+        ref={textareaRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+      <div className={css.composerBottomBar}>
+        <div>{modelSelector ?? <div />}</div>
+        {isRunning ? (
+          <button
+            aria-label="Abort agent run"
+            className={css.composerAbortButton}
+            type="button"
+            onClick={onAbort}
+          >
+            <Square size={14} />
+          </button>
+        ) : (
+          <button
+            aria-label="Send message"
+            className={css.composerSendButton}
+            disabled={disabled || !trimmed}
+            type="button"
+            onClick={handleSend}
+          >
+            <ArrowUp size={16} />
+          </button>
+        )}
       </div>
     </div>
   );

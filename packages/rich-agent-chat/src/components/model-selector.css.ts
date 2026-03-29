@@ -29,7 +29,7 @@ export const providerIcon = style({
   width: 14,
   height: 14,
   borderRadius: 3,
-  background: 'linear-gradient(135deg, #d4a574, #c4956a)',
+  background: vars.color.fillSecondary,
   flexShrink: 0,
 });
 
@@ -52,7 +52,7 @@ export const popoverContent = style({
   overflowY: 'auto',
   padding: 8,
   borderRadius: 8,
-  background: vars.color.bg,
+  background: vars.color.bgSecondary,
 });
 
 export const modelGroup = style({

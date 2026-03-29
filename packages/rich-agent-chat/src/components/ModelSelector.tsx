@@ -1,9 +1,23 @@
 import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui';
+import Claude from '@lobehub/icons/es/Claude';
+import OpenAI from '@lobehub/icons/es/OpenAI';
 import { Check, ChevronDown, Settings2 } from 'lucide-react';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 
 import type { ProviderConfig, SelectedModel } from '../types';
 import * as css from './model-selector.css';
+
+function ProviderIcon({ type }: { type: ProviderConfig['type'] }): ReactElement {
+  switch (type) {
+    case 'claude': {
+      return <Claude.Color size={14} />;
+    }
+    case 'openai-compatible': {
+      return <OpenAI size={14} />;
+    }
+  }
+}
 
 interface ModelSelectorProps {
   onOpenSettings: () => void;
@@ -30,11 +44,12 @@ export function ModelSelector({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger className={css.triggerButton}>
-        <span className={css.providerIcon} />
-        <span className={css.triggerLabel}>
-          {currentProvider ? `${currentProvider.name} / ` : ''}
-          {currentLabel}
-        </span>
+        {currentProvider ? (
+          <ProviderIcon type={currentProvider.type} />
+        ) : (
+          <span className={css.providerIcon} />
+        )}
+        <span className={css.triggerLabel}>{currentLabel}</span>
         <ChevronDown className={css.chevronIcon} size={12} />
       </PopoverTrigger>
       <PopoverPanel align="start" className={css.popoverContent} side="top" sideOffset={10}>

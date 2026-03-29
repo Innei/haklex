@@ -12,7 +12,7 @@ export const chatPanel = style({
   boxSizing: 'border-box',
   padding: 0,
   fontSize: '14px',
-  background: vars.color.bg,
+  background: vars.color.bgSecondary,
   overflow: 'hidden',
 });
 
@@ -32,8 +32,8 @@ export const bubbleUser = style({
   alignSelf: 'flex-end',
   maxWidth: '82%',
   padding: '10px 14px',
-  background: '#171717',
-  color: '#fafafa',
+  background: vars.color.text,
+  color: vars.color.bg,
   borderRadius: '18px 18px 6px 18px',
   lineHeight: 1.5,
   fontSize: '13px',
@@ -189,17 +189,10 @@ export const bubbleTool = style({
 
 // ── Composer Card ──
 
-export const composerContainer = style({
+export const composerDock = style({
   flexShrink: 0,
-  padding: '10px 14px 14px',
-});
-
-export const composerCard = style({
-  background: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 14,
-  padding: '12px 14px',
-  boxShadow: '0 1px 4px rgba(0, 0, 0, 0.04)',
+  borderTop: `1px solid ${vars.color.border}`,
+  padding: '10px 18px 14px',
   display: 'flex',
   flexDirection: 'column',
   gap: 0,
@@ -251,8 +244,8 @@ export const composerSendButton = style({
   'flexShrink': 0,
   'border': 'none',
   'borderRadius': '50%',
-  'background': '#171717',
-  'color': '#fafafa',
+  'background': vars.color.text,
+  'color': vars.color.bg,
   'cursor': 'pointer',
   'transition': 'opacity 160ms ease',
   ':hover': {
