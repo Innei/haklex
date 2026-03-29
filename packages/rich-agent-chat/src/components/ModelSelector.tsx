@@ -1,59 +1,73 @@
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectGroupLabel,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@haklex/rich-editor-ui';
-import type { ReactElement } from 'react';
+import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui';
+import { Check, ChevronDown, Settings } from 'lucide-react';
+import { useState } from 'react';
+
+import type { ProviderConfig, SelectedModel } from '../types';
+import * as css from './model-selector.css';
 
 interface ModelSelectorProps {
-  model: string;
-  onModelChange: (model: string) => void;
+  onOpenSettings: () => void;
+  onSelectModel: (selected: SelectedModel) => void;
+  providers: ProviderConfig[];
+  selectedModel: SelectedModel | null;
 }
 
-const models = [
-  {
-    group: 'Claude',
-    items: [
-      { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4' },
-      { value: 'claude-opus-4-20250514', label: 'Claude Opus 4' },
-    ],
-  },
-  {
-    group: 'OpenAI',
-    items: [
-      { value: 'gpt-4o', label: 'GPT-4o' },
-      { value: 'gpt-4o-mini', label: 'GPT-4o Mini' },
-      { value: 'o3', label: 'o3' },
-    ],
-  },
-];
+export function ModelSelector({
+  providers,
+  selectedModel,
+  onSelectModel,
+  onOpenSettings,
+}: ModelSelectorProps) {
+  const [open, setOpen] = useState(false);
 
-export function getProviderFromModel(model: string): 'claude' | 'openai' {
-  return model.startsWith('claude') ? 'claude' : 'openai';
-}
+  const currentLabel = selectedModel ? selectedModel.modelId : 'No model';
 
-export function ModelSelector({ model, onModelChange }: ModelSelectorProps): ReactElement {
+  const providersWithModels = providers.filter((p) => p.models.length > 0);
+
   return (
-    <Select value={model} onValueChange={onModelChange}>
-      <SelectTrigger>
-        <SelectValue />
-      </SelectTrigger>
-      <SelectContent align="start" side="bottom">
-        {models.map((group) => (
-          <SelectGroup key={group.group}>
-            <SelectGroupLabel>{group.group}</SelectGroupLabel>
-            {group.items.map((item) => (
-              <SelectItem key={item.value} value={item.value}>
-                {item.label}
-              </SelectItem>
-            ))}
-          </SelectGroup>
-        ))}
-      </SelectContent>
-    </Select>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger className={css.triggerButton}>
+        {currentLabel}
+        <ChevronDown className={css.chevronIcon} size={14} />
+      </PopoverTrigger>
+      <PopoverPanel align="start" className={css.popoverContent} side="top" sideOffset={8}>
+        {providersWithModels.length === 0 ? (
+          <div className={css.emptyState}>Configure a provider to get started</div>
+        ) : (
+          providersWithModels.map((provider) => (
+            <div className={css.modelGroup} key={provider.id}>
+              <div className={css.modelGroupLabel}>{provider.name}</div>
+              {provider.models.map((modelId) => {
+                const isActive =
+                  selectedModel?.providerId === provider.id && selectedModel?.modelId === modelId;
+                return (
+                  <div
+                    className={`${css.modelItem}${isActive ? ` ${css.modelItemActive}` : ''}`}
+                    key={modelId}
+                    onClick={() => {
+                      onSelectModel({ providerId: provider.id, modelId });
+                      setOpen(false);
+                    }}
+                  >
+                    {modelId}
+                    {isActive && <Check size={14} />}
+                  </div>
+                );
+              })}
+            </div>
+          ))
+        )}
+        <div
+          className={css.settingsEntry}
+          onClick={() => {
+            setOpen(false);
+            onOpenSettings();
+          }}
+        >
+          <Settings size={14} />
+          Provider Settings
+        </div>
+      </PopoverPanel>
+    </Popover>
   );
 }
