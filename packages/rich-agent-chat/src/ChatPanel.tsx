@@ -5,7 +5,6 @@ import { ChatInput } from './ChatInput';
 import { ChatMessageList } from './ChatMessageList';
 import { ModelSelector } from './components/ModelSelector';
 import { SettingsModal } from './components/SettingsModal';
-import { StatusBar } from './components/StatusBar';
 import * as css from './styles.css';
 import type { ProviderConfig, SelectedModel } from './types';
 
@@ -19,6 +18,12 @@ interface ChatPanelProps {
   selectedModel: SelectedModel | null;
   store: AgentStore;
 }
+
+const STATUS_LABELS: Record<string, string> = {
+  thinking: 'Thinking...',
+  writing: 'Writing...',
+  running: 'Processing...',
+};
 
 export function ChatPanel({
   onAbort,
@@ -46,13 +51,23 @@ export function ChatPanel({
   const isRunning = status !== 'idle' && status !== 'done';
   const hasModel = selectedModel !== null;
 
+  // Build status label for composer
+  let statusLabel: string | undefined;
+  if (isRunning) {
+    if (status === 'calling_tool') {
+      statusLabel = 'Calling tool...';
+    } else {
+      statusLabel = STATUS_LABELS[status] || 'Processing...';
+    }
+  }
+
   return (
     <div className={css.chatPanel}>
       <ChatMessageList bubbles={bubbles} onRetry={onRetry} />
-      {isRunning && <StatusBar status={status} />}
       <ChatInput
         disabled={!hasModel}
         isRunning={isRunning}
+        statusLabel={statusLabel}
         modelSelector={
           <ModelSelector
             providers={providers}
