@@ -27,7 +27,8 @@
   "main": "./src/index.ts",
   "files": [
     "dist",
-    "src/style.css"
+    "src/style.css",
+    "src/style-renderer.css"
   ],
   "scripts": {
     "build": "vite build",
@@ -121,8 +122,8 @@
         "import": "./dist/exports/markdown.mjs",
         "types": "./dist/exports/markdown.d.ts"
       },
-      "./style.css": "./dist/index.css",
-      "./style-renderer.css": "./dist/renderer.css"
+      "./style.css": "./src/style.css",
+      "./style-renderer.css": "./src/style-renderer.css"
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"
