@@ -1,104 +1,88 @@
-import { Check, Copy } from 'lucide-react';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-import {
-  codeBlockWrapper,
-  codeContent,
-  codeHeader,
-  codePre,
-  copyButton,
-  languageLabel,
-} from './styles.css';
+import { CodeBlockCard } from './CodeBlockCard';
+import { normalizeLanguage } from './constants';
+import { getHighlighterWithLang, SHIKI_DUAL_THEMES } from './shiki';
+import * as styles from './styles.css';
 
 export interface CodeBlockProps {
   className?: string;
   code: string;
   language?: string;
+  collapsible?: boolean;
   showCopyButton?: boolean;
   showLineNumbers?: boolean;
 }
 
-let shikiHighlighter: any = null;
-let shikiLoading: Promise<any> | null = null;
-
-async function getHighlighter() {
-  if (shikiHighlighter) return shikiHighlighter;
-  if (shikiLoading) return shikiLoading;
-  shikiLoading = import('shiki').then(async ({ createHighlighter }) => {
-    shikiHighlighter = await createHighlighter({
-      themes: ['github-light', 'github-dark'],
-      langs: [],
-    });
-    return shikiHighlighter;
-  });
-  return shikiLoading;
-}
-
 export function CodeBlock({
+  className,
+  collapsible = true,
   code,
   language,
   showCopyButton = true,
-  className,
+  showLineNumbers = false,
 }: CodeBlockProps): ReactElement {
-  const [html, setHtml] = useState<string>('');
-  const [copied, setCopied] = useState(false);
-  const timerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const normalizedLanguage = normalizeLanguage(language);
+  const [html, setHtml] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!language) return;
     let cancelled = false;
-    getHighlighter().then(async (highlighter) => {
+
+    setHtml(null);
+
+    (async () => {
+      const highlighter = await getHighlighterWithLang(normalizedLanguage);
       if (cancelled) return;
-      const loadedLangs = highlighter.getLoadedLanguages();
-      if (!loadedLangs.includes(language)) {
-        try {
-          await highlighter.loadLanguage(language);
-        } catch {
-          return;
-        }
-      }
-      if (cancelled) return;
+
+      const loaded: string[] = highlighter.getLoadedLanguages();
+      const lang = loaded.includes(normalizedLanguage) ? normalizedLanguage : 'text';
       const result = highlighter.codeToHtml(code, {
-        lang: language,
-        themes: { light: 'github-light', dark: 'github-dark' },
+        lang,
+        themes: SHIKI_DUAL_THEMES,
       });
-      setHtml(result);
-    });
+
+      if (!cancelled) {
+        setHtml(result);
+      }
+    })();
+
     return () => {
       cancelled = true;
     };
-  }, [code, language]);
+  }, [code, normalizedLanguage]);
 
-  const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setCopied(false), 2000);
-  }, [code]);
+  const fallbackLines = useMemo(() => code.split('\n'), [code]);
+
+  const linedClassName = [
+    showLineNumbers && styles.lined,
+    showLineNumbers && styles.linedWithNumbers,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <div className={`${codeBlockWrapper}${className ? ` ${className}` : ''}`}>
-      {(language || showCopyButton) && (
-        <div className={codeHeader}>
-          <span className={languageLabel}>{language || ''}</span>
-          {showCopyButton && (
-            <button className={copyButton} type="button" onClick={handleCopy}>
-              {copied ? <Check size={12} /> : <Copy size={12} />}
-              {copied ? 'Copied' : 'Copy'}
-            </button>
-          )}
-        </div>
+    <CodeBlockCard
+      className={className}
+      code={code}
+      collapsible={collapsible}
+      language={language}
+      showCopyButton={showCopyButton}
+      static
+    >
+      {html ? (
+        <div className={linedClassName} dangerouslySetInnerHTML={{ __html: html }} />
+      ) : (
+        <pre className={linedClassName}>
+          <code>
+            {fallbackLines.map((line, i) => (
+              <span className="line" key={i}>
+                {line}
+              </span>
+            ))}
+          </code>
+        </pre>
       )}
-      <div className={codeContent}>
-        {html ? (
-          <div dangerouslySetInnerHTML={{ __html: html }} />
-        ) : (
-          <pre className={codePre}>
-            <code>{code}</code>
-          </pre>
-        )}
-      </div>
-    </div>
+    </CodeBlockCard>
   );
 }
