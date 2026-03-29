@@ -33,7 +33,7 @@ import {
 } from '@haklex/rich-editor-ui';
 import { PortalThemeProvider, vars } from '@haklex/rich-style-token';
 import { Heart, Plus, Settings, Trash2 } from 'lucide-react';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { type ReactNode, useState } from 'react';
 
 import { useTheme } from '../context/ThemeContext';
 import * as css from './DesignPage.css';
@@ -865,48 +865,11 @@ function CodeBlockSection() {
 
 export function DesignPage() {
   const theme = useTheme();
-  const layoutRef = useRef<HTMLDivElement | null>(null);
-  const [paneHeight, setPaneHeight] = useState<number | null>(null);
-
-  useEffect(() => {
-    const layoutNode = layoutRef.current;
-
-    if (!layoutNode) {
-      return;
-    }
-
-    const scrollPane = layoutNode.closest('.app-main');
-
-    if (!(scrollPane instanceof HTMLElement)) {
-      return;
-    }
-
-    const updatePaneHeight = () => {
-      setPaneHeight(scrollPane.clientHeight);
-    };
-
-    updatePaneHeight();
-
-    const observer = new ResizeObserver(updatePaneHeight);
-    observer.observe(scrollPane);
-
-    return () => {
-      observer.disconnect();
-    };
-  }, []);
 
   return (
     <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
       <ColorSchemeProvider colorScheme={theme}>
-        <div
-          className={css.pageLayout}
-          ref={layoutRef}
-          style={
-            paneHeight == null
-              ? undefined
-              : { ['--design-page-pane-height' as string]: `${paneHeight}px` }
-          }
-        >
+        <div className={css.pageLayout}>
           <SideNav />
           <div className={css.content}>
             <PageHero />

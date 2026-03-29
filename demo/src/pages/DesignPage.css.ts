@@ -6,14 +6,13 @@ export const pageLayout = style({
   gridTemplateColumns: '280px minmax(0, 1fr)',
   gap: '32px',
   alignItems: 'start',
-  minHeight: '100%',
 })
 
 export const sidebar = style({
   position: 'sticky',
-  top: 0,
+  top: 88,
   alignSelf: 'start',
-  height: 'var(--design-page-pane-height, 100%)',
+  height: 'calc(100dvh - 88px)',
   minHeight: 0,
   overflow: 'hidden',
 })
