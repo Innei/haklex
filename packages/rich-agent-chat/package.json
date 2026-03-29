@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@haklex/rich-agent-core": "workspace:*",
-    "@haklex/rich-diff": "workspace:*",
+    "@haklex/rich-diff-core": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "@lobehub/icons": "^5.2.0",

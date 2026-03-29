@@ -1,5 +1,5 @@
 import type { ReviewBatch } from '@haklex/rich-agent-core';
-import { computeDiff } from '@haklex/rich-diff';
+import { computeDiff } from '@haklex/rich-diff-core';
 import type { ReactElement } from 'react';
 import { useMemo } from 'react';
 
