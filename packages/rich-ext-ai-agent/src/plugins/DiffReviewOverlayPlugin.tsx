@@ -9,12 +9,18 @@ import {
 } from '@haklex/rich-editor/static';
 import { RichRenderer } from '@haklex/rich-static-renderer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getRoot, $getState, type SerializedLexicalNode } from 'lexical';
+import { $getRoot, $getState, $parseSerializedNode, type SerializedLexicalNode } from 'lexical';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { diffPanel, diffPanelDelete, overlayContainer } from './diff-review-overlay.css';
+import {
+  overlayContainer,
+} from './diff-review-overlay.css';
+
+const INSERT_GAP = 8;
+const DELETE_BG = 'color-mix(in srgb, var(--rc-alert-caution) 7%, transparent)';
+const DELETE_BORDER = '2px solid var(--rc-alert-caution)';
 
 function getBlockId(node: SerializedLexicalNode): string | undefined {
   return (node as any).$?.blockId as string | undefined;
@@ -33,18 +39,89 @@ function wrapDoc(nodes: SerializedLexicalNode[]) {
   };
 }
 
+function $findBlockByBlockId(blockId: string) {
+  const root = $getRoot();
+  for (const child of root.getChildren()) {
+    if ($getState(child, blockIdState) === blockId) {
+      return child;
+    }
+  }
+  return null;
+}
+
 type OverlayEntry = {
   id: string;
+  batchId: string;
   type: 'insert' | 'delete' | 'replace';
-  top: number;
-  height: number;
   blockEl: HTMLElement | null;
+  blockTop: number;
+  blockHeight: number;
+  previewTop?: number;
   oldNode?: SerializedLexicalNode;
   newNode?: SerializedLexicalNode;
+  spacing: 'none' | 'before' | 'after';
 };
 
-const DELETE_BG = 'rgba(239, 68, 68, 0.08)';
-const DELETE_BORDER = '3px solid rgb(239, 68, 68)';
+function applyDeleteDecorations(entry: OverlayEntry) {
+  if (!entry.blockEl) return;
+  entry.blockEl.style.background = DELETE_BG;
+  entry.blockEl.style.borderLeft = DELETE_BORDER;
+  entry.blockEl.style.textDecoration = 'line-through';
+  entry.blockEl.style.textDecorationColor = 'var(--rc-alert-caution)';
+  entry.blockEl.style.opacity = '0.72';
+}
+
+function resetBlockDecorations(entry: OverlayEntry) {
+  if (!entry.blockEl) return;
+  entry.blockEl.style.background = '';
+  entry.blockEl.style.borderLeft = '';
+  entry.blockEl.style.textDecoration = '';
+  entry.blockEl.style.textDecorationColor = '';
+  entry.blockEl.style.opacity = '';
+  entry.blockEl.style.marginTop = '';
+  entry.blockEl.style.marginBottom = '';
+}
+
+function InlineToolbar({
+  batchId,
+  top,
+  onAccept,
+  onReject,
+}: {
+  batchId: string;
+  onAccept: (batchId: string) => void;
+  onReject: (batchId: string) => void;
+  top: number;
+}): ReactElement {
+  return (
+    <div className={inlineToolbarLayer} style={{ top }}>
+      <div className={inlineToolbar}>
+        <ActionButton
+          icon
+          rounded
+          aria-label="Reject change"
+          className={`${inlineActionButton} ${inlineRejectButton}`}
+          size="sm"
+          title="Reject change"
+          onClick={() => onReject(batchId)}
+        >
+          <X size={14} />
+        </ActionButton>
+        <ActionButton
+          icon
+          rounded
+          aria-label="Accept change"
+          className={`${inlineActionButton} ${inlineAcceptButton}`}
+          size="sm"
+          title="Accept change"
+          onClick={() => onAccept(batchId)}
+        >
+          <Check size={14} />
+        </ActionButton>
+      </div>
+    </div>
+  );
+}
 
 export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): ReactElement | null {
   const [editor] = useLexicalComposerContext();
@@ -55,36 +132,117 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   const rendererConfig = useRendererConfig();
   const extraNodes = useExtraNodes();
 
-  // Track panel heights via ResizeObserver to set block margins
-  const panelRefs = useRef(new Map<string, HTMLDivElement>());
+  const previewRefs = useRef(new Map<string, HTMLDivElement>());
   const observerRef = useRef<ResizeObserver | null>(null);
 
-  const syncMargins = useCallback(() => {
-    for (const o of overlays) {
-      if (!o.blockEl) continue;
-      const panel = panelRefs.current.get(o.id);
-      if (panel) {
-        o.blockEl.style.marginBottom = `${panel.offsetHeight}px`;
+  const renderNode = useCallback(
+    (node: SerializedLexicalNode) => (
+      <RichRenderer
+        extraNodes={extraNodes}
+        rendererConfig={rendererConfig}
+        theme={theme}
+        value={wrapDoc([node])}
+        variant={variant}
+      />
+    ),
+    [extraNodes, rendererConfig, theme, variant],
+  );
+
+  const handleAcceptBatch = useCallback(
+    (batchId: string) => {
+      const reviewState = store.getState().reviewState;
+      const batch = reviewState?.batches.find((item) => item.id === batchId);
+      if (!batch) return;
+
+      store.getState().acceptReviewBatch(batchId);
+
+      editor.update(() => {
+        const root = $getRoot();
+
+        for (const entry of batch.entries) {
+          const { op } = entry;
+
+          if (op.op === 'insert') {
+            if (!op.node?.type) continue;
+            const newNode = $parseSerializedNode(op.node);
+            if (op.position.type === 'root') {
+              const idx = op.position.index ?? root.getChildrenSize();
+              const children = root.getChildren();
+              if (idx >= children.length) {
+                root.append(newNode);
+              } else {
+                children[idx].insertBefore(newNode);
+              }
+            } else {
+              const target = $findBlockByBlockId(op.position.blockId);
+              if (!target) continue;
+              if (op.position.type === 'after') {
+                target.insertAfter(newNode);
+              } else {
+                target.insertBefore(newNode);
+              }
+            }
+            continue;
+          }
+
+          if (op.op === 'replace') {
+            if (!op.node?.type) continue;
+            const target = $findBlockByBlockId(op.blockId);
+            if (!target) continue;
+            target.replace($parseSerializedNode(op.node));
+            continue;
+          }
+
+          if (op.op === 'delete') {
+            const target = $findBlockByBlockId(op.blockId);
+            if (!target) continue;
+            target.remove();
+          }
+        }
+      });
+    },
+    [editor, store],
+  );
+
+  const handleRejectBatch = useCallback(
+    (batchId: string) => {
+      store.getState().rejectReviewBatch(batchId);
+    },
+    [store],
+  );
+
+  const syncSpacing = useCallback(() => {
+    for (const overlay of overlays) {
+      if (!overlay.blockEl) continue;
+      const previewEl = previewRefs.current.get(overlay.id);
+      const previewHeight = previewEl?.offsetHeight ?? 0;
+
+      if (overlay.spacing === 'before') {
+        overlay.blockEl.style.marginTop =
+          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
+      } else if (overlay.spacing === 'after') {
+        overlay.blockEl.style.marginBottom =
+          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
       }
     }
   }, [overlays]);
 
   useEffect(() => {
-    const observer = new ResizeObserver(() => syncMargins());
+    const observer = new ResizeObserver(() => syncSpacing());
     observerRef.current = observer;
-    for (const el of panelRefs.current.values()) {
+    for (const el of previewRefs.current.values()) {
       observer.observe(el);
     }
     return () => observer.disconnect();
-  }, [syncMargins]);
+  }, [syncSpacing]);
 
-  const panelRefCallback = useCallback(
+  const previewRefCallback = useCallback(
     (id: string) => (el: HTMLDivElement | null) => {
       if (el) {
-        panelRefs.current.set(id, el);
+        previewRefs.current.set(id, el);
         observerRef.current?.observe(el);
       } else {
-        panelRefs.current.delete(id);
+        previewRefs.current.delete(id);
       }
     },
     [],
@@ -97,7 +255,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       return;
     }
 
-    const pendingBatches = reviewState.batches.filter((b) => b.status === 'pending');
+    const pendingBatches = reviewState.batches.filter((batch) => batch.status === 'pending');
     if (pendingBatches.length === 0) {
       setOverlays([]);
       return;
@@ -117,52 +275,100 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       for (const batch of pendingBatches) {
         const baseChildren = (batch.baseSnapshot.root as any).children as SerializedLexicalNode[];
         const blockMap = new Map<string, SerializedLexicalNode>();
-        for (const c of baseChildren) {
-          const bid = getBlockId(c);
-          if (bid) blockMap.set(bid, c);
+        for (const child of baseChildren) {
+          const blockId = getBlockId(child);
+          if (blockId) blockMap.set(blockId, child);
         }
 
         for (const entry of batch.entries) {
           if (entry.op.op === 'insert') {
             if (!entry.op.node?.type) continue;
-            const anchorId = (entry as any).anchorBeforeId || (entry as any).anchorAfterId;
-            if (!anchorId) continue;
-            const anchorChild = children.find((c) => $getState(c, blockIdState) === anchorId);
-            if (!anchorChild) continue;
-            const domEl = editor.getElementByKey(anchorChild.getKey());
-            if (!domEl) continue;
-            const rect = domEl.getBoundingClientRect();
 
-            entries.push({
-              id: entry.id,
-              type: 'insert',
-              top: rect.bottom - containerRect.top,
-              height: 0,
-              blockEl: domEl,
-              newNode: entry.op.node,
-            });
+            if (entry.anchorBeforeId) {
+              const beforeChild = children.find(
+                (child) => $getState(child, blockIdState) === entry.anchorBeforeId,
+              );
+              if (!beforeChild) continue;
+              const domEl = editor.getElementByKey(beforeChild.getKey());
+              if (!domEl) continue;
+              const rect = domEl.getBoundingClientRect();
+
+              entries.push({
+                id: entry.id,
+                batchId: batch.id,
+                type: 'insert',
+                blockEl: domEl,
+                blockTop: rect.bottom - containerRect.top,
+                blockHeight: rect.height,
+                newNode: decorateSubtree(entry.op.node, 'insert'),
+                previewTop: rect.bottom - containerRect.top + INSERT_GAP,
+                spacing: 'after',
+              });
+              continue;
+            }
+
+            if (entry.anchorAfterId) {
+              const afterChild = children.find(
+                (child) => $getState(child, blockIdState) === entry.anchorAfterId,
+              );
+              if (!afterChild) continue;
+              const domEl = editor.getElementByKey(afterChild.getKey());
+              if (!domEl) continue;
+              const rect = domEl.getBoundingClientRect();
+
+              entries.push({
+                id: entry.id,
+                batchId: batch.id,
+                type: 'insert',
+                blockEl: domEl,
+                blockTop: rect.top - containerRect.top,
+                blockHeight: rect.height,
+                newNode: decorateSubtree(entry.op.node, 'insert'),
+                previewTop: rect.top - containerRect.top,
+                spacing: 'before',
+              });
+            }
+
             continue;
           }
 
           const blockId = entry.targetBlockId;
           if (!blockId) continue;
 
-          const child = children.find((c) => $getState(c, blockIdState) === blockId);
+          const child = children.find((item) => $getState(item, blockIdState) === blockId);
           if (!child) continue;
-
           const domEl = editor.getElementByKey(child.getKey());
           if (!domEl) continue;
-
           const rect = domEl.getBoundingClientRect();
+
+          if (entry.op.op === 'delete') {
+            entries.push({
+              id: entry.id,
+              batchId: batch.id,
+              type: 'delete',
+              blockEl: domEl,
+              blockTop: rect.top - containerRect.top,
+              blockHeight: rect.height,
+              spacing: 'none',
+            });
+            continue;
+          }
+
+          const baseNode = blockMap.get(blockId);
+          if (!baseNode || !entry.op.node?.type) continue;
+          const diffResult = diffModifiedNode(baseNode, entry.op.node);
 
           entries.push({
             id: entry.id,
-            type: entry.op.op as 'delete' | 'replace',
-            top: rect.top - containerRect.top,
-            height: rect.height,
+            batchId: batch.id,
+            type: 'replace',
             blockEl: domEl,
-            oldNode: blockMap.get(blockId),
-            newNode: entry.op.op === 'replace' ? entry.op.node : undefined,
+            blockTop: rect.top - containerRect.top,
+            blockHeight: rect.height,
+            oldNode: diffResult.oldNode,
+            newNode: diffResult.newNode,
+            previewTop: rect.bottom - containerRect.top + INSERT_GAP,
+            spacing: 'after',
           });
         }
       }
@@ -171,33 +377,22 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     setOverlays(entries);
   }, [editor, store]);
 
-  // Apply block inline styles & margins
   useEffect(() => {
-    for (const o of overlays) {
-      if (!o.blockEl) continue;
-      if (o.type === 'delete') {
-        o.blockEl.style.background = DELETE_BG;
-        o.blockEl.style.borderLeft = DELETE_BORDER;
-        o.blockEl.style.textDecoration = 'line-through';
-        o.blockEl.style.textDecorationColor = 'rgb(239, 68, 68)';
-      } else if (o.type === 'replace') {
-        o.blockEl.style.background = DELETE_BG;
-        o.blockEl.style.borderLeft = DELETE_BORDER;
+    for (const overlay of overlays) {
+      resetBlockDecorations(overlay);
+      if (overlay.type === 'delete') {
+        applyDeleteDecorations(overlay);
       }
     }
-    syncMargins();
+
+    syncSpacing();
 
     return () => {
-      for (const o of overlays) {
-        if (!o.blockEl) continue;
-        o.blockEl.style.background = '';
-        o.blockEl.style.borderLeft = '';
-        o.blockEl.style.textDecoration = '';
-        o.blockEl.style.textDecorationColor = '';
-        o.blockEl.style.marginBottom = '';
+      for (const overlay of overlays) {
+        resetBlockDecorations(overlay);
       }
     };
-  }, [overlays, syncMargins]);
+  }, [overlays, syncSpacing]);
 
   useEffect(() => {
     const rootEl = editor.getRootElement();
@@ -213,11 +408,12 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   useEffect(() => {
     const unsub = store.subscribe(() => computeOverlays());
     return unsub;
-  }, [store, computeOverlays]);
+  }, [computeOverlays, store]);
 
-  useEffect(() => {
-    return editor.registerUpdateListener(() => computeOverlays());
-  }, [editor, computeOverlays]);
+  useEffect(
+    () => editor.registerUpdateListener(() => computeOverlays()),
+    [computeOverlays, editor],
+  );
 
   useEffect(() => {
     computeOverlays();
@@ -227,65 +423,32 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
   return createPortal(
     <div className={overlayContainer}>
-      {overlays.map((o) => {
-        if (o.type === 'delete') {
-          return null;
-        }
+      {overlays.map((overlay) => (
+        <InlineToolbar
+          batchId={overlay.batchId}
+          key={`${overlay.id}:toolbar`}
+          top={overlay.blockTop + TOOLBAR_OFFSET}
+          onAccept={handleAcceptBatch}
+          onReject={handleRejectBatch}
+        />
+      ))}
 
-        if (o.type === 'insert' && o.newNode) {
-          const decorated = decorateSubtree(o.newNode, 'insert');
-          return (
-            <div
-              className={diffPanel}
-              key={o.id}
-              ref={panelRefCallback(o.id)}
-              style={{ position: 'absolute', top: o.top, left: 0, right: 0 }}
-            >
-              <RichRenderer
-                extraNodes={extraNodes}
-                rendererConfig={rendererConfig}
-                theme={theme}
-                value={wrapDoc([decorated])}
-                variant={variant}
-              />
+      {overlays.map((overlay) => {
+        if (!overlay.previewNode || overlay.previewTop == null) return null;
+
+        const tone = overlay.type === 'replace' ? 'replace' : 'insert';
+        return (
+          <div
+            className={`${inlinePreview} ${inlinePreviewTone[tone]}`}
+            key={`${overlay.id}:preview`}
+            ref={previewRefCallback(overlay.id)}
+            style={{ top: overlay.previewTop }}
+          >
+            <div className={inlinePreviewBody}>
+              <div className={inlineRendererFrame}>{renderNode(overlay.previewNode)}</div>
             </div>
-          );
-        }
-
-        if (o.type === 'replace' && o.oldNode && o.newNode) {
-          const { oldNode: decoratedOld, newNode: decoratedNew } = diffModifiedNode(
-            o.oldNode,
-            o.newNode,
-          );
-          return (
-            <div
-              key={o.id}
-              ref={panelRefCallback(o.id)}
-              style={{ position: 'absolute', top: o.top + o.height, left: 0, right: 0 }}
-            >
-              <div className={diffPanelDelete}>
-                <RichRenderer
-                  extraNodes={extraNodes}
-                  rendererConfig={rendererConfig}
-                  theme={theme}
-                  value={wrapDoc([decoratedOld])}
-                  variant={variant}
-                />
-              </div>
-              <div className={diffPanel}>
-                <RichRenderer
-                  extraNodes={extraNodes}
-                  rendererConfig={rendererConfig}
-                  theme={theme}
-                  value={wrapDoc([decoratedNew])}
-                  variant={variant}
-                />
-              </div>
-            </div>
-          );
-        }
-
-        return null;
+          </div>
+        );
       })}
     </div>,
     containerEl,
