@@ -1,4 +1,4 @@
-import type { ChatBubble, ReviewBatch } from '@haklex/rich-agent-core';
+import type { ChatBubble, ReviewBatch, ToolCallGroupItem } from '@haklex/rich-agent-core';
 import { ScrollArea } from '@haklex/rich-editor-ui';
 import type { ReactElement } from 'react';
 import { useRef } from 'react';
@@ -6,8 +6,8 @@ import { useRef } from 'react';
 import { DiffReviewBubble } from './components/DiffReviewBubble';
 import { ErrorBubble } from './components/ErrorBubble';
 import { StreamdownBubble } from './components/StreamdownBubble';
-import { ThinkingBlock } from './components/ThinkingBlock';
-import { ToolCallBubble } from './components/ToolCallBubble';
+import { ThinkingChain } from './components/ThinkingChain';
+import { ToolCallGroup } from './components/ToolCallGroup';
 import { bubbleTool, bubbleUser, messageList } from './styles.css';
 
 interface ChatMessageListProps {
@@ -16,56 +16,84 @@ interface ChatMessageListProps {
   onAcceptBatch?: (batchId: string) => void;
   onRejectBatch?: (batchId: string) => void;
   onRetry?: () => void;
-  onRetryToolCall?: (name: string, params: Record<string, unknown>) => void;
 }
 
-interface ToolCallItem {
-  name: string;
-  params: Record<string, unknown>;
-  result?: { success: boolean; summary: string };
+interface ToolCallGroupView {
+  id: string;
+  items: ToolCallGroupItem[];
+  type: 'tool_call_group_view';
 }
 
-type MergedBubble = ChatBubble | { type: 'tool_call_group'; items: ToolCallItem[] };
+type MergedBubble = ChatBubble | ToolCallGroupView;
 
 function mergeBubbles(bubbles: ChatBubble[]): MergedBubble[] {
   const result: MergedBubble[] = [];
-  let currentGroup: ToolCallItem[] | null = null;
+  let legacyGroup: ToolCallGroupItem[] | null = null;
+  let legacyGroupStartIdx = 0;
 
-  function flushGroup() {
-    if (currentGroup && currentGroup.length > 0) {
-      result.push({ type: 'tool_call_group', items: currentGroup });
-      currentGroup = null;
+  function flushLegacy() {
+    if (legacyGroup && legacyGroup.length > 0) {
+      result.push({
+        type: 'tool_call_group_view',
+        id: `legacy-${legacyGroupStartIdx}`,
+        items: legacyGroup,
+      });
+      legacyGroup = null;
     }
   }
 
   for (let i = 0; i < bubbles.length; i++) {
     const b = bubbles[i];
 
+    // New canonical type — pass through
+    if (b.type === 'tool_call_group') {
+      flushLegacy();
+      result.push({
+        type: 'tool_call_group_view',
+        id: b.id,
+        items: b.items,
+      });
+      continue;
+    }
+
+    // Legacy: merge adjacent tool_call + tool_result
     if (b.type === 'tool_call') {
-      if (!currentGroup) currentGroup = [];
+      if (!legacyGroup) {
+        legacyGroup = [];
+        legacyGroupStartIdx = i;
+      }
       const next = bubbles[i + 1];
       if (next?.type === 'tool_result' && next.toolName === b.toolName) {
-        currentGroup.push({
-          name: b.toolName,
+        legacyGroup.push({
+          id: `fallback-${i}`,
+          toolName: b.toolName,
           params: b.params,
-          result: { success: next.success, summary: next.summary },
+          status: next.success ? 'completed' : 'error',
+          result: next.success ? next.summary : undefined,
+          resultPreview: next.success ? next.summary.slice(0, 80) : undefined,
+          error: !next.success ? next.summary : undefined,
         });
-        i++; // skip tool_result
+        i++;
       } else {
-        currentGroup.push({
-          name: b.toolName,
+        legacyGroup.push({
+          id: `fallback-${i}`,
+          toolName: b.toolName,
           params: b.params,
+          status: 'running',
         });
       }
-    } else if (b.type === 'tool_result') {
-      // orphaned tool_result — skip
-      flushGroup();
-    } else {
-      flushGroup();
-      result.push(b);
+      continue;
     }
+
+    if (b.type === 'tool_result') {
+      flushLegacy();
+      continue;
+    }
+
+    flushLegacy();
+    result.push(b);
   }
-  flushGroup();
+  flushLegacy();
   return result;
 }
 
@@ -75,14 +103,13 @@ export function ChatMessageList({
   onAcceptBatch,
   onRejectBatch,
   onRetry,
-  onRetryToolCall,
 }: ChatMessageListProps): ReactElement {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const mergedBubbles = mergeBubbles(bubbles);
+  const merged = mergeBubbles(bubbles);
 
   return (
     <ScrollArea autoScrollToBottom className={messageList} scrollRef={scrollRef}>
-      {mergedBubbles.map((item, i) => {
+      {merged.map((item, i) => {
         switch (item.type) {
           case 'user': {
             return (
@@ -93,7 +120,26 @@ export function ChatMessageList({
           }
 
           case 'thinking': {
-            return <ThinkingBlock content={item.content} isStreaming={false} key={i} />;
+            if ('id' in item && item.id && 'rawText' in item) {
+              return (
+                <ThinkingChain
+                  id={item.id}
+                  isStreaming={item.isStreaming ?? false}
+                  key={i}
+                  rawText={item.rawText ?? item.content}
+                  steps={item.steps ?? []}
+                />
+              );
+            }
+            return (
+              <ThinkingChain
+                id={`legacy-thinking-${i}`}
+                isStreaming={false}
+                key={i}
+                rawText={item.content}
+                steps={item.content ? item.content.split(/\n{2,}/).filter(Boolean) : []}
+              />
+            );
           }
 
           case 'assistant': {
@@ -106,8 +152,8 @@ export function ChatMessageList({
             );
           }
 
-          case 'tool_call_group': {
-            return <ToolCallBubble items={item.items} key={i} onRetryToolCall={onRetryToolCall} />;
+          case 'tool_call_group_view': {
+            return <ToolCallGroup id={item.id} items={item.items} key={i} />;
           }
 
           case 'error': {

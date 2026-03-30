@@ -84,7 +84,6 @@ export function ChatPanel({
         onAcceptBatch={onAcceptBatch}
         onRejectBatch={onRejectBatch}
         onRetry={onRetry}
-        onRetryToolCall={onRetryToolCall}
       />
       <ChatInput
         disabled={!hasModel}
