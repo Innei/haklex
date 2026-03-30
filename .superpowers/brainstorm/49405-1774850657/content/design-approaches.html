@@ -1,0 +1,446 @@
+<h2>Design Approaches</h2>
+<p class="subtitle">
+  Two visual styles for the unified overlay panel. Both share the same layout: batch header +
+  stacked red/green blocks.
+</p>
+
+<div class="cards" style="gap: 40px">
+  <!-- Approach A: Minimal -->
+  <div
+    class="card"
+    data-choice="a"
+    onclick="toggleSelect(this)"
+    style="padding: 0; overflow: hidden"
+  >
+    <div class="card-body" style="padding: 16px 16px 8px">
+      <h3>A — Minimal & Transparent</h3>
+      <p style="color: #888; font-size: 13px">
+        Cursor-inspired. Background tints only, thin left accent border. Blends into editor content.
+        Header is a slim strip.
+      </p>
+    </div>
+    <div
+      style="
+        padding: 12px 16px 16px;
+        font-family: 'Georgia', serif;
+        font-size: 15px;
+        line-height: 1.7;
+      "
+    >
+      <!-- Normal content above -->
+      <div style="padding: 8px 12px; color: #ccc">
+        The morning sun cast long shadows across the quiet village. A gentle breeze carried the
+        scent of fresh bread from the bakery.
+      </div>
+
+      <!-- Delete: decorated original block -->
+      <div
+        style="
+          padding: 8px 12px;
+          background: rgba(239, 68, 68, 0.06);
+          border-left: 2px solid rgba(239, 68, 68, 0.4);
+          text-decoration: line-through;
+          text-decoration-color: rgba(239, 68, 68, 0.35);
+          color: #888;
+          opacity: 0.75;
+        "
+      >
+        The old clock tower stood silently in the square.
+      </div>
+
+      <!-- Normal content -->
+      <div style="padding: 8px 12px; color: #ccc">
+        Children played near the fountain, their laughter echoing through the cobblestone streets.
+      </div>
+
+      <!-- Replace overlay panel -->
+      <div style="margin: 4px 0; border-radius: 6px; overflow: hidden">
+        <!-- Batch header -->
+        <div
+          style="
+            padding: 3px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-family: system-ui, sans-serif;
+            color: #777;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+          "
+        >
+          <span style="opacity: 0.7">1 change</span>
+          <div style="display: flex; gap: 4px">
+            <div
+              style="
+                padding: 1px 8px;
+                border-radius: 3px;
+                color: #999;
+                cursor: pointer;
+                font-size: 11px;
+                transition: all 100ms;
+              "
+            >
+              Reject
+            </div>
+            <div
+              style="
+                padding: 1px 8px;
+                border-radius: 3px;
+                color: #22c55e;
+                cursor: pointer;
+                font-size: 11px;
+                transition: all 100ms;
+              "
+            >
+              Accept
+            </div>
+          </div>
+        </div>
+        <!-- Old (red) -->
+        <div
+          style="
+            background: rgba(239, 68, 68, 0.06);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(239, 68, 68, 0.4);
+            text-decoration: line-through;
+            text-decoration-color: rgba(239, 68, 68, 0.3);
+            color: #999;
+          "
+        >
+          She walked slowly through the narrow streets, looking at each shop window with mild
+          curiosity.
+        </div>
+        <!-- New (green) -->
+        <div
+          style="
+            background: rgba(34, 197, 94, 0.06);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(34, 197, 94, 0.4);
+          "
+        >
+          She
+          <span style="background: rgba(34, 197, 94, 0.15); border-radius: 2px; padding: 0 2px"
+            >strode purposefully</span
+          >
+          through the narrow streets,
+          <span style="background: rgba(34, 197, 94, 0.15); border-radius: 2px; padding: 0 2px"
+            >her eyes scanning</span
+          >
+          each shop window with
+          <span style="background: rgba(34, 197, 94, 0.15); border-radius: 2px; padding: 0 2px"
+            >keen interest</span
+          >.
+        </div>
+      </div>
+
+      <!-- Normal content -->
+      <div style="padding: 8px 12px; color: #ccc">
+        The baker waved from his doorway as she passed by, flour dusting his apron.
+      </div>
+
+      <!-- Insert overlay panel -->
+      <div style="margin: 4px 0; border-radius: 6px; overflow: hidden">
+        <!-- Batch header -->
+        <div
+          style="
+            padding: 3px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-family: system-ui, sans-serif;
+            color: #777;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+          "
+        >
+          <span style="opacity: 0.7">1 insertion</span>
+          <div style="display: flex; gap: 4px">
+            <div
+              style="
+                padding: 1px 8px;
+                border-radius: 3px;
+                color: #999;
+                cursor: pointer;
+                font-size: 11px;
+              "
+            >
+              Reject
+            </div>
+            <div
+              style="
+                padding: 1px 8px;
+                border-radius: 3px;
+                color: #22c55e;
+                cursor: pointer;
+                font-size: 11px;
+              "
+            >
+              Accept
+            </div>
+          </div>
+        </div>
+        <!-- New only (green) -->
+        <div
+          style="
+            background: rgba(34, 197, 94, 0.06);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(34, 197, 94, 0.4);
+          "
+        >
+          A small cat perched on the windowsill, watching the world go by with half-closed eyes.
+        </div>
+      </div>
+
+      <div style="padding: 8px 12px; color: #ccc">
+        Evening came softly, wrapping the village in a warm amber glow.
+      </div>
+    </div>
+  </div>
+
+  <!-- Approach B: Structured -->
+  <div
+    class="card"
+    data-choice="b"
+    onclick="toggleSelect(this)"
+    style="padding: 0; overflow: hidden"
+  >
+    <div class="card-body" style="padding: 16px 16px 8px">
+      <h3>B — Structured & Outlined</h3>
+      <p style="color: #888; font-size: 13px">
+        More defined boundaries. Subtle outer border, stronger header bar, icon buttons. Clearly
+        delineates overlay from editor content.
+      </p>
+    </div>
+    <div
+      style="
+        padding: 12px 16px 16px;
+        font-family: 'Georgia', serif;
+        font-size: 15px;
+        line-height: 1.7;
+      "
+    >
+      <!-- Normal content above -->
+      <div style="padding: 8px 12px; color: #ccc">
+        The morning sun cast long shadows across the quiet village. A gentle breeze carried the
+        scent of fresh bread from the bakery.
+      </div>
+
+      <!-- Delete: decorated original block -->
+      <div
+        style="
+          padding: 8px 12px;
+          background: rgba(239, 68, 68, 0.06);
+          border-left: 2px solid rgba(239, 68, 68, 0.4);
+          text-decoration: line-through;
+          text-decoration-color: rgba(239, 68, 68, 0.35);
+          color: #888;
+          opacity: 0.75;
+        "
+      >
+        The old clock tower stood silently in the square.
+      </div>
+
+      <!-- Normal content -->
+      <div style="padding: 8px 12px; color: #ccc">
+        Children played near the fountain, their laughter echoing through the cobblestone streets.
+      </div>
+
+      <!-- Replace overlay panel -->
+      <div
+        style="
+          margin: 6px 0;
+          border-radius: 8px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        "
+      >
+        <!-- Batch header -->
+        <div
+          style="
+            padding: 5px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-family: system-ui, sans-serif;
+            color: #888;
+            background: rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          "
+        >
+          <span>1 change</span>
+          <div style="display: flex; gap: 6px">
+            <div
+              style="
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ef4444;
+                background: rgba(239, 68, 68, 0.08);
+                cursor: pointer;
+                font-size: 13px;
+                border: 1px solid rgba(239, 68, 68, 0.15);
+                transition: all 100ms;
+              "
+            >
+              &#10005;
+            </div>
+            <div
+              style="
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #22c55e;
+                background: rgba(34, 197, 94, 0.08);
+                cursor: pointer;
+                font-size: 13px;
+                border: 1px solid rgba(34, 197, 94, 0.15);
+                transition: all 100ms;
+              "
+            >
+              &#10003;
+            </div>
+          </div>
+        </div>
+        <!-- Old (red) -->
+        <div
+          style="
+            background: rgba(239, 68, 68, 0.07);
+            padding: 8px 12px;
+            border-left: 3px solid rgba(239, 68, 68, 0.5);
+            text-decoration: line-through;
+            text-decoration-color: rgba(239, 68, 68, 0.35);
+            color: #999;
+          "
+        >
+          She walked slowly through the narrow streets, looking at each shop window with mild
+          curiosity.
+        </div>
+        <!-- Divider -->
+        <div style="height: 1px; background: rgba(255, 255, 255, 0.05)"></div>
+        <!-- New (green) -->
+        <div
+          style="
+            background: rgba(34, 197, 94, 0.07);
+            padding: 8px 12px;
+            border-left: 3px solid rgba(34, 197, 94, 0.5);
+          "
+        >
+          She
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 2px"
+            >strode purposefully</span
+          >
+          through the narrow streets,
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 2px"
+            >her eyes scanning</span
+          >
+          each shop window with
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 2px"
+            >keen interest</span
+          >.
+        </div>
+      </div>
+
+      <!-- Normal content -->
+      <div style="padding: 8px 12px; color: #ccc">
+        The baker waved from his doorway as she passed by, flour dusting his apron.
+      </div>
+
+      <!-- Insert overlay panel -->
+      <div
+        style="
+          margin: 6px 0;
+          border-radius: 8px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        "
+      >
+        <!-- Batch header -->
+        <div
+          style="
+            padding: 5px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            font-family: system-ui, sans-serif;
+            color: #888;
+            background: rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+          "
+        >
+          <span>1 insertion</span>
+          <div style="display: flex; gap: 6px">
+            <div
+              style="
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ef4444;
+                background: rgba(239, 68, 68, 0.08);
+                cursor: pointer;
+                font-size: 13px;
+                border: 1px solid rgba(239, 68, 68, 0.15);
+              "
+            >
+              &#10005;
+            </div>
+            <div
+              style="
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #22c55e;
+                background: rgba(34, 197, 94, 0.08);
+                cursor: pointer;
+                font-size: 13px;
+                border: 1px solid rgba(34, 197, 94, 0.15);
+              "
+            >
+              &#10003;
+            </div>
+          </div>
+        </div>
+        <!-- New only (green) -->
+        <div
+          style="
+            background: rgba(34, 197, 94, 0.07);
+            padding: 8px 12px;
+            border-left: 3px solid rgba(34, 197, 94, 0.5);
+          "
+        >
+          A small cat perched on the windowsill, watching the world go by with half-closed eyes.
+        </div>
+      </div>
+
+      <div style="padding: 8px 12px; color: #ccc">
+        Evening came softly, wrapping the village in a warm amber glow.
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top: 24px">
+  Recommendation: <strong>Option A (Minimal)</strong> — lighter visual weight, blends with rich text
+  editor content better. Option B's borders and shadows may feel heavy in a prose editing context.
+</p>

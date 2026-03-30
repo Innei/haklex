@@ -1,0 +1,368 @@
+<h2>Toolbar Position Options</h2>
+<p class="subtitle">
+  Each mockup simulates a replace diff overlay — old (red) stacked above new (green)
+</p>
+
+<div class="cards" style="gap: 32px">
+  <!-- Option A -->
+  <div
+    class="card"
+    data-choice="a"
+    onclick="toggleSelect(this)"
+    style="padding: 0; overflow: hidden"
+  >
+    <div class="card-body" style="padding: 16px 16px 8px">
+      <h3>A — Per-entry floating pill, hover to reveal</h3>
+      <p style="color: #888; font-size: 13px">
+        Each overlay entry has its own toolbar. Appears on hover only.
+      </p>
+    </div>
+    <div
+      style="
+        padding: 12px 16px 16px;
+        font-family: 'Georgia', serif;
+        font-size: 15px;
+        line-height: 1.7;
+        position: relative;
+      "
+    >
+      <!-- Simulated editor content -->
+      <div
+        style="padding: 8px 12px; color: #666; border-bottom: 1px solid rgba(255, 255, 255, 0.05)"
+      >
+        The morning sun cast long shadows across the quiet village...
+      </div>
+
+      <!-- Diff overlay panel -->
+      <div style="margin: 6px 0; border-radius: 8px; overflow: hidden; position: relative">
+        <!-- Old (red) -->
+        <div
+          style="
+            background: rgba(239, 68, 68, 0.08);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(239, 68, 68, 0.5);
+            text-decoration: line-through;
+            text-decoration-color: rgba(239, 68, 68, 0.4);
+            color: #999;
+          "
+        >
+          She walked slowly through the narrow streets, looking at each shop window.
+        </div>
+        <!-- New (green) -->
+        <div
+          style="
+            background: rgba(34, 197, 94, 0.08);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(34, 197, 94, 0.5);
+          "
+        >
+          She
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 1px"
+            >strode purposefully</span
+          >
+          through the narrow streets,
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 1px"
+            >her eyes scanning</span
+          >
+          each shop window.
+        </div>
+        <!-- Floating pill toolbar -->
+        <div
+          style="
+            position: absolute;
+            top: 6px;
+            right: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            background: #1a1a1a;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+          "
+        >
+          <div
+            style="
+              width: 22px;
+              height: 22px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #ef4444;
+              font-size: 14px;
+              cursor: pointer;
+            "
+          >
+            &#10005;
+          </div>
+          <div
+            style="
+              width: 22px;
+              height: 22px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #22c55e;
+              font-size: 14px;
+              cursor: pointer;
+            "
+          >
+            &#10003;
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 8px 12px; color: #666">
+        The baker waved from his doorway as she passed by...
+      </div>
+    </div>
+  </div>
+
+  <!-- Option B -->
+  <div
+    class="card"
+    data-choice="b"
+    onclick="toggleSelect(this)"
+    style="padding: 0; overflow: hidden"
+  >
+    <div class="card-body" style="padding: 16px 16px 8px">
+      <h3>B — Per-batch toolbar, at batch header</h3>
+      <p style="color: #888; font-size: 13px">
+        One toolbar per batch. Sits above the first entry as a header bar.
+      </p>
+    </div>
+    <div
+      style="
+        padding: 12px 16px 16px;
+        font-family: 'Georgia', serif;
+        font-size: 15px;
+        line-height: 1.7;
+      "
+    >
+      <div
+        style="padding: 8px 12px; color: #666; border-bottom: 1px solid rgba(255, 255, 255, 0.05)"
+      >
+        The morning sun cast long shadows across the quiet village...
+      </div>
+
+      <!-- Batch header toolbar -->
+      <div
+        style="
+          margin: 6px 0 0;
+          border-radius: 8px 8px 0 0;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-bottom: none;
+          padding: 4px 10px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          font-size: 12px;
+          color: #888;
+          font-family: system-ui, sans-serif;
+        "
+      >
+        <span>2 changes</span>
+        <div style="display: flex; gap: 6px">
+          <div
+            style="
+              padding: 2px 10px;
+              border-radius: 4px;
+              background: rgba(239, 68, 68, 0.12);
+              color: #ef4444;
+              cursor: pointer;
+              font-size: 12px;
+            "
+          >
+            Reject
+          </div>
+          <div
+            style="
+              padding: 2px 10px;
+              border-radius: 4px;
+              background: rgba(34, 197, 94, 0.12);
+              color: #22c55e;
+              cursor: pointer;
+              font-size: 12px;
+            "
+          >
+            Accept
+          </div>
+        </div>
+      </div>
+
+      <!-- Diff overlay panel -->
+      <div
+        style="
+          border-radius: 0 0 8px 8px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-top: none;
+        "
+      >
+        <div
+          style="
+            background: rgba(239, 68, 68, 0.08);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(239, 68, 68, 0.5);
+            text-decoration: line-through;
+            text-decoration-color: rgba(239, 68, 68, 0.4);
+            color: #999;
+          "
+        >
+          She walked slowly through the narrow streets, looking at each shop window.
+        </div>
+        <div
+          style="
+            background: rgba(34, 197, 94, 0.08);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(34, 197, 94, 0.5);
+          "
+        >
+          She
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 1px"
+            >strode purposefully</span
+          >
+          through the narrow streets,
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 1px"
+            >her eyes scanning</span
+          >
+          each shop window.
+        </div>
+      </div>
+
+      <div style="padding: 8px 12px; color: #666; margin-top: 4px">
+        The baker waved from his doorway as she passed by...
+      </div>
+    </div>
+  </div>
+
+  <!-- Option C -->
+  <div
+    class="card"
+    data-choice="c"
+    onclick="toggleSelect(this)"
+    style="padding: 0; overflow: hidden"
+  >
+    <div class="card-body" style="padding: 16px 16px 8px">
+      <h3>C — Toolbar inside panel, top-right corner</h3>
+      <p style="color: #888; font-size: 13px">
+        Buttons embedded within the overlay panel itself. Always visible, no hover needed.
+      </p>
+    </div>
+    <div
+      style="
+        padding: 12px 16px 16px;
+        font-family: 'Georgia', serif;
+        font-size: 15px;
+        line-height: 1.7;
+      "
+    >
+      <div
+        style="padding: 8px 12px; color: #666; border-bottom: 1px solid rgba(255, 255, 255, 0.05)"
+      >
+        The morning sun cast long shadows across the quiet village...
+      </div>
+
+      <!-- Diff overlay panel with embedded toolbar -->
+      <div
+        style="
+          margin: 6px 0;
+          border-radius: 8px;
+          overflow: hidden;
+          position: relative;
+          border: 1px solid rgba(255, 255, 255, 0.06);
+        "
+      >
+        <div
+          style="
+            background: rgba(239, 68, 68, 0.08);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(239, 68, 68, 0.5);
+            text-decoration: line-through;
+            text-decoration-color: rgba(239, 68, 68, 0.4);
+            color: #999;
+          "
+        >
+          She walked slowly through the narrow streets, looking at each shop window.
+        </div>
+        <div
+          style="
+            background: rgba(34, 197, 94, 0.08);
+            padding: 8px 12px;
+            border-left: 2px solid rgba(34, 197, 94, 0.5);
+            position: relative;
+          "
+        >
+          She
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 1px"
+            >strode purposefully</span
+          >
+          through the narrow streets,
+          <span style="background: rgba(34, 197, 94, 0.18); border-radius: 2px; padding: 0 1px"
+            >her eyes scanning</span
+          >
+          each shop window.
+          <!-- Embedded buttons -->
+          <div
+            style="
+              position: absolute;
+              top: 50%;
+              right: 8px;
+              transform: translateY(-50%);
+              display: flex;
+              gap: 4px;
+            "
+          >
+            <div
+              style="
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #ef4444;
+                background: rgba(239, 68, 68, 0.1);
+                cursor: pointer;
+                font-size: 13px;
+                border: 1px solid rgba(239, 68, 68, 0.2);
+              "
+            >
+              &#10005;
+            </div>
+            <div
+              style="
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #22c55e;
+                background: rgba(34, 197, 94, 0.1);
+                cursor: pointer;
+                font-size: 13px;
+                border: 1px solid rgba(34, 197, 94, 0.2);
+              "
+            >
+              &#10003;
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="padding: 8px 12px; color: #666">
+        The baker waved from his doorway as she passed by...
+      </div>
+    </div>
+  </div>
+</div>
+
+<p class="subtitle" style="margin-top: 24px">
+  Recommendation: <strong>Option C</strong> — toolbar embedded in panel. Self-contained, no extra
+  floating layers, always discoverable. Cleaner DOM structure.
+</p>

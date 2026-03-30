@@ -197,53 +197,52 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       const batch = reviewState?.batches.find((item) => item.id === batchId);
       if (!batch) return;
 
-      editor.update(
-        () => {
-          const root = $getRoot();
+      store.getState().acceptReviewBatch(batchId);
 
-          for (const entry of batch.entries) {
-            const { op } = entry;
+      editor.update(() => {
+        const root = $getRoot();
 
-            if (op.op === 'insert') {
-              if (!op.node?.type) continue;
-              const newNode = $parseSerializedNode(op.node);
-              if (op.position.type === 'root') {
-                const idx = op.position.index ?? root.getChildrenSize();
-                const children = root.getChildren();
-                if (idx >= children.length) {
-                  root.append(newNode);
-                } else {
-                  children[idx].insertBefore(newNode);
-                }
+        for (const entry of batch.entries) {
+          const { op } = entry;
+
+          if (op.op === 'insert') {
+            if (!op.node?.type) continue;
+            const newNode = $parseSerializedNode(op.node);
+            if (op.position.type === 'root') {
+              const idx = op.position.index ?? root.getChildrenSize();
+              const children = root.getChildren();
+              if (idx >= children.length) {
+                root.append(newNode);
               } else {
-                const target = $findBlockByBlockId(op.position.blockId);
-                if (!target) continue;
-                if (op.position.type === 'after') {
-                  target.insertAfter(newNode);
-                } else {
-                  target.insertBefore(newNode);
-                }
+                children[idx].insertBefore(newNode);
               }
-              continue;
-            }
-
-            if (op.op === 'replace') {
-              if (!op.node?.type) continue;
-              const target = $findBlockByBlockId(op.blockId);
+            } else {
+              const target = $findBlockByBlockId(op.position.blockId);
               if (!target) continue;
-              target.replace($parseSerializedNode(op.node));
-              continue;
+              if (op.position.type === 'after') {
+                target.insertAfter(newNode);
+              } else {
+                target.insertBefore(newNode);
+              }
             }
-
-            if (op.op === 'delete') {
-              const target = $findBlockByBlockId(op.blockId);
-              if (!target) continue;
-              target.remove();
-            }
+            continue;
           }
-        },
-        { onUpdate: () => store.getState().acceptReviewBatch(batchId) },
-      );
+
+          if (op.op === 'replace') {
+            if (!op.node?.type) continue;
+            const target = $findBlockByBlockId(op.blockId);
+            if (!target) continue;
+            target.replace($parseSerializedNode(op.node));
+            continue;
+          }
+
+          if (op.op === 'delete') {
+            const target = $findBlockByBlockId(op.blockId);
+            if (!target) continue;
+            target.remove();
+          }
+        }
+      });
     },
     [editor, store],
   );
