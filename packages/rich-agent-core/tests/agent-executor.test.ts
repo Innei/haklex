@@ -122,6 +122,99 @@ describe('createAgentExecutor', () => {
     expect(result.operations[0].op).toBe('delete');
   });
 
+  it('emits tool_call_group bubble with per-item status updates', async () => {
+    const store = createAgentStore();
+    const snapshot = createSnapshot(makeEditorState() as any);
+
+    let callCount = 0;
+    const provider: LLMProvider = {
+      async *chat() {
+        callCount++;
+        if (callCount === 1) {
+          yield {
+            type: 'tool_call' as const,
+            id: 'tc1',
+            name: 'search_document',
+            arguments: JSON.stringify({ query: 'Hello' }),
+          };
+          yield {
+            type: 'tool_call' as const,
+            id: 'tc2',
+            name: 'delete_node',
+            arguments: JSON.stringify({ blockId: 'p1' }),
+          };
+          yield { type: 'done' as const };
+        } else {
+          yield { type: 'text' as const, text: 'Done.' };
+          yield { type: 'done' as const };
+        }
+      },
+    };
+
+    const executor = createAgentExecutor({
+      provider,
+      snapshot,
+      store,
+      tools: [],
+      systemMessages: [{ role: 'system', content: 'Agent' }],
+    });
+
+    await executor.run({ role: 'user', content: 'Do it' }, { role: 'user', content: 'Doc' });
+
+    const groupBubbles = store.getState().bubbles.filter((b) => b.type === 'tool_call_group');
+    expect(groupBubbles).toHaveLength(1);
+
+    const group = groupBubbles[0];
+    if (group.type === 'tool_call_group') {
+      expect(group.items).toHaveLength(2);
+      expect(group.items[0].toolName).toBe('search_document');
+      expect(group.items[0].status).toBe('completed');
+      expect(group.items[0].finishedAt).toBeGreaterThan(0);
+      expect(group.items[1].toolName).toBe('delete_node');
+      expect(group.items[1].status).toBe('completed');
+    }
+  });
+
+  it('sets item status to error on JSON parse failure', async () => {
+    const store = createAgentStore();
+    const snapshot = createSnapshot(makeEditorState() as any);
+
+    let callCount = 0;
+    const provider: LLMProvider = {
+      async *chat() {
+        callCount++;
+        if (callCount === 1) {
+          yield {
+            type: 'tool_call' as const,
+            id: 'tc1',
+            name: 'delete_node',
+            arguments: '{bad json',
+          };
+          yield { type: 'done' as const };
+        } else {
+          yield { type: 'text' as const, text: 'Failed.' };
+          yield { type: 'done' as const };
+        }
+      },
+    };
+
+    const executor = createAgentExecutor({
+      provider,
+      snapshot,
+      store,
+      tools: [],
+      systemMessages: [{ role: 'system', content: 'Agent' }],
+    });
+
+    await executor.run({ role: 'user', content: 'Do it' }, { role: 'user', content: 'Doc' });
+
+    const group = store.getState().bubbles.find((b) => b.type === 'tool_call_group');
+    if (group?.type === 'tool_call_group') {
+      expect(group.items[0].status).toBe('error');
+      expect(group.items[0].error).toBeDefined();
+    }
+  });
+
   it('supports abort via AbortController', async () => {
     const store = createAgentStore();
     const snapshot = createSnapshot(makeEditorState() as any);

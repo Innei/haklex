@@ -41,6 +41,7 @@ export type AgentToolConfig = {
   description: string;
   parameters: Record<string, unknown>;
   execute: (params: unknown) => Promise<AgentToolResult>;
+  describeCall?: (params: unknown) => string;
 };
 
 export type DocumentContextOptions = {

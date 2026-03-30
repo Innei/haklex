@@ -20,6 +20,7 @@ export function createDocumentTools(
     name: 'read_selection',
     description: 'Read the current text selection and its block IDs',
     parameters: { type: 'object', properties: {} },
+    describeCall: () => 'reading current selection',
     execute: async (): Promise<AgentToolResult> => {
       const sel = readSelection?.();
       if (!sel) {
@@ -54,6 +55,11 @@ export function createDocumentTools(
         node: { type: 'object' },
       },
       required: ['position', 'node'],
+    },
+    describeCall: (params: unknown) => {
+      const p = params as { position?: { type?: string; blockId?: string } };
+      const pos = p.position;
+      return pos?.blockId ? `inserting ${pos.type} block "${pos.blockId}"` : 'inserting node';
     },
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { position, node } = params as { position: any; node: SerializedLexicalNode };
@@ -97,6 +103,10 @@ export function createDocumentTools(
       },
       required: ['blockId', 'node'],
     },
+    describeCall: (params: unknown) => {
+      const p = params as { blockId?: string };
+      return p.blockId ? `replacing block "${p.blockId}"` : 'replacing node';
+    },
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { blockId, node } = params as { blockId: string; node: SerializedLexicalNode };
       if (!node || typeof node !== 'object' || !node.type) {
@@ -136,6 +146,10 @@ export function createDocumentTools(
       },
       required: ['blockId'],
     },
+    describeCall: (params: unknown) => {
+      const p = params as { blockId?: string };
+      return p.blockId ? `deleting block "${p.blockId}"` : 'deleting node';
+    },
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { blockId } = params as { blockId: string };
       const existing = snapshot.getBlock(blockId);
@@ -165,6 +179,13 @@ export function createDocumentTools(
         blockType: { type: 'string' },
       },
       required: ['query'],
+    },
+    describeCall: (params: unknown) => {
+      const p = params as { query?: string; blockType?: string };
+      const parts: string[] = [];
+      if (p.query) parts.push(`"${p.query}"`);
+      if (p.blockType) parts.push(`type=${p.blockType}`);
+      return `searching ${parts.join(', ') || 'document'}`;
     },
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { query, blockType } = params as { query: string; blockType?: string };
