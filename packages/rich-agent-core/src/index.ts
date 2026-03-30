@@ -8,6 +8,7 @@ export {
   rejectDiff,
 } from './diff-engine';
 export { createDocumentTools } from './document-tools';
+export type { ToolCallGroupItem, ToolCallItemStatus } from './initialState';
 export { createInitialAgentStoreState } from './initialState';
 export { buildDocumentContext, buildMessages } from './pipeline';
 export type {

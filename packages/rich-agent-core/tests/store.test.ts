@@ -77,4 +77,44 @@ describe('createAgentStore', () => {
     store.getState().setStatus('running');
     expect(listener).not.toHaveBeenCalled();
   });
+
+  it('accepts tool_call_group bubble', () => {
+    const store = createAgentStore();
+    store.getState().addBubble({
+      type: 'tool_call_group',
+      id: 'g1',
+      items: [
+        {
+          id: 'tc1',
+          toolName: 'replace_node',
+          description: 'replacing paragraph at block-3',
+          params: { blockId: 'p3' },
+          status: 'pending',
+        },
+      ],
+    });
+    expect(store.getState().bubbles).toHaveLength(1);
+    const bubble = store.getState().bubbles[0];
+    expect(bubble.type).toBe('tool_call_group');
+    if (bubble.type === 'tool_call_group') {
+      expect(bubble.items[0].status).toBe('pending');
+    }
+  });
+
+  it('accepts enhanced thinking bubble with steps', () => {
+    const store = createAgentStore();
+    store.getState().addBubble({
+      type: 'thinking',
+      content: 'Step one.\n\nStep two.',
+      id: 'th1',
+      rawText: 'Step one.\n\nStep two.',
+      steps: ['Step one.', 'Step two.'],
+      isStreaming: false,
+    });
+    const bubble = store.getState().bubbles[0];
+    expect(bubble.type).toBe('thinking');
+    if (bubble.type === 'thinking') {
+      expect(bubble.steps).toEqual(['Step one.', 'Step two.']);
+    }
+  });
 });
