@@ -31,6 +31,11 @@ export type AgentStoreActionMethods = {
   setReviewState: (state: ReviewState | null) => void;
   setStatus: (status: AgentStoreStatus) => void;
   updateLastBubble: (bubble: ChatBubble) => void;
+  updateToolCallItem: (
+    groupId: string,
+    itemId: string,
+    patch: Partial<import('./initialState').ToolCallGroupItem>,
+  ) => void;
 };
 
 type Setter = StoreSetter<AgentStoreShape & AgentStoreActionMethods>;
@@ -98,6 +103,32 @@ export class AgentStoreActionImpl {
 
   setStatus = (status: AgentStoreStatus) => {
     this.#set({ status });
+  };
+
+  updateToolCallItem = (
+    groupId: string,
+    itemId: string,
+    patch: Partial<import('./initialState').ToolCallGroupItem>,
+  ) => {
+    this.#set((state) => {
+      const idx = state.bubbles.findIndex((b) => b.type === 'tool_call_group' && b.id === groupId);
+      if (idx === -1) return {};
+
+      const group = state.bubbles[idx] as Extract<
+        (typeof state.bubbles)[number],
+        { type: 'tool_call_group' }
+      >;
+      const itemIdx = group.items.findIndex((item) => item.id === itemId);
+      if (itemIdx === -1) return {};
+
+      const nextItems = [...group.items];
+      nextItems[itemIdx] = { ...nextItems[itemIdx], ...patch };
+
+      const nextBubbles = [...state.bubbles];
+      nextBubbles[idx] = { ...group, items: nextItems };
+
+      return { bubbles: nextBubbles };
+    });
   };
 
   updateLastBubble = (bubble: ChatBubble) => {
