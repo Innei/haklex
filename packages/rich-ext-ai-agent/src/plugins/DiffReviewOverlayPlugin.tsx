@@ -197,52 +197,53 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       const batch = reviewState?.batches.find((item) => item.id === batchId);
       if (!batch) return;
 
-      store.getState().acceptReviewBatch(batchId);
+      editor.update(
+        () => {
+          const root = $getRoot();
 
-      editor.update(() => {
-        const root = $getRoot();
+          for (const entry of batch.entries) {
+            const { op } = entry;
 
-        for (const entry of batch.entries) {
-          const { op } = entry;
-
-          if (op.op === 'insert') {
-            if (!op.node?.type) continue;
-            const newNode = $parseSerializedNode(op.node);
-            if (op.position.type === 'root') {
-              const idx = op.position.index ?? root.getChildrenSize();
-              const children = root.getChildren();
-              if (idx >= children.length) {
-                root.append(newNode);
+            if (op.op === 'insert') {
+              if (!op.node?.type) continue;
+              const newNode = $parseSerializedNode(op.node);
+              if (op.position.type === 'root') {
+                const idx = op.position.index ?? root.getChildrenSize();
+                const children = root.getChildren();
+                if (idx >= children.length) {
+                  root.append(newNode);
+                } else {
+                  children[idx].insertBefore(newNode);
+                }
               } else {
-                children[idx].insertBefore(newNode);
+                const target = $findBlockByBlockId(op.position.blockId);
+                if (!target) continue;
+                if (op.position.type === 'after') {
+                  target.insertAfter(newNode);
+                } else {
+                  target.insertBefore(newNode);
+                }
               }
-            } else {
-              const target = $findBlockByBlockId(op.position.blockId);
-              if (!target) continue;
-              if (op.position.type === 'after') {
-                target.insertAfter(newNode);
-              } else {
-                target.insertBefore(newNode);
-              }
+              continue;
             }
-            continue;
-          }
 
-          if (op.op === 'replace') {
-            if (!op.node?.type) continue;
-            const target = $findBlockByBlockId(op.blockId);
-            if (!target) continue;
-            target.replace($parseSerializedNode(op.node));
-            continue;
-          }
+            if (op.op === 'replace') {
+              if (!op.node?.type) continue;
+              const target = $findBlockByBlockId(op.blockId);
+              if (!target) continue;
+              target.replace($parseSerializedNode(op.node));
+              continue;
+            }
 
-          if (op.op === 'delete') {
-            const target = $findBlockByBlockId(op.blockId);
-            if (!target) continue;
-            target.remove();
+            if (op.op === 'delete') {
+              const target = $findBlockByBlockId(op.blockId);
+              if (!target) continue;
+              target.remove();
+            }
           }
-        }
-      });
+        },
+        { onUpdate: () => store.getState().acceptReviewBatch(batchId) },
+      );
     },
     [editor, store],
   );
@@ -255,20 +256,22 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   );
 
   const syncSpacing = useCallback(() => {
-    for (const overlay of overlays) {
-      if (!overlay.blockEl) continue;
-      const previewEl = previewRefs.current.get(overlay.id);
+    for (const [, entries] of batchGroups) {
+      const firstEntry = entries[0];
+      const previewEl = previewRefs.current.get(firstEntry.id);
       const previewHeight = previewEl?.offsetHeight ?? 0;
-
-      if (overlay.spacing === 'before') {
-        overlay.blockEl.style.marginTop =
-          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
-      } else if (overlay.spacing === 'after') {
-        overlay.blockEl.style.marginBottom =
-          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
+      for (const overlay of entries) {
+        if (!overlay.blockEl) continue;
+        if (overlay.spacing === 'before') {
+          overlay.blockEl.style.marginTop =
+            previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
+        } else if (overlay.spacing === 'after') {
+          overlay.blockEl.style.marginBottom =
+            previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
+        }
       }
     }
-  }, [overlays]);
+  }, [batchGroups]);
 
   useEffect(() => {
     const observer = new ResizeObserver(() => syncSpacing());
