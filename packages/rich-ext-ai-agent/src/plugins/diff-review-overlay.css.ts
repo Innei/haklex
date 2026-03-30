@@ -1,4 +1,5 @@
-import { style } from '@vanilla-extract/css';
+import { vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
 export const overlayContainer = style({
   position: 'absolute',
@@ -10,13 +11,90 @@ export const overlayContainer = style({
   zIndex: 10,
 });
 
-export const diffPanel = style({
-  pointerEvents: 'none',
-  borderLeft: '3px solid rgb(34, 197, 94)',
-  background: 'rgba(34, 197, 94, 0.04)',
+export const batchPanel = style({
+  pointerEvents: 'auto',
+  position: 'absolute',
+  left: 0,
+  right: 0,
+  overflow: 'hidden',
+  borderRadius: vars.borderRadius.md,
 });
 
-export const diffPanelDelete = style({
-  pointerEvents: 'none',
-  opacity: 0.7,
+export const batchHeader = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '3px 10px',
+  fontFamily: 'system-ui, sans-serif',
+  fontSize: '11px',
+  background: `color-mix(in srgb, ${vars.color.text} 3%, ${vars.color.bg})`,
+  borderBottom: `1px solid color-mix(in srgb, ${vars.color.text} 6%, transparent)`,
+  borderRadius: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
+});
+
+export const batchHeaderLabel = style({
+  color: vars.color.textTertiary,
+});
+
+export const batchHeaderActions = style({
+  display: 'flex',
+  gap: '4px',
+});
+
+export const batchHeaderReject = style({
+  all: 'unset',
+  cursor: 'pointer',
+  padding: '1px 8px',
+  borderRadius: '3px',
+  fontSize: '11px',
+  color: vars.color.textTertiary,
+  transition: 'color 100ms ease, background 100ms ease',
+  selectors: {
+    '&:hover': {
+      color: vars.color.alertCaution,
+      background: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
+    },
+  },
+});
+
+export const batchHeaderAccept = style({
+  all: 'unset',
+  cursor: 'pointer',
+  padding: '1px 8px',
+  borderRadius: '3px',
+  fontSize: '11px',
+  color: vars.color.alertTip,
+  transition: 'color 100ms ease, background 100ms ease',
+  selectors: {
+    '&:hover': {
+      background: `color-mix(in srgb, ${vars.color.alertTip} 10%, transparent)`,
+    },
+  },
+});
+
+export const oldBlock = style({
+  background: `color-mix(in srgb, ${vars.color.alertCaution} 6%, ${vars.color.bg})`,
+  borderLeft: `2px solid ${vars.color.alertCaution}`,
+  padding: '6px 10px',
+  textDecoration: 'line-through',
+  textDecorationColor: `color-mix(in srgb, ${vars.color.alertCaution} 40%, transparent)`,
+  color: vars.color.textTertiary,
+});
+
+export const newBlock = style({
+  background: `color-mix(in srgb, ${vars.color.alertTip} 6%, ${vars.color.bg})`,
+  borderLeft: `2px solid ${vars.color.alertTip}`,
+  padding: '6px 10px',
+});
+
+export const rendererFrame = style({
+  overflow: 'hidden',
+});
+
+globalStyle(`${rendererFrame} > :first-child`, {
+  marginTop: 0,
+});
+
+globalStyle(`${rendererFrame} > :last-child`, {
+  marginBottom: 0,
 });
