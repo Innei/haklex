@@ -11,11 +11,20 @@ import { RichRenderer } from '@haklex/rich-static-renderer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getRoot, $getState, $parseSerializedNode, type SerializedLexicalNode } from 'lexical';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import {
+  batchHeader,
+  batchHeaderAccept,
+  batchHeaderActions,
+  batchHeaderLabel,
+  batchHeaderReject,
+  batchPanel,
+  newBlock,
+  oldBlock,
   overlayContainer,
+  rendererFrame,
 } from './diff-review-overlay.css';
 
 const INSERT_GAP = 8;
@@ -82,43 +91,79 @@ function resetBlockDecorations(entry: OverlayEntry) {
   entry.blockEl.style.marginBottom = '';
 }
 
-function InlineToolbar({
+function BatchPanel({
   batchId,
+  entries,
   top,
+  extraNodes,
+  rendererConfig,
+  theme,
+  variant,
   onAccept,
   onReject,
+  previewRefCallback,
 }: {
   batchId: string;
+  entries: OverlayEntry[];
+  top: number;
+  extraNodes: ReturnType<typeof useExtraNodes>;
+  rendererConfig: ReturnType<typeof useRendererConfig>;
+  theme: ReturnType<typeof useColorScheme>;
+  variant: ReturnType<typeof useVariant>;
   onAccept: (batchId: string) => void;
   onReject: (batchId: string) => void;
-  top: number;
+  previewRefCallback: (id: string) => (el: HTMLDivElement | null) => void;
 }): ReactElement {
+  const insertCount = entries.filter((e) => e.type === 'insert').length;
+  const replaceCount = entries.filter((e) => e.type === 'replace').length;
+  const parts: string[] = [];
+  if (replaceCount > 0) parts.push(`${replaceCount} change${replaceCount > 1 ? 's' : ''}`);
+  if (insertCount > 0) parts.push(`${insertCount} insertion${insertCount > 1 ? 's' : ''}`);
+  const label = parts.join(', ');
+
   return (
-    <div className={inlineToolbarLayer} style={{ top }}>
-      <div className={inlineToolbar}>
-        <ActionButton
-          icon
-          rounded
-          aria-label="Reject change"
-          className={`${inlineActionButton} ${inlineRejectButton}`}
-          size="sm"
-          title="Reject change"
-          onClick={() => onReject(batchId)}
-        >
-          <X size={14} />
-        </ActionButton>
-        <ActionButton
-          icon
-          rounded
-          aria-label="Accept change"
-          className={`${inlineActionButton} ${inlineAcceptButton}`}
-          size="sm"
-          title="Accept change"
-          onClick={() => onAccept(batchId)}
-        >
-          <Check size={14} />
-        </ActionButton>
+    <div className={batchPanel} ref={previewRefCallback(entries[0].id)} style={{ top }}>
+      <div className={batchHeader}>
+        <span className={batchHeaderLabel}>{label}</span>
+        <div className={batchHeaderActions}>
+          <button className={batchHeaderReject} type="button" onClick={() => onReject(batchId)}>
+            Reject
+          </button>
+          <button className={batchHeaderAccept} type="button" onClick={() => onAccept(batchId)}>
+            Accept
+          </button>
+        </div>
       </div>
+      {entries.map((entry) => (
+        <div key={entry.id}>
+          {entry.oldNode && (
+            <div className={oldBlock}>
+              <div className={rendererFrame}>
+                <RichRenderer
+                  extraNodes={extraNodes}
+                  rendererConfig={rendererConfig}
+                  theme={theme}
+                  value={wrapDoc([entry.oldNode])}
+                  variant={variant}
+                />
+              </div>
+            </div>
+          )}
+          {entry.newNode && (
+            <div className={newBlock}>
+              <div className={rendererFrame}>
+                <RichRenderer
+                  extraNodes={extraNodes}
+                  rendererConfig={rendererConfig}
+                  theme={theme}
+                  value={wrapDoc([entry.newNode])}
+                  variant={variant}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -135,18 +180,16 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   const previewRefs = useRef(new Map<string, HTMLDivElement>());
   const observerRef = useRef<ResizeObserver | null>(null);
 
-  const renderNode = useCallback(
-    (node: SerializedLexicalNode) => (
-      <RichRenderer
-        extraNodes={extraNodes}
-        rendererConfig={rendererConfig}
-        theme={theme}
-        value={wrapDoc([node])}
-        variant={variant}
-      />
-    ),
-    [extraNodes, rendererConfig, theme, variant],
-  );
+  const batchGroups = useMemo(() => {
+    const groups = new Map<string, OverlayEntry[]>();
+    for (const entry of overlays) {
+      if (entry.type === 'delete') continue;
+      const list = groups.get(entry.batchId) ?? [];
+      list.push(entry);
+      groups.set(entry.batchId, list);
+    }
+    return groups;
+  }, [overlays]);
 
   const handleAcceptBatch = useCallback(
     (batchId: string) => {
@@ -423,31 +466,24 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
   return createPortal(
     <div className={overlayContainer}>
-      {overlays.map((overlay) => (
-        <InlineToolbar
-          batchId={overlay.batchId}
-          key={`${overlay.id}:toolbar`}
-          top={overlay.blockTop + TOOLBAR_OFFSET}
-          onAccept={handleAcceptBatch}
-          onReject={handleRejectBatch}
-        />
-      ))}
+      {Array.from(batchGroups.entries()).map(([batchId, entries]) => {
+        const firstEntry = entries[0];
+        if (firstEntry.previewTop == null) return null;
 
-      {overlays.map((overlay) => {
-        if (!overlay.previewNode || overlay.previewTop == null) return null;
-
-        const tone = overlay.type === 'replace' ? 'replace' : 'insert';
         return (
-          <div
-            className={`${inlinePreview} ${inlinePreviewTone[tone]}`}
-            key={`${overlay.id}:preview`}
-            ref={previewRefCallback(overlay.id)}
-            style={{ top: overlay.previewTop }}
-          >
-            <div className={inlinePreviewBody}>
-              <div className={inlineRendererFrame}>{renderNode(overlay.previewNode)}</div>
-            </div>
-          </div>
+          <BatchPanel
+            batchId={batchId}
+            entries={entries}
+            extraNodes={extraNodes}
+            key={batchId}
+            previewRefCallback={previewRefCallback}
+            rendererConfig={rendererConfig}
+            theme={theme}
+            top={firstEntry.previewTop}
+            variant={variant}
+            onAccept={handleAcceptBatch}
+            onReject={handleRejectBatch}
+          />
         );
       })}
     </div>,
