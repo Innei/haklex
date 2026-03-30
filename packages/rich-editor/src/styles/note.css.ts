@@ -169,14 +169,16 @@ globalStyle(note(sharedStyles.quote), {
 globalStyle(`${note(sharedStyles.quote)}::before`, {
   content: '""',
   position: 'absolute',
-  top: 0,
+  top: '-7px',
   left: '50%',
-  transform: 'translateX(-50%)',
-  width: '40px',
-  height: '12px',
-  background: `color-mix(in srgb, ${vars.color.accent} 15%, rgba(0,0,0,0.06))`,
-  borderRadius: '0 0 3px 3px',
+  transform: 'translateX(-50%) rotate(1.2deg)',
+  width: '56px',
+  height: '16px',
+  background: `repeating-linear-gradient(105deg, transparent, transparent 2px, rgba(255,255,255,0.08) 2px, rgba(255,255,255,0.08) 4px), color-mix(in srgb, ${vars.color.accent} 20%, rgba(0,0,0,0.06))`,
+  boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
+  borderRadius: '1px',
   bottom: 'auto',
+  opacity: 0.85,
 });
 
 globalStyle(note(`${sharedStyles.quote} ${sharedStyles.paragraph}:first-child::first-letter`), {
