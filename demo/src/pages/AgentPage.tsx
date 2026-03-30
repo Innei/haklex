@@ -9,12 +9,7 @@ import {
 } from '@haklex/rich-agent-core';
 import { getVariantClass } from '@haklex/rich-editor';
 import { blockIdState } from '@haklex/rich-editor/plugins';
-import {
-  AgentPanelPlugin,
-  builtInActions,
-  DiffReviewOverlayPlugin,
-  useAgentLoop,
-} from '@haklex/rich-ext-ai-agent';
+import { AgentPanelPlugin, DiffReviewOverlayPlugin, useAgentLoop } from '@haklex/rich-ext-ai-agent';
 import { MentionPlatformProvider, ShiroEditor } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
@@ -194,7 +189,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
       const loop = agentLoopRef.current;
       if (!loop) return;
       abortRef.current = new AbortController();
-      loop.run(builtInActions[1], message).catch((err: unknown) => {
+      loop.run(message).catch((err: unknown) => {
         if ((err as Error).name === 'AbortError') return;
         store.getState().addBubble({ type: 'error', message: String(err) });
       });

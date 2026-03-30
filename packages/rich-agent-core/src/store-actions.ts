@@ -6,9 +6,10 @@ import {
   createInitialAgentStoreState,
 } from './initialState';
 import {
-  acceptBatch as acceptBatchFn,
-  detectConflicts,
+  acceptAndRebaseBatch,
+  reconcileReviewBatches,
   rejectBatch as rejectBatchFn,
+  resolveReviewEntry,
 } from './review-engine';
 import type { ReviewBatch, ReviewState } from './review-types';
 import type { StoreSetter } from './store-types';
@@ -25,7 +26,9 @@ export type AgentStoreActionMethods = {
   addBubble: (bubble: ChatBubble) => void;
   addReviewBatch: (batch: ReviewBatch) => void;
   acceptReviewBatch: (batchId: string) => void;
+  acceptReviewEntry: (batchId: string, entryId: string) => void;
   rejectReviewBatch: (batchId: string) => void;
+  rejectReviewEntry: (batchId: string, entryId: string) => void;
   reset: () => void;
   setDiffState: (diffState: DiffState | null) => void;
   setReviewState: (state: ReviewState | null) => void;
@@ -40,11 +43,13 @@ export type AgentStoreActionMethods = {
 
 type Setter = StoreSetter<AgentStoreShape & AgentStoreActionMethods>;
 
-export const createAgentStoreSlice = (
+export function createAgentStoreSlice(
   set: Setter,
   get: () => AgentStoreShape & AgentStoreActionMethods,
   api?: StoreApi<AgentStoreShape & AgentStoreActionMethods>,
-) => new AgentStoreActionImpl(set, get, api);
+): AgentStoreActionImpl {
+  return new AgentStoreActionImpl(set, get, api);
+}
 
 export class AgentStoreActionImpl {
   readonly #get: () => AgentStoreShape & AgentStoreActionMethods;
@@ -79,21 +84,35 @@ export class AgentStoreActionImpl {
         ...current,
         batches: [...current.batches, batch],
       };
-      return { reviewState: detectConflicts(next) };
+      return { reviewState: reconcileReviewBatches(next) };
     });
   };
 
   acceptReviewBatch = (batchId: string) => {
     this.#set((state) => {
       if (!state.reviewState) return {};
-      return { reviewState: acceptBatchFn(state.reviewState, batchId) };
+      return { reviewState: acceptAndRebaseBatch(state.reviewState, batchId) };
+    });
+  };
+
+  acceptReviewEntry = (batchId: string, entryId: string) => {
+    this.#set((state) => {
+      if (!state.reviewState) return {};
+      return { reviewState: resolveReviewEntry(state.reviewState, batchId, entryId, 'accepted') };
     });
   };
 
   rejectReviewBatch = (batchId: string) => {
     this.#set((state) => {
       if (!state.reviewState) return {};
-      return { reviewState: rejectBatchFn(state.reviewState, batchId) };
+      return { reviewState: reconcileReviewBatches(rejectBatchFn(state.reviewState, batchId)) };
+    });
+  };
+
+  rejectReviewEntry = (batchId: string, entryId: string) => {
+    this.#set((state) => {
+      if (!state.reviewState) return {};
+      return { reviewState: resolveReviewEntry(state.reviewState, batchId, entryId, 'rejected') };
     });
   };
 

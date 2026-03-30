@@ -1,6 +1,11 @@
 export type ChatMessage =
   | { role: 'system'; content: string; cacheBreakpoint?: boolean }
-  | { role: 'user'; content: string; cacheBreakpoint?: boolean }
+  | {
+      role: 'user';
+      content: string;
+      cacheBreakpoint?: boolean;
+      metadata?: UserMessageMetadata;
+    }
   | { role: 'assistant'; content: string }
   | { role: 'assistant_tool_call'; toolCalls: ToolCall[] }
   | { role: 'tool_result'; toolCallId: string; content: string; isError?: boolean };
@@ -45,12 +50,62 @@ export type AgentToolConfig = {
 };
 
 export type DocumentContextOptions = {
+  compact?: boolean;
   mode: 'full' | 'structure' | 'selection-window';
   windowSize?: number;
 };
 
-export type MessagePipeline = {
+export type PageSelection = {
+  xml: string;
+  startLine?: number;
+  endLine?: number;
+};
+
+export type UserMessageMetadata = {
+  pageSelections?: PageSelection[];
+} & Record<string, unknown>;
+
+export type PageContentMetadata = {
+  charCount?: number;
+  fileType?: string;
+  lineCount?: number;
+  title: string;
+};
+
+export type PageContentContext = {
+  markdown?: string;
+  metadata: PageContentMetadata;
+  xml?: string;
+};
+
+export type MessageEngineInitialContext = {
+  pageEditor?: PageContentContext;
+};
+
+export type MessageEngineStepContext = {
+  stepPageEditor?: {
+    xml?: string;
+  };
+};
+
+export type MessageEngineContext = {
+  messages: ChatMessage[];
+  pageContentContext?: PageContentContext;
+  initialContext?: MessageEngineInitialContext;
+  stepContext?: MessageEngineStepContext;
+};
+
+export type MessageDraft = {
+  systemMessages: Array<Extract<ChatMessage, { role: 'system' }>>;
+  messages: ChatMessage[];
+};
+
+export interface MessageEngine {
+  process: (context: MessageEngineContext) => PreparedMessages;
+}
+
+export type PreparedMessages = {
   systemMessages: ChatMessage[];
-  actionPrompt: ChatMessage;
+  preambleMessages: ChatMessage[];
   turns: ChatMessage[];
 };

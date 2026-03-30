@@ -1,10 +1,12 @@
 import { createDocumentTools } from './document-tools';
 import type { ChatBubble } from './initialState';
+import { buildMessages } from './messages-engine';
 import type {
   AgentToolConfig,
   AgentToolResult,
   ChatMessage,
   LLMProvider,
+  PreparedMessages,
   ToolSchema,
 } from './protocol';
 import type { EditorSnapshot } from './snapshot';
@@ -16,8 +18,8 @@ export type AgentExecutorConfig = {
   snapshot: EditorSnapshot;
   store: AgentStore;
   tools: AgentToolConfig[];
-  systemMessages: ChatMessage[];
   signal?: AbortSignal;
+  onOperationsChanged?: (operations: AgentOperation[]) => void;
 };
 
 export type AgentExecutorResult = {
@@ -65,8 +67,9 @@ function toolConfigToSchema(tool: AgentToolConfig): ToolSchema {
 }
 
 export function createAgentExecutor(config: AgentExecutorConfig) {
-  const { provider, snapshot, store, signal } = config;
+  const { provider, snapshot, store, signal, onOperationsChanged } = config;
   const operations: AgentOperation[] = [];
+  let lastOpsLength = 0;
   const documentTools = createDocumentTools(snapshot, operations);
   const allTools = [...documentTools, ...config.tools];
   const toolMap = new Map(allTools.map((t) => [t.name, t]));
@@ -82,20 +85,22 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
   }
 
   async function run(
-    actionPrompt: ChatMessage,
-    documentMessage: ChatMessage,
+    initialMessages: Omit<PreparedMessages, 'turns'>,
   ): Promise<AgentExecutorResult> {
     const { addBubble, setStatus, updateLastBubble } = store.getState();
 
     setStatus('running');
 
-    const turns: ChatMessage[] = [documentMessage];
+    const turns: ChatMessage[] = [];
 
     const maxTurns = 20;
     for (let turn = 0; turn < maxTurns; turn++) {
       signal?.throwIfAborted();
 
-      const messages: ChatMessage[] = [...config.systemMessages, actionPrompt, ...turns];
+      const messages = buildMessages({
+        ...initialMessages,
+        turns,
+      });
 
       let textAccum = '';
       let thinkingAccum = '';
@@ -261,6 +266,11 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
           content,
           isError: !result.ok,
         });
+
+        if (operations.length > lastOpsLength) {
+          lastOpsLength = operations.length;
+          onOperationsChanged?.(operations);
+        }
       }
     }
 

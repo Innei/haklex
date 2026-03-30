@@ -87,6 +87,72 @@ export const newBlock = style({
   padding: '6px 10px',
 });
 
+export const mergedBlock = style({
+  background: vars.color.bg,
+  padding: '6px 10px',
+});
+
+export const floatingBar = style({
+  pointerEvents: 'auto',
+  position: 'sticky',
+  bottom: 0,
+  left: 0,
+  right: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+  padding: '6px 16px',
+  fontFamily: 'system-ui, sans-serif',
+  fontSize: '12px',
+  background: `color-mix(in srgb, ${vars.color.text} 4%, ${vars.color.bg})`,
+  borderTop: `1px solid color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+  borderRadius: `${vars.borderRadius.md} ${vars.borderRadius.md} 0 0`,
+  backdropFilter: 'blur(8px)',
+  zIndex: 20,
+});
+
+export const floatingBarBtn = style({
+  all: 'unset',
+  cursor: 'pointer',
+  padding: '3px 12px',
+  borderRadius: '4px',
+  fontSize: '12px',
+  fontWeight: 500,
+  transition: 'color 100ms ease, background 100ms ease',
+});
+
+export const floatingBarAccept = style([
+  floatingBarBtn,
+  {
+    color: vars.color.alertTip,
+    background: `color-mix(in srgb, ${vars.color.alertTip} 10%, transparent)`,
+    selectors: {
+      '&:hover': {
+        background: `color-mix(in srgb, ${vars.color.alertTip} 18%, transparent)`,
+      },
+    },
+  },
+]);
+
+export const floatingBarReject = style([
+  floatingBarBtn,
+  {
+    color: vars.color.textTertiary,
+    selectors: {
+      '&:hover': {
+        color: vars.color.alertCaution,
+        background: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
+      },
+    },
+  },
+]);
+
+export const floatingBarLabel = style({
+  color: vars.color.textTertiary,
+  marginRight: '4px',
+});
+
 export const rendererFrame = style({
   overflow: 'hidden',
 });

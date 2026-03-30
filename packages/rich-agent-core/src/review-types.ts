@@ -3,7 +3,12 @@ import type { SerializedEditorState } from 'lexical';
 import type { AgentOperation } from './types';
 
 export type ReviewEntryStatus = 'pending' | 'accepted' | 'rejected' | 'conflicted';
-export type ReviewBatchStatus = 'pending' | 'accepted' | 'rejected' | 'conflicted';
+export type ReviewBatchStatus =
+  | 'pending'
+  | 'order_dependent'
+  | 'accepted'
+  | 'rejected'
+  | 'conflicted';
 
 export type ReviewEntry = {
   id: string;

@@ -7,10 +7,10 @@ import type {
 import type { ReactElement } from 'react';
 
 import { useAgentLoop } from '../hooks/useAgentLoop';
-import type { AgentActionConfig } from '../registry';
+import type { AgentMessagesEngine } from '../messageEngine';
 
 export interface AgentPanelPluginProps {
-  actions?: AgentActionConfig[];
+  messageEngine?: AgentMessagesEngine;
   provider: LLMProvider;
   store: AgentStore;
   systemMessages?: ChatMessage[];
@@ -18,11 +18,12 @@ export interface AgentPanelPluginProps {
 }
 
 export function AgentPanelPlugin({
+  messageEngine,
   provider,
   store,
   tools,
   systemMessages,
 }: AgentPanelPluginProps): ReactElement | null {
-  useAgentLoop({ provider, store, tools, systemMessages });
+  useAgentLoop({ provider, store, tools, systemMessages, messageEngine });
   return null;
 }

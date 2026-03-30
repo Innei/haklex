@@ -7,10 +7,21 @@ export {
   rejectAllDiffs,
   rejectDiff,
 } from './diff-engine';
+export { buildDocumentContext } from './document-context';
 export { createDocumentTools } from './document-tools';
 export type { ToolCallGroupItem, ToolCallItemStatus } from './initialState';
 export { createInitialAgentStoreState } from './initialState';
-export { buildDocumentContext, buildMessages } from './pipeline';
+export {
+  BaseEveryUserContentProvider,
+  BaseFirstUserContentProvider,
+  BaseFirstUserMessageProvider,
+  BaseLastUserContentProvider,
+  BaseMessageEngineProcessor,
+  BaseSystemMessageProvider,
+  BaseSystemRoleProvider,
+  BaseSystemRootProvider,
+  MessagesEngine,
+} from './messages-engine';
 export type {
   AgentToolConfig,
   AgentToolResult,
@@ -18,17 +29,25 @@ export type {
   DocumentContextOptions,
   LLMChunk,
   LLMProvider,
-  MessagePipeline,
+  MessageEngine,
+  MessageEngineContext,
+  PageContentContext,
+  PageContentMetadata,
+  PageSelection,
+  PreparedMessages,
   ToolCall,
   ToolError,
   ToolSchema,
 } from './protocol';
 export {
+  acceptAndRebaseBatch,
   acceptBatch,
   applyOpsToSnapshot,
   createReviewBatch,
   detectConflicts,
+  reconcileReviewBatches,
   rejectBatch,
+  resolveReviewEntry,
 } from './review-engine';
 export type {
   ReviewBatch,

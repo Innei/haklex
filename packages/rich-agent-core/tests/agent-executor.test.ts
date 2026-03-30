@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { createAgentExecutor } from '../src/agent-executor';
-import type { LLMChunk, LLMProvider } from '../src/protocol';
+import type { LLMChunk, LLMProvider, PreparedMessages } from '../src/protocol';
 import { createSnapshot } from '../src/snapshot';
 import { createAgentStore } from '../src/store';
 
@@ -50,6 +50,23 @@ function mockProvider(chunks: LLMChunk[]): LLMProvider {
   };
 }
 
+function makeInitialMessages(): Omit<PreparedMessages, 'turns'> {
+  return {
+    systemMessages: [{ role: 'system', content: 'You are a helpful agent.' }],
+    preambleMessages: [
+      {
+        role: 'user',
+        content: 'Fix the text',
+        cacheBreakpoint: true,
+      },
+      {
+        role: 'user',
+        content: 'Document: Hello',
+      },
+    ],
+  };
+}
+
 describe('createAgentExecutor', () => {
   it('executes a simple text-only response', async () => {
     const store = createAgentStore();
@@ -61,17 +78,9 @@ describe('createAgentExecutor', () => {
       snapshot,
       store,
       tools: [],
-      systemMessages: [{ role: 'system', content: 'You are a helpful agent.' }],
     });
 
-    const result = await executor.run(
-      {
-        role: 'user',
-        content: 'Fix the text',
-        cacheBreakpoint: true,
-      },
-      { role: 'user', content: 'Document: Hello' },
-    );
+    const result = await executor.run(makeInitialMessages());
 
     expect(result.operations).toHaveLength(0);
     expect(store.getState().bubbles.length).toBeGreaterThan(0);
@@ -106,17 +115,19 @@ describe('createAgentExecutor', () => {
       snapshot,
       store,
       tools: [],
-      systemMessages: [{ role: 'system', content: 'You are a helpful agent.' }],
     });
 
-    const result = await executor.run(
-      {
-        role: 'user',
-        content: 'Delete the paragraph',
-        cacheBreakpoint: true,
-      },
-      { role: 'user', content: 'Document: Hello' },
-    );
+    const result = await executor.run({
+      ...makeInitialMessages(),
+      preambleMessages: [
+        {
+          role: 'user',
+          content: 'Delete the paragraph',
+          cacheBreakpoint: true,
+        },
+        { role: 'user', content: 'Document: Hello' },
+      ],
+    });
 
     expect(result.operations).toHaveLength(1);
     expect(result.operations[0].op).toBe('delete');
@@ -156,10 +167,15 @@ describe('createAgentExecutor', () => {
       snapshot,
       store,
       tools: [],
-      systemMessages: [{ role: 'system', content: 'Agent' }],
     });
 
-    await executor.run({ role: 'user', content: 'Do it' }, { role: 'user', content: 'Doc' });
+    await executor.run({
+      systemMessages: [{ role: 'system', content: 'Agent' }],
+      preambleMessages: [
+        { role: 'user', content: 'Do it' },
+        { role: 'user', content: 'Doc' },
+      ],
+    });
 
     const groupBubbles = store.getState().bubbles.filter((b) => b.type === 'tool_call_group');
     expect(groupBubbles).toHaveLength(1);
@@ -203,10 +219,15 @@ describe('createAgentExecutor', () => {
       snapshot,
       store,
       tools: [],
-      systemMessages: [{ role: 'system', content: 'Agent' }],
     });
 
-    await executor.run({ role: 'user', content: 'Do it' }, { role: 'user', content: 'Doc' });
+    await executor.run({
+      systemMessages: [{ role: 'system', content: 'Agent' }],
+      preambleMessages: [
+        { role: 'user', content: 'Do it' },
+        { role: 'user', content: 'Doc' },
+      ],
+    });
 
     const group = store.getState().bubbles.find((b) => b.type === 'tool_call_group');
     if (group?.type === 'tool_call_group') {
@@ -234,14 +255,16 @@ describe('createAgentExecutor', () => {
       snapshot,
       store,
       tools: [],
-      systemMessages: [{ role: 'system', content: 'Agent' }],
       signal: controller.signal,
     });
 
-    const promise = executor.run(
-      { role: 'user', content: 'Do something' },
-      { role: 'user', content: 'Doc' },
-    );
+    const promise = executor.run({
+      systemMessages: [{ role: 'system', content: 'Agent' }],
+      preambleMessages: [
+        { role: 'user', content: 'Do something' },
+        { role: 'user', content: 'Doc' },
+      ],
+    });
 
     setTimeout(() => controller.abort(), 10);
 

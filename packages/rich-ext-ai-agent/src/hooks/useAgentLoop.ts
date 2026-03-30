@@ -1,7 +1,6 @@
 import {
   type AgentStore,
   type AgentToolConfig,
-  buildDocumentContext,
   type ChatMessage,
   createAgentExecutor,
   createReviewBatch,
@@ -12,12 +11,13 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { SerializedEditorState } from 'lexical';
 import { useCallback, useRef } from 'react';
 
-import type { AgentActionConfig } from '../registry';
+import { AgentMessagesEngine } from '../messageEngine';
 
 export type UseAgentLoopOptions = {
   provider: LLMProvider;
   store: AgentStore;
   tools?: AgentToolConfig[];
+  messageEngine?: AgentMessagesEngine;
   systemMessages?: ChatMessage[];
 };
 
@@ -26,111 +26,69 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
   const abortRef = useRef<AbortController | null>(null);
 
   const run = useCallback(
-    async (action: AgentActionConfig, userInput: string) => {
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
+    async (userInput: string) => {
+      try {
+        abortRef.current?.abort();
+        const controller = new AbortController();
+        abortRef.current = controller;
 
-      const serialized = editor.getEditorState().toJSON() as SerializedEditorState;
-      const snapshot = createSnapshot(serialized);
+        const serialized = editor.getEditorState().toJSON() as SerializedEditorState;
+        const snapshot = createSnapshot(serialized);
 
-      const prompt =
-        typeof action.prompt === 'function'
-          ? action.prompt({
-              selection: null,
-              getBlockByBlockId: (id) => snapshot.getBlock(id) ?? null,
-              getDocumentStructure: () => serialized.root as any,
-            })
-          : action.prompt;
+        const messageEngine =
+          options.messageEngine ??
+          new AgentMessagesEngine({ systemMessages: options.systemMessages });
+        const preparedMessages = messageEngine.processWithEditor({
+          editorState: serialized,
+          userInput,
+        });
 
-      const actionPrompt: ChatMessage = {
-        role: 'user',
-        content: `${prompt}\n\nUser instruction: ${userInput}`,
-        cacheBreakpoint: true,
-      };
+        let activeBatchId: string | null = null;
 
-      const documentMessage: ChatMessage = {
-        role: 'user',
-        content: `<document>\n${buildDocumentContext(serialized, { mode: 'full' })}</document>`,
-      };
+        const executor = createAgentExecutor({
+          provider: options.provider,
+          snapshot,
+          store: options.store,
+          tools: options.tools ?? [],
+          signal: controller.signal,
+          onOperationsChanged: (ops) => {
+            const revision = options.store.getState().reviewState?.documentRevision ?? 0;
+            const batch = createReviewBatch(ops, serialized, revision);
 
-      const executor = createAgentExecutor({
-        provider: options.provider,
-        snapshot,
-        store: options.store,
-        tools: options.tools ?? [],
-        systemMessages: options.systemMessages ?? [
-          {
-            role: 'system',
-            content: `You are an AI editor agent that modifies a rich-text document using structured XML tools.
-
-## Document Format
-
-The document is provided as XML. Each block element has an \`id\` attribute you use to reference it.
-
-### Block elements
-- \`<p>\` paragraph
-- \`<h1>\` to \`<h6>\` headings
-- \`<blockquote>\` block quote
-- \`<ul>\` / \`<ol>\` lists with \`<li>\` items. Checklists: \`<ul type="check"><li checked="true">...\`
-- \`<hr />\` horizontal rule
-- \`<table>\` with \`<tr>\`, \`<th>\`, \`<td>\`
-- \`<codeblock lang="...">\` code block
-- \`<img src="..." alt="..." />\` image
-- \`<video src="..." />\` video
-- \`<math display="block">\` block equation (KaTeX)
-- \`<mermaid>\` mermaid diagram
-- \`<alert type="note|tip|important|warning|caution">\` alert/callout
-- \`<banner type="...">\` banner
-- \`<details summary="...">\` collapsible section
-- \`<linkcard url="..." />\` link card
-- \`<embed url="..." />\` embed
-- \`<gallery layout="grid|masonry|carousel">\` image gallery with \`<img>\` children
-- \`<codesnippet>\` multi-file code with \`<file name="..." lang="...">\` children
-- \`<footnotesection>\` with \`<def ref="...">\` children
-
-### Inline elements (inside block elements)
-- \`<b>\` bold, \`<i>\` italic, \`<u>\` underline, \`<s>\` strikethrough
-- \`<code>\` inline code, \`<mark>\` highlight, \`<sub>\` subscript, \`<sup>\` superscript
-- \`<a href="...">\` link
-- \`<math>\` inline equation
-- \`<mention platform="..." handle="...">\` mention
-- \`<tag>\` tag
-- \`<comment>\` HTML comment node
-- \`<spoiler>\` spoiler text
-- \`<ruby rt="...">\` ruby annotation
-- \`<footnote ref="..." />\` footnote reference
-
-### Opaque elements
-\`<node type="..." data="..." />\` — unrecognized or complex nodes. Do NOT modify these.
-
-## Tool Usage Rules
-
-1. **Use the XML format** for insert_node and replace_node. Write proper block elements, not raw text with \\n.
-2. **One block per replace_node call.** If replacing one block with multiple, the first replaces and extras insert after.
-3. **insert_node supports multiple blocks** in one call. Write multiple XML elements in the xml parameter.
-4. **Preserve document structure.** Don't merge separate paragraphs into one unless explicitly asked.
-5. **Keep existing block IDs.** When modifying content within a block, use replace_node with the block's id.
-6. **Do not invent block IDs** in your XML output — the system assigns them automatically.
-7. **For bulk edits** (e.g. polishing an article), work block-by-block: replace each block that needs changes, delete blocks to remove, insert new blocks where needed.
-8. **search_document** finds blocks by text content or type. Use it to locate blocks before modifying.
-`,
-            cacheBreakpoint: true,
+            if (activeBatchId) {
+              // Replace the existing batch
+              const reviewState = options.store.getState().reviewState;
+              if (reviewState) {
+                options.store.getState().setReviewState({
+                  ...reviewState,
+                  batches: reviewState.batches.map((b) =>
+                    b.id === activeBatchId ? { ...batch, id: activeBatchId } : b,
+                  ),
+                });
+              }
+            } else {
+              activeBatchId = batch.id;
+              options.store.getState().addReviewBatch(batch);
+              options.store.getState().addBubble({ type: 'diff_review', batchId: batch.id });
+            }
           },
-        ],
-        signal: controller.signal,
-      });
+        });
 
-      const result = await executor.run(actionPrompt, documentMessage);
+        const result = await executor.run(preparedMessages);
 
-      if (result.operations.length > 0) {
-        const revision = options.store.getState().reviewState?.documentRevision ?? 0;
-        const batch = createReviewBatch(result.operations, serialized, revision);
-        options.store.getState().addReviewBatch(batch);
-        options.store.getState().addBubble({ type: 'diff_review', batchId: batch.id });
+        // Final batch creation if no operations were emitted incrementally
+        if (result.operations.length > 0 && !activeBatchId) {
+          const revision = options.store.getState().reviewState?.documentRevision ?? 0;
+          const batch = createReviewBatch(result.operations, serialized, revision);
+          options.store.getState().addReviewBatch(batch);
+          options.store.getState().addBubble({ type: 'diff_review', batchId: batch.id });
+        }
+
+        return result;
+      } catch (error) {
+        console.error('[useAgentLoop] run failed:', error);
+        throw error;
       }
-
-      return result;
     },
     [editor, options],
   );

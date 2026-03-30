@@ -1,5 +1,9 @@
 import type { XmlContent, XmlElement } from './types';
 
+export interface XmlRenderOptions {
+  compact?: boolean;
+}
+
 const ESCAPE_MAP: Record<string, string> = {
   '&': '&amp;',
   '<': '&lt;',
@@ -20,27 +24,32 @@ export function buildAttrs(attrs: Record<string, string>): string {
 }
 
 /** Render XmlContent tree to XML string. */
-export function renderXml(content: XmlContent[], indent: number = 0): string {
+export function renderXml(
+  content: XmlContent[],
+  indent: number = 0,
+  options: XmlRenderOptions = {},
+): string {
   const lines: string[] = [];
   for (const item of content) {
     if (typeof item === 'string') {
       lines.push(escapeXml(item));
     } else {
-      lines.push(renderElement(item, indent));
+      lines.push(renderElement(item, indent, options));
     }
   }
   return lines.join('');
 }
 
-function renderElement(el: XmlElement, indent: number): string {
+function renderElement(el: XmlElement, indent: number, options: XmlRenderOptions): string {
   const attrs = el.attrs ? buildAttrs(el.attrs) : '';
+  const compact = options.compact === true;
 
   if (el.selfClosing) {
-    return `${pad(indent)}<${el.tag}${attrs} />\n`;
+    return compact ? `<${el.tag}${attrs} />` : `${pad(indent)}<${el.tag}${attrs} />\n`;
   }
 
   if (!el.children || el.children.length === 0) {
-    return `${pad(indent)}<${el.tag}${attrs} />\n`;
+    return compact ? `<${el.tag}${attrs} />` : `${pad(indent)}<${el.tag}${attrs} />\n`;
   }
 
   // Check if all children are inline (strings or inline elements)
@@ -50,14 +59,23 @@ function renderElement(el: XmlElement, indent: number): string {
     const inner = el.children
       .map((c) => (typeof c === 'string' ? escapeXml(c) : renderInline(c)))
       .join('');
-    return `${pad(indent)}<${el.tag}${attrs}>${inner}</${el.tag}>\n`;
+    return compact
+      ? `<${el.tag}${attrs}>${inner}</${el.tag}>`
+      : `${pad(indent)}<${el.tag}${attrs}>${inner}</${el.tag}>\n`;
   }
 
   // Block children: each on its own line with indent
+  if (compact) {
+    const inner = el.children
+      .map((c) => (typeof c === 'string' ? escapeXml(c) : renderElement(c, indent + 1, options)))
+      .join('');
+    return `<${el.tag}${attrs}>${inner}</${el.tag}>`;
+  }
+
   const inner = el.children
     .map((c) => {
       if (typeof c === 'string') return `${pad(indent + 1)}${escapeXml(c)}\n`;
-      return renderElement(c, indent + 1);
+      return renderElement(c, indent + 1, options);
     })
     .join('');
   return `${pad(indent)}<${el.tag}${attrs}>\n${inner}${pad(indent)}</${el.tag}>\n`;

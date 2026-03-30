@@ -3,25 +3,36 @@ import type { SerializedEditorState, SerializedLexicalNode } from 'lexical';
 import type { LitexmlRegistry } from './registry';
 import { wrapWithFormatTags } from './text-format';
 import type { WriterContext, XmlContent } from './types';
-import { renderXml } from './xml-utils';
+import { renderXml, type XmlRenderOptions } from './xml-utils';
 
-export function serializeToXml(state: SerializedEditorState, registry: LitexmlRegistry): string {
+export type XmlSerializerOptions = XmlRenderOptions;
+
+export function serializeToXml(
+  state: SerializedEditorState,
+  registry: LitexmlRegistry,
+  options: XmlSerializerOptions = {},
+): string {
   const root = state.root as any;
   const children: SerializedLexicalNode[] = root.children ?? [];
 
   const ctx = createWriterContext(registry);
   const content = children.flatMap((child) => ctx.serializeNode(child));
 
-  return `<doc>\n${renderXml(content, 1)}</doc>\n`;
+  if (options.compact) {
+    return `<doc>${renderXml(content, 0, options)}</doc>`;
+  }
+
+  return `<doc>\n${renderXml(content, 1, options)}</doc>\n`;
 }
 
 export function serializeNodesToXml(
   nodes: SerializedLexicalNode[],
   registry: LitexmlRegistry,
+  options: XmlSerializerOptions = {},
 ): string {
   const ctx = createWriterContext(registry);
   const content = nodes.flatMap((node) => ctx.serializeNode(node));
-  return renderXml(content, 0);
+  return renderXml(content, 0, options);
 }
 
 function createWriterContext(registry: LitexmlRegistry): WriterContext {

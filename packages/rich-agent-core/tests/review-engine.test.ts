@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { applyOpsToSnapshot, createReviewBatch } from '../src/review-engine';
+import {
+  acceptAndRebaseBatch,
+  applyOpsToSnapshot,
+  createReviewBatch,
+  detectConflicts,
+} from '../src/review-engine';
 import type { AgentOperation } from '../src/types';
 
 function makeDoc(children: any[]) {
@@ -140,5 +145,173 @@ describe('createReviewBatch', () => {
     expect(entry.anchorBeforeId).toBe('b1');
     expect(entry.anchorAfterId).toBe('b2');
     expect(entry.targetBlockId).toBe('b1');
+  });
+});
+
+describe('detectConflicts', () => {
+  const base = makeDoc([makeParagraph('Hello', 'b1'), makeParagraph('World', 'b2')]);
+
+  it('marks sequential inserts on the same anchor as order dependent', () => {
+    const first = createReviewBatch(
+      [
+        {
+          op: 'insert',
+          position: { type: 'after', blockId: 'b1' },
+          node: makeParagraph('First insert', 'n1') as any,
+        },
+      ],
+      base,
+      0,
+    );
+    const second = createReviewBatch(
+      [
+        {
+          op: 'insert',
+          position: { type: 'after', blockId: 'b1' },
+          node: makeParagraph('Second insert', 'n2') as any,
+        },
+      ],
+      base,
+      0,
+    );
+
+    const result = detectConflicts({
+      documentRevision: 0,
+      batches: [first, second],
+    });
+
+    expect(result.batches[0].status).toBe('order_dependent');
+    expect(result.batches[1].status).toBe('order_dependent');
+  });
+
+  it('marks delete and anchored insert as conflicted', () => {
+    const deleting = createReviewBatch([{ op: 'delete', blockId: 'b1' }], base, 0);
+    const inserting = createReviewBatch(
+      [
+        {
+          op: 'insert',
+          position: { type: 'after', blockId: 'b1' },
+          node: makeParagraph('Inserted after deleted block', 'n1') as any,
+        },
+      ],
+      base,
+      0,
+    );
+
+    const result = detectConflicts({
+      documentRevision: 0,
+      batches: [deleting, inserting],
+    });
+
+    expect(result.batches[0].status).toBe('conflicted');
+    expect(result.batches[1].status).toBe('conflicted');
+  });
+
+  it('marks replace and replace on the same block as conflicted', () => {
+    const first = createReviewBatch(
+      [
+        {
+          op: 'replace',
+          blockId: 'b1',
+          node: makeParagraph('First rewrite', 'b1') as any,
+        },
+      ],
+      base,
+      0,
+    );
+    const second = createReviewBatch(
+      [
+        {
+          op: 'replace',
+          blockId: 'b1',
+          node: makeParagraph('Second rewrite', 'b1') as any,
+        },
+      ],
+      base,
+      0,
+    );
+
+    const result = detectConflicts({
+      documentRevision: 0,
+      batches: [first, second],
+    });
+
+    expect(result.batches[0].status).toBe('conflicted');
+    expect(result.batches[1].status).toBe('conflicted');
+  });
+});
+
+describe('acceptAndRebaseBatch', () => {
+  const base = makeDoc([makeParagraph('Hello', 'b1'), makeParagraph('World', 'b2')]);
+
+  it('increments revision and rebases remaining inserts onto the accepted preview', () => {
+    const first = createReviewBatch(
+      [
+        {
+          op: 'insert',
+          position: { type: 'after', blockId: 'b1' },
+          node: makeParagraph('First insert', 'n1') as any,
+        },
+      ],
+      base,
+      0,
+    );
+    const second = createReviewBatch(
+      [
+        {
+          op: 'insert',
+          position: { type: 'after', blockId: 'b1' },
+          node: makeParagraph('Second insert', 'n2') as any,
+        },
+      ],
+      base,
+      0,
+    );
+
+    const result = acceptAndRebaseBatch(
+      detectConflicts({
+        documentRevision: 0,
+        batches: [first, second],
+      }),
+      first.id,
+    );
+
+    expect(result.documentRevision).toBe(1);
+    const accepted = result.batches.find((batch) => batch.id === first.id)!;
+    const rebased = result.batches.find((batch) => batch.id === second.id)!;
+
+    expect(accepted.status).toBe('accepted');
+    expect(rebased.baseRevision).toBe(1);
+    expect(rebased.status).toBe('pending');
+    expect((rebased.baseSnapshot.root as any).children ?? []).toHaveLength(3);
+  });
+
+  it('marks a batch as conflicted when rebase target no longer exists', () => {
+    const deleting = createReviewBatch([{ op: 'delete', blockId: 'b1' }], base, 0);
+    const inserting = createReviewBatch(
+      [
+        {
+          op: 'insert',
+          position: { type: 'after', blockId: 'b1' },
+          node: makeParagraph('Inserted after deleted block', 'n1') as any,
+        },
+      ],
+      base,
+      0,
+    );
+
+    const result = acceptAndRebaseBatch(
+      detectConflicts({
+        documentRevision: 0,
+        batches: [deleting, inserting],
+      }),
+      deleting.id,
+    );
+
+    const rebased = result.batches.find((batch) => batch.id === inserting.id)!;
+
+    expect(result.documentRevision).toBe(1);
+    expect(rebased.status).toBe('conflicted');
+    expect(rebased.baseRevision).toBe(0);
   });
 });

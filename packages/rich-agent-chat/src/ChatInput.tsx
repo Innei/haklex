@@ -1,5 +1,5 @@
 import { AutoResizeTextArea, Spinner } from '@haklex/rich-editor-ui';
-import { ArrowUp, Square } from 'lucide-react';
+import { Send, Square } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
@@ -25,6 +25,7 @@ export function ChatInput({
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const trimmed = input.trim();
+  const isAbortMode = Boolean(isRunning);
   const placeholder = disabled
     ? 'Configure a model to start an agent task.'
     : 'Ask a follow-up question...';
@@ -63,26 +64,19 @@ export function ChatInput({
       />
       <div className={css.composerBottomBar}>
         <div>{modelSelector ?? <div />}</div>
-        {isRunning ? (
-          <button
-            aria-label="Abort agent run"
-            className={css.composerAbortButton}
-            type="button"
-            onClick={onAbort}
-          >
-            <Square size={14} />
-          </button>
-        ) : (
-          <button
-            aria-label="Send message"
-            className={css.composerSendButton}
-            disabled={disabled || !trimmed}
-            type="button"
-            onClick={handleSend}
-          >
-            <ArrowUp size={16} />
-          </button>
-        )}
+        <button
+          aria-label={isAbortMode ? 'Abort agent run' : 'Send message'}
+          className={isAbortMode ? css.composerAbortButton : css.composerSendButton}
+          disabled={isAbortMode ? !onAbort : disabled || !trimmed}
+          type="button"
+          onClick={isAbortMode ? () => onAbort?.() : handleSend}
+        >
+          {isAbortMode ? (
+            <Square fill="currentColor" size={14} strokeWidth={0} />
+          ) : (
+            <Send fill="currentColor" size={16} strokeWidth={0} />
+          )}
+        </button>
       </div>
     </div>
   );

@@ -504,6 +504,95 @@ export function diffModifiedNode(
   };
 }
 
+function mergeTextDiffNodes(
+  oldNode: SerializedTextNodeLike,
+  newNode: SerializedTextNodeLike,
+): SerializedLexicalNode[] {
+  const ops = diffTextByChar(oldNode.text, newNode.text);
+  const merged: SerializedLexicalNode[] = [];
+
+  for (const op of ops) {
+    if (!op.text) continue;
+    if (op.kind === 'equal') {
+      merged.push(cloneTextNode(newNode, op.text));
+    } else if (op.kind === 'delete') {
+      merged.push(cloneTextNode(oldNode, op.text, 'delete'));
+    } else {
+      merged.push(cloneTextNode(newNode, op.text, 'insert'));
+    }
+  }
+
+  return merged;
+}
+
+function diffChildrenMerged(
+  oldChildren: SerializedLexicalNode[],
+  newChildren: SerializedLexicalNode[],
+): SerializedLexicalNode[] {
+  const ops = alignNodes(oldChildren, newChildren);
+  const merged: SerializedLexicalNode[] = [];
+
+  for (const op of ops) {
+    switch (op.kind) {
+      case 'equal': {
+        merged.push(op.node);
+        break;
+      }
+      case 'delete': {
+        merged.push(decorateSubtree(op.node, 'delete'));
+        break;
+      }
+      case 'insert': {
+        merged.push(decorateSubtree(op.node, 'insert'));
+        break;
+      }
+      case 'modify': {
+        if (isTextNode(op.oldNode) && isTextNode(op.newNode)) {
+          merged.push(...mergeTextDiffNodes(op.oldNode, op.newNode));
+          break;
+        }
+
+        const nestedOld = getChildren(op.oldNode);
+        const nestedNew = getChildren(op.newNode);
+        if (nestedOld && nestedNew) {
+          merged.push(cloneNodeWithChildren(op.newNode, diffChildrenMerged(nestedOld, nestedNew)));
+        } else {
+          merged.push(decorateSubtree(op.oldNode, 'delete'));
+          merged.push(decorateSubtree(op.newNode, 'insert'));
+        }
+        break;
+      }
+    }
+  }
+
+  return merged;
+}
+
+/**
+ * Produces a **single** merged node with both deletions (strikethrough) and
+ * insertions (green highlight) interleaved inline – like VS Code's inline diff.
+ */
+export function diffMergedNode(
+  oldNode: SerializedLexicalNode,
+  newNode: SerializedLexicalNode,
+): SerializedLexicalNode {
+  if (getNodeTypeKey(oldNode) !== getNodeTypeKey(newNode)) {
+    return decorateSubtree(newNode, 'insert');
+  }
+
+  if (nodesEqual(oldNode, newNode)) {
+    return newNode;
+  }
+
+  const oldChildren = getChildren(oldNode);
+  const newChildren = getChildren(newNode);
+  if (!oldChildren || !newChildren) {
+    return decorateSubtree(newNode, 'insert');
+  }
+
+  return cloneNodeWithChildren(newNode, diffChildrenMerged(oldChildren, newChildren));
+}
+
 export function computeDiff(
   oldState: SerializedEditorState,
   newState: SerializedEditorState,

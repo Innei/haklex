@@ -1,5 +1,5 @@
 import type { AgentStore } from '@haklex/rich-agent-core';
-import { decorateSubtree, diffModifiedNode } from '@haklex/rich-diff-core';
+import { decorateSubtree, diffMergedNode } from '@haklex/rich-diff-core';
 import { blockIdState } from '@haklex/rich-editor/plugins';
 import {
   useColorScheme,
@@ -11,7 +11,7 @@ import { RichRenderer } from '@haklex/rich-static-renderer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getRoot, $getState, $parseSerializedNode, type SerializedLexicalNode } from 'lexical';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import {
@@ -21,6 +21,11 @@ import {
   batchHeaderLabel,
   batchHeaderReject,
   batchPanel,
+  floatingBar,
+  floatingBarAccept,
+  floatingBarLabel,
+  floatingBarReject,
+  mergedBlock,
   newBlock,
   oldBlock,
   overlayContainer,
@@ -68,7 +73,8 @@ type OverlayEntry = {
   previewTop?: number;
   oldNode?: SerializedLexicalNode;
   newNode?: SerializedLexicalNode;
-  spacing: 'none' | 'before' | 'after';
+  mergedNode?: SerializedLexicalNode;
+  spacing: 'none' | 'before' | 'after' | 'overlay';
 };
 
 function applyDeleteDecorations(entry: OverlayEntry) {
@@ -87,55 +93,71 @@ function resetBlockDecorations(entry: OverlayEntry) {
   entry.blockEl.style.textDecoration = '';
   entry.blockEl.style.textDecorationColor = '';
   entry.blockEl.style.opacity = '';
+  entry.blockEl.style.visibility = '';
   entry.blockEl.style.marginTop = '';
   entry.blockEl.style.marginBottom = '';
 }
 
-function BatchPanel({
+function InlineEntryPanel({
+  entry,
   batchId,
-  entries,
-  top,
   extraNodes,
   rendererConfig,
   theme,
   variant,
-  onAccept,
-  onReject,
+  onAcceptEntry,
+  onRejectEntry,
   previewRefCallback,
 }: {
+  entry: OverlayEntry;
   batchId: string;
-  entries: OverlayEntry[];
-  top: number;
   extraNodes: ReturnType<typeof useExtraNodes>;
   rendererConfig: ReturnType<typeof useRendererConfig>;
   theme: ReturnType<typeof useColorScheme>;
   variant: ReturnType<typeof useVariant>;
-  onAccept: (batchId: string) => void;
-  onReject: (batchId: string) => void;
+  onAcceptEntry: (batchId: string, entryId: string) => void;
+  onRejectEntry: (batchId: string, entryId: string) => void;
   previewRefCallback: (id: string) => (el: HTMLDivElement | null) => void;
 }): ReactElement {
-  const insertCount = entries.filter((e) => e.type === 'insert').length;
-  const replaceCount = entries.filter((e) => e.type === 'replace').length;
-  const parts: string[] = [];
-  if (replaceCount > 0) parts.push(`${replaceCount} change${replaceCount > 1 ? 's' : ''}`);
-  if (insertCount > 0) parts.push(`${insertCount} insertion${insertCount > 1 ? 's' : ''}`);
-  const label = parts.join(', ');
-
   return (
-    <div className={batchPanel} ref={previewRefCallback(entries[0].id)} style={{ top }}>
+    <div
+      className={batchPanel}
+      ref={previewRefCallback(entry.id)}
+      style={{ top: entry.previewTop }}
+    >
       <div className={batchHeader}>
-        <span className={batchHeaderLabel}>{label}</span>
+        <span className={batchHeaderLabel} />
         <div className={batchHeaderActions}>
-          <button className={batchHeaderReject} type="button" onClick={() => onReject(batchId)}>
+          <button
+            className={batchHeaderReject}
+            type="button"
+            onClick={() => onRejectEntry(batchId, entry.id)}
+          >
             Reject
           </button>
-          <button className={batchHeaderAccept} type="button" onClick={() => onAccept(batchId)}>
+          <button
+            className={batchHeaderAccept}
+            type="button"
+            onClick={() => onAcceptEntry(batchId, entry.id)}
+          >
             Accept
           </button>
         </div>
       </div>
-      {entries.map((entry) => (
-        <div key={entry.id}>
+      {entry.mergedNode ? (
+        <div className={mergedBlock}>
+          <div className={rendererFrame}>
+            <RichRenderer
+              extraNodes={extraNodes}
+              rendererConfig={rendererConfig}
+              theme={theme}
+              value={wrapDoc([entry.mergedNode])}
+              variant={variant}
+            />
+          </div>
+        </div>
+      ) : (
+        <>
           {entry.oldNode && (
             <div className={oldBlock}>
               <div className={rendererFrame}>
@@ -162,8 +184,8 @@ function BatchPanel({
               </div>
             </div>
           )}
-        </div>
-      ))}
+        </>
+      )}
     </div>
   );
 }
@@ -191,95 +213,143 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     return groups;
   }, [overlays]);
 
-  const handleAcceptBatch = useCallback(
+  const applyEntryOp = useCallback(
+    (op: import('@haklex/rich-agent-core').AgentOperation) => {
+      editor.update(() => {
+        const root = $getRoot();
+
+        if (op.op === 'insert') {
+          if (!op.node?.type) return;
+          const newNode = $parseSerializedNode(op.node);
+          if (op.position.type === 'root') {
+            const idx = op.position.index ?? root.getChildrenSize();
+            const children = root.getChildren();
+            if (idx >= children.length) root.append(newNode);
+            else children[idx].insertBefore(newNode);
+          } else {
+            const target = $findBlockByBlockId(op.position.blockId);
+            if (!target) return;
+            if (op.position.type === 'after') target.insertAfter(newNode);
+            else target.insertBefore(newNode);
+          }
+          return;
+        }
+
+        if (op.op === 'replace') {
+          if (!op.node?.type) return;
+          const target = $findBlockByBlockId(op.blockId);
+          if (!target) return;
+          target.replace($parseSerializedNode(op.node));
+          return;
+        }
+
+        if (op.op === 'delete') {
+          const target = $findBlockByBlockId(op.blockId);
+          if (!target) return;
+          target.remove();
+        }
+      });
+    },
+    [editor],
+  );
+
+  const handleAcceptEntry = useCallback(
+    (batchId: string, entryId: string) => {
+      const reviewState = store.getState().reviewState;
+      const batch = reviewState?.batches.find((item) => item.id === batchId);
+      const entry = batch?.entries.find((e) => e.id === entryId);
+      if (!entry) return;
+
+      store.getState().acceptReviewEntry(batchId, entryId);
+      applyEntryOp(entry.op);
+    },
+    [store, applyEntryOp],
+  );
+
+  const handleRejectEntry = useCallback(
+    (batchId: string, entryId: string) => {
+      store.getState().rejectReviewEntry(batchId, entryId);
+    },
+    [store],
+  );
+
+  const handleAcceptAllBatch = useCallback(
     (batchId: string) => {
       const reviewState = store.getState().reviewState;
       const batch = reviewState?.batches.find((item) => item.id === batchId);
       if (!batch) return;
 
-      store.getState().acceptReviewBatch(batchId);
-
-      editor.update(() => {
-        const root = $getRoot();
-
-        for (const entry of batch.entries) {
-          const { op } = entry;
-
-          if (op.op === 'insert') {
-            if (!op.node?.type) continue;
-            const newNode = $parseSerializedNode(op.node);
-            if (op.position.type === 'root') {
-              const idx = op.position.index ?? root.getChildrenSize();
-              const children = root.getChildren();
-              if (idx >= children.length) {
-                root.append(newNode);
-              } else {
-                children[idx].insertBefore(newNode);
-              }
-            } else {
-              const target = $findBlockByBlockId(op.position.blockId);
-              if (!target) continue;
-              if (op.position.type === 'after') {
-                target.insertAfter(newNode);
-              } else {
-                target.insertBefore(newNode);
-              }
-            }
-            continue;
-          }
-
-          if (op.op === 'replace') {
-            if (!op.node?.type) continue;
-            const target = $findBlockByBlockId(op.blockId);
-            if (!target) continue;
-            target.replace($parseSerializedNode(op.node));
-            continue;
-          }
-
-          if (op.op === 'delete') {
-            const target = $findBlockByBlockId(op.blockId);
-            if (!target) continue;
-            target.remove();
-          }
-        }
-      });
+      const pendingEntries = batch.entries.filter((e) => e.status === 'pending');
+      for (const entry of pendingEntries) {
+        store.getState().acceptReviewEntry(batchId, entry.id);
+        applyEntryOp(entry.op);
+      }
     },
-    [editor, store],
+    [store, applyEntryOp],
   );
 
-  const handleRejectBatch = useCallback(
+  const handleRejectAllBatch = useCallback(
     (batchId: string) => {
       store.getState().rejectReviewBatch(batchId);
     },
     [store],
   );
 
-  const syncSpacing = useCallback(() => {
-    for (const [, entries] of batchGroups) {
-      const firstEntry = entries[0];
-      const previewEl = previewRefs.current.get(firstEntry.id);
+  const repositionPanels = useCallback(() => {
+    if (!containerEl) return;
+    const containerRect = containerEl.getBoundingClientRect();
+
+    // Phase 1: apply margins/visibility to blocks based on panel heights
+    for (const overlay of overlays) {
+      if (!overlay.blockEl || overlay.type === 'delete') continue;
+      const previewEl = previewRefs.current.get(overlay.id);
       const previewHeight = previewEl?.offsetHeight ?? 0;
-      for (const overlay of entries) {
-        if (!overlay.blockEl) continue;
-        if (overlay.spacing === 'before') {
-          overlay.blockEl.style.marginTop =
-            previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
-        } else if (overlay.spacing === 'after') {
-          overlay.blockEl.style.marginBottom =
-            previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
-        }
+
+      if (overlay.spacing === 'overlay') {
+        // Hide original block, add margin if overlay is taller
+        overlay.blockEl.style.visibility = 'hidden';
+        const heightDiff = previewHeight - overlay.blockEl.offsetHeight;
+        overlay.blockEl.style.marginBottom = heightDiff > 0 ? `${heightDiff}px` : '';
+      } else if (overlay.spacing === 'before') {
+        overlay.blockEl.style.marginTop =
+          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
+      } else if (overlay.spacing === 'after') {
+        overlay.blockEl.style.marginBottom =
+          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
       }
     }
-  }, [batchGroups]);
+
+    // Phase 2: re-read block positions (now correct after margins) and set panel positions
+    for (const overlay of overlays) {
+      if (!overlay.blockEl || overlay.type === 'delete') continue;
+      const panelEl = previewRefs.current.get(overlay.id);
+      if (!panelEl) continue;
+
+      const blockRect = overlay.blockEl.getBoundingClientRect();
+      let newTop: number;
+      if (overlay.spacing === 'overlay') {
+        newTop = blockRect.top - containerRect.top;
+      } else if (overlay.spacing === 'after') {
+        newTop = blockRect.bottom - containerRect.top + INSERT_GAP;
+      } else {
+        newTop = blockRect.top - containerRect.top;
+      }
+      panelEl.style.top = `${newTop}px`;
+    }
+  }, [overlays, containerEl]);
+
+  useLayoutEffect(() => {
+    repositionPanels();
+  }, [repositionPanels]);
 
   useEffect(() => {
-    const observer = new ResizeObserver(() => syncSpacing());
+    const observer = new ResizeObserver(() => repositionPanels());
     observerRef.current = observer;
     for (const el of previewRefs.current.values()) {
       observer.observe(el);
     }
     return () => observer.disconnect();
-  }, [syncSpacing]);
+  }, [repositionPanels]);
 
   const previewRefCallback = useCallback(
     (id: string) => (el: HTMLDivElement | null) => {
@@ -300,8 +370,10 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       return;
     }
 
-    const pendingBatches = reviewState.batches.filter((batch) => batch.status === 'pending');
-    if (pendingBatches.length === 0) {
+    const visibleBatches = reviewState.batches.filter(
+      (batch) => batch.status === 'pending' || batch.status === 'order_dependent',
+    );
+    if (visibleBatches.length === 0) {
       setOverlays([]);
       return;
     }
@@ -317,7 +389,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       const root = $getRoot();
       const children = root.getChildren();
 
-      for (const batch of pendingBatches) {
+      for (const batch of visibleBatches) {
         const baseChildren = (batch.baseSnapshot.root as any).children as SerializedLexicalNode[];
         const blockMap = new Map<string, SerializedLexicalNode>();
         for (const child of baseChildren) {
@@ -326,6 +398,8 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
         }
 
         for (const entry of batch.entries) {
+          if (entry.status !== 'pending') continue;
+
           if (entry.op.op === 'insert') {
             if (!entry.op.node?.type) continue;
 
@@ -401,7 +475,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
           const baseNode = blockMap.get(blockId);
           if (!baseNode || !entry.op.node?.type) continue;
-          const diffResult = diffModifiedNode(baseNode, entry.op.node);
+          const merged = diffMergedNode(baseNode, entry.op.node);
 
           entries.push({
             id: entry.id,
@@ -410,10 +484,9 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
             blockEl: domEl,
             blockTop: rect.top - containerRect.top,
             blockHeight: rect.height,
-            oldNode: diffResult.oldNode,
-            newNode: diffResult.newNode,
-            previewTop: rect.bottom - containerRect.top + INSERT_GAP,
-            spacing: 'after',
+            mergedNode: merged,
+            previewTop: rect.top - containerRect.top,
+            spacing: 'overlay',
           });
         }
       }
@@ -430,14 +503,12 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       }
     }
 
-    syncSpacing();
-
     return () => {
       for (const overlay of overlays) {
         resetBlockDecorations(overlay);
       }
     };
-  }, [overlays, syncSpacing]);
+  }, [overlays]);
 
   useEffect(() => {
     const rootEl = editor.getRootElement();
@@ -464,30 +535,54 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     computeOverlays();
   }, [computeOverlays]);
 
+  const pendingCount = overlays.length;
+
   if (!containerEl || overlays.length === 0) return null;
 
   return createPortal(
     <div className={overlayContainer}>
-      {Array.from(batchGroups.entries()).map(([batchId, entries]) => {
-        const firstEntry = entries[0];
-        if (firstEntry.previewTop == null) return null;
-
-        return (
-          <BatchPanel
-            batchId={batchId}
-            entries={entries}
-            extraNodes={extraNodes}
-            key={batchId}
-            previewRefCallback={previewRefCallback}
-            rendererConfig={rendererConfig}
-            theme={theme}
-            top={firstEntry.previewTop}
-            variant={variant}
-            onAccept={handleAcceptBatch}
-            onReject={handleRejectBatch}
-          />
-        );
-      })}
+      {Array.from(batchGroups.entries()).map(([batchId, entries]) =>
+        entries.map((entry) => {
+          if (entry.previewTop == null) return null;
+          return (
+            <InlineEntryPanel
+              batchId={batchId}
+              entry={entry}
+              extraNodes={extraNodes}
+              key={entry.id}
+              previewRefCallback={previewRefCallback}
+              rendererConfig={rendererConfig}
+              theme={theme}
+              variant={variant}
+              onAcceptEntry={handleAcceptEntry}
+              onRejectEntry={handleRejectEntry}
+            />
+          );
+        }),
+      )}
+      {pendingCount > 1 && (
+        <div className={floatingBar}>
+          <span className={floatingBarLabel}>{pendingCount} changes</span>
+          {Array.from(batchGroups.keys()).map((batchId) => (
+            <span key={batchId}>
+              <button
+                className={floatingBarReject}
+                type="button"
+                onClick={() => handleRejectAllBatch(batchId)}
+              >
+                Reject All
+              </button>
+              <button
+                className={floatingBarAccept}
+                type="button"
+                onClick={() => handleAcceptAllBatch(batchId)}
+              >
+                Accept All
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
     </div>,
     containerEl,
   );

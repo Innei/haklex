@@ -6,16 +6,9 @@ interface DirectToolBarProps {
   onExecute: (toolName: string, params: Record<string, unknown>) => void;
 }
 
-type ActiveTool =
-  | 'insert_node'
-  | 'replace_node'
-  | 'delete_node'
-  | 'search_document'
-  | 'read_selection'
-  | null;
+type ActiveTool = 'insert_node' | 'replace_node' | 'delete_node' | 'search_document' | null;
 
 const TOOLS: { name: ActiveTool & string; label: string }[] = [
-  { name: 'read_selection', label: 'Read Selection' },
   { name: 'search_document', label: 'Search' },
   { name: 'insert_node', label: 'Insert' },
   { name: 'replace_node', label: 'Replace' },
@@ -26,10 +19,6 @@ export function DirectToolBar({ onExecute }: DirectToolBarProps) {
   const [activeTool, setActiveTool] = useState<ActiveTool>(null);
 
   function handleToolClick(name: ActiveTool & string) {
-    if (name === 'read_selection') {
-      onExecute('read_selection', {});
-      return;
-    }
     setActiveTool(activeTool === name ? null : name);
   }
 
@@ -56,9 +45,7 @@ export function DirectToolBar({ onExecute }: DirectToolBarProps) {
           ))}
         </div>
       </div>
-      {activeTool && activeTool !== 'read_selection' && (
-        <ToolForm toolName={activeTool} onSubmit={handleSubmit} />
-      )}
+      {activeTool && <ToolForm toolName={activeTool} onSubmit={handleSubmit} />}
     </div>
   );
 }

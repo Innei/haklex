@@ -61,6 +61,22 @@ function cloneChildren(root: SerializedLexicalNode): SerializedLexicalNode[] {
   return [...((root as any).children ?? [])].map((c: any) => ({ ...c }));
 }
 
+function snapshotChildren(snapshot: SerializedEditorState): SerializedLexicalNode[] {
+  return ((snapshot.root as any).children ?? []) as SerializedLexicalNode[];
+}
+
+function snapshotHasBlock(snapshot: SerializedEditorState, blockId: string): boolean {
+  return snapshotChildren(snapshot).some((child) => getBlockId(child) === blockId);
+}
+
+function canApplyOpToSnapshot(snapshot: SerializedEditorState, op: AgentOperation): boolean {
+  if (op.op === 'insert') {
+    return op.position.type === 'root' || snapshotHasBlock(snapshot, op.position.blockId);
+  }
+
+  return snapshotHasBlock(snapshot, op.blockId);
+}
+
 export function applyOpsToSnapshot(
   base: SerializedEditorState,
   ops: AgentOperation[],
@@ -105,6 +121,41 @@ function extractTouchedBlockIds(entries: ReviewEntry[]): string[] {
     if (entry.targetBlockId) ids.add(entry.targetBlockId);
   }
   return [...ids];
+}
+
+function updateResolvedBatch(
+  state: ReviewState,
+  batchId: string,
+  status: 'accepted' | 'rejected',
+): ReviewState {
+  return {
+    ...state,
+    batches: state.batches.map((batch) =>
+      batch.id === batchId
+        ? {
+            ...batch,
+            status,
+            entries: batch.entries.map((entry) => ({ ...entry, status })),
+          }
+        : batch,
+    ),
+  };
+}
+
+function batchEntriesMatch(
+  left: ReviewBatch,
+  right: ReviewBatch,
+  predicate: (left: ReviewEntry, right: ReviewEntry) => boolean,
+): boolean {
+  for (const leftEntry of left.entries) {
+    for (const rightEntry of right.entries) {
+      if (predicate(leftEntry, rightEntry)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 export function createReviewBatch(
@@ -166,62 +217,196 @@ export function createReviewBatch(
 }
 
 export function acceptBatch(state: ReviewState, batchId: string): ReviewState {
-  return {
-    ...state,
-    batches: state.batches.map((b) =>
-      b.id === batchId
-        ? {
-            ...b,
-            status: 'accepted' as const,
-            entries: b.entries.map((e) => ({ ...e, status: 'accepted' as const })),
-          }
-        : b,
-    ),
-  };
+  return updateResolvedBatch(state, batchId, 'accepted');
 }
 
 export function rejectBatch(state: ReviewState, batchId: string): ReviewState {
+  return updateResolvedBatch(state, batchId, 'rejected');
+}
+
+function batchesConflict(left: ReviewBatch, right: ReviewBatch): boolean {
+  return batchEntriesMatch(left, right, entriesConflict);
+}
+
+function batchesAreOrderDependent(left: ReviewBatch, right: ReviewBatch): boolean {
+  return batchEntriesMatch(left, right, entriesAreOrderDependent);
+}
+
+function entriesConflict(left: ReviewEntry, right: ReviewEntry): boolean {
+  const leftOp = left.op;
+  const rightOp = right.op;
+
+  if (leftOp.op === 'insert' && rightOp.op === 'insert') {
+    return false;
+  }
+
+  if (leftOp.op === 'delete') {
+    return conflictsWithDeletedBlock(leftOp.blockId, right);
+  }
+
+  if (rightOp.op === 'delete') {
+    return conflictsWithDeletedBlock(rightOp.blockId, left);
+  }
+
+  if (leftOp.op === 'replace' && rightOp.op === 'replace') {
+    return leftOp.blockId === rightOp.blockId;
+  }
+
+  return false;
+}
+
+function entriesAreOrderDependent(left: ReviewEntry, right: ReviewEntry): boolean {
+  if (left.op.op !== 'insert' || right.op.op !== 'insert') {
+    return false;
+  }
+
+  return left.anchorBeforeId === right.anchorBeforeId && left.anchorAfterId === right.anchorAfterId;
+}
+
+function conflictsWithDeletedBlock(deletedBlockId: string, entry: ReviewEntry): boolean {
+  const op = entry.op;
+
+  if (op.op === 'delete' || op.op === 'replace') {
+    return op.blockId === deletedBlockId;
+  }
+
+  return (
+    entry.targetBlockId === deletedBlockId ||
+    entry.anchorBeforeId === deletedBlockId ||
+    entry.anchorAfterId === deletedBlockId
+  );
+}
+
+function isFinalBatchStatus(status: ReviewBatch['status']): boolean {
+  return status === 'accepted' || status === 'rejected';
+}
+
+function getInitialBatchStatus(
+  batch: ReviewBatch,
+  documentRevision: number,
+): ReviewBatch['status'] {
+  return batch.baseRevision < documentRevision ? 'conflicted' : 'pending';
+}
+
+function updateStatusUnlessConflicted(
+  statuses: Map<string, ReviewBatch['status']>,
+  batchId: string,
+  status: ReviewBatch['status'],
+): void {
+  if (statuses.get(batchId) === 'conflicted') {
+    return;
+  }
+
+  statuses.set(batchId, status);
+}
+
+function rebaseBatch(
+  batch: ReviewBatch,
+  baseSnapshot: SerializedEditorState,
+  baseRevision: number,
+): ReviewBatch {
+  const ops = batch.entries.map((entry) => entry.op);
+  if (!ops.every((op) => canApplyOpToSnapshot(baseSnapshot, op))) {
+    return batch;
+  }
+
+  const rebased = createReviewBatch(ops, baseSnapshot, baseRevision);
   return {
-    ...state,
-    batches: state.batches.map((b) =>
-      b.id === batchId
-        ? {
-            ...b,
-            status: 'rejected' as const,
-            entries: b.entries.map((e) => ({ ...e, status: 'rejected' as const })),
-          }
-        : b,
-    ),
+    ...rebased,
+    id: batch.id,
   };
 }
 
-export function detectConflicts(state: ReviewState): ReviewState {
-  const pendingBatches = state.batches.filter((b) => b.status === 'pending');
-  if (pendingBatches.length < 2) return state;
+export function reconcileReviewBatches(state: ReviewState): ReviewState {
+  const nextStatuses = new Map<string, ReviewBatch['status']>();
+  const activeBatches = state.batches.filter((batch) => !isFinalBatchStatus(batch.status));
+  const currentRevisionBatches = activeBatches.filter(
+    (batch) => batch.baseRevision === state.documentRevision,
+  );
 
-  const seen = new Map<string, string>();
-  const conflictedBatchIds = new Set<string>();
+  for (const batch of activeBatches) {
+    nextStatuses.set(batch.id, getInitialBatchStatus(batch, state.documentRevision));
+  }
 
-  for (const batch of pendingBatches) {
-    for (const blockId of batch.touchedBlockIds) {
-      const existing = seen.get(blockId);
-      if (existing && existing !== batch.id) {
-        conflictedBatchIds.add(existing);
-        conflictedBatchIds.add(batch.id);
-      } else {
-        seen.set(blockId, batch.id);
+  for (let i = 0; i < currentRevisionBatches.length; i++) {
+    for (let j = i + 1; j < currentRevisionBatches.length; j++) {
+      const left = currentRevisionBatches[i];
+      const right = currentRevisionBatches[j];
+
+      if (batchesConflict(left, right)) {
+        nextStatuses.set(left.id, 'conflicted');
+        nextStatuses.set(right.id, 'conflicted');
+        continue;
+      }
+
+      if (batchesAreOrderDependent(left, right)) {
+        updateStatusUnlessConflicted(nextStatuses, left.id, 'order_dependent');
+        updateStatusUnlessConflicted(nextStatuses, right.id, 'order_dependent');
       }
     }
   }
 
-  if (conflictedBatchIds.size === 0) return state;
-
   return {
     ...state,
-    batches: state.batches.map((b) =>
-      conflictedBatchIds.has(b.id) && b.status === 'pending'
-        ? { ...b, status: 'conflicted' as const }
-        : b,
+    batches: state.batches.map((batch) =>
+      isFinalBatchStatus(batch.status)
+        ? batch
+        : { ...batch, status: nextStatuses.get(batch.id) ?? batch.status },
     ),
   };
+}
+
+export function acceptAndRebaseBatch(state: ReviewState, batchId: string): ReviewState {
+  const acceptedState = acceptBatch(state, batchId);
+  const acceptedBatch = acceptedState.batches.find((batch) => batch.id === batchId);
+  if (!acceptedBatch) {
+    return state;
+  }
+
+  const nextRevision = state.documentRevision + 1;
+  const nextState: ReviewState = {
+    ...acceptedState,
+    documentRevision: nextRevision,
+    batches: acceptedState.batches.map((batch) => {
+      if (batch.id === batchId || isFinalBatchStatus(batch.status)) {
+        return batch;
+      }
+
+      return rebaseBatch(batch, acceptedBatch.previewSnapshot, nextRevision);
+    }),
+  };
+
+  return reconcileReviewBatches(nextState);
+}
+
+export function resolveReviewEntry(
+  state: ReviewState,
+  batchId: string,
+  entryId: string,
+  resolution: 'accepted' | 'rejected',
+): ReviewState {
+  return {
+    ...state,
+    batches: state.batches.map((batch) => {
+      if (batch.id !== batchId) return batch;
+
+      const entries = batch.entries.map((entry) =>
+        entry.id === entryId ? { ...entry, status: resolution } : entry,
+      );
+
+      const allResolved = entries.every((e) => e.status === 'accepted' || e.status === 'rejected');
+
+      let batchStatus = batch.status;
+      if (allResolved) {
+        const allRejected = entries.every((e) => e.status === 'rejected');
+        batchStatus = allRejected ? 'rejected' : 'accepted';
+      }
+
+      return { ...batch, entries, status: batchStatus };
+    }),
+  };
+}
+
+export function detectConflicts(state: ReviewState): ReviewState {
+  return reconcileReviewBatches(state);
 }
