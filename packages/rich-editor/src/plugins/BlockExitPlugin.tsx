@@ -3,6 +3,7 @@ import { $isQuoteNode } from '@lexical/rich-text';
 import {
   $createNodeSelection,
   $createParagraphNode,
+  $getNodeByKey,
   $getRoot,
   $getSelection,
   $isDecoratorNode,
@@ -22,6 +23,7 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
+  type LexicalEditor,
   type LexicalNode,
   type RangeSelection,
 } from 'lexical';
@@ -79,6 +81,38 @@ function getOutermostNodeWithinTopLevel(node: LexicalNode, topLevel: LexicalNode
   return current;
 }
 
+function isDeeplyEmptyElement(node: LexicalNode): boolean {
+  if (!$isElementNode(node)) {
+    return false;
+  }
+
+  if (node.getChildrenSize() === 0) {
+    return true;
+  }
+
+  for (const child of node.getChildren()) {
+    if ($isTextNode(child)) {
+      if (child.getTextContent().trim().length > 0) {
+        return false;
+      }
+      continue;
+    }
+
+    if (!$isElementNode(child) || !isDeeplyEmptyElement(child)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isSelectionInsideTopLevel(selection: RangeSelection, topLevelKey: string): boolean {
+  return (
+    selection.anchor.getNode().getTopLevelElementOrThrow().getKey() === topLevelKey &&
+    selection.focus.getNode().getTopLevelElementOrThrow().getKey() === topLevelKey
+  );
+}
+
 function exitInlineCodeAtLineEnd(selection: RangeSelection): boolean {
   if (!selection.isCollapsed() || selection.anchor.type !== 'text') {
     return false;
@@ -113,64 +147,151 @@ export function BlockExitPlugin() {
   const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
-    const unregisterArrowRight = editor.registerCommand(
-      KEY_ARROW_RIGHT_COMMAND,
-      (event) => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) return false;
-        if (!exitInlineCodeAtLineEnd(selection)) return false;
+    return registerBlockExitCommands(editor);
+  }, [editor]);
 
-        event?.preventDefault();
-        return true;
-      },
-      COMMAND_PRIORITY_CRITICAL,
-    );
+  return null;
+}
 
-    // ArrowDown: exit QuoteNode when at last empty paragraph
-    const unregisterArrowDown = editor.registerCommand(
-      KEY_ARROW_DOWN_COMMAND,
-      (event) => {
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
-          return false;
+export function registerBlockExitCommands(editor: LexicalEditor) {
+  let virtualParagraphKey: null | string = null;
+
+  const clearVirtualParagraph = () => {
+    virtualParagraphKey = null;
+  };
+
+  const getVirtualParagraph = () => {
+    if (!virtualParagraphKey) {
+      return null;
+    }
+
+    const node = $getNodeByKey(virtualParagraphKey);
+    return $isParagraphNode(node) ? node : null;
+  };
+
+  const insertVirtualParagraph = (
+    target: LexicalNode,
+    position: 'after' | 'before',
+    cursorPlacement: 'start' | 'end' = 'start',
+  ) => {
+    const paragraph = $createParagraphNode();
+
+    if (position === 'before') {
+      target.insertBefore(paragraph);
+    } else {
+      target.insertAfter(paragraph);
+    }
+
+    virtualParagraphKey = paragraph.getKey();
+
+    if (cursorPlacement === 'end') {
+      paragraph.selectEnd();
+    } else {
+      paragraph.selectStart();
+    }
+
+    return true;
+  };
+
+  const unregisterVirtualParagraphCleanup = editor.registerUpdateListener(({ editorState }) => {
+    if (!virtualParagraphKey) {
+      return;
+    }
+
+    let shouldKeepTracking = false;
+    let shouldRemove = false;
+
+    editorState.read(() => {
+      const paragraph = getVirtualParagraph();
+      if (!paragraph) {
+        return;
+      }
+
+      const selection = $getSelection();
+      if (
+        $isRangeSelection(selection) &&
+        isSelectionInsideTopLevel(selection, paragraph.getKey())
+      ) {
+        shouldKeepTracking = true;
+        return;
+      }
+
+      shouldRemove = isDeeplyEmptyElement(paragraph);
+    });
+
+    if (shouldKeepTracking) {
+      return;
+    }
+
+    editor.update(() => {
+      const paragraph = getVirtualParagraph();
+      if (paragraph && shouldRemove && isDeeplyEmptyElement(paragraph)) {
+        paragraph.remove();
+      }
+      clearVirtualParagraph();
+    });
+  });
+
+  const unregisterArrowRight = editor.registerCommand(
+    KEY_ARROW_RIGHT_COMMAND,
+    (event) => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return false;
+      if (!exitInlineCodeAtLineEnd(selection)) return false;
+
+      event?.preventDefault();
+      return true;
+    },
+    COMMAND_PRIORITY_CRITICAL,
+  );
+
+  // ArrowDown: exit QuoteNode when at last empty paragraph
+  const unregisterArrowDown = editor.registerCommand(
+    KEY_ARROW_DOWN_COMMAND,
+    (event) => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection) || !selection.isCollapsed()) {
+        return false;
+      }
+
+      const anchorNode = selection.anchor.getNode();
+      const topLevelElement = anchorNode.getTopLevelElementOrThrow();
+
+      const shouldSelectNextDecorator =
+        isAtTopLevelBoundary(selection, 'end') || isSingleLineParagraph(topLevelElement);
+
+      if (!$isQuoteNode(topLevelElement) && shouldSelectNextDecorator) {
+        const next = topLevelElement.getNextSibling();
+        if (next && $isDecoratorNode(next) && next.isKeyboardSelectable()) {
+          event?.preventDefault();
+          selectDecoratorNode(next, 'start');
+          return true;
         }
+      }
 
-        const anchorNode = selection.anchor.getNode();
-        const topLevelElement = anchorNode.getTopLevelElementOrThrow();
+      const element = $isElementNode(anchorNode) ? anchorNode : anchorNode.getParentOrThrow();
 
-        const shouldSelectNextDecorator =
-          isAtTopLevelBoundary(selection, 'end') || isSingleLineParagraph(topLevelElement);
-
-        if (!$isQuoteNode(topLevelElement) && shouldSelectNextDecorator) {
-          const next = topLevelElement.getNextSibling();
-          if (next && $isDecoratorNode(next) && next.isKeyboardSelectable()) {
-            event?.preventDefault();
-            selectDecoratorNode(next, 'start');
-            return true;
-          }
+      // Walk up to find QuoteNode parent
+      let quoteChild = element;
+      let quoteNode = null;
+      let current = element;
+      while (current) {
+        const parent = current.getParent();
+        if (!parent || $isRootNode(parent)) break;
+        if ($isQuoteNode(parent)) {
+          quoteNode = parent;
+          quoteChild = current;
+          break;
         }
+        current = parent;
+      }
 
-        const element = $isElementNode(anchorNode) ? anchorNode : anchorNode.getParentOrThrow();
-
-        // Walk up to find QuoteNode parent
-        let quoteChild = element;
-        let quoteNode = null;
-        let current = element;
-        while (current) {
-          const parent = current.getParent();
-          if (!parent || $isRootNode(parent)) break;
-          if ($isQuoteNode(parent)) {
-            quoteNode = parent;
-            quoteChild = current;
-            break;
-          }
-          current = parent;
-        }
-
-        if (!quoteNode) return false;
-        if (quoteChild.getNextSibling() !== null) return false;
-        if (!$isParagraphNode(quoteChild) || quoteChild.getTextContent() !== '') return false;
-
+      if (
+        quoteNode &&
+        quoteChild.getNextSibling() === null &&
+        $isParagraphNode(quoteChild) &&
+        quoteChild.getTextContent() === ''
+      ) {
         event?.preventDefault();
         let next = quoteNode.getNextSibling();
         if (!next) {
@@ -179,61 +300,187 @@ export function BlockExitPlugin() {
         }
         next.selectStart();
         return true;
-      },
-      COMMAND_PRIORITY_CRITICAL,
-    );
+      }
 
-    // Cmd+Enter: exit any non-paragraph top-level block (including DecoratorNodes)
-    const unregisterCmdEnter = editor.registerCommand(
-      KEY_ENTER_COMMAND,
-      (event) => {
-        if (!event?.metaKey && !event?.ctrlKey) return false;
+      if (
+        !event?.shiftKey &&
+        topLevelElement.getNextSibling() === null &&
+        isAtTopLevelBoundary(selection, 'end') &&
+        topLevelElement.getKey() !== virtualParagraphKey &&
+        !isDeeplyEmptyElement(topLevelElement)
+      ) {
+        event?.preventDefault();
+        return insertVirtualParagraph(topLevelElement, 'after');
+      }
 
-        const selection = $getSelection();
+      return false;
+    },
+    COMMAND_PRIORITY_CRITICAL,
+  );
 
-        // Handle NodeSelection (selected DecoratorNode)
-        if ($isNodeSelection(selection)) {
-          const nodes = selection.getNodes();
-          if (nodes.length !== 1) return false;
-          const node = nodes[0];
-          if (!$isDecoratorNode(node)) return false;
+  // Cmd+Enter: exit any non-paragraph top-level block (including DecoratorNodes)
+  const unregisterCmdEnter = editor.registerCommand(
+    KEY_ENTER_COMMAND,
+    (event) => {
+      if (!event?.metaKey && !event?.ctrlKey) return false;
 
-          event.preventDefault();
-          let next = node.getNextSibling();
-          if (!next) {
-            next = $createParagraphNode();
-            node.insertAfter(next);
-          }
+      const selection = $getSelection();
 
-          if ($isElementNode(next)) {
-            next.selectStart();
-          } else if ($isDecoratorNode(next)) {
-            selectDecoratorNode(next, 'start');
-          }
-          return true;
+      // Handle NodeSelection (selected DecoratorNode)
+      if ($isNodeSelection(selection)) {
+        const nodes = selection.getNodes();
+        if (nodes.length !== 1) return false;
+        const node = nodes[0];
+        if (!$isDecoratorNode(node)) return false;
+
+        event.preventDefault();
+        let next = node.getNextSibling();
+        if (!next) {
+          next = $createParagraphNode();
+          node.insertAfter(next);
         }
 
-        if (!$isRangeSelection(selection)) return false;
+        if ($isElementNode(next)) {
+          next.selectStart();
+        } else if ($isDecoratorNode(next)) {
+          selectDecoratorNode(next, 'start');
+        }
+        return true;
+      }
 
+      if (!$isRangeSelection(selection)) return false;
+
+      const anchorNode = selection.anchor.getNode();
+      const topLevelElement = anchorNode.getTopLevelElementOrThrow();
+
+      if ($isParagraphNode(topLevelElement)) return false;
+
+      event.preventDefault();
+      let next = topLevelElement.getNextSibling();
+      if (!next || !$isParagraphNode(next)) {
+        next = $createParagraphNode();
+        topLevelElement.insertAfter(next);
+      }
+      next.selectStart();
+      return true;
+    },
+    COMMAND_PRIORITY_CRITICAL,
+  );
+
+  // Backspace/Delete on selected DecoratorNode
+  function handleDeleteDecorator(event: KeyboardEvent | null) {
+    const selection = $getSelection();
+    if (!$isNodeSelection(selection)) return false;
+
+    const nodes = selection.getNodes();
+    if (nodes.length !== 1) return false;
+    const node = nodes[0];
+    if (!$isDecoratorNode(node)) return false;
+
+    event?.preventDefault();
+    const prev = node.getPreviousSibling();
+    const next = node.getNextSibling();
+    node.remove();
+
+    if (prev && $isElementNode(prev)) {
+      prev.selectEnd();
+    } else if (prev && $isDecoratorNode(prev)) {
+      selectDecoratorNode(prev, 'end');
+    } else if (next && $isElementNode(next)) {
+      next.selectStart();
+    } else if (next && $isDecoratorNode(next)) {
+      selectDecoratorNode(next, 'start');
+    } else {
+      const root = $getRoot();
+      if (root && $isElementNode(root)) {
+        const p = $createParagraphNode();
+        root.append(p);
+        p.selectStart();
+      }
+    }
+    return true;
+  }
+
+  const unregisterBackspace = editor.registerCommand(
+    KEY_BACKSPACE_COMMAND,
+    handleDeleteDecorator,
+    COMMAND_PRIORITY_HIGH,
+  );
+
+  const unregisterDelete = editor.registerCommand(
+    KEY_DELETE_COMMAND,
+    handleDeleteDecorator,
+    COMMAND_PRIORITY_HIGH,
+  );
+
+  // ArrowUp on selected DecoratorNode: move to previous sibling
+  const unregisterArrowUpDecorator = editor.registerCommand(
+    KEY_ARROW_UP_COMMAND,
+    (event) => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection) && selection.isCollapsed()) {
         const anchorNode = selection.anchor.getNode();
         const topLevelElement = anchorNode.getTopLevelElementOrThrow();
 
-        if ($isParagraphNode(topLevelElement)) return false;
+        const shouldSelectPreviousDecorator =
+          isAtTopLevelBoundary(selection, 'start') || isSingleLineParagraph(topLevelElement);
 
-        event.preventDefault();
-        let next = topLevelElement.getNextSibling();
-        if (!next || !$isParagraphNode(next)) {
-          next = $createParagraphNode();
-          topLevelElement.insertAfter(next);
+        if (!$isQuoteNode(topLevelElement) && shouldSelectPreviousDecorator) {
+          const prev = topLevelElement.getPreviousSibling();
+          if (prev && $isDecoratorNode(prev) && prev.isKeyboardSelectable()) {
+            event?.preventDefault();
+            selectDecoratorNode(prev, 'end');
+            return true;
+          }
         }
-        next.selectStart();
-        return true;
-      },
-      COMMAND_PRIORITY_CRITICAL,
-    );
 
-    // Backspace/Delete on selected DecoratorNode
-    function handleDeleteDecorator(event: KeyboardEvent | null) {
+        if (
+          !event?.shiftKey &&
+          topLevelElement.getPreviousSibling() === null &&
+          isAtTopLevelBoundary(selection, 'start') &&
+          topLevelElement.getKey() !== virtualParagraphKey &&
+          !isDeeplyEmptyElement(topLevelElement)
+        ) {
+          event?.preventDefault();
+          return insertVirtualParagraph(topLevelElement, 'before');
+        }
+      }
+
+      if (!$isNodeSelection(selection)) return false;
+
+      const nodes = selection.getNodes();
+      if (nodes.length !== 1) return false;
+      const node = nodes[0];
+      if (!$isDecoratorNode(node)) return false;
+
+      const prev = node.getPreviousSibling();
+      if (prev && $isElementNode(prev)) {
+        event?.preventDefault();
+        prev.selectEnd();
+        return true;
+      }
+      if (prev && $isDecoratorNode(prev)) {
+        event?.preventDefault();
+        selectDecoratorNode(prev, 'end');
+        return true;
+      }
+      if (
+        !event?.shiftKey &&
+        node.getTopLevelElementOrThrow().getPreviousSibling() === null &&
+        node.getKey() !== virtualParagraphKey
+      ) {
+        event?.preventDefault();
+        return insertVirtualParagraph(node, 'before', 'end');
+      }
+      return false;
+    },
+    COMMAND_PRIORITY_CRITICAL,
+  );
+
+  // ArrowDown on selected DecoratorNode: move to next sibling
+  const unregisterArrowDownDecorator = editor.registerCommand(
+    KEY_ARROW_DOWN_COMMAND,
+    (event) => {
       const selection = $getSelection();
       if (!$isNodeSelection(selection)) return false;
 
@@ -242,125 +489,39 @@ export function BlockExitPlugin() {
       const node = nodes[0];
       if (!$isDecoratorNode(node)) return false;
 
-      event?.preventDefault();
-      const prev = node.getPreviousSibling();
       const next = node.getNextSibling();
-      node.remove();
-
-      if (prev && $isElementNode(prev)) {
-        prev.selectEnd();
-      } else if (prev && $isDecoratorNode(prev)) {
-        selectDecoratorNode(prev, 'end');
-      } else if (next && $isElementNode(next)) {
+      if (next && $isElementNode(next)) {
+        event?.preventDefault();
         next.selectStart();
-      } else if (next && $isDecoratorNode(next)) {
-        selectDecoratorNode(next, 'start');
-      } else {
-        const root = $getRoot();
-        if (root && $isElementNode(root)) {
-          const p = $createParagraphNode();
-          root.append(p);
-          p.selectStart();
-        }
+        return true;
       }
-      return true;
-    }
+      if (next && $isDecoratorNode(next)) {
+        event?.preventDefault();
+        selectDecoratorNode(next, 'start');
+        return true;
+      }
+      if (
+        !event?.shiftKey &&
+        node.getTopLevelElementOrThrow().getNextSibling() === null &&
+        node.getKey() !== virtualParagraphKey
+      ) {
+        event?.preventDefault();
+        return insertVirtualParagraph(node, 'after');
+      }
+      return false;
+    },
+    COMMAND_PRIORITY_CRITICAL,
+  );
 
-    const unregisterBackspace = editor.registerCommand(
-      KEY_BACKSPACE_COMMAND,
-      handleDeleteDecorator,
-      COMMAND_PRIORITY_HIGH,
-    );
-
-    const unregisterDelete = editor.registerCommand(
-      KEY_DELETE_COMMAND,
-      handleDeleteDecorator,
-      COMMAND_PRIORITY_HIGH,
-    );
-
-    // ArrowUp on selected DecoratorNode: move to previous sibling
-    const unregisterArrowUpDecorator = editor.registerCommand(
-      KEY_ARROW_UP_COMMAND,
-      (event) => {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection) && selection.isCollapsed()) {
-          const anchorNode = selection.anchor.getNode();
-          const topLevelElement = anchorNode.getTopLevelElementOrThrow();
-
-          const shouldSelectPreviousDecorator =
-            isAtTopLevelBoundary(selection, 'start') || isSingleLineParagraph(topLevelElement);
-
-          if (!$isQuoteNode(topLevelElement) && shouldSelectPreviousDecorator) {
-            const prev = topLevelElement.getPreviousSibling();
-            if (prev && $isDecoratorNode(prev) && prev.isKeyboardSelectable()) {
-              event?.preventDefault();
-              selectDecoratorNode(prev, 'end');
-              return true;
-            }
-          }
-        }
-
-        if (!$isNodeSelection(selection)) return false;
-
-        const nodes = selection.getNodes();
-        if (nodes.length !== 1) return false;
-        const node = nodes[0];
-        if (!$isDecoratorNode(node)) return false;
-
-        const prev = node.getPreviousSibling();
-        if (prev && $isElementNode(prev)) {
-          event?.preventDefault();
-          prev.selectEnd();
-          return true;
-        }
-        if (prev && $isDecoratorNode(prev)) {
-          event?.preventDefault();
-          selectDecoratorNode(prev, 'end');
-          return true;
-        }
-        return false;
-      },
-      COMMAND_PRIORITY_CRITICAL,
-    );
-
-    // ArrowDown on selected DecoratorNode: move to next sibling
-    const unregisterArrowDownDecorator = editor.registerCommand(
-      KEY_ARROW_DOWN_COMMAND,
-      (event) => {
-        const selection = $getSelection();
-        if (!$isNodeSelection(selection)) return false;
-
-        const nodes = selection.getNodes();
-        if (nodes.length !== 1) return false;
-        const node = nodes[0];
-        if (!$isDecoratorNode(node)) return false;
-
-        const next = node.getNextSibling();
-        if (next && $isElementNode(next)) {
-          event?.preventDefault();
-          next.selectStart();
-          return true;
-        }
-        if (next && $isDecoratorNode(next)) {
-          event?.preventDefault();
-          selectDecoratorNode(next, 'start');
-          return true;
-        }
-        return false;
-      },
-      COMMAND_PRIORITY_CRITICAL,
-    );
-
-    return () => {
-      unregisterArrowRight();
-      unregisterArrowDown();
-      unregisterCmdEnter();
-      unregisterBackspace();
-      unregisterDelete();
-      unregisterArrowUpDecorator();
-      unregisterArrowDownDecorator();
-    };
-  }, [editor]);
-
-  return null;
+  return () => {
+    unregisterVirtualParagraphCleanup();
+    unregisterArrowRight();
+    unregisterArrowDown();
+    unregisterCmdEnter();
+    unregisterBackspace();
+    unregisterDelete();
+    unregisterArrowUpDecorator();
+    unregisterArrowDownDecorator();
+    clearVirtualParagraph();
+  };
 }
