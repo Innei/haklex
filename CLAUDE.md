@@ -90,3 +90,16 @@ mx-core (NestJS backend, ../mx-core)
 ```
 
 **Release flow**: `pnpm release:rich` → bump + build + publish to npm. Then update pinned versions in `admin-vue3/package.json` and `mx-core/apps/core/package.json`.
+
+## Adding New Nodes Checklist
+
+When creating a new Lexical node type:
+
+- Node class in `packages/rich-editor/src/nodes/`
+- Static renderer in `packages/rich-renderers/`
+- Edit renderer in `packages/rich-renderers-edit/` (if edit UI needed)
+- Register in `config.ts` (static) and `config-edit.ts` (edit)
+- **XML writer in `packages/rich-litexml/src/writers/`** (required for AI agent)
+- **XML reader in `packages/rich-litexml/src/readers/`** (required for AI agent)
+- **Register in `packages/rich-litexml/src/default-registry.ts`**
+- Update `packages/rich-ext-ai-agent` system prompt if the node is agent-creatable

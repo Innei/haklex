@@ -21,31 +21,80 @@ describe('buildMessages', () => {
 });
 
 describe('buildDocumentContext', () => {
-  const editorState = {
-    root: {
-      type: 'root',
-      children: [
-        { type: 'paragraph', children: [{ type: 'text', text: 'Block 0' }], $: { blockId: 'b0' } },
-        { type: 'paragraph', children: [{ type: 'text', text: 'Block 1' }], $: { blockId: 'b1' } },
-        { type: 'paragraph', children: [{ type: 'text', text: 'Block 2' }], $: { blockId: 'b2' } },
-        { type: 'paragraph', children: [{ type: 'text', text: 'Block 3' }], $: { blockId: 'b3' } },
-        { type: 'paragraph', children: [{ type: 'text', text: 'Block 4' }], $: { blockId: 'b4' } },
-      ],
-    },
-  };
+  it('returns XML format with doc wrapper', () => {
+    const state = {
+      root: {
+        type: 'root',
+        children: [
+          {
+            type: 'paragraph',
+            $: { blockId: 'p1' },
+            children: [
+              {
+                type: 'text',
+                text: 'Hello',
+                format: 0,
+                detail: 0,
+                mode: 'normal',
+                style: '',
+                version: 1,
+              },
+            ],
+            direction: 'ltr',
+            format: '',
+            indent: 0,
+            textFormat: 0,
+            textStyle: '',
+            version: 1,
+          },
+          {
+            type: 'heading',
+            tag: 'h2',
+            $: { blockId: 'h1' },
+            children: [
+              {
+                type: 'text',
+                text: 'Title',
+                format: 0,
+                detail: 0,
+                mode: 'normal',
+                style: '',
+                version: 1,
+              },
+            ],
+            direction: 'ltr',
+            format: '',
+            indent: 0,
+            textFormat: 0,
+            textStyle: '',
+            version: 1,
+          },
+        ],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    } as any;
 
-  it('full mode returns all blocks', () => {
-    const ctx = buildDocumentContext(editorState as any, { mode: 'full' });
-    expect(ctx).toContain('b0');
-    expect(ctx).toContain('b4');
+    const xml = buildDocumentContext(state, { mode: 'full' });
+    expect(xml).toContain('<p id="p1">Hello</p>');
+    expect(xml).toContain('<h2 id="h1">Title</h2>');
   });
 
-  it('structure mode returns type + blockId only', () => {
-    const ctx = buildDocumentContext(editorState as any, { mode: 'structure' });
-    expect(ctx).toContain('b0');
-    expect(ctx).toContain('paragraph');
-    expect(ctx.length).toBeLessThan(
-      buildDocumentContext(editorState as any, { mode: 'full' }).length,
-    );
+  it('wraps output in doc element', () => {
+    const state = {
+      root: {
+        type: 'root',
+        children: [],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    } as any;
+    const xml = buildDocumentContext(state, { mode: 'full' });
+    expect(xml).toContain('<doc>');
+    expect(xml).toContain('</doc>');
   });
 });

@@ -1,3 +1,4 @@
+import { createDefaultRegistry, deserializeNodesFromXml } from '@haklex/rich-litexml';
 import type { SerializedLexicalNode } from 'lexical';
 
 import type { AgentToolConfig, AgentToolResult } from './protocol';
@@ -14,32 +15,13 @@ function extractText(node: SerializedLexicalNode): string {
 export function createDocumentTools(
   snapshot: EditorSnapshot,
   operations: AgentOperation[],
-  readSelection?: () => { text: string; anchorBlockId: string; focusBlockId: string } | null,
 ): AgentToolConfig[] {
-  const readSelectionTool: AgentToolConfig = {
-    name: 'read_selection',
-    description: 'Read the current text selection and its block IDs',
-    parameters: { type: 'object', properties: {} },
-    describeCall: () => 'reading current selection',
-    execute: async (): Promise<AgentToolResult> => {
-      const sel = readSelection?.();
-      if (!sel) {
-        return { ok: true, content: 'No selection active.' };
-      }
-      return {
-        ok: true,
-        content: JSON.stringify({
-          text: sel.text,
-          anchorBlockId: sel.anchorBlockId,
-          focusBlockId: sel.focusBlockId,
-        }),
-      };
-    },
-  };
+  const registry = createDefaultRegistry();
 
   const insertNodeTool: AgentToolConfig = {
     name: 'insert_node',
-    description: 'Insert a new block node at a position relative to an existing block',
+    description:
+      'Insert one or more block nodes at a position relative to an existing block. The xml parameter should contain XML elements like <p>, <h2>, <ul>, <codeblock>, <img />, etc.',
     parameters: {
       type: 'object',
       properties: {
@@ -52,9 +34,9 @@ export function createDocumentTools(
           },
           required: ['type'],
         },
-        node: { type: 'object' },
+        xml: { type: 'string', description: 'XML string containing block elements to insert' },
       },
-      required: ['position', 'node'],
+      required: ['position', 'xml'],
     },
     describeCall: (params: unknown) => {
       const p = params as { position?: { type?: string; blockId?: string } };
@@ -62,14 +44,13 @@ export function createDocumentTools(
       return pos?.blockId ? `inserting ${pos.type} block "${pos.blockId}"` : 'inserting node';
     },
     execute: async (params: unknown): Promise<AgentToolResult> => {
-      const { position, node } = params as { position: any; node: SerializedLexicalNode };
-      if (!node || typeof node !== 'object' || !node.type) {
+      const { position, xml } = params as { position: any; xml: string };
+      if (!xml || typeof xml !== 'string') {
         return {
           ok: false,
           error: {
-            error: 'invalid_node',
-            message:
-              'Missing or invalid "node" parameter. Must be a serialized Lexical node with at least a "type" field (e.g. {"type":"paragraph","children":[{"type":"text","text":"...","version":1}],"direction":"ltr","format":"","indent":0,"version":1,"textFormat":0,"textStyle":""}).',
+            error: 'invalid_xml',
+            message: 'Missing or invalid "xml" parameter. Must be an XML string.',
           },
         };
       }
@@ -79,60 +60,91 @@ export function createDocumentTools(
           error: {
             error: 'block_not_found',
             blockId: position.blockId,
-            message: `Block "${position.blockId}" not found in document.`,
+            message: `Block "${position.blockId}" not found.`,
           },
         };
       }
-      const op: AgentOperation = { op: 'insert', position, node };
-      operations.push(op);
+
+      let nodes: SerializedLexicalNode[];
+      try {
+        nodes = deserializeNodesFromXml(xml, registry);
+      } catch {
+        return {
+          ok: false,
+          error: { error: 'xml_parse_error', message: 'Failed to parse XML string.' },
+        };
+      }
+
+      if (nodes.length === 0) {
+        return { ok: false, error: { error: 'empty_xml', message: 'XML produced no nodes.' } };
+      }
+
+      for (let i = 0; i < nodes.length; i++) {
+        const pos = i === 0 ? position : { ...position, _insertIndex: i };
+        operations.push({ op: 'insert', position: pos, node: nodes[i] });
+      }
+
       return {
         ok: true,
-        content: `Inserted node ${position.type} block "${position.blockId ?? 'root'}"`,
+        content: `Inserted ${nodes.length} node(s) ${position.type} block "${position.blockId ?? 'root'}"`,
       };
     },
   };
 
   const replaceNodeTool: AgentToolConfig = {
     name: 'replace_node',
-    description: 'Replace an existing block node by its blockId',
+    description:
+      'Replace an existing block node by its blockId with new XML content. The xml should contain exactly one block element.',
     parameters: {
       type: 'object',
       properties: {
         blockId: { type: 'string' },
-        node: { type: 'object' },
+        xml: { type: 'string', description: 'XML string containing one block element' },
       },
-      required: ['blockId', 'node'],
+      required: ['blockId', 'xml'],
     },
     describeCall: (params: unknown) => {
       const p = params as { blockId?: string };
       return p.blockId ? `replacing block "${p.blockId}"` : 'replacing node';
     },
     execute: async (params: unknown): Promise<AgentToolResult> => {
-      const { blockId, node } = params as { blockId: string; node: SerializedLexicalNode };
-      if (!node || typeof node !== 'object' || !node.type) {
+      const { blockId, xml } = params as { blockId: string; xml: string };
+      if (!xml || typeof xml !== 'string') {
         return {
           ok: false,
-          error: {
-            error: 'invalid_node',
-            message:
-              'Missing or invalid "node" parameter. Must be a serialized Lexical node with at least a "type" field.',
-          },
+          error: { error: 'invalid_xml', message: 'Missing or invalid "xml" parameter.' },
         };
       }
       const existing = snapshot.getBlock(blockId);
       if (!existing) {
         return {
           ok: false,
-          error: {
-            error: 'block_not_found',
-            blockId,
-            message: `Block "${blockId}" not found in document.`,
-          },
+          error: { error: 'block_not_found', blockId, message: `Block "${blockId}" not found.` },
         };
       }
-      const op: AgentOperation = { op: 'replace', blockId, node };
-      operations.push(op);
-      return { ok: true, content: `Replaced block "${blockId}"` };
+
+      let nodes: SerializedLexicalNode[];
+      try {
+        nodes = deserializeNodesFromXml(xml, registry);
+      } catch {
+        return {
+          ok: false,
+          error: { error: 'xml_parse_error', message: 'Failed to parse XML string.' },
+        };
+      }
+
+      if (nodes.length === 0) {
+        return { ok: false, error: { error: 'empty_xml', message: 'XML produced no nodes.' } };
+      }
+
+      const primaryNode = { ...nodes[0], $: { ...(nodes[0] as any).$, blockId } } as any;
+      operations.push({ op: 'replace', blockId, node: primaryNode });
+
+      for (let i = 1; i < nodes.length; i++) {
+        operations.push({ op: 'insert', position: { type: 'after', blockId }, node: nodes[i] });
+      }
+
+      return { ok: true, content: `Replaced block "${blockId}" (${nodes.length} node(s))` };
     },
   };
 
@@ -141,9 +153,7 @@ export function createDocumentTools(
     description: 'Delete an existing block node by its blockId',
     parameters: {
       type: 'object',
-      properties: {
-        blockId: { type: 'string' },
-      },
+      properties: { blockId: { type: 'string' } },
       required: ['blockId'],
     },
     describeCall: (params: unknown) => {
@@ -152,19 +162,13 @@ export function createDocumentTools(
     },
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { blockId } = params as { blockId: string };
-      const existing = snapshot.getBlock(blockId);
-      if (!existing) {
+      if (!snapshot.getBlock(blockId)) {
         return {
           ok: false,
-          error: {
-            error: 'block_not_found',
-            blockId,
-            message: `Block "${blockId}" not found in document.`,
-          },
+          error: { error: 'block_not_found', blockId, message: `Block "${blockId}" not found.` },
         };
       }
-      const op: AgentOperation = { op: 'delete', blockId };
-      operations.push(op);
+      operations.push({ op: 'delete', blockId });
       return { ok: true, content: `Deleted block "${blockId}"` };
     },
   };
@@ -190,7 +194,6 @@ export function createDocumentTools(
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { query, blockType } = params as { query: string; blockType?: string };
       const matches: Array<{ blockId: string; nodeType: string; textContent: string }> = [];
-
       for (const blockId of snapshot.blockIds) {
         const block = snapshot.getBlock(blockId)!;
         const nodeType = (block as any).type ?? 'unknown';
@@ -199,10 +202,9 @@ export function createDocumentTools(
         if (query && !text.toLowerCase().includes(query.toLowerCase())) continue;
         matches.push({ blockId, nodeType, textContent: text });
       }
-
       return { ok: true, content: JSON.stringify(matches) };
     },
   };
 
-  return [readSelectionTool, insertNodeTool, replaceNodeTool, deleteNodeTool, searchDocumentTool];
+  return [insertNodeTool, replaceNodeTool, deleteNodeTool, searchDocumentTool];
 }

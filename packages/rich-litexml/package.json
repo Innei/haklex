@@ -1,11 +1,11 @@
 {
-  "name": "@haklex/rich-agent-core",
+  "name": "@haklex/rich-litexml",
   "version": "0.0.90",
-  "description": "Headless AI agent protocol, diff engine, and store for Lexical editor",
+  "description": "Bidirectional Lexical SerializedNode <-> XML conversion with plugin registry",
   "repository": {
     "type": "git",
     "url": "https://github.com/Innei/haklex.git",
-    "directory": "packages/rich-agent-core"
+    "directory": "packages/rich-litexml"
   },
   "license": "MIT",
   "type": "module",
@@ -18,25 +18,16 @@
   ],
   "scripts": {
     "build": "vite build",
-    "dev:build": "vite build --watch",
-    "test": "vitest run"
+    "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@haklex/rich-litexml": "workspace:*",
-    "nanoid": "^5.1.6",
-    "zustand": "^5.0.12"
+    "lexical": "^0.42.0",
+    "linkedom": "^0.18.9"
   },
   "devDependencies": {
-    "@haklex/rich-editor": "workspace:*",
-    "lexical": "^0.42.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
-    "vite-plugin-dts": "^4.5.4",
-    "vitest": "^4.0.18"
-  },
-  "peerDependencies": {
-    "@haklex/rich-editor": "workspace:*",
-    "lexical": "^0.42.0"
+    "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {
     "access": "public",

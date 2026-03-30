@@ -64,12 +64,11 @@ function makeSnapshot(): { snapshot: EditorSnapshot; operations: AgentOperation[
 }
 
 describe('createDocumentTools', () => {
-  it('returns 5 tools', () => {
+  it('returns 4 tools', () => {
     const { snapshot, operations } = makeSnapshot();
     const tools = createDocumentTools(snapshot, operations);
-    expect(tools).toHaveLength(5);
+    expect(tools).toHaveLength(4);
     expect(tools.map((t) => t.name)).toEqual([
-      'read_selection',
       'insert_node',
       'replace_node',
       'delete_node',
@@ -77,19 +76,61 @@ describe('createDocumentTools', () => {
     ]);
   });
 
-  it('insert_node adds operation to accumulator', async () => {
+  it('insert_node accepts XML and creates operation', async () => {
     const { snapshot, operations } = makeSnapshot();
     const tools = createDocumentTools(snapshot, operations);
     const insertTool = tools.find((t) => t.name === 'insert_node')!;
 
     const result = await insertTool.execute({
       position: { type: 'after', blockId: 'p1' },
-      node: { type: 'paragraph', children: [] },
+      xml: '<p>New paragraph</p>',
     });
 
     expect(result.ok).toBe(true);
     expect(operations).toHaveLength(1);
     expect(operations[0].op).toBe('insert');
+    expect((operations[0] as any).node.type).toBe('paragraph');
+  });
+
+  it('insert_node with multiple XML elements creates multiple operations', async () => {
+    const { snapshot, operations } = makeSnapshot();
+    const tools = createDocumentTools(snapshot, operations);
+    const insertTool = tools.find((t) => t.name === 'insert_node')!;
+
+    const result = await insertTool.execute({
+      position: { type: 'after', blockId: 'p1' },
+      xml: '<h2>Title</h2><p>Content</p>',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(operations).toHaveLength(2);
+  });
+
+  it('replace_node accepts XML', async () => {
+    const { snapshot, operations } = makeSnapshot();
+    const tools = createDocumentTools(snapshot, operations);
+    const replaceTool = tools.find((t) => t.name === 'replace_node')!;
+
+    const result = await replaceTool.execute({
+      blockId: 'p1',
+      xml: '<p>Replaced content</p>',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(operations[0].op).toBe('replace');
+  });
+
+  it('replace_node preserves original blockId', async () => {
+    const { snapshot, operations } = makeSnapshot();
+    const tools = createDocumentTools(snapshot, operations);
+    const replaceTool = tools.find((t) => t.name === 'replace_node')!;
+
+    await replaceTool.execute({
+      blockId: 'p1',
+      xml: '<p>New text</p>',
+    });
+
+    expect((operations[0] as any).node.$?.blockId).toBe('p1');
   });
 
   it('delete_node with valid blockId adds operation', async () => {

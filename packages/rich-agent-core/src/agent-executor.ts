@@ -18,7 +18,6 @@ export type AgentExecutorConfig = {
   tools: AgentToolConfig[];
   systemMessages: ChatMessage[];
   signal?: AbortSignal;
-  readSelection?: () => { text: string; anchorBlockId: string; focusBlockId: string } | null;
 };
 
 export type AgentExecutorResult = {
@@ -66,9 +65,9 @@ function toolConfigToSchema(tool: AgentToolConfig): ToolSchema {
 }
 
 export function createAgentExecutor(config: AgentExecutorConfig) {
-  const { provider, snapshot, store, signal, readSelection } = config;
+  const { provider, snapshot, store, signal } = config;
   const operations: AgentOperation[] = [];
-  const documentTools = createDocumentTools(snapshot, operations, readSelection);
+  const documentTools = createDocumentTools(snapshot, operations);
   const allTools = [...documentTools, ...config.tools];
   const toolMap = new Map(allTools.map((t) => [t.name, t]));
   const toolSchemas = allTools.map(toolConfigToSchema);
