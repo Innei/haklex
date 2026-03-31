@@ -1,1 +1,1 @@
-export { default, VideoRenderer } from '@haklex/rich-renderer-video/static'
+export { VideoRenderer as default,VideoRenderer } from '@haklex/rich-renderer-video/static';

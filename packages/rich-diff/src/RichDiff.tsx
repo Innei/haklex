@@ -7,7 +7,7 @@ import { PortalThemeProvider } from '@haklex/rich-style-token';
 import type { SerializedEditorState, SerializedLexicalNode } from 'lexical';
 import { useMemo } from 'react';
 
-import * as diffStyles from './style.css.ts';
+import * as diffStyles from './style.css';
 
 export interface RichDiffProps {
   className?: string;

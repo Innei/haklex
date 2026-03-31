@@ -1,4 +1,4 @@
-import './style.css.ts';
+import './style.css';
 
 export type { RichDiffProps } from './RichDiff';
 export { RichDiff } from './RichDiff';

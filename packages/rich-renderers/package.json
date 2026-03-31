@@ -21,7 +21,7 @@
     "./image": "./src/image.ts",
     "./linkcard": "./src/linkcard.ts",
     "./mention": "./src/mention.ts",
-    "./mermaid": "./src/mermaid.ts",
+    "./mermaid": "./src/mermaid-entry.ts",
     "./ruby": "./src/ruby.ts",
     "./style.css": "./src/style.css",
     "./video": "./src/video.ts"

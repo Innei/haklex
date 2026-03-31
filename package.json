@@ -20,7 +20,9 @@
     "release": "bumpp -r",
     "release:dry": "bumpp -r --no-commit --no-tag --no-push",
     "release:packages": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\"",
-    "release:rich": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\""
+    "release:rich": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\"",
+    "test": "vitest run",
+    "typecheck": "pnpm --filter \"./packages/*\" -r exec tsc --noEmit"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged"

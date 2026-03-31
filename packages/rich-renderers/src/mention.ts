@@ -1,1 +1,1 @@
-export { default, MentionRenderer } from '@haklex/rich-renderer-mention/static'
+export { MentionRenderer as default,MentionRenderer } from '@haklex/rich-renderer-mention/static';

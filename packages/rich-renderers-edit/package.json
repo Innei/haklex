@@ -19,7 +19,7 @@
     "./embed": "./src/embed.ts",
     "./excalidraw": "./src/excalidraw.ts",
     "./mention": "./src/mention.ts",
-    "./mermaid": "./src/mermaid.ts",
+    "./mermaid": "./src/mermaid-entry.ts",
     "./ruby": "./src/ruby.ts",
     "./slash-menu": "./src/slash-menu.ts"
   },

@@ -7,7 +7,7 @@ import {
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import type { TextNode } from 'lexical';
 import { $createTextNode } from 'lexical';
-import { useCallback, useMemo, useState } from 'react';
+import { isValidElement, useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { MentionMenuItem } from './MentionMenuItem';
@@ -39,7 +39,7 @@ function parseQueryPhase(
       const confirmItem = new MentionMenuItem({
         type: 'confirm',
         platformKey,
-        icon: platform.icon,
+        icon: isValidElement(platform.icon) ? platform.icon : undefined,
         label: handle ? `@${handle}` : 'Type username...',
         description: `${platform.label} — Enter to confirm`,
         handleText: handle,
@@ -58,7 +58,7 @@ function parseQueryPhase(
         new MentionMenuItem({
           type: 'platform',
           platformKey: p.key,
-          icon: p.icon,
+          icon: isValidElement(p.icon) ? p.icon : undefined,
           label: p.label,
           description: `@${p.key}:username`,
         }),

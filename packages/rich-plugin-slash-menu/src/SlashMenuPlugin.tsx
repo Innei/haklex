@@ -7,7 +7,7 @@ import {
 } from '@lexical/react/LexicalTypeaheadMenuPlugin';
 import type { LexicalEditor, TextNode } from 'lexical';
 import { $getSelection, $isRangeSelection } from 'lexical';
-import { useCallback, useMemo, useState } from 'react';
+import { isValidElement, useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { getBuiltinItems } from './builtinItems';
@@ -25,7 +25,16 @@ export function collectNodeSlashItems(editor: LexicalEditor): SlashMenuItem[] {
   const configs = collectCommandItems(editor);
   return configs
     .filter((c) => !c.placement || c.placement.includes('slash'))
-    .map((c) => new SlashMenuItemClass(c.title, c));
+    .map(
+      (c) =>
+        new SlashMenuItemClass(c.title, {
+          description: c.description,
+          icon: isValidElement(c.icon) ? c.icon : undefined,
+          keywords: c.keywords,
+          section: c.section,
+          onSelect: c.onSelect,
+        }),
+    );
 }
 
 function filterItems(query: string, items: SlashMenuItem[]): SlashMenuItem[] {
