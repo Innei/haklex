@@ -3,6 +3,8 @@ export const fonts = {
     '"PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, Helvetica, "noto sans sc", "hiragino sans gb", -apple-system, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Not Color Emoji',
   fontFamilySerif:
     '"Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif", "source-han-serif-sc", "Songti SC", STSong, "华文宋体", serif',
+  fontFamilyKai:
+    '"楷体", KaiTi, STKaiti, "Kaiti SC", "LXGW WenKai", "霞鹜文楷", "Noto Serif CJK SC", serif',
   fontMono:
     '"SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace',
 };
@@ -92,6 +94,7 @@ export const darkBoxShadow = {
 const baseTypography = {
   fontFamilySans: fonts.fontFamilySans,
   fontFamilySerif: fonts.fontFamilySerif,
+  fontFamilyKai: fonts.fontFamilyKai,
   fontMono: fonts.fontMono,
   fontSize2xs: '0.625em',
   fontSizeXs: '0.75em',

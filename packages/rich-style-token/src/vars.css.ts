@@ -88,6 +88,8 @@ export const vars = createGlobalThemeContract({
     fontFamilySans: 'rc-font-family-sans',
     /** 默认值: '"Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif", "source-han-serif-sc", "Songti SC", STSong, "华文宋体", serif' */
     fontFamilySerif: 'rc-font-family-serif',
+    /** 默认值: '"楷体", KaiTi, STKaiti, "Kaiti SC", "LXGW WenKai", "霞鹜文楷", "Noto Serif CJK SC", serif' */
+    fontFamilyKai: 'rc-font-family-kai',
     /** 默认值: '"SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace' */
     fontMono: 'rc-font-mono',
     /** 默认值: '0.625em' */
