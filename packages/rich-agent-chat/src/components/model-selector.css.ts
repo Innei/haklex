@@ -10,19 +10,20 @@ export const triggerButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
   'fontSize': 12,
-  'padding': '4px 10px',
-  'borderRadius': 8,
+  'padding': '4px 8px',
+  'borderRadius': 6,
   'border': 'none',
   'gap': 6,
-  'background': vars.color.fillTertiary,
-  'color': vars.color.text,
+  'background': 'transparent',
+  'color': vars.color.textTertiary,
   'fontFamily': 'inherit',
   'cursor': 'pointer',
   'outline': 'none',
   'minWidth': 0,
   'maxWidth': 220,
   ':hover': {
-    background: vars.color.fillSecondary,
+    background: vars.color.fillTertiary,
+    color: vars.color.textSecondary,
   },
 });
 
@@ -33,12 +34,16 @@ export const triggerLabel = style({
   color: vars.color.textSecondary,
 });
 
-export const fallbackIcon = style({
-  display: 'inline-block',
-  width: 16,
-  height: 16,
-  borderRadius: 4,
-  background: vars.color.fillSecondary,
+export const modelDot = style({
+  width: 8,
+  height: 8,
+  borderRadius: '50%',
+  background: vars.color.textQuaternary,
+  flexShrink: 0,
+});
+
+export const triggerChevron = style({
+  color: vars.color.textQuaternary,
   flexShrink: 0,
 });
 
@@ -100,27 +105,4 @@ export const emptyState = style({
   textAlign: 'center',
   fontSize: 13,
   color: vars.color.textQuaternary,
-});
-
-export const settingsFooter = style({
-  borderTop: `1px solid ${vars.color.hrBorder}`,
-});
-
-export const settingsLink = style({
-  'display': 'flex',
-  'alignItems': 'center',
-  'gap': 6,
-  'width': '100%',
-  'padding': '8px 12px',
-  'border': 'none',
-  'background': 'transparent',
-  'fontFamily': 'inherit',
-  'fontSize': 12,
-  'color': vars.color.textTertiary,
-  'cursor': 'pointer',
-  'textAlign': 'left',
-  'outline': 'none',
-  ':hover': {
-    color: vars.color.text,
-  },
 });

@@ -1,25 +1,21 @@
 import { type AgentStore, agentStoreSelectors, type ReviewBatch } from '@haklex/rich-agent-core';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useStore } from 'zustand';
 
 import { ChatInput } from './ChatInput';
 import { ChatMessageList } from './ChatMessageList';
 import { ModelSelector } from './components/ModelSelector';
-import { SettingsModal } from './components/SettingsModal';
-import { DirectToolBar } from './DirectToolBar';
 import * as css from './styles.css';
-import type { ProviderConfig, SelectedModel } from './types';
+import type { ProviderGroup, SelectedModel } from './types';
 
 interface ChatPanelProps {
-  onAbort?: () => void;
+  onAbort: () => void;
   onAcceptBatch?: (batchId: string) => void;
-  onProvidersChange: (providers: ProviderConfig[]) => void;
   onRejectBatch?: (batchId: string) => void;
   onRetry?: () => void;
-  onRetryToolCall?: (name: string, params: Record<string, unknown>) => void;
   onSelectModel: (selected: SelectedModel) => void;
-  onSend?: (message: string) => void;
-  providers: ProviderConfig[];
+  onSend: (message: string) => void;
+  providerGroups: ProviderGroup[];
   selectedModel: SelectedModel | null;
   store: AgentStore;
 }
@@ -35,10 +31,8 @@ export function ChatPanel({
   onAcceptBatch,
   onRejectBatch,
   onRetry,
-  onRetryToolCall,
   onSend,
-  providers,
-  onProvidersChange,
+  providerGroups,
   selectedModel,
   onSelectModel,
   store,
@@ -52,12 +46,10 @@ export function ChatPanel({
     [reviewState],
   );
 
-  const [settingsOpen, setSettingsOpen] = useState(false);
-
   const handleSend = useCallback(
     (message: string) => {
       store.getState().addBubble({ type: 'user', content: message });
-      onSend?.(message);
+      onSend(message);
     },
     [onSend, store],
   );
@@ -65,19 +57,14 @@ export function ChatPanel({
   const isRunning = status !== 'idle' && status !== 'done';
   const hasModel = selectedModel !== null;
 
-  // Build status label for composer
   let statusLabel: string | undefined;
   if (isRunning) {
-    if (status === 'calling_tool') {
-      statusLabel = 'Calling tool...';
-    } else {
-      statusLabel = STATUS_LABELS[status] || 'Processing...';
-    }
+    statusLabel =
+      status === 'calling_tool' ? 'Calling tool...' : STATUS_LABELS[status] || 'Processing...';
   }
 
   return (
     <div className={css.chatPanel}>
-      <DirectToolBar onExecute={(name, params) => onRetryToolCall?.(name, params)} />
       <ChatMessageList
         bubbles={bubbles}
         getBatch={getBatch}
@@ -91,20 +78,13 @@ export function ChatPanel({
         statusLabel={statusLabel}
         modelSelector={
           <ModelSelector
-            providers={providers}
+            providerGroups={providerGroups}
             selectedModel={selectedModel}
-            onOpenSettings={() => setSettingsOpen(true)}
             onSelectModel={onSelectModel}
           />
         }
         onAbort={onAbort}
         onSend={handleSend}
-      />
-      <SettingsModal
-        open={settingsOpen}
-        providers={providers}
-        onOpenChange={setSettingsOpen}
-        onProvidersChange={onProvidersChange}
       />
     </div>
   );
