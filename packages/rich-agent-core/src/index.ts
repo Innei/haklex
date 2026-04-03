@@ -39,6 +39,8 @@ export type {
   ToolError,
   ToolSchema,
 } from './protocol';
+export type { ProviderType, TransportAdapter } from './provider';
+export { createDirectTransport, createProvider, createProxyTransport } from './provider';
 export {
   acceptAndRebaseBatch,
   acceptBatch,
