@@ -1,5 +1,5 @@
-import { AutoResizeTextArea, Spinner } from '@haklex/rich-editor-ui';
-import { Send, Square } from 'lucide-react';
+import { AutoResizeTextArea } from '@haklex/rich-editor-ui';
+import { ArrowUp, Square } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { useRef, useState } from 'react';
 
@@ -26,9 +26,6 @@ export function ChatInput({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const trimmed = input.trim();
   const isAbortMode = Boolean(isRunning);
-  const placeholder = disabled
-    ? 'Configure a model to start an agent task.'
-    : 'Ask a follow-up question...';
 
   function handleSend() {
     if (!trimmed) return;
@@ -47,25 +44,24 @@ export function ChatInput({
     <div className={css.composerDock}>
       {isRunning && statusLabel && (
         <div className={css.composerStatusLine}>
-          <Spinner size="sm" />
+          <span className={css.composerStatusDot} />
           <span>{statusLabel}</span>
         </div>
       )}
-      <AutoResizeTextArea
-        className={css.composerTextArea}
-        disabled={disabled}
-        maxRows={10}
-        minRows={2}
-        placeholder={placeholder}
-        ref={textareaRef}
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-      />
-      <div className={css.composerBottomBar}>
-        <div>{modelSelector ?? <div />}</div>
+      <div className={css.composerBox}>
+        <AutoResizeTextArea
+          className={css.composerTextArea}
+          disabled={disabled}
+          maxRows={10}
+          minRows={1}
+          placeholder="Message..."
+          ref={textareaRef}
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+        />
         <button
-          aria-label={isAbortMode ? 'Abort agent run' : 'Send message'}
+          aria-label={isAbortMode ? 'Stop' : 'Send'}
           className={isAbortMode ? css.composerAbortButton : css.composerSendButton}
           disabled={isAbortMode ? !onAbort : disabled || !trimmed}
           type="button"
@@ -74,9 +70,13 @@ export function ChatInput({
           {isAbortMode ? (
             <Square fill="currentColor" size={14} strokeWidth={0} />
           ) : (
-            <Send fill="currentColor" size={16} strokeWidth={0} />
+            <ArrowUp size={16} strokeWidth={2.5} />
           )}
         </button>
+      </div>
+      <div className={css.composerBottomBar}>
+        <div>{modelSelector ?? <div />}</div>
+        <span className={css.composerHint}>↵ Send · ⇧↵ Newline</span>
       </div>
     </div>
   );

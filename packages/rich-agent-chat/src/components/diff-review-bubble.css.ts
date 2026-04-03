@@ -15,7 +15,7 @@ export const diffReviewHeader = style({
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: '8px 12px',
-  background: vars.color.fillTertiary,
+  background: vars.color.fillQuaternary,
   borderBottom: `1px solid ${vars.color.border}`,
   fontSize: '12px',
   color: vars.color.textTertiary,
@@ -29,10 +29,10 @@ export const diffReviewActions = style({
 export const diffReviewActionBtn = style({
   'padding': '3px 10px',
   'border': `1px solid ${vars.color.border}`,
-  'borderRadius': 4,
+  'borderRadius': 6,
   'background': 'transparent',
   'color': vars.color.textSecondary,
-  'fontSize': '11px',
+  'fontSize': '12px',
   'cursor': 'pointer',
   'transition': 'background 120ms ease',
   ':hover': {
@@ -43,10 +43,11 @@ export const diffReviewActionBtn = style({
 export const diffReviewAcceptBtn = style([
   diffReviewActionBtn,
   {
-    'borderColor': 'rgb(34, 197, 94)',
-    'color': 'rgb(34, 197, 94)',
+    'borderColor': vars.color.text,
+    'background': vars.color.text,
+    'color': vars.color.bg,
     ':hover': {
-      background: 'rgba(34, 197, 94, 0.1)',
+      opacity: 0.85,
     },
   },
 ]);
@@ -54,10 +55,10 @@ export const diffReviewAcceptBtn = style([
 export const diffReviewRejectBtn = style([
   diffReviewActionBtn,
   {
-    'borderColor': 'rgb(239, 68, 68)',
-    'color': 'rgb(239, 68, 68)',
+    'borderColor': 'var(--hk-color-text-error, #dc2626)',
+    'color': 'var(--hk-color-text-error, #dc2626)',
     ':hover': {
-      background: 'rgba(239, 68, 68, 0.1)',
+      background: 'rgba(220, 38, 38, 0.06)',
     },
   },
 ]);
@@ -72,12 +73,12 @@ export const diffHunkRow = style({
 });
 
 export const diffHunkInsert = style({
-  background: 'rgba(34, 197, 94, 0.12)',
+  background: 'rgba(22, 163, 74, 0.08)',
   color: vars.color.text,
 });
 
 export const diffHunkDelete = style({
-  background: 'rgba(239, 68, 68, 0.12)',
+  background: 'rgba(220, 38, 38, 0.06)',
   color: vars.color.text,
   textDecoration: 'line-through',
   opacity: 0.7,
@@ -89,7 +90,9 @@ export const diffHunkEqual = style({
 
 export const diffStatusBadge = style({
   padding: '2px 8px',
-  borderRadius: 4,
+  borderRadius: 999,
+  border: `1px solid ${vars.color.border}`,
   fontSize: '11px',
   fontWeight: 500,
+  fontFamily: vars.typography.fontMono,
 });

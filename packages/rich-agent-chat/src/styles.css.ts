@@ -12,7 +12,7 @@ export const chatPanel = style({
   boxSizing: 'border-box',
   padding: 0,
   fontSize: '14px',
-  background: vars.color.bgSecondary,
+  background: vars.color.bg,
   overflow: 'hidden',
 });
 
@@ -20,10 +20,10 @@ export const messageList = style({
   flex: 1,
   minHeight: 0,
   overflowY: 'auto',
-  padding: '16px 18px 20px',
+  padding: '20px 18px 24px',
   display: 'flex',
   flexDirection: 'column',
-  gap: 4,
+  gap: 20,
 });
 
 // ── User Bubble ──
@@ -36,8 +36,7 @@ export const bubbleUser = style({
   color: vars.color.bg,
   borderRadius: '18px 18px 6px 18px',
   lineHeight: 1.5,
-  fontSize: '13px',
-  marginBottom: 12,
+  fontSize: '14px',
 });
 
 // ── Assistant Prose ──
@@ -158,26 +157,26 @@ export const toolCallResultPre = style({
   margin: 0,
   overflowX: 'auto',
   padding: 6,
-  background: 'rgba(34, 197, 94, 0.05)',
+  background: vars.color.fillQuaternary,
   borderRadius: vars.borderRadius.sm,
   fontFamily: vars.typography.fontMono,
   fontSize: '11px',
   whiteSpace: 'pre-wrap',
   wordBreak: 'break-all',
-  color: '#22c55e',
+  color: vars.color.textSecondary,
 });
 
 export const toolCallErrorPre = style({
   margin: 0,
   overflowX: 'auto',
   padding: 6,
-  background: 'rgba(239, 68, 68, 0.05)',
+  background: 'rgba(220, 38, 38, 0.04)',
   borderRadius: vars.borderRadius.sm,
   fontFamily: vars.typography.fontMono,
   fontSize: '11px',
   whiteSpace: 'pre-wrap',
   wordBreak: 'break-all',
-  color: '#ef4444',
+  color: 'var(--hk-color-text-error, #dc2626)',
 });
 
 export const toolCallGroupItems = style({
@@ -226,29 +225,17 @@ export const thinkingSteps = style({
   lineHeight: 1.6,
 });
 
-const bounceAnimation = keyframes({
-  '0%, 100%': { transform: 'translateY(0)' },
-  '50%': { transform: 'translateY(-3px)' },
+const pulseAnimation = keyframes({
+  '0%, 100%': { opacity: 1 },
+  '50%': { opacity: 0.3 },
 });
 
-export const bounceDot = style({
+export const pulseDot = style({
   width: 4,
   height: 4,
   borderRadius: '50%',
   background: vars.color.textTertiary,
-  animation: `${bounceAnimation} 0.6s ease-in-out infinite`,
-});
-
-const pulseAnimation = keyframes({
-  '0%, 100%': { opacity: 1 },
-  '50%': { opacity: 0.5 },
-});
-
-export const thinkingSkeleton = style({
-  height: 14,
-  borderRadius: 4,
-  background: vars.color.fillTertiary,
-  animation: `${pulseAnimation} 1.5s ease-in-out infinite`,
+  animation: `${pulseAnimation} 1.2s ease-in-out infinite`,
 });
 
 export const toolCallJson = style({
@@ -270,14 +257,14 @@ export const errorInline = style({
   alignItems: 'baseline',
   gap: 8,
   fontSize: '13px',
-  color: '#ef4444',
+  color: 'var(--hk-color-text-error, #dc2626)',
   lineHeight: 1.5,
   margin: '8px 0',
 });
 
 export const errorRetryLink = style({
   'fontSize': '12px',
-  'color': '#ef4444',
+  'color': 'var(--hk-color-text-error, #dc2626)',
   'textDecoration': 'underline',
   'cursor': 'pointer',
   'background': 'none',
@@ -290,7 +277,7 @@ export const errorRetryLink = style({
   },
 });
 
-// ── Diff Summary (kept as-is per spec) ──
+// ── Diff Summary ──
 
 export const bubbleTool = style({
   alignSelf: 'flex-start',
@@ -298,7 +285,7 @@ export const bubbleTool = style({
   padding: '8px 12px',
   background: vars.color.fill,
   border: `1px solid ${vars.color.border}`,
-  borderRadius: 14,
+  borderRadius: 8,
   fontSize: '12px',
   color: vars.color.textTertiary,
 });
@@ -308,10 +295,23 @@ export const bubbleTool = style({
 export const composerDock = style({
   flexShrink: 0,
   borderTop: `1px solid ${vars.color.border}`,
-  padding: '10px 18px 14px',
+  padding: '10px 18px 10px',
   display: 'flex',
   flexDirection: 'column',
-  gap: 0,
+});
+
+const statusDotPulse = keyframes({
+  '0%, 100%': { opacity: 1 },
+  '50%': { opacity: 0.4 },
+});
+
+export const composerStatusDot = style({
+  width: 6,
+  height: 6,
+  borderRadius: '50%',
+  background: '#22c55e',
+  animation: `${statusDotPulse} 1.5s ease-in-out infinite`,
+  flexShrink: 0,
 });
 
 export const composerStatusLine = style({
@@ -319,11 +319,28 @@ export const composerStatusLine = style({
   alignItems: 'center',
   gap: 6,
   fontSize: '11px',
-  color: '#22c55e',
+  color: vars.color.textTertiary,
   marginBottom: 8,
 });
 
+export const composerBox = style({
+  display: 'flex',
+  alignItems: 'flex-end',
+  gap: 0,
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: 10,
+  padding: '8px 10px',
+  background: vars.color.bg,
+  transition: 'border-color 150ms ease',
+  selectors: {
+    '&:focus-within': {
+      borderColor: vars.color.textTertiary,
+    },
+  },
+});
+
 export const composerTextArea = style({
+  flex: 1,
   padding: 0,
   border: 'none',
   borderRadius: 0,
@@ -351,15 +368,21 @@ export const composerBottomBar = style({
   paddingTop: 8,
 });
 
+export const composerHint = style({
+  fontSize: '11px',
+  color: vars.color.textQuaternary,
+});
+
 export const composerSendButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 32,
-  'height': 32,
+  'width': 28,
+  'height': 28,
   'flexShrink': 0,
+  'marginLeft': 8,
   'border': 'none',
-  'borderRadius': '50%',
+  'borderRadius': 8,
   'background': vars.color.text,
   'color': vars.color.bg,
   'cursor': 'pointer',
@@ -378,16 +401,17 @@ export const composerAbortButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 32,
-  'height': 32,
+  'width': 28,
+  'height': 28,
   'flexShrink': 0,
-  'border': '1px solid rgba(239, 68, 68, 0.3)',
-  'borderRadius': '50%',
+  'marginLeft': 8,
+  'border': '1px solid var(--hk-color-text-error, #dc2626)',
+  'borderRadius': 8,
   'background': vars.color.bg,
-  'color': '#ef4444',
+  'color': 'var(--hk-color-text-error, #dc2626)',
   'cursor': 'pointer',
   'transition': 'background 160ms ease',
   ':hover': {
-    background: 'rgba(239, 68, 68, 0.06)',
+    background: 'rgba(220, 38, 38, 0.06)',
   },
 });

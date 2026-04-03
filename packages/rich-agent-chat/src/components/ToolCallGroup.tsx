@@ -36,7 +36,9 @@ function GroupStatusIcon({ status }: { status: ToolCallItemStatus }): ReactEleme
         <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
       )}
       {status === 'completed' && <Check size={14} />}
-      {status === 'error' && <X size={14} style={{ color: '#ef4444' }} />}
+      {status === 'error' && (
+        <X size={14} style={{ color: 'var(--hk-color-text-error, #dc2626)' }} />
+      )}
     </span>
   );
 }

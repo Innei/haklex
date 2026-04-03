@@ -32,7 +32,9 @@ function StatusIcon({ status }: { status: ToolCallGroupItem['status'] }): ReactE
         <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} />
       )}
       {status === 'completed' && <Check size={14} />}
-      {status === 'error' && <X size={14} style={{ color: '#ef4444' }} />}
+      {status === 'error' && (
+        <X size={14} style={{ color: 'var(--hk-color-text-error, #dc2626)' }} />
+      )}
     </span>
   );
 }
@@ -59,10 +61,7 @@ export function ToolCall({ item, defaultExpanded = false }: ToolCallProps): Reac
         <StatusIcon status={item.status} />
         <span
           className={toolCallName}
-          style={{
-            ...(item.status === 'error' ? { color: '#ef4444' } : {}),
-            ...(item.status === 'running' ? { color: 'var(--hk-color-text)' } : {}),
-          }}
+          style={item.status === 'running' ? { color: 'var(--hk-color-text)' } : undefined}
         >
           {item.toolName}
         </span>

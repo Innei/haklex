@@ -3,9 +3,8 @@ import type { ReactElement } from 'react';
 import { useState } from 'react';
 
 import {
-  bounceDot,
+  pulseDot,
   thinkingRow,
-  thinkingSkeleton,
   thinkingSteps,
   toolCallChevron,
   toolCallDetail,
@@ -44,9 +43,9 @@ export function ThinkingChain({
 
         {isStreaming ? (
           <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <span className={bounceDot} style={{ animationDelay: '-0.3s' }} />
-            <span className={bounceDot} style={{ animationDelay: '-0.15s' }} />
-            <span className={bounceDot} />
+            <span className={pulseDot} />
+            <span className={pulseDot} style={{ animationDelay: '0.2s' }} />
+            <span className={pulseDot} style={{ animationDelay: '0.4s' }} />
           </span>
         ) : (
           steps.length > 0 && <span className={toolCallGroupCounter}>{steps.length} steps</span>
@@ -64,13 +63,6 @@ export function ThinkingChain({
                 {step}
               </p>
             ))}
-
-            {isStreaming && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                <div className={thinkingSkeleton} style={{ width: 96 }} />
-                <div className={thinkingSkeleton} style={{ width: 64, animationDelay: '0.15s' }} />
-              </div>
-            )}
           </div>
         </div>
       </div>
