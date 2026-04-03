@@ -164,6 +164,9 @@ export default defineConfig(({ command }) => ({
   server: {
     port: 5188,
     open: true,
+    watch: {
+      ignored: ['**/node_modules/**', '**/.git/**'],
+    },
   },
 
   define: {

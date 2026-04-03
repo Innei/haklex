@@ -20,12 +20,6 @@ interface ChatPanelProps {
   store: AgentStore;
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  thinking: 'Thinking...',
-  writing: 'Writing...',
-  running: 'Processing...',
-};
-
 export function ChatPanel({
   onAbort,
   onAcceptBatch,
@@ -57,12 +51,6 @@ export function ChatPanel({
   const isRunning = status !== 'idle' && status !== 'done';
   const hasModel = selectedModel !== null;
 
-  let statusLabel: string | undefined;
-  if (isRunning) {
-    statusLabel =
-      status === 'calling_tool' ? 'Calling tool...' : STATUS_LABELS[status] || 'Processing...';
-  }
-
   return (
     <div className={css.chatPanel}>
       <ChatMessageList
@@ -75,7 +63,7 @@ export function ChatPanel({
       <ChatInput
         disabled={!hasModel}
         isRunning={isRunning}
-        statusLabel={statusLabel}
+        status={status}
         modelSelector={
           <ModelSelector
             providerGroups={providerGroups}

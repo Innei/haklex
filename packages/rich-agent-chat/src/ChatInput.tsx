@@ -1,3 +1,4 @@
+import type { AgentStoreStatus } from '@haklex/rich-agent-core';
 import { AutoResizeTextArea } from '@haklex/rich-editor-ui';
 import { ArrowUp, Square } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -5,13 +6,20 @@ import { useRef, useState } from 'react';
 
 import * as css from './styles.css';
 
+const STATUS_LABELS: Partial<Record<AgentStoreStatus, string>> = {
+  thinking: 'Thinking...',
+  writing: 'Writing...',
+  running: 'Processing...',
+  calling_tool: 'Calling tool...',
+};
+
 interface ChatInputProps {
   disabled?: boolean;
   isRunning?: boolean;
   modelSelector?: ReactNode;
   onAbort?: () => void;
   onSend: (message: string) => void;
-  statusLabel?: string;
+  status?: AgentStoreStatus;
 }
 
 export function ChatInput({
@@ -20,12 +28,13 @@ export function ChatInput({
   modelSelector,
   onAbort,
   onSend,
-  statusLabel,
+  status,
 }: ChatInputProps) {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const trimmed = input.trim();
   const isAbortMode = Boolean(isRunning);
+  const statusLabel = status ? STATUS_LABELS[status] : undefined;
 
   function handleSend() {
     if (!trimmed) return;
@@ -44,7 +53,10 @@ export function ChatInput({
     <div className={css.composerDock}>
       {isRunning && statusLabel && (
         <div className={css.composerStatusLine}>
-          <span className={css.composerStatusDot} />
+          <span className={css.composerStatusDotWrap}>
+            <span className={css.composerStatusDotOuter} />
+            <span className={css.composerStatusDotInner} />
+          </span>
           <span>{statusLabel}</span>
         </div>
       )}
@@ -60,23 +72,22 @@ export function ChatInput({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
         />
-        <button
-          aria-label={isAbortMode ? 'Stop' : 'Send'}
-          className={isAbortMode ? css.composerAbortButton : css.composerSendButton}
-          disabled={isAbortMode ? !onAbort : disabled || !trimmed}
-          type="button"
-          onClick={isAbortMode ? () => onAbort?.() : handleSend}
-        >
-          {isAbortMode ? (
-            <Square fill="currentColor" size={14} strokeWidth={0} />
-          ) : (
-            <ArrowUp size={16} strokeWidth={2.5} />
-          )}
-        </button>
-      </div>
-      <div className={css.composerBottomBar}>
-        <div>{modelSelector ?? <div />}</div>
-        <span className={css.composerHint}>↵ Send · ⇧↵ Newline</span>
+        <div className={css.composerBottomBar}>
+          <div>{modelSelector ?? <div />}</div>
+          <button
+            aria-label={isAbortMode ? 'Stop' : 'Send'}
+            className={isAbortMode ? css.composerAbortButton : css.composerSendButton}
+            disabled={isAbortMode ? !onAbort : disabled || !trimmed}
+            type="button"
+            onClick={isAbortMode ? () => onAbort?.() : handleSend}
+          >
+            {isAbortMode ? (
+              <Square fill="currentColor" size={14} strokeWidth={0} />
+            ) : (
+              <ArrowUp size={16} strokeWidth={2.5} />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );

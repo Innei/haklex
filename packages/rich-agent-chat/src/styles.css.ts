@@ -294,43 +294,59 @@ export const bubbleTool = style({
 
 export const composerDock = style({
   flexShrink: 0,
-  borderTop: `1px solid ${vars.color.border}`,
-  padding: '10px 18px 10px',
+  padding: '10px 18px 14px',
   display: 'flex',
   flexDirection: 'column',
 });
 
-const statusDotPulse = keyframes({
-  '0%, 100%': { opacity: 1 },
-  '50%': { opacity: 0.4 },
+const statusDotPing = keyframes({
+  '75%, 100%': { transform: 'scale(2)', opacity: 0 },
 });
 
-export const composerStatusDot = style({
+export const composerStatusDotOuter = style({
+  position: 'absolute',
+  display: 'inline-flex',
+  width: 6,
+  height: 6,
+  borderRadius: '50%',
+  background: '#34d399',
+  opacity: 0.75,
+  animation: `${statusDotPing} 1s cubic-bezier(0, 0, 0.2, 1) infinite`,
+});
+
+export const composerStatusDotInner = style({
+  position: 'relative',
+  display: 'inline-flex',
   width: 6,
   height: 6,
   borderRadius: '50%',
   background: '#22c55e',
-  animation: `${statusDotPulse} 1.5s ease-in-out infinite`,
-  flexShrink: 0,
 });
 
 export const composerStatusLine = style({
   display: 'flex',
   alignItems: 'center',
   gap: 6,
-  fontSize: '11px',
+  fontSize: '12px',
   color: vars.color.textTertiary,
   marginBottom: 8,
+  marginLeft: 4,
+});
+
+export const composerStatusDotWrap = style({
+  position: 'relative',
+  display: 'flex',
+  width: 6,
+  height: 6,
+  flexShrink: 0,
 });
 
 export const composerBox = style({
-  display: 'flex',
-  alignItems: 'flex-end',
-  gap: 0,
+  position: 'relative',
   border: `1px solid ${vars.color.border}`,
-  borderRadius: 10,
-  padding: '8px 10px',
+  borderRadius: 16,
   background: vars.color.bg,
+  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
   transition: 'border-color 150ms ease',
   selectors: {
     '&:focus-within': {
@@ -340,8 +356,9 @@ export const composerBox = style({
 });
 
 export const composerTextArea = style({
-  flex: 1,
-  padding: 0,
+  width: '100%',
+  resize: 'none',
+  padding: '14px 16px 48px',
   border: 'none',
   borderRadius: 0,
   background: 'transparent',
@@ -353,36 +370,37 @@ export const composerTextArea = style({
     '&:focus': {
       borderColor: 'transparent',
       boxShadow: 'none',
+      outline: 'none',
     },
     '&::placeholder': {
       color: vars.color.textTertiary,
+    },
+    '&:disabled': {
+      cursor: 'not-allowed',
+      opacity: 0.5,
     },
   },
 });
 
 export const composerBottomBar = style({
+  position: 'absolute',
+  bottom: 10,
+  left: 10,
+  right: 10,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: 12,
-  paddingTop: 8,
-});
-
-export const composerHint = style({
-  fontSize: '11px',
-  color: vars.color.textQuaternary,
 });
 
 export const composerSendButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 28,
-  'height': 28,
+  'width': 30,
+  'height': 30,
   'flexShrink': 0,
-  'marginLeft': 8,
   'border': 'none',
-  'borderRadius': 8,
+  'borderRadius': '50%',
   'background': vars.color.text,
   'color': vars.color.bg,
   'cursor': 'pointer',
@@ -401,12 +419,11 @@ export const composerAbortButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 28,
-  'height': 28,
+  'width': 30,
+  'height': 30,
   'flexShrink': 0,
-  'marginLeft': 8,
   'border': '1px solid var(--hk-color-text-error, #dc2626)',
-  'borderRadius': 8,
+  'borderRadius': '50%',
   'background': vars.color.bg,
   'color': 'var(--hk-color-text-error, #dc2626)',
   'cursor': 'pointer',
