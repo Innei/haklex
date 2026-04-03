@@ -1,12 +1,7 @@
-import type { ProviderConfig, SelectedModel } from '@haklex/rich-agent-chat';
+import type { ProviderGroup, SelectedModel } from '@haklex/rich-agent-chat';
 import { ChatPanel } from '@haklex/rich-agent-chat';
-import type { AgentOperation, LLMProvider } from '@haklex/rich-agent-core';
-import {
-  createAgentStore,
-  createDocumentTools,
-  createReviewBatch,
-  createSnapshot,
-} from '@haklex/rich-agent-core';
+import type { LLMProvider } from '@haklex/rich-agent-core';
+import { createAgentStore, createDirectTransport, createProvider } from '@haklex/rich-agent-core';
 import { getVariantClass } from '@haklex/rich-editor';
 import { blockIdState } from '@haklex/rich-editor/plugins';
 import { AgentPanelPlugin, DiffReviewOverlayPlugin, useAgentLoop } from '@haklex/rich-ext-ai-agent';
@@ -22,26 +17,29 @@ import {
   type LexicalNode,
   type SerializedEditorState,
 } from 'lexical';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useTheme } from '../context/ThemeContext';
-import { createClaudeProvider } from '../providers/claude-provider';
-import { createOpenAIProvider } from '../providers/openai-provider';
+
+interface DemoProviderConfig {
+  apiKey: string;
+  baseUrl: string;
+  id: string;
+  models: string[];
+  name: string;
+  type: 'claude' | 'openai-compatible';
+}
 
 const STORAGE_KEY_PROVIDERS = 'agent-providers';
 const STORAGE_KEY_MODEL = 'agent-selected-model';
 
-function loadProviders(): ProviderConfig[] {
+function loadProviders(): DemoProviderConfig[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY_PROVIDERS);
     return raw ? JSON.parse(raw) : [];
   } catch {
     return [];
   }
-}
-
-function saveProviders(providers: ProviderConfig[]) {
-  localStorage.setItem(STORAGE_KEY_PROVIDERS, JSON.stringify(providers));
 }
 
 function loadSelectedModel(): SelectedModel | null {
@@ -146,38 +144,40 @@ function $findBlockByBlockId(blockId: string): LexicalNode | null {
 
 function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentStore> }) {
   const theme = useTheme();
-  const [providers, setProviders] = useState<ProviderConfig[]>(loadProviders);
+  const [providers] = useState<DemoProviderConfig[]>(loadProviders);
   const [selectedModel, setSelectedModel] = useState<SelectedModel | null>(loadSelectedModel);
 
-  const [provider, setProvider] = useState<LLMProvider | null>(null);
   const agentLoopRef = useRef<ReturnType<typeof useAgentLoop> | null>(null);
   const editorRef = useRef<LexicalEditor | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  useEffect(() => {
-    if (!selectedModel) {
-      setProvider(null);
-      return;
-    }
+  const provider = useMemo(() => {
+    if (!selectedModel) return null;
     const providerConfig = providers.find((p) => p.id === selectedModel.providerId);
-    if (!providerConfig) {
-      setProvider(null);
-      return;
-    }
-    const opts = {
-      model: selectedModel.modelId,
+    if (!providerConfig) return null;
+    const transport = createDirectTransport({
       apiKey: providerConfig.apiKey,
       baseUrl: providerConfig.baseUrl,
-    };
-    setProvider(
-      providerConfig.type === 'claude' ? createClaudeProvider(opts) : createOpenAIProvider(opts),
-    );
+      providerType: providerConfig.type,
+    });
+    return createProvider({
+      model: selectedModel.modelId,
+      transport,
+      providerType: providerConfig.type,
+    });
   }, [selectedModel, providers]);
 
-  function handleProvidersChange(next: ProviderConfig[]) {
-    setProviders(next);
-    saveProviders(next);
-  }
+  const providerGroups: ProviderGroup[] = useMemo(() => {
+    return providers.map((p) => ({
+      id: p.id,
+      name: p.name,
+      providerType: p.type,
+      models: p.models.map((modelId) => ({
+        id: modelId,
+        displayName: modelId,
+      })),
+    }));
+  }, [providers]);
 
   function handleSelectModel(selected: SelectedModel) {
     setSelectedModel(selected);
@@ -209,38 +209,6 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
       handleSend(lastUserBubble.content);
     }
   }, [store, handleSend]);
-
-  const handleRetryToolCall = useCallback(
-    async (toolName: string, params: Record<string, unknown>) => {
-      const editor = editorRef.current;
-      if (!editor) return;
-
-      const serialized = editor.getEditorState().toJSON() as SerializedEditorState;
-      const snapshot = createSnapshot(serialized);
-      const operations: AgentOperation[] = [];
-      const tools = createDocumentTools(snapshot, operations);
-      const tool = tools.find((t) => t.name === toolName);
-      if (!tool) return;
-
-      store.getState().addBubble({ type: 'tool_call', toolName, params });
-      const result = await tool.execute(params);
-      const content = result.ok ? result.content : JSON.stringify(result.error);
-      store.getState().addBubble({
-        type: 'tool_result',
-        toolName,
-        success: result.ok,
-        summary: content,
-      });
-
-      if (operations.length > 0) {
-        const revision = store.getState().reviewState?.documentRevision ?? 0;
-        const batch = createReviewBatch(operations, serialized, revision);
-        store.getState().addReviewBatch(batch);
-        store.getState().addBubble({ type: 'diff_review', batchId: batch.id });
-      }
-    },
-    [store],
-  );
 
   const handleAcceptBatch = useCallback(
     (batchId: string) => {
@@ -310,15 +278,13 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
       <div className="agent-pane-chat" data-theme={theme}>
         <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
           <ChatPanel
-            providers={providers}
+            providerGroups={providerGroups}
             selectedModel={selectedModel}
             store={store}
             onAbort={handleAbort}
             onAcceptBatch={handleAcceptBatch}
-            onProvidersChange={handleProvidersChange}
             onRejectBatch={handleRejectBatch}
             onRetry={handleRetry}
-            onRetryToolCall={handleRetryToolCall}
             onSelectModel={handleSelectModel}
             onSend={handleSend}
           />
