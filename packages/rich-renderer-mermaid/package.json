@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-mermaid",
-  "version": "0.0.95",
+  "version": "0.0.97",
   "description": "Mermaid diagram renderer",
   "repository": {
     "type": "git",
