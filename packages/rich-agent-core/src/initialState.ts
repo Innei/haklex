@@ -49,10 +49,10 @@ export type AgentStoreState = {
   reviewState: ReviewState | null;
 };
 
-export function createInitialAgentStoreState(): AgentStoreState {
+export function createInitialAgentStoreState(initialBubbles?: ChatBubble[]): AgentStoreState {
   return {
     status: 'idle',
-    bubbles: [],
+    bubbles: initialBubbles ?? [],
     diffState: null,
     reviewState: null,
   };
