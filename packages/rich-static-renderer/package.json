@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-static-renderer",
-  "version": "0.0.97",
+  "version": "0.0.98",
   "description": "Headless SSR engine for Lexical rich content",
   "repository": {
     "type": "git",
