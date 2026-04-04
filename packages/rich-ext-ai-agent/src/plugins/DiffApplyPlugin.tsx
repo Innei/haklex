@@ -1,17 +1,29 @@
 import type { AgentStore } from '@haklex/rich-agent-core';
-import { blockIdState } from '@haklex/rich-editor/plugins';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getRoot, $getState, $parseSerializedNode, type LexicalNode } from 'lexical';
+import { $getRoot, $parseSerializedNode, type LexicalEditor, type LexicalNode } from 'lexical';
 import { useEffect } from 'react';
 
-function $findBlockByBlockId(blockId: string): LexicalNode | null {
+import { getSanitizedOperationNode } from './sanitize-operation-node';
+
+function getRenderedBlockId(editor: LexicalEditor, node: LexicalNode): string | null {
+  return editor.getElementByKey(node.getKey())?.getAttribute('data-block-id') ?? null;
+}
+
+function $findBlockByBlockId(editor: LexicalEditor, blockId: string): LexicalNode | null {
   const root = $getRoot();
   for (const child of root.getChildren()) {
-    if ($getState(child, blockIdState) === blockId) {
+    if (getRenderedBlockId(editor, child) === blockId) {
       return child;
     }
   }
   return null;
+}
+
+function preserveBlockState(target: LexicalNode, nextNode: LexicalNode) {
+  const currentState = (target.getLatest() as any).__state;
+  if (currentState) {
+    (nextNode as any).__state = currentState;
+  }
 }
 
 export function DiffApplyPlugin({ store }: { store: AgentStore }) {
@@ -36,8 +48,9 @@ export function DiffApplyPlugin({ store }: { store: AgentStore }) {
           const { op } = entry;
 
           if (op.op === 'insert') {
-            if (!op.node?.type) continue;
-            const newNode = $parseSerializedNode(op.node);
+            const serializedNode = getSanitizedOperationNode(op);
+            if (!serializedNode) continue;
+            const newNode = $parseSerializedNode(serializedNode);
 
             if (op.position.type === 'root') {
               const idx = op.position.index ?? root.getChildrenSize();
@@ -48,7 +61,7 @@ export function DiffApplyPlugin({ store }: { store: AgentStore }) {
                 children[idx].insertBefore(newNode);
               }
             } else {
-              const target = $findBlockByBlockId(op.position.blockId);
+              const target = $findBlockByBlockId(editor, op.position.blockId);
               if (!target) continue;
               if (op.position.type === 'after') {
                 target.insertAfter(newNode);
@@ -57,13 +70,15 @@ export function DiffApplyPlugin({ store }: { store: AgentStore }) {
               }
             }
           } else if (op.op === 'replace') {
-            if (!op.node?.type) continue;
-            const target = $findBlockByBlockId(op.blockId);
+            const serializedNode = getSanitizedOperationNode(op);
+            if (!serializedNode) continue;
+            const target = $findBlockByBlockId(editor, op.blockId);
             if (!target) continue;
-            const newNode = $parseSerializedNode(op.node);
+            const newNode = $parseSerializedNode(serializedNode);
+            preserveBlockState(target, newNode);
             target.replace(newNode);
           } else if (op.op === 'delete') {
-            const target = $findBlockByBlockId(op.blockId);
+            const target = $findBlockByBlockId(editor, op.blockId);
             if (!target) continue;
             target.remove();
           }

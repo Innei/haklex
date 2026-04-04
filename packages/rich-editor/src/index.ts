@@ -30,6 +30,7 @@ export {
   useRendererMode,
   useVariant,
 } from './context/RendererConfigContext';
+export { blockIdState } from './plugins/BlockIdPlugin';
 export * from './styles';
 export type { RichEditorProps, RichEditorVariant } from './types';
 export type { RendererConfig } from './types/renderer-config';

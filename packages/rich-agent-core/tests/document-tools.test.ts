@@ -120,7 +120,7 @@ describe('createDocumentTools', () => {
     expect(operations[0].op).toBe('replace');
   });
 
-  it('replace_node preserves original blockId', async () => {
+  it('replace_node preserves original blockId on the primary replacement node', async () => {
     const { snapshot, operations } = makeSnapshot();
     const tools = createDocumentTools(snapshot, operations);
     const replaceTool = tools.find((t) => t.name === 'replace_node')!;
@@ -131,6 +131,21 @@ describe('createDocumentTools', () => {
     });
 
     expect((operations[0] as any).node.$?.blockId).toBe('p1');
+  });
+
+  it('replace_node keeps the original blockId as the anchor for trailing inserts', async () => {
+    const { snapshot, operations } = makeSnapshot();
+    const tools = createDocumentTools(snapshot, operations);
+    const replaceTool = tools.find((t) => t.name === 'replace_node')!;
+
+    await replaceTool.execute({
+      blockId: 'p1',
+      xml: '<p>New first block</p><p>Trailing block</p>',
+    });
+
+    expect(operations).toHaveLength(2);
+    expect((operations[0] as any).node.$?.blockId).toBe('p1');
+    expect((operations[1] as any).position).toEqual({ type: 'after', blockId: 'p1' });
   });
 
   it('delete_node with valid blockId adds operation', async () => {

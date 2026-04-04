@@ -89,6 +89,29 @@ describe('applyOpsToSnapshot', () => {
     expect(children[0].children[0].text).toBe('World');
     expect(children[1].children[0].text).toBe('New');
   });
+
+  it('keeps replace anchors stable for a following insert-after op', () => {
+    const ops: AgentOperation[] = [
+      {
+        op: 'replace',
+        blockId: 'b1',
+        node: makeParagraph('Replaced', 'b1') as any,
+      },
+      {
+        op: 'insert',
+        position: { type: 'after', blockId: 'b1' },
+        node: makeParagraph('Trailing', 'n1') as any,
+      },
+    ];
+
+    const result = applyOpsToSnapshot(base, ops);
+    const children = (result.root as any).children;
+
+    expect(children).toHaveLength(3);
+    expect(children[0].children[0].text).toBe('Replaced');
+    expect(children[1].children[0].text).toBe('Trailing');
+    expect(children[0].$?.blockId).toBe('b1');
+  });
 });
 
 describe('createReviewBatch', () => {

@@ -1,6 +1,5 @@
 import type { AgentStore } from '@haklex/rich-agent-core';
 import { decorateSubtree, diffMergedNode } from '@haklex/rich-diff-core';
-import { blockIdState } from '@haklex/rich-editor/plugins';
 import {
   useColorScheme,
   useExtraNodes,
@@ -9,7 +8,13 @@ import {
 } from '@haklex/rich-editor/static';
 import { RichRenderer } from '@haklex/rich-static-renderer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getRoot, $getState, $parseSerializedNode, type SerializedLexicalNode } from 'lexical';
+import {
+  $getRoot,
+  $parseSerializedNode,
+  type LexicalEditor,
+  type LexicalNode,
+  type SerializedLexicalNode,
+} from 'lexical';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -31,6 +36,7 @@ import {
   overlayContainer,
   rendererFrame,
 } from './diff-review-overlay.css';
+import { getSanitizedOperationNode } from './sanitize-operation-node';
 
 const INSERT_GAP = 8;
 const DELETE_BG = 'color-mix(in srgb, var(--rc-alert-caution) 7%, transparent)';
@@ -53,14 +59,25 @@ function wrapDoc(nodes: SerializedLexicalNode[]) {
   };
 }
 
-function $findBlockByBlockId(blockId: string) {
+function getRenderedBlockId(editor: LexicalEditor, node: LexicalNode): string | null {
+  return editor.getElementByKey(node.getKey())?.getAttribute('data-block-id') ?? null;
+}
+
+function $findBlockByBlockId(editor: LexicalEditor, blockId: string) {
   const root = $getRoot();
   for (const child of root.getChildren()) {
-    if ($getState(child, blockIdState) === blockId) {
+    if (getRenderedBlockId(editor, child) === blockId) {
       return child;
     }
   }
   return null;
+}
+
+function preserveBlockState(target: LexicalNode, nextNode: LexicalNode) {
+  const currentState = (target.getLatest() as any).__state;
+  if (currentState) {
+    (nextNode as any).__state = currentState;
+  }
 }
 
 type OverlayEntry = {
@@ -219,15 +236,16 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
         const root = $getRoot();
 
         if (op.op === 'insert') {
-          if (!op.node?.type) return;
-          const newNode = $parseSerializedNode(op.node);
+          const serializedNode = getSanitizedOperationNode(op);
+          if (!serializedNode) return;
+          const newNode = $parseSerializedNode(serializedNode);
           if (op.position.type === 'root') {
             const idx = op.position.index ?? root.getChildrenSize();
             const children = root.getChildren();
             if (idx >= children.length) root.append(newNode);
             else children[idx].insertBefore(newNode);
           } else {
-            const target = $findBlockByBlockId(op.position.blockId);
+            const target = $findBlockByBlockId(editor, op.position.blockId);
             if (!target) return;
             if (op.position.type === 'after') target.insertAfter(newNode);
             else target.insertBefore(newNode);
@@ -236,15 +254,18 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
         }
 
         if (op.op === 'replace') {
-          if (!op.node?.type) return;
-          const target = $findBlockByBlockId(op.blockId);
+          const serializedNode = getSanitizedOperationNode(op);
+          if (!serializedNode) return;
+          const target = $findBlockByBlockId(editor, op.blockId);
           if (!target) return;
-          target.replace($parseSerializedNode(op.node));
+          const newNode = $parseSerializedNode(serializedNode);
+          preserveBlockState(target, newNode);
+          target.replace(newNode);
           return;
         }
 
         if (op.op === 'delete') {
-          const target = $findBlockByBlockId(op.blockId);
+          const target = $findBlockByBlockId(editor, op.blockId);
           if (!target) return;
           target.remove();
         }
@@ -405,7 +426,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
             if (entry.anchorBeforeId) {
               const beforeChild = children.find(
-                (child) => $getState(child, blockIdState) === entry.anchorBeforeId,
+                (child) => getRenderedBlockId(editor, child) === entry.anchorBeforeId,
               );
               if (!beforeChild) continue;
               const domEl = editor.getElementByKey(beforeChild.getKey());
@@ -428,7 +449,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
             if (entry.anchorAfterId) {
               const afterChild = children.find(
-                (child) => $getState(child, blockIdState) === entry.anchorAfterId,
+                (child) => getRenderedBlockId(editor, child) === entry.anchorAfterId,
               );
               if (!afterChild) continue;
               const domEl = editor.getElementByKey(afterChild.getKey());
@@ -454,7 +475,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           const blockId = entry.targetBlockId;
           if (!blockId) continue;
 
-          const child = children.find((item) => $getState(item, blockIdState) === blockId);
+          const child = children.find((item) => getRenderedBlockId(editor, item) === blockId);
           if (!child) continue;
           const domEl = editor.getElementByKey(child.getKey());
           if (!domEl) continue;
