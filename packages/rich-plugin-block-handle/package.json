@@ -27,6 +27,7 @@
     "@lexical/code-core": "^0.42.0"
   },
   "devDependencies": {
+    "@lexical/html": "^0.42.0",
     "@lexical/list": "^0.42.0",
     "@lexical/react": "^0.42.0",
     "@lexical/rich-text": "^0.42.0",
@@ -44,6 +45,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@lexical/html": "^0.42.0",
     "@lexical/list": "^0.42.0",
     "@lexical/react": "^0.42.0",
     "@lexical/rich-text": "^0.42.0",

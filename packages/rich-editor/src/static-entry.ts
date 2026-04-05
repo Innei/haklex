@@ -49,4 +49,5 @@ export { editorTheme } from './styles/theme';
 export type { RichEditorVariant } from './types';
 export type { RendererConfig } from './types/renderer-config';
 export { extractTextContent } from './utils/extractTextContent';
+export { normalizeSerializedEditorState } from './utils/normalizeSerializedEditorState';
 export { articleTheme, commentTheme, noteTheme, vars } from '@haklex/rich-style-token/styles';

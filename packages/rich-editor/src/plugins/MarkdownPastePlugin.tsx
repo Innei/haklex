@@ -147,6 +147,9 @@ export function MarkdownPastePlugin() {
 
         // debugPastePayload(event as Event, clipboardData)
 
+        // Preserve Lexical-native copy/paste before any markdown heuristics.
+        if (clipboardData.getData('application/x-lexical-editor')) return false;
+
         // Image files → let ImageUploadPlugin handle
         if (Array.from(clipboardData.files).some((f) => f.type.startsWith('image/'))) return false;
 

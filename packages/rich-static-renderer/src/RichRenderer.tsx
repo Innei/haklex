@@ -7,6 +7,7 @@ import {
   gridClassNames,
   gridStyles,
   NestedContentRendererProvider,
+  normalizeSerializedEditorState,
   RendererConfigProvider,
   semanticClassNames,
   sharedStyles,
@@ -162,13 +163,14 @@ function renderEditorToReact(
   });
 
   const editorConfig: EditorConfig = { namespace: 'ssr', theme: editorTheme };
+  const normalizedValue = normalizeSerializedEditorState(value);
 
-  const editorState = editor.parseEditorState(value);
+  const editorState = editor.parseEditorState(normalizedValue);
   editor.setEditorState(editorState);
 
-  const footnoteData = preprocessFootnotes(value);
+  const footnoteData = preprocessFootnotes(normalizedValue);
 
-  const rawRootChildren = (value as any).root?.children as any[] | undefined;
+  const rawRootChildren = (normalizedValue as any).root?.children as any[] | undefined;
 
   let content: ReactNode = null;
   editorState.read(() => {
@@ -203,10 +205,11 @@ function renderEditorToReact(
       namespace: 'ssr-nested',
       theme: editorTheme,
     };
-    const nestedState = nestedEditor.parseEditorState(state);
+    const normalizedState = normalizeSerializedEditorState(state);
+    const nestedState = nestedEditor.parseEditorState(normalizedState);
     nestedEditor.setEditorState(nestedState);
     let nested: ReactNode = null;
-    const nestedRawChildren = (state as any).root?.children as any[] | undefined;
+    const nestedRawChildren = (normalizedState as any).root?.children as any[] | undefined;
     nestedState.read(() => {
       const root = $getRoot();
       const headingSlugs = new Map<string, number>();
