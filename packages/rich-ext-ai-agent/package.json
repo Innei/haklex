@@ -27,6 +27,7 @@
     "@haklex/rich-diff-core": "workspace:*",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-litexml": "workspace:*",
     "@haklex/rich-static-renderer": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "lucide-react": "^1.0.0"

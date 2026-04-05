@@ -4,6 +4,8 @@ import {
   BaseSystemRoleProvider,
   BaseSystemRootProvider,
   buildDocumentContext,
+  type CapturedSelection,
+  type CapturedTextSelection,
   type ChatMessage,
   type MessageEngineContext,
   MessagesEngine,
@@ -11,6 +13,7 @@ import {
   type PageSelection,
   type PreparedMessages,
 } from '@haklex/rich-agent-core';
+import { createDefaultRegistry, serializeNodesToXml } from '@haklex/rich-litexml';
 import type { SerializedEditorState } from 'lexical';
 
 import defaultSystemRoleMarkdown from './prompts/default-system-role.md?raw';
@@ -57,6 +60,17 @@ ${selection.xml}
   return `<user_selections count="${selections.length}">
 ${formattedSelections}
 </user_selections>`;
+}
+
+function formatTextSelection(selection: CapturedTextSelection): string {
+  return `<text_selection>
+<selected_text>${selection.text}</selected_text>
+<anchor blockId="${selection.anchorBlockId}" offset="${selection.anchorOffset}" />
+<focus blockId="${selection.focusBlockId}" offset="${selection.focusOffset}" />
+<containing_blocks>
+${selection.containingBlocksXml}
+</containing_blocks>
+</text_selection>`;
 }
 
 function formatPageContentContext(context: PageContentContext): string {
@@ -132,6 +146,21 @@ class PageSelectionsInjector extends BaseEveryUserContentProvider {
   }
 }
 
+class TextSelectionInjector extends BaseLastUserContentProvider {
+  protected buildContent(context: MessageEngineContext) {
+    const textSelection = context.textSelection;
+    if (!textSelection) return null;
+
+    const formatted = formatTextSelection(textSelection);
+    if (!formatted) return null;
+
+    return {
+      content: formatted,
+      contextType: 'text_selection',
+    };
+  }
+}
+
 class PageEditorContextInjector extends BaseLastUserContentProvider {
   protected buildContent(context: MessageEngineContext) {
     const pageContentContext = resolvePageContentContext(context);
@@ -147,12 +176,54 @@ class PageEditorContextInjector extends BaseLastUserContentProvider {
   }
 }
 
+function buildTextSelectionContext(
+  editorState: SerializedEditorState,
+  selection: Extract<CapturedSelection, { type: 'text' }>,
+): CapturedTextSelection {
+  const root = editorState.root as any;
+  const children: any[] = root.children ?? [];
+
+  const blockIds = new Set<string>([selection.anchorBlockId, selection.focusBlockId]);
+
+  if (selection.anchorBlockId !== selection.focusBlockId) {
+    let inRange = false;
+    for (const child of children) {
+      const blockId = child.$?.blockId;
+      if (blockId === selection.anchorBlockId || blockId === selection.focusBlockId) {
+        blockIds.add(blockId);
+        if (inRange) break;
+        inRange = true;
+      } else if (inRange && blockId) {
+        blockIds.add(blockId);
+      }
+    }
+  }
+
+  const containingNodes = children.filter((child) => {
+    const blockId = child.$?.blockId;
+    return blockId && blockIds.has(blockId);
+  });
+
+  const registry = createDefaultRegistry();
+  const containingBlocksXml = serializeNodesToXml(containingNodes, registry, { compact: true });
+
+  return {
+    text: selection.text,
+    anchorBlockId: selection.anchorBlockId,
+    anchorOffset: selection.anchorOffset,
+    focusBlockId: selection.focusBlockId,
+    focusOffset: selection.focusOffset,
+    containingBlocksXml,
+  };
+}
+
 export class AgentMessagesEngine extends MessagesEngine {
   constructor(options: AgentMessagesEngineOptions = {}) {
     super([
       new DefaultSystemRoleInjector(normalizeSystemMessages(options.systemMessages)),
       new DocumentToolSystemInjector(options.toolSystemRole ?? defaultDocumentToolSystemRole),
       new PageSelectionsInjector(),
+      new TextSelectionInjector(),
       new PageEditorContextInjector(),
     ]);
   }
@@ -161,6 +232,7 @@ export class AgentMessagesEngine extends MessagesEngine {
     editorState: SerializedEditorState;
     userInput: string;
     title?: string;
+    selection?: CapturedSelection | null;
   }): PreparedMessages {
     const userMessage: Extract<ChatMessage, { role: 'user' }> = {
       role: 'user',
@@ -168,12 +240,25 @@ export class AgentMessagesEngine extends MessagesEngine {
       cacheBreakpoint: true,
     };
 
+    const selectedBlockIds =
+      params.selection?.type === 'block' ? new Set(params.selection.blockIds) : undefined;
+
+    const textSelection =
+      params.selection?.type === 'text'
+        ? buildTextSelectionContext(params.editorState, params.selection)
+        : undefined;
+
     return this.process({
       messages: [userMessage],
       pageContentContext: {
         metadata: { title: params.title ?? 'Current Document' },
-        xml: buildDocumentContext(params.editorState, { mode: 'full', compact: true }),
+        xml: buildDocumentContext(params.editorState, {
+          mode: 'full',
+          compact: true,
+          selectedBlockIds,
+        }),
       },
+      textSelection,
     });
   }
 }

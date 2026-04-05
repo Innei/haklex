@@ -548,6 +548,9 @@ importers:
       '@haklex/rich-editor-ui':
         specifier: workspace:*
         version: link:../rich-editor-ui
+      '@haklex/rich-litexml':
+        specifier: workspace:*
+        version: link:../rich-litexml
       '@haklex/rich-static-renderer':
         specifier: workspace:*
         version: link:../rich-static-renderer
