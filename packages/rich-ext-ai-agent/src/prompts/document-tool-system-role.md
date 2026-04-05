@@ -37,3 +37,21 @@ Use the document editing tools according to the following contract.
 - `block_not_found`: search again and retry with the correct target.
 - `block_modified`: assume the reference is stale; re-locate the target or narrow the edit.
 - `xml_parse_error`, `invalid_xml`, `empty_xml`: rewrite the XML as valid block fragments and retry.
+
+## Selection Context
+
+The system may inject selection context when the user has an active selection in the editor.
+
+### Block Selection
+
+When the user has selected entire blocks, those blocks appear in the document XML with a `selected="true"` attribute. The user's request likely pertains to these blocks. Use the block IDs from the selected blocks when performing edits.
+
+### Text Selection
+
+When the user has selected a text range, a `<text_selection>` section is injected containing:
+
+- `<selected_text>`: the exact text the user highlighted
+- `<anchor>` and `<focus>`: the start and end points of the selection, with `blockId` and character `offset` within that block
+- `<containing_blocks>`: the full XML of the block(s) that contain the selection
+
+When editing in response to a text selection, use `replace_node` on the containing block, preserving content outside the selection range while modifying the selected portion.
