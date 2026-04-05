@@ -283,10 +283,60 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       const pendingEntries = batch.entries.filter((e) => e.status === 'pending');
       for (const entry of pendingEntries) {
         store.getState().acceptReviewEntry(batchId, entry.id);
-        applyEntryOp(entry.op);
       }
+
+      editor.update(() => {
+        const root = $getRoot();
+        const lastInserted = new Map<string, LexicalNode>();
+
+        for (const entry of pendingEntries) {
+          const { op } = entry;
+
+          if (op.op === 'insert') {
+            const serializedNode = getSanitizedOperationNode(op);
+            if (!serializedNode) continue;
+            const newNode = $parseSerializedNode(serializedNode);
+            if (op.position.type === 'root') {
+              const idx = op.position.index ?? root.getChildrenSize();
+              const children = root.getChildren();
+              if (idx >= children.length) root.append(newNode);
+              else children[idx].insertBefore(newNode);
+            } else {
+              const anchorKey = `${op.position.type}:${op.position.blockId}`;
+              const prev = lastInserted.get(anchorKey);
+              if (prev) {
+                prev.insertAfter(newNode);
+              } else {
+                const target = $findBlockByBlockId(editor, op.position.blockId);
+                if (!target) continue;
+                if (op.position.type === 'after') target.insertAfter(newNode);
+                else target.insertBefore(newNode);
+              }
+              lastInserted.set(anchorKey, newNode);
+            }
+            continue;
+          }
+
+          if (op.op === 'replace') {
+            const serializedNode = getSanitizedOperationNode(op);
+            if (!serializedNode) continue;
+            const target = $findBlockByBlockId(editor, op.blockId);
+            if (!target) continue;
+            const newNode = $parseSerializedNode(serializedNode);
+            preserveBlockState(target, newNode);
+            target.replace(newNode);
+            continue;
+          }
+
+          if (op.op === 'delete') {
+            const target = $findBlockByBlockId(editor, op.blockId);
+            if (!target) continue;
+            target.remove();
+          }
+        }
+      });
     },
-    [store, applyEntryOp],
+    [store, editor],
   );
 
   const handleRejectAllBatch = useCallback(
