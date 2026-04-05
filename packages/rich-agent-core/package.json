@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-agent-core",
-  "version": "0.0.100",
+  "version": "0.0.101",
   "description": "Headless AI agent protocol, diff engine, and store for Lexical editor",
   "repository": {
     "type": "git",
