@@ -107,9 +107,87 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
       let hasThinking = false;
       let thinkingId = '';
       const toolCalls: Array<{ id: string; name: string; arguments: string }> = [];
+      // Mid-stream tool execution: create group lazily on first tool_call chunk,
+      // then append + execute each tool as it arrives so diffs surface immediately
+      // instead of only after the full assistant turn completes.
+      let streamGroupId: string | null = null;
+      const streamToolTurns: ChatMessage[] = [];
+      // Assistant bubble is created lazily so a tool_call_group inserted
+      // mid-stream doesn't get clobbered by subsequent updateLastBubble calls.
+      let assistantBubbleOpen = false;
+
+      const runToolCallMidStream = async (tc: { id: string; name: string; arguments: string }) => {
+        // Finalize any open assistant text bubble before inserting the tool group,
+        // so subsequent text chunks will start a fresh assistant bubble below the group.
+        if (assistantBubbleOpen) {
+          updateLastBubble({ type: 'assistant', content: textAccum, streaming: false });
+          assistantBubbleOpen = false;
+          textAccum = '';
+        }
+
+        if (!streamGroupId) {
+          streamGroupId = nextGroupId();
+          addBubble({ type: 'tool_call_group', id: streamGroupId, items: [] });
+          setStatus('calling_tool');
+        }
+
+        let params: Record<string, unknown>;
+        let parseError: string | null = null;
+        try {
+          params = JSON.parse(tc.arguments);
+        } catch (e) {
+          params = {};
+          parseError = (e as Error).message;
+        }
+
+        const { addToolCallItem, updateToolCallItem } = store.getState();
+        addToolCallItem(streamGroupId, {
+          id: tc.id,
+          toolName: tc.name,
+          description: describeToolCall(toolMap.get(tc.name), params),
+          params,
+          status: parseError ? 'error' : 'running',
+          startedAt: Date.now(),
+          ...(parseError
+            ? { error: `JSON parse error: ${parseError}`, finishedAt: Date.now() }
+            : {}),
+        });
+
+        if (parseError) {
+          streamToolTurns.push({
+            role: 'tool_result',
+            toolCallId: tc.id,
+            content: `JSON parse error: ${parseError}`,
+            isError: true,
+          });
+          return;
+        }
+
+        const result = await executeTool(tc.name, tc.arguments);
+        const content = result.ok ? result.content : JSON.stringify(result.error);
+
+        updateToolCallItem(streamGroupId, tc.id, {
+          status: result.ok ? 'completed' : 'error',
+          result: result.ok ? result.content : undefined,
+          resultPreview: result.ok ? result.content.slice(0, 80) : undefined,
+          error: !result.ok ? content : undefined,
+          finishedAt: Date.now(),
+        });
+
+        streamToolTurns.push({
+          role: 'tool_result',
+          toolCallId: tc.id,
+          content,
+          isError: !result.ok,
+        });
+
+        if (operations.length > lastOpsLength) {
+          lastOpsLength = operations.length;
+          onOperationsChanged?.(operations);
+        }
+      };
 
       setStatus('thinking');
-      addBubble({ type: 'assistant', content: '', streaming: true });
 
       for await (const chunk of provider.chat(messages, toolSchemas)) {
         signal?.throwIfAborted();
@@ -119,7 +197,7 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
           if (!hasThinking) {
             hasThinking = true;
             thinkingId = nextThinkingId();
-            updateLastBubble({
+            addBubble({
               type: 'thinking',
               content: chunk.text,
               id: thinkingId,
@@ -141,25 +219,29 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
         }
 
         if (chunk.type === 'text') {
-          if (hasThinking && textAccum === '') {
+          if (!assistantBubbleOpen) {
             addBubble({ type: 'assistant', content: chunk.text, streaming: true });
+            assistantBubbleOpen = true;
+            textAccum = chunk.text;
             setStatus('writing');
-          } else if (textAccum === '') {
-            setStatus('writing');
-            updateLastBubble({ type: 'assistant', content: chunk.text, streaming: true });
           } else {
+            textAccum += chunk.text;
             updateLastBubble({
               type: 'assistant',
-              content: textAccum + chunk.text,
+              content: textAccum,
               streaming: true,
             });
           }
-          textAccum += chunk.text;
           continue;
         }
 
         if (chunk.type === 'tool_call') {
           toolCalls.push({ id: chunk.id, name: chunk.name, arguments: chunk.arguments });
+          await runToolCallMidStream({
+            id: chunk.id,
+            name: chunk.name,
+            arguments: chunk.arguments,
+          });
         }
       }
 
@@ -182,96 +264,16 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
         }
       }
 
-      updateLastBubble({ type: 'assistant', content: textAccum, streaming: false });
+      if (assistantBubbleOpen) {
+        updateLastBubble({ type: 'assistant', content: textAccum, streaming: false });
+        assistantBubbleOpen = false;
+      }
 
       if (toolCalls.length === 0) break;
 
+      // Tools were executed mid-stream above; just wire the turns for the next LLM call.
       turns.push({ role: 'assistant_tool_call', toolCalls });
-
-      setStatus('calling_tool');
-
-      const groupId = nextGroupId();
-      const items: Array<{
-        id: string;
-        toolName: string;
-        description?: string;
-        params: Record<string, unknown>;
-        status: 'pending' | 'running' | 'completed' | 'error';
-        result?: string;
-        resultPreview?: string;
-        error?: string;
-        startedAt?: number;
-        finishedAt?: number;
-      }> = [];
-
-      for (const tc of toolCalls) {
-        let params: Record<string, unknown>;
-        try {
-          params = JSON.parse(tc.arguments);
-        } catch {
-          params = {};
-        }
-        items.push({
-          id: tc.id,
-          toolName: tc.name,
-          description: describeToolCall(toolMap.get(tc.name), params),
-          params,
-          status: 'pending',
-        });
-      }
-
-      addBubble({ type: 'tool_call_group', id: groupId, items });
-
-      const { updateToolCallItem } = store.getState();
-
-      for (let i = 0; i < toolCalls.length; i++) {
-        const tc = toolCalls[i];
-
-        updateToolCallItem(groupId, tc.id, {
-          status: 'running',
-          startedAt: Date.now(),
-        });
-
-        try {
-          JSON.parse(tc.arguments);
-        } catch (e) {
-          updateToolCallItem(groupId, tc.id, {
-            status: 'error',
-            error: `JSON parse error: ${(e as Error).message}`,
-            finishedAt: Date.now(),
-          });
-          turns.push({
-            role: 'tool_result',
-            toolCallId: tc.id,
-            content: `JSON parse error: ${(e as Error).message}`,
-            isError: true,
-          });
-          continue;
-        }
-
-        const result = await executeTool(tc.name, tc.arguments);
-        const content = result.ok ? result.content : JSON.stringify(result.error);
-
-        updateToolCallItem(groupId, tc.id, {
-          status: result.ok ? 'completed' : 'error',
-          result: result.ok ? result.content : undefined,
-          resultPreview: result.ok ? result.content.slice(0, 80) : undefined,
-          error: !result.ok ? content : undefined,
-          finishedAt: Date.now(),
-        });
-
-        turns.push({
-          role: 'tool_result',
-          toolCallId: tc.id,
-          content,
-          isError: !result.ok,
-        });
-
-        if (operations.length > lastOpsLength) {
-          lastOpsLength = operations.length;
-          onOperationsChanged?.(operations);
-        }
-      }
+      for (const t of streamToolTurns) turns.push(t);
     }
 
     setStatus('done');

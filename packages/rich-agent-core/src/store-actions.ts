@@ -39,6 +39,7 @@ export type AgentStoreActionMethods = {
     itemId: string,
     patch: Partial<import('./initialState').ToolCallGroupItem>,
   ) => void;
+  addToolCallItem: (groupId: string, item: import('./initialState').ToolCallGroupItem) => void;
 };
 
 type Setter = StoreSetter<AgentStoreShape & AgentStoreActionMethods>;
@@ -146,6 +147,23 @@ export class AgentStoreActionImpl {
       const nextBubbles = [...state.bubbles];
       nextBubbles[idx] = { ...group, items: nextItems };
 
+      return { bubbles: nextBubbles };
+    });
+  };
+
+  addToolCallItem = (groupId: string, item: import('./initialState').ToolCallGroupItem) => {
+    this.#set((state) => {
+      const idx = state.bubbles.findIndex((b) => b.type === 'tool_call_group' && b.id === groupId);
+      if (idx === -1) return {};
+
+      const group = state.bubbles[idx] as Extract<
+        (typeof state.bubbles)[number],
+        { type: 'tool_call_group' }
+      >;
+      if (group.items.some((it) => it.id === item.id)) return {};
+
+      const nextBubbles = [...state.bubbles];
+      nextBubbles[idx] = { ...group, items: [...group.items, item] };
       return { bubbles: nextBubbles };
     });
   };

@@ -1,10 +1,77 @@
 import type { LLMChunk } from '../protocol';
 
+type PendingToolCall = {
+  id: string;
+  name: string;
+  arguments: string;
+  yielded: boolean;
+};
+
 export async function* parseOpenAISSE(response: Response): AsyncIterable<LLMChunk> {
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
-  const pendingToolCalls = new Map<number, { id: string; name: string; arguments: string }>();
+  const pendingToolCalls = new Map<number, PendingToolCall>();
+
+  // Detect whether a streamed JSON arguments string is structurally complete.
+  // Relying on JSON.parse alone is unsafe: empty string coerced to "{}" would
+  // parse successfully and cause tool_calls to fire with empty params before
+  // their real arguments have streamed in. Track brace/bracket depth with
+  // string-state awareness so we only yield once the top-level value closes.
+  function isBalanced(s: string): boolean {
+    if (!s) return false;
+    let depth = 0;
+    let inString = false;
+    let escape = false;
+    let sawOpen = false;
+    for (let i = 0; i < s.length; i++) {
+      const c = s[i];
+      if (escape) {
+        escape = false;
+        continue;
+      }
+      if (c === '\\') {
+        escape = true;
+        continue;
+      }
+      if (c === '"') {
+        inString = !inString;
+        continue;
+      }
+      if (inString) continue;
+      if (c === '{' || c === '[') {
+        depth++;
+        sawOpen = true;
+      } else if (c === '}' || c === ']') {
+        depth--;
+        if (sawOpen && depth === 0) return true;
+      }
+    }
+    return false;
+  }
+
+  function tryYieldReady(): LLMChunk[] {
+    const ready: LLMChunk[] = [];
+    for (const tc of pendingToolCalls.values()) {
+      if (tc.yielded) continue;
+      if (!tc.id || !tc.name) continue;
+      if (!isBalanced(tc.arguments)) continue;
+      // Final sanity parse; if it throws we keep accumulating.
+      try {
+        JSON.parse(tc.arguments);
+      } catch {
+        continue;
+      }
+      tc.yielded = true;
+      ready.push({
+        type: 'tool_call',
+        id: tc.id,
+        name: tc.name,
+        arguments: tc.arguments,
+      });
+    }
+    return ready;
+  }
 
   try {
     while (true) {
@@ -20,7 +87,13 @@ export async function* parseOpenAISSE(response: Response): AsyncIterable<LLMChun
         const data = line.slice(6).trim();
         if (data === '[DONE]') {
           for (const tc of pendingToolCalls.values()) {
-            yield { type: 'tool_call', id: tc.id, name: tc.name, arguments: tc.arguments };
+            if (tc.yielded) continue;
+            yield {
+              type: 'tool_call',
+              id: tc.id,
+              name: tc.name,
+              arguments: tc.arguments,
+            };
           }
           pendingToolCalls.clear();
           yield { type: 'done' };
@@ -49,6 +122,7 @@ export async function* parseOpenAISSE(response: Response): AsyncIterable<LLMChun
                 id: tc.id || '',
                 name: tc.function?.name || '',
                 arguments: '',
+                yielded: false,
               });
             }
             const pending = pendingToolCalls.get(idx)!;
@@ -56,14 +130,22 @@ export async function* parseOpenAISSE(response: Response): AsyncIterable<LLMChun
             if (tc.function?.name) pending.name = tc.function.name;
             if (tc.function?.arguments) pending.arguments += tc.function.arguments;
           }
+
+          for (const ready of tryYieldReady()) yield ready;
         }
 
         const finishReason = parsed.choices?.[0]?.finish_reason;
         if (finishReason === 'tool_calls') {
           for (const tc of pendingToolCalls.values()) {
-            yield { type: 'tool_call', id: tc.id, name: tc.name, arguments: tc.arguments };
+            if (tc.yielded) continue;
+            yield {
+              type: 'tool_call',
+              id: tc.id,
+              name: tc.name,
+              arguments: tc.arguments,
+            };
+            tc.yielded = true;
           }
-          pendingToolCalls.clear();
         }
       }
     }
