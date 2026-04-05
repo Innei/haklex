@@ -5,7 +5,9 @@ import { wrapWithFormatTags } from './text-format';
 import type { WriterContext, XmlContent } from './types';
 import { renderXml, type XmlRenderOptions } from './xml-utils';
 
-export type XmlSerializerOptions = XmlRenderOptions;
+export interface XmlSerializerOptions extends XmlRenderOptions {
+  selectedBlockIds?: Set<string>;
+}
 
 export function serializeToXml(
   state: SerializedEditorState,
@@ -14,9 +16,23 @@ export function serializeToXml(
 ): string {
   const root = state.root as any;
   const children: SerializedLexicalNode[] = root.children ?? [];
+  const selectedBlockIds = options.selectedBlockIds;
 
   const ctx = createWriterContext(registry);
-  const content = children.flatMap((child) => ctx.serializeNode(child));
+  const content = children.flatMap((child) => {
+    const result = ctx.serializeNode(child);
+    const items = Array.isArray(result) ? result : [result];
+
+    if (!selectedBlockIds?.size) return items;
+
+    const blockId = (child as any).$?.blockId;
+    if (!blockId || !selectedBlockIds.has(blockId)) return items;
+
+    return items.map((item): XmlContent => {
+      if (typeof item === 'string' || 'cdata' in item) return item;
+      return { ...item, attrs: { ...item.attrs, selected: 'true' } };
+    });
+  });
 
   if (options.compact) {
     return `<doc>${renderXml(content, 0, options)}</doc>`;
