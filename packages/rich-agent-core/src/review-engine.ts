@@ -83,6 +83,8 @@ export function applyOpsToSnapshot(
 ): SerializedEditorState {
   let children = cloneChildren(base.root as unknown as SerializedLexicalNode);
 
+  const insertOffset = new Map<string, number>();
+
   for (const op of ops) {
     if (op.op === 'insert') {
       if (!op.node?.type) continue;
@@ -93,8 +95,11 @@ export function applyOpsToSnapshot(
       } else {
         const idx = children.findIndex((c) => getBlockId(c) === pos.blockId);
         if (idx === -1) continue;
-        const insertIdx = pos.type === 'after' ? idx + 1 : idx;
-        children.splice(insertIdx, 0, op.node);
+        const baseIdx = pos.type === 'after' ? idx + 1 : idx;
+        const key = `${pos.type}:${pos.blockId}`;
+        const offset = insertOffset.get(key) ?? 0;
+        children.splice(baseIdx + offset, 0, op.node);
+        insertOffset.set(key, offset + 1);
       }
     } else if (op.op === 'replace') {
       if (!op.node?.type) continue;
