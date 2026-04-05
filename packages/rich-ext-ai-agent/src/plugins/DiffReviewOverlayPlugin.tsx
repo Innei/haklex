@@ -297,7 +297,10 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     }
 
     const rootEl = editor.getRootElement();
-    if (!rootEl) return;
+    if (!rootEl) {
+      setOverlays([]);
+      return;
+    }
 
     const entries: OverlayEntry[] = [];
 
@@ -399,6 +402,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   }, [editor, store]);
 
   const containerRefs = useRef(new Map<string, HTMLDivElement>());
+  const [, setContainerTick] = useState(0);
 
   useLayoutEffect(() => {
     const prevContainers = containerRefs.current;
@@ -439,6 +443,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     }
 
     containerRefs.current = nextContainers;
+    setContainerTick((t) => t + 1);
 
     return () => {
       for (const [, container] of nextContainers) {
