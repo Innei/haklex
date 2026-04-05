@@ -108,7 +108,11 @@ function renderInline(el: XmlElement): string {
     return `<${el.tag}${attrs} />`;
   }
   const inner = el.children
-    .map((c) => (typeof c === 'string' ? escapeXml(c) : renderInline(c)))
+    .map((c) => {
+      if (typeof c === 'string') return escapeXml(c);
+      if (isCdata(c)) return renderCdata(c);
+      return renderInline(c);
+    })
     .join('');
   return `<${el.tag}${attrs}>${inner}</${el.tag}>`;
 }

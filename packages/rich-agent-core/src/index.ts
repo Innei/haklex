@@ -9,7 +9,7 @@ export {
 } from './diff-engine';
 export { buildDocumentContext } from './document-context';
 export { createDocumentTools } from './document-tools';
-export type { ToolCallGroupItem, ToolCallItemStatus } from './initialState';
+export type { AgentStoreStatus, ToolCallGroupItem, ToolCallItemStatus } from './initialState';
 export { createInitialAgentStoreState } from './initialState';
 export {
   BaseEveryUserContentProvider,
