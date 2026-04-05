@@ -57,6 +57,9 @@ const BLOCK_TAGS = new Set([
   'gallery',
   'codesnippet',
   'footnotesection',
+  'grid',
+  'cell',
+  'excalidraw',
 ]);
 
 function isBlockContainer(element: Element): boolean {

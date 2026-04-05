@@ -8,6 +8,7 @@ export { serializeNodesToXml, serializeToXml } from './serializer';
 export type {
   ReaderContext,
   WriterContext,
+  XmlCdata,
   XmlContent,
   XmlElement,
   XmlReaderFn,

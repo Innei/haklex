@@ -8,8 +8,13 @@ export interface XmlElement {
   tag: string;
 }
 
-/** XML content: either a structured element or raw text (will be escaped) */
-export type XmlContent = XmlElement | string;
+/** CDATA wrapper — rendered as <![CDATA[...]]> without escaping */
+export interface XmlCdata {
+  cdata: string;
+}
+
+/** XML content: either a structured element, raw text (will be escaped), or CDATA */
+export type XmlContent = XmlElement | XmlCdata | string;
 
 /** Context provided to writer functions */
 export interface WriterContext {

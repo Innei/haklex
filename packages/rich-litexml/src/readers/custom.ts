@@ -12,6 +12,23 @@ function numAttr(el: Element, name: string): number | undefined {
   return v !== null ? Number(v) : undefined;
 }
 
+/**
+ * Extract CDATA text content from an element.
+ * linkedom (HTML parser) converts <![CDATA[...]]> to a comment node
+ * with value "[CDATA[...]]", so we detect that pattern.
+ */
+function extractCdataText(el: Element): string {
+  for (const child of el.childNodes) {
+    if (child.nodeType === 8 /* COMMENT_NODE */) {
+      const val = child.nodeValue ?? '';
+      if (val.startsWith('[CDATA[') && val.endsWith(']]')) {
+        return val.slice(7, -2);
+      }
+    }
+  }
+  return el.textContent?.trim() ?? '';
+}
+
 export function registerCustomReaders(registry: LitexmlRegistry): void {
   // -- Pattern A: simple attributes --
 
@@ -316,6 +333,62 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       version: 1,
     } as any;
   });
+
+  // -- Excalidraw: opaque snapshot preserved --
+
+  registry.registerReader(
+    'excalidraw',
+    (el) =>
+      ({
+        type: 'excalidraw',
+        ...extractBlockId(el),
+        snapshot: extractCdataText(el) || el.getAttribute('snapshot') || '',
+        version: 1,
+      }) as any,
+  );
+
+  // -- Grid container: cols + gap + nested cell states --
+
+  registry.registerReader('grid', (el, ctx) => {
+    const cells: SerializedEditorState[] = [];
+    for (const child of el.children) {
+      if (child.tagName.toLowerCase() === 'cell') {
+        const children = ctx.parseChildren(child);
+        cells.push({
+          root: {
+            type: 'root',
+            children,
+            direction: 'ltr',
+            format: '',
+            indent: 0,
+            version: 1,
+          },
+        } as SerializedEditorState);
+      }
+    }
+    return {
+      type: 'grid-container',
+      ...extractBlockId(el),
+      cols: numAttr(el, 'cols') ?? 2,
+      gap: el.getAttribute('gap') ?? '16px',
+      cells,
+      version: 1,
+    } as any;
+  });
+
+  // -- Agent diff: editing marker --
+
+  registry.registerReader(
+    'agentdiff',
+    (el) =>
+      ({
+        type: 'agent-diff',
+        ...extractBlockId(el),
+        opType: el.getAttribute('op') ?? 'insert',
+        diffEntryId: el.getAttribute('entry') ?? '',
+        version: 1,
+      }) as any,
+  );
 
   registry.registerReader('codesnippet', (el) => {
     const files: Array<{ filename: string; code: string; language: string }> = [];

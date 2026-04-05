@@ -135,8 +135,53 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
     };
   });
 
-  // grid-container: complex nested cell states, use fallback
-  // excalidraw: binary snapshot data, use fallback
+  // -- Excalidraw: preserve snapshot as opaque attribute for round-trip --
+
+  registry.registerWriter('excalidraw', (node) => {
+    const n = node as any;
+    if (!n.snapshot) {
+      return {
+        tag: 'excalidraw',
+        attrs: optAttr(blockId(n)),
+        selfClosing: true,
+      };
+    }
+    return {
+      tag: 'excalidraw',
+      attrs: optAttr(blockId(n)),
+      children: [{ cdata: n.snapshot }],
+    };
+  });
+
+  // -- Grid container: cols + gap + cells as nested editor states --
+
+  registry.registerWriter('grid-container', (node, ctx) => {
+    const n = node as any;
+    const cells: XmlElement[] = (n.cells ?? []).map((cellState: any) => ({
+      tag: 'cell',
+      children: ctx.serializeNestedState(cellState),
+    }));
+    return {
+      tag: 'grid',
+      attrs: optAttr({
+        ...blockId(n),
+        cols: n.cols != null ? String(n.cols) : undefined,
+        gap: n.gap,
+      }),
+      children: cells,
+    };
+  });
+
+  // -- Agent diff: editing marker --
+
+  registry.registerWriter('agent-diff', (node) => {
+    const n = node as any;
+    return {
+      tag: 'agentdiff',
+      attrs: optAttr({ ...blockId(n), op: n.opType, entry: n.diffEntryId }),
+      selfClosing: true,
+    };
+  });
 
   // -- Pattern D: element with children --
 

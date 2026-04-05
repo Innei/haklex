@@ -1,4 +1,4 @@
-import type { XmlContent, XmlElement } from './types';
+import type { XmlCdata, XmlContent, XmlElement } from './types';
 
 export interface XmlRenderOptions {
   compact?: boolean;
@@ -23,6 +23,14 @@ export function buildAttrs(attrs: Record<string, string>): string {
   return parts.join('');
 }
 
+function isCdata(item: XmlContent): item is XmlCdata {
+  return typeof item === 'object' && 'cdata' in item;
+}
+
+function renderCdata(item: XmlCdata): string {
+  return `<![CDATA[${item.cdata}]]>`;
+}
+
 /** Render XmlContent tree to XML string. */
 export function renderXml(
   content: XmlContent[],
@@ -33,6 +41,8 @@ export function renderXml(
   for (const item of content) {
     if (typeof item === 'string') {
       lines.push(escapeXml(item));
+    } else if (isCdata(item)) {
+      lines.push(renderCdata(item));
     } else {
       lines.push(renderElement(item, indent, options));
     }
@@ -52,12 +62,18 @@ function renderElement(el: XmlElement, indent: number, options: XmlRenderOptions
     return compact ? `<${el.tag}${attrs} />` : `${pad(indent)}<${el.tag}${attrs} />\n`;
   }
 
-  // Check if all children are inline (strings or inline elements)
-  const allInline = el.children.every((c) => typeof c === 'string' || isInlineElement(c));
+  // Check if all children are inline (strings, CDATA, or inline elements)
+  const allInline = el.children.every(
+    (c) => typeof c === 'string' || isCdata(c) || isInlineElement(c),
+  );
 
   if (allInline) {
     const inner = el.children
-      .map((c) => (typeof c === 'string' ? escapeXml(c) : renderInline(c)))
+      .map((c) => {
+        if (typeof c === 'string') return escapeXml(c);
+        if (isCdata(c)) return renderCdata(c);
+        return renderInline(c);
+      })
       .join('');
     return compact
       ? `<${el.tag}${attrs}>${inner}</${el.tag}>`
@@ -67,7 +83,11 @@ function renderElement(el: XmlElement, indent: number, options: XmlRenderOptions
   // Block children: each on its own line with indent
   if (compact) {
     const inner = el.children
-      .map((c) => (typeof c === 'string' ? escapeXml(c) : renderElement(c, indent + 1, options)))
+      .map((c) => {
+        if (typeof c === 'string') return escapeXml(c);
+        if (isCdata(c)) return renderCdata(c);
+        return renderElement(c, indent + 1, options);
+      })
       .join('');
     return `<${el.tag}${attrs}>${inner}</${el.tag}>`;
   }
@@ -75,6 +95,7 @@ function renderElement(el: XmlElement, indent: number, options: XmlRenderOptions
   const inner = el.children
     .map((c) => {
       if (typeof c === 'string') return `${pad(indent + 1)}${escapeXml(c)}\n`;
+      if (isCdata(c)) return `${pad(indent + 1)}${renderCdata(c)}\n`;
       return renderElement(c, indent + 1, options);
     })
     .join('');
