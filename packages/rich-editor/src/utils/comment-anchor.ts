@@ -53,7 +53,7 @@ function computeBlockFingerprint(block: ElementNode): string {
   return (hash >>> 0).toString(16);
 }
 
-function $getRootBlock(node: LexicalNode): ElementNode | null {
+export function $getRootBlock(node: LexicalNode): ElementNode | null {
   const root = $getRoot();
   let current: LexicalNode | null = node;
   while (current) {
@@ -66,7 +66,7 @@ function $getRootBlock(node: LexicalNode): ElementNode | null {
   return null;
 }
 
-function $resolveSelectionPoint(
+export function $resolveSelectionPoint(
   selection: RangeSelection,
   which: 'anchor' | 'focus',
 ): { node: LexicalNode; offset: number } {
@@ -88,7 +88,7 @@ function $resolveSelectionPoint(
   return { node, offset: point.offset };
 }
 
-function $getTextOffsetInBlock(
+export function $getTextOffsetInBlock(
   block: ElementNode,
   targetNode: LexicalNode,
   targetOffset: number,

@@ -41,4 +41,10 @@ export type {
   CommentAnchor,
   RangeAnchor,
 } from './utils/comment-anchor';
-export { buildBlockAnchor, buildRangeAnchor } from './utils/comment-anchor';
+export {
+  $getRootBlock,
+  $getTextOffsetInBlock,
+  $resolveSelectionPoint,
+  buildBlockAnchor,
+  buildRangeAnchor,
+} from './utils/comment-anchor';
