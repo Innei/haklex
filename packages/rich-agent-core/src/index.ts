@@ -25,6 +25,8 @@ export {
 export type {
   AgentToolConfig,
   AgentToolResult,
+  CapturedSelection,
+  CapturedTextSelection,
   ChatMessage,
   DocumentContextOptions,
   LLMChunk,

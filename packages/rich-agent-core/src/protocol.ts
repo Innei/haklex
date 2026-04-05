@@ -52,6 +52,7 @@ export type AgentToolConfig = {
 export type DocumentContextOptions = {
   compact?: boolean;
   mode: 'full' | 'structure' | 'selection-window';
+  selectedBlockIds?: Set<string>;
   windowSize?: number;
 };
 
@@ -59,6 +60,26 @@ export type PageSelection = {
   xml: string;
   startLine?: number;
   endLine?: number;
+};
+
+export type CapturedSelection =
+  | { type: 'block'; blockIds: string[] }
+  | {
+      type: 'text';
+      text: string;
+      anchorBlockId: string;
+      anchorOffset: number;
+      focusBlockId: string;
+      focusOffset: number;
+    };
+
+export type CapturedTextSelection = {
+  text: string;
+  anchorBlockId: string;
+  anchorOffset: number;
+  focusBlockId: string;
+  focusOffset: number;
+  containingBlocksXml: string;
 };
 
 export type UserMessageMetadata = {
@@ -93,6 +114,7 @@ export type MessageEngineContext = {
   pageContentContext?: PageContentContext;
   initialContext?: MessageEngineInitialContext;
   stepContext?: MessageEngineStepContext;
+  textSelection?: CapturedTextSelection;
 };
 
 export type MessageDraft = {
