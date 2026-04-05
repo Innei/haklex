@@ -1,5 +1,5 @@
 import type { AgentStore } from '@haklex/rich-agent-core';
-import { decorateSubtree, diffMergedNode } from '@haklex/rich-diff-core';
+import { decorateSubtree, diffModifiedNode } from '@haklex/rich-diff-core';
 import {
   useColorScheme,
   useExtraNodes,
@@ -23,22 +23,19 @@ import {
   batchHeader,
   batchHeaderAccept,
   batchHeaderActions,
-  batchHeaderLabel,
   batchHeaderReject,
   batchPanel,
+  diffContainer,
   floatingBar,
   floatingBarAccept,
   floatingBarLabel,
   floatingBarReject,
-  mergedBlock,
   newBlock,
   oldBlock,
-  overlayContainer,
   rendererFrame,
 } from './diff-review-overlay.css';
 import { getSanitizedOperationNode } from './sanitize-operation-node';
 
-const INSERT_GAP = 8;
 const DELETE_BG = 'color-mix(in srgb, var(--rc-alert-caution) 7%, transparent)';
 const DELETE_BORDER = '2px solid var(--rc-alert-caution)';
 
@@ -85,13 +82,9 @@ type OverlayEntry = {
   batchId: string;
   type: 'insert' | 'delete' | 'replace';
   blockEl: HTMLElement | null;
-  blockTop: number;
-  blockHeight: number;
-  previewTop?: number;
   oldNode?: SerializedLexicalNode;
   newNode?: SerializedLexicalNode;
-  mergedNode?: SerializedLexicalNode;
-  spacing: 'none' | 'before' | 'after' | 'overlay';
+  spacing: 'none' | 'before' | 'after';
 };
 
 function applyDeleteDecorations(entry: OverlayEntry) {
@@ -110,9 +103,6 @@ function resetBlockDecorations(entry: OverlayEntry) {
   entry.blockEl.style.textDecoration = '';
   entry.blockEl.style.textDecorationColor = '';
   entry.blockEl.style.opacity = '';
-  entry.blockEl.style.visibility = '';
-  entry.blockEl.style.marginTop = '';
-  entry.blockEl.style.marginBottom = '';
 }
 
 function InlineEntryPanel({
@@ -124,7 +114,6 @@ function InlineEntryPanel({
   variant,
   onAcceptEntry,
   onRejectEntry,
-  previewRefCallback,
 }: {
   entry: OverlayEntry;
   batchId: string;
@@ -134,16 +123,10 @@ function InlineEntryPanel({
   variant: ReturnType<typeof useVariant>;
   onAcceptEntry: (batchId: string, entryId: string) => void;
   onRejectEntry: (batchId: string, entryId: string) => void;
-  previewRefCallback: (id: string) => (el: HTMLDivElement | null) => void;
 }): ReactElement {
   return (
-    <div
-      className={batchPanel}
-      ref={previewRefCallback(entry.id)}
-      style={{ top: entry.previewTop }}
-    >
+    <div className={batchPanel}>
       <div className={batchHeader}>
-        <span className={batchHeaderLabel} />
         <div className={batchHeaderActions}>
           <button
             className={batchHeaderReject}
@@ -161,48 +144,34 @@ function InlineEntryPanel({
           </button>
         </div>
       </div>
-      {entry.mergedNode ? (
-        <div className={mergedBlock}>
-          <div className={rendererFrame}>
-            <RichRenderer
-              extraNodes={extraNodes}
-              rendererConfig={rendererConfig}
-              theme={theme}
-              value={wrapDoc([entry.mergedNode])}
-              variant={variant}
-            />
+      <>
+        {entry.oldNode && (
+          <div className={oldBlock}>
+            <div className={rendererFrame}>
+              <RichRenderer
+                extraNodes={extraNodes}
+                rendererConfig={rendererConfig}
+                theme={theme}
+                value={wrapDoc([entry.oldNode])}
+                variant={variant}
+              />
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          {entry.oldNode && (
-            <div className={oldBlock}>
-              <div className={rendererFrame}>
-                <RichRenderer
-                  extraNodes={extraNodes}
-                  rendererConfig={rendererConfig}
-                  theme={theme}
-                  value={wrapDoc([entry.oldNode])}
-                  variant={variant}
-                />
-              </div>
+        )}
+        {entry.newNode && (
+          <div className={newBlock}>
+            <div className={rendererFrame}>
+              <RichRenderer
+                extraNodes={extraNodes}
+                rendererConfig={rendererConfig}
+                theme={theme}
+                value={wrapDoc([entry.newNode])}
+                variant={variant}
+              />
             </div>
-          )}
-          {entry.newNode && (
-            <div className={newBlock}>
-              <div className={rendererFrame}>
-                <RichRenderer
-                  extraNodes={extraNodes}
-                  rendererConfig={rendererConfig}
-                  theme={theme}
-                  value={wrapDoc([entry.newNode])}
-                  variant={variant}
-                />
-              </div>
-            </div>
-          )}
-        </>
-      )}
+          </div>
+        )}
+      </>
     </div>
   );
 }
@@ -210,14 +179,10 @@ function InlineEntryPanel({
 export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): ReactElement | null {
   const [editor] = useLexicalComposerContext();
   const [overlays, setOverlays] = useState<OverlayEntry[]>([]);
-  const [containerEl, setContainerEl] = useState<HTMLElement | null>(null);
   const theme = useColorScheme();
   const variant = useVariant();
   const rendererConfig = useRendererConfig();
   const extraNodes = useExtraNodes();
-
-  const previewRefs = useRef(new Map<string, HTMLDivElement>());
-  const observerRef = useRef<ResizeObserver | null>(null);
 
   const batchGroups = useMemo(() => {
     const groups = new Map<string, OverlayEntry[]>();
@@ -316,74 +281,6 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     [store],
   );
 
-  const repositionPanels = useCallback(() => {
-    if (!containerEl) return;
-    const containerRect = containerEl.getBoundingClientRect();
-
-    // Phase 1: apply margins/visibility to blocks based on panel heights
-    for (const overlay of overlays) {
-      if (!overlay.blockEl || overlay.type === 'delete') continue;
-      const previewEl = previewRefs.current.get(overlay.id);
-      const previewHeight = previewEl?.offsetHeight ?? 0;
-
-      if (overlay.spacing === 'overlay') {
-        // Hide original block, add margin if overlay is taller
-        overlay.blockEl.style.visibility = 'hidden';
-        const heightDiff = previewHeight - overlay.blockEl.offsetHeight;
-        overlay.blockEl.style.marginBottom = heightDiff > 0 ? `${heightDiff}px` : '';
-      } else if (overlay.spacing === 'before') {
-        overlay.blockEl.style.marginTop =
-          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
-      } else if (overlay.spacing === 'after') {
-        overlay.blockEl.style.marginBottom =
-          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
-      }
-    }
-
-    // Phase 2: re-read block positions (now correct after margins) and set panel positions
-    for (const overlay of overlays) {
-      if (!overlay.blockEl || overlay.type === 'delete') continue;
-      const panelEl = previewRefs.current.get(overlay.id);
-      if (!panelEl) continue;
-
-      const blockRect = overlay.blockEl.getBoundingClientRect();
-      let newTop: number;
-      if (overlay.spacing === 'overlay') {
-        newTop = blockRect.top - containerRect.top;
-      } else if (overlay.spacing === 'after') {
-        newTop = blockRect.bottom - containerRect.top + INSERT_GAP;
-      } else {
-        newTop = blockRect.top - containerRect.top;
-      }
-      panelEl.style.top = `${newTop}px`;
-    }
-  }, [overlays, containerEl]);
-
-  useLayoutEffect(() => {
-    repositionPanels();
-  }, [repositionPanels]);
-
-  useEffect(() => {
-    const observer = new ResizeObserver(() => repositionPanels());
-    observerRef.current = observer;
-    for (const el of previewRefs.current.values()) {
-      observer.observe(el);
-    }
-    return () => observer.disconnect();
-  }, [repositionPanels]);
-
-  const previewRefCallback = useCallback(
-    (id: string) => (el: HTMLDivElement | null) => {
-      if (el) {
-        previewRefs.current.set(id, el);
-        observerRef.current?.observe(el);
-      } else {
-        previewRefs.current.delete(id);
-      }
-    },
-    [],
-  );
-
   const computeOverlays = useCallback(() => {
     const reviewState = store.getState().reviewState;
     if (!reviewState) {
@@ -402,8 +299,6 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     const rootEl = editor.getRootElement();
     if (!rootEl) return;
 
-    const container = rootEl.parentElement ?? rootEl;
-    const containerRect = container.getBoundingClientRect();
     const entries: OverlayEntry[] = [];
 
     editor.getEditorState().read(() => {
@@ -431,17 +326,13 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
               if (!beforeChild) continue;
               const domEl = editor.getElementByKey(beforeChild.getKey());
               if (!domEl) continue;
-              const rect = domEl.getBoundingClientRect();
 
               entries.push({
                 id: entry.id,
                 batchId: batch.id,
                 type: 'insert',
                 blockEl: domEl,
-                blockTop: rect.bottom - containerRect.top,
-                blockHeight: rect.height,
                 newNode: decorateSubtree(entry.op.node, 'insert'),
-                previewTop: rect.bottom - containerRect.top + INSERT_GAP,
                 spacing: 'after',
               });
               continue;
@@ -454,17 +345,13 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
               if (!afterChild) continue;
               const domEl = editor.getElementByKey(afterChild.getKey());
               if (!domEl) continue;
-              const rect = domEl.getBoundingClientRect();
 
               entries.push({
                 id: entry.id,
                 batchId: batch.id,
                 type: 'insert',
                 blockEl: domEl,
-                blockTop: rect.top - containerRect.top,
-                blockHeight: rect.height,
                 newNode: decorateSubtree(entry.op.node, 'insert'),
-                previewTop: rect.top - containerRect.top,
                 spacing: 'before',
               });
             }
@@ -479,7 +366,6 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           if (!child) continue;
           const domEl = editor.getElementByKey(child.getKey());
           if (!domEl) continue;
-          const rect = domEl.getBoundingClientRect();
 
           if (entry.op.op === 'delete') {
             entries.push({
@@ -487,8 +373,6 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
               batchId: batch.id,
               type: 'delete',
               blockEl: domEl,
-              blockTop: rect.top - containerRect.top,
-              blockHeight: rect.height,
               spacing: 'none',
             });
             continue;
@@ -496,18 +380,16 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
           const baseNode = blockMap.get(blockId);
           if (!baseNode || !entry.op.node?.type) continue;
-          const merged = diffMergedNode(baseNode, entry.op.node);
+          const modified = diffModifiedNode(baseNode, entry.op.node);
 
           entries.push({
             id: entry.id,
             batchId: batch.id,
             type: 'replace',
             blockEl: domEl,
-            blockTop: rect.top - containerRect.top,
-            blockHeight: rect.height,
-            mergedNode: merged,
-            previewTop: rect.top - containerRect.top,
-            spacing: 'overlay',
+            oldNode: modified.oldNode,
+            newNode: modified.newNode,
+            spacing: 'none',
           });
         }
       }
@@ -515,6 +397,64 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
     setOverlays(entries);
   }, [editor, store]);
+
+  const containerRefs = useRef(new Map<string, HTMLDivElement>());
+
+  useLayoutEffect(() => {
+    const prevContainers = containerRefs.current;
+    const nextContainers = new Map<string, HTMLDivElement>();
+
+    for (const [, container] of prevContainers) {
+      const hiddenBlockId = container.dataset.diffBlockId;
+      if (hiddenBlockId) {
+        const rootEl = editor.getRootElement();
+        const blockEl = rootEl?.querySelector(
+          `[data-block-id="${hiddenBlockId}"]`,
+        ) as HTMLElement | null;
+        if (blockEl) blockEl.style.display = '';
+      }
+      container.remove();
+    }
+
+    for (const entry of overlays) {
+      if (entry.type === 'delete' || !entry.blockEl) continue;
+
+      const container = document.createElement('div');
+      container.setAttribute('contenteditable', 'false');
+      container.className = diffContainer;
+      container.dataset.diffEntryId = entry.id;
+
+      if (entry.type === 'replace') {
+        const blockId = entry.blockEl.getAttribute('data-block-id');
+        if (blockId) container.dataset.diffBlockId = blockId;
+        entry.blockEl.parentNode?.insertBefore(container, entry.blockEl);
+        entry.blockEl.style.display = 'none';
+      } else if (entry.spacing === 'after') {
+        entry.blockEl.parentNode?.insertBefore(container, entry.blockEl.nextSibling);
+      } else {
+        entry.blockEl.parentNode?.insertBefore(container, entry.blockEl);
+      }
+
+      nextContainers.set(entry.id, container);
+    }
+
+    containerRefs.current = nextContainers;
+
+    return () => {
+      for (const [, container] of nextContainers) {
+        const hiddenBlockId = container.dataset.diffBlockId;
+        if (hiddenBlockId) {
+          const rootEl = editor.getRootElement();
+          const blockEl = rootEl?.querySelector(
+            `[data-block-id="${hiddenBlockId}"]`,
+          ) as HTMLElement | null;
+          if (blockEl) blockEl.style.display = '';
+        }
+        container.remove();
+      }
+      containerRefs.current = new Map();
+    };
+  }, [overlays, editor]);
 
   useEffect(() => {
     for (const overlay of overlays) {
@@ -532,17 +472,6 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   }, [overlays]);
 
   useEffect(() => {
-    const rootEl = editor.getRootElement();
-    if (rootEl) {
-      const wrapper = rootEl.parentElement;
-      if (wrapper) {
-        wrapper.style.position = 'relative';
-        setContainerEl(wrapper);
-      }
-    }
-  }, [editor]);
-
-  useEffect(() => {
     const unsub = store.subscribe(() => computeOverlays());
     return unsub;
   }, [computeOverlays, store]);
@@ -558,31 +487,35 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
   const pendingCount = overlays.length;
 
-  if (!containerEl || overlays.length === 0) return null;
+  const portals: ReactElement[] = [];
 
-  return createPortal(
-    <div className={overlayContainer}>
-      {Array.from(batchGroups.entries()).map(([batchId, entries]) =>
-        entries.map((entry) => {
-          if (entry.previewTop == null) return null;
-          return (
-            <InlineEntryPanel
-              batchId={batchId}
-              entry={entry}
-              extraNodes={extraNodes}
-              key={entry.id}
-              previewRefCallback={previewRefCallback}
-              rendererConfig={rendererConfig}
-              theme={theme}
-              variant={variant}
-              onAcceptEntry={handleAcceptEntry}
-              onRejectEntry={handleRejectEntry}
-            />
-          );
-        }),
-      )}
-      {pendingCount > 1 && (
-        <div className={floatingBar}>
+  for (const entry of overlays) {
+    if (entry.type === 'delete') continue;
+    const container = containerRefs.current.get(entry.id);
+    if (!container) continue;
+
+    portals.push(
+      createPortal(
+        <InlineEntryPanel
+          batchId={entry.batchId}
+          entry={entry}
+          extraNodes={extraNodes}
+          key={entry.id}
+          rendererConfig={rendererConfig}
+          theme={theme}
+          variant={variant}
+          onAcceptEntry={handleAcceptEntry}
+          onRejectEntry={handleRejectEntry}
+        />,
+        container,
+      ),
+    );
+  }
+
+  if (pendingCount > 1) {
+    portals.push(
+      createPortal(
+        <div className={floatingBar} key="__floating-bar__">
           <span className={floatingBarLabel}>{pendingCount} changes</span>
           {Array.from(batchGroups.keys()).map((batchId) => (
             <span key={batchId}>
@@ -602,9 +535,13 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
               </button>
             </span>
           ))}
-        </div>
-      )}
-    </div>,
-    containerEl,
-  );
+        </div>,
+        document.body,
+      ),
+    );
+  }
+
+  if (portals.length === 0) return null;
+
+  return <>{portals}</>;
 }
