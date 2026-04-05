@@ -148,6 +148,7 @@ globalStyle(`${note(sharedStyles.headingH6)} + *`, {
 
 // ─── Blockquote (sticky-note style) ─────────────────────
 globalStyle(note(sharedStyles.quote), {
+  fontFamily: vars.typography.fontFamilyKai,
   fontStyle: 'normal',
   lineHeight: '1.75',
   color: `color-mix(in srgb, ${vars.color.accent} 60%, ${vars.color.text})`,

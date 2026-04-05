@@ -420,7 +420,6 @@ export const quote = style({
   margin: `${vars.spacing.md} 0`,
   padding: `${vars.spacing.sm} ${vars.spacing.md}`,
   paddingLeft: `calc(${vars.spacing.md} + ${quoteBarWidth}px)`,
-  fontFamily: vars.typography.fontFamilyKai,
   fontStyle: 'normal',
   color: vars.color.textSecondary,
   borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
