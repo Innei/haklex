@@ -27,29 +27,31 @@ Change `replace` operations from inline merged diff to a Git-style unified split
 
 `diffModifiedNode` already exists in `@haklex/rich-diff-core` and produces exactly the paired output needed. It delegates to `diffNodeInline` for char-level diff with `diffTextByChar`, then decorates changed text segments with `DELETE_MARK_STYLE` / `INSERT_MARK_STYLE`.
 
-### 2. Document-flow DOM injection (replace wrapper)
+### 2. Document-flow DOM injection (sibling container)
 
 **Current**: All overlay panels use `position: absolute` inside a portal container, with `repositionPanels()` + `ResizeObserver` manually calculating positions and adding margin compensation.
 
-**New**: For `replace` entries, inject a **wrapper div** into the DOM that participates in document flow:
+**New**: For `replace` entries, inject a **sibling container** before the block element. The block element is **not reparented** — it stays as a direct child of the Lexical root to preserve Lexical's DOM ownership.
 
 1. Find `blockEl` (the original Lexical block DOM element)
-2. Create a wrapper div via `document.createElement`
-3. `blockEl.parentNode.insertBefore(wrapper, blockEl)` — insert wrapper before blockEl
-4. `wrapper.appendChild(blockEl)` — move blockEl inside wrapper
-5. Render diff panel (header + oldBlock + newBlock) into wrapper via `createPortal`, before blockEl
-6. Hide blockEl: `height: 0; overflow: hidden; visibility: hidden`
-7. On review completion: move blockEl back to its original position, remove wrapper
+2. Create a container div via `document.createElement`, mark it `contenteditable="false"`
+3. `blockEl.parentNode.insertBefore(container, blockEl)` — insert container as sibling before blockEl
+4. Render diff panel (header + oldBlock + newBlock) into the container via `createPortal`
+5. Hide blockEl: `display: none` (Lexical still owns it in the DOM tree — it's just not visible)
+6. On review completion: remove the container, restore blockEl visibility
+
+**Why not reparent blockEl into a wrapper?** Lexical expects to own the DOM tree under `contentEditable`. Moving a block element to a foreign parent breaks Lexical's reconciliation — it may recreate the node, corrupt selection, or fight the wrapper during the next `editor.update()`. By keeping blockEl in place (just hidden) and inserting a non-editable sibling, we avoid all of these risks.
 
 **Benefits**:
 
 - Panel height naturally participates in document flow — no manual position calculation
 - No risk of overlapping subsequent content
 - No `ResizeObserver` or `repositionPanels` needed for replace entries
+- Lexical's DOM ownership preserved — no reconciliation conflicts
 
 ### 3. Insert entries — also document-flow
 
-Insert entries follow the same pattern: create a container div, insert it as a sibling before/after the anchor block, and portal the new block preview into it. No absolute positioning.
+Insert entries follow the same pattern: create a container div (marked `contenteditable="false"`), insert it as a sibling before/after the anchor block, and portal the new block preview into it. No absolute positioning.
 
 ### 4. Delete entries — unchanged
 
@@ -58,6 +60,12 @@ Delete entries keep the current behavior: direct DOM decoration on the existing 
 ### 5. FloatingBar positioning
 
 The floating "Accept All / Reject All" bar is currently rendered inside `overlayContainer`. With the container removed, the FloatingBar needs a new home. It should be rendered as a `position: fixed` element (bottom of viewport) or portaled to `document.body`, since it's not tied to any specific block. Its show/hide logic (appears when `pendingCount > 1`) remains unchanged.
+
+### 6. Undo/redo safety
+
+Injected sibling containers hold refs to `blockEl`. If the user triggers undo/redo, Lexical may replace or remove block DOM elements. The `computeOverlays` function is already called on every `editor.registerUpdateListener` callback — on each update, all injected containers are torn down and rebuilt from the current DOM state. This "full teardown + rebuild" approach guarantees no stale refs survive an undo/redo cycle.
+
+Additionally, the `oldBlock` row's line-through style is applied by the CSS class on the container, **not** as an inline style on serialized text nodes. This avoids double-strikethrough with the char-level `DELETE_MARK_STYLE` from `compute-diff.ts`. The char-level marks only add background-color highlighting; the row-level container adds the strikethrough.
 
 ### 7. Code to remove
 
@@ -107,22 +115,24 @@ DiffReviewOverlayPlugin
 │   └── replace → diffModifiedNode → { oldNode, newNode }
 │   └── insert → decorateSubtree → { newNode }
 │   └── delete → { blockEl only }
-├── useEffect: DOM wrapper injection / cleanup
-│   └── replace: wrap blockEl, hide it, portal diff panel
-│   └── insert: insert sibling container, portal new block
+├── useEffect: DOM sibling injection / cleanup (full teardown + rebuild on each update)
+│   └── replace: insert sibling container before blockEl, hide blockEl (display: none), portal diff panel
+│   └── insert: insert sibling container before/after anchor block, portal new block preview
 │   └── delete: applyDeleteDecorations (unchanged)
-├── InlineEntryPanel (rendered into wrapper via portal)
-│   ├── header (Reject / Accept)
-│   ├── oldBlock (RichRenderer with oldNode)
-│   └── newBlock (RichRenderer with newNode)
-└── FloatingBar (Accept All / Reject All — sticky bottom, unchanged)
+│   └── cleanup: remove all injected containers, restore blockEl visibility
+├── InlineEntryPanel (rendered into sibling container via portal)
+│   ├── header (Reject / Accept) — contenteditable="false"
+│   ├── oldBlock (RichRenderer with oldNode) — line-through via CSS class, char highlights via inline style
+│   └── newBlock (RichRenderer with newNode) — char highlights via inline style
+└── FloatingBar (Accept All / Reject All — position: fixed or portal to body)
 ```
 
 ## Lifecycle
 
 1. Agent produces operations → review state populated
 2. `computeOverlays` reads review state, computes `OverlayEntry[]` with diffed nodes
-3. DOM effect creates wrappers, hides original blocks, portals panels
-4. User clicks Accept → `applyEntryOp` applies the op to Lexical state, wrapper removed
-5. User clicks Reject → wrapper removed, original block restored
-6. All entries resolved → floating bar disappears
+3. DOM effect tears down any previous containers, then creates new sibling containers before each target blockEl, hides blockEls, portals panels
+4. On editor update (including undo/redo): full teardown + rebuild from step 2
+5. User clicks Accept → `applyEntryOp` applies the op to Lexical state, store updated, containers rebuilt on next cycle
+6. User clicks Reject → store updated, containers rebuilt on next cycle (blockEl restored)
+7. All entries resolved → all containers removed, floating bar disappears
