@@ -300,6 +300,9 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     if (!containerEl) return;
     const containerRect = containerEl.getBoundingClientRect();
 
+    const afterAccum = new Map<HTMLElement, number>();
+    const beforeAccum = new Map<HTMLElement, number>();
+
     for (const overlay of overlays) {
       if (!overlay.blockEl || overlay.type === 'delete') continue;
       const previewEl = previewRefs.current.get(overlay.id);
@@ -310,13 +313,18 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
         const heightDiff = previewHeight - overlay.blockEl.offsetHeight;
         overlay.blockEl.style.marginBottom = heightDiff > 0 ? `${heightDiff}px` : '';
       } else if (overlay.spacing === 'before') {
-        overlay.blockEl.style.marginTop =
-          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
+        const prev = beforeAccum.get(overlay.blockEl) ?? 0;
+        beforeAccum.set(overlay.blockEl, prev + previewHeight + INSERT_GAP);
+        overlay.blockEl.style.marginTop = `${beforeAccum.get(overlay.blockEl)!}px`;
       } else if (overlay.spacing === 'after') {
-        overlay.blockEl.style.marginBottom =
-          previewHeight > 0 ? `${previewHeight + INSERT_GAP}px` : '';
+        const prev = afterAccum.get(overlay.blockEl) ?? 0;
+        afterAccum.set(overlay.blockEl, prev + previewHeight + INSERT_GAP);
+        overlay.blockEl.style.marginBottom = `${afterAccum.get(overlay.blockEl)!}px`;
       }
     }
+
+    const afterOffset = new Map<HTMLElement, number>();
+    const beforeOffset = new Map<HTMLElement, number>();
 
     for (const overlay of overlays) {
       if (!overlay.blockEl || overlay.type === 'delete') continue;
@@ -328,9 +336,14 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       if (overlay.spacing === 'overlay') {
         newTop = blockRect.top - containerRect.top;
       } else if (overlay.spacing === 'after') {
-        newTop = blockRect.bottom - containerRect.top + INSERT_GAP;
+        const offset = afterOffset.get(overlay.blockEl) ?? 0;
+        newTop = blockRect.bottom - containerRect.top + INSERT_GAP + offset;
+        afterOffset.set(overlay.blockEl, offset + (panelEl.offsetHeight ?? 0) + INSERT_GAP);
       } else {
-        newTop = blockRect.top - containerRect.top;
+        const offset = beforeOffset.get(overlay.blockEl) ?? 0;
+        newTop =
+          blockRect.top - containerRect.top - (beforeAccum.get(overlay.blockEl) ?? 0) + offset;
+        beforeOffset.set(overlay.blockEl, offset + (panelEl.offsetHeight ?? 0) + INSERT_GAP);
       }
       panelEl.style.top = `${newTop}px`;
     }
