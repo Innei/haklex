@@ -51,6 +51,7 @@ const ExcalidrawEditorDialogContent: FC<{
   const isDirtyRef = useRef(false);
   const confirmDialogOpenRef = useRef(false);
   const initializedRef = useRef(false);
+  const stableRef = useRef(false);
   const baseRefRef = useRef(baseRef);
   const baseDataRef = useRef(baseData);
   const [storageMode, setStorageMode] = useState<'inline' | 'remote' | 'delta'>(() => {
@@ -71,7 +72,11 @@ const ExcalidrawEditorDialogContent: FC<{
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    const stableTimer = setTimeout(() => {
+      stableRef.current = true;
+    }, 500);
     return () => {
+      clearTimeout(stableTimer);
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
   }, []);
@@ -194,11 +199,10 @@ const ExcalidrawEditorDialogContent: FC<{
   const handleChange = useCallback(
     (elements: readonly any[]) => {
       if (!initializedRef.current) {
-        // Skip the first onChange fired during excalidraw mount
         initializedRef.current = true;
         return;
       }
-      // Only schedule save when there are actual drawn elements
+      if (!stableRef.current) return;
       if (elements.length === 0) return;
       if (!isDirtyRef.current) {
         isDirtyRef.current = true;
