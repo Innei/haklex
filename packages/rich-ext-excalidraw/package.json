@@ -23,7 +23,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@excalidraw/excalidraw": "0.17.0",
+    "@excalidraw/excalidraw": "0.17.6",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
