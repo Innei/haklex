@@ -8,5 +8,8 @@ export function buildDocumentContext(
   options: DocumentContextOptions,
 ): string {
   const registry = createDefaultRegistry();
-  return serializeToXml(editorState, registry, { compact: options.compact ?? true });
+  return serializeToXml(editorState, registry, {
+    compact: options.compact ?? true,
+    selectedBlockIds: options.selectedBlockIds,
+  });
 }
