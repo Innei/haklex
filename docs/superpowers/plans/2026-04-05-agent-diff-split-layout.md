@@ -12,6 +12,8 @@
 
 ---
 
+> **Note:** Tasks 1–3 modify the same two files and form a single deployable unit. Intermediate commits (Task 1 alone, Task 2 alone) will leave the package in a broken state. This is acceptable for development flow — only the final state after Task 3 needs to build cleanly. If CI runs per-commit, squash Tasks 1–3 into one commit.
+
 ### Task 1: Update CSS — remove old styles, add new minimal styles
 
 **Files:**
@@ -416,67 +418,79 @@ Delete the following from `DiffReviewOverlayPlugin`:
 
 - [ ] **Step 2: Add sibling container injection effect**
 
-Add a new `useEffect` that manages DOM sibling containers. Place it after the `computeOverlays` definition. This replaces all the old positioning logic.
+Add a new `useLayoutEffect` (not `useEffect` — must run synchronously before paint so portals can mount) that manages DOM sibling containers. Place it after the `computeOverlays` definition. This replaces all the old positioning logic.
+
+**Important:** No container reuse across overlay cycles. On every update, all containers are torn down and rebuilt fresh. This ensures correctness after undo/redo where `blockEl` may be a completely new DOM element for the same `entry.id`. Store `blockEl` ref on the container via `dataset` for safe cleanup when entries disappear.
 
 ```typescript
 const containerRefs = useRef(new Map<string, HTMLDivElement>());
 
-useEffect(() => {
+useLayoutEffect(() => {
   const prevContainers = containerRefs.current;
   const nextContainers = new Map<string, HTMLDivElement>();
+
+  for (const [, container] of prevContainers) {
+    const hiddenBlockId = container.dataset.diffBlockId;
+    if (hiddenBlockId) {
+      const rootEl = editor.getRootElement();
+      const blockEl = rootEl?.querySelector(
+        `[data-block-id="${hiddenBlockId}"]`,
+      ) as HTMLElement | null;
+      if (blockEl) blockEl.style.display = '';
+    }
+    container.remove();
+  }
 
   for (const entry of overlays) {
     if (entry.type === 'delete' || !entry.blockEl) continue;
 
-    const existing = prevContainers.get(entry.id);
-    if (existing && existing.parentNode) {
-      nextContainers.set(entry.id, existing);
-      prevContainers.delete(entry.id);
+    const container = document.createElement('div');
+    container.setAttribute('contenteditable', 'false');
+    container.className = diffContainer;
+    container.dataset.diffEntryId = entry.id;
+
+    if (entry.type === 'replace') {
+      const blockId = entry.blockEl.getAttribute('data-block-id');
+      if (blockId) container.dataset.diffBlockId = blockId;
+      entry.blockEl.parentNode?.insertBefore(container, entry.blockEl);
+      entry.blockEl.style.display = 'none';
+    } else if (entry.spacing === 'after') {
+      entry.blockEl.parentNode?.insertBefore(container, entry.blockEl.nextSibling);
     } else {
-      const container = document.createElement('div');
-      container.setAttribute('contenteditable', 'false');
-      container.className = diffContainer;
-      container.dataset.diffEntryId = entry.id;
-
-      if (entry.type === 'replace') {
-        entry.blockEl.parentNode?.insertBefore(container, entry.blockEl);
-        entry.blockEl.style.display = 'none';
-      } else if (entry.spacing === 'after') {
-        entry.blockEl.parentNode?.insertBefore(container, entry.blockEl.nextSibling);
-      } else {
-        entry.blockEl.parentNode?.insertBefore(container, entry.blockEl);
-      }
-
-      nextContainers.set(entry.id, container);
+      entry.blockEl.parentNode?.insertBefore(container, entry.blockEl);
     }
-  }
 
-  for (const [id, container] of prevContainers) {
-    const entry = overlays.find((e) => e.id === id);
-    if (entry?.blockEl) {
-      entry.blockEl.style.display = '';
-    }
-    container.remove();
+    nextContainers.set(entry.id, container);
   }
 
   containerRefs.current = nextContainers;
 
   return () => {
-    for (const [id, container] of nextContainers) {
-      const entry = overlays.find((e) => e.id === id);
-      if (entry?.blockEl) {
-        entry.blockEl.style.display = '';
+    for (const [, container] of nextContainers) {
+      const hiddenBlockId = container.dataset.diffBlockId;
+      if (hiddenBlockId) {
+        const rootEl = editor.getRootElement();
+        const blockEl = rootEl?.querySelector(
+          `[data-block-id="${hiddenBlockId}"]`,
+        ) as HTMLElement | null;
+        if (blockEl) blockEl.style.display = '';
       }
       container.remove();
     }
     containerRefs.current = new Map();
   };
-}, [overlays]);
+}, [overlays, editor]);
 ```
 
-- [ ] **Step 3: Update resetBlockDecorations — add display reset**
+Key design choices:
 
-In the `resetBlockDecorations` function, add `entry.blockEl.style.display = '';` so blocks hidden by replace entries are properly restored:
+- **`useLayoutEffect`** instead of `useEffect`: containers must exist before React renders portals into them. `useLayoutEffect` runs synchronously after DOM mutations but before paint, so `containerRefs.current` is populated when the render phase reads it.
+- **No container reuse**: always teardown all → rebuild all. After undo/redo, `blockEl` can be a different DOM element even if `entry.id` is unchanged. Full rebuild avoids stale refs.
+- **`data-block-id` on container**: cleanup uses `querySelector` to find and restore the block element, rather than relying on stale `entry.blockEl` refs from a previous `overlays` array.
+
+- [ ] **Step 3: Update resetBlockDecorations — remove unused properties**
+
+`resetBlockDecorations` is only called for `delete` entries. It should NOT touch `display` — that's managed exclusively by the container injection effect (Step 2). Remove `visibility` and margin resets (no longer used):
 
 ```typescript
 function resetBlockDecorations(entry: OverlayEntry) {
@@ -486,11 +500,10 @@ function resetBlockDecorations(entry: OverlayEntry) {
   entry.blockEl.style.textDecoration = '';
   entry.blockEl.style.textDecorationColor = '';
   entry.blockEl.style.opacity = '';
-  entry.blockEl.style.display = '';
 }
 ```
 
-Remove `visibility` and `marginTop`/`marginBottom` resets — no longer used.
+**Do not add `display` reset here.** The injection `useLayoutEffect` in Step 2 owns the `display: none` / `display: ''` lifecycle for replace entries. If `resetBlockDecorations` cleared `display`, it would fight the injection effect and flash the hidden block.
 
 - [ ] **Step 4: Update InlineEntryPanel — remove merged branch, remove positioning props**
 
@@ -572,7 +585,7 @@ function InlineEntryPanel({
 Replace the entire return block of `DiffReviewOverlayPlugin` (currently lines 561-609):
 
 ```typescript
-  const pendingCount = overlays.filter((e) => e.type !== 'delete').length;
+  const pendingCount = overlays.length;
 
   const portals: ReactElement[] = [];
 
@@ -603,7 +616,7 @@ Replace the entire return block of `DiffReviewOverlayPlugin` (currently lines 56
     portals.push(
       createPortal(
         <div className={floatingBar} key="__floating-bar__">
-          <span className={floatingBarLabel}>{overlays.length} changes</span>
+          <span className={floatingBarLabel}>{pendingCount} changes</span>
           {Array.from(batchGroups.keys()).map((batchId) => (
             <span key={batchId}>
               <button
@@ -635,15 +648,15 @@ Replace the entire return block of `DiffReviewOverlayPlugin` (currently lines 56
 
 - [ ] **Step 6: Remove unused imports**
 
-Remove from React imports: `useLayoutEffect` (no longer used).
 Remove `INSERT_GAP` constant (no longer used).
 Remove the `useEffect` that sets `containerEl` (already removed in Step 1).
+Keep `useLayoutEffect` (used by the container injection effect in Step 2).
 
 Verify final import list:
 
 ```typescript
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 ```
 
