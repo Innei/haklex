@@ -1,12 +1,23 @@
 import { vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
-export const diffContainer = style({
-  border: `1px solid color-mix(in srgb, ${vars.color.text} 10%, transparent)`,
+export const overlayContainer = style({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  pointerEvents: 'none',
+  zIndex: 10,
 });
 
 export const batchPanel = style({
+  pointerEvents: 'auto',
+  position: 'absolute',
+  left: 0,
+  right: 0,
   overflow: 'hidden',
+  border: `1px solid color-mix(in srgb, ${vars.color.text} 10%, transparent)`,
 });
 
 export const batchHeader = style({
@@ -70,7 +81,8 @@ export const newBlock = style({
 });
 
 export const floatingBar = style({
-  position: 'fixed',
+  pointerEvents: 'auto',
+  position: 'sticky',
   bottom: 0,
   left: 0,
   right: 0,
