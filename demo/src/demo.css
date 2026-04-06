@@ -57,39 +57,40 @@
 }
 
 .app-header-content {
-  max-width: 1400px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px 24px;
+  padding: 0 32px;
+  height: 56px;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 24px;
-  flex-wrap: wrap;
 }
 
-.app-title {
-  font-size: 24px;
-  font-weight: 700;
-  margin: 0 0 4px;
+.app-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
   color: var(--demo-text);
 }
 
-.app-subtitle {
-  font-size: 14px;
-  color: var(--demo-text-muted);
-  margin: 0;
+.app-logo-text {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
 }
 
 .app-nav {
   display: flex;
-  gap: 4px;
+  gap: 2px;
   align-items: center;
 }
 
 .nav-tab {
   display: inline-block;
-  padding: 8px 16px;
-  font-size: 14px;
+  padding: 6px 14px;
+  font-size: 13px;
   font-weight: 500;
   border: none;
   background: none;
@@ -112,35 +113,53 @@
 
 .nav-tab-active {
   background: var(--demo-accent-bg);
-  color: var(--demo-accent);
+  color: var(--demo-text);
   font-weight: 600;
 }
 
 .nav-tab-active:visited {
-  color: var(--demo-accent);
+  color: var(--demo-text);
 }
 
-.nav-divider {
-  width: 1px;
-  height: 20px;
-  background: var(--demo-border);
-  margin: 0 4px;
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-github-link {
+  font-size: 13px;
+  color: var(--demo-text-muted);
+  text-decoration: none;
+  padding: 6px 12px;
+  border: 1px solid var(--demo-border);
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+.nav-github-link:hover {
+  color: var(--demo-text);
+  border-color: var(--demo-text-muted);
 }
 
 .nav-theme-toggle {
-  padding: 6px 10px;
-  font-size: 16px;
+  width: 32px;
+  height: 32px;
   border: 1px solid var(--demo-border);
   border-radius: 6px;
-  background: var(--demo-surface);
-  color: var(--demo-text);
+  background: transparent;
+  color: var(--demo-text-muted);
   cursor: pointer;
-  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
+  transition: all 0.15s;
 }
 
 .nav-theme-toggle:hover {
   background: var(--demo-hover);
+  color: var(--demo-text);
 }
 
 .app-main {
@@ -148,7 +167,7 @@
   display: flex;
   flex-direction: column;
   overflow: visible;
-  max-width: 1400px;
+  max-width: 1200px;
   width: 100%;
   margin: 0 auto;
   padding: 24px;
@@ -900,6 +919,9 @@
   .app-header-content {
     flex-direction: column;
     align-items: flex-start;
+    height: auto;
+    padding: 12px 24px;
+    gap: 8px;
   }
 
   .presets-layout {

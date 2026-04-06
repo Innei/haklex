@@ -9,6 +9,7 @@ import { Monitor, Moon, Sun } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 
+import { Logo } from './components/Logo';
 import { ThemeContext } from './context/ThemeContext';
 import { AgentPage } from './pages/AgentPage';
 import { BizPage } from './pages/BizPage';
@@ -21,13 +22,10 @@ import { PresetsPage } from './pages/PresetsPage';
 type ThemeMode = 'system' | 'light' | 'dark';
 
 const navItems = [
-  { path: '/editor', label: 'Editor' },
-  { path: '/comments', label: 'Comments' },
-  { path: '/nodes', label: 'Node Showcase' },
-  { path: '/presets', label: 'Presets' },
-  { path: '/biz', label: 'Biz' },
-  { path: '/agent', label: 'AI Agent' },
-  { path: '/design', label: 'Design System' },
+  { path: '/', label: 'Playground' },
+  { path: '/nodes', label: 'Nodes' },
+  { path: '/extensions', label: 'Extensions' },
+  { path: '/ai', label: 'AI' },
 ] as const;
 
 function useSystemColorScheme(): ColorScheme {
@@ -70,7 +68,10 @@ function Layout() {
   const themeLabel = themeMode === 'system' ? 'System' : themeMode === 'light' ? 'Light' : 'Dark';
   const ThemeIcon = themeMode === 'system' ? Monitor : themeMode === 'light' ? Sun : Moon;
   const isActivePath = useCallback(
-    (path: string) => location.pathname === path || location.pathname.startsWith(`${path}/`),
+    (path: string) => {
+      if (path === '/') return location.pathname === '/';
+      return location.pathname === path || location.pathname.startsWith(`${path}/`);
+    },
     [location.pathname],
   );
 
@@ -119,25 +120,34 @@ function Layout() {
             style={{ left: 0, position: 'fixed', right: 0, top: 0 }}
           >
             <div className="app-header-content">
-              <div>
-                <h1 className="app-title">@haklex/rich-editor</h1>
-                <p className="app-subtitle">Lexical-based rich text editor & renderer</p>
-              </div>
+              <Link className="app-logo" to="/">
+                <Logo size={20} />
+                <span className="app-logo-text">haklex</span>
+              </Link>
               <nav className="app-nav">
                 {navItems.map((item) => (
                   <Link
+                    className={isActivePath(item.path) ? 'nav-tab nav-tab-active' : 'nav-tab'}
                     key={item.path}
                     to={item.path}
-                    className={isActivePath(item.path) ? 'nav-tab nav-tab-active' : 'nav-tab'}
                   >
                     {item.label}
                   </Link>
                 ))}
-                <div className="nav-divider" />
-                <button className="nav-theme-toggle" title={themeLabel} onClick={cycleTheme}>
-                  <ThemeIcon size={18} />
-                </button>
               </nav>
+              <div className="app-header-right">
+                <a
+                  className="nav-github-link"
+                  href="https://github.com/user/haklex"
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  GitHub
+                </a>
+                <button className="nav-theme-toggle" title={themeLabel} onClick={cycleTheme}>
+                  <ThemeIcon size={16} />
+                </button>
+              </div>
             </div>
           </header>
 
@@ -160,7 +170,7 @@ function Layout() {
               style={{
                 boxSizing: 'border-box',
                 margin: '0 auto',
-                maxWidth: '1400px',
+                maxWidth: '1200px',
                 minHeight: '100%',
                 padding: '24px',
                 width: '100%',
