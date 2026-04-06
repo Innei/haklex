@@ -1,6 +1,7 @@
 export { $captureSelection } from './captureSelection';
 export { AGENT_PIN_SELECTION_COMMAND } from './commands';
 export { AgentActionBar } from './components/AgentActionBar';
+export { AgentAskAIAction } from './components/AgentAskAIAction';
 export { useAgentLoop } from './hooks/useAgentLoop';
 export { defaultAgentSystemMessage, defaultAgentSystemRole } from './messageEngine';
 export { AgentDiffEditNode } from './nodes/AgentDiffEditNode';

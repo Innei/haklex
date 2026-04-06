@@ -4,7 +4,13 @@ import type { LLMProvider } from '@haklex/rich-agent-core';
 import { createAgentStore, createDirectTransport, createProvider } from '@haklex/rich-agent-core';
 import { getVariantClass } from '@haklex/rich-editor';
 import { blockIdState } from '@haklex/rich-editor/plugins';
-import { AgentPanelPlugin, DiffReviewOverlayPlugin, useAgentLoop } from '@haklex/rich-ext-ai-agent';
+import {
+  AgentAskAIAction,
+  AgentPanelPlugin,
+  AgentSelectionPinPlugin,
+  DiffReviewOverlayPlugin,
+  useAgentLoop,
+} from '@haklex/rich-ext-ai-agent';
 import { MentionPlatformProvider, ShiroEditor } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
@@ -271,8 +277,13 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
     <div className="agent-split">
       <div className="agent-pane-editor">
         <MentionPlatformProvider platforms={{}}>
-          <ShiroEditor header={<ToolbarPlugin />} initialValue={initialContent}>
+          <ShiroEditor
+            floatingToolbarActions={provider ? <AgentAskAIAction /> : undefined}
+            header={<ToolbarPlugin />}
+            initialValue={initialContent}
+          >
             {provider && <AgentPanelPlugin provider={provider} store={store} />}
+            {provider && <AgentSelectionPinPlugin store={store} />}
             <DiffReviewOverlayPlugin store={store} />
             <AgentLoopCapture
               editorRef={editorRef}

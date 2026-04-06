@@ -42,12 +42,15 @@ export interface ShiroEditorProps extends Omit<
   actions?: ReactNode;
   extraMentionPlatforms?: MentionPlatformDef[];
   extraNodes?: Array<Klass<LexicalNode>>;
+  /** Extra controls rendered in the floating selection toolbar (e.g. Ask AI). */
+  floatingToolbarActions?: ReactNode;
   selfHostnames?: string[];
 }
 
 export function ShiroEditor({
   extraNodes,
   actions,
+  floatingToolbarActions,
   children,
   selfHostnames,
   extraMentionPlatforms,
@@ -97,7 +100,7 @@ export function ShiroEditor({
         }
       >
         <BlockHandlePlugin />
-        <FloatingToolbarPlugin />
+        <FloatingToolbarPlugin actions={floatingToolbarActions} />
         <FloatingLinkEditorPlugin renderExtraActions={renderLinkExtraActions} />
         <ExcalidrawPlugin />
         <EmbedPlugin selfHostnames={selfHostnames} />
