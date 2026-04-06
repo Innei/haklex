@@ -15,7 +15,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@excalidraw/excalidraw": "0.17.0",
+    "@excalidraw/excalidraw": "0.17.6",
     "@haklex/rich-agent-chat": "workspace:*",
     "@haklex/rich-agent-core": "workspace:*",
     "@haklex/rich-diff": "workspace:*",
