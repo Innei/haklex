@@ -1,6 +1,10 @@
 import type { CapturedSelection } from '@haklex/rich-agent-core';
-import { $getRootBlock, $getTextOffsetInBlock, $resolveSelectionPoint } from '@haklex/rich-editor';
-import { blockIdState } from '@haklex/rich-editor/plugins';
+import {
+  $getRootBlock,
+  $getTextOffsetInBlock,
+  $resolveSelectionPoint,
+  blockIdState,
+} from '@haklex/rich-editor';
 import { $getRoot, $getSelection, $getState, $isNodeSelection, $isRangeSelection } from 'lexical';
 
 export function $captureSelection(): CapturedSelection | null {
