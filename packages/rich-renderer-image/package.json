@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-image",
-  "version": "0.0.101",
+  "version": "0.0.104",
   "description": "Image renderer with blurhash and lightbox",
   "repository": {
     "type": "git",

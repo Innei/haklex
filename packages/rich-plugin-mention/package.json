@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-mention",
-  "version": "0.0.101",
+  "version": "0.0.104",
   "description": "Mention typeahead plugin with platform selection",
   "repository": {
     "type": "git",
