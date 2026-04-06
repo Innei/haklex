@@ -1,159 +1,136 @@
-import type { RichEditorVariant } from '@haklex/rich-editor';
 import { ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro';
 import type { SerializedEditorState } from 'lexical';
 import { useCallback, useState } from 'react';
 
 import { JsonViewer } from '../components/JsonViewer';
-import { Panel } from '../components/Panel';
 import { useTheme } from '../context/ThemeContext';
 import { nodeSamples } from '../fixtures';
 
+type Filter = 'all' | 'inline' | 'block' | 'container';
+
+const variant = 'article' as const;
+
 export function NodeShowcase() {
   const theme = useTheme();
-  const [variant, setVariant] = useState<RichEditorVariant>('article');
-  const [mode, setMode] = useState<'edit' | 'readonly'>('readonly');
+  const [filter, setFilter] = useState<Filter>('all');
+  const [expandedKey, setExpandedKey] = useState<string | null>(null);
+  const [editModeKeys, setEditModeKeys] = useState<Set<string>>(new Set());
   const [liveStateByKey, setLiveStateByKey] = useState<Record<string, SerializedEditorState>>({});
+
+  const filtered =
+    filter === 'all' ? nodeSamples : nodeSamples.filter((n) => n.category === filter);
+
+  const counts = {
+    all: nodeSamples.length,
+    inline: nodeSamples.filter((n) => n.category === 'inline').length,
+    block: nodeSamples.filter((n) => n.category === 'block').length,
+    container: nodeSamples.filter((n) => n.category === 'container').length,
+  };
 
   const handleEditorChange = useCallback((key: string, state: SerializedEditorState) => {
     setLiveStateByKey((prev) => ({ ...prev, [key]: state }));
   }, []);
 
-  const inlineNodes = nodeSamples.filter((n) => n.category === 'inline');
-  const blockNodes = nodeSamples.filter((n) => n.category === 'block');
-  const containerNodes = nodeSamples.filter((n) => n.category === 'container');
+  const toggleEditMode = useCallback((key: string) => {
+    setEditModeKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }, []);
+
+  const filters: { key: Filter; label: string }[] = [
+    { key: 'all', label: 'All' },
+    { key: 'inline', label: 'Inline' },
+    { key: 'block', label: 'Block' },
+    { key: 'container', label: 'Container' },
+  ];
 
   return (
     <div className="page">
-      <div className="showcase-intro">
-        <h2>Node Showcase</h2>
-        <p>
-          All custom node types rendered individually with their DSL definitions, including Ruby
-          annotations for Japanese furigana.
+      <div className="nodes-page-header">
+        <h1 className="nodes-page-title">Nodes</h1>
+        <p className="nodes-page-desc">
+          Every custom node type in the editor — live preview, serialization, and editable toggle.
         </p>
       </div>
 
-      <div className="toolbar">
-        <div className="toolbar-group">
-          <span className="toolbar-label">Mode</span>
+      <div className="nodes-filter-bar">
+        {filters.map((f) => (
           <button
-            className={mode === 'readonly' ? 'btn btn-active' : 'btn'}
-            onClick={() => setMode('readonly')}
+            key={f.key}
+            className={
+              filter === f.key ? 'nodes-filter-pill nodes-filter-pill-active' : 'nodes-filter-pill'
+            }
+            onClick={() => setFilter(f.key)}
           >
-            Readonly
+            {f.label}
+            <span className="nodes-filter-count">{counts[f.key]}</span>
           </button>
-          <button
-            className={mode === 'edit' ? 'btn btn-active' : 'btn'}
-            onClick={() => setMode('edit')}
-          >
-            Edit
-          </button>
-        </div>
-        <div className="toolbar-group">
-          <span className="toolbar-label">Variant</span>
-          <button
-            className={variant === 'article' ? 'btn btn-active' : 'btn'}
-            onClick={() => setVariant('article')}
-          >
-            Article
-          </button>
-          <button
-            className={variant === 'comment' ? 'btn btn-active' : 'btn'}
-            onClick={() => setVariant('comment')}
-          >
-            Comment
-          </button>
-          <button
-            className={variant === 'note' ? 'btn btn-active' : 'btn'}
-            onClick={() => setVariant('note')}
-          >
-            Note
-          </button>
-        </div>
+        ))}
       </div>
 
-      {/* Inline Nodes */}
-      <section className="showcase-section">
-        <h3 className="showcase-section-title">Inline Nodes</h3>
-        <div className="showcase-grid">
-          {inlineNodes.map((sample) => (
-            <Panel badge={sample.category} key={sample.key} title={sample.label}>
-              <p className="node-description">{sample.description}</p>
-              <div className="node-render">
-                {mode === 'edit' ? (
-                  <ShiroEditor
-                    initialValue={sample.data}
-                    key={`${sample.key}-edit`}
-                    theme={theme}
-                    variant={variant}
-                    onChange={(state) => handleEditorChange(sample.key, state)}
-                  />
-                ) : (
-                  <ShiroRenderer theme={theme} value={sample.data} variant={variant} />
-                )}
-              </div>
-              <JsonViewer
-                data={mode === 'edit' ? (liveStateByKey[sample.key] ?? sample.data) : sample.data}
-              />
-            </Panel>
-          ))}
-        </div>
-      </section>
+      <div className="nodes-grid">
+        {filtered.map((sample) => {
+          const isExpanded = expandedKey === sample.key;
+          const isEdit = editModeKeys.has(sample.key);
+          const jsonData = isEdit ? (liveStateByKey[sample.key] ?? sample.data) : sample.data;
 
-      {/* Block Nodes */}
-      <section className="showcase-section">
-        <h3 className="showcase-section-title">Block Nodes</h3>
-        <div className="showcase-grid">
-          {blockNodes.map((sample) => (
-            <Panel badge={sample.category} key={sample.key} title={sample.label}>
-              <p className="node-description">{sample.description}</p>
-              <div className="node-render">
-                {mode === 'edit' ? (
-                  <ShiroEditor
-                    initialValue={sample.data}
-                    key={`${sample.key}-edit`}
-                    theme={theme}
-                    variant={variant}
-                    onChange={(state) => handleEditorChange(sample.key, state)}
-                  />
-                ) : (
-                  <ShiroRenderer theme={theme} value={sample.data} variant={variant} />
-                )}
+          return (
+            <div
+              className={`node-card${isExpanded ? ' node-card-expanded' : ''}`}
+              key={sample.key}
+              onClick={() => setExpandedKey(isExpanded ? null : sample.key)}
+            >
+              <div className="node-card-body">
+                <div className="node-card-top">
+                  <div className="node-card-name">{sample.label}</div>
+                  <span className="node-card-type">{sample.category}</span>
+                </div>
+                <div className="node-card-desc">{sample.description}</div>
+                <div className="node-card-preview">
+                  {isEdit ? (
+                    <ShiroEditor
+                      initialValue={sample.data}
+                      key={`${sample.key}-edit`}
+                      theme={theme}
+                      variant={variant}
+                      onChange={(state) => handleEditorChange(sample.key, state)}
+                    />
+                  ) : (
+                    <ShiroRenderer theme={theme} value={sample.data} variant={variant} />
+                  )}
+                </div>
               </div>
-              <JsonViewer
-                data={mode === 'edit' ? (liveStateByKey[sample.key] ?? sample.data) : sample.data}
-              />
-            </Panel>
-          ))}
-        </div>
-      </section>
 
-      {/* Container Nodes */}
-      <section className="showcase-section">
-        <h3 className="showcase-section-title">Container Nodes</h3>
-        <div className="showcase-grid">
-          {containerNodes.map((sample) => (
-            <Panel badge={sample.category} key={sample.key} title={sample.label}>
-              <p className="node-description">{sample.description}</p>
-              <div className="node-render">
-                {mode === 'edit' ? (
-                  <ShiroEditor
-                    initialValue={sample.data}
-                    key={`${sample.key}-edit`}
-                    theme={theme}
-                    variant={variant}
-                    onChange={(state) => handleEditorChange(sample.key, state)}
-                  />
-                ) : (
-                  <ShiroRenderer theme={theme} value={sample.data} variant={variant} />
-                )}
-              </div>
-              <JsonViewer
-                data={mode === 'edit' ? (liveStateByKey[sample.key] ?? sample.data) : sample.data}
-              />
-            </Panel>
-          ))}
-        </div>
-      </section>
+              {isExpanded && (
+                <div className="node-card-detail" onClick={(e) => e.stopPropagation()}>
+                  <JsonViewer data={jsonData} defaultExpanded={false} />
+                  <div className="node-detail-actions">
+                    <button
+                      className={!isEdit ? 'btn btn-active' : 'btn'}
+                      onClick={() => {
+                        if (isEdit) toggleEditMode(sample.key);
+                      }}
+                    >
+                      Readonly
+                    </button>
+                    <button
+                      className={isEdit ? 'btn btn-active' : 'btn'}
+                      onClick={() => {
+                        if (!isEdit) toggleEditMode(sample.key);
+                      }}
+                    >
+                      Editable
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
