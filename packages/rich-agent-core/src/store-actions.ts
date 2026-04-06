@@ -5,6 +5,7 @@ import {
   type ChatBubble,
   createInitialAgentStoreState,
 } from './initialState';
+import type { CapturedSelection } from './protocol';
 import {
   acceptAndRebaseBatch,
   reconcileReviewBatches,
@@ -18,6 +19,7 @@ import type { DiffState } from './types';
 type AgentStoreShape = {
   bubbles: ChatBubble[];
   diffState: DiffState | null;
+  pinnedSelection: CapturedSelection | null;
   reviewState: ReviewState | null;
   status: AgentStoreStatus;
 };
@@ -30,6 +32,8 @@ export type AgentStoreActionMethods = {
   rejectReviewBatch: (batchId: string) => void;
   rejectReviewEntry: (batchId: string, entryId: string) => void;
   reset: () => void;
+  pinSelection: (selection: CapturedSelection) => void;
+  clearPinnedSelection: () => void;
   setDiffState: (diffState: DiffState | null) => void;
   setReviewState: (state: ReviewState | null) => void;
   setStatus: (status: AgentStoreStatus) => void;
@@ -72,6 +76,14 @@ export class AgentStoreActionImpl {
 
   reset = () => {
     this.#set(createInitialAgentStoreState());
+  };
+
+  pinSelection = (selection: CapturedSelection) => {
+    this.#set({ pinnedSelection: selection });
+  };
+
+  clearPinnedSelection = () => {
+    this.#set({ pinnedSelection: null });
   };
 
   setDiffState = (diffState: DiffState | null) => {

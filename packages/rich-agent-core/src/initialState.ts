@@ -1,3 +1,4 @@
+import type { CapturedSelection } from './protocol';
 import type { ReviewState } from './review-types';
 import type { DiffState } from './types';
 
@@ -47,6 +48,7 @@ export type AgentStoreState = {
   bubbles: ChatBubble[];
   diffState: DiffState | null;
   reviewState: ReviewState | null;
+  pinnedSelection: CapturedSelection | null;
 };
 
 export function createInitialAgentStoreState(initialBubbles?: ChatBubble[]): AgentStoreState {
@@ -55,5 +57,6 @@ export function createInitialAgentStoreState(initialBubbles?: ChatBubble[]): Age
     bubbles: initialBubbles ?? [],
     diffState: null,
     reviewState: null,
+    pinnedSelection: null,
   };
 }
