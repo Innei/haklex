@@ -32,7 +32,7 @@ import {
   Underline,
   X,
 } from 'lucide-react';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -224,7 +224,13 @@ function collectThemeVarNames(contract: unknown, output: Set<CssVarName>): Set<C
 
 const THEME_VAR_NAMES = Array.from(collectThemeVarNames(vars, new Set()));
 
-export function FloatingToolbarPlugin(): ReactElement | null {
+export interface FloatingToolbarPluginProps {
+  actions?: ReactNode;
+}
+
+export function FloatingToolbarPlugin({
+  actions,
+}: FloatingToolbarPluginProps = {}): ReactElement | null {
   const [editor] = useLexicalComposerContext();
   const { className: portalClassName } = usePortalTheme();
   const portalContainer = usePortalContainer();
@@ -658,6 +664,13 @@ export function FloatingToolbarPlugin(): ReactElement | null {
 
             {/* Group 3: Color picker */}
             <ColorPicker currentColor={state.fontColor || 'inherit'} onSelect={handleColor} />
+
+            {actions && (
+              <>
+                <span className={css.separator} />
+                {actions}
+              </>
+            )}
           </div>,
           portalContainer,
         )}

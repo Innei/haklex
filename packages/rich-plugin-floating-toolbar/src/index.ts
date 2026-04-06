@@ -1,1 +1,2 @@
-export { FloatingToolbarPlugin } from './FloatingToolbarPlugin'
+export type { FloatingToolbarPluginProps } from './FloatingToolbarPlugin';
+export { FloatingToolbarPlugin } from './FloatingToolbarPlugin';
