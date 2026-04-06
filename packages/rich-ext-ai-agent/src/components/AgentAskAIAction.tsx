@@ -7,10 +7,14 @@ import { AGENT_PIN_SELECTION_COMMAND } from '../commands';
 export function AgentAskAIAction({ onPin }: { onPin?: () => void }) {
   const [editor] = useLexicalComposerContext();
 
-  const handleClick = useCallback(() => {
-    editor.dispatchCommand(AGENT_PIN_SELECTION_COMMAND, undefined);
-    onPin?.();
-  }, [editor, onPin]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      editor.dispatchCommand(AGENT_PIN_SELECTION_COMMAND, undefined);
+      onPin?.();
+    },
+    [editor, onPin],
+  );
 
   return (
     <button
@@ -29,7 +33,7 @@ export function AgentAskAIAction({ onPin }: { onPin?: () => void }) {
         color: 'inherit',
         padding: 0,
       }}
-      onClick={handleClick}
+      onMouseDown={handleMouseDown}
     >
       <Sparkles size={14} strokeWidth={2} />
     </button>
