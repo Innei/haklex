@@ -12,12 +12,9 @@ import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-
 import { Logo } from './components/Logo';
 import { ThemeContext } from './context/ThemeContext';
 import { AgentPage } from './pages/AgentPage';
-import { BizPage } from './pages/BizPage';
-import { CommentsPage } from './pages/CommentsPage';
-import { DesignPage } from './pages/DesignPage';
-import { EditorPage } from './pages/EditorPage';
+import { ExtensionsPage } from './pages/ExtensionsPage';
 import { NodeShowcase } from './pages/NodeShowcase';
-import { PresetsPage } from './pages/PresetsPage';
+import { PlaygroundPage } from './pages/PlaygroundPage';
 
 type ThemeMode = 'system' | 'light' | 'dark';
 
@@ -189,15 +186,11 @@ export const router = createBrowserRouter([
   {
     element: <Layout />,
     children: [
-      { path: '/editor', element: <EditorPage /> },
-      { path: '/comments', element: <CommentsPage /> },
+      { path: '/', element: <PlaygroundPage /> },
       { path: '/nodes', element: <NodeShowcase /> },
-      { path: '/presets', element: <PresetsPage /> },
-      { path: '/biz', element: <BizPage /> },
-      { path: '/agent', element: <AgentPage /> },
-      { path: '/design', element: <DesignPage /> },
-      { path: '/design/:section', element: <DesignPage /> },
-      { path: '*', element: <Navigate replace to="/editor" /> },
+      { path: '/extensions', element: <ExtensionsPage /> },
+      { path: '/ai', element: <AgentPage /> },
+      { path: '*', element: <Navigate replace to="/" /> },
     ],
   },
 ]);
