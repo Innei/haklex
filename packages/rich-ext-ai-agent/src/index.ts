@@ -1,8 +1,11 @@
+export { $captureSelection } from './captureSelection';
+export { AGENT_PIN_SELECTION_COMMAND } from './commands';
 export { AgentActionBar } from './components/AgentActionBar';
 export { useAgentLoop } from './hooks/useAgentLoop';
 export { defaultAgentSystemMessage, defaultAgentSystemRole } from './messageEngine';
 export { AgentDiffEditNode } from './nodes/AgentDiffEditNode';
 export { AgentPanelPlugin } from './plugins/AgentPanelPlugin';
+export { AgentSelectionPinPlugin } from './plugins/AgentSelectionPinPlugin';
 export { DiffApplyPlugin } from './plugins/DiffApplyPlugin';
 export { DiffReviewOverlayPlugin } from './plugins/DiffReviewOverlayPlugin';
 export type { AgentActionConfig } from './registry';
