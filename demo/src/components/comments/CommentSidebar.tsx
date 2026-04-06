@@ -1,6 +1,6 @@
 import { Trash2 } from 'lucide-react';
 
-import type { Comment } from '../../pages/CommentsPage';
+import type { Comment } from '../../types/comments';
 
 interface CommentSidebarProps {
   activeId: string | null;

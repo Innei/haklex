@@ -23,23 +23,7 @@ import { useTheme } from '../context/ThemeContext';
 import { presets } from '../fixtures';
 import { allExtraPlatformMeta, extraMentionPlatforms } from '../fixtures/extra-mention-platforms';
 import { initialContent } from '../fixtures/initial-content';
-
-// ── Types ──
-
-interface Comment {
-  anchor: CommentAnchor;
-  createdAt: number;
-  id: string;
-  text: string;
-}
-
-interface BlockInfo {
-  blockId: string;
-  fingerprint: string;
-  index: number;
-  textContent: string;
-  type: string;
-}
+import type { BlockInfo, Comment } from '../types/comments';
 
 interface ColorSet {
   accent: string;

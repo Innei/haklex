@@ -3,7 +3,7 @@ import { MessageSquare, Plus } from 'lucide-react';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import type { BlockInfo, Comment } from '../../pages/CommentsPage';
+import type { BlockInfo, Comment } from '../../types/comments';
 
 interface BlockCommentGutterProps {
   blockInfos: BlockInfo[];

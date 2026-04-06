@@ -4,7 +4,7 @@ import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import type { BlockInfo } from '../../pages/CommentsPage';
+import type { BlockInfo } from '../../types/comments';
 
 interface SelectionCommentPopupProps {
   blockInfos: BlockInfo[];

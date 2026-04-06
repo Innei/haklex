@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useEffect } from 'react';
 
-import type { BlockInfo, Comment } from '../../pages/CommentsPage';
+import type { BlockInfo, Comment } from '../../types/comments';
 
 interface CommentHighlighterProps {
   activeId: string | null;
