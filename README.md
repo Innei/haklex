@@ -1,14 +1,16 @@
 <div align="center">
   <img src="assets/logo.svg" alt="Haklex" width="80" height="80" />
   <h1>Haklex</h1>
-  <p>A modular rich text editor ecosystem built on <a href="https://lexical.dev/">Lexical</a>.</p>
-  <p>Editing, static rendering, and server-side parsing — all from a single schema.</p>
+  <p>An AI-agent-native rich text editor ecosystem built on <a href="https://lexical.dev/">Lexical</a>.</p>
+  <p>AI writing assistance, structured editing, static rendering, and server-side parsing — all from a single schema.</p>
 </div>
 
 ---
 
 ## Key Features
 
+- **AI Agent Integration** — Built-in AI writing agent with LiteXML serialization, diff review overlay, selection-aware context capture, and streaming document edits — the editor is designed as a human–AI collaborative surface
+- **LiteXML Bridge** — Bidirectional Lexical JSON ↔ XML serialization (`@haklex/rich-litexml`) enables LLMs to read and write structured documents through a compact, token-efficient XML format
 - **Rich Block Types** — Images, videos, code blocks, Mermaid diagrams, KaTeX math, Excalidraw whiteboards, embeds, galleries, link cards, mentions, and more
 - **Static / Edit Split** — Separate node and renderer trees for read-only display vs. full editing, enabling aggressive tree-shaking
 - **SSR-Ready** — `RichRenderer` renders Lexical JSON to React without loading the editor runtime
@@ -96,7 +98,8 @@ haklex/
 │   ├── rich-renderers-edit/      # Edit renderer aggregator
 │   ├── rich-renderer-*/          # Individual renderers (alert, banner, codeblock, image, ...)
 │   ├── rich-plugin-*/            # Editor plugins (toolbar, slash-menu, block-handle, ...)
-│   ├── rich-ext-*/               # Heavy extensions (code-snippet, embed, excalidraw, gallery, nested-doc)
+│   ├── rich-litexml/              # Lexical JSON ↔ XML serialization (LLM bridge)
+│   ├── rich-ext-*/               # Heavy extensions (ai-agent, code-snippet, embed, excalidraw, gallery, nested-doc)
 │   ├── rich-kit-shiro/           # Integration bundle for Shiroi (ShiroEditor + ShiroRenderer)
 │   ├── rich-diff/                # Diff viewer
 │   └── cm-editor/                # Shared CodeMirror 6 utilities
@@ -117,10 +120,13 @@ haklex/
 ├── @haklex/rich-static-renderer
 ├── @haklex/rich-renderers
 ├── @haklex/rich-renderers-edit
+├── @haklex/rich-ext-ai-agent (AI writing agent + diff review)
+│   └── @haklex/rich-litexml (Lexical ↔ XML bridge)
 ├── @haklex/rich-ext-{code-snippet, embed, excalidraw, gallery, nested-doc}
 ├── @haklex/rich-plugin-{block-handle, floating-toolbar, link-edit, mention, slash-menu, table, toolbar}
 └── @haklex/rich-renderer-katex
 
+@haklex/rich-litexml (standalone, also used by ai-agent)
 @haklex/rich-diff (standalone)
 ```
 
@@ -169,19 +175,21 @@ Aggregated by `@haklex/rich-renderers` (static) and `@haklex/rich-renderers-edit
 
 ### Extensions
 
-| Package                 | Description                                                       |
-| ----------------------- | ----------------------------------------------------------------- |
-| `rich-ext-code-snippet` | Multi-file tabbed code display with drag-and-drop                 |
-| `rich-ext-embed`        | URL embeds — YouTube, Twitter, Bilibili, CodeSandbox, GitHub Gist |
-| `rich-ext-excalidraw`   | Excalidraw whiteboard integration                                 |
-| `rich-ext-gallery`      | Image gallery with grid and carousel layouts                      |
-| `rich-ext-nested-doc`   | Nested document / card content blocks                             |
+| Package                 | Description                                                                                  |
+| ----------------------- | -------------------------------------------------------------------------------------------- |
+| `rich-ext-ai-agent`     | AI writing agent — chat panel, diff review overlay, selection-aware prompts, streaming edits |
+| `rich-ext-code-snippet` | Multi-file tabbed code display with drag-and-drop                                            |
+| `rich-ext-embed`        | URL embeds — YouTube, Twitter, Bilibili, CodeSandbox, GitHub Gist                            |
+| `rich-ext-excalidraw`   | Excalidraw whiteboard integration                                                            |
+| `rich-ext-gallery`      | Image gallery with grid and carousel layouts                                                 |
+| `rich-ext-nested-doc`   | Nested document / card content blocks                                                        |
 
 ### Integration & Utilities
 
 | Package                  | Description                                                                               |
 | ------------------------ | ----------------------------------------------------------------------------------------- |
 | `@haklex/rich-kit-shiro` | Pre-configured bundle — `ShiroEditor` and `ShiroRenderer` with all plugins and extensions |
+| `@haklex/rich-litexml`   | Bidirectional Lexical JSON ↔ XML serialization for LLM-friendly document I/O              |
 | `@haklex/rich-diff`      | Diff viewer for comparing two editor states                                               |
 | `@haklex/cm-editor`      | Shared CodeMirror 6 editor utilities                                                      |
 

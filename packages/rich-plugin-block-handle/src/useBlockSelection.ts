@@ -351,7 +351,7 @@ export function useBlockSelection(editor: LexicalEditor) {
     const unregCopy = editor.registerCommand(
       COPY_COMMAND,
       (event) => {
-        if (!event?.clipboardData) return false;
+        if (!event || !('clipboardData' in event) || !event.clipboardData) return false;
 
         let handled = false;
         editor.getEditorState().read(() => {
@@ -361,7 +361,7 @@ export function useBlockSelection(editor: LexicalEditor) {
           event.preventDefault();
           const clipboardData = buildBlockClipboardData(editor, nodes);
           for (const [mimeType, value] of Object.entries(clipboardData)) {
-            event.clipboardData?.setData(mimeType, value);
+            (event as ClipboardEvent).clipboardData?.setData(mimeType, value);
           }
           handled = true;
         });
@@ -374,7 +374,7 @@ export function useBlockSelection(editor: LexicalEditor) {
     const unregCut = editor.registerCommand(
       CUT_COMMAND,
       (event) => {
-        if (!event?.clipboardData) return false;
+        if (!event || !('clipboardData' in event) || !event.clipboardData) return false;
 
         let keysToDelete: string[] = [];
 
@@ -385,7 +385,7 @@ export function useBlockSelection(editor: LexicalEditor) {
           event.preventDefault();
           const clipboardData = buildBlockClipboardData(editor, nodes);
           for (const [mimeType, value] of Object.entries(clipboardData)) {
-            event.clipboardData?.setData(mimeType, value);
+            (event as ClipboardEvent).clipboardData?.setData(mimeType, value);
           }
           keysToDelete = nodes.map((node) => node.getKey());
         });

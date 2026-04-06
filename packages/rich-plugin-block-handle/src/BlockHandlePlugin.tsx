@@ -328,7 +328,7 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
   const handleAddBlock = useCallback(() => {
     if (!handle.nodeKey) return;
     editor.update(() => {
-      const node = $getNodeByKey(handle.nodeKey);
+      const node = $getNodeByKey(handle.nodeKey!);
       if (!node) return;
       const paragraph = $createParagraphNode();
       node.insertAfter(paragraph);

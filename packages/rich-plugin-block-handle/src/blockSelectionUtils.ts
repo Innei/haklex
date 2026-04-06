@@ -58,7 +58,7 @@ export function buildBlockClipboardData(
     ] as Array<new (...args: never[]) => LexicalNode>;
     const tempEditor = createEditor({
       namespace: `${namespace}-block-selection-html`,
-      nodes: registeredNodeKlasses,
+      nodes: registeredNodeKlasses as any,
       onError: (error) => {
         throw error;
       },
