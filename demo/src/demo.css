@@ -2,17 +2,17 @@
 
 /* ── Tokens ── */
 :root {
-  --demo-bg: #f5f5f5; /* neutral-100 */
-  --demo-surface: #fff; /* white */
-  --demo-surface-alt: #fafafa; /* neutral-50 */
-  --demo-text: #171717; /* neutral-900 */
-  --demo-text-secondary: #525252; /* neutral-600 */
-  --demo-text-muted: #737373; /* neutral-500 */
-  --demo-border: #e5e5e5; /* neutral-200 */
-  --demo-border-light: #f5f5f5; /* neutral-100 */
-  --demo-hover: #f5f5f5; /* neutral-100 */
-  --demo-accent: #33a6b8;
-  --demo-accent-bg: rgba(51, 166, 184, 0.08);
+  --demo-bg: #fafafa;
+  --demo-surface: #fff;
+  --demo-surface-alt: #fafafa;
+  --demo-text: #171717;
+  --demo-text-secondary: #525252;
+  --demo-text-muted: #a3a3a3;
+  --demo-border: #e5e5e5;
+  --demo-border-light: #f5f5f5;
+  --demo-hover: #f5f5f5;
+  --demo-accent: #171717;
+  --demo-accent-bg: rgba(23, 23, 23, 0.06);
   --demo-code-bg: #1a1a2e;
   --demo-code-text: #a5d6ff;
 
@@ -21,16 +21,16 @@
 
 [data-theme='dark'] {
   --demo-bg: #0a0a0a;
-  --demo-surface: #171717;
+  --demo-surface: #141414;
   --demo-surface-alt: #0a0a0a;
   --demo-text: #fafafa;
-  --demo-text-secondary: #d4d4d4;
-  --demo-text-muted: #a3a3a3;
+  --demo-text-secondary: #a3a3a3;
+  --demo-text-muted: #525252;
   --demo-border: #262626;
   --demo-border-light: #262626;
   --demo-hover: #262626;
-  --demo-accent: #f596aa;
-  --demo-accent-bg: rgba(245, 150, 170, 0.1);
+  --demo-accent: #fafafa;
+  --demo-accent-bg: rgba(250, 250, 250, 0.06);
   --demo-code-bg: #0a0a0a;
   --demo-code-text: #e5e5e5;
 }
