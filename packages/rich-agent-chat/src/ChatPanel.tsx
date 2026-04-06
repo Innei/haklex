@@ -32,6 +32,7 @@ export function ChatPanel({
   store,
 }: ChatPanelProps) {
   const bubbles = useStore(store, agentStoreSelectors.bubbles);
+  const pinnedSelection = useStore(store, agentStoreSelectors.pinnedSelection);
   const status = useStore(store, agentStoreSelectors.status);
   const reviewState = useStore(store, agentStoreSelectors.reviewState);
 
@@ -48,6 +49,10 @@ export function ChatPanel({
     [onSend, store],
   );
 
+  const handleDismissSelection = useCallback(() => {
+    store.getState().clearPinnedSelection();
+  }, [store]);
+
   const isRunning = status !== 'idle' && status !== 'done';
   const hasModel = selectedModel !== null;
 
@@ -63,6 +68,7 @@ export function ChatPanel({
       <ChatInput
         disabled={!hasModel}
         isRunning={isRunning}
+        pinnedSelection={pinnedSelection}
         status={status}
         modelSelector={
           <ModelSelector
@@ -72,6 +78,7 @@ export function ChatPanel({
           />
         }
         onAbort={onAbort}
+        onDismissSelection={handleDismissSelection}
         onSend={handleSend}
       />
     </div>

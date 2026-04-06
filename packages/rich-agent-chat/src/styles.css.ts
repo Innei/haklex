@@ -415,6 +415,52 @@ export const composerSendButton = style({
   },
 });
 
+// ── Selection Indicator ──
+
+export const selectionIndicator = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  padding: '6px 10px',
+  marginBottom: 6,
+  background: vars.color.fillSecondary,
+  borderRadius: 8,
+  fontSize: '12px',
+  color: vars.color.textSecondary,
+  lineHeight: 1.4,
+});
+
+export const selectionIndicatorIcon = style({
+  flexShrink: 0,
+  color: vars.color.textTertiary,
+});
+
+export const selectionIndicatorText = style({
+  flex: 1,
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+});
+
+export const selectionIndicatorDismiss = style({
+  'flexShrink': 0,
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 16,
+  'height': 16,
+  'border': 'none',
+  'borderRadius': '50%',
+  'background': 'none',
+  'color': vars.color.textTertiary,
+  'cursor': 'pointer',
+  'padding': 0,
+  ':hover': {
+    color: vars.color.text,
+  },
+});
+
 export const composerAbortButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
