@@ -716,13 +716,8 @@
 }
 
 .comment-badge-range {
-  background: rgba(51, 166, 184, 0.15);
-  color: #33a6b8;
-}
-
-[data-theme='dark'] .comment-badge-range {
-  background: rgba(245, 150, 170, 0.15);
-  color: #f596aa;
+  background: var(--demo-accent-bg);
+  color: var(--demo-accent);
 }
 
 .comment-badge-block {
@@ -782,17 +777,17 @@
 
 /* ── CSS Highlight API ── */
 ::highlight(comment-highlight) {
-  background: rgba(51, 166, 184, 0.08);
+  background: var(--demo-accent-bg);
   text-decoration: underline;
-  text-decoration-color: rgba(51, 166, 184, 0.6);
+  text-decoration-color: var(--demo-accent);
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
 }
 
 ::highlight(comment-highlight-active) {
-  background: rgba(51, 166, 184, 0.2);
+  background: rgba(23, 23, 23, 0.12);
   text-decoration: underline;
-  text-decoration-color: rgba(51, 166, 184, 0.9);
+  text-decoration-color: var(--demo-accent);
   text-decoration-thickness: 2px;
   text-underline-offset: 2px;
 }

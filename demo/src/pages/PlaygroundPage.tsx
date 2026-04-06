@@ -281,7 +281,7 @@ function EditorTabContent({ variant }: { variant: RichEditorVariant }) {
               <input
                 style={{ width: 20, height: 20, border: 'none', padding: 0 }}
                 type="color"
-                value={customAccent || '#33a6b8'}
+                value={customAccent || '#171717'}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setCustomAccent(e.target.value)
                 }
