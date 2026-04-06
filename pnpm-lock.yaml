@@ -181,6 +181,9 @@ importers:
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.4)
+      masonic:
+        specifier: ^4.1.0
+        version: 4.1.0(react@19.2.4)
       modern-normalize:
         specifier: ^3.0.1
         version: 3.0.1
@@ -3497,6 +3500,30 @@ packages:
       }
     engines: { node: ^20.19.0 || ^22.13.0 || >=24 }
 
+  '@essentials/memoize-one@1.1.0':
+    resolution:
+      {
+        integrity: sha512-HMkuIkKNe0EWSUpZhlaq9+5Yp47YhrMhxLMnXTRnEyE5N4xKLspAvMGjUFdi794VnEF1EcOZFS8rdROeujrgag==,
+      }
+
+  '@essentials/one-key-map@1.2.0':
+    resolution:
+      {
+        integrity: sha512-C2H7zHVcsoipDv4VKY5uUcv5ilsK+uEgEj+WeOdN5oz/Qj1/OZIzCdle90gDzj0xnGQrmZ9qDujwD7AkBb5k9A==,
+      }
+
+  '@essentials/raf@1.2.0':
+    resolution:
+      {
+        integrity: sha512-AWJvpprE2o7ATMb7HBYMVUVmPJBCt2wZp2rY7d+rAcNSMvzLbDepy9KFeqqrPZh+s9aIpbw1LgmuAW7kuRFgrQ==,
+      }
+
+  '@essentials/request-timeout@1.3.0':
+    resolution:
+      {
+        integrity: sha512-lKZPhKScNFnR1MBnk4+sxshk46fpvdN+Uh1LlKWFO5g1ocuz4EcknNIL7tm/rsCAs/+xMWiBTwbDUvm+pDNlXw==,
+      }
+
   '@excalidraw/excalidraw@0.17.0':
     resolution:
       {
@@ -4642,6 +4669,62 @@ packages:
       {
         integrity: sha512-slT6XeTCAbdql61GVLlGU4x7XHI7kCZV5Um5uhE4zLX4ApgiiXc0UYFvVOKq06xcovzp7p+61l68oPi563ARKg==,
       }
+
+  '@react-hook/debounce@3.0.0':
+    resolution:
+      {
+        integrity: sha512-ir/kPrSfAzY12Gre0sOHkZ2rkEmM4fS5M5zFxCi4BnCeXh2nvx9Ujd+U4IGpKCuPA+EQD0pg1eK2NGLvfWejag==,
+      }
+    peerDependencies:
+      react: '>=16.8'
+
+  '@react-hook/event@1.2.6':
+    resolution:
+      {
+        integrity: sha512-JUL5IluaOdn5w5Afpe/puPa1rj8X6udMlQ9dt4hvMuKmTrBS1Ya6sb4sVgvfe2eU4yDuOfAhik8xhbcCekbg9Q==,
+      }
+    peerDependencies:
+      react: '>=16.8'
+
+  '@react-hook/latest@1.0.3':
+    resolution:
+      {
+        integrity: sha512-dy6duzl+JnAZcDbNTfmaP3xHiKtbXYOaz3G51MGVljh548Y8MWzTr+PHLOfvpypEVW9zwvl+VyKjbWKEVbV1Rg==,
+      }
+    peerDependencies:
+      react: '>=16.8'
+
+  '@react-hook/passive-layout-effect@1.2.1':
+    resolution:
+      {
+        integrity: sha512-IwEphTD75liO8g+6taS+4oqz+nnroocNfWVHWz7j+N+ZO2vYrc6PV1q7GQhuahL0IOR7JccFTsFKQ/mb6iZWAg==,
+      }
+    peerDependencies:
+      react: '>=16.8'
+
+  '@react-hook/throttle@2.2.0':
+    resolution:
+      {
+        integrity: sha512-LJ5eg+yMV8lXtqK3lR+OtOZ2WH/EfWvuiEEu0M3bhR7dZRfTyEJKxH1oK9uyBxiXPtWXiQggWbZirMCXam51tg==,
+      }
+    peerDependencies:
+      react: '>=16.8'
+
+  '@react-hook/window-scroll@1.3.0':
+    resolution:
+      {
+        integrity: sha512-LdYnCL22pFI+LTs85Fi2OQHSKWkzIuHFgv8lA+wwuaPxLOEhWR5bzJ21iygUH9X4meeLVRZKEbfpYi3OWWD4GQ==,
+      }
+    peerDependencies:
+      react: '>=16.8'
+
+  '@react-hook/window-size@3.1.1':
+    resolution:
+      {
+        integrity: sha512-yWnVS5LKnOUIrEsI44oz3bIIUYqflamPL27n+k/PC//PsX/YeWBky09oPeAoc9As6jSH16Wgo8plI+ECZaHk3g==,
+      }
+    peerDependencies:
+      react: '>=16.8'
 
   '@rolldown/binding-android-arm64@1.0.0-rc.8':
     resolution:
@@ -9599,6 +9682,14 @@ packages:
     engines: { node: '>= 20' }
     hasBin: true
 
+  masonic@4.1.0:
+    resolution:
+      {
+        integrity: sha512-3RNbAG5qLve7qNtGp1UM/u7vI39jO73ZFHDBAg3xl8AVh7A6Ikx7I7mBeC0NY0h1r1jJn2Wqeol1QMa09MQbyQ==,
+      }
+    peerDependencies:
+      react: '>=16.8'
+
   math-intrinsics@1.1.0:
     resolution:
       {
@@ -10523,6 +10614,12 @@ packages:
     resolution:
       {
         integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==,
+      }
+
+  raf-schd@4.0.3:
+    resolution:
+      {
+        integrity: sha512-tQkJl2GRWh83ui2DiPTJz9wEiMN20syf+5oKfB03yYP7ioZcJwsIK8FjrtLwH1m7C7e+Tt2yYBlrOpdT+dyeIQ==,
       }
 
   rc9@2.1.2:
@@ -11540,6 +11637,12 @@ packages:
         integrity: sha512-A5F0cM6+mDleacLIEUkmfpkBbnHJFV1d2rprHU2MXNk7mlxHq2zGojA+SRvQD1RoMo9gqjZPWEaKG4v1BQ48lw==,
       }
     engines: { node: ^20.19.0 || ^22.13.0 || >=24 }
+
+  trie-memoize@1.2.0:
+    resolution:
+      {
+        integrity: sha512-hEDLVEP1FCgaRtt0oZDJdz2lK9uK7WlB7ASswt9U9cqruSNueVigtRGxI97hevKlViqhAcRgNgzuY/m8FCCMcg==,
+      }
 
   trim-lines@3.0.1:
     resolution:
@@ -13332,6 +13435,16 @@ snapshots:
       '@eslint/core': 1.1.1
       levn: 0.4.1
 
+  '@essentials/memoize-one@1.1.0': {}
+
+  '@essentials/one-key-map@1.2.0': {}
+
+  '@essentials/raf@1.2.0': {}
+
+  '@essentials/request-timeout@1.3.0':
+    dependencies:
+      '@essentials/raf': 1.2.0
+
   '@excalidraw/excalidraw@0.17.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)':
     dependencies:
       react: 19.2.4
@@ -14057,6 +14170,41 @@ snapshots:
   '@pkgr/core@0.2.9': {}
 
   '@preact/signals-core@1.13.0': {}
+
+  '@react-hook/debounce@3.0.0(react@19.2.4)':
+    dependencies:
+      '@react-hook/latest': 1.0.3(react@19.2.4)
+      react: 19.2.4
+
+  '@react-hook/event@1.2.6(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+
+  '@react-hook/latest@1.0.3(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+
+  '@react-hook/passive-layout-effect@1.2.1(react@19.2.4)':
+    dependencies:
+      react: 19.2.4
+
+  '@react-hook/throttle@2.2.0(react@19.2.4)':
+    dependencies:
+      '@react-hook/latest': 1.0.3(react@19.2.4)
+      react: 19.2.4
+
+  '@react-hook/window-scroll@1.3.0(react@19.2.4)':
+    dependencies:
+      '@react-hook/event': 1.2.6(react@19.2.4)
+      '@react-hook/throttle': 2.2.0(react@19.2.4)
+      react: 19.2.4
+
+  '@react-hook/window-size@3.1.1(react@19.2.4)':
+    dependencies:
+      '@react-hook/debounce': 3.0.0(react@19.2.4)
+      '@react-hook/event': 1.2.6(react@19.2.4)
+      '@react-hook/throttle': 2.2.0(react@19.2.4)
+      react: 19.2.4
 
   '@rolldown/binding-android-arm64@1.0.0-rc.8':
     optional: true
@@ -17334,6 +17482,21 @@ snapshots:
 
   marked@17.0.5: {}
 
+  masonic@4.1.0(react@19.2.4):
+    dependencies:
+      '@essentials/memoize-one': 1.1.0
+      '@essentials/one-key-map': 1.2.0
+      '@essentials/request-timeout': 1.3.0
+      '@react-hook/event': 1.2.6(react@19.2.4)
+      '@react-hook/latest': 1.0.3(react@19.2.4)
+      '@react-hook/passive-layout-effect': 1.2.1(react@19.2.4)
+      '@react-hook/throttle': 2.2.0(react@19.2.4)
+      '@react-hook/window-scroll': 1.3.0(react@19.2.4)
+      '@react-hook/window-size': 3.1.1(react@19.2.4)
+      raf-schd: 4.0.3
+      react: 19.2.4
+      trie-memoize: 1.2.0
+
   math-intrinsics@1.1.0: {}
 
   mathml-tag-names@4.0.0: {}
@@ -18098,6 +18261,8 @@ snapshots:
 
   queue-microtask@1.2.3: {}
 
+  raf-schd@4.0.3: {}
+
   rc9@2.1.2:
     dependencies:
       defu: 6.1.4
@@ -18843,6 +19008,8 @@ snapshots:
   toml-eslint-parser@1.0.3:
     dependencies:
       eslint-visitor-keys: 5.0.1
+
+  trie-memoize@1.2.0: {}
 
   trim-lines@3.0.1: {}
 

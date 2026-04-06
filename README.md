@@ -1,31 +1,20 @@
-# Haklex
+<div align="center">
+  <img src="assets/logo.svg" alt="Haklex" width="80" height="80" />
+  <h1>Haklex</h1>
+  <p>A modular rich text editor ecosystem built on <a href="https://lexical.dev/">Lexical</a>.</p>
+  <p>Editing, static rendering, and server-side parsing — all from a single schema.</p>
+</div>
 
-A modular rich text editor ecosystem built on [Lexical](https://lexical.dev/). Designed for content-heavy applications with full support for editing, static rendering, and server-side parsing — all from a single schema.
-
-## Table of Contents
-
-- [Key Features](#key-features)
-- [Tech Stack](#tech-stack)
-- [Prerequisites](#prerequisites)
-- [Getting Started](#getting-started)
-- [Architecture](#architecture)
-- [Package Overview](#package-overview)
-- [Variant System](#variant-system)
-- [Usage](#usage)
-- [Available Scripts](#available-scripts)
-- [Open Source, AI, and Dialogue](#open-source-ai-and-dialogue)
-- [Testing](#testing)
-- [Contributing](#contributing)
-- [License](#license)
+---
 
 ## Key Features
 
-- **Rich Block Types** — Images, videos, code blocks, Mermaid diagrams, KaTeX math, Excalidraw whiteboards, embeds (YouTube, Twitter, Bilibili), galleries, link cards, mentions, and more
+- **Rich Block Types** — Images, videos, code blocks, Mermaid diagrams, KaTeX math, Excalidraw whiteboards, embeds, galleries, link cards, mentions, and more
 - **Static / Edit Split** — Separate node and renderer trees for read-only display vs. full editing, enabling aggressive tree-shaking
 - **SSR-Ready** — `RichRenderer` renders Lexical JSON to React without loading the editor runtime
 - **Server-Side Parsing** — `@haklex/rich-headless` provides a zero-React node registry for backend use (Lexical JSON → Markdown)
 - **Variant Theming** — Three typographic presets (`article`, `note`, `comment`) with light/dark color scheme support
-- **Zero-Runtime CSS** — All styles authored in Vanilla Extract (CSS-in-TS), compiled to static CSS at build time
+- **Zero-Runtime CSS** — Vanilla Extract (CSS-in-TS), compiled to static CSS at build time
 - **Plugin Architecture** — Slash menu, floating toolbar, block handle, table controls, mention typeahead, link editor, and top toolbar — all composable
 - **Diff Viewer** — `@haklex/rich-diff` renders side-by-side diffs of two editor states
 

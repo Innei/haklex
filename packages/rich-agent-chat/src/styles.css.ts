@@ -11,7 +11,7 @@ export const chatPanel = style({
   minHeight: 0,
   boxSizing: 'border-box',
   padding: 0,
-  fontSize: '14px',
+  fontSize: '13px',
   background: vars.color.bg,
   overflow: 'hidden',
 });
@@ -20,10 +20,10 @@ export const messageList = style({
   flex: 1,
   minHeight: 0,
   overflowY: 'auto',
-  padding: '20px 18px 24px',
+  padding: 16,
   display: 'flex',
   flexDirection: 'column',
-  gap: 20,
+  gap: 16,
 });
 
 // ── User Bubble ──
@@ -31,19 +31,19 @@ export const messageList = style({
 export const bubbleUser = style({
   alignSelf: 'flex-end',
   maxWidth: '82%',
-  padding: '10px 14px',
-  background: vars.color.text,
-  color: vars.color.bg,
-  borderRadius: '18px 18px 6px 18px',
+  padding: '8px 14px',
+  background: vars.color.fillSecondary,
+  color: vars.color.text,
+  borderRadius: 10,
   lineHeight: 1.5,
-  fontSize: '14px',
+  fontSize: '13px',
 });
 
 // ── Assistant Prose ──
 
 export const proseAssistant = style({
-  fontSize: '14px',
-  lineHeight: 1.75,
+  fontSize: '13px',
+  lineHeight: 1.7,
   color: vars.color.text,
   textAlign: 'left',
 });
@@ -294,9 +294,10 @@ export const bubbleTool = style({
 
 export const composerDock = style({
   flexShrink: 0,
-  padding: '10px 18px 14px',
+  padding: 0,
   display: 'flex',
   flexDirection: 'column',
+  borderTop: `1px solid ${vars.color.border}`,
 });
 
 const statusDotPing = keyframes({
@@ -329,8 +330,7 @@ export const composerStatusLine = style({
   gap: 6,
   fontSize: '12px',
   color: vars.color.textTertiary,
-  marginBottom: 8,
-  marginLeft: 4,
+  margin: '8px 12px 0',
 });
 
 export const composerStatusDotWrap = style({
@@ -343,22 +343,15 @@ export const composerStatusDotWrap = style({
 
 export const composerBox = style({
   position: 'relative',
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 16,
+  border: 'none',
+  borderRadius: 0,
   background: vars.color.bg,
-  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-  transition: 'border-color 150ms ease',
-  selectors: {
-    '&:focus-within': {
-      borderColor: vars.color.textTertiary,
-    },
-  },
 });
 
 export const composerTextArea = style({
   width: '100%',
   resize: 'none',
-  padding: '14px 16px 48px',
+  padding: '12px 16px 44px',
   border: 'none',
   borderRadius: 0,
   background: 'transparent',
@@ -384,9 +377,9 @@ export const composerTextArea = style({
 
 export const composerBottomBar = style({
   position: 'absolute',
-  bottom: 10,
-  left: 10,
-  right: 10,
+  bottom: 8,
+  left: 12,
+  right: 12,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
@@ -396,11 +389,11 @@ export const composerSendButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 30,
-  'height': 30,
+  'width': 28,
+  'height': 28,
   'flexShrink': 0,
   'border': 'none',
-  'borderRadius': '50%',
+  'borderRadius': 8,
   'background': vars.color.text,
   'color': vars.color.bg,
   'cursor': 'pointer',
@@ -421,8 +414,8 @@ export const selectionIndicator = style({
   display: 'flex',
   alignItems: 'center',
   gap: 6,
-  padding: '6px 10px',
-  marginBottom: 6,
+  padding: '6px 12px',
+  margin: '8px 12px 0',
   background: vars.color.fillSecondary,
   borderRadius: 8,
   fontSize: '12px',
@@ -465,11 +458,11 @@ export const composerAbortButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 30,
-  'height': 30,
+  'width': 28,
+  'height': 28,
   'flexShrink': 0,
   'border': '1px solid var(--hk-color-text-error, #dc2626)',
-  'borderRadius': '50%',
+  'borderRadius': 8,
   'background': vars.color.bg,
   'color': 'var(--hk-color-text-error, #dc2626)',
   'cursor': 'pointer',

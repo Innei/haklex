@@ -25,6 +25,7 @@ import {
 } from 'lexical';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
+import { useFullWidth } from '../context/FullWidthContext';
 import { useTheme } from '../context/ThemeContext';
 
 interface DemoProviderConfig {
@@ -359,6 +360,7 @@ function AgentLoopCaptureInner({
 }
 
 export function AgentPage() {
+  useFullWidth();
   const store = useMemo(() => createAgentStore(), []);
 
   return <AgentEditorWithChat store={store} />;

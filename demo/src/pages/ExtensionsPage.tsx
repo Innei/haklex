@@ -11,6 +11,7 @@ import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { type FC, useCallback, useState } from 'react';
 
 import { Panel } from '../components/Panel';
+import { useFullWidth } from '../context/FullWidthContext';
 import { useTheme } from '../context/ThemeContext';
 import { diffSamples } from '../fixtures/diff-samples';
 import { customGithubRepoPlugin, extraLinkCardPlugins } from '../fixtures/extra-linkcard-plugins';
@@ -421,52 +422,38 @@ function ExtensionDetail({ id }: { id: string }) {
 // ── Page ──────────────────────────────────────────────────────
 
 export function ExtensionsPage() {
-  const [activeExt, setActiveExt] = useState<string | null>(null);
+  useFullWidth();
+  const [activeExt, setActiveExt] = useState<string>(extensions[0].id);
+  const active = extensions.find((e) => e.id === activeExt) || extensions[0];
 
   return (
-    <div className="page">
-      <div className="nodes-page-header">
-        <h1 className="nodes-page-title">Extensions</h1>
-        <p className="nodes-page-desc">
-          Heavy or domain-specific extensions that can be loaded on demand.
-        </p>
-      </div>
-
-      <div className="ext-grid">
-        {extensions.map((ext) => (
-          <div
-            className="ext-card"
-            key={ext.id}
-            style={activeExt === ext.id ? { borderColor: 'var(--demo-text-muted)' } : undefined}
-            onClick={() => setActiveExt(activeExt === ext.id ? null : ext.id)}
-          >
-            <div className="ext-card-preview">
-              <span
-                style={{
-                  fontSize: 32,
-                  fontWeight: 700,
-                  color: 'var(--demo-text-muted)',
-                  opacity: 0.3,
-                  letterSpacing: '-1px',
-                }}
-              >
-                {ext.preview}
-              </span>
-            </div>
-            <div className="ext-card-body">
-              <div className="ext-card-name">{ext.name}</div>
-              <div className="ext-card-desc">{ext.description}</div>
-              <span className="ext-card-tag">@haklex/{ext.packageName}</span>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {activeExt && (
-        <div className="ext-detail">
-          <ExtensionDetail id={activeExt} />
+    <div className="ext-layout">
+      <aside className="ext-sidebar">
+        <div className="sidebar-header">
+          <span className="sidebar-label">Extensions</span>
         </div>
-      )}
+        <div className="sidebar-list">
+          {extensions.map((ext) => (
+            <button
+              className={activeExt === ext.id ? 'sidebar-item sidebar-item-active' : 'sidebar-item'}
+              key={ext.id}
+              onClick={() => setActiveExt(ext.id)}
+            >
+              <div className="sidebar-item-name">{ext.name}</div>
+              <div className="sidebar-item-desc">{ext.description}</div>
+            </button>
+          ))}
+        </div>
+      </aside>
+
+      <div className="ext-detail">
+        <div className="ext-detail-header">
+          <h2 className="ext-detail-title">{active.name}</h2>
+          <span className="ext-detail-tag">@haklex/{active.packageName}</span>
+        </div>
+        <p className="ext-detail-desc">{active.description}</p>
+        <ExtensionDetail id={active.id} />
+      </div>
     </div>
   );
 }

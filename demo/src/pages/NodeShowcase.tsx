@@ -1,14 +1,96 @@
+import type { ColorScheme } from '@haklex/rich-editor';
 import { ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro';
 import type { SerializedEditorState } from 'lexical';
-import { useCallback, useState } from 'react';
+import { Masonry } from 'masonic';
+import { createContext, use, useCallback, useMemo, useState } from 'react';
 
 import { JsonViewer } from '../components/JsonViewer';
 import { useTheme } from '../context/ThemeContext';
+import type { NodeSample } from '../fixtures';
 import { nodeSamples } from '../fixtures';
 
 type Filter = 'all' | 'inline' | 'block' | 'container';
 
 const variant = 'article' as const;
+
+interface NodeCardContext {
+  editModeKeys: Set<string>;
+  expandedKey: string | null;
+  liveStateByKey: Record<string, SerializedEditorState>;
+  onEditorChange: (key: string, state: SerializedEditorState) => void;
+  onToggleEdit: (key: string) => void;
+  onToggleExpand: (key: string) => void;
+  theme: ColorScheme;
+}
+
+const NodeCardCtx = createContext<NodeCardContext>(null!);
+
+function NodeCard({ data: sample }: { data: NodeSample }) {
+  const {
+    expandedKey,
+    editModeKeys,
+    liveStateByKey,
+    theme,
+    onToggleExpand,
+    onToggleEdit,
+    onEditorChange,
+  } = use(NodeCardCtx);
+  const isExpanded = expandedKey === sample.key;
+  const isEdit = editModeKeys.has(sample.key);
+  const jsonData = isEdit ? (liveStateByKey[sample.key] ?? sample.data) : sample.data;
+
+  return (
+    <div
+      className={`node-card${isExpanded ? ' node-card-expanded' : ''}`}
+      onClick={() => onToggleExpand(sample.key)}
+    >
+      <div className="node-card-body">
+        <div className="node-card-top">
+          <div className="node-card-name">{sample.label}</div>
+          <span className="node-card-type">{sample.category}</span>
+        </div>
+        <div className="node-card-desc">{sample.description}</div>
+        <div className="node-card-preview">
+          {isEdit ? (
+            <ShiroEditor
+              initialValue={sample.data}
+              key={`${sample.key}-edit`}
+              theme={theme}
+              variant={variant}
+              onChange={(state) => onEditorChange(sample.key, state)}
+            />
+          ) : (
+            <ShiroRenderer theme={theme} value={sample.data} variant={variant} />
+          )}
+        </div>
+      </div>
+
+      {isExpanded && (
+        <div className="node-card-detail" onClick={(e) => e.stopPropagation()}>
+          <JsonViewer data={jsonData} defaultExpanded={false} />
+          <div className="node-detail-actions">
+            <button
+              className={!isEdit ? 'btn btn-active' : 'btn'}
+              onClick={() => {
+                if (isEdit) onToggleEdit(sample.key);
+              }}
+            >
+              Readonly
+            </button>
+            <button
+              className={isEdit ? 'btn btn-active' : 'btn'}
+              onClick={() => {
+                if (!isEdit) onToggleEdit(sample.key);
+              }}
+            >
+              Editable
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function NodeShowcase() {
   const theme = useTheme();
@@ -27,11 +109,11 @@ export function NodeShowcase() {
     container: nodeSamples.filter((n) => n.category === 'container').length,
   };
 
-  const handleEditorChange = useCallback((key: string, state: SerializedEditorState) => {
+  const onEditorChange = useCallback((key: string, state: SerializedEditorState) => {
     setLiveStateByKey((prev) => ({ ...prev, [key]: state }));
   }, []);
 
-  const toggleEditMode = useCallback((key: string) => {
+  const onToggleEdit = useCallback((key: string) => {
     setEditModeKeys((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
@@ -39,6 +121,31 @@ export function NodeShowcase() {
       return next;
     });
   }, []);
+
+  const onToggleExpand = useCallback((key: string) => {
+    setExpandedKey((prev) => (prev === key ? null : key));
+  }, []);
+
+  const cardCtx = useMemo<NodeCardContext>(
+    () => ({
+      expandedKey,
+      editModeKeys,
+      liveStateByKey,
+      theme,
+      onToggleExpand,
+      onToggleEdit,
+      onEditorChange,
+    }),
+    [
+      expandedKey,
+      editModeKeys,
+      liveStateByKey,
+      theme,
+      onToggleExpand,
+      onToggleEdit,
+      onEditorChange,
+    ],
+  );
 
   const filters: { key: Filter; label: string }[] = [
     { key: 'all', label: 'All' },
@@ -71,66 +178,15 @@ export function NodeShowcase() {
         ))}
       </div>
 
-      <div className="nodes-grid">
-        {filtered.map((sample) => {
-          const isExpanded = expandedKey === sample.key;
-          const isEdit = editModeKeys.has(sample.key);
-          const jsonData = isEdit ? (liveStateByKey[sample.key] ?? sample.data) : sample.data;
-
-          return (
-            <div
-              className={`node-card${isExpanded ? ' node-card-expanded' : ''}`}
-              key={sample.key}
-              onClick={() => setExpandedKey(isExpanded ? null : sample.key)}
-            >
-              <div className="node-card-body">
-                <div className="node-card-top">
-                  <div className="node-card-name">{sample.label}</div>
-                  <span className="node-card-type">{sample.category}</span>
-                </div>
-                <div className="node-card-desc">{sample.description}</div>
-                <div className="node-card-preview">
-                  {isEdit ? (
-                    <ShiroEditor
-                      initialValue={sample.data}
-                      key={`${sample.key}-edit`}
-                      theme={theme}
-                      variant={variant}
-                      onChange={(state) => handleEditorChange(sample.key, state)}
-                    />
-                  ) : (
-                    <ShiroRenderer theme={theme} value={sample.data} variant={variant} />
-                  )}
-                </div>
-              </div>
-
-              {isExpanded && (
-                <div className="node-card-detail" onClick={(e) => e.stopPropagation()}>
-                  <JsonViewer data={jsonData} defaultExpanded={false} />
-                  <div className="node-detail-actions">
-                    <button
-                      className={!isEdit ? 'btn btn-active' : 'btn'}
-                      onClick={() => {
-                        if (isEdit) toggleEditMode(sample.key);
-                      }}
-                    >
-                      Readonly
-                    </button>
-                    <button
-                      className={isEdit ? 'btn btn-active' : 'btn'}
-                      onClick={() => {
-                        if (!isEdit) toggleEditMode(sample.key);
-                      }}
-                    >
-                      Editable
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      <NodeCardCtx value={cardCtx}>
+        <Masonry
+          columnGutter={16}
+          columnWidth={340}
+          items={filtered}
+          key={filter}
+          render={NodeCard}
+        />
+      </NodeCardCtx>
     </div>
   );
 }
