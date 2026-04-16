@@ -6,7 +6,7 @@ Release @haklex/\* packages and update all downstream consumers.
 | --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Which haklex directory to use** | Run the entire release (bumpp → build → publish → commit → push) in the **same repository root** where you run `git status` (often a [git worktree](https://git-scm.com/docs/git-worktree)). Do not switch to another checkout of haklex unless the user asks; a second clone may be on a different branch or commit. |
 | **Confirming paths**              | Run `git worktree list` if needed: it shows the main clone and all worktrees. The directory that contains the bumped `packages/rich-editor/package.json` is the one you build and publish from.                                                                                                                       |
-| **Downstream repos**              | Consumers live **outside** haklex (sibling repos). Default locations on this machine: `/Users/innei/git/innei-repo/Shiroi`, `admin-vue3`, `mx-core`. If the workspace path differs, still edit those consumer paths—or ask the user for their `innei-repo` root.                                                      |
+| **Downstream repos**              | Consumers live **outside** haklex (sibling repos). Default locations on this machine: `/Users/innei/git/innei-repo/Yohaku`, `admin-vue3`, `mx-core`. If the workspace path differs, still edit those consumer paths—or ask the user for their `innei-repo` root.                                                      |
 
 ## Steps
 
@@ -56,7 +56,7 @@ git push
 
 For each downstream project, update all `@haklex/*` dependency versions to `$NEW_VERSION`:
 
-**Shiroi** — `/Users/innei/git/innei-repo/Shiroi/apps/web/package.json`
+**Yohaku** — `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json`
 
 - Update `@haklex/rich-editor`, `@haklex/rich-kit-shiro`, `@haklex/rich-static-renderer`
 
@@ -75,7 +75,7 @@ Use sed or Edit to replace pinned version strings. Match pattern: `"@haklex/<pkg
 Run `pnpm install` in each downstream project root:
 
 ```bash
-cd /Users/innei/git/innei-repo/Shiroi && pnpm install
+cd /Users/innei/git/innei-repo/Yohaku && pnpm install
 cd /Users/innei/git/innei-repo/admin-vue3 && pnpm install
 cd /Users/innei/git/innei-repo/mx-core && pnpm install
 ```
@@ -102,15 +102,15 @@ For each downstream project, run `git status` after `pnpm install`. **Prefer sta
 
 | Project    | Typical files to stage                          |
 | ---------- | ----------------------------------------------- |
-| Shiroi     | `apps/web/package.json`, root `pnpm-lock.yaml`  |
+| Yohaku     | `apps/web/package.json`, root `pnpm-lock.yaml`  |
 | admin-vue3 | `package.json`, `pnpm-lock.yaml`                |
 | mx-core    | `apps/core/package.json`, root `pnpm-lock.yaml` |
 
 Use explicit paths, for example:
 
 ```bash
-# Shiroi
-cd /Users/innei/git/innei-repo/Shiroi
+# Yohaku
+cd /Users/innei/git/innei-repo/Yohaku
 git add apps/web/package.json pnpm-lock.yaml
 git commit -m "chore(deps): bump @haklex/* to $NEW_VERSION"
 git push
