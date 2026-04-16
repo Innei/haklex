@@ -9,6 +9,8 @@ describe('createAgentStore', () => {
     expect(state.status).toBe('idle');
     expect(state.bubbles).toEqual([]);
     expect(state.diffState).toBeNull();
+    expect(state.liveSelection).toBeNull();
+    expect(state.pinnedSelection).toBeNull();
   });
 
   it('actions update state and notify subscribers', () => {
@@ -57,16 +59,57 @@ describe('createAgentStore', () => {
     expect(store.getState().diffState).toBe(diff);
   });
 
+  it('tracks live and pinned selections independently', () => {
+    const store = createAgentStore();
+
+    store.getState().setLiveSelection({
+      type: 'text',
+      text: 'selected text',
+      anchorBlockId: 'b1',
+      anchorOffset: 0,
+      focusBlockId: 'b1',
+      focusOffset: 13,
+    });
+    store.getState().pinSelection({ type: 'block', blockIds: ['b1', 'b2'] });
+
+    expect(store.getState().liveSelection).toEqual({
+      type: 'text',
+      text: 'selected text',
+      anchorBlockId: 'b1',
+      anchorOffset: 0,
+      focusBlockId: 'b1',
+      focusOffset: 13,
+    });
+    expect(store.getState().pinnedSelection).toEqual({ type: 'block', blockIds: ['b1', 'b2'] });
+
+    store.getState().clearLiveSelection();
+    store.getState().clearPinnedSelection();
+
+    expect(store.getState().liveSelection).toBeNull();
+    expect(store.getState().pinnedSelection).toBeNull();
+  });
+
   it('reset clears everything', () => {
     const store = createAgentStore();
     store.getState().setStatus('running');
     store.getState().addBubble({ type: 'user', content: 'hi' });
+    store.getState().setLiveSelection({
+      type: 'text',
+      text: 'hi',
+      anchorBlockId: 'b1',
+      anchorOffset: 0,
+      focusBlockId: 'b1',
+      focusOffset: 2,
+    });
+    store.getState().pinSelection({ type: 'block', blockIds: ['b1'] });
     store.getState().reset();
 
     const state = store.getState();
     expect(state.status).toBe('idle');
     expect(state.bubbles).toEqual([]);
     expect(state.diffState).toBeNull();
+    expect(state.liveSelection).toBeNull();
+    expect(state.pinnedSelection).toBeNull();
   });
 
   it('unsubscribe stops notifications', () => {

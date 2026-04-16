@@ -19,6 +19,7 @@ import type { DiffState } from './types';
 type AgentStoreShape = {
   bubbles: ChatBubble[];
   diffState: DiffState | null;
+  liveSelection: CapturedSelection | null;
   pinnedSelection: CapturedSelection | null;
   reviewState: ReviewState | null;
   status: AgentStoreStatus;
@@ -32,9 +33,11 @@ export type AgentStoreActionMethods = {
   rejectReviewBatch: (batchId: string) => void;
   rejectReviewEntry: (batchId: string, entryId: string) => void;
   reset: () => void;
+  clearLiveSelection: () => void;
   pinSelection: (selection: CapturedSelection) => void;
   clearPinnedSelection: () => void;
   setDiffState: (diffState: DiffState | null) => void;
+  setLiveSelection: (selection: CapturedSelection | null) => void;
   setReviewState: (state: ReviewState | null) => void;
   setStatus: (status: AgentStoreStatus) => void;
   updateLastBubble: (bubble: ChatBubble) => void;
@@ -76,6 +79,14 @@ export class AgentStoreActionImpl {
 
   reset = () => {
     this.#set(createInitialAgentStoreState());
+  };
+
+  setLiveSelection = (selection: CapturedSelection | null) => {
+    this.#set({ liveSelection: selection });
+  };
+
+  clearLiveSelection = () => {
+    this.#set({ liveSelection: null });
   };
 
   pinSelection = (selection: CapturedSelection) => {

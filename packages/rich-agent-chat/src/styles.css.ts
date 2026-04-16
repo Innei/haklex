@@ -416,16 +416,23 @@ export const selectionIndicator = style({
   gap: 6,
   padding: '6px 12px',
   margin: '8px 12px 0',
-  background: vars.color.fillSecondary,
+  background: `color-mix(in srgb, ${vars.color.accent} 8%, ${vars.color.bg})`,
+  border: `1px solid color-mix(in srgb, ${vars.color.accent} 20%, transparent)`,
   borderRadius: 8,
   fontSize: '12px',
   color: vars.color.textSecondary,
   lineHeight: 1.4,
+  selectors: {
+    '&[data-selection-mode="pinned"]': {
+      background: `color-mix(in srgb, ${vars.color.accent} 10%, ${vars.color.bg})`,
+      borderColor: `color-mix(in srgb, ${vars.color.accent} 28%, transparent)`,
+    },
+  },
 });
 
 export const selectionIndicatorIcon = style({
   flexShrink: 0,
-  color: vars.color.textTertiary,
+  color: vars.color.accent,
 });
 
 export const selectionIndicatorText = style({
@@ -446,7 +453,7 @@ export const selectionIndicatorDismiss = style({
   'border': 'none',
   'borderRadius': '50%',
   'background': 'none',
-  'color': vars.color.textTertiary,
+  'color': vars.color.accent,
   'cursor': 'pointer',
   'padding': 0,
   ':hover': {

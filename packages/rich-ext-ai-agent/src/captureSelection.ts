@@ -1,10 +1,5 @@
 import type { CapturedSelection } from '@haklex/rich-agent-core';
-import {
-  $getRootBlock,
-  $getTextOffsetInBlock,
-  $resolveSelectionPoint,
-  blockIdState,
-} from '@haklex/rich-editor';
+import { $captureTextSelection, blockIdState } from '@haklex/rich-editor';
 import { $getRoot, $getSelection, $getState, $isNodeSelection, $isRangeSelection } from 'lexical';
 
 export function $captureSelection(): CapturedSelection | null {
@@ -23,27 +18,12 @@ export function $captureSelection(): CapturedSelection | null {
   }
 
   if ($isRangeSelection(sel) && !sel.isCollapsed()) {
-    const anchorBlock = $getRootBlock(sel.anchor.getNode());
-    const focusBlock = $getRootBlock(sel.focus.getNode());
-    if (!anchorBlock || !focusBlock) return null;
-
-    const anchorBlockId = $getState(anchorBlock, blockIdState);
-    const focusBlockId = $getState(focusBlock, blockIdState);
-    if (!anchorBlockId || !focusBlockId) return null;
-
-    const anchorPoint = $resolveSelectionPoint(sel, 'anchor');
-    const focusPoint = $resolveSelectionPoint(sel, 'focus');
-
-    const anchorOffset = $getTextOffsetInBlock(anchorBlock, anchorPoint.node, anchorPoint.offset);
-    const focusOffset = $getTextOffsetInBlock(focusBlock, focusPoint.node, focusPoint.offset);
+    const textSelection = $captureTextSelection();
+    if (!textSelection) return null;
 
     return {
       type: 'text',
-      text: sel.getTextContent(),
-      anchorBlockId,
-      anchorOffset,
-      focusBlockId,
-      focusOffset,
+      ...textSelection,
     };
   }
 

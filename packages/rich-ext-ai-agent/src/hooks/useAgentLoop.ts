@@ -37,7 +37,9 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
         const snapshot = createSnapshot(serialized);
 
         const pinned = options.store.getState().pinnedSelection;
-        const live = editor.getEditorState().read(() => $captureSelection());
+        const live =
+          options.store.getState().liveSelection ??
+          editor.getEditorState().read(() => $captureSelection());
         const selection = pinned ?? live;
 
         const messageEngine =

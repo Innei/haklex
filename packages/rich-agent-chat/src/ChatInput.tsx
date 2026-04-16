@@ -16,6 +16,7 @@ const STATUS_LABELS: Partial<Record<AgentStoreStatus, string>> = {
 interface ChatInputProps {
   disabled?: boolean;
   isRunning?: boolean;
+  liveSelection?: CapturedSelection | null;
   modelSelector?: ReactNode;
   onAbort?: () => void;
   onDismissSelection?: () => void;
@@ -27,6 +28,7 @@ interface ChatInputProps {
 export function ChatInput({
   disabled,
   isRunning,
+  liveSelection,
   modelSelector,
   onAbort,
   onDismissSelection,
@@ -39,6 +41,8 @@ export function ChatInput({
   const trimmed = input.trim();
   const isAbortMode = Boolean(isRunning);
   const statusLabel = status ? STATUS_LABELS[status] : undefined;
+  const activeSelection = pinnedSelection ?? liveSelection ?? null;
+  const isPinnedSelection = activeSelection === pinnedSelection;
 
   function handleSend() {
     if (!trimmed) return;
@@ -53,24 +57,37 @@ export function ChatInput({
     }
   }
 
+  function renderSelectionLabel(selection: CapturedSelection) {
+    if (selection.type === 'text') {
+      const preview =
+        selection.text.length > 60 ? `${selection.text.slice(0, 60)}…` : selection.text;
+      return `${isPinnedSelection ? 'Pinned text' : 'Selected text'}: "${preview}"`;
+    }
+
+    return `${selection.blockIds.length} block${selection.blockIds.length > 1 ? 's' : ''} selected`;
+  }
+
   return (
     <div className={css.composerDock}>
-      {pinnedSelection && (
-        <div className={css.selectionIndicator}>
+      {activeSelection && (
+        <div
+          className={css.selectionIndicator}
+          data-selection-mode={isPinnedSelection ? 'pinned' : 'live'}
+        >
           <Type className={css.selectionIndicatorIcon} size={12} strokeWidth={2} />
           <span className={css.selectionIndicatorText}>
-            {pinnedSelection.type === 'text'
-              ? `"${pinnedSelection.text.length > 60 ? `${pinnedSelection.text.slice(0, 60)}…` : pinnedSelection.text}"`
-              : `${pinnedSelection.blockIds.length} block${pinnedSelection.blockIds.length > 1 ? 's' : ''} selected`}
+            {renderSelectionLabel(activeSelection)}
           </span>
-          <button
-            aria-label="Dismiss selection"
-            className={css.selectionIndicatorDismiss}
-            type="button"
-            onClick={onDismissSelection}
-          >
-            <X size={12} strokeWidth={2} />
-          </button>
+          {isPinnedSelection && (
+            <button
+              aria-label="Dismiss selection"
+              className={css.selectionIndicatorDismiss}
+              type="button"
+              onClick={onDismissSelection}
+            >
+              <X size={12} strokeWidth={2} />
+            </button>
+          )}
         </div>
       )}
       {isRunning && statusLabel && (

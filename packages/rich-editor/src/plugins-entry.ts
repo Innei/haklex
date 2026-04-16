@@ -23,4 +23,5 @@ export { MarkdownShortcutsPlugin } from './plugins/MarkdownShortcutsPlugin';
 export { MermaidPlugin } from './plugins/MermaidPlugin';
 export { OnChangePlugin } from './plugins/OnChangePlugin';
 export { SubmitShortcutPlugin } from './plugins/SubmitShortcutPlugin';
+export { TextSelectionPlugin } from './plugins/TextSelectionPlugin';
 export { ALL_TRANSFORMERS } from './transformers';

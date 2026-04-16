@@ -48,6 +48,7 @@ export type AgentStoreState = {
   bubbles: ChatBubble[];
   diffState: DiffState | null;
   reviewState: ReviewState | null;
+  liveSelection: CapturedSelection | null;
   pinnedSelection: CapturedSelection | null;
 };
 
@@ -57,6 +58,7 @@ export function createInitialAgentStoreState(initialBubbles?: ChatBubble[]): Age
     bubbles: initialBubbles ?? [],
     diffState: null,
     reviewState: null,
+    liveSelection: null,
     pinnedSelection: null,
   };
 }

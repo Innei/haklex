@@ -32,6 +32,7 @@ export function ChatPanel({
   store,
 }: ChatPanelProps) {
   const bubbles = useStore(store, agentStoreSelectors.bubbles);
+  const liveSelection = useStore(store, agentStoreSelectors.liveSelection);
   const pinnedSelection = useStore(store, agentStoreSelectors.pinnedSelection);
   const status = useStore(store, agentStoreSelectors.status);
   const reviewState = useStore(store, agentStoreSelectors.reviewState);
@@ -68,6 +69,7 @@ export function ChatPanel({
       <ChatInput
         disabled={!hasModel}
         isRunning={isRunning}
+        liveSelection={liveSelection}
         pinnedSelection={pinnedSelection}
         status={status}
         modelSelector={

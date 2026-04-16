@@ -1,3 +1,4 @@
+import { getDOMRectFromTextSelection, useTextSelectionSnapshot } from '@haklex/rich-editor';
 import { $selectionTouchesSpoiler, $toggleSpoilerSelection } from '@haklex/rich-editor/commands';
 import { $createRubyNode, $isRubyNode } from '@haklex/rich-editor/nodes';
 import { ColorPicker } from '@haklex/rich-editor-ui';
@@ -143,12 +144,10 @@ function getSelectionState(selection: RangeSelection): ToolbarState {
 }
 
 function computePosition(
-  nativeSelection: Selection,
+  rect: DOMRect,
   toolbar: HTMLElement,
   container: Element,
 ): { top: number; left: number } | null {
-  const range = nativeSelection.getRangeAt(0);
-  const rect = range.getBoundingClientRect();
   if (rect.width === 0 && rect.height === 0) return null;
 
   const toolbarWidth = toolbar.offsetWidth;
@@ -234,6 +233,7 @@ export function FloatingToolbarPlugin({
   const [editor] = useLexicalComposerContext();
   const { className: portalClassName } = usePortalTheme();
   const portalContainer = usePortalContainer();
+  const selectionSnapshot = useTextSelectionSnapshot();
   const toolbarRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const [state, setState] = useState<ToolbarState>(INITIAL_STATE);
@@ -297,7 +297,13 @@ export function FloatingToolbarPlugin({
   }, [editor, updateToolbar]);
 
   useEffect(() => {
-    if (!visible || !toolbarRef.current) return;
+    if (!selectionSnapshot) {
+      setVisible(false);
+    }
+  }, [selectionSnapshot]);
+
+  useEffect(() => {
+    if (!visible || !toolbarRef.current || !selectionSnapshot) return;
 
     const positionToolbar = () => {
       const toolbar = toolbarRef.current;
@@ -307,13 +313,19 @@ export function FloatingToolbarPlugin({
       // editor theme variables for correct light/dark rendering.
       applyThemeVars(toolbar);
 
-      const nativeSelection = window.getSelection();
-      if (!nativeSelection || nativeSelection.rangeCount === 0) {
+      const rootElement = editor.getRootElement();
+      if (!rootElement) {
         setVisible(false);
         return;
       }
 
-      const pos = computePosition(nativeSelection, toolbar, portalContainer);
+      const rect = getDOMRectFromTextSelection(rootElement, selectionSnapshot);
+      if (!rect) {
+        setVisible(false);
+        return;
+      }
+
+      const pos = computePosition(rect, toolbar, portalContainer);
       if (!pos) {
         setVisible(false);
         return;
@@ -343,7 +355,7 @@ export function FloatingToolbarPlugin({
     const onScroll = () => requestAnimationFrame(positionToolbar);
     scrollParent.addEventListener('scroll', onScroll, { passive: true });
     return () => scrollParent.removeEventListener('scroll', onScroll);
-  }, [applyThemeVars, editor, visible, state]);
+  }, [applyThemeVars, editor, portalContainer, selectionSnapshot, state, visible]);
 
   const handleFormat = useCallback(
     (

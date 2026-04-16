@@ -9,6 +9,7 @@ import type { ReactNode } from 'react';
 import type { ColorScheme } from '../context/ColorSchemeContext';
 import { ColorSchemeProvider } from '../context/ColorSchemeContext';
 import { RendererConfigProvider } from '../context/RendererConfigContext';
+import { TextSelectionStoreProvider } from '../context/TextSelectionContext';
 import { setResolvedEditNodes } from '../node-registry';
 import { AutoFocusPlugin } from '../plugins/AutoFocusPlugin';
 import { EditorRefPlugin } from '../plugins/EditorRefPlugin';
@@ -79,33 +80,35 @@ export function RichEditorShell({
       <ColorSchemeProvider colorScheme={theme}>
         <RendererConfigProvider config={rendererConfig} mode="editor" variant={variant}>
           <LexicalComposer initialConfig={initialConfig}>
-            <FootnotePlugin>
-              <div
-                suppressHydrationWarning
-                className={clsx('rich-editor', variantClass, className)}
-                data-theme={theme}
-                style={{ ...style, maxWidth: 'none' }}
-              >
-                {header}
-                <RichTextPlugin
-                  ErrorBoundary={LexicalErrorBoundary}
-                  contentEditable={
-                    <ContentEditable
-                      className={contentClassName}
-                      hasHeader={!!header}
-                      placeholder={placeholder}
-                    />
-                  }
-                />
-                <HistoryPlugin />
-                <OnChangePlugin debounceMs={debounceMs} onChange={onChange} />
-                <SubmitShortcutPlugin onSubmit={onSubmit} />
-                <EditorRefPlugin onEditorReady={onEditorReady} />
-                {autoFocus && <AutoFocusPlugin />}
-                {children}
-                {actions && <div className="rich-editor__actions">{actions}</div>}
-              </div>
-            </FootnotePlugin>
+            <TextSelectionStoreProvider>
+              <FootnotePlugin>
+                <div
+                  suppressHydrationWarning
+                  className={clsx('rich-editor', variantClass, className)}
+                  data-theme={theme}
+                  style={{ ...style, maxWidth: 'none' }}
+                >
+                  {header}
+                  <RichTextPlugin
+                    ErrorBoundary={LexicalErrorBoundary}
+                    contentEditable={
+                      <ContentEditable
+                        className={contentClassName}
+                        hasHeader={!!header}
+                        placeholder={placeholder}
+                      />
+                    }
+                  />
+                  <HistoryPlugin />
+                  <OnChangePlugin debounceMs={debounceMs} onChange={onChange} />
+                  <SubmitShortcutPlugin onSubmit={onSubmit} />
+                  <EditorRefPlugin onEditorReady={onEditorReady} />
+                  {autoFocus && <AutoFocusPlugin />}
+                  {children}
+                  {actions && <div className="rich-editor__actions">{actions}</div>}
+                </div>
+              </FootnotePlugin>
+            </TextSelectionStoreProvider>
           </LexicalComposer>
         </RendererConfigProvider>
       </ColorSchemeProvider>

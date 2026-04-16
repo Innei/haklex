@@ -8,6 +8,7 @@ import { defaultImageUpload, ImageUploadPlugin } from '../plugins/ImageUploadPlu
 import { KaTeXPlugin } from '../plugins/KaTeXPlugin';
 import { LinkFaviconPlugin } from '../plugins/LinkFaviconPlugin';
 import { MermaidPlugin } from '../plugins/MermaidPlugin';
+import { TextSelectionPlugin } from '../plugins/TextSelectionPlugin';
 import type { RichEditorProps } from '../types';
 import { CorePlugins } from './CorePlugins';
 import { RichEditorShell } from './RichEditorShell';
@@ -28,6 +29,7 @@ export function RichEditor({ extraNodes, imageUpload, children, ...shellProps }:
           <MermaidPlugin />
           <LinkFaviconPlugin />
           <BlockIdPlugin />
+          <TextSelectionPlugin />
           {children}
         </RichEditorShell>
       </ExtraNodesProvider>

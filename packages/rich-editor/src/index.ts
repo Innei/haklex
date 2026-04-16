@@ -30,6 +30,13 @@ export {
   useRendererMode,
   useVariant,
 } from './context/RendererConfigContext';
+export type { TextSelectionStore, TextSelectionStoreState } from './context/TextSelectionContext';
+export {
+  createTextSelectionStore,
+  TextSelectionStoreProvider,
+  useTextSelectionSnapshot,
+  useTextSelectionStore,
+} from './context/TextSelectionContext';
 export { blockIdState } from './plugins/BlockIdPlugin';
 export * from './styles';
 export type { RichEditorProps, RichEditorVariant } from './types';
@@ -48,3 +55,15 @@ export {
   buildBlockAnchor,
   buildRangeAnchor,
 } from './utils/comment-anchor';
+export type { DOMSelectionTarget, TextSelectionSnapshot } from './utils/text-selection';
+export { TEXT_SELECTION_HIGHLIGHT_NAME } from './utils/text-selection-constants';
+export {
+  $captureTextSelection,
+  $captureTextSelectionFromRangeSelection,
+  $restoreTextSelection,
+  createDOMRangeFromTextSelection,
+  findDOMPointByTextOffset,
+  getBlockElementById,
+  getDOMRectFromTextSelection,
+  getTextOffsetFromDOMPoint,
+} from './utils/text-selection';

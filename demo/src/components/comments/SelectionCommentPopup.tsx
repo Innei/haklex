@@ -1,4 +1,8 @@
-import type { CommentAnchor, RangeAnchor } from '@haklex/rich-editor';
+import {
+  type CommentAnchor,
+  getTextOffsetFromDOMPoint,
+  type RangeAnchor,
+} from '@haklex/rich-editor';
 import { MessageSquarePlus } from 'lucide-react';
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -24,21 +28,6 @@ function findBlockIndex(contentEl: Element, node: Node): number {
   return -1;
 }
 
-function getTextOffset(container: Element, targetNode: Node, targetOffset: number): number {
-  const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
-  let offset = 0;
-  while (true) {
-    const node = walker.nextNode() as Text | null;
-    if (!node) break;
-
-    if (node === targetNode) {
-      return offset + targetOffset;
-    }
-    offset += node.textContent?.length ?? 0;
-  }
-  return offset;
-}
-
 function buildRangeAnchorFromSelection(
   sel: Selection,
   contentEl: Element,
@@ -57,8 +46,8 @@ function buildRangeAnchorFromSelection(
   if (!info) return null;
 
   const blockEl = contentEl.children[anchorIdx];
-  let startOffset = getTextOffset(blockEl, anchorNode, sel.anchorOffset);
-  let endOffset = getTextOffset(blockEl, focusNode, sel.focusOffset);
+  let startOffset = getTextOffsetFromDOMPoint(blockEl, anchorNode, sel.anchorOffset);
+  let endOffset = getTextOffsetFromDOMPoint(blockEl, focusNode, sel.focusOffset);
   if (startOffset > endOffset) {
     [startOffset, endOffset] = [endOffset, startOffset];
   }
