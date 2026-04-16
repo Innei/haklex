@@ -18,6 +18,7 @@ import { CURSOR_TOKEN, filterKaTeXSnippets, insertSnippetAtSelection } from './s
 import * as styles from './styles.css';
 
 interface KaTeXEditDecoratorProps {
+  autoOpenOnMount: boolean;
   children: ReactElement;
   displayMode: boolean;
   equation: string;
@@ -30,12 +31,13 @@ export function KaTeXEditDecorator({
   nodeKey,
   equation,
   displayMode,
+  autoOpenOnMount,
   children,
 }: KaTeXEditDecoratorProps) {
   const [editor] = useLexicalComposerContext();
   const editable = editor.isEditable();
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(autoOpenOnMount);
   const [value, setValue] = useState(equation);
   const [copied, setCopied] = useState(false);
   const [activeTab, setActiveTab] = useState<'editor' | 'snippets'>('editor');
@@ -53,6 +55,17 @@ export function KaTeXEditDecorator({
       end: target.selectionEnd,
     };
   }, []);
+
+  useEffect(() => {
+    if (autoOpenOnMount) {
+      editor.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if ($isKaTeXInlineNode(node) || $isKaTeXBlockNode(node)) {
+          node.setShouldAutoOpenOnMount(false);
+        }
+      });
+    }
+  }, [autoOpenOnMount, editor, nodeKey]);
 
   useEffect(() => {
     setValue(equation);
@@ -161,7 +174,16 @@ export function KaTeXEditDecorator({
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+
+        if (!nextOpen) {
+          setValue(equation);
+        }
+      }}
+    >
       <PopoverTrigger
         nativeButton={false}
         render={
@@ -175,6 +197,7 @@ export function KaTeXEditDecorator({
       </PopoverTrigger>
       <PopoverPanel
         className={`${styles.panel} ${styles.semanticClassNames.panel}`}
+        initialFocus={inputRef}
         side="bottom"
         sideOffset={8}
       >

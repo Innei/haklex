@@ -14,6 +14,8 @@ import { createElement } from 'react'
 import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer'
 import { createRendererDecoration } from '../components/RendererWrapper'
 import type { SlashMenuItemConfig } from '../types/slash-menu'
+import { resolveKaTeXEquation } from '../utils/katex-defaults'
+import { getRegisteredNodeKlass } from '../utils/getRegisteredNodeKlass'
 
 export type SerializedKaTeXBlockNode = Spread<
   {
@@ -24,6 +26,7 @@ export type SerializedKaTeXBlockNode = Spread<
 
 export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
   __equation: string
+  __autoOpenOnMount: boolean
 
   static slashMenuItems: SlashMenuItemConfig[] = [
     {
@@ -34,7 +37,9 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
       section: 'ADVANCED',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createKaTeXBlockNode('')])
+          $insertNodes([
+            $createKaTeXBlockNode('', { autoOpenOnMount: true }),
+          ])
         })
       },
     },
@@ -45,12 +50,17 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
   }
 
   static clone(node: KaTeXBlockNode): KaTeXBlockNode {
-    return new KaTeXBlockNode(node.__equation, node.__key)
+    return new KaTeXBlockNode(
+      node.__equation,
+      node.__key,
+      node.__autoOpenOnMount,
+    )
   }
 
-  constructor(equation: string, key?: NodeKey) {
+  constructor(equation: string, key?: NodeKey, autoOpenOnMount = false) {
     super(key)
     this.__equation = equation
+    this.__autoOpenOnMount = autoOpenOnMount
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
@@ -89,6 +99,15 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
     writable.__equation = equation
   }
 
+  getShouldAutoOpenOnMount(): boolean {
+    return this.getLatest().__autoOpenOnMount
+  }
+
+  setShouldAutoOpenOnMount(autoOpenOnMount: boolean): void {
+    const writable = this.getWritable()
+    writable.__autoOpenOnMount = autoOpenOnMount
+  }
+
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createRendererDecoration('KaTeX', KaTeXRenderer, {
       equation: this.__equation,
@@ -97,8 +116,19 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
   }
 }
 
-export function $createKaTeXBlockNode(equation: string): KaTeXBlockNode {
-  return new KaTeXBlockNode(equation)
+export function $createKaTeXBlockNode(
+  equation: string,
+  options?: { autoOpenOnMount?: boolean },
+): KaTeXBlockNode {
+  const NodeKlass = getRegisteredNodeKlass(
+    KaTeXBlockNode.getType(),
+    KaTeXBlockNode,
+  )
+  const node = new NodeKlass(resolveKaTeXEquation(equation, options))
+  if (options?.autoOpenOnMount) {
+    node.setShouldAutoOpenOnMount(true)
+  }
+  return node
 }
 
 export function $isKaTeXBlockNode(

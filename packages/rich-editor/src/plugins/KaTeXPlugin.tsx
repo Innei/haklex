@@ -18,7 +18,9 @@ export function KaTeXPlugin() {
     const unregisterInline = editor.registerCommand(
       INSERT_KATEX_INLINE_COMMAND,
       (equation) => {
-        const node = $createKaTeXInlineNode(equation)
+        const node = $createKaTeXInlineNode(equation, {
+          autoOpenOnMount: !equation.trim(),
+        })
         $insertNodes([node])
         return true
       },
@@ -28,7 +30,9 @@ export function KaTeXPlugin() {
     const unregisterBlock = editor.registerCommand(
       INSERT_KATEX_BLOCK_COMMAND,
       (equation) => {
-        const node = $createKaTeXBlockNode(equation)
+        const node = $createKaTeXBlockNode(equation, {
+          autoOpenOnMount: !equation.trim(),
+        })
         $insertNodes([node])
         return true
       },

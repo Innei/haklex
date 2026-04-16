@@ -8,7 +8,11 @@ import { KaTeXEditDecorator } from './KaTeXEditDecorator';
 
 export class KaTeXBlockEditNode extends KaTeXBlockNode {
   static clone(node: KaTeXBlockEditNode): KaTeXBlockEditNode {
-    return new KaTeXBlockEditNode(node.__equation, node.__key);
+    return new KaTeXBlockEditNode(
+      node.__equation,
+      node.__key,
+      node.getShouldAutoOpenOnMount(),
+    );
   }
 
   static importJSON(serializedNode: SerializedKaTeXBlockNode): KaTeXBlockEditNode {
@@ -24,6 +28,7 @@ export class KaTeXBlockEditNode extends KaTeXBlockNode {
       nodeKey: this.__key,
       equation: this.__equation,
       displayMode: true,
+      autoOpenOnMount: this.getShouldAutoOpenOnMount(),
       children: rendererEl,
     });
   }
