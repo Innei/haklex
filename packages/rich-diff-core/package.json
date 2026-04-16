@@ -22,13 +22,13 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "lexical": "^0.42.0",
+    "lexical": "^0.43.0",
     "typescript": "^5.9.3",
     "vite": "^7.3.1",
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "lexical": "^0.42.0"
+    "lexical": "^0.43.0"
   },
   "publishConfig": {
     "access": "public",
