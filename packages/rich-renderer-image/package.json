@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-image",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "Image renderer with blurhash and lightbox",
   "repository": {
     "type": "git",
@@ -27,7 +27,6 @@
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "jotai": "2.18.0",
-    "lucide-react": "^1.0.0",
     "react-photo-view": "^1.2.7"
   },
   "devDependencies": {
@@ -46,6 +45,7 @@
   "peerDependencies": {
     "@lexical/react": "^0.43.0",
     "lexical": "^0.43.0",
+    "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
   },

@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-static-renderer",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "Headless SSR engine for Lexical rich content",
   "repository": {
     "type": "git",
@@ -24,8 +24,7 @@
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "@lexical/code-core": "^0.43.0",
-    "@lexical/headless": "^0.43.0",
-    "lucide-react": "^1.0.0"
+    "@lexical/headless": "^0.43.0"
   },
   "devDependencies": {
     "@lexical/extension": "^0.43.0",
@@ -50,6 +49,7 @@
     "@lexical/rich-text": "^0.43.0",
     "@lexical/table": "^0.43.0",
     "lexical": "^0.43.0",
+    "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
   },

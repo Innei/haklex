@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-mermaid",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "Mermaid diagram renderer",
   "repository": {
     "type": "git",
@@ -27,7 +27,6 @@
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "lucide-react": "^1.0.0",
     "mermaid": "^11.12.3",
     "react-zoom-pan-pinch": "^3.7.0"
   },
@@ -43,6 +42,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
   },

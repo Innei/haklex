@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-ai-agent",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "AI agent editor integration: diff UI, action registry, agent panel plugin",
   "repository": {
     "type": "git",
@@ -29,8 +29,7 @@
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-litexml": "workspace:*",
     "@haklex/rich-static-renderer": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
-    "lucide-react": "^1.0.0"
+    "@haklex/rich-style-token": "workspace:*"
   },
   "devDependencies": {
     "@lexical/react": "^0.43.0",
@@ -48,6 +47,7 @@
   "peerDependencies": {
     "@lexical/react": "^0.43.0",
     "lexical": "^0.43.0",
+    "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
   },

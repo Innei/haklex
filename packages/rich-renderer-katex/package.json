@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-katex",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "KaTeX math renderer for haklex rich editor",
   "repository": {
     "type": "git",
@@ -24,8 +24,7 @@
   "dependencies": {
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
-    "lucide-react": "^1.0.0"
+    "@haklex/rich-style-token": "workspace:*"
   },
   "devDependencies": {
     "@lexical/react": "^0.43.0",
@@ -46,6 +45,7 @@
     "@lexical/react": "^0.43.0",
     "katex": ">=0.16.0",
     "lexical": "^0.43.0",
+    "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
   },

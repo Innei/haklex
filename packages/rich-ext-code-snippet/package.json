@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-code-snippet",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "Multi-file code snippet extension",
   "repository": {
     "type": "git",
@@ -35,7 +35,6 @@
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "lucide-react": "^1.0.0",
     "shiki": "^4.0.1"
   },
   "devDependencies": {
@@ -54,6 +53,7 @@
   },
   "peerDependencies": {
     "lexical": "^0.43.0",
+    "lucide-react": "^1.0.0",
     "react": ">=19"
   },
   "publishConfig": {

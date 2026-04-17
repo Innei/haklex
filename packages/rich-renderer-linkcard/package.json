@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-linkcard",
-  "version": "0.0.106",
+  "version": "0.0.107",
   "description": "Rich link preview card renderer with extensible URL plugins",
   "repository": {
     "type": "git",
@@ -26,7 +26,6 @@
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "lucide-react": "^1.0.0",
     "react-intersection-observer": "^10.0.3"
   },
   "devDependencies": {
@@ -47,6 +46,7 @@
     "@lexical/link": "^0.43.0",
     "@lexical/react": "^0.43.0",
     "lexical": "^0.43.0",
+    "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
   },
