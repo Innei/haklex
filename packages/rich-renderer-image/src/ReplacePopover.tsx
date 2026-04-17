@@ -15,6 +15,10 @@ export function ReplacePopover() {
     <Popover open={replaceOpen} onOpenChange={handleReplaceOpenChange}>
       <PopoverTrigger
         className={`${styles.editPlaceholder} ${styles.semanticClassNames.editPlaceholder}`}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
       >
         <ImageIcon size={24} />
         <span>Click to add image</span>

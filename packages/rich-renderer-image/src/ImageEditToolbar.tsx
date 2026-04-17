@@ -30,6 +30,10 @@ export function ImageEditToolbar() {
         <PopoverTrigger
           className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}
           title="Edit details"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
           <Type size={14} />
         </PopoverTrigger>
@@ -48,6 +52,10 @@ export function ImageEditToolbar() {
         <PopoverTrigger
           className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}
           title="Replace image"
+          onMouseDown={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
         >
           <Replace size={14} />
         </PopoverTrigger>
