@@ -120,27 +120,32 @@ Only stage the bumped manifests and lockfile. If the worktree has unrelated edit
 
 ## Phase 6 — Downstream update in parallel worktrees
 
-**Record the primary branch per downstream** before touching anything — this is the branch we'll push back to in Phase 8b:
+**Target branch is always the downstream's default branch** (`origin/HEAD` — typically `main` or `master`), regardless of what branch the local checkout is currently on. The bump lands there so all feature branches can rebase/merge it in. Never target a feature branch — that strands the bump in a silo.
+
+Derive the default branch per repo — do not guess:
 
 ```bash
-declare -A PRIMARY
+declare -A DEFAULT
 for repo in Yohaku admin-vue3 mx-core; do
-  PRIMARY[$repo]=$(git -C "/Users/innei/git/innei-repo/$repo" branch --show-current)
+  git -C "/Users/innei/git/innei-repo/$repo" remote set-head origin --auto > /dev/null 2>&1
+  DEFAULT[$repo]=$(git -C "/Users/innei/git/innei-repo/$repo" symbolic-ref refs/remotes/origin/HEAD --short | sed 's#^origin/##')
 done
 ```
 
-If a repo is in detached HEAD state, stop and ask the user which branch to target. Never guess.
+If `symbolic-ref` fails (no `origin/HEAD`), stop and ask the user which branch is canonical.
 
-Create a disposable worktree per repo on a temp branch (isolation only — this branch is never pushed):
+Create a disposable worktree per downstream, branched off `origin/${DEFAULT[$repo]}`:
 
 ```bash
 for repo in Yohaku admin-vue3 mx-core; do
+  D="${DEFAULT[$repo]}"
+  git -C "/Users/innei/git/innei-repo/$repo" fetch origin "$D"
   git -C "/Users/innei/git/innei-repo/$repo" worktree add \
-    "/tmp/release-$repo-$NEW_VERSION" -b "chore/haklex-$NEW_VERSION"
+    "/tmp/release-$repo-$NEW_VERSION" -b "chore/haklex-$NEW_VERSION" "origin/$D"
 done
 ```
 
-Before editing, `git fetch origin` inside each worktree so the rebase in Phase 8b has fresh refs.
+The `chore/haklex-$NEW_VERSION` branch is temp — it exists only for worktree isolation and is never pushed to origin.
 
 In each worktree, replace pinned `"@haklex/<pkg>": "<old>"` → `"$NEW_VERSION"` in the file(s) from the Repo layout table. Use `Edit` (not `sed -i`) so the diff is reviewable. Then `pnpm install`.
 
@@ -192,14 +197,14 @@ Run the three repos in parallel (one subagent per worktree). Collect pass/fail p
 
    Report the offending package, the diff, and the recommended fix.
 
-## Phase 8b — Success: push commit directly to downstream primary branch
+## Phase 8b — Success: push commit directly to downstream default branch
 
-Downstream bumps are pure version pins — no code review needed. Push direct, no PR.
+Downstream bumps are pure version pins — no code review needed. Push direct, no PR. Never target a feature branch.
 
-In each worktree:
+In each worktree (branched off `origin/${DEFAULT[$repo]}` in Phase 6):
 
 ```bash
-PRIMARY_BRANCH="${PRIMARY[$repo]}"   # recorded in Phase 6
+D="${DEFAULT[$repo]}"   # e.g. main or master
 git add <files from table>
 git commit -m "$(cat <<EOF
 chore(deps): bump @haklex/* to $NEW_VERSION
@@ -209,12 +214,12 @@ $( [[ -n "$LIN_REFS" ]] && printf 'Linear: %s\n' "$LIN_REFS" )
 EOF
 )"
 
-# Rebase on the latest primary branch in case it moved during the release
-git fetch origin "$PRIMARY_BRANCH"
-git rebase "origin/$PRIMARY_BRANCH"
+# Refresh in case the default branch advanced during the release window
+git fetch origin "$D"
+git rebase "origin/$D"
 
-# Push the commit to the primary branch
-git push origin "HEAD:$PRIMARY_BRANCH"
+# Push the commit straight to the default branch
+git push origin "HEAD:$D"
 ```
 
 If `git rebase` surfaces conflicts, stop and ask the user. Do not `--skip` or `--abort` silently.
@@ -234,28 +239,28 @@ Emit `LIN-\d+` references (parsed from the caller's changeset description) insid
 
 Print:
 
-| Repo       | Branch    | Commit SHA | Bump | Tests (typecheck / build / e2e) | Linear |
-| ---------- | --------- | ---------- | ---- | ------------------------------- | ------ |
-| haklex     | main      | …          | …    | —                               | …      |
-| Yohaku     | main      | …          | —    | ✅ / ✅ / ✅                    | …      |
-| admin-vue3 | <primary> | …          | —    | ✅ / ✅ / ✅                    | …      |
-| mx-core    | <primary> | …          | —    | ✅ / ✅ / (skipped)             | …      |
+| Repo       | Branch | Commit SHA | Bump | Tests (typecheck / build / e2e) | Linear |
+| ---------- | ------ | ---------- | ---- | ------------------------------- | ------ |
+| haklex     | main   | …          | …    | —                               | …      |
+| Yohaku     | main   | …          | —    | ✅ / ✅ / ✅                    | …      |
+| admin-vue3 | main   | …          | —    | ✅ / ✅ / ✅                    | …      |
+| mx-core    | main   | …          | —    | ✅ / ✅ / (skipped)             | …      |
 
 ## Quick reference
 
-| Step             | Command                                                                                         |
-| ---------------- | ----------------------------------------------------------------------------------------------- |
-| Last release SHA | `git log --grep='^release: v' -n1 --format=%H`                                                  |
-| Changed pkgs     | `git diff --name-only $LAST..HEAD -- 'packages/*/src/**'`                                       |
-| Export diff      | `diff <(git show $LAST:…/index.ts \| grep ^export) <(git show HEAD:…/index.ts \| grep ^export)` |
-| Peer audit       | `jq '.dependencies, .peerDependencies' packages/<pkg>/package.json`                             |
-| Bump             | `pnpm bumpp -r <level> --no-git --no-tag`                                                       |
-| Build            | `pnpm run build:packages`                                                                       |
-| Publish one      | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                           |
-| Registry poll    | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                     |
-| Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V`                                    |
-| Primary branch   | `git -C <repo> branch --show-current` (record BEFORE worktree creation)                         |
-| Push downstream  | `git push origin HEAD:$PRIMARY_BRANCH` (rebase on `origin/$PRIMARY_BRANCH` first)               |
+| Step             | Command                                                                                           |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| Last release SHA | `git log --grep='^release: v' -n1 --format=%H`                                                    |
+| Changed pkgs     | `git diff --name-only $LAST..HEAD -- 'packages/*/src/**'`                                         |
+| Export diff      | `diff <(git show $LAST:…/index.ts \| grep ^export) <(git show HEAD:…/index.ts \| grep ^export)`   |
+| Peer audit       | `jq '.dependencies, .peerDependencies' packages/<pkg>/package.json`                               |
+| Bump             | `pnpm bumpp -r <level> --no-git --no-tag`                                                         |
+| Build            | `pnpm run build:packages`                                                                         |
+| Publish one      | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                             |
+| Registry poll    | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                       |
+| Default branch   | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master) |
+| Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                            |
+| Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                   |
 
 ## Common mistakes
 
@@ -271,9 +276,10 @@ Print:
 | Force-pushing reverts without `--force-with-lease`  | Use `--force-with-lease`; ask user before pushing any force                             |
 | Guessing lobehub path                               | Ask the user; skip that downstream if not provided                                      |
 | Inventing Linear issue IDs                          | Only emit `LIN-\d+` IDs present in the user's changeset description                     |
-| Opening a PR for the downstream bump                | Bumps go direct to the primary branch — no PR, no `gh pr create`                        |
-| Pushing the `chore/haklex-$V` branch to origin      | That branch is worktree-local; push commits as `HEAD:$PRIMARY_BRANCH` instead           |
-| Skipping `git fetch` + rebase before push           | Primary may have advanced during the release; rebase on `origin/$PRIMARY_BRANCH` first  |
+| Opening a PR for the downstream bump                | Bumps go direct to the default branch — no PR, no `gh pr create`                        |
+| Pushing the `chore/haklex-$V` branch to origin      | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch |
+| Skipping `git fetch` + rebase before push           | Default branch may have advanced during the release; rebase on `origin/$D` first        |
+| Targeting a feature branch or guessing `main`       | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`              |
 
 ## Red flags — STOP and ask
 
@@ -284,9 +290,9 @@ Print:
 - Any `major` classification
 - Downstream smoke tests pass but build artefacts differ in size >30% from previous release
 - Being asked to `npm unpublish`, force-push, or revert commits already consumed by others
-- Downstream repo in detached-HEAD state (can't derive primary branch)
-- Rebase against `origin/$PRIMARY_BRANCH` surfaces conflicts (something else landed during the release)
-- Primary branch is protected in a way that rejects direct push (fall back to opening a PR, but ask first)
+- Downstream repo has no `main` branch (ask the user which branch is canonical; never guess)
+- Rebase against `origin/main` surfaces conflicts (something else landed during the release)
+- `main` is protected in a way that rejects direct push (fall back to opening a PR, but ask first)
 
 ## Real-world anchors
 
