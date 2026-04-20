@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-mention",
-  "version": "0.0.108",
+  "version": "0.0.109",
   "description": "Social mention renderer with platform badges",
   "repository": {
     "type": "git",
