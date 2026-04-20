@@ -82,13 +82,15 @@ function HunkRenderer({
 }) {
   const doc = useMemo(() => wrapDoc(hunk.nodes), [hunk.nodes]);
   return (
-    <RichRenderer
-      extraNodes={extraNodes}
-      rendererConfig={rendererConfig}
-      theme={theme}
-      value={doc}
-      variant={variant}
-    />
+    <div className={diffStyles.diffCompact}>
+      <RichRenderer
+        extraNodes={extraNodes}
+        rendererConfig={rendererConfig}
+        theme={theme}
+        value={doc}
+        variant={variant}
+      />
+    </div>
   );
 }
 

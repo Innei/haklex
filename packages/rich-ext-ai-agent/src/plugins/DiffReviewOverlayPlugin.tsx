@@ -25,6 +25,8 @@ import {
   batchHeaderActions,
   batchHeaderReject,
   batchPanel,
+  deleteActionBar,
+  diffCompact,
   floatingBar,
   floatingBarAccept,
   floatingBarLabel,
@@ -135,7 +137,7 @@ function InlineEntryPanel({
 }): ReactElement {
   return (
     <div
-      className={batchPanel}
+      className={`${batchPanel} ${diffCompact}`}
       ref={previewRefCallback(entry.id)}
       style={{ top: entry.previewTop }}
     >
@@ -197,7 +199,10 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
   const extraNodes = useExtraNodes();
 
   const previewRefs = useRef(new Map<string, HTMLDivElement>());
+  const deleteBarRefs = useRef(new Map<string, HTMLDivElement>());
   const observerRef = useRef<ResizeObserver | null>(null);
+  const repositionRef = useRef<() => void>(() => {});
+  const rafPendingRef = useRef(false);
 
   const batchGroups = useMemo(() => {
     const groups = new Map<string, OverlayEntry[]>();
@@ -209,6 +214,8 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     }
     return groups;
   }, [overlays]);
+
+  const deleteEntries = useMemo(() => overlays.filter((o) => o.type === 'delete'), [overlays]);
 
   const applyEntryOp = useCallback(
     (op: import('@haklex/rich-agent-core').AgentOperation) => {
@@ -397,20 +404,64 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       }
       panelEl.style.top = `${newTop}px`;
     }
+
+    // 定位 delete action bar：悬浮于 block 上缘右侧，right 对齐 block.right
+    for (const overlay of overlays) {
+      if (overlay.type !== 'delete' || !overlay.blockEl) continue;
+      const barEl = deleteBarRefs.current.get(overlay.id);
+      if (!barEl) continue;
+      const blockRect = overlay.blockEl.getBoundingClientRect();
+      barEl.style.top = `${blockRect.top - containerRect.top}px`;
+      barEl.style.right = `${containerRect.right - blockRect.right}px`;
+    }
   }, [overlays, containerEl]);
+
+  useEffect(() => {
+    repositionRef.current = repositionPanels;
+  }, [repositionPanels]);
+
+  const scheduleReposition = useCallback(() => {
+    if (rafPendingRef.current) return;
+    rafPendingRef.current = true;
+    requestAnimationFrame(() => {
+      rafPendingRef.current = false;
+      repositionRef.current();
+    });
+  }, []);
 
   useLayoutEffect(() => {
     repositionPanels();
-  }, [repositionPanels]);
+    // 次轮补正：上方 overlay 插 margin 后连锁偏移
+    scheduleReposition();
+  }, [repositionPanels, scheduleReposition]);
 
   useEffect(() => {
-    const observer = new ResizeObserver(() => repositionPanels());
+    const observer = new ResizeObserver(() => scheduleReposition());
     observerRef.current = observer;
     for (const el of previewRefs.current.values()) {
       observer.observe(el);
     }
-    return () => observer.disconnect();
-  }, [repositionPanels]);
+    // 监听 block 与容器尺寸变化
+    const blockEls = new Set<HTMLElement>();
+    for (const overlay of overlays) {
+      if (overlay.blockEl && !blockEls.has(overlay.blockEl)) {
+        blockEls.add(overlay.blockEl);
+        observer.observe(overlay.blockEl);
+      }
+    }
+    if (containerEl) observer.observe(containerEl);
+
+    const onWinChange = () => scheduleReposition();
+    window.addEventListener('resize', onWinChange, { passive: true });
+    window.addEventListener('scroll', onWinChange, { passive: true, capture: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', onWinChange);
+      window.removeEventListener('scroll', onWinChange, { capture: true } as any);
+      // 不 cancel rAF：effect 因 overlays 变动而反复 cleanup，若 cancel 则 reposition 永不跑
+    };
+  }, [scheduleReposition, overlays, containerEl]);
 
   const previewRefCallback = useCallback(
     (id: string) => (el: HTMLDivElement | null) => {
@@ -419,6 +470,17 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
         observerRef.current?.observe(el);
       } else {
         previewRefs.current.delete(id);
+      }
+    },
+    [],
+  );
+
+  const deleteBarRefCallback = useCallback(
+    (id: string) => (el: HTMLDivElement | null) => {
+      if (el) {
+        deleteBarRefs.current.set(id, el);
+      } else {
+        deleteBarRefs.current.delete(id);
       }
     },
     [],
@@ -557,7 +619,24 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
       }
     });
 
-    setOverlays(entries);
+    setOverlays((prev) => {
+      // 结构等价则复用旧数组，避 editor 频发 update 触发全链重渲而闪
+      if (prev.length !== entries.length) return entries;
+      for (let i = 0; i < entries.length; i++) {
+        const a = prev[i];
+        const b = entries[i];
+        if (
+          a.id !== b.id ||
+          a.batchId !== b.batchId ||
+          a.type !== b.type ||
+          a.blockEl !== b.blockEl ||
+          a.spacing !== b.spacing
+        ) {
+          return entries;
+        }
+      }
+      return prev;
+    });
   }, [editor, store]);
 
   useEffect(() => {
@@ -625,6 +704,24 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           );
         }),
       )}
+      {deleteEntries.map((entry) => (
+        <div className={deleteActionBar} key={entry.id} ref={deleteBarRefCallback(entry.id)}>
+          <button
+            className={batchHeaderReject}
+            type="button"
+            onClick={() => handleRejectEntry(entry.batchId, entry.id)}
+          >
+            Reject
+          </button>
+          <button
+            className={batchHeaderAccept}
+            type="button"
+            onClick={() => handleAcceptEntry(entry.batchId, entry.id)}
+          >
+            Accept
+          </button>
+        </div>
+      ))}
       {pendingCount > 1 && (
         <div className={floatingBar}>
           <span className={floatingBarLabel}>{pendingCount} changes</span>

@@ -143,10 +143,94 @@ export const rendererFrame = style({
   overflow: 'hidden',
 });
 
+// Delete 条目独立入口：视觉与 batchHeader 一致（同底色、同字号、同按钮），仅盒子为悬浮小宽
+export const deleteActionBar = style({
+  pointerEvents: 'auto',
+  position: 'absolute',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'flex-end',
+  gap: '2px',
+  padding: '2px 10px',
+  fontFamily: 'system-ui, sans-serif',
+  fontSize: '11px',
+  background: `color-mix(in srgb, ${vars.color.text} 3%, ${vars.color.bg})`,
+  border: `1px solid color-mix(in srgb, ${vars.color.text} 10%, transparent)`,
+  transform: 'translate(0, -100%)',
+});
+
+// Diff 特化样式：不复用 article/note/comment 之排版规格
+// selector 重复 className 以提 specificity，压制 variant 之 globalStyle 覆写
+export const diffCompact = style({
+  fontSize: '13px',
+  lineHeight: 1.55,
+});
+
 globalStyle(`${rendererFrame} > :first-child`, {
   marginTop: 0,
 });
 
 globalStyle(`${rendererFrame} > :last-child`, {
   marginBottom: 0,
+});
+
+const dc = `${diffCompact}${diffCompact}`;
+
+// RichRenderer 内部 wrap 一层 .articleVariant/.rich-content 并强写 fontSize: 16px
+// 断继承链，故此处需显式为各文本元素指定紧凑字号
+globalStyle(`${dc} .rich-content, ${dc} .article-article, ${dc} [class*="richContent"]`, {
+  fontSize: '13px',
+  lineHeight: 1.55,
+});
+
+globalStyle(
+  `${dc} p, ${dc} .rich-paragraph, ${dc} ul, ${dc} ol, ${dc} .rich-list-ul, ${dc} .rich-list-ol, ${dc} li, ${dc} .rich-list-item, ${dc} blockquote, ${dc} .rich-quote, ${dc} pre`,
+  {
+    marginTop: '2px',
+    marginBottom: '2px',
+    fontSize: '13px',
+  },
+);
+
+globalStyle(
+  `${dc} h1, ${dc} h2, ${dc} h3, ${dc} h4, ${dc} h5, ${dc} h6, ${dc} .rich-heading-h1, ${dc} .rich-heading-h2, ${dc} .rich-heading-h3, ${dc} .rich-heading-h4, ${dc} .rich-heading-h5, ${dc} .rich-heading-h6`,
+  {
+    fontSize: '13px',
+    fontWeight: 600,
+    lineHeight: 1.35,
+    marginTop: '4px',
+    marginBottom: '2px',
+  },
+);
+
+globalStyle(`${dc} ul, ${dc} ol, ${dc} .rich-list-ul, ${dc} .rich-list-ol`, {
+  paddingLeft: '18px',
+});
+
+globalStyle(`${dc} li, ${dc} .rich-list-item`, {
+  marginTop: 0,
+  marginBottom: 0,
+});
+
+globalStyle(`${dc} pre, ${dc} .rich-code-block`, {
+  padding: '6px 8px',
+  fontSize: '12px',
+  lineHeight: 1.45,
+  marginTop: '4px',
+  marginBottom: '4px',
+});
+
+globalStyle(`${dc} blockquote, ${dc} .rich-quote`, {
+  paddingLeft: '8px',
+  marginLeft: 0,
+  marginTop: '4px',
+  marginBottom: '4px',
+  fontStyle: 'normal',
+});
+
+globalStyle(`${dc} img, ${dc} .rich-image`, {
+  maxWidth: '100%',
+  height: 'auto',
+  marginTop: '4px',
+  marginBottom: '4px',
 });
