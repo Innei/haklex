@@ -1,0 +1,33 @@
+{
+  "fixtures": [
+    {
+      "match": { "toolCallId": "call_delete" },
+      "response": {
+        "content": "All three edits proposed. Review each diff in the document and accept or reject individually, or use the floating bar to bulk-apply."
+      }
+    },
+    {
+      "match": { "userMessage": "demo overlay" },
+      "response": {
+        "content": "Applying three edits: replace one paragraph, insert two blocks after an anchor, and delete another paragraph.",
+        "toolCalls": [
+          {
+            "id": "call_replace",
+            "name": "replace_node",
+            "arguments": "{\"blockId\":\"b-005\",\"xml\":\"<p>REPLACED: rewritten by mock agent to demonstrate the replace overlay, which should visually cover the original block while the diff preview renders in place with tight compact spacing. The replaced content is longer than the original to stress panel sizing.</p>\"}"
+          },
+          {
+            "id": "call_insert",
+            "name": "insert_node",
+            "arguments": "{\"position\":{\"type\":\"after\",\"blockId\":\"b-013\"},\"xml\":\"<h3>Mock Inserted Heading</h3><p>INSERTED: this paragraph is a mock insert. Multiple stacked previews after the anchor should accumulate margin without collision, and the anchor should remain visually stable underneath.</p>\"}"
+          },
+          {
+            "id": "call_delete",
+            "name": "delete_node",
+            "arguments": "{\"blockId\":\"b-021\"}"
+          }
+        ]
+      }
+    }
+  ]
+}
