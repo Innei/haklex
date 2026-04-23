@@ -1,6 +1,11 @@
 import { getDOMRectFromTextSelection, useTextSelectionSnapshot } from '@haklex/rich-editor';
 import { $selectionTouchesSpoiler, $toggleSpoilerSelection } from '@haklex/rich-editor/commands';
-import { $createRubyNode, $isRubyNode } from '@haklex/rich-editor/nodes';
+import {
+  $createRubyNode,
+  $isKaTeXInlineNode,
+  $isRubyNode,
+  type KaTeXInlineNode,
+} from '@haklex/rich-editor/nodes';
 import { ColorPicker } from '@haklex/rich-editor-ui';
 import { usePortalContainer, usePortalTheme, vars } from '@haklex/rich-style-token';
 import type { AutoLinkNode } from '@lexical/link';
@@ -126,6 +131,12 @@ function getSelectionState(selection: RangeSelection): ToolbarState {
     return isEffectiveLinkNode(parent) || isEffectiveLinkNode(node);
   });
   const hasRuby = getSelectedRubyNodes(nodes).length > 0;
+  const textColor = $getSelectionStyleValueForProperty(selection, 'color', '');
+  let fontColor = textColor;
+  if (!fontColor) {
+    const katex = nodes.find((n): n is KaTeXInlineNode => $isKaTeXInlineNode(n));
+    if (katex) fontColor = katex.getColor() ?? '';
+  }
 
   return {
     isBold: selection.hasFormat('bold'),
@@ -139,7 +150,7 @@ function getSelectionState(selection: RangeSelection): ToolbarState {
     isLink: hasLink,
     isRuby: hasRuby,
     isSpoiler: $selectionTouchesSpoiler(selection),
-    fontColor: $getSelectionStyleValueForProperty(selection, 'color', ''),
+    fontColor,
   };
 }
 
@@ -411,8 +422,11 @@ export function FloatingToolbarPlugin({
     (value: string) => {
       editor.update(() => {
         const sel = $getSelection();
-        if ($isRangeSelection(sel)) {
-          $patchStyleText(sel, { color: value === 'inherit' ? null : value });
+        if (!$isRangeSelection(sel)) return;
+        const color = value === 'inherit' ? null : value;
+        $patchStyleText(sel, { color });
+        for (const node of sel.getNodes()) {
+          if ($isKaTeXInlineNode(node)) node.setColor(color);
         }
       });
     },

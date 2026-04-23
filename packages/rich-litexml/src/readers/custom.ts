@@ -127,9 +127,11 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
         version: 1,
       } as any;
     }
+    const color = el.getAttribute('color');
     return {
       type: 'katex-inline',
       equation: el.textContent ?? '',
+      ...(color ? { color } : {}),
       version: 1,
     } as any;
   });

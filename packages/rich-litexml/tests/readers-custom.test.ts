@@ -50,6 +50,13 @@ describe('custom readers', () => {
     expect(inline.equation).toBe('E=mc^2');
   });
 
+  it('reads inline <math color="..."> and preserves color', () => {
+    const nodes = parse('<p id="p1"><math color="#ef4444">E=mc^2</math></p>');
+    const inline = nodes[0].children[0];
+    expect(inline.type).toBe('katex-inline');
+    expect(inline.color).toBe('#ef4444');
+  });
+
   it('reads <alert>', () => {
     const nodes = parse('<alert id="aq1" type="warning"><p>Be careful</p></alert>');
     expect(nodes[0].type).toBe('alert-quote');

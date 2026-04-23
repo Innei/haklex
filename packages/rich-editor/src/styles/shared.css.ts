@@ -127,7 +127,7 @@ export const textCode = style({
   fontFamily: vars.typography.fontMono,
   fontSize: '0.9em',
   backgroundColor: vars.color.codeBg,
-  color: vars.color.codeText,
+  color: 'inherit',
   padding: '2px 6px',
   borderRadius: vars.borderRadius.sm,
   border: `1px solid ${vars.color.border}`,
@@ -525,6 +525,11 @@ export const spoiler = style({
 globalStyle(`.rich-content ${spoiler}`, {
   backgroundColor: vars.color.textTertiary,
   color: 'transparent',
+});
+
+/** Force descendants transparent while hidden so TextNode inline `color` styles don't leak through the mask */
+globalStyle(`.rich-content ${spoiler}:not(:hover):not(.${semanticClassNames.spoilerRevealed}) *`, {
+  color: 'transparent !important',
 });
 
 globalStyle(`.rich-content ${spoiler}:hover`, {

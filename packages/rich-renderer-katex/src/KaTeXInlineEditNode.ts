@@ -12,11 +12,14 @@ export class KaTeXInlineEditNode extends KaTeXInlineNode {
       node.__equation,
       node.__key,
       node.getShouldAutoOpenOnMount(),
+      node.__color,
     );
   }
 
   static importJSON(serializedNode: SerializedKaTeXInlineNode): KaTeXInlineEditNode {
-    return new KaTeXInlineEditNode(serializedNode.equation);
+    const node = new KaTeXInlineEditNode(serializedNode.equation);
+    if (serializedNode.color) node.setColor(serializedNode.color);
+    return node;
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -24,12 +27,14 @@ export class KaTeXInlineEditNode extends KaTeXInlineNode {
       equation: this.__equation,
       displayMode: false,
     });
-    return createElement(KaTeXEditDecorator, {
+    const decorator = createElement(KaTeXEditDecorator, {
       nodeKey: this.__key,
       equation: this.__equation,
       displayMode: false,
       autoOpenOnMount: this.getShouldAutoOpenOnMount(),
       children: rendererEl,
     });
+    if (!this.__color) return decorator;
+    return createElement('span', { style: { color: this.__color } }, decorator);
   }
 }

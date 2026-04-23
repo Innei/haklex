@@ -145,6 +145,23 @@ describe('custom writers', () => {
     expect(xml).toContain('Energy is <math>E=mc^2</math>');
   });
 
+  it('katex-inline with color attribute', () => {
+    const xml = serialize([
+      {
+        type: 'paragraph',
+        $: { blockId: 'p1' },
+        children: [{ type: 'katex-inline', equation: 'E=mc^2', color: '#ef4444', version: 1 }],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        textFormat: 0,
+        textStyle: '',
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain('<math color="#ef4444">E=mc^2</math>');
+  });
+
   // Pattern C: nested EditorState
   it('alert-quote', () => {
     const xml = serialize([

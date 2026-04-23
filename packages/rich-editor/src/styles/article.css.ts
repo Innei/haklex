@@ -105,7 +105,7 @@ globalStyle(article(`${sharedStyles.quote} ${sharedStyles.paragraph}:last-child`
 });
 
 globalStyle(article(sharedStyles.textCode), {
-  color: vars.color.text,
+  color: 'inherit',
   fontWeight: 600,
   fontSize: em(14, 16),
   backgroundColor: vars.color.codeBg,

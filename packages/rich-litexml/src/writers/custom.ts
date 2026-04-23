@@ -100,8 +100,11 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
 
   registry.registerWriter('katex-inline', (node) => {
     const n = node as any;
+    const attrs: Record<string, string> = {};
+    if (n.color) attrs.color = n.color;
     return {
       tag: 'math',
+      attrs: Object.keys(attrs).length > 0 ? attrs : undefined,
       children: [n.equation ?? ''],
     };
   });
