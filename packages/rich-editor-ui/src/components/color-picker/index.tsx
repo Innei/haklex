@@ -1,6 +1,8 @@
-import { Check, ChevronDown } from 'lucide-react';
+import { Check, ChevronDown, Plus } from 'lucide-react';
+import { useState } from 'react';
 
 import { Popover, PopoverPanel, PopoverTrigger } from '../popover';
+import { PickerView } from './picker-view';
 import * as css from './styles.css';
 
 const TEXT_COLORS = [
@@ -13,6 +15,7 @@ const TEXT_COLORS = [
   { name: 'Teal', value: '#14b8a6' },
   { name: 'Blue', value: '#3b82f6' },
   { name: 'Indigo', value: '#6366f1' },
+  { name: 'Purple', value: '#a855f7' },
   { name: 'Pink', value: '#ec4899' },
 ];
 
@@ -23,10 +26,30 @@ export interface ColorPickerProps {
 }
 
 export function ColorPicker({ currentColor, onSelect, className }: ColorPickerProps) {
+  const [open, setOpen] = useState(false);
+  const [view, setView] = useState<'preset' | 'picker'>('preset');
+
   const displayColor = currentColor === 'inherit' || !currentColor ? 'currentColor' : currentColor;
 
+  const handleOpenChange = (next: boolean) => {
+    setOpen(next);
+    if (!next) setView('preset');
+  };
+
+  const handlePreset = (value: string) => {
+    onSelect(value);
+    handleOpenChange(false);
+  };
+
+  const handleApply = (hex: string) => {
+    onSelect(hex);
+    handleOpenChange(false);
+  };
+
+  const handleCancel = () => handleOpenChange(false);
+
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
         className={`${css.trigger}${className ? ` ${className}` : ''}`}
         render={<button type="button" onMouseDown={(e) => e.preventDefault()} />}
@@ -41,28 +64,46 @@ export function ColorPicker({ currentColor, onSelect, className }: ColorPickerPr
       </PopoverTrigger>
 
       <PopoverPanel className={css.panel} side="bottom" sideOffset={6}>
-        <div className={css.grid}>
-          {TEXT_COLORS.map((color) => (
+        {view === 'preset' ? (
+          <div className={css.grid}>
+            {TEXT_COLORS.map((color) => (
+              <button
+                aria-label={color.name}
+                className={css.swatch}
+                key={color.value}
+                type="button"
+                onClick={() => handlePreset(color.value)}
+                onMouseDown={(e) => e.preventDefault()}
+              >
+                <span
+                  className={css.swatchDot}
+                  style={{
+                    backgroundColor: color.value === 'inherit' ? 'currentColor' : color.value,
+                  }}
+                />
+                {currentColor === color.value && <Check className={css.swatchCheck} />}
+              </button>
+            ))}
             <button
-              aria-label={color.name}
+              aria-label="Custom color"
               className={css.swatch}
-              key={color.value}
               type="button"
-              onMouseDown={(e) => {
-                e.preventDefault();
-                onSelect(color.value);
-              }}
+              onClick={() => setView('picker')}
+              onMouseDown={(e) => e.preventDefault()}
             >
-              <span
-                className={css.swatchDot}
-                style={{
-                  backgroundColor: color.value === 'inherit' ? 'currentColor' : color.value,
-                }}
-              />
-              {currentColor === color.value && <Check className={css.swatchCheck} />}
+              <span className={css.addSwatchDot}>
+                <Plus className={css.addSwatchIcon} />
+              </span>
             </button>
-          ))}
-        </div>
+          </div>
+        ) : (
+          <PickerView
+            initialColor={currentColor}
+            onApply={handleApply}
+            onBack={() => setView('preset')}
+            onCancel={handleCancel}
+          />
+        )}
       </PopoverPanel>
     </Popover>
   );
