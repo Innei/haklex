@@ -1,6 +1,6 @@
 ---
 name: release-orchestrator
-description: Use when releasing @haklex/* packages and propagating to downstream consumers (Yohaku, admin-vue3, mx-core, mx-space). Owns end-to-end orchestration: change detection, per-package semver calc, peer-dep audit to prevent duplicate-instance bugs (e.g. lucide-react React Context mismatch), topologically-ordered publish with npm registry polling, parallel-worktree downstream smoke tests, auto-revert on failure, and direct push to downstream primary branches (no PRs). Supersedes the old /release command.
+description: Use when releasing @haklex/* packages and propagating to downstream consumers (Yohaku, admin-vue3, mx-core, mx-space). Owns end-to-end orchestration: change detection, per-package semver calc, peer-dep audit to prevent duplicate-instance bugs (e.g. lucide-react React Context mismatch), topologically-ordered publish with npm registry polling, parallel-worktree downstream smoke tests, auto-revert on failure, and direct push to downstream primary branches (no PRs). Fully autonomous — no user confirmation gates. Supersedes the old /release command.
 user_invocable: true
 ---
 
@@ -19,16 +19,15 @@ If no package has publishable `src/**` changes, stop and report that there is no
 
 ## Repo layout
 
-| Concern                  | Path / Rule                                                                                                                                                                                                                                         |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| haklex root              | Run the release from the **same worktree** where `git status` is clean. Use `git worktree list` to confirm. Never switch checkouts mid-release.                                                                                                     |
-| Published namespace      | `@haklex/*`, via `pnpm run publish:packages` (excludes `@haklex/rich-editor-demo`).                                                                                                                                                                 |
-| Version strategy         | **Shared** — every `@haklex/*` lives on the same version (read from `packages/rich-editor/package.json`).                                                                                                                                           |
-| Downstream: Yohaku       | `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json` — `rich-editor`, `rich-kit-shiro`, `rich-static-renderer`                                                                                                                                |
-| Downstream: admin-vue3   | `/Users/innei/git/innei-repo/admin-vue3/package.json` — `rich-diff`, `rich-ext-nested-doc`, `rich-editor`, `rich-editor-ui`, `rich-kit-shiro`, `rich-plugin-toolbar`, `rich-style-token`, `rich-agent-chat`, `rich-agent-core`, `rich-ext-ai-agent` |
-| Downstream: mx-core      | `/Users/innei/git/innei-repo/mx-core/apps/core/package.json` — `rich-headless` only                                                                                                                                                                 |
-| Downstream: lobehub apps | Ask user for path (not auto-discoverable).                                                                                                                                                                                                          |
-| mx-space                 | Same repo as `mx-core` (mx-core is mx-space/core).                                                                                                                                                                                                  |
+| Concern                | Path / Rule                                                                                                                                                                                                                                         |
+| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| haklex root            | Run the release from the **same worktree** where `git status` is clean. Use `git worktree list` to confirm. Never switch checkouts mid-release.                                                                                                     |
+| Published namespace    | `@haklex/*`, via `pnpm run publish:packages` (excludes `@haklex/rich-editor-demo`).                                                                                                                                                                 |
+| Version strategy       | **Shared** — every `@haklex/*` lives on the same version (read from `packages/rich-editor/package.json`).                                                                                                                                           |
+| Downstream: Yohaku     | `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json` — `rich-editor`, `rich-kit-shiro`, `rich-static-renderer`                                                                                                                                |
+| Downstream: admin-vue3 | `/Users/innei/git/innei-repo/admin-vue3/package.json` — `rich-diff`, `rich-ext-nested-doc`, `rich-editor`, `rich-editor-ui`, `rich-kit-shiro`, `rich-plugin-toolbar`, `rich-style-token`, `rich-agent-chat`, `rich-agent-core`, `rich-ext-ai-agent` |
+| Downstream: mx-core    | `/Users/innei/git/innei-repo/mx-core/apps/core/package.json` — `rich-headless` only                                                                                                                                                                 |
+| mx-space               | Same repo as `mx-core` (mx-core is mx-space/core).                                                                                                                                                                                                  |
 
 ## Phase 1 — Pre-flight
 
@@ -66,7 +65,7 @@ diff \
 # '<' only = removed → major;  '>' only = added → minor
 ```
 
-Because haklex uses a **shared version**, compute `max(bumps)` across all changed packages and apply to all. Print the per-package classification table and get user approval before any `bumpp` call. Any `major` classification requires explicit confirmation.
+Because haklex uses a **shared version**, compute `max(bumps)` across all changed packages and apply to all. Print the per-package classification table for visibility, then proceed directly to Phase 3 — do **not** gate on user approval, including for `major` classifications. Run fully autonomously.
 
 ## Phase 3 — peerDependencies audit (critical)
 
@@ -273,7 +272,6 @@ Print:
 | Running `pnpm run release:rich` inside this skill  | That script compresses bump/build/publish into one step; this skill needs them separate |
 | `npm unpublish` without user confirmation          | Always ask — unpublish is public, permanent, and time-limited                           |
 | Force-pushing reverts without `--force-with-lease` | Use `--force-with-lease`; ask user before pushing any force                             |
-| Guessing lobehub path                              | Ask the user; skip that downstream if not provided                                      |
 | Opening a PR for the downstream bump               | Bumps go direct to the default branch — no PR, no `gh pr create`                        |
 | Pushing the `chore/haklex-$V` branch to origin     | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch |
 | Skipping `git fetch` + rebase before push          | Default branch may have advanced during the release; rebase on `origin/$D` first        |
@@ -285,7 +283,6 @@ Print:
 - `git status` dirty in haklex
 - A published package still 404s from the registry after 5 minutes of polling
 - User asks to skip peer-dep audit ("it worked last time")
-- Any `major` classification
 - Downstream smoke tests pass but build artefacts differ in size >30% from previous release
 - Being asked to `npm unpublish`, force-push, or revert commits already consumed by others
 - Downstream repo has no `main` branch (ask the user which branch is canonical; never guess)
