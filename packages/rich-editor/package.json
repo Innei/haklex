@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-editor",
-  "version": "0.0.109",
+  "version": "0.0.110",
   "description": "Core rich text editor based on Lexical",
   "repository": {
     "type": "git",
@@ -28,7 +28,6 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@base-ui/react": "^1.1.0",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
