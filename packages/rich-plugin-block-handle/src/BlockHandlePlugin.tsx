@@ -561,9 +561,11 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
         return;
       }
       if (!handle.nodeKey) return;
-      selectBlock(handle.nodeKey, event.shiftKey);
+      const { nodeKey } = handle;
+      const { shiftKey } = event;
+      editor.focus(() => selectBlock(nodeKey, shiftKey));
     },
-    [handle.nodeKey, selectBlock],
+    [editor, handle.nodeKey, selectBlock],
   );
 
   const onGripContextMenu = useCallback(
@@ -738,8 +740,7 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
       if (!nodeKey) return;
 
       event.preventDefault();
-      selectBlock(nodeKey, event.shiftKey);
-      editor.focus();
+      editor.focus(() => selectBlock(nodeKey, event.shiftKey));
       isDragging = true;
       lastKey = nodeKey;
     };

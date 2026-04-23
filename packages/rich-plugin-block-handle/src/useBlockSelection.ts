@@ -14,9 +14,12 @@ import {
   KEY_ARROW_UP_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
+  KEY_DOWN_COMMAND,
   KEY_ESCAPE_COMMAND,
   type LexicalEditor,
   type LexicalNode,
+  PASTE_COMMAND,
+  PASTE_TAG,
   REMOVE_TEXT_COMMAND,
   SELECT_ALL_COMMAND,
 } from 'lexical';
@@ -24,14 +27,38 @@ import { useCallback, useEffect, useRef } from 'react';
 
 import {
   buildBlockClipboardData,
+  createDataTransferFromBlockClipboardData,
+  getDataTransferFromPasteEvent,
+  hasInsertableClipboardData,
+  hasPasteableClipboardData,
+  insertDataTransferForBlockSelectionPaste,
+  isDataTransferOnlyPasteEvent,
+  readNativeClipboardDataTransfer,
+  removeTopLevelNodesAndCreatePasteTarget,
   removeTopLevelNodesAndRestoreSelection,
+  replaceTopLevelNodesWithDataTransfer,
+  setBlockClipboardDataTransfer,
+  writeBlockClipboardDataToNativeClipboard,
 } from './blockSelectionUtils';
 import * as css from './styles.css';
+
+function isPasteBeforeInputEvent(event: InputEvent): boolean {
+  return event.inputType === 'insertFromPaste' || event.inputType === 'insertFromPasteAsQuotation';
+}
 
 function $getTopLevelKeys(): string[] {
   return $getRoot()
     .getChildren()
     .map((c) => c.getKey());
+}
+
+function getTopLevelKey(node: LexicalNode): string | null {
+  let current: LexicalNode | null = node;
+  while (current && current.getParent() && current.getParent() !== $getRoot()) {
+    current = current.getParent();
+  }
+
+  return current?.getParent() === $getRoot() ? current.getKey() : null;
 }
 
 function $selectBlockRange(anchorKey: string, focusKey: string): void {
@@ -58,6 +85,7 @@ export function useBlockSelection(editor: LexicalEditor) {
   // only activate when this set is non-empty. This prevents hijacking
   // single-decorator NodeSelections (code-block click, image click, etc.).
   const blockSelectionKeysRef = useRef<Set<string>>(new Set());
+  const latestBlockClipboardDataRef = useRef<Record<string, string> | null>(null);
 
   const clearBlockSelectionState = useCallback(() => {
     blockSelectionKeysRef.current = new Set();
@@ -74,20 +102,70 @@ export function useBlockSelection(editor: LexicalEditor) {
 
   const getOwnedSelectionNodes = useCallback((): LexicalNode[] => {
     const ownedKeys = blockSelectionKeysRef.current;
-    if (ownedKeys.size === 0) return [];
+    if (ownedKeys.size === 0) {
+      const selection = $getSelection();
+      if (!$isNodeSelection(selection)) return [];
+
+      const selectedNodes = selection.getNodes();
+      const topLevelFallbackNodes = selectedNodes.filter((node) => node.getParent() === $getRoot());
+
+      if (
+        topLevelFallbackNodes.length > 1 &&
+        topLevelFallbackNodes.length === selectedNodes.length
+      ) {
+        return getTopLevelNodesByKeys(new Set(topLevelFallbackNodes.map((node) => node.getKey())));
+      }
+
+      return [];
+    }
 
     const selection = $getSelection();
-    if (!$isNodeSelection(selection)) return [];
-
-    const selectionKeys = new Set(selection.getNodes().map((node) => node.getKey()));
-    const isOwnedSelection =
-      selectionKeys.size === ownedKeys.size &&
-      [...selectionKeys].every((key) => ownedKeys.has(key));
-
-    if (!isOwnedSelection) return [];
+    if (!$isNodeSelection(selection)) {
+      return getTopLevelNodesByKeys(ownedKeys);
+    }
 
     return getTopLevelNodesByKeys(ownedKeys);
   }, [getTopLevelNodesByKeys]);
+
+  const replaceBlockSelectionWithDataTransfer = useCallback(
+    (dataTransfer: DataTransfer): boolean => {
+      if (!hasInsertableClipboardData(dataTransfer)) {
+        return false;
+      }
+
+      let handled = false;
+      editor.update(
+        () => {
+          const nodes = getOwnedSelectionNodes();
+          if (nodes.length === 0) {
+            return;
+          }
+
+          handled = replaceTopLevelNodesWithDataTransfer(editor, nodes, dataTransfer);
+          if (handled) {
+            clearBlockSelectionState();
+          }
+        },
+        { discrete: true, tag: PASTE_TAG },
+      );
+
+      return handled;
+    },
+    [clearBlockSelectionState, editor, getOwnedSelectionNodes],
+  );
+
+  const getCurrentBlockClipboardData = useCallback((): Record<string, string> | null => {
+    let clipboardData: Record<string, string> | null = null;
+
+    editor.getEditorState().read(() => {
+      const nodes = getOwnedSelectionNodes();
+      if (nodes.length === 0) return;
+
+      clipboardData = buildBlockClipboardData(editor, nodes);
+    });
+
+    return clipboardData;
+  }, [editor, getOwnedSelectionNodes]);
 
   const deleteBlocksByKeys = useCallback(
     (keys: readonly string[]) => {
@@ -115,6 +193,7 @@ export function useBlockSelection(editor: LexicalEditor) {
 
       const nextKeys = new Set<string>();
       let isNodeSel = false;
+      const rangeTopLevelKeys: string[] = [];
       let topLevelKeys: string[] = [];
 
       editorState.read(() => {
@@ -123,6 +202,13 @@ export function useBlockSelection(editor: LexicalEditor) {
           isNodeSel = true;
           for (const node of sel.getNodes()) {
             nextKeys.add(node.getKey());
+          }
+        } else if ($isRangeSelection(sel)) {
+          const anchorTopLevelKey = getTopLevelKey(sel.anchor.getNode());
+          const focusTopLevelKey = getTopLevelKey(sel.focus.getNode());
+          if (anchorTopLevelKey) rangeTopLevelKeys.push(anchorTopLevelKey);
+          if (focusTopLevelKey && focusTopLevelKey !== anchorTopLevelKey) {
+            rangeTopLevelKeys.push(focusTopLevelKey);
           }
         }
         topLevelKeys = $getTopLevelKeys();
@@ -133,7 +219,13 @@ export function useBlockSelection(editor: LexicalEditor) {
       // relinquish ownership.
       if (blockSelectionKeysRef.current.size > 0) {
         if (!isNodeSel) {
-          clearBlockSelectionState();
+          const owned = blockSelectionKeysRef.current;
+          const rangeStillInsideOwnedBlocks =
+            rangeTopLevelKeys.length > 0 && rangeTopLevelKeys.every((key) => owned.has(key));
+
+          if (!rangeStillInsideOwnedBlocks) {
+            clearBlockSelectionState();
+          }
         } else {
           const owned = blockSelectionKeysRef.current;
           const stillOwned =
@@ -157,7 +249,11 @@ export function useBlockSelection(editor: LexicalEditor) {
       }
 
       // Only apply highlight classes for our owned block selection.
-      const highlightKeys = blockSelectionKeysRef.current.size > 0 ? nextKeys : new Set<string>();
+      const topLevelKeySet = new Set(topLevelKeys);
+      const highlightKeys =
+        blockSelectionKeysRef.current.size > 0
+          ? new Set([...blockSelectionKeysRef.current].filter((key) => topLevelKeySet.has(key)))
+          : new Set<string>();
 
       for (const key of prevKeys) {
         if (!highlightKeys.has(key)) {
@@ -180,6 +276,21 @@ export function useBlockSelection(editor: LexicalEditor) {
         editor.getElementByKey(key)?.classList.remove(css.blockSelected);
       }
     };
+  }, [clearBlockSelectionState, editor]);
+
+  useEffect(() => {
+    const rootEl = editor.getRootElement();
+    if (!rootEl) return;
+
+    const onPointerDown = (event: PointerEvent) => {
+      if (blockSelectionKeysRef.current.size === 0) return;
+      if (!(event.target instanceof Node) || !rootEl.contains(event.target)) return;
+
+      clearBlockSelectionState();
+    };
+
+    rootEl.addEventListener('pointerdown', onPointerDown, true);
+    return () => rootEl.removeEventListener('pointerdown', onPointerDown, true);
   }, [clearBlockSelectionState, editor]);
 
   // ── Nested editor focus guard ──
@@ -214,8 +325,67 @@ export function useBlockSelection(editor: LexicalEditor) {
     return () => rootEl.removeEventListener('focusin', onFocusIn);
   }, [clearBlockSelectionState, editor]);
 
+  useEffect(() => {
+    const rootEl = editor.getRootElement();
+    if (!rootEl) return;
+
+    const onBeforeInput = (event: InputEvent) => {
+      if (!isPasteBeforeInputEvent(event)) return;
+
+      if (blockSelectionKeysRef.current.size === 0 || !event.dataTransfer) return;
+
+      const handled = replaceBlockSelectionWithDataTransfer(event.dataTransfer);
+      if (!handled) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+    };
+
+    rootEl.addEventListener('beforeinput', onBeforeInput, true);
+    return () => rootEl.removeEventListener('beforeinput', onBeforeInput, true);
+  }, [editor, replaceBlockSelectionWithDataTransfer]);
+
   // ── Keyboard commands ──
   useEffect(() => {
+    const unregKeyDown = editor.registerCommand(
+      KEY_DOWN_COMMAND,
+      (event) => {
+        const key = event.key.toLowerCase();
+        if (!event.metaKey && !event.ctrlKey && key !== 'escape') return false;
+        if (!['a', 'c', 'v', 'x', 'escape'].includes(key)) return false;
+
+        if (
+          (event.metaKey || event.ctrlKey) &&
+          key === 'v' &&
+          blockSelectionKeysRef.current.size > 0
+        ) {
+          event.preventDefault();
+          const cachedClipboardData = latestBlockClipboardDataRef.current
+            ? { ...latestBlockClipboardDataRef.current }
+            : null;
+
+          void (async () => {
+            const dataTransfer = cachedClipboardData
+              ? createDataTransferFromBlockClipboardData(cachedClipboardData)
+              : await readNativeClipboardDataTransfer();
+
+            if (!dataTransfer) {
+              return;
+            }
+            if (blockSelectionKeysRef.current.size === 0) {
+              return;
+            }
+
+            replaceBlockSelectionWithDataTransfer(dataTransfer);
+          })();
+          return true;
+        }
+
+        return false;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+
     // Shift+ArrowDown: extend block selection downward.
     // Guard: only activate for our owned block selection.
     const unregShiftDown = editor.registerCommand(
@@ -351,22 +521,32 @@ export function useBlockSelection(editor: LexicalEditor) {
     const unregCopy = editor.registerCommand(
       COPY_COMMAND,
       (event) => {
-        if (!event || !('clipboardData' in event) || !event.clipboardData) return false;
+        const clipboardEvent =
+          event && typeof event === 'object' && 'clipboardData' in event ? event : null;
 
-        let handled = false;
-        editor.getEditorState().read(() => {
-          const nodes = getOwnedSelectionNodes();
-          if (nodes.length === 0) return;
+        const clipboardData = getCurrentBlockClipboardData();
+        if (!clipboardData) return false;
 
+        latestBlockClipboardDataRef.current = clipboardData;
+
+        if (clipboardEvent?.clipboardData) {
+          clipboardEvent.preventDefault();
+          setBlockClipboardDataTransfer(clipboardEvent.clipboardData, clipboardData);
+          return true;
+        }
+
+        if (
+          event &&
+          typeof event === 'object' &&
+          'preventDefault' in event &&
+          typeof event.preventDefault === 'function'
+        ) {
           event.preventDefault();
-          const clipboardData = buildBlockClipboardData(editor, nodes);
-          for (const [mimeType, value] of Object.entries(clipboardData)) {
-            (event as ClipboardEvent).clipboardData?.setData(mimeType, value);
-          }
-          handled = true;
-        });
+        }
 
-        return handled;
+        writeBlockClipboardDataToNativeClipboard(editor, clipboardData);
+
+        return true;
       },
       COMMAND_PRIORITY_CRITICAL,
     );
@@ -374,26 +554,82 @@ export function useBlockSelection(editor: LexicalEditor) {
     const unregCut = editor.registerCommand(
       CUT_COMMAND,
       (event) => {
-        if (!event || !('clipboardData' in event) || !event.clipboardData) return false;
+        const clipboardEvent =
+          event && typeof event === 'object' && 'clipboardData' in event ? event : null;
 
         let keysToDelete: string[] = [];
+        let clipboardData: Record<string, string> | null = null;
 
         editor.getEditorState().read(() => {
           const nodes = getOwnedSelectionNodes();
           if (nodes.length === 0) return;
 
-          event.preventDefault();
-          const clipboardData = buildBlockClipboardData(editor, nodes);
-          for (const [mimeType, value] of Object.entries(clipboardData)) {
-            (event as ClipboardEvent).clipboardData?.setData(mimeType, value);
-          }
+          clipboardData = buildBlockClipboardData(editor, nodes);
           keysToDelete = nodes.map((node) => node.getKey());
         });
 
-        if (keysToDelete.length === 0) return false;
+        if (keysToDelete.length === 0 || !clipboardData) return false;
+
+        latestBlockClipboardDataRef.current = clipboardData;
+
+        if (clipboardEvent?.clipboardData) {
+          clipboardEvent.preventDefault();
+          setBlockClipboardDataTransfer(clipboardEvent.clipboardData, clipboardData);
+        } else {
+          if (
+            event &&
+            typeof event === 'object' &&
+            'preventDefault' in event &&
+            typeof event.preventDefault === 'function'
+          ) {
+            event.preventDefault();
+          }
+          writeBlockClipboardDataToNativeClipboard(editor, clipboardData);
+        }
 
         deleteBlocksByKeys(keysToDelete);
         return true;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+
+    const unregPaste = editor.registerCommand(
+      PASTE_COMMAND,
+      (event) => {
+        const clipboardData = getDataTransferFromPasteEvent(event);
+        if (!clipboardData) {
+          return false;
+        }
+
+        const dataTransferOnly = isDataTransferOnlyPasteEvent(event);
+        const hasPasteData = dataTransferOnly
+          ? hasInsertableClipboardData(clipboardData)
+          : hasPasteableClipboardData(clipboardData);
+        if (!hasPasteData) {
+          return false;
+        }
+
+        const nodes = getOwnedSelectionNodes();
+        if (nodes.length === 0) {
+          return false;
+        }
+
+        removeTopLevelNodesAndCreatePasteTarget(nodes);
+        clearBlockSelectionState();
+
+        if (dataTransferOnly) {
+          if (
+            event &&
+            typeof event === 'object' &&
+            'preventDefault' in event &&
+            typeof event.preventDefault === 'function'
+          ) {
+            event.preventDefault();
+          }
+          return insertDataTransferForBlockSelectionPaste(editor, clipboardData);
+        }
+
+        return false;
       },
       COMMAND_PRIORITY_CRITICAL,
     );
@@ -446,18 +682,27 @@ export function useBlockSelection(editor: LexicalEditor) {
     );
 
     return () => {
+      unregKeyDown();
       unregShiftDown();
       unregShiftUp();
       unregSelectAll();
       unregEscape();
       unregCopy();
       unregCut();
+      unregPaste();
       unregBackspace();
       unregDelete();
       unregRemoveText();
       unregDeleteCharacter();
     };
-  }, [clearBlockSelectionState, deleteBlocksByKeys, editor, getOwnedSelectionNodes]);
+  }, [
+    clearBlockSelectionState,
+    deleteBlocksByKeys,
+    editor,
+    getCurrentBlockClipboardData,
+    getOwnedSelectionNodes,
+    replaceBlockSelectionWithDataTransfer,
+  ]);
 
   // ── Public API ──
   const selectBlock = useCallback(
