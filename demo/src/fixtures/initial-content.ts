@@ -161,6 +161,41 @@ console.log(greet('World'))`,
     version: 1,
   } as any,
 
+  heading('h3', text('Nested Lists')),
+
+  list(
+    'bullet',
+    listItem(paragraph(text('Top-level bullet'))),
+    listItem(
+      list(
+        'bullet',
+        listItem(paragraph(text('Second level'))),
+        listItem(
+          list(
+            'bullet',
+            listItem(paragraph(text('Third level (square marker)'))),
+            listItem(paragraph(text('Another deep item'))),
+          ),
+        ),
+        listItem(paragraph(text('Back to second level'))),
+      ),
+    ),
+    listItem(paragraph(text('Top-level bullet again'))),
+  ),
+
+  list(
+    'number',
+    listItem(paragraph(text('Ordered step one'))),
+    listItem(
+      list(
+        'number',
+        listItem(paragraph(text('Sub-step a (lower-alpha)'))),
+        listItem(paragraph(text('Sub-step b'))),
+      ),
+    ),
+    listItem(paragraph(text('Ordered step two'))),
+  ),
+
   heading('h2', text('Mermaid Diagram')),
 
   {

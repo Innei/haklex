@@ -110,22 +110,35 @@ function renderTree(
     return renderTextNode(serialized, nodeKey);
   }
 
+  const childNodes: any[] = typeof node.getChildren === 'function' ? node.getChildren() : [];
+
+  // Lexical's ElementNode.exportJSON() returns children: [] - child nodes
+  // are not embedded in the serialized output. Restore minimal type info
+  // from the live Lexical nodes so downstream structural checks (e.g.
+  // nested-list detection in listitem rendering) work.
+  if (
+    Array.isArray(serialized.children) &&
+    serialized.children.length === 0 &&
+    childNodes.length > 0
+  ) {
+    serialized.children = childNodes.map((c: any) => ({
+      type: typeof c.getType === 'function' ? c.getType() : c.__type,
+    }));
+  }
+
   let children: ReactNode[] | null = null;
-  if (node.getChildren) {
-    const childNodes = node.getChildren();
-    if (childNodes.length > 0) {
-      children = childNodes.map((child: any, i: number) =>
-        renderTree(
-          child,
-          editor,
-          editorConfig,
-          headingSlugs,
-          `${nodeKey}-${i}`,
-          undefined,
-          builtinNodeOverrides,
-        ),
-      );
-    }
+  if (childNodes.length > 0) {
+    children = childNodes.map((child: any, i: number) =>
+      renderTree(
+        child,
+        editor,
+        editorConfig,
+        headingSlugs,
+        `${nodeKey}-${i}`,
+        undefined,
+        builtinNodeOverrides,
+      ),
+    );
   }
 
   const textContent = node.getTextContent ? node.getTextContent() : undefined;

@@ -217,14 +217,6 @@ globalStyle(`${note(sharedStyles.listOl)}, ${note(sharedStyles.listUl)}`, {
   paddingLeft: '1.625em',
 });
 
-globalStyle(note(sharedStyles.listOl), {
-  listStyleType: 'decimal',
-});
-
-globalStyle(note(sharedStyles.listUl), {
-  listStyleType: 'disc',
-});
-
 globalStyle(note(sharedStyles.listItem), {
   marginTop: '0.5em',
   marginBottom: '0.5em',
