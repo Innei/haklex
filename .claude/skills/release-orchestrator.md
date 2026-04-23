@@ -1,6 +1,6 @@
 ---
 name: release-orchestrator
-description: Use when releasing @haklex/* packages and propagating to downstream consumers (Yohaku, admin-vue3, mx-core, lobehub, mx-space). Owns end-to-end orchestration: change detection, per-package semver calc, peer-dep audit to prevent duplicate-instance bugs (e.g. lucide-react React Context mismatch), topologically-ordered publish with npm registry polling, parallel-worktree downstream smoke tests, auto-revert on failure, and direct push to downstream primary branches (no PRs). Supersedes the old /release command.
+description: Use when releasing @haklex/* packages and propagating to downstream consumers (Yohaku, admin-vue3, mx-core, mx-space). Owns end-to-end orchestration: change detection, per-package semver calc, peer-dep audit to prevent duplicate-instance bugs (e.g. lucide-react React Context mismatch), topologically-ordered publish with npm registry polling, parallel-worktree downstream smoke tests, auto-revert on failure, and direct push to downstream primary branches (no PRs). Supersedes the old /release command.
 user_invocable: true
 ---
 
@@ -8,12 +8,14 @@ user_invocable: true
 
 Owns the full multi-package release pipeline. Supersedes the old `.claude/commands/release.md`.
 
-## Inputs (explicit contract — refuse to start if missing)
+## Invocation contract
 
-1. **Changeset description** — human summary. Scan for `LIN-\d+` to link Linear issues.
-2. **Affected packages** — caller hint. **Always verify** against `git diff --name-only`.
+Do not require caller-supplied release metadata. Infer the release context from repository state:
 
-If either is missing, ask the user.
+1. **Changeset summary** — derive from `git log --oneline "$LAST"..HEAD` and `git diff --stat "$LAST"..HEAD`.
+2. **Affected packages** — derive mechanically from `git diff --name-only "$LAST"..HEAD`; do not ask the caller for a package list.
+
+If no package has publishable `src/**` changes, stop and report that there is no releasable package diff.
 
 ## Repo layout
 
@@ -37,13 +39,13 @@ If either is missing, ask the user.
    LAST=$(git log --grep='^release: v' -n1 --format=%H)
    ```
 
-3. Verify caller's affected-packages list against actual diff:
+3. Derive affected packages from the actual diff:
 
    ```bash
    git diff --name-only "$LAST"..HEAD -- 'packages/*/src/**' 'packages/*/package.json'
    ```
 
-   A package is **changed** only if `src/**` has diffs. `package.json`-only or lockfile-only changes do **not** trigger a publish on their own.
+   A package is **changed** only if `src/**` has diffs. `package.json`-only or lockfile-only changes do **not** trigger a publish on their own. Use the full diff and commit log to infer a terse changeset summary for downstream commit messages and final reporting.
 
 ## Phase 2 — Semver calc (highest-wins across shared version)
 
@@ -210,7 +212,6 @@ git commit -m "$(cat <<EOF
 chore(deps): bump @haklex/* to $NEW_VERSION
 
 Upstream: <git log --oneline $LAST..HEAD from haklex>
-$( [[ -n "$LIN_REFS" ]] && printf 'Linear: %s\n' "$LIN_REFS" )
 EOF
 )"
 
@@ -233,18 +234,16 @@ git -C "/Users/innei/git/innei-repo/$repo" branch -D "chore/haklex-$NEW_VERSION"
 
 **Never** push the `chore/haklex-$NEW_VERSION` branch itself to origin — it exists purely for worktree isolation.
 
-Emit `LIN-\d+` references (parsed from the caller's changeset description) inside the commit body. Do not invent Linear links.
-
 ## Phase 9 — Final summary
 
 Print:
 
-| Repo       | Branch | Commit SHA | Bump | Tests (typecheck / build / e2e) | Linear |
-| ---------- | ------ | ---------- | ---- | ------------------------------- | ------ |
-| haklex     | main   | …          | …    | —                               | …      |
-| Yohaku     | main   | …          | —    | ✅ / ✅ / ✅                    | …      |
-| admin-vue3 | main   | …          | —    | ✅ / ✅ / ✅                    | …      |
-| mx-core    | main   | …          | —    | ✅ / ✅ / (skipped)             | …      |
+| Repo       | Branch | Commit SHA | Bump | Tests (typecheck / build / e2e) |
+| ---------- | ------ | ---------- | ---- | ------------------------------- |
+| haklex     | main   | …          | …    | —                               |
+| Yohaku     | main   | …          | —    | ✅ / ✅ / ✅                    |
+| admin-vue3 | main   | …          | —    | ✅ / ✅ / ✅                    |
+| mx-core    | main   | …          | —    | ✅ / ✅ / (skipped)             |
 
 ## Quick reference
 
@@ -264,26 +263,25 @@ Print:
 
 ## Common mistakes
 
-| Mistake                                             | Fix                                                                                     |
-| --------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Trusting caller's "affected packages" list verbatim | Always re-derive from `git diff --name-only … src/**`                                   |
-| Publishing before registry poll succeeds            | Downstream `pnpm install` 404s or resolves stale mirror                                 |
-| Treating a Context-creating lib as a regular dep    | Promote to peer (reference: commit 88bb7a0 — lucide-react)                              |
-| Attempting per-package bumps                        | Not supported — shared version; highest-wins                                            |
-| `git add -A` in a dirty downstream worktree         | Stage only the pinned-version files per Repo layout table                               |
-| Running `pnpm run release:rich` inside this skill   | That script compresses bump/build/publish into one step; this skill needs them separate |
-| `npm unpublish` without user confirmation           | Always ask — unpublish is public, permanent, and time-limited                           |
-| Force-pushing reverts without `--force-with-lease`  | Use `--force-with-lease`; ask user before pushing any force                             |
-| Guessing lobehub path                               | Ask the user; skip that downstream if not provided                                      |
-| Inventing Linear issue IDs                          | Only emit `LIN-\d+` IDs present in the user's changeset description                     |
-| Opening a PR for the downstream bump                | Bumps go direct to the default branch — no PR, no `gh pr create`                        |
-| Pushing the `chore/haklex-$V` branch to origin      | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch |
-| Skipping `git fetch` + rebase before push           | Default branch may have advanced during the release; rebase on `origin/$D` first        |
-| Targeting a feature branch or guessing `main`       | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`              |
+| Mistake                                            | Fix                                                                                     |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Asking the caller for release metadata             | Infer the changeset summary and affected packages from `git log` and `git diff`         |
+| Publishing before registry poll succeeds           | Downstream `pnpm install` 404s or resolves stale mirror                                 |
+| Treating a Context-creating lib as a regular dep   | Promote to peer (reference: commit 88bb7a0 — lucide-react)                              |
+| Attempting per-package bumps                       | Not supported — shared version; highest-wins                                            |
+| `git add -A` in a dirty downstream worktree        | Stage only the pinned-version files per Repo layout table                               |
+| Running `pnpm run release:rich` inside this skill  | That script compresses bump/build/publish into one step; this skill needs them separate |
+| `npm unpublish` without user confirmation          | Always ask — unpublish is public, permanent, and time-limited                           |
+| Force-pushing reverts without `--force-with-lease` | Use `--force-with-lease`; ask user before pushing any force                             |
+| Guessing lobehub path                              | Ask the user; skip that downstream if not provided                                      |
+| Opening a PR for the downstream bump               | Bumps go direct to the default branch — no PR, no `gh pr create`                        |
+| Pushing the `chore/haklex-$V` branch to origin     | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch |
+| Skipping `git fetch` + rebase before push          | Default branch may have advanced during the release; rebase on `origin/$D` first        |
+| Targeting a feature branch or guessing `main`      | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`              |
 
 ## Red flags — STOP and ask
 
-- Changeset description or package list missing
+- No publishable package diff under `packages/*/src/**`
 - `git status` dirty in haklex
 - A published package still 404s from the registry after 5 minutes of polling
 - User asks to skip peer-dep audit ("it worked last time")
