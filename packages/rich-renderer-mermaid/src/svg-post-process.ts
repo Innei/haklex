@@ -11,7 +11,7 @@
  * @see https://github.com/Justineo/beautiful-mermaid-playground
  */
 
-import type { ThemeTokens } from './mermaid-theme'
+import type { ThemeTokens } from './mermaid-theme';
 
 // Corner radius presets (matching beautiful-mermaid's "soft" preset)
 const CORNER_RADIUS = {
@@ -23,7 +23,7 @@ const CORNER_RADIUS = {
   actor: 6,
   activation: 4,
   diamond: 4,
-} as const
+} as const;
 
 /**
  * Convert node <polygon> elements to <path> with rounded corners.
@@ -31,90 +31,85 @@ const CORNER_RADIUS = {
  * Each corner is replaced by a quadratic bezier curve.
  */
 function roundNodePolygons(doc: Document, radius: number): void {
-  const polygons = doc.querySelectorAll<SVGPolygonElement>(
-    '.node > polygon, .node polygon',
-  )
+  const polygons = doc.querySelectorAll<SVGPolygonElement>('.node > polygon, .node polygon');
   for (const polygon of polygons) {
-    const points = polygon.points
-    if (points.numberOfItems < 3) continue
+    const points = polygon.points;
+    if (points.numberOfItems < 3) continue;
 
-    const pts: [number, number][] = []
+    const pts: [number, number][] = [];
     for (let i = 0; i < points.numberOfItems; i++) {
-      const p = points.getItem(i)
-      pts.push([p.x, p.y])
+      const p = points.getItem(i);
+      pts.push([p.x, p.y]);
     }
 
     const d = pts
       .map((pt, i) => {
-        const prev = pts[(i + pts.length - 1) % pts.length]
-        const next = pts[(i + 1) % pts.length]
+        const prev = pts[(i + pts.length - 1) % pts.length];
+        const next = pts[(i + 1) % pts.length];
 
-        const dx1 = prev[0] - pt[0]
-        const dy1 = prev[1] - pt[1]
-        const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1)
-        const dx2 = next[0] - pt[0]
-        const dy2 = next[1] - pt[1]
-        const len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2)
+        const dx1 = prev[0] - pt[0];
+        const dy1 = prev[1] - pt[1];
+        const len1 = Math.sqrt(dx1 * dx1 + dy1 * dy1);
+        const dx2 = next[0] - pt[0];
+        const dy2 = next[1] - pt[1];
+        const len2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
 
-        const r = Math.min(radius, len1 / 2, len2 / 2)
+        const r = Math.min(radius, len1 / 2, len2 / 2);
 
-        const startX = pt[0] + (dx1 / len1) * r
-        const startY = pt[1] + (dy1 / len1) * r
-        const endX = pt[0] + (dx2 / len2) * r
-        const endY = pt[1] + (dy2 / len2) * r
+        const startX = pt[0] + (dx1 / len1) * r;
+        const startY = pt[1] + (dy1 / len1) * r;
+        const endX = pt[0] + (dx2 / len2) * r;
+        const endY = pt[1] + (dy2 / len2) * r;
 
-        const moveOrLine = i === 0 ? 'M' : 'L'
-        return `${moveOrLine}${startX},${startY} Q${pt[0]},${pt[1]} ${endX},${endY}`
+        const moveOrLine = i === 0 ? 'M' : 'L';
+        return `${moveOrLine}${startX},${startY} Q${pt[0]},${pt[1]} ${endX},${endY}`;
       })
-      .join(' ')
+      .join(' ');
 
-    const path = doc.createElementNS('http://www.w3.org/2000/svg', 'path')
-    path.setAttribute('d', `${d} Z`)
+    const path = doc.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', `${d} Z`);
 
     // Copy attributes from polygon
     for (const attr of Array.from(polygon.attributes)) {
       if (attr.name !== 'points') {
-        path.setAttribute(attr.name, attr.value)
+        path.setAttribute(attr.name, attr.value);
       }
     }
 
-    polygon.replaceWith(path)
+    polygon.replaceWith(path);
   }
 }
 
 function applyCornerRounding(doc: Document): void {
   const applyRadius = (selector: string, radius: number) => {
-    const rects = doc.querySelectorAll<SVGRectElement>(selector)
+    const rects = doc.querySelectorAll<SVGRectElement>(selector);
     for (const rect of rects) {
-      rect.setAttribute('rx', String(radius))
-      rect.setAttribute('ry', String(radius))
+      rect.setAttribute('rx', String(radius));
+      rect.setAttribute('ry', String(radius));
     }
-  }
+  };
 
   // Flowchart nodes
-  applyRadius('.node > rect', CORNER_RADIUS.node)
-  applyRadius('.node > .basic', CORNER_RADIUS.node)
+  applyRadius('.node > rect', CORNER_RADIUS.node);
+  applyRadius('.node > .basic', CORNER_RADIUS.node);
 
   // Class diagram nodes
-  applyRadius('.classGroup > rect', CORNER_RADIUS.classNode)
+  applyRadius('.classGroup > rect', CORNER_RADIUS.classNode);
 
   // ER diagram entities
-  applyRadius('.er > rect', CORNER_RADIUS.entity)
+  applyRadius('.er > rect', CORNER_RADIUS.entity);
 
   // Subgraph/cluster
-  applyRadius('.cluster > rect', CORNER_RADIUS.subgraphOuter)
+  applyRadius('.cluster > rect', CORNER_RADIUS.subgraphOuter);
 
   // Sequence diagram actors
-  applyRadius('.actor', CORNER_RADIUS.actor)
+  applyRadius('.actor', CORNER_RADIUS.actor);
 
   // Activations
-  applyRadius(
-    '.activation0, .activation1, .activation2',
-    CORNER_RADIUS.activation,
-  )
+  applyRadius('.activation0, .activation1, .activation2', CORNER_RADIUS.activation);
 
   // Polygon nodes (diamond, hexagon, etc.) — convert to rounded path
-  roundNodePolygons(doc, CORNER_RADIUS.diamond)
+  roundNodePolygons(doc, CORNER_RADIUS.diamond);
 }
 
 function buildVisualCss(tokens: ThemeTokens): string {
@@ -288,39 +283,58 @@ function buildVisualCss(tokens: ThemeTokens): string {
       fill: ${tokens.textMuted} !important;
     }
 
-  `
+  `;
 }
 
-export function postProcessMermaidSvg(
-  svg: string,
-  tokens: ThemeTokens,
-): string {
-  const parser = new DOMParser()
-  const doc = parser.parseFromString(svg, 'image/svg+xml')
+export function postProcessMermaidSvg(svg: string, tokens: ThemeTokens): string {
+  // Mermaid emits unclosed `<br>` inside <foreignObject> labels (HTML void
+  // form). DOMPurify undoes mermaid's own `<br/>` cleanup, leaving an SVG
+  // string that fails strict XML parsing — both for our DOMParser below and
+  // later when the SVG is rendered via `data:image/svg+xml`. Normalize once
+  // so post-processing applies and the data URI <img> renders.
+  const normalizedSvg = svg.replaceAll(/<br\s*>/gi, '<br/>');
 
-  const parseError = doc.querySelector('parsererror')
-  if (parseError) return svg
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(normalizedSvg, 'image/svg+xml');
 
-  const root = doc.documentElement
-  if (!root || root.tagName.toLowerCase() !== 'svg') return svg
+  const parseError = doc.querySelector('parsererror');
+  if (parseError) return normalizedSvg;
+
+  const root = doc.documentElement;
+  if (!root || root.tagName.toLowerCase() !== 'svg') return normalizedSvg;
 
   // 1. Apply corner rounding
-  applyCornerRounding(doc)
+  applyCornerRounding(doc);
+
+  // Pin intrinsic dimensions from the viewBox. Mermaid emits `width="100%"`,
+  // which collapses an `<img>`'s naturalWidth to the 300px UA default — the
+  // image preview lightbox then displays a thumbnail-sized SVG instead of the
+  // full-resolution diagram. Promoting viewBox to explicit pixel attrs makes
+  // the preview match the diagram's true size while still scaling responsively
+  // through CSS in the host container.
+  const viewBox = root.getAttribute('viewBox');
+  if (viewBox) {
+    const parts = viewBox.split(/\s+/).map(Number);
+    if (parts.length === 4 && parts[2] > 0 && parts[3] > 0) {
+      root.setAttribute('width', String(parts[2]));
+      root.setAttribute('height', String(parts[3]));
+    }
+  }
 
   // 2. Inject visual CSS overrides
-  const existingOverride = root.querySelector('style[data-visual-overrides]')
-  existingOverride?.remove()
+  const existingOverride = root.querySelector('style[data-visual-overrides]');
+  existingOverride?.remove();
 
-  const styleEl = doc.createElementNS('http://www.w3.org/2000/svg', 'style')
-  styleEl.dataset.visualOverrides = ''
-  styleEl.textContent = buildVisualCss(tokens)
+  const styleEl = doc.createElementNS('http://www.w3.org/2000/svg', 'style');
+  styleEl.dataset.visualOverrides = '';
+  styleEl.textContent = buildVisualCss(tokens);
 
   // Insert style as first child for proper cascade
   if (root.firstChild) {
-    root.insertBefore(styleEl, root.firstChild)
+    root.insertBefore(styleEl, root.firstChild);
   } else {
-    root.append(styleEl)
+    root.append(styleEl);
   }
 
-  return new XMLSerializer().serializeToString(root)
+  return new XMLSerializer().serializeToString(root);
 }
