@@ -2228,7 +2228,7 @@ packages:
       astro-eslint-parser: ^1.0.2
       eslint: ^9.10.0 || ^10.0.0
       eslint-plugin-astro: ^1.2.0
-      eslint-plugin-format: '>=0.1.0'
+      eslint-plugin-format: '>=0.1.1'
       eslint-plugin-jsx-a11y: '>=6.10.2'
       eslint-plugin-react-hooks: ^7.0.0
       eslint-plugin-react-refresh: ^0.5.0
@@ -10452,7 +10452,7 @@ packages:
         integrity: sha512-b7uo2UCUOYZcnF/3ID0lulOJi/bafxa1xPe7ZPsammBSpjSWQkjNxlt635YGS2MiR9GjvuXCtz2emr3jbsz98g==,
       }
 
-  path-data-parser@0.1.0:
+  path-data-parser@0.1.1:
     resolution:
       {
         integrity: sha512-NOnmBpt5Y2RWbuv0LMzsayp3lVylAHLPUTut412ZA3l+C4uw4ZVkQbjShYCQ8TCpUMdPapr4YjUqLYD6v68j+w==,
@@ -10597,7 +10597,7 @@ packages:
       }
     engines: { node: ^10 || ^12 || >=14 }
 
-  powershell-utils@0.1.0:
+  powershell-utils@0.1.1:
     resolution:
       {
         integrity: sha512-dM0jVuXJPsDN6DvRpea484tCUaMiXWjuCn++HGTqUWzGDjv5tZkEZldAJ/UMlqRYGFrD/etByo4/xOuC/snX2A==,
@@ -12416,7 +12416,7 @@ packages:
       }
     engines: { node: '>=16.0.0', npm: '>=8.0.0' }
 
-  yocto-queue@0.1.0:
+  yocto-queue@0.1.1:
     resolution:
       {
         integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==,
@@ -18110,7 +18110,7 @@ snapshots:
       define-lazy-prop: 3.0.0
       is-in-ssh: 1.0.0
       is-inside-container: 1.0.0
-      powershell-utils: 0.1.0
+      powershell-utils: 0.1.1
       wsl-utils: 0.3.1
 
   optionator@0.9.4:
@@ -18177,7 +18177,7 @@ snapshots:
 
   p-limit@3.1.0:
     dependencies:
-      yocto-queue: 0.1.0
+      yocto-queue: 0.1.1
 
   p-locate@5.0.0:
     dependencies:
@@ -18224,7 +18224,7 @@ snapshots:
 
   path-browserify@1.0.1: {}
 
-  path-data-parser@0.1.0: {}
+  path-data-parser@0.1.1: {}
 
   path-exists@4.0.0: {}
 
@@ -18267,7 +18267,7 @@ snapshots:
 
   points-on-path@0.2.1:
     dependencies:
-      path-data-parser: 0.1.0
+      path-data-parser: 0.1.1
       points-on-curve: 0.2.0
 
   portfinder@1.0.38:
@@ -18296,7 +18296,7 @@ snapshots:
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
-  powershell-utils@0.1.0: {}
+  powershell-utils@0.1.1: {}
 
   prelude-ls@1.2.1: {}
 
@@ -18623,7 +18623,7 @@ snapshots:
   roughjs@4.6.6:
     dependencies:
       hachure-fill: 0.5.2
-      path-data-parser: 0.1.0
+      path-data-parser: 0.1.1
       points-on-curve: 0.2.0
       points-on-path: 0.2.1
 
@@ -19532,7 +19532,7 @@ snapshots:
   wsl-utils@0.3.1:
     dependencies:
       is-wsl: 3.1.1
-      powershell-utils: 0.1.0
+      powershell-utils: 0.1.1
 
   xml-name-validator@4.0.0: {}
 
@@ -19579,7 +19579,7 @@ snapshots:
     dependencies:
       lib0: 0.2.117
 
-  yocto-queue@0.1.0: {}
+  yocto-queue@0.1.1: {}
 
   zod-validation-error@3.5.4(zod@3.25.76):
     dependencies:
