@@ -20,15 +20,14 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "dependencies": {},
   "devDependencies": {
-    "lexical": "^0.43.0",
+    "lexical": "^0.44.0",
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
+    "vite": "^8.0.10",
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "lexical": "^0.43.0"
+    "lexical": "^0.44.0"
   },
   "publishConfig": {
     "access": "public",

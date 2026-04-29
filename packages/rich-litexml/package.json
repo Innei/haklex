@@ -21,12 +21,12 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "lexical": "^0.43.0",
-    "linkedom": "^0.18.9"
+    "lexical": "^0.44.0",
+    "linkedom": "^0.18.12"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "vite": "^7.3.1",
+    "vite": "^8.0.10",
     "vite-plugin-dts": "^4.5.4"
   },
   "publishConfig": {

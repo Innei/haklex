@@ -39,29 +39,29 @@
     "@lobehub/eslint-config": "^2.1.5",
     "@lobehub/prettier-config": "^2.1.5",
     "@types/mdast": "^4.0.4",
-    "@types/node": "25.3.3",
+    "@types/node": "25.6.0",
     "@types/unist": "^3.0.3",
-    "@vanilla-extract/css": "^1.18.0",
-    "bumpp": "^10.4.1",
-    "commitlint": "^20.4.3",
+    "@vanilla-extract/css": "^1.20.1",
+    "bumpp": "^11.0.1",
+    "commitlint": "^20.5.2",
     "eslint": "^9.39.4",
-    "eslint-config-hyoban": "6.0.0",
-    "knip": "^5.85.0",
-    "lint-staged": "16.3.2",
+    "eslint-config-hyoban": "7.0.3",
+    "knip": "^6.8.0",
+    "lint-staged": "16.4.0",
     "mdast-util-to-string": "^4.0.0",
-    "prettier": "3.8.1",
+    "prettier": "3.8.3",
     "remark-frontmatter": "^5.0.0",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
     "sharp": "^0.34.5",
     "simple-git-hooks": "2.13.1",
-    "stylelint": "^17.4.0",
+    "stylelint": "^17.9.1",
     "thumbhash": "^0.1.1",
     "tsx": "^4.21.0",
-    "turbo": "^2.8.14",
+    "turbo": "^2.9.6",
     "unified": "^11.0.5",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.5"
   },
   "packageManager": "pnpm@10.27.0",
   "engines": {
@@ -91,7 +91,9 @@
       "object.groupby": "npm:@nolyfill/object.groupby@^1.0.44",
       "object.hasown": "npm:@nolyfill/object.hasown@^1.0.44",
       "object.values": "npm:@nolyfill/object.values@^1.0.44",
-      "string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@^1.0.44"
+      "path-data-parser": "0.1.0",
+      "string.prototype.matchall": "npm:@nolyfill/string.prototype.matchall@^1.0.44",
+      "yocto-queue": "0.1.0"
     }
   }
 }
