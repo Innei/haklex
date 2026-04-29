@@ -279,6 +279,36 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
     return { tag: 'codesnippet', attrs: blockId(n), children: files };
   });
 
+  registry.registerWriter('chat', (node) => {
+    const n = node as any;
+    const participantsEl: XmlElement = {
+      tag: 'participants',
+      children: (n.participants ?? []).map((p: any) => ({
+        tag: 'participant',
+        attrs: optAttr({
+          id: p.id,
+          kind: p.kind,
+          name: p.name,
+          avatar: p.avatar,
+        }),
+        selfClosing: true,
+      })),
+    };
+    const messagesEl: XmlElement = {
+      tag: 'messages',
+      children: (n.messages ?? []).map((m: any) => ({
+        tag: 'message',
+        attrs: optAttr({ id: m.id, participant: m.participantId }),
+        children: [m.content ?? ''],
+      })),
+    };
+    return {
+      tag: 'chat',
+      attrs: optAttr({ ...blockId(n), variant: n.variant }),
+      children: [participantsEl, messagesEl],
+    };
+  });
+
   registry.registerWriter('poll', (node) => {
     const n = node as any;
     const optionElements: XmlElement[] = (n.options ?? []).map(
