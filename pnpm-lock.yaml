@@ -806,9 +806,6 @@ importers:
 
   packages/rich-ext-excalidraw:
     dependencies:
-      '@excalidraw/excalidraw':
-        specifier: ^0.18.0
-        version: 0.18.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@haklex/rich-editor':
         specifier: '>=0.3.0'
         version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
@@ -825,6 +822,9 @@ importers:
         specifier: ^0.7.3
         version: 0.7.3
     devDependencies:
+      '@excalidraw/excalidraw':
+        specifier: ^0.18.0
+        version: 0.18.1(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(immer@11.1.4)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@lexical/react':
         specifier: ^0.44.0
         version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)

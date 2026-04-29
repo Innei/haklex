@@ -71,7 +71,11 @@ const ExcalidrawStaticCanvas: FC<{
   const { className: portalClassName } = usePortalTheme();
 
   useEffect(() => {
-    Promise.all([import('@excalidraw/excalidraw'), import('@excalidraw/excalidraw/index.css')])
+    Promise.all([
+      import('@excalidraw/excalidraw'),
+      // @ts-expect-error - Excalidraw 0.18 ships CSS as a separate entry; loaded for side effects.
+      import('@excalidraw/excalidraw/index.css'),
+    ])
       .then(([mod]) => {
         const Comp = mod.Excalidraw;
 

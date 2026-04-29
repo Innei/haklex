@@ -457,7 +457,11 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
   }, [initialData]);
 
   useEffect(() => {
-    Promise.all([import('@excalidraw/excalidraw'), import('@excalidraw/excalidraw/index.css')])
+    Promise.all([
+      import('@excalidraw/excalidraw'),
+      // @ts-expect-error - Excalidraw 0.18 ships CSS as a separate entry; loaded for side effects.
+      import('@excalidraw/excalidraw/index.css'),
+    ])
       .then(([mod]: [any, unknown]) => {
         const Comp = mod.Excalidraw || mod.default?.Excalidraw;
         if (Comp) setExcalidrawComponent(() => Comp);
