@@ -13,6 +13,7 @@
     ".": "./src/index.ts",
     "./alert": "./src/alert.ts",
     "./banner": "./src/banner.ts",
+    "./chat": "./src/chat.ts",
     "./code-snippet": "./src/code-snippet.ts",
     "./codeblock": "./src/codeblock.ts",
     "./config": "./src/config.ts",
@@ -32,6 +33,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
+    "@haklex/rich-ext-chat": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",

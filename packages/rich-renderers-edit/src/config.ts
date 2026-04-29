@@ -1,5 +1,6 @@
 import type { RendererConfig } from '@haklex/rich-editor';
 import { FootnoteRenderer } from '@haklex/rich-editor/renderers';
+import { ChatEditRenderer } from '@haklex/rich-ext-chat';
 import { CodeSnippetEditRenderer } from '@haklex/rich-ext-code-snippet';
 import { GalleryEditRenderer } from '@haklex/rich-ext-gallery';
 import { AlertEditRenderer } from '@haklex/rich-renderer-alert';
@@ -18,6 +19,7 @@ export const enhancedEditRendererConfig: RendererConfig = {
   ...enhancedRendererConfig,
   Alert: AlertEditRenderer,
   Banner: BannerEditRenderer,
+  Chat: ChatEditRenderer,
   CodeBlock: CodeBlockEditRenderer,
   Footnote: FootnoteRenderer,
   Gallery: GalleryEditRenderer,

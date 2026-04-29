@@ -2105,6 +2105,9 @@ importers:
       '@haklex/rich-editor':
         specifier: '>=0.3.0'
         version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
+      '@haklex/rich-ext-chat':
+        specifier: workspace:*
+        version: link:../rich-ext-chat
       '@haklex/rich-ext-code-snippet':
         specifier: workspace:*
         version: link:../rich-ext-code-snippet
