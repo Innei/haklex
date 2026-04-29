@@ -8,16 +8,18 @@
  *
  * Defaults to ../lobe-chat relative to this repo root.
  */
-import { readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { readFileSync, writeFileSync } from 'node:fs';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(__dirname, '..');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(__dirname, '..');
 
-const lobeChatRoot = process.argv[2] ? resolve(process.argv[2]) : resolve(repoRoot, '../lobe-chat');
+const lobeChatRoot = process.argv[2]
+  ? path.resolve(process.argv[2])
+  : path.resolve(repoRoot, '../lobe-chat');
 
-const modelsDir = join(lobeChatRoot, 'packages/model-bank/src/aiModels');
+const modelsDir = path.join(lobeChatRoot, 'packages/model-bank/src/aiModels');
 
 const PROVIDERS = [
   'anthropic',
@@ -49,12 +51,12 @@ const map = {};
 for (const p of PROVIDERS) {
   let content;
   try {
-    content = readFileSync(join(modelsDir, `${p}.ts`), 'utf8');
+    content = readFileSync(path.join(modelsDir, `${p}.ts`), 'utf8');
   } catch {
     continue;
   }
 
-  const blocks = content.split(/\n  \{/);
+  const blocks = content.split(/\n {2}\{/);
   for (const block of blocks) {
     const typeMatch = block.match(/^\s*type:\s*'([^']+)'/m);
     if (typeMatch && typeMatch[1] !== 'chat') continue;
@@ -80,6 +82,9 @@ for (const [id, name] of Object.entries(sorted)) {
 }
 ts += '};\n';
 
-const outPath = join(repoRoot, 'packages/rich-agent-chat/src/components/model-display-names.ts');
+const outPath = path.join(
+  repoRoot,
+  'packages/rich-agent-chat/src/components/model-display-names.ts',
+);
 writeFileSync(outPath, ts);
 console.log(`Wrote ${Object.keys(sorted).length} entries to ${outPath}`);

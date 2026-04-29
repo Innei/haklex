@@ -10,19 +10,19 @@ pnpm add @haklex/rich-editor lexical @lexical/react react react-dom
 
 ## Peer Dependencies
 
-Lexical 0.42+ exposes code blocks in `@lexical/code-core` (no Prism). This package depends on it; add `@lexical/code-core` to your app only if you import it yourself (e.g. custom code-block tooling).
+Lexical 0.44+ exposes code blocks in `@lexical/code-core` (no Prism). This package depends on it; add `@lexical/code-core` to your app only if you import it yourself (e.g. custom code-block tooling).
 
 | Package              | Version    | Required |
 | -------------------- | ---------- | -------- |
 | `@base-ui/react`     | `^1.1.0`   | Yes      |
-| `@lexical/extension` | `^0.42.0`  | Yes      |
-| `@lexical/link`      | `^0.42.0`  | Yes      |
-| `@lexical/list`      | `^0.42.0`  | Yes      |
-| `@lexical/markdown`  | `^0.42.0`  | Yes      |
-| `@lexical/react`     | `^0.42.0`  | Yes      |
-| `@lexical/rich-text` | `^0.42.0`  | Yes      |
-| `@lexical/table`     | `^0.42.0`  | Yes      |
-| `lexical`            | `^0.42.0`  | Yes      |
+| `@lexical/extension` | `^0.44.0`  | Yes      |
+| `@lexical/link`      | `^0.44.0`  | Yes      |
+| `@lexical/list`      | `^0.44.0`  | Yes      |
+| `@lexical/markdown`  | `^0.44.0`  | Yes      |
+| `@lexical/react`     | `^0.44.0`  | Yes      |
+| `@lexical/rich-text` | `^0.44.0`  | Yes      |
+| `@lexical/table`     | `^0.44.0`  | Yes      |
+| `lexical`            | `^0.44.0`  | Yes      |
 | `lucide-react`       | `^0.574.0` | Yes      |
 | `react`              | `>=19`     | Yes      |
 | `react-dom`          | `>=19`     | Yes      |

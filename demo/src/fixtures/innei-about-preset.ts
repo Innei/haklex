@@ -1,6 +1,6 @@
 import type { SerializedEditorState } from 'lexical';
 
-import inneiAboutData from './innei-about-data';
+import { inneiAboutData } from './innei-about-data';
 import type { Preset } from './presets';
 
 export const inneiAboutPreset: Preset = {

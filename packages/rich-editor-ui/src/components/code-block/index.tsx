@@ -9,8 +9,8 @@ import * as styles from './styles.css';
 export interface CodeBlockProps {
   className?: string;
   code: string;
-  language?: string;
   collapsible?: boolean;
+  language?: string;
   showCopyButton?: boolean;
   showLineNumbers?: boolean;
 }
@@ -63,12 +63,12 @@ export function CodeBlock({
 
   return (
     <CodeBlockCard
+      static
       className={className}
       code={code}
       collapsible={collapsible}
       language={language}
       showCopyButton={showCopyButton}
-      static
     >
       {html ? (
         <div className={linedClassName} dangerouslySetInnerHTML={{ __html: html }} />

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Lexical-based rich editor ecosystem. Modular packages: core editor, UI primitives, content renderers, plugins, extensions, and integration bundles.
 
-**Build**: Vite 7 + Vanilla Extract CSS-in-TS. ESM only (`.mjs`). TypeScript 5.9. Lexical 0.42. pnpm 10. Node >= 20.
+**Build**: Vite 8 + Vanilla Extract CSS-in-TS. ESM only (`.mjs`). TypeScript 5.9. Lexical 0.44. pnpm 10. Node >= 20.
 
 ## Commands
 
@@ -16,7 +16,9 @@ pnpm --filter @haklex/rich-editor dev:build        # watch mode for core
 pnpm build                                         # turbo build (all)
 pnpm build:packages                                # workspace packages under packages/
 pnpm --filter @haklex/rich-editor build            # single package
-pnpm lint                                          # turbo lint (all)
+pnpm lint                                          # eslint . --fix (repo root)
+pnpm test                                          # vitest run (all suites)
+pnpm typecheck                                     # tsc --noEmit in packages/*
 npx eslint path/to/file.ts                         # lint single file
 npx prettier --write path/to/file.ts               # format single file
 npx vitest run packages/rich-renderer-katex/tests/ # run specific tests
@@ -25,7 +27,7 @@ pnpm release:rich                                  # bump + build + publish @hak
 
 ## Toolchain
 
-- **ESLint**: `eslint-config-hyoban`. Key rule: `react/no-use-context: 'error'` — must use React 19 `use(Context)` not `useContext()`.
+- **ESLint**: `@lobehub/eslint-config` (root `eslint.config.mjs`). Key rule: `react/no-use-context: 'error'` — must use React 19 `use(Context)` not `useContext()`.
 - **Versioning**: All `@haklex/*` share one version (from `packages/rich-editor/package.json`), managed by `bumpp`.
 - **Pre-commit**: `simple-git-hooks` + `lint-staged` (prettier + eslint on staged files).
 - **Build**: Shared Vite config in `vite.shared.ts` (`createViteConfig()`). Auto-externalizes deps/peerDeps. Output: ESM `.mjs` + `.d.ts`. Vanilla Extract for CSS-in-TS (zero runtime).
@@ -59,11 +61,13 @@ Registration:
 ├── @haklex/rich-static-renderer (SSR engine, RichRenderer component)
 ├── @haklex/rich-renderers (static renderer aggregator)
 ├── @haklex/rich-renderers-edit (edit renderer aggregator)
-├── @haklex/rich-ext-{code-snippet,embed,excalidraw,gallery} (heavy extensions)
+├── @haklex/rich-ext-{chat,code-snippet,embed,excalidraw,gallery,nested-doc} (heavy extensions)
 ├── @haklex/rich-plugin-{block-handle,floating-toolbar,link-edit,mention,slash-menu,table,toolbar}
 └── @haklex/rich-renderer-katex (KaTeX edit nodes)
 
-@haklex/rich-diff (standalone diff viewer)
+@haklex/rich-diff → @haklex/rich-diff-core (standalone diff viewer)
+@haklex/rich-agent-core → @haklex/rich-litexml (headless agent protocol; used by rich-ext-ai-agent)
+@haklex/rich-agent-chat → @haklex/rich-agent-core, @haklex/rich-diff-core (chat UI)
 @haklex/rich-editor-demo (dev playground, workspace at demo/)
 ```
 

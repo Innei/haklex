@@ -5,28 +5,28 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { $insertNodes, DecoratorNode } from 'lexical'
-import { Sigma } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { $insertNodes, DecoratorNode } from 'lexical';
+import { Sigma } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer'
-import { createRendererDecoration } from '../components/RendererWrapper'
-import type { SlashMenuItemConfig } from '../types/slash-menu'
-import { resolveKaTeXEquation } from '../utils/katex-defaults'
-import { getRegisteredNodeKlass } from '../utils/getRegisteredNodeKlass'
+import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer';
+import { createRendererDecoration } from '../components/RendererWrapper';
+import type { SlashMenuItemConfig } from '../types/slash-menu';
+import { getRegisteredNodeKlass } from '../utils/getRegisteredNodeKlass';
+import { resolveKaTeXEquation } from '../utils/katex-defaults';
 
 export type SerializedKaTeXBlockNode = Spread<
   {
-    equation: string
+    equation: string;
   },
   SerializedLexicalNode
->
+>;
 
 export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
-  __equation: string
-  __autoOpenOnMount: boolean
+  __equation: string;
+  __autoOpenOnMount: boolean;
 
   static slashMenuItems: SlashMenuItemConfig[] = [
     {
@@ -37,48 +37,42 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
       section: 'ADVANCED',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([
-            $createKaTeXBlockNode('', { autoOpenOnMount: true }),
-          ])
-        })
+          $insertNodes([$createKaTeXBlockNode('', { autoOpenOnMount: true })]);
+        });
       },
     },
-  ]
+  ];
 
   static getType(): string {
-    return 'katex-block'
+    return 'katex-block';
   }
 
   static clone(node: KaTeXBlockNode): KaTeXBlockNode {
-    return new KaTeXBlockNode(
-      node.__equation,
-      node.__key,
-      node.__autoOpenOnMount,
-    )
+    return new KaTeXBlockNode(node.__equation, node.__key, node.__autoOpenOnMount);
   }
 
   constructor(equation: string, key?: NodeKey, autoOpenOnMount = false) {
-    super(key)
-    this.__equation = equation
-    this.__autoOpenOnMount = autoOpenOnMount
+    super(key);
+    this.__equation = equation;
+    this.__autoOpenOnMount = autoOpenOnMount;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = 'rich-katex-block-wrapper'
-    return div
+    const div = document.createElement('div');
+    div.className = 'rich-katex-block-wrapper';
+    return div;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
   static importJSON(serializedNode: SerializedKaTeXBlockNode): KaTeXBlockNode {
-    return $createKaTeXBlockNode(serializedNode.equation)
+    return $createKaTeXBlockNode(serializedNode.equation);
   }
 
   exportJSON(): SerializedKaTeXBlockNode {
@@ -87,32 +81,32 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
       type: 'katex-block',
       equation: this.__equation,
       version: 1,
-    }
+    };
   }
 
   getEquation(): string {
-    return this.__equation
+    return this.__equation;
   }
 
   setEquation(equation: string): void {
-    const writable = this.getWritable()
-    writable.__equation = equation
+    const writable = this.getWritable();
+    writable.__equation = equation;
   }
 
   getShouldAutoOpenOnMount(): boolean {
-    return this.getLatest().__autoOpenOnMount
+    return this.getLatest().__autoOpenOnMount;
   }
 
   setShouldAutoOpenOnMount(autoOpenOnMount: boolean): void {
-    const writable = this.getWritable()
-    writable.__autoOpenOnMount = autoOpenOnMount
+    const writable = this.getWritable();
+    writable.__autoOpenOnMount = autoOpenOnMount;
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createRendererDecoration('KaTeX', KaTeXRenderer, {
       equation: this.__equation,
       displayMode: true,
-    })
+    });
   }
 }
 
@@ -120,19 +114,14 @@ export function $createKaTeXBlockNode(
   equation: string,
   options?: { autoOpenOnMount?: boolean },
 ): KaTeXBlockNode {
-  const NodeKlass = getRegisteredNodeKlass(
-    KaTeXBlockNode.getType(),
-    KaTeXBlockNode,
-  )
-  const node = new NodeKlass(resolveKaTeXEquation(equation, options))
+  const NodeKlass = getRegisteredNodeKlass(KaTeXBlockNode.getType(), KaTeXBlockNode);
+  const node = new NodeKlass(resolveKaTeXEquation(equation, options));
   if (options?.autoOpenOnMount) {
-    node.setShouldAutoOpenOnMount(true)
+    node.setShouldAutoOpenOnMount(true);
   }
-  return node
+  return node;
 }
 
-export function $isKaTeXBlockNode(
-  node: LexicalNode | null | undefined,
-): node is KaTeXBlockNode {
-  return node instanceof KaTeXBlockNode
+export function $isKaTeXBlockNode(node: LexicalNode | null | undefined): node is KaTeXBlockNode {
+  return node instanceof KaTeXBlockNode;
 }

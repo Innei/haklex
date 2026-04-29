@@ -10,16 +10,16 @@ pnpm add @haklex/rich-static-renderer
 
 ## Peer Dependencies
 
-This package depends on `@lexical/code-core` (Lexical 0.42+ code blocks, no Prism). Add `@lexical/code-core` yourself only if your app imports it directly.
+This package depends on `@lexical/code-core` (Lexical 0.44+ code blocks, no Prism). Add `@lexical/code-core` yourself only if your app imports it directly.
 
 | Package              | Version   |
 | -------------------- | --------- |
-| `@lexical/extension` | `^0.42.0` |
-| `@lexical/link`      | `^0.42.0` |
-| `@lexical/list`      | `^0.42.0` |
-| `@lexical/rich-text` | `^0.42.0` |
-| `@lexical/table`     | `^0.42.0` |
-| `lexical`            | `^0.42.0` |
+| `@lexical/extension` | `^0.44.0` |
+| `@lexical/link`      | `^0.44.0` |
+| `@lexical/list`      | `^0.44.0` |
+| `@lexical/rich-text` | `^0.44.0` |
+| `@lexical/table`     | `^0.44.0` |
+| `lexical`            | `^0.44.0` |
 | `react`              | `>=19`    |
 | `react-dom`          | `>=19`    |
 

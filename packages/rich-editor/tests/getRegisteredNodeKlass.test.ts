@@ -1,4 +1,3 @@
-import type { ReactElement } from 'react'
 import {
   $createParagraphNode,
   $createTextNode,
@@ -10,13 +9,14 @@ import {
   type EditorConfig,
   type LexicalEditor,
   type NodeKey,
-} from 'lexical'
-import { describe, expect, it } from 'vitest'
+} from 'lexical';
+import type { ReactElement } from 'react';
+import { describe, expect, it } from 'vitest';
 
-import { getRegisteredNodeKlass } from '../src/utils/getRegisteredNodeKlass'
+import { getRegisteredNodeKlass } from '../src/utils/getRegisteredNodeKlass';
 
 class DummySlashNode extends DecoratorNode<ReactElement | null> {
-  __value: string
+  __value: string;
 
   static slashMenuItems = [
     {
@@ -26,62 +26,59 @@ class DummySlashNode extends DecoratorNode<ReactElement | null> {
       section: 'ADVANCED',
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
-          const NodeKlass = getRegisteredNodeKlass(
-            DummySlashNode.getType(),
-            DummySlashNode,
-          )
-          $insertNodes([new NodeKlass('inserted')])
-        })
+          const NodeKlass = getRegisteredNodeKlass(DummySlashNode.getType(), DummySlashNode);
+          $insertNodes([new NodeKlass('inserted')]);
+        });
       },
     },
-  ]
+  ];
 
   static getType(): string {
-    return 'dummy-slash'
+    return 'dummy-slash';
   }
 
   static clone(node: DummySlashNode): DummySlashNode {
-    return new DummySlashNode(node.__value, node.__key)
+    return new DummySlashNode(node.__value, node.__key);
   }
 
   static importJSON(): DummySlashNode {
-    return new DummySlashNode('')
+    return new DummySlashNode('');
   }
 
   constructor(value = '', key?: NodeKey) {
-    super(key)
-    this.__value = value
+    super(key);
+    this.__value = value;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    return {} as HTMLElement
+    return {} as HTMLElement;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement | null {
-    return null
+    return null;
   }
 }
 
 class DummySlashEditNode extends DummySlashNode {
   static getType(): string {
-    return DummySlashNode.getType()
+    return DummySlashNode.getType();
   }
 
   static clone(node: DummySlashEditNode): DummySlashEditNode {
-    return new DummySlashEditNode(node.__value, node.__key)
+    return new DummySlashEditNode(node.__value, node.__key);
   }
 
   static importJSON(): DummySlashEditNode {
-    return new DummySlashEditNode('')
+    return new DummySlashEditNode('');
   }
 }
 
 async function flushEditor(): Promise<void> {
-  await new Promise((resolve) => setTimeout(resolve, 0))
+  await new Promise((resolve) => setTimeout(resolve, 0));
 }
 
 describe('getRegisteredNodeKlass', () => {
@@ -90,55 +87,50 @@ describe('getRegisteredNodeKlass', () => {
       namespace: 'GetRegisteredNodeKlassTest',
       nodes: [DummySlashEditNode],
       onError: (error) => {
-        throw error
+        throw error;
       },
-    })
+    });
 
-    let NodeKlass: typeof DummySlashNode | null = null
+    let NodeKlass: typeof DummySlashNode | null = null;
 
     editor.update(() => {
-      NodeKlass = getRegisteredNodeKlass(
-        DummySlashNode.getType(),
-        DummySlashNode,
-      )
-    })
+      NodeKlass = getRegisteredNodeKlass(DummySlashNode.getType(), DummySlashNode);
+    });
 
-    expect(NodeKlass).toBe(DummySlashEditNode)
-  })
+    expect(NodeKlass).toBe(DummySlashEditNode);
+  });
 
   it('falls back to the base klass outside editor updates', () => {
-    expect(
-      getRegisteredNodeKlass(DummySlashNode.getType(), DummySlashNode),
-    ).toBe(DummySlashNode)
-  })
+    expect(getRegisteredNodeKlass(DummySlashNode.getType(), DummySlashNode)).toBe(DummySlashNode);
+  });
 
   it('supports slash-menu style insertion through the registered edit klass', async () => {
     const editor = createEditor({
       namespace: 'GetRegisteredNodeKlassSlashMenuTest',
       nodes: [DummySlashEditNode],
       onError: (error) => {
-        throw error
+        throw error;
       },
-    })
+    });
 
     editor.update(() => {
-      const paragraph = $createParagraphNode()
-      paragraph.append($createTextNode('cursor'))
-      $getRoot().append(paragraph)
-      paragraph.getFirstChildOrThrow().selectEnd()
-    })
+      const paragraph = $createParagraphNode();
+      paragraph.append($createTextNode('cursor'));
+      $getRoot().append(paragraph);
+      paragraph.getFirstChildOrThrow().selectEnd();
+    });
 
-    await flushEditor()
+    await flushEditor();
 
-    DummySlashEditNode.slashMenuItems[0].onSelect(editor)
+    DummySlashEditNode.slashMenuItems[0].onSelect(editor);
 
-    await flushEditor()
+    await flushEditor();
 
     editor.getEditorState().read(() => {
-      const nodes = $nodesOfType(DummySlashEditNode)
+      const nodes = $nodesOfType(DummySlashEditNode);
 
-      expect(nodes).toHaveLength(1)
-      expect(nodes[0].__value).toBe('inserted')
-    })
-  })
-})
+      expect(nodes).toHaveLength(1);
+      expect(nodes[0].__value).toBe('inserted');
+    });
+  });
+});

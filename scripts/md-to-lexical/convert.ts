@@ -23,9 +23,9 @@ import {
   lineBreak,
   link,
   linkCard,
-  type LNode,
   listItem,
   listNode,
+  type LNode,
   mermaid,
   nestedDoc,
   paragraph,
@@ -38,8 +38,8 @@ import {
   wrapRoot,
 } from './types.js'
 
-const VIDEO_EXTS = /\.(mp4|webm|ogg|mov|m4v)(\?.*)?$/i
-const ALERT_PATTERN = /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/i
+const VIDEO_EXTS = /\.(?:mp4|webm|ogg|mov|m4v)(?:\?.*)?$/i
+const ALERT_PATTERN = /^\[!(note|tip|important|warning|caution)\]\s*/i
 
 export function markdownToLexical(mdast: MdastNode, pre: PreprocessResult): EditorState {
   const children = convertChildren((mdast as any).children ?? [], pre)
@@ -66,83 +66,107 @@ function convertChildren(nodes: MdastNode[], pre: PreprocessResult): LNode[] {
 function convertNode(node: MdastNode, pre: PreprocessResult): LNode | LNode[] | null {
   const n = node as any
   switch (n.type) {
-    case 'root':
+    case 'root': {
       return convertChildren(n.children ?? [], pre)
+    }
 
-    case 'heading':
+    case 'heading': {
       return heading(`h${n.depth}` as string, ...convertInlineChildren(n.children ?? [], pre))
+    }
 
-    case 'paragraph':
+    case 'paragraph': {
       return convertParagraph(n, pre)
+    }
 
-    case 'text':
+    case 'text': {
       return processCustomInline(n.value ?? '')
+    }
 
-    case 'emphasis':
+    case 'emphasis': {
       return applyFormat(convertInlineChildren(n.children ?? [], pre), FORMAT_MAP.italic)
+    }
 
-    case 'strong':
+    case 'strong': {
       return applyFormat(convertInlineChildren(n.children ?? [], pre), FORMAT_MAP.bold)
+    }
 
-    case 'delete':
+    case 'delete': {
       return applyFormat(convertInlineChildren(n.children ?? [], pre), FORMAT_MAP.strikethrough)
+    }
 
-    case 'inlineCode':
+    case 'inlineCode': {
       return text(n.value ?? '', FORMAT_MAP.code)
+    }
 
-    case 'code':
+    case 'code': {
       return convertCodeBlock(n)
+    }
 
-    case 'blockquote':
+    case 'blockquote': {
       return convertBlockquote(n, pre)
+    }
 
-    case 'list':
+    case 'list': {
       return convertList(n, pre)
+    }
 
-    case 'listItem':
+    case 'listItem': {
       return convertListItem(n, pre)
+    }
 
-    case 'link':
+    case 'link': {
       return link(n.url ?? '', n.title ?? null, ...convertInlineChildren(n.children ?? [], pre))
+    }
 
-    case 'image':
+    case 'image': {
       return convertImage(n)
+    }
 
-    case 'table':
+    case 'table': {
       return convertTable(n, pre)
+    }
 
-    case 'thematicBreak':
+    case 'thematicBreak': {
       return horizontalRule()
+    }
 
-    case 'break':
+    case 'break': {
       return lineBreak()
+    }
 
-    case 'math':
+    case 'math': {
       return katexBlock(n.value ?? '')
+    }
 
-    case 'inlineMath':
+    case 'inlineMath': {
       return { type: 'katex-inline', equation: n.value ?? '', version: 1 }
+    }
 
-    case 'html':
+    case 'html': {
       return convertHtml(n.value ?? '', pre)
+    }
 
-    case 'footnoteReference':
+    case 'footnoteReference': {
       return { type: 'footnote', identifier: n.identifier ?? '', version: 1 }
+    }
 
-    case 'footnoteDefinition':
+    case 'footnoteDefinition': {
       // Collected separately
       return null
+    }
 
     case 'yaml':
-    case 'toml':
+    case 'toml': {
       // Skip frontmatter
       return null
+    }
 
-    default:
+    default: {
       // Unknown node: try to extract text
       if (n.value) return text(n.value)
       if (n.children) return convertChildren(n.children, pre)
       return null
+    }
   }
 }
 
@@ -452,6 +476,21 @@ function convertTable(n: any, pre: PreprocessResult): LNode {
 
 // ── HTML nodes ──
 
+/** Parse leading <summary>...</summary> without regex backtracking (ReDoS-safe). */
+function parseDetailsSummaryAndBody(html: string): { body: string; summary: string } {
+  const lower = html.toLowerCase()
+  const open = '<summary>'
+  const close = '</summary>'
+  const oi = lower.indexOf(open)
+  if (oi === -1) return { summary: '', body: html.trim() }
+  const innerStart = oi + open.length
+  const ci = lower.indexOf(close, innerStart)
+  if (ci === -1) return { summary: '', body: html.trim() }
+  const summary = html.slice(innerStart, ci).trim()
+  const body = html.slice(ci + close.length).trim()
+  return { summary, body }
+}
+
 function convertHtml(html: string, pre: PreprocessResult): LNode | LNode[] | null {
   const trimmed = html.trim()
 
@@ -465,7 +504,7 @@ function convertHtml(html: string, pre: PreprocessResult): LNode | LNode[] | nul
   }
 
   // Handle merged HTML nodes containing multiple placeholders (remark may merge adjacent HTML lines)
-  const PLACEHOLDER_GLOBAL = /<!--PLACEHOLDER:(container|html):(\d+):\w+-->/g
+  const PLACEHOLDER_GLOBAL = /<!--PLACEHOLDER:(?:container|html):\d+:\w+-->/g
   if (PLACEHOLDER_GLOBAL.test(trimmed)) {
     PLACEHOLDER_GLOBAL.lastIndex = 0
     const results: LNode[] = []
@@ -487,7 +526,7 @@ function convertHtml(html: string, pre: PreprocessResult): LNode | LNode[] | nul
   }
 
   // <video src="..." /> or <video src="..."></video>
-  const videoMatch = trimmed.match(/<video[^>]*\bsrc=["']([^"']+)["'][^>]*\/?>/i)
+  const videoMatch = trimmed.match(/<video\s[^>]*src=["']([^"']+)["'][^>]*>/i)
   if (videoMatch) return video(videoMatch[1])
 
   // <tag>text</tag>
@@ -507,10 +546,9 @@ function convertHtmlBlock(
 ): LNode | null {
   switch (block.tag) {
     case 'details': {
-      // content starts with <summary>...</summary>
-      const sumMatch = block.content.match(/^<summary>([\s\S]*?)<\/summary>\s*([\s\S]*)$/i)
-      const summary = sumMatch ? sumMatch[1].trim() : ''
-      let bodyMd = sumMatch ? sumMatch[2].trim() : block.content
+      // content starts with <summary>...</summary> (string split avoids regex backtracking)
+      const { body: bodyMdRaw, summary } = parseDetailsSummaryAndBody(block.content)
+      let bodyMd = bodyMdRaw
       // If body is HTML-heavy, convert to markdown first
       if (/^\s*</.test(bodyMd)) {
         bodyMd = htmlBodyToMarkdown(bodyMd)
@@ -522,14 +560,14 @@ function convertHtmlBlock(
 
     case 'tabs': {
       // Parse <tab label="...">content</tab> blocks
-      const tabRegex = /<tab\s+label=["']([^"']+)["']\s*>([\s\S]*?)<\/tab>/gi
+      const tabRegex = /<tab\s+label=["']([^"']+)["']\s*>(.*?)<\/tab>/gis
       const files: { filename: string; language: string; code: string }[] = []
       let m: RegExpExecArray | null
       while ((m = tabRegex.exec(block.content)) !== null) {
         const label = m[1]
         const tabContent = m[2].trim()
         // Try to extract code block from tab content
-        const codeMatch = tabContent.match(/^```(\w*)\n([\s\S]*?)\n```$/)
+        const codeMatch = tabContent.match(/^```(\w*)\n(.*?)\n```$/s)
         if (codeMatch) {
           files.push({ filename: label, language: codeMatch[1] || '', code: codeMatch[2] })
         } else {
@@ -540,16 +578,18 @@ function convertHtmlBlock(
       return null
     }
 
-    case 'excalidraw':
+    case 'excalidraw': {
       return excalidraw(block.content)
+    }
 
     case 'nested-doc': {
       const bodyNodes = convertMarkdownString(block.content, pre)
       return nestedDoc(...bodyNodes)
     }
 
-    default:
+    default: {
       return null
+    }
   }
 }
 
@@ -594,7 +634,7 @@ function convertContainer(block: ContainerBlock, pre: PreprocessResult): LNode |
 
     case 'details': {
       const params = parseContainerParams(block.params)
-      const summary = params.summary?.replace(/^"|"$/g, '') ?? ''
+      const summary = params.summary?.replaceAll(/^"|"$/g, '') ?? ''
       const bodyNodes = convertMarkdownString(block.content, pre)
       return details(summary, false, ...bodyNodes)
     }
@@ -602,7 +642,7 @@ function convertContainer(block: ContainerBlock, pre: PreprocessResult): LNode |
     case 'grid': {
       const params = parseContainerParams(block.params)
       const cols = Number.parseInt(params.cols ?? '2', 10)
-      const rawGap = params.gap?.replace(/^"|"$/g, '') ?? '16px'
+      const rawGap = params.gap?.replaceAll(/^"|"$/g, '') ?? '16px'
       const gap = /\d+$/.test(rawGap) ? `${rawGap}px` : rawGap
 
       if (params.type === 'images') {
@@ -614,7 +654,7 @@ function convertContainer(block: ContainerBlock, pre: PreprocessResult): LNode |
       const cellParts = block.content.split(/^\s*::: *cell\s*$/gm).filter((s) => s.trim())
       // Remove trailing ::: from each cell
       const cells = cellParts.map((part) => {
-        const cleaned = part.replace(/^\s*:::\s*$/gm, '').trim()
+        const cleaned = part.replaceAll(/^\s*:::\s*$/gm, '').trim()
         return wrapRoot(convertMarkdownString(cleaned, pre))
       })
       if (cells.length === 0) {
@@ -624,8 +664,9 @@ function convertContainer(block: ContainerBlock, pre: PreprocessResult): LNode |
       return gridContainer(cols, gap, cells)
     }
 
-    default:
+    default: {
       return null
+    }
   }
 }
 
@@ -676,12 +717,12 @@ function htmlBodyToMarkdown(html: string): string {
   return (
     html
       // Strip <p> wrappers (with optional attributes)
-      .replace(/<p[^>]*>/gi, '')
-      .replace(/<\/p>/gi, '\n\n')
+      .replaceAll(/<p[^>]*>/gi, '')
+      .replaceAll(/<\/p>/gi, '\n\n')
       // <span class="spoiler">text</span> → ||text||
-      .replace(/<span\s+class="spoiler">([\s\S]*?)<\/span>/gi, '||$1||')
+      .replaceAll(/<span\s+class="spoiler">(.*?)<\/span>/gis, '||$1||')
       // <blockquote>text</blockquote> → > text
-      .replace(/<blockquote>([\s\S]*?)<\/blockquote>/gi, (_m, inner: string) => {
+      .replaceAll(/<blockquote>(.*?)<\/blockquote>/gis, (_m, inner: string) => {
         return inner
           .trim()
           .split('\n')
@@ -689,18 +730,18 @@ function htmlBodyToMarkdown(html: string): string {
           .join('\n')
       })
       // <strong>text</strong> → **text**
-      .replace(/<strong>([\s\S]*?)<\/strong>/gi, '**$1**')
+      .replaceAll(/<strong>(.*?)<\/strong>/gis, '**$1**')
       // <em>text</em> → *text*
-      .replace(/<em>([\s\S]*?)<\/em>/gi, '*$1*')
+      .replaceAll(/<em>(.*?)<\/em>/gis, '*$1*')
       // <del>text</del> → ~~text~~
-      .replace(/<del>([\s\S]*?)<\/del>/gi, '~~$1~~')
+      .replaceAll(/<del>(.*?)<\/del>/gis, '~~$1~~')
       // <code>text</code> → `text`
-      .replace(/<code>([\s\S]*?)<\/code>/gi, '`$1`')
+      .replaceAll(/<code>(.*?)<\/code>/gis, '`$1`')
       // Strip remaining HTML tags (br, span without class, etc.)
-      .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<\/?[a-z][^>]*>/gi, '')
+      .replaceAll(/<br\s*\/?>/gi, '\n')
+      .replaceAll(/<\/?[a-z][^>]*>/gi, '')
       // Dedent: remove leading whitespace from each line (HTML indentation)
-      .replace(/^[ \t]+/gm, '')
+      .replaceAll(/^[\t ]+/gm, '')
       .trim()
   )
 }

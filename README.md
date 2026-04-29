@@ -24,17 +24,17 @@
 
 | Category              | Technology                    |
 | --------------------- | ----------------------------- |
-| **Language**          | TypeScript 5                  |
-| **Editor Core**       | Lexical 0.42                  |
+| **Language**          | TypeScript 5.9                |
+| **Editor Core**       | Lexical 0.44                  |
 | **UI Framework**      | React 19                      |
 | **UI Primitives**     | Base UI 1 (`@base-ui/react`)  |
-| **Build**             | Vite 7, Turbo 2               |
+| **Build**             | Vite 8, Turbo 2               |
 | **Styling**           | Vanilla Extract 1 (CSS-in-TS) |
 | **Code Highlighting** | Shiki 4, CodeMirror 6         |
 | **Package Manager**   | pnpm 10                       |
 | **Module Format**     | ESM only (`.mjs`)             |
 
-Lexical stays on **0.x** releases: the **minor** (e.g. **0.42**) is what must align across `lexical` and `@lexical/*`, not the patch number.
+Lexical stays on **0.x** releases: the **minor** (e.g. **0.44**) is what must align across `lexical` and `@lexical/*`, not the patch number.
 
 ## Prerequisites
 
@@ -46,7 +46,7 @@ Lexical stays on **0.x** releases: the **minor** (e.g. **0.42**) is what must al
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/innei-template/haklex.git
+git clone https://github.com/Innei/haklex.git
 cd haklex
 ```
 
@@ -99,7 +99,10 @@ haklex/
 │   ├── rich-renderer-*/          # Individual renderers (alert, banner, codeblock, image, ...)
 │   ├── rich-plugin-*/            # Editor plugins (toolbar, slash-menu, block-handle, ...)
 │   ├── rich-litexml/              # Lexical JSON ↔ XML serialization (LLM bridge)
-│   ├── rich-ext-*/               # Heavy extensions (ai-agent, code-snippet, embed, excalidraw, gallery, nested-doc)
+│   ├── rich-agent-core/           # Headless AI agent protocol, diff orchestration, document store
+│   ├── rich-agent-chat/           # Chat panel UI for AI interaction (used by demo / integrations)
+│   ├── rich-diff-core/            # Lexical diff engine (structural + decoration; shared by agent + diff UI)
+│   ├── rich-ext-*/               # Heavy extensions (ai-agent, chat snapshots, code-snippet, embed, excalidraw, gallery, nested-doc)
 │   ├── rich-kit-shiro/           # Integration bundle for Shiroi (ShiroEditor + ShiroRenderer)
 │   ├── rich-diff/                # Diff viewer
 │   └── cm-editor/                # Shared CodeMirror 6 utilities
@@ -120,14 +123,16 @@ haklex/
 ├── @haklex/rich-static-renderer
 ├── @haklex/rich-renderers
 ├── @haklex/rich-renderers-edit
-├── @haklex/rich-ext-ai-agent (AI writing agent + diff review)
-│   └── @haklex/rich-litexml (Lexical ↔ XML bridge)
-├── @haklex/rich-ext-{code-snippet, embed, excalidraw, gallery, nested-doc}
+├── @haklex/rich-ext-ai-agent (AI writing agent + diff review UI)
+│   ├── @haklex/rich-agent-core → @haklex/rich-litexml
+│   └── @haklex/rich-diff-core
+├── @haklex/rich-agent-chat → @haklex/rich-agent-core, @haklex/rich-diff-core (chat UI; optional integration)
+├── @haklex/rich-ext-{chat, code-snippet, embed, excalidraw, gallery, nested-doc}
 ├── @haklex/rich-plugin-{block-handle, floating-toolbar, link-edit, mention, slash-menu, table, toolbar}
 └── @haklex/rich-renderer-katex
 
-@haklex/rich-litexml (standalone, also used by ai-agent)
-@haklex/rich-diff (standalone)
+@haklex/rich-litexml (standalone; consumed by @haklex/rich-agent-core and others)
+@haklex/rich-diff → @haklex/rich-diff-core (standalone diff viewer)
 ```
 
 ## Package Overview
@@ -175,23 +180,27 @@ Aggregated by `@haklex/rich-renderers` (static) and `@haklex/rich-renderers-edit
 
 ### Extensions
 
-| Package                 | Description                                                                                  |
-| ----------------------- | -------------------------------------------------------------------------------------------- |
-| `rich-ext-ai-agent`     | AI writing agent — chat panel, diff review overlay, selection-aware prompts, streaming edits |
-| `rich-ext-code-snippet` | Multi-file tabbed code display with drag-and-drop                                            |
-| `rich-ext-embed`        | URL embeds — YouTube, Twitter, Bilibili, CodeSandbox, GitHub Gist                            |
-| `rich-ext-excalidraw`   | Excalidraw whiteboard integration                                                            |
-| `rich-ext-gallery`      | Image gallery with grid and carousel layouts                                                 |
-| `rich-ext-nested-doc`   | Nested document / card content blocks                                                        |
+| Package                 | Description                                                                 |
+| ----------------------- | --------------------------------------------------------------------------- |
+| `rich-ext-ai-agent`     | AI writing agent — diff review overlay, action registry, editor integration |
+| `rich-ext-chat`         | Static chat-snapshot blocks for assistant / conversation transcripts        |
+| `rich-ext-code-snippet` | Multi-file tabbed code display with drag-and-drop                           |
+| `rich-ext-embed`        | URL embeds — YouTube, Twitter, Bilibili, CodeSandbox, GitHub Gist           |
+| `rich-ext-excalidraw`   | Excalidraw whiteboard integration                                           |
+| `rich-ext-gallery`      | Image gallery with grid and carousel layouts                                |
+| `rich-ext-nested-doc`   | Nested document / card content blocks                                       |
 
 ### Integration & Utilities
 
-| Package                  | Description                                                                               |
-| ------------------------ | ----------------------------------------------------------------------------------------- |
-| `@haklex/rich-kit-shiro` | Pre-configured bundle — `ShiroEditor` and `ShiroRenderer` with all plugins and extensions |
-| `@haklex/rich-litexml`   | Bidirectional Lexical JSON ↔ XML serialization for LLM-friendly document I/O              |
-| `@haklex/rich-diff`      | Diff viewer for comparing two editor states                                               |
-| `@haklex/cm-editor`      | Shared CodeMirror 6 editor utilities                                                      |
+| Package                   | Description                                                                               |
+| ------------------------- | ----------------------------------------------------------------------------------------- |
+| `@haklex/rich-kit-shiro`  | Pre-configured bundle — `ShiroEditor` and `ShiroRenderer` with all plugins and extensions |
+| `@haklex/rich-litexml`    | Bidirectional Lexical JSON ↔ XML serialization for LLM-friendly document I/O              |
+| `@haklex/rich-agent-core` | Headless AI agent protocol, LiteXML-backed edits, and document/session state              |
+| `@haklex/rich-agent-chat` | Chat panel UI (tool calls, streaming) built on `rich-agent-core`                          |
+| `@haklex/rich-diff-core`  | Core Lexical diff engine — character-level and structural diff with node decoration       |
+| `@haklex/rich-diff`       | Diff viewer for comparing two editor states (uses `rich-diff-core`)                       |
+| `@haklex/cm-editor`       | Shared CodeMirror 6 editor utilities                                                      |
 
 ## Variant System
 
@@ -274,7 +283,9 @@ import '@haklex/rich-kit-shiro/style.css'
 | `pnpm build:packages`                                | Build all workspace packages under `packages/`          |
 | `pnpm --filter @haklex/rich-editor build`            | Build a single package                                  |
 | `pnpm --filter @haklex/rich-editor dev:build`        | Watch mode for a single package                         |
-| `pnpm lint`                                          | Lint all packages                                       |
+| `pnpm lint`                                          | ESLint on the repo root (`eslint . --fix`)              |
+| `pnpm test`                                          | Run all Vitest suites (`vitest run`)                    |
+| `pnpm typecheck`                                     | `tsc --noEmit` for every `packages/*` workspace         |
 | `npx eslint path/to/file.ts`                         | Lint a single file                                      |
 | `npx prettier --write path/to/file.ts`               | Format a single file                                    |
 | `npx vitest run packages/rich-renderer-katex/tests/` | Run tests for a specific package                        |
@@ -309,7 +320,7 @@ Contributions are welcome. Please open an issue or PR on [GitHub](https://github
 
 ### Toolchain
 
-- **ESLint** — [@lobehub/eslint-config](https://github.com/lobehub/eslint-config)
+- **ESLint** — [@lobehub/eslint-config](https://github.com/lobehub/eslint-config) (see root `eslint.config.mjs`)
 - **Pre-commit** — `simple-git-hooks` + `lint-staged` (ESLint `--fix` + Prettier on staged files)
 - **Versioning** — All `@haklex/*` packages share one version; source of truth is `packages/rich-editor/package.json`, managed by [bumpp](https://github.com/antfu-collective/bumpp)
 

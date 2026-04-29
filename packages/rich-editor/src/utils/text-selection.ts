@@ -13,6 +13,7 @@ import {
 
 import { blockIdState } from '../plugins/BlockIdPlugin';
 import { $getRootBlock, $getTextOffsetInBlock, $resolveSelectionPoint } from './comment-anchor';
+
 export { TEXT_SELECTION_HIGHLIGHT_NAME } from './text-selection-constants';
 
 export interface TextSelectionSnapshot {

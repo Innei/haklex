@@ -1,4 +1,5 @@
 import {
+  footnoteRef,
   FORMAT_BOLD,
   FORMAT_CODE,
   FORMAT_HIGHLIGHT,
@@ -7,7 +8,6 @@ import {
   FORMAT_SUBSCRIPT,
   FORMAT_SUPERSCRIPT,
   FORMAT_UNDERLINE,
-  footnoteRef,
   katexInline,
   type LNode,
   mention,
@@ -18,10 +18,10 @@ import {
 } from './types.js'
 
 interface InlineToken {
-  type: 'text' | 'node'
-  value?: string
   format?: number
   node?: LNode
+  type: 'text' | 'node'
+  value?: string
 }
 
 // Process a plain text string for custom inline syntax not handled by remark
@@ -65,7 +65,7 @@ function tokenize(input: string): InlineToken[] {
 
     // KaTeX inline: $equation$ (not $$)
     if (!matched) {
-      const katexMatch = input.slice(pos).match(/^\$([^\n$]+?)\$(?!\$)/)
+      const katexMatch = input.slice(pos).match(/^\$([^\n$]+)\$(?!\$)/)
       if (katexMatch) {
         tokens.push({ type: 'node', node: katexInline(katexMatch[1]) })
         pos += katexMatch[0].length
@@ -125,7 +125,7 @@ function tokenize(input: string): InlineToken[] {
 
     // Superscript: ^text^ (single caret, not ^^)
     if (!matched) {
-      const supMatch = input.slice(pos).match(/^\^([^^]+?)\^/)
+      const supMatch = input.slice(pos).match(/^\^([^^]+)\^/)
       if (supMatch) {
         tokens.push({ type: 'text', value: supMatch[1], format: FORMAT_SUPERSCRIPT })
         pos += supMatch[0].length
@@ -135,7 +135,7 @@ function tokenize(input: string): InlineToken[] {
 
     // Subscript: ~text~ (single tilde, not ~~)
     if (!matched) {
-      const subMatch = input.slice(pos).match(/^~([^~]+?)~(?!~)/)
+      const subMatch = input.slice(pos).match(/^~([^~]+)~(?!~)/)
       if (subMatch) {
         tokens.push({ type: 'text', value: subMatch[1], format: FORMAT_SUBSCRIPT })
         pos += subMatch[0].length
@@ -145,7 +145,7 @@ function tokenize(input: string): InlineToken[] {
 
     // Plain text: consume one character
     if (!matched) {
-      const last = tokens[tokens.length - 1]
+      const last = tokens.at(-1)
       if (last && last.type === 'text' && (last.format ?? 0) === 0) {
         last.value += input[pos]
       } else {

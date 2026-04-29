@@ -83,6 +83,8 @@ function TagEditRendererInner({ text }: TagRendererProps) {
       >
         <input
           ref={inputRef}
+          type="text"
+          value={editText}
           style={{
             appearance: 'none',
             border: 'none',
@@ -97,8 +99,6 @@ function TagEditRendererInner({ text }: TagRendererProps) {
             width: `${Math.max(editText.length, 1)}ch`,
             minWidth: '2ch',
           }}
-          type="text"
-          value={editText}
           onBlur={commitChanges}
           onChange={(e) => setEditText(e.target.value)}
           onKeyDown={handleKeyDown}
