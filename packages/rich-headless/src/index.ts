@@ -561,3 +561,7 @@ export const allHeadlessNodes: Klass<LexicalNode>[] = [...builtinNodes, ...custo
 // ── Transformers (Lexical → Markdown) ──
 
 export { $toMarkdown, allHeadlessTransformers } from './transformers';
+
+// ── Unknown-node fallback for forward-compat parsing ──
+
+export { type SanitizeOptions,sanitizeSerializedJSON, sanitizeSerializedState } from './sanitize';
