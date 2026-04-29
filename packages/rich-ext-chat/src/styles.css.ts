@@ -1,3 +1,4 @@
+import { vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const container = style({
@@ -21,22 +22,22 @@ export const avatar = style({
   width: 32,
   height: 32,
   borderRadius: '50%',
-  background: '#f5f5f5',
-  border: '1px solid #e5e5e5',
+  background: vars.color.bgTertiary,
+  border: `1px solid ${vars.color.border}`,
   flexShrink: 0,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   fontSize: 12,
   fontWeight: 600,
-  color: '#737373',
+  color: vars.color.textTertiary,
   overflow: 'hidden',
 });
 
 export const avatarDark = style({
-  background: '#1f1f1f',
-  color: '#ffffff',
-  borderColor: '#1f1f1f',
+  background: vars.color.text,
+  color: vars.color.bg,
+  borderColor: vars.color.text,
 });
 
 export const avatarImg = style({
@@ -57,33 +58,33 @@ export const bubble = style({
 });
 
 export const userBubble = style({
-  background: '#1f1f1f',
-  color: '#ffffff',
+  background: vars.color.text,
+  color: vars.color.bg,
   borderRadius: '14px 14px 4px 14px',
 });
 
 export const leftBubble = style({
-  background: '#f5f5f5',
-  color: '#1f1f1f',
+  background: vars.color.bgTertiary,
+  color: vars.color.text,
   borderRadius: '14px 14px 14px 4px',
-  border: '1px solid #ececec',
+  border: `1px solid ${vars.color.border}`,
 });
 
 export const rightBubble = style({
-  background: '#1f1f1f',
-  color: '#ffffff',
+  background: vars.color.text,
+  color: vars.color.bg,
   borderRadius: '14px 14px 4px 14px',
 });
 
 export const author = style({
   fontSize: 11,
-  color: '#737373',
+  color: vars.color.textTertiary,
   marginBottom: 4,
   fontWeight: 500,
 });
 
 export const authorOnDark = style({
-  color: '#a3a3a3',
+  color: `color-mix(in srgb, ${vars.color.bg} 70%, transparent)`,
 });
 
 export const article = style({
@@ -96,14 +97,14 @@ export const article = style({
 
 export const articleHeader = style({
   fontSize: 11,
-  color: '#a3a3a3',
+  color: vars.color.textQuaternary,
   marginBottom: 6,
   letterSpacing: '0.04em',
   textTransform: 'uppercase',
 });
 
 export const empty = style({
-  color: '#737373',
+  color: vars.color.textTertiary,
   fontSize: 13,
   fontStyle: 'italic',
   padding: '8px 0',
@@ -117,13 +118,13 @@ export const editOverlay = style({
   position: 'absolute',
   top: 8,
   right: 8,
-  background: '#ffffff',
-  border: '1px solid #e5e5e5',
+  background: vars.color.bg,
+  border: `1px solid ${vars.color.border}`,
   borderRadius: 6,
   padding: '4px 10px',
   fontSize: 12,
   fontWeight: 500,
-  color: '#1f1f1f',
+  color: vars.color.text,
   opacity: 0,
   transition: 'opacity 120ms ease',
   cursor: 'pointer',
@@ -160,7 +161,8 @@ export const semanticClassNames = {
 } as const;
 
 export const modal = style({
-  background: '#ffffff',
+  background: vars.color.bg,
+  color: vars.color.text,
   borderRadius: 14,
   width: 920,
   maxWidth: '95vw',
@@ -171,9 +173,10 @@ export const modal = style({
 
 export const modalHeader = style({
   padding: '14px 22px',
-  borderBottom: '1px solid #ececec',
+  borderBottom: `1px solid ${vars.color.border}`,
   fontSize: 14,
   fontWeight: 600,
+  color: vars.color.text,
 });
 
 export const modalBody = style({
@@ -184,8 +187,8 @@ export const modalBody = style({
 export const rail = style({
   width: 280,
   flexShrink: 0,
-  borderRight: '1px solid #ececec',
-  background: '#fafafa',
+  borderRight: `1px solid ${vars.color.border}`,
+  background: vars.color.bgSecondary,
   padding: '18px 18px 14px',
   overflowY: 'auto',
 });
@@ -201,7 +204,7 @@ export const sectionLabel = style({
   fontSize: 11,
   textTransform: 'uppercase',
   letterSpacing: '0.08em',
-  color: '#737373',
+  color: vars.color.textTertiary,
   marginBottom: 8,
   fontWeight: 500,
   selectors: { '&:not(:first-child)': { marginTop: 22 } },
@@ -210,18 +213,29 @@ export const sectionLabel = style({
 export const variantStack = style({ display: 'flex', flexDirection: 'column', gap: 6 });
 export const variantPill = style({
   padding: '9px 11px',
-  border: '1px solid #e5e5e5',
+  border: `1px solid ${vars.color.border}`,
   borderRadius: 8,
   cursor: 'pointer',
-  background: '#ffffff',
+  background: vars.color.bg,
+  color: vars.color.text,
+  textAlign: 'left',
 });
-export const variantPillActive = style({ borderColor: '#1f1f1f' });
+export const variantPillActive = style({ borderColor: vars.color.text });
+
+export const variantPillName = style({
+  fontSize: 13,
+  fontWeight: 600,
+});
+export const variantPillHint = style({
+  fontSize: 11,
+  color: vars.color.textTertiary,
+});
 
 export const participantCard = style({
-  border: '1px solid #ececec',
+  border: `1px solid ${vars.color.border}`,
   borderRadius: 8,
   padding: '9px 10px',
-  background: '#ffffff',
+  background: vars.color.bg,
   marginBottom: 8,
 });
 export const participantRow = style({
@@ -236,35 +250,57 @@ export const participantPill = style({
   letterSpacing: '0.08em',
   padding: '2px 6px',
   borderRadius: 4,
-  background: '#1f1f1f',
-  color: '#ffffff',
+  background: vars.color.text,
+  color: vars.color.bg,
   fontWeight: 600,
 });
-export const participantPillUser = style({ background: '#737373' });
+export const participantPillUser = style({
+  background: vars.color.textTertiary,
+});
+export const participantLabel = style({
+  fontSize: 10.5,
+  color: vars.color.textTertiary,
+  width: 42,
+});
 export const participantInput = style({
   flex: 1,
-  border: '1px solid #e5e5e5',
+  border: `1px solid ${vars.color.border}`,
   borderRadius: 5,
   padding: '4px 7px',
   fontSize: 12.5,
-  background: '#ffffff',
-  color: '#1f1f1f',
+  background: vars.color.bg,
+  color: vars.color.text,
   width: 0,
+  outline: 'none',
+  selectors: {
+    '&:focus': {
+      borderColor: `color-mix(in srgb, ${vars.color.text} 40%, transparent)`,
+    },
+  },
 });
 
 export const messageCard = style({
-  border: '1px solid #ececec',
+  border: `1px solid ${vars.color.border}`,
   borderRadius: 10,
   marginBottom: 10,
   overflow: 'hidden',
+  background: vars.color.bg,
 });
 export const messageHead = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   padding: '7px 12px',
-  background: '#fafafa',
-  borderBottom: '1px solid #ececec',
+  background: vars.color.bgSecondary,
+  borderBottom: `1px solid ${vars.color.border}`,
+});
+export const messageSelect = style({
+  background: vars.color.bg,
+  color: vars.color.text,
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: 5,
+  padding: '3px 6px',
+  fontSize: 12,
 });
 export const messageActions = style({ display: 'flex', gap: 2 });
 export const messageTextarea = style({
@@ -274,10 +310,12 @@ export const messageTextarea = style({
   fontFamily: '-apple-system, "JetBrains Mono", monospace',
   fontSize: 13,
   lineHeight: 1.55,
-  color: '#1f1f1f',
+  color: vars.color.text,
+  background: vars.color.bg,
   resize: 'vertical',
   minHeight: 70,
   boxSizing: 'border-box',
+  outline: 'none',
 });
 
 export const addMessage = style({
@@ -286,35 +324,51 @@ export const addMessage = style({
   margin: '10px 0 4px',
 });
 export const addMessageButton = style({
-  border: '1px dashed #cfcfcf',
+  border: `1px dashed ${vars.color.border}`,
   background: 'transparent',
-  color: '#737373',
+  color: vars.color.textTertiary,
   padding: '6px 14px',
   borderRadius: 6,
   fontSize: 13,
   cursor: 'pointer',
+  selectors: {
+    '&:hover': {
+      color: vars.color.text,
+      borderColor: `color-mix(in srgb, ${vars.color.text} 40%, transparent)`,
+    },
+  },
 });
 
 export const modalFooter = style({
   padding: '12px 22px',
-  borderTop: '1px solid #ececec',
+  borderTop: `1px solid ${vars.color.border}`,
   display: 'flex',
   justifyContent: 'flex-end',
   gap: 8,
-  background: '#fafafa',
+  background: vars.color.bgSecondary,
 });
 export const button = style({
   fontSize: 13,
   padding: '6px 12px',
   borderRadius: 6,
-  border: '1px solid #e5e5e5',
-  background: '#ffffff',
-  color: '#1f1f1f',
+  border: `1px solid ${vars.color.border}`,
+  background: vars.color.bg,
+  color: vars.color.text,
   cursor: 'pointer',
 });
 export const buttonPrimary = style({
-  background: '#1f1f1f',
-  color: '#ffffff',
-  borderColor: '#1f1f1f',
+  background: vars.color.text,
+  color: vars.color.bg,
+  borderColor: vars.color.text,
 });
-export const buttonGhost = style({ borderColor: 'transparent', color: '#737373' });
+export const buttonGhost = style({
+  borderColor: 'transparent',
+  background: 'transparent',
+  color: vars.color.textTertiary,
+  selectors: {
+    '&:hover': {
+      color: vars.color.text,
+      background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+    },
+  },
+});

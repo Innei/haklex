@@ -100,8 +100,8 @@ export const ChatEditorModal: FC<ChatEditorModalProps> = ({
                 type="button"
                 onClick={() => handleVariantChange(key)}
               >
-                <div style={{ fontSize: 13, fontWeight: 600 }}>{VARIANT_LABELS[key].name}</div>
-                <div style={{ fontSize: 11, color: '#737373' }}>{VARIANT_LABELS[key].hint}</div>
+                <div className={styles.variantPillName}>{VARIANT_LABELS[key].name}</div>
+                <div className={styles.variantPillHint}>{VARIANT_LABELS[key].hint}</div>
               </button>
             ))}
           </div>
@@ -126,7 +126,7 @@ export const ChatEditorModal: FC<ChatEditorModalProps> = ({
                 />
               </div>
               <div className={styles.participantRow}>
-                <span style={{ fontSize: 10.5, color: '#737373', width: 42 }}>Avatar</span>
+                <span className={styles.participantLabel}>Avatar</span>
                 <input
                   className={styles.participantInput}
                   placeholder="URL (optional)"
@@ -148,6 +148,7 @@ export const ChatEditorModal: FC<ChatEditorModalProps> = ({
             <div className={styles.messageCard} key={m.id}>
               <div className={styles.messageHead}>
                 <select
+                  className={styles.messageSelect}
                   value={m.participantId}
                   onChange={(e) => updateMessage(m.id, { participantId: e.target.value })}
                 >
