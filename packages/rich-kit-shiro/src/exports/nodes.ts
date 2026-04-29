@@ -20,15 +20,20 @@ export {
 
 // Re-export from @haklex/rich-renderers
 export type {
+  SerializedChatNode,
   SerializedCodeSnippetNode,
   SerializedEmbedNode,
   SerializedGalleryNode,
 } from '@haklex/rich-renderers';
 export {
+  $createChatNode,
   $createCodeSnippetNode,
   $createGalleryNode,
+  $isChatNode,
   $isCodeSnippetNode,
   $isGalleryNode,
+  ChatNode,
+  chatNodes,
   CodeSnippetNode,
   codeSnippetNodes,
   EmbedNode,
@@ -39,10 +44,14 @@ export {
 
 // Re-export from @haklex/rich-renderers-edit
 export {
+  $createChatEditNode,
   $createCodeSnippetEditNode,
   $createEmbedEditNode,
+  $isChatEditNode,
   $isCodeSnippetEditNode,
   $isEmbedEditNode,
+  ChatEditNode,
+  chatEditNodes,
   CodeSnippetEditNode,
   codeSnippetEditNodes,
   EmbedEditNode,

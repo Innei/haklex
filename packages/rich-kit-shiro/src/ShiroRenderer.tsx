@@ -2,6 +2,7 @@ import type { RendererConfig, RichEditorVariant } from '@haklex/rich-editor';
 import { NestedContentRendererProvider } from '@haklex/rich-editor';
 import { nestedDocNodes } from '@haklex/rich-ext-nested-doc/static';
 import {
+  chatNodes,
   codeSnippetNodes,
   embedNodes,
   enhancedRendererConfig,
@@ -18,6 +19,7 @@ const defaultExtraNodes = [
   ...embedNodes,
   ...galleryNodes,
   ...codeSnippetNodes,
+  ...chatNodes,
   ...nestedDocNodes,
 ];
 

@@ -8,6 +8,7 @@ import { MentionMenuPlugin } from '@haklex/rich-plugin-mention';
 import { SlashMenuPlugin } from '@haklex/rich-plugin-slash-menu';
 import { TableCellResizerPlugin, TableRowColumnHandlesPlugin } from '@haklex/rich-plugin-table';
 import {
+  chatEditNodes,
   codeSnippetEditNodes,
   ConvertToLinkCardAction,
   embedEditNodes,
@@ -33,6 +34,7 @@ const defaultExtraNodes = [
   ...katexEditNodes,
   ...galleryEditNodes,
   ...codeSnippetEditNodes,
+  ...chatEditNodes,
 ];
 
 export interface ShiroEditorProps extends Omit<
