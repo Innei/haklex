@@ -319,6 +319,19 @@ export const TagNode = headlessDecorator('tag', ['text'], { text: '' }, true);
 
 export const CommentNode = headlessDecorator('comment', ['text'], { text: '' }, true);
 
+export const PollNode = headlessDecorator(
+  'poll',
+  ['pollId', 'question', 'options', 'mode', 'closeAt', 'showResults'],
+  {
+    pollId: '',
+    question: '',
+    options: [],
+    mode: 'single',
+    closeAt: undefined,
+    showResults: undefined,
+  },
+);
+
 // ── Nested content nodes ──
 
 export class BannerNode extends DecoratorNode<null> {
@@ -540,6 +553,7 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   AlertQuoteNode,
   NestedDocNode,
   GridContainerNode,
+  PollNode,
 ];
 
 export const allHeadlessNodes: Klass<LexicalNode>[] = [...builtinNodes, ...customHeadlessNodes];

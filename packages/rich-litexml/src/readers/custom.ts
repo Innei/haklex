@@ -1,6 +1,11 @@
 import type { SerializedEditorState } from 'lexical';
+import { customAlphabet } from 'nanoid';
 
 import type { LitexmlRegistry } from '../registry';
+
+const idAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+const makePollIdSuffix = customAlphabet(idAlphabet, 10);
+const makeOptionIdSuffix = customAlphabet(idAlphabet, 6);
 
 function extractBlockId(el: Element): Record<string, any> {
   const id = el.getAttribute('id');
@@ -407,6 +412,41 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       type: 'code-snippet',
       ...extractBlockId(el),
       files,
+      version: 1,
+    } as any;
+  });
+
+  registry.registerReader('poll', (el) => {
+    let question = '';
+    const options: Array<{ id: string; label: string }> = [];
+    for (const child of el.children) {
+      const tag = child.tagName.toLowerCase();
+      if (tag === 'question') {
+        question = child.textContent ?? '';
+      } else if (tag === 'option') {
+        const id = child.getAttribute('id') || `o_${makeOptionIdSuffix()}`;
+        options.push({ id, label: child.textContent ?? '' });
+      }
+    }
+    const modeAttr = el.getAttribute('mode');
+    const mode = modeAttr === 'multiple' ? 'multiple' : 'single';
+    const closeAt = el.getAttribute('close-at');
+    const showResultsAttr = el.getAttribute('show-results');
+    const showResults =
+      showResultsAttr === 'always' ||
+      showResultsAttr === 'after-vote' ||
+      showResultsAttr === 'after-close'
+        ? showResultsAttr
+        : undefined;
+    return {
+      type: 'poll',
+      ...extractBlockId(el),
+      pollId: el.getAttribute('poll-id') || `p_${makePollIdSuffix()}`,
+      question,
+      options,
+      mode,
+      ...(closeAt ? { closeAt } : {}),
+      ...(showResults ? { showResults } : {}),
       version: 1,
     } as any;
   });

@@ -419,6 +419,34 @@ export const EXCALIDRAW_BLOCK_TRANSFORMER: ElementTransformer = {
   type: 'element',
 };
 
+export const POLL_BLOCK_TRANSFORMER: ElementTransformer = {
+  dependencies: [],
+  export: (node) => {
+    if (node.getType() !== 'poll') return null;
+    const j = node.exportJSON() as any;
+    const meta: Record<string, unknown> = {
+      pollId: j.pollId,
+      mode: j.mode,
+    };
+    if (j.closeAt) meta.closeAt = j.closeAt;
+    if (j.showResults) meta.showResults = j.showResults;
+    const optionLines = (j.options ?? []).map(
+      (option: { id: string; label: string }) =>
+        `- ${escHtml(option.label || '')} <!-- id=${option.id} -->`,
+    );
+    return [
+      `<!--haklex:poll ${JSON.stringify(meta)}-->`,
+      `**${escHtml(j.question || '')}**`,
+      '',
+      ...optionLines,
+      '<!--/haklex:poll-->',
+    ].join('\n');
+  },
+  regExp: NEVER,
+  replace: NOOP,
+  type: 'element',
+};
+
 // ── Aggregate ──
 
 export const allHeadlessTransformers = [
@@ -453,6 +481,7 @@ export const allHeadlessTransformers = [
   EMBED_BLOCK_TRANSFORMER,
   GALLERY_BLOCK_TRANSFORMER,
   EXCALIDRAW_BLOCK_TRANSFORMER,
+  POLL_BLOCK_TRANSFORMER,
   // Standard (heading, quote, list, code, bold, italic, strikethrough, link…)
   ...TRANSFORMERS,
 ];

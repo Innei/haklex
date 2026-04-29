@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "lexical": "^0.44.0",
-    "linkedom": "^0.18.12"
+    "linkedom": "^0.18.12",
+    "nanoid": "^5.1.9"
   },
   "devDependencies": {
     "typescript": "^5.9.3",

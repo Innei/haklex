@@ -21,6 +21,12 @@ export {
   useNestedContentRenderer,
   useOptionalNestedContentRenderer,
 } from './context/NestedContentRendererContext';
+export type { PollDataProviderProps } from './context/PollDataContext';
+export {
+  PollDataProvider,
+  useInitialPollState,
+  usePollDataAdapter,
+} from './context/PollDataContext';
 export type { PresentDialogFn, PresentDialogProps } from './context/PresentDialogContext';
 export { PresentDialogProvider, usePresentDialog } from './context/PresentDialogContext';
 export type { RendererMode } from './context/RendererConfigContext';
@@ -40,6 +46,15 @@ export {
 export { blockIdState } from './plugins/BlockIdPlugin';
 export * from './styles';
 export type { RichEditorProps, RichEditorVariant } from './types';
+export type {
+  PollDataAdapter,
+  PollMetadata,
+  PollMode,
+  PollOption,
+  PollRendererProps,
+  PollShowResults,
+  PollState,
+} from './types/poll';
 export type { RendererConfig } from './types/renderer-config';
 export type {
   AnchorError,
@@ -55,8 +70,8 @@ export {
   buildBlockAnchor,
   buildRangeAnchor,
 } from './utils/comment-anchor';
+export { extractPolls } from './utils/extractPolls';
 export type { DOMSelectionTarget, TextSelectionSnapshot } from './utils/text-selection';
-export { TEXT_SELECTION_HIGHLIGHT_NAME } from './utils/text-selection-constants';
 export {
   $captureTextSelection,
   $captureTextSelectionFromRangeSelection,
@@ -67,3 +82,4 @@ export {
   getDOMRectFromTextSelection,
   getTextOffsetFromDOMPoint,
 } from './utils/text-selection';
+export { TEXT_SELECTION_HIGHLIGHT_NAME } from './utils/text-selection-constants';

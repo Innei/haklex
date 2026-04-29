@@ -15,6 +15,7 @@ import { KaTeXInlineNode } from './nodes/KaTeXInlineNode';
 import { LinkCardNode } from './nodes/LinkCardNode';
 import { MentionNode } from './nodes/MentionNode';
 import { MermaidNode } from './nodes/MermaidNode';
+import { PollEditNode } from './nodes/PollEditNode';
 import { RubyNode } from './nodes/RubyNode';
 import { SpoilerNode } from './nodes/SpoilerNode';
 import { TagNode } from './nodes/TagNode';
@@ -39,6 +40,7 @@ export const customEditNodes: Array<Klass<LexicalNode>> = [
   MermaidNode,
   RubyNode,
   TagNode,
+  PollEditNode,
 ];
 
 export const allEditNodes: Array<Klass<LexicalNode>> = [...builtinNodes, ...customEditNodes];

@@ -278,4 +278,26 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
     }));
     return { tag: 'codesnippet', attrs: blockId(n), children: files };
   });
+
+  registry.registerWriter('poll', (node) => {
+    const n = node as any;
+    const optionElements: XmlElement[] = (n.options ?? []).map(
+      (option: { id: string; label: string }) => ({
+        tag: 'option',
+        attrs: optAttr({ id: option.id }),
+        children: [option.label ?? ''],
+      }),
+    );
+    return {
+      tag: 'poll',
+      attrs: optAttr({
+        ...blockId(n),
+        'poll-id': n.pollId,
+        'mode': n.mode,
+        'close-at': n.closeAt,
+        'show-results': n.showResults,
+      }),
+      children: [{ tag: 'question', children: [n.question ?? ''] }, ...optionElements],
+    };
+  });
 }

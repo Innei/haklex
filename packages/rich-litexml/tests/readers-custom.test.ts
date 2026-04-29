@@ -204,4 +204,33 @@ describe('custom readers', () => {
     expect(nodes[0].opType).toBe('replace');
     expect(nodes[0].diffEntryId).toBe('diff-123');
   });
+
+  it('reads <poll>', () => {
+    const nodes = parse(
+      '<poll id="pl1" poll-id="p_abc" mode="multiple" close-at="2026-05-01" show-results="after-vote"><question>Which one?</question><option id="o_a">Option A</option><option id="o_b">Option B</option></poll>',
+    );
+    expect(nodes[0].type).toBe('poll');
+    expect(nodes[0].pollId).toBe('p_abc');
+    expect(nodes[0].question).toBe('Which one?');
+    expect(nodes[0].mode).toBe('multiple');
+    expect(nodes[0].closeAt).toBe('2026-05-01');
+    expect(nodes[0].showResults).toBe('after-vote');
+    expect(nodes[0].options).toEqual([
+      { id: 'o_a', label: 'Option A' },
+      { id: 'o_b', label: 'Option B' },
+    ]);
+  });
+
+  it('reads <poll> mints IDs when missing (agent creates fresh)', () => {
+    const nodes = parse(
+      '<poll mode="single"><question>Pick one</question><option>A</option><option>B</option></poll>',
+    );
+    expect(nodes[0].type).toBe('poll');
+    expect(nodes[0].mode).toBe('single');
+    expect(typeof nodes[0].pollId).toBe('string');
+    expect((nodes[0].pollId as string).startsWith('p_')).toBe(true);
+    expect(nodes[0].options).toHaveLength(2);
+    expect((nodes[0].options[0].id as string).startsWith('o_')).toBe(true);
+    expect(nodes[0].options[0].label).toBe('A');
+  });
 });

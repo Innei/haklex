@@ -13,6 +13,7 @@ import type { MermaidRendererProps } from '../components/renderers/MermaidRender
 import type { RubyRendererProps } from '../components/renderers/RubyRenderer';
 import type { TagRendererProps } from '../components/renderers/TagRenderer';
 import type { VideoRendererProps } from '../components/renderers/VideoRenderer';
+import type { PollRendererProps } from './poll';
 
 export interface CodeFile {
   code: string;
@@ -69,6 +70,8 @@ export interface RendererConfig {
   Mention?: ComponentType<MentionRendererProps>;
   /** Custom renderer for Mermaid diagrams */
   Mermaid?: ComponentType<MermaidRendererProps>;
+  /** Custom renderer for reader-facing vote/poll widgets */
+  Poll?: ComponentType<PollRendererProps>;
   /** Custom renderer for ruby annotations */
   Ruby?: ComponentType<RubyRendererProps>;
   /** Custom renderer for inline tag badges */

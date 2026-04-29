@@ -1059,6 +1059,9 @@ importers:
       linkedom:
         specifier: ^0.18.12
         version: 0.18.12
+      nanoid:
+        specifier: ^5.1.9
+        version: 5.1.9
     devDependencies:
       typescript:
         specifier: ^5.9.3

@@ -26,6 +26,17 @@ export { $createMentionNode, $isMentionNode, MentionNode } from './nodes/Mention
 export type { SerializedMermaidNode } from './nodes/MermaidNode';
 export { $createMermaidNode, $isMermaidNode, MermaidNode } from './nodes/MermaidNode';
 
+// PollNode
+export { $createPollEditNode, PollEditNode } from './nodes/PollEditNode';
+export type { PollNodePayload, SerializedPollNode } from './nodes/PollNode';
+export {
+  $createPollNode,
+  $isPollNode,
+  createOptionId,
+  createPollId,
+  PollNode,
+} from './nodes/PollNode';
+
 // RubyNode
 export type { SerializedRubyNode } from './nodes/RubyNode';
 export { $createRubyNode, $isRubyNode, RubyNode } from './nodes/RubyNode';

@@ -32,6 +32,15 @@ Use the document editing tools according to the following contract.
 - Use to locate candidate blocks by text or block type.
 - Prefer search when the target block is unknown or a prior edit attempt failed.
 
+## Node-Specific Guidance
+
+### `<poll>` (interactive vote widget)
+
+- Shape: `<poll mode="single|multiple" [poll-id="..."] [close-at="ISO8601"] [show-results="always|after-vote|after-close"]><question>...</question><option [id="..."]>...</option>...</poll>`
+- When **creating** a new poll, omit `poll-id` and `option id` attributes — the system mints stable IDs.
+- When **editing** an existing poll, preserve `poll-id` and existing `option id`s. Adding a new option without an `id` mints a new one. Removing an option deletes its tally permanently.
+- Minimum 2 options. `mode` defaults to `single`. Question is plain text (no inline formatting).
+
 ## Failure Recovery
 
 - `block_not_found`: search again and retry with the correct target.

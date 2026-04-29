@@ -6,6 +6,7 @@ import {
   FORMAT_BOLD,
   FORMAT_ITALIC,
   paragraph,
+  poll,
   ruby,
   table,
   tableCell,
@@ -729,5 +730,45 @@ void bootstrap()`,
       ],
       version: 1,
     } as any),
+  },
+  {
+    key: 'poll-single',
+    label: 'Poll (Single Choice)',
+    description: 'Reader-facing single-choice vote widget',
+    category: 'block',
+    data: doc(
+      paragraph(text('Pick the cat species you find most charming:')),
+      poll({
+        pollId: 'p_demo_single',
+        question: 'Which cat species do you prefer?',
+        options: [
+          { id: 'o_ragdoll', label: 'Ragdoll' },
+          { id: 'o_amshort', label: 'American Shorthair' },
+          { id: 'o_orange', label: 'Orange tabby' },
+        ],
+        mode: 'single',
+      }) as any,
+      paragraph(text('Votes drive the discussion below.')),
+    ),
+  },
+  {
+    key: 'poll-multiple',
+    label: 'Poll (Multiple Choice)',
+    description: 'Reader-facing multi-choice vote widget',
+    category: 'block',
+    data: doc(
+      paragraph(text('Which pets have you raised? (multi-select)')),
+      poll({
+        pollId: 'p_demo_multi',
+        question: 'Which pets have you raised?',
+        options: [
+          { id: 'o_cat', label: 'Cat' },
+          { id: 'o_dog', label: 'Dog' },
+          { id: 'o_hamster', label: 'Hamster' },
+          { id: 'o_fish', label: 'Fish' },
+        ],
+        mode: 'multiple',
+      }) as any,
+    ),
   },
 ];

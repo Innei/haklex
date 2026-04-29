@@ -601,4 +601,29 @@ describe('custom writers', () => {
     ]);
     expect(xml).toContain('<comment>a comment</comment>');
   });
+
+  it('poll', () => {
+    const xml = serialize([
+      {
+        type: 'poll',
+        $: { blockId: 'pl1' },
+        pollId: 'p_abc',
+        question: 'Which one?',
+        options: [
+          { id: 'o_a', label: 'Option A' },
+          { id: 'o_b', label: 'Option B' },
+        ],
+        mode: 'multiple',
+        closeAt: '2026-05-01T00:00:00Z',
+        showResults: 'after-vote',
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain(
+      '<poll id="pl1" poll-id="p_abc" mode="multiple" close-at="2026-05-01T00:00:00Z" show-results="after-vote">',
+    );
+    expect(xml).toContain('<question>Which one?</question>');
+    expect(xml).toContain('<option id="o_a">Option A</option>');
+    expect(xml).toContain('<option id="o_b">Option B</option>');
+  });
 });

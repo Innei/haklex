@@ -1,83 +1,83 @@
-import type { SerializedEditorState, SerializedLexicalNode } from 'lexical'
+import type { SerializedEditorState, SerializedLexicalNode } from 'lexical';
 
 // Re-export common node types (defined inline to avoid Lexical package import issues)
 type SerializedTextNode = SerializedLexicalNode & {
-  type: 'text'
-  text: string
-  format: number
-  detail: number
-  mode: 'normal' | 'token' | 'segmented'
-  style: string
-}
+  type: 'text';
+  text: string;
+  format: number;
+  detail: number;
+  mode: 'normal' | 'token' | 'segmented';
+  style: string;
+};
 
 type SerializedParagraphNode = SerializedLexicalNode & {
-  type: 'paragraph'
-  children: SerializedLexicalNode[]
-  direction: 'ltr' | 'rtl' | null
-  format: string
-  indent: number
-  textFormat: number
-  textStyle: string
-}
+  type: 'paragraph';
+  children: SerializedLexicalNode[];
+  direction: 'ltr' | 'rtl' | null;
+  format: string;
+  indent: number;
+  textFormat: number;
+  textStyle: string;
+};
 
 type SerializedHeadingNode = SerializedLexicalNode & {
-  type: 'heading'
-  tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6'
-  children: SerializedLexicalNode[]
-  direction: 'ltr' | 'rtl' | null
-  format: string
-  indent: number
-}
+  type: 'heading';
+  tag: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  children: SerializedLexicalNode[];
+  direction: 'ltr' | 'rtl' | null;
+  format: string;
+  indent: number;
+};
 
 type SerializedQuoteNode = SerializedLexicalNode & {
-  type: 'quote'
-  children: SerializedLexicalNode[]
-  direction: 'ltr' | 'rtl' | null
-  format: string
-  indent: number
-}
+  type: 'quote';
+  children: SerializedLexicalNode[];
+  direction: 'ltr' | 'rtl' | null;
+  format: string;
+  indent: number;
+};
 
 type SerializedListNode = SerializedLexicalNode & {
-  type: 'list'
-  listType: 'bullet' | 'number'
-  start: number
-  tag: 'ul' | 'ol'
-  children: SerializedLexicalNode[]
-  direction: 'ltr' | 'rtl' | null
-  format: string
-  indent: number
-}
+  type: 'list';
+  listType: 'bullet' | 'number';
+  start: number;
+  tag: 'ul' | 'ol';
+  children: SerializedLexicalNode[];
+  direction: 'ltr' | 'rtl' | null;
+  format: string;
+  indent: number;
+};
 
 type SerializedListItemNode = SerializedLexicalNode & {
-  type: 'listitem'
-  value: number
-  children: SerializedLexicalNode[]
-  direction: 'ltr' | 'rtl' | null
-  format: string
-  indent: number
-}
+  type: 'listitem';
+  value: number;
+  children: SerializedLexicalNode[];
+  direction: 'ltr' | 'rtl' | null;
+  format: string;
+  indent: number;
+};
 
 type SerializedLinkNode = SerializedLexicalNode & {
-  type: 'link'
-  url: string
-  rel: string | null
-  target: string | null
-  title: string | null
-  children: SerializedLexicalNode[]
-  direction: 'ltr' | 'rtl' | null
-  format: string
-  indent: number
-}
+  type: 'link';
+  url: string;
+  rel: string | null;
+  target: string | null;
+  title: string | null;
+  children: SerializedLexicalNode[];
+  direction: 'ltr' | 'rtl' | null;
+  format: string;
+  indent: number;
+};
 
 // Text formats (bitwise flags)
-export const FORMAT_BOLD = 1
-export const FORMAT_ITALIC = 1 << 1
-export const FORMAT_STRIKETHROUGH = 1 << 2
-export const FORMAT_UNDERLINE = 1 << 3
-export const FORMAT_CODE = 1 << 4
-export const FORMAT_SUBSCRIPT = 1 << 5
-export const FORMAT_SUPERSCRIPT = 1 << 6
-export const FORMAT_HIGHLIGHT = 1 << 7
+export const FORMAT_BOLD = 1;
+export const FORMAT_ITALIC = 1 << 1;
+export const FORMAT_STRIKETHROUGH = 1 << 2;
+export const FORMAT_UNDERLINE = 1 << 3;
+export const FORMAT_CODE = 1 << 4;
+export const FORMAT_SUBSCRIPT = 1 << 5;
+export const FORMAT_SUPERSCRIPT = 1 << 6;
+export const FORMAT_HIGHLIGHT = 1 << 7;
 
 export function text(content: string, format = 0): SerializedTextNode {
   return {
@@ -88,12 +88,10 @@ export function text(content: string, format = 0): SerializedTextNode {
     text: content,
     type: 'text',
     version: 1,
-  }
+  };
 }
 
-export function paragraph(
-  ...children: SerializedLexicalNode[]
-): SerializedParagraphNode {
+export function paragraph(...children: SerializedLexicalNode[]): SerializedParagraphNode {
   return {
     children,
     direction: 'ltr',
@@ -103,7 +101,7 @@ export function paragraph(
     version: 1,
     textFormat: 0,
     textStyle: '',
-  }
+  };
 }
 
 export function heading(
@@ -118,12 +116,10 @@ export function heading(
     tag,
     type: 'heading',
     version: 1,
-  }
+  };
 }
 
-export function quote(
-  ...children: SerializedLexicalNode[]
-): SerializedQuoteNode {
+export function quote(...children: SerializedLexicalNode[]): SerializedQuoteNode {
   return {
     children,
     direction: 'ltr',
@@ -131,7 +127,7 @@ export function quote(
     indent: 0,
     type: 'quote',
     version: 1,
-  }
+  };
 }
 
 export function list(
@@ -148,12 +144,10 @@ export function list(
     tag: listType === 'bullet' ? 'ul' : 'ol',
     type: 'list',
     version: 1,
-  }
+  };
 }
 
-export function listItem(
-  ...children: SerializedLexicalNode[]
-): SerializedListItemNode {
+export function listItem(...children: SerializedLexicalNode[]): SerializedListItemNode {
   return {
     children,
     direction: 'ltr',
@@ -162,13 +156,10 @@ export function listItem(
     type: 'listitem',
     version: 1,
     value: 1,
-  }
+  };
 }
 
-export function link(
-  url: string,
-  ...children: SerializedLexicalNode[]
-): SerializedLinkNode {
+export function link(url: string, ...children: SerializedLexicalNode[]): SerializedLinkNode {
   return {
     children,
     direction: 'ltr',
@@ -180,21 +171,21 @@ export function link(
     target: null,
     title: null,
     url,
-  }
+  };
 }
 
 export function horizontalRule() {
   return {
     type: 'horizontalrule',
     version: 1,
-  }
+  };
 }
 
 export function lineBreak() {
   return {
     type: 'linebreak',
     version: 1,
-  }
+  };
 }
 
 export function table(...children: SerializedLexicalNode[]) {
@@ -205,7 +196,7 @@ export function table(...children: SerializedLexicalNode[]) {
     indent: 0,
     type: 'table',
     version: 1,
-  }
+  };
 }
 
 export function tableRow(...children: SerializedLexicalNode[]) {
@@ -216,13 +207,10 @@ export function tableRow(...children: SerializedLexicalNode[]) {
     indent: 0,
     type: 'tablerow',
     version: 1,
-  }
+  };
 }
 
-export function tableCell(
-  headerState: number,
-  ...children: SerializedLexicalNode[]
-) {
+export function tableCell(headerState: number, ...children: SerializedLexicalNode[]) {
   return {
     children,
     colSpan: 1,
@@ -233,13 +221,10 @@ export function tableCell(
     type: 'tablecell',
     version: 1,
     width: null,
-  }
+  };
 }
 
-export function alertQuote(
-  alertType: string,
-  ...children: SerializedLexicalNode[]
-) {
+export function alertQuote(alertType: string, ...children: SerializedLexicalNode[]) {
   return {
     type: 'alert-quote',
     alertType,
@@ -254,17 +239,17 @@ export function alertQuote(
       },
     },
     version: 1,
-  }
+  };
 }
 
 export function image(payload: {
-  src: string
-  altText: string
-  width?: number
-  height?: number
-  caption?: string
-  thumbhash?: string
-  accent?: string
+  src: string;
+  altText: string;
+  width?: number;
+  height?: number;
+  caption?: string;
+  thumbhash?: string;
+  accent?: string;
 }) {
   return {
     type: 'image',
@@ -276,15 +261,10 @@ export function image(payload: {
     thumbhash: payload.thumbhash,
     accent: payload.accent,
     version: 1,
-  }
+  };
 }
 
-export function video(payload: {
-  src: string
-  poster?: string
-  width?: number
-  height?: number
-}) {
+export function video(payload: { src: string; poster?: string; width?: number; height?: number }) {
   return {
     type: 'video',
     src: payload.src,
@@ -292,7 +272,7 @@ export function video(payload: {
     width: payload.width,
     height: payload.height,
     version: 1,
-  }
+  };
 }
 
 export function mermaid(diagram: string) {
@@ -300,7 +280,7 @@ export function mermaid(diagram: string) {
     type: 'mermaid',
     diagram,
     version: 1,
-  }
+  };
 }
 
 export function katexBlock(equation: string) {
@@ -308,7 +288,7 @@ export function katexBlock(equation: string) {
     type: 'katex-block',
     equation,
     version: 1,
-  }
+  };
 }
 
 export function katexInline(equation: string) {
@@ -316,14 +296,10 @@ export function katexInline(equation: string) {
     type: 'katex-inline',
     equation,
     version: 1,
-  }
+  };
 }
 
-export function details(
-  summary: string,
-  open: boolean,
-  ...children: SerializedLexicalNode[]
-) {
+export function details(summary: string, open: boolean, ...children: SerializedLexicalNode[]) {
   return {
     type: 'details',
     summary,
@@ -333,7 +309,7 @@ export function details(
     format: '',
     indent: 0,
     version: 1,
-  }
+  };
 }
 
 export function spoiler(...children: SerializedLexicalNode[]) {
@@ -344,7 +320,7 @@ export function spoiler(...children: SerializedLexicalNode[]) {
     format: '',
     indent: 0,
     version: 1,
-  }
+  };
 }
 
 export function ruby(base: string, reading: string) {
@@ -356,7 +332,7 @@ export function ruby(base: string, reading: string) {
     format: '',
     indent: 0,
     version: 1,
-  }
+  };
 }
 
 export function footnote(identifier: string) {
@@ -364,7 +340,7 @@ export function footnote(identifier: string) {
     type: 'footnote',
     identifier,
     version: 1,
-  }
+  };
 }
 
 export function footnoteSection(definitions: Record<string, string>) {
@@ -372,21 +348,17 @@ export function footnoteSection(definitions: Record<string, string>) {
     type: 'footnote-section',
     definitions,
     version: 1,
-  }
+  };
 }
 
-export function mention(
-  platform: string,
-  handle: string,
-  displayName?: string,
-) {
+export function mention(platform: string, handle: string, displayName?: string) {
   return {
     type: 'mention',
     platform,
     handle,
     ...(displayName ? { displayName } : {}),
     version: 1,
-  }
+  };
 }
 
 export function banner(
@@ -407,7 +379,7 @@ export function banner(
       },
     },
     version: 1,
-  }
+  };
 }
 
 export function excalidraw(snapshot: string) {
@@ -415,7 +387,7 @@ export function excalidraw(snapshot: string) {
     type: 'excalidraw',
     snapshot,
     version: 1,
-  }
+  };
 }
 
 export function nestedDoc(...children: SerializedLexicalNode[]) {
@@ -432,7 +404,7 @@ export function nestedDoc(...children: SerializedLexicalNode[]) {
       },
     },
     version: 1,
-  }
+  };
 }
 
 export function tag(text: string) {
@@ -440,12 +412,30 @@ export function tag(text: string) {
     type: 'tag',
     text,
     version: 1,
-  }
+  };
 }
 
-export function doc(
-  ...children: SerializedLexicalNode[]
-): SerializedEditorState {
+export function poll(payload: {
+  pollId: string;
+  question: string;
+  options: Array<{ id: string; label: string }>;
+  mode: 'single' | 'multiple';
+  closeAt?: string;
+  showResults?: 'always' | 'after-vote' | 'after-close';
+}) {
+  return {
+    type: 'poll',
+    pollId: payload.pollId,
+    question: payload.question,
+    options: payload.options,
+    mode: payload.mode,
+    ...(payload.closeAt ? { closeAt: payload.closeAt } : {}),
+    ...(payload.showResults ? { showResults: payload.showResults } : {}),
+    version: 1,
+  };
+}
+
+export function doc(...children: SerializedLexicalNode[]): SerializedEditorState {
   return {
     root: {
       children,
@@ -455,5 +445,5 @@ export function doc(
       type: 'root',
       version: 1,
     },
-  }
+  };
 }
