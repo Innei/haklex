@@ -36,6 +36,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
+    "@haklex/rich-ext-chat": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",

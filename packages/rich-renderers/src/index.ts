@@ -1,48 +1,52 @@
+// Chat
+export type { SerializedChatNode } from '@haklex/rich-ext-chat/static';
+export {
+  $createChatNode,
+  $isChatNode,
+  ChatNode,
+  chatNodes,
+  ChatRenderer,
+} from '@haklex/rich-ext-chat/static';
+
 // Code Snippet
-export type { SerializedCodeSnippetNode } from '@haklex/rich-ext-code-snippet/static'
+export type { SerializedCodeSnippetNode } from '@haklex/rich-ext-code-snippet/static';
 export {
   $createCodeSnippetNode,
   $isCodeSnippetNode,
   CodeSnippetNode,
   codeSnippetNodes,
   CodeSnippetRenderer,
-} from '@haklex/rich-ext-code-snippet/static'
+} from '@haklex/rich-ext-code-snippet/static';
 
 // Renderers
-export { GalleryRenderer } from '@haklex/rich-ext-gallery/static'
-export { AlertRenderer } from '@haklex/rich-renderer-alert/static'
-export { BannerRenderer } from '@haklex/rich-renderer-banner/static'
-export { CodeBlockRenderer } from '@haklex/rich-renderer-codeblock/static'
+export { GalleryRenderer } from '@haklex/rich-ext-gallery/static';
+export { AlertRenderer } from '@haklex/rich-renderer-alert/static';
+export { BannerRenderer } from '@haklex/rich-renderer-banner/static';
+export { CodeBlockRenderer } from '@haklex/rich-renderer-codeblock/static';
 
 // Gallery
-export type {
-  GalleryNodePayload,
-  SerializedGalleryNode,
-} from '@haklex/rich-ext-gallery/static'
+export type { GalleryNodePayload, SerializedGalleryNode } from '@haklex/rich-ext-gallery/static';
 export {
   $createGalleryNode,
   $isGalleryNode,
   GalleryNode,
   galleryNodes,
-} from '@haklex/rich-ext-gallery/static'
-export { ImageRenderer } from '@haklex/rich-renderer-image/static'
-export { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static'
-export type { MentionPlatformMeta } from '@haklex/rich-renderer-mention/static'
-export {
-  MentionPlatformProvider,
-  MentionRenderer,
-} from '@haklex/rich-renderer-mention/static'
-export { MermaidRenderer } from '@haklex/rich-renderer-mermaid/static'
-export type { RubyRendererProps } from '@haklex/rich-renderer-ruby/static'
-export { RubyRenderer } from '@haklex/rich-renderer-ruby/static'
-export { VideoRenderer } from '@haklex/rich-renderer-video/static'
+} from '@haklex/rich-ext-gallery/static';
+export { ImageRenderer } from '@haklex/rich-renderer-image/static';
+export { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static';
+export type { MentionPlatformMeta } from '@haklex/rich-renderer-mention/static';
+export { MentionPlatformProvider, MentionRenderer } from '@haklex/rich-renderer-mention/static';
+export { MermaidRenderer } from '@haklex/rich-renderer-mermaid/static';
+export type { RubyRendererProps } from '@haklex/rich-renderer-ruby/static';
+export { RubyRenderer } from '@haklex/rich-renderer-ruby/static';
+export { VideoRenderer } from '@haklex/rich-renderer-video/static';
 
 // Excalidraw
 export type {
   ExcalidrawRendererProps,
   ExcalidrawStaticRendererProps,
   SerializedExcalidrawNode,
-} from '@haklex/rich-ext-excalidraw/static'
+} from '@haklex/rich-ext-excalidraw/static';
 export {
   $createExcalidrawNode,
   $isExcalidrawNode,
@@ -51,7 +55,7 @@ export {
   ExcalidrawNode,
   ExcalidrawRenderer,
   ExcalidrawStaticRenderer,
-} from '@haklex/rich-ext-excalidraw/static'
+} from '@haklex/rich-ext-excalidraw/static';
 
 // LinkCard types & utilities
 export type {
@@ -64,7 +68,7 @@ export type {
   PluginRegistry,
   UrlMatchInfo,
   UrlMatchResult,
-} from '@haklex/rich-renderer-linkcard/static'
+} from '@haklex/rich-renderer-linkcard/static';
 export {
   arxivPlugin,
   bangumiPlugin,
@@ -88,7 +92,7 @@ export {
   qqMusicPlugin,
   tmdbPlugin,
   useUrlMatcher,
-} from '@haklex/rich-renderer-linkcard/static'
+} from '@haklex/rich-renderer-linkcard/static';
 
 // Embed
 export type {
@@ -98,7 +102,7 @@ export type {
   EmbedStaticRendererProps,
   EmbedType,
   SerializedEmbedNode,
-} from '@haklex/rich-ext-embed/static'
+} from '@haklex/rich-ext-embed/static';
 export {
   $createEmbedNode,
   $isEmbedNode,
@@ -116,7 +120,7 @@ export {
   isYoutubeUrl,
   matchEmbedUrl,
   useEmbedRenderers,
-} from '@haklex/rich-ext-embed/static'
+} from '@haklex/rich-ext-embed/static';
 
 // Pre-built config
-export { enhancedRendererConfig } from './config'
+export { enhancedRendererConfig } from './config';
