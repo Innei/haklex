@@ -28,6 +28,7 @@
     "streamdown": "^2.5.0"
   },
   "devDependencies": {
+    "@haklex/rich-editor": "workspace:*",
     "@lexical/react": "^0.44.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",

@@ -12,16 +12,7 @@
     "declaration": true,
     "declarationMap": true,
     "outDir": "./dist",
-    "baseUrl": "./src",
-    "paths": {
-      "@haklex/rich-editor": ["../../rich-editor/src/index.ts"],
-      "@haklex/rich-editor/renderers": ["../../rich-editor/src/renderers-entry.ts"],
-      "@haklex/rich-editor/nodes": ["../../rich-editor/src/nodes-entry.ts"],
-      "@haklex/rich-editor/plugins": ["../../rich-editor/src/plugins-entry.ts"],
-      "@haklex/rich-editor/commands": ["../../rich-editor/src/commands-entry.ts"],
-      "@haklex/rich-editor/static": ["../../rich-editor/src/static-entry.ts"],
-      "@haklex/rich-editor/styles": ["../../rich-editor/src/styles-entry.ts"]
-    }
+    "baseUrl": "./src"
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src/**/*.ts", "src/**/*.tsx", "../rich-editor/src/types/lucide-icons.d.ts"]

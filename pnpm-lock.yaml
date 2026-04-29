@@ -129,6 +129,9 @@ importers:
       '@haklex/rich-ext-ai-agent':
         specifier: workspace:*
         version: link:../packages/rich-ext-ai-agent
+      '@haklex/rich-ext-chat':
+        specifier: workspace:*
+        version: link:../packages/rich-ext-chat
       '@haklex/rich-ext-excalidraw':
         specifier: workspace:*
         version: link:../packages/rich-ext-excalidraw
@@ -605,12 +608,9 @@ importers:
 
   packages/rich-ext-chat:
     dependencies:
-      '@haklex/rich-editor':
-        specifier: '>=0.3.0'
-        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
         specifier: '>=0.3.0'
-        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-style-token':
         specifier: '>=0.3.0'
         version: 0.3.0(react@19.2.5)
@@ -627,6 +627,9 @@ importers:
         specifier: ^2.5.0
         version: 2.5.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
     devDependencies:
+      '@haklex/rich-editor':
+        specifier: workspace:*
+        version: link:../rich-editor
       '@lexical/react':
         specifier: ^0.44.0
         version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
@@ -2032,9 +2035,6 @@ importers:
 
   packages/rich-renderers:
     dependencies:
-      '@haklex/rich-editor':
-        specifier: '>=0.3.0'
-        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-ext-chat':
         specifier: workspace:*
         version: link:../rich-ext-chat
@@ -2078,6 +2078,9 @@ importers:
         specifier: workspace:*
         version: link:../rich-renderer-video
     devDependencies:
+      '@haklex/rich-editor':
+        specifier: workspace:*
+        version: link:../rich-editor
       '@lexical/react':
         specifier: ^0.44.0
         version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
@@ -2108,9 +2111,6 @@ importers:
 
   packages/rich-renderers-edit:
     dependencies:
-      '@haklex/rich-editor':
-        specifier: '>=0.3.0'
-        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-ext-chat':
         specifier: workspace:*
         version: link:../rich-ext-chat
@@ -2169,6 +2169,9 @@ importers:
         specifier: workspace:*
         version: link:../rich-renderers
     devDependencies:
+      '@haklex/rich-editor':
+        specifier: workspace:*
+        version: link:../rich-editor
       '@lexical/react':
         specifier: ^0.44.0
         version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)

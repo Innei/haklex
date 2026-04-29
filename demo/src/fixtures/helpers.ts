@@ -435,6 +435,20 @@ export function poll(payload: {
   };
 }
 
+export function chat(payload: {
+  variant: 'user-agent' | 'user-user';
+  participants: Array<{ id: string; kind: 'user' | 'agent'; name?: string; avatar?: string }>;
+  messages: Array<{ id: string; participantId: string; content: string }>;
+}) {
+  return {
+    type: 'chat',
+    version: 1,
+    variant: payload.variant,
+    participants: payload.participants,
+    messages: payload.messages,
+  };
+}
+
 export function doc(...children: SerializedLexicalNode[]): SerializedEditorState {
   return {
     root: {

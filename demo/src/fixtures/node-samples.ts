@@ -2,6 +2,7 @@ import type { SerializedEditorState } from 'lexical';
 
 import {
   alertQuote,
+  chat,
   doc,
   FORMAT_BOLD,
   FORMAT_ITALIC,
@@ -768,6 +769,77 @@ void bootstrap()`,
           { id: 'o_fish', label: 'Fish' },
         ],
         mode: 'multiple',
+      }) as any,
+    ),
+  },
+  {
+    key: 'chat-user-agent',
+    label: 'Chat (User · Agent)',
+    description: 'Embedded conversation snapshot — user as bubble, agent as article',
+    category: 'block',
+    data: doc(
+      paragraph(text('A captured exchange between user and assistant:')),
+      chat({
+        variant: 'user-agent',
+        participants: [
+          { id: 'p_u_demo', kind: 'user', name: 'Innei' },
+          { id: 'p_a_demo', kind: 'agent', name: 'Claude' },
+        ],
+        messages: [
+          {
+            id: 'm_ua_1',
+            participantId: 'p_u_demo',
+            content: "How does Lexical's DecoratorNode differ from ElementNode?",
+          },
+          {
+            id: 'm_ua_2',
+            participantId: 'p_a_demo',
+            content:
+              "The two serve different purposes:\n\n- **ElementNode** contains other nodes — paragraphs, headings, lists.\n- **DecoratorNode** renders a React component as a leaf — polls, embeds, charts.\n\nUse a decorator when the content isn't editable as text.",
+          },
+          {
+            id: 'm_ua_3',
+            participantId: 'p_u_demo',
+            content: 'Got it. So for the chat node we should subclass DecoratorNode.',
+          },
+        ],
+      }) as any,
+    ),
+  },
+  {
+    key: 'chat-user-user',
+    label: 'Chat (User · User)',
+    description: 'Two-person dialogue — both sides as bubbles',
+    category: 'block',
+    data: doc(
+      chat({
+        variant: 'user-user',
+        participants: [
+          { id: 'p_alice_demo', kind: 'user', name: 'Alice' },
+          { id: 'p_bob_demo', kind: 'user', name: 'Bob' },
+        ],
+        messages: [
+          {
+            id: 'm_uu_1',
+            participantId: 'p_alice_demo',
+            content: 'Are we still doing the static/edit split for the new chat node?',
+          },
+          {
+            id: 'm_uu_2',
+            participantId: 'p_bob_demo',
+            content: 'Yes — same pattern as code-snippet.',
+          },
+          {
+            id: 'm_uu_3',
+            participantId: 'p_alice_demo',
+            content: 'Perfect. Should I open a draft PR?',
+          },
+          {
+            id: 'm_uu_4',
+            participantId: 'p_bob_demo',
+            content: "Hold on — let's get the spec approved first.",
+          },
+        ],
       }) as any,
     ),
   },
