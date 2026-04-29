@@ -1,5 +1,14 @@
+import {
+  SegmentedControl,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey } from 'lexical';
+import { CalendarClock, ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
 import { customAlphabet } from 'nanoid';
 import type { KeyboardEvent } from 'react';
 import { useCallback } from 'react';
@@ -10,6 +19,11 @@ import type { PollMode, PollOption, PollShowResults } from '../../types/poll';
 
 const optionIdAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const makeOptionId = customAlphabet(optionIdAlphabet, 6);
+
+const pollModeItems: Array<{ label: string; value: PollMode }> = [
+  { label: 'Single', value: 'single' },
+  { label: 'Multiple', value: 'multiple' },
+];
 
 interface PollEditDecoratorProps {
   closeAt?: string;
@@ -118,6 +132,13 @@ export function PollEditDecorator({
     [updatePoll],
   );
 
+  const handleShowResultsSelectChange = useCallback(
+    (value: unknown) => {
+      if (typeof value === 'string') handleShowResultsChange(value);
+    },
+    [handleShowResultsChange],
+  );
+
   const handleOptionKeyDown = useCallback(
     (event: KeyboardEvent<HTMLInputElement>, index: number) => {
       if (event.key === 'Enter') {
@@ -153,7 +174,7 @@ export function PollEditDecorator({
                   type="button"
                   onClick={() => handleOptionMove(index, -1)}
                 >
-                  ▲
+                  <ChevronUp aria-hidden size={14} />
                 </button>
                 <button
                   aria-label="Move option down"
@@ -162,7 +183,7 @@ export function PollEditDecorator({
                   type="button"
                   onClick={() => handleOptionMove(index, 1)}
                 >
-                  ▼
+                  <ChevronDown aria-hidden size={14} />
                 </button>
               </span>
             )}
@@ -182,7 +203,7 @@ export function PollEditDecorator({
                 type="button"
                 onClick={() => handleOptionRemove(option.id)}
               >
-                ×
+                <X aria-hidden size={16} />
               </button>
             )}
           </li>
@@ -190,29 +211,19 @@ export function PollEditDecorator({
       </ul>
       {editable && (
         <button className={pollEditClasses.addOption} type="button" onClick={handleOptionAdd}>
-          + Add option
+          <Plus aria-hidden size={16} />
+          <span>Add option</span>
         </button>
       )}
       {editable && (
         <div className={pollEditClasses.modeRow}>
-          <label className={pollEditClasses.modeLabel}>
-            <input
-              checked={mode === 'single'}
-              name={`poll-mode-${nodeKey}`}
-              type="radio"
-              onChange={() => handleModeChange('single')}
-            />
-            Single
-          </label>
-          <label className={pollEditClasses.modeLabel}>
-            <input
-              checked={mode === 'multiple'}
-              name={`poll-mode-${nodeKey}`}
-              type="radio"
-              onChange={() => handleModeChange('multiple')}
-            />
-            Multiple
-          </label>
+          <span className={pollEditClasses.advancedLabel}>Mode</span>
+          <SegmentedControl
+            className={pollEditClasses.modeControl}
+            items={pollModeItems}
+            value={mode}
+            onChange={handleModeChange}
+          />
         </div>
       )}
       {editable && (
@@ -220,24 +231,30 @@ export function PollEditDecorator({
           <summary className={pollEditClasses.advancedSummary}>Advanced</summary>
           <div className={pollEditClasses.advancedGrid}>
             <span className={pollEditClasses.advancedLabel}>Close at</span>
-            <input
-              aria-label="Closing time"
-              className={pollEditClasses.advancedInput}
-              type="datetime-local"
-              value={closeAt ?? ''}
-              onChange={(event) => handleCloseAtChange(event.target.value)}
-            />
+            <div className={pollEditClasses.dateTimeField}>
+              <CalendarClock aria-hidden className={pollEditClasses.dateTimeIcon} size={16} />
+              <input
+                aria-label="Closing time"
+                className={pollEditClasses.dateTimeInput}
+                type="datetime-local"
+                value={closeAt ?? ''}
+                onChange={(event) => handleCloseAtChange(event.target.value)}
+              />
+            </div>
             <span className={pollEditClasses.advancedLabel}>Show results</span>
-            <select
-              aria-label="Show results policy"
-              className={pollEditClasses.advancedInput}
-              value={showResults ?? 'always'}
-              onChange={(event) => handleShowResultsChange(event.target.value)}
-            >
-              <option value="always">Always</option>
-              <option value="after-vote">After vote</option>
-              <option value="after-close">After close</option>
-            </select>
+            <Select value={showResults ?? 'always'} onValueChange={handleShowResultsSelectChange}>
+              <SelectTrigger
+                aria-label="Show results policy"
+                className={pollEditClasses.selectTrigger}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className={pollEditClasses.selectContent} sideOffset={6}>
+                <SelectItem value="always">Always</SelectItem>
+                <SelectItem value="after-vote">After vote</SelectItem>
+                <SelectItem value="after-close">After close</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </details>
       )}

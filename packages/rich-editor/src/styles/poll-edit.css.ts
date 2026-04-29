@@ -57,7 +57,7 @@ export const editReorderColumn = style({
 
 export const editReorderButton = style({
   width: 18,
-  height: 14,
+  height: 16,
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -66,7 +66,6 @@ export const editReorderButton = style({
   cursor: 'pointer',
   color: vars.color.textTertiary,
   padding: 0,
-  fontSize: '0.65rem',
   lineHeight: 1,
   borderRadius: 2,
   transition: 'color 120ms ease, background 120ms ease',
@@ -103,11 +102,13 @@ export const editOptionInput = style({
 });
 
 export const editRemoveButton = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   border: 'none',
   background: 'transparent',
   cursor: 'pointer',
   color: vars.color.textTertiary,
-  fontSize: '1rem',
   padding: '2px 6px',
   borderRadius: 2,
   transition: 'color 120ms ease',
@@ -119,12 +120,15 @@ export const editRemoveButton = style({
 });
 
 export const editAddOption = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: vars.spacing.xs,
   marginTop: vars.spacing.sm,
   border: `1px dashed ${vars.color.hrBorder}`,
   background: 'transparent',
   borderRadius: vars.borderRadius.sm,
   padding: `${vars.spacing.xs} ${vars.spacing.md}`,
-  fontSize: '0.8125rem',
+  fontSize: '0.875rem',
   color: vars.color.textTertiary,
   cursor: 'pointer',
   fontFamily: 'inherit',
@@ -139,7 +143,7 @@ export const editAddOption = style({
 
 export const editAdvancedSummary = style({
   marginTop: vars.spacing.md,
-  fontSize: '0.75rem',
+  fontSize: '0.875rem',
   color: vars.color.textTertiary,
   cursor: 'pointer',
   userSelect: 'none',
@@ -155,7 +159,7 @@ export const editAdvancedGrid = style({
   gridTemplateColumns: '120px 1fr',
   gap: vars.spacing.sm,
   marginTop: vars.spacing.sm,
-  fontSize: '0.75rem',
+  fontSize: '0.875rem',
   color: vars.color.textSecondary,
   alignItems: 'center',
 });
@@ -164,35 +168,91 @@ export const editAdvancedLabel = style({
   color: vars.color.textTertiary,
 });
 
-export const editAdvancedInput = style({
-  fontSize: '0.8125rem',
+export const editDateTimeField = style({
+  display: 'grid',
+  gridTemplateColumns: '16px minmax(0, 1fr)',
+  alignItems: 'center',
+  gap: vars.spacing.xs,
+  minWidth: 0,
+  minHeight: 32,
   border: `1px solid ${vars.color.hrBorder}`,
   borderRadius: vars.borderRadius.sm,
-  padding: `${vars.spacing.xs} ${vars.spacing.sm}`,
+  padding: `0 ${vars.spacing.sm}`,
   background: vars.color.bg,
   color: vars.color.text,
-  fontFamily: 'inherit',
-  outline: 'none',
+  transition: 'border-color 120ms ease, box-shadow 120ms ease',
   selectors: {
-    '&:focus-visible': {
+    '&:focus-within': {
       borderColor: vars.color.text,
+      boxShadow: `0 0 0 2px color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
     },
   },
 });
 
-export const editModeRow = style({
-  marginTop: vars.spacing.sm,
-  display: 'flex',
-  gap: vars.spacing.md,
-  fontSize: '0.75rem',
-  color: vars.color.textSecondary,
+export const editDateTimeIcon = style({
+  color: vars.color.textTertiary,
+  pointerEvents: 'none',
+  flexShrink: 0,
 });
 
-export const editModeLabel = style({
-  display: 'inline-flex',
+export const editDateTimeInput = style({
+  width: '100%',
+  minWidth: 0,
+  border: 'none',
+  background: 'transparent',
+  color: vars.color.text,
+  fontFamily: 'inherit',
+  fontSize: '0.875rem',
+  lineHeight: 1.35,
+  outline: 'none',
+  colorScheme: 'light dark',
+  selectors: {
+    '&::-webkit-calendar-picker-indicator': {
+      opacity: 0.55,
+      cursor: 'pointer',
+    },
+    '&::-webkit-datetime-edit': {
+      padding: 0,
+    },
+    '&::-webkit-datetime-edit-fields-wrapper': {
+      padding: 0,
+    },
+  },
+});
+
+export const editSelectTrigger = style({
+  width: '100%',
+  minWidth: 0,
+  height: 32,
+  fontSize: '0.875rem',
+  background: vars.color.bg,
+  borderColor: vars.color.hrBorder,
+  boxShadow: 'none',
+  selectors: {
+    '&:focus-visible': {
+      borderColor: vars.color.text,
+      boxShadow: `0 0 0 2px color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+    },
+  },
+});
+
+export const editSelectContent = style({
+  minWidth: 'var(--anchor-width)',
+});
+
+export const editModeRow = style({
+  marginTop: vars.spacing.sm,
+  display: 'grid',
+  gridTemplateColumns: '120px max-content',
+  gap: vars.spacing.sm,
   alignItems: 'center',
-  gap: vars.spacing.xs,
-  cursor: 'pointer',
+  fontSize: '0.875rem',
+});
+
+export const editModeControl = style({
+  width: 'max-content',
+  justifySelf: 'start',
+  fontSize: '0.875rem',
 });
 
 export const pollEditClasses = {
@@ -209,7 +269,11 @@ export const pollEditClasses = {
   advancedSummary: editAdvancedSummary,
   advancedGrid: editAdvancedGrid,
   advancedLabel: editAdvancedLabel,
-  advancedInput: editAdvancedInput,
+  dateTimeField: editDateTimeField,
+  dateTimeIcon: editDateTimeIcon,
+  dateTimeInput: editDateTimeInput,
+  selectTrigger: editSelectTrigger,
+  selectContent: editSelectContent,
   modeRow: editModeRow,
-  modeLabel: editModeLabel,
+  modeControl: editModeControl,
 } as const;
