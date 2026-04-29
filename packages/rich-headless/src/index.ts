@@ -332,6 +332,12 @@ export const PollNode = headlessDecorator(
   },
 );
 
+export const ChatNode = headlessDecorator('chat', ['variant', 'participants', 'messages'], {
+  variant: 'user-agent',
+  participants: [],
+  messages: [],
+});
+
 // ── Nested content nodes ──
 
 export class BannerNode extends DecoratorNode<null> {
@@ -554,6 +560,7 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   NestedDocNode,
   GridContainerNode,
   PollNode,
+  ChatNode,
 ];
 
 export const allHeadlessNodes: Klass<LexicalNode>[] = [...builtinNodes, ...customHeadlessNodes];
@@ -564,4 +571,4 @@ export { $toMarkdown, allHeadlessTransformers } from './transformers';
 
 // ── Unknown-node fallback for forward-compat parsing ──
 
-export { type SanitizeOptions,sanitizeSerializedJSON, sanitizeSerializedState } from './sanitize';
+export { type SanitizeOptions, sanitizeSerializedJSON, sanitizeSerializedState } from './sanitize';

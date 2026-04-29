@@ -31,6 +31,7 @@
     "@lexical/table": "^0.44.0"
   },
   "devDependencies": {
+    "@lexical/headless": "^0.44.0",
     "lexical": "^0.44.0",
     "typescript": "^5.9.3",
     "vite": "^8.0.10",

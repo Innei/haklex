@@ -999,6 +999,9 @@ importers:
         specifier: ^0.44.0
         version: 0.44.0
     devDependencies:
+      '@lexical/headless':
+        specifier: ^0.44.0
+        version: 0.44.0
       lexical:
         specifier: ^0.44.0
         version: 0.44.0

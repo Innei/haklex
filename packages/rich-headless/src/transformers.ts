@@ -447,6 +447,47 @@ export const POLL_BLOCK_TRANSFORMER: ElementTransformer = {
   type: 'element',
 };
 
+interface ChatJSON {
+  messages: Array<{ id: string; participantId: string; content: string }>;
+  participants: Array<{ id: string; kind: 'user' | 'agent'; name?: string }>;
+  variant: 'user-agent' | 'user-user';
+}
+
+const UNKNOWN_CHAT_PARTICIPANT = { id: '__unknown__', kind: 'user' as const, name: 'Unknown' };
+
+function chatParticipantName(p: { kind: string; name?: string }): string {
+  if (p.name) return p.name;
+  return p.kind === 'agent' ? 'Assistant' : 'User';
+}
+
+export const CHAT_BLOCK_TRANSFORMER: ElementTransformer = {
+  dependencies: [],
+  export: (node) => {
+    if (node.getType() !== 'chat') return null;
+    const j = node.exportJSON() as unknown as ChatJSON;
+    const lookup = new Map(j.participants.map((p) => [p.id, p]));
+    const lines: string[] = [];
+    j.messages.forEach((m, idx) => {
+      const p = lookup.get(m.participantId) ?? UNKNOWN_CHAT_PARTICIPANT;
+      const name = chatParticipantName(p);
+      const isUserBubble =
+        j.variant === 'user-user' || (j.variant === 'user-agent' && p.kind === 'user');
+      const block = isUserBubble
+        ? m.content
+            .split('\n')
+            .map((line, i) => (i === 0 ? `> **${name}:** ${line}` : `> ${line}`))
+            .join('\n')
+        : m.content;
+      if (idx > 0) lines.push('');
+      lines.push(block);
+    });
+    return lines.join('\n');
+  },
+  regExp: NEVER,
+  replace: NOOP,
+  type: 'element',
+};
+
 // ── Aggregate ──
 
 export const allHeadlessTransformers = [
@@ -482,6 +523,7 @@ export const allHeadlessTransformers = [
   GALLERY_BLOCK_TRANSFORMER,
   EXCALIDRAW_BLOCK_TRANSFORMER,
   POLL_BLOCK_TRANSFORMER,
+  CHAT_BLOCK_TRANSFORMER,
   // Standard (heading, quote, list, code, bold, italic, strikethrough, link…)
   ...TRANSFORMERS,
 ];
