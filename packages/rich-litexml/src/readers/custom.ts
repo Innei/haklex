@@ -6,6 +6,8 @@ import type { LitexmlRegistry } from '../registry';
 const idAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const makePollIdSuffix = customAlphabet(idAlphabet, 10);
 const makeOptionIdSuffix = customAlphabet(idAlphabet, 6);
+const makeChatParticipantId = customAlphabet(idAlphabet, 6);
+const makeChatMessageId = customAlphabet(idAlphabet, 8);
 
 function extractBlockId(el: Element): Record<string, any> {
   const id = el.getAttribute('id');
@@ -412,6 +414,49 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       type: 'code-snippet',
       ...extractBlockId(el),
       files,
+      version: 1,
+    } as any;
+  });
+
+  registry.registerReader('chat', (el) => {
+    const variantAttr = el.getAttribute('variant');
+    const variant: 'user-agent' | 'user-user' =
+      variantAttr === 'user-user' ? 'user-user' : 'user-agent';
+
+    const participants: Array<{ id: string; kind: string; name?: string; avatar?: string }> = [];
+    const messages: Array<{ id: string; participantId: string; content: string }> = [];
+
+    for (const child of el.children) {
+      const tag = child.tagName.toLowerCase();
+      if (tag === 'participants') {
+        for (const p of child.children) {
+          if (p.tagName.toLowerCase() !== 'participant') continue;
+          const kind = p.getAttribute('kind') === 'agent' ? 'agent' : 'user';
+          participants.push({
+            id: p.getAttribute('id') || `p_${makeChatParticipantId()}`,
+            kind,
+            name: p.getAttribute('name') || undefined,
+            avatar: p.getAttribute('avatar') || undefined,
+          });
+        }
+      } else if (tag === 'messages') {
+        for (const m of child.children) {
+          if (m.tagName.toLowerCase() !== 'message') continue;
+          messages.push({
+            id: m.getAttribute('id') || `m_${makeChatMessageId()}`,
+            participantId: m.getAttribute('participant') ?? '',
+            content: m.textContent ?? '',
+          });
+        }
+      }
+    }
+
+    return {
+      type: 'chat',
+      ...extractBlockId(el),
+      variant,
+      participants,
+      messages,
       version: 1,
     } as any;
   });
