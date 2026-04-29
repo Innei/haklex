@@ -5,6 +5,7 @@ import { use, useCallback, useEffect, useState } from 'react';
 
 import { JsonViewer } from '../components/JsonViewer';
 import { Panel } from '../components/Panel';
+import { VariantPicker } from '../components/VariantPicker';
 import { useFullWidth } from '../context/FullWidthContext';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
@@ -104,6 +105,9 @@ export function PresetsPage() {
         </aside>
 
         <div className="presets-main">
+          <div className="toolbar">
+            <VariantPicker />
+          </div>
           <Panel badge={`${variant} · ${mode}`} title={selected.label}>
             {mode === 'edit' ? (
               <ShiroEditor

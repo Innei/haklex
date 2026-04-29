@@ -8,6 +8,7 @@ import { BlockCommentGutter } from '../components/comments/BlockCommentGutter';
 import { CommentHighlighter } from '../components/comments/CommentHighlightPlugin';
 import { CommentSidebar } from '../components/comments/CommentSidebar';
 import { SelectionCommentPopup } from '../components/comments/SelectionCommentPopup';
+import { VariantPicker } from '../components/VariantPicker';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { initialContent } from '../fixtures/initial-content';
@@ -69,7 +70,8 @@ export function CommentsPage() {
 
   return (
     <MentionPlatformProvider platforms={{}}>
-      <div className="toolbar">
+      <div className="toolbar" style={{ marginBlockEnd: 12 }}>
+        <VariantPicker />
         <div className="toolbar-group">
           <span className="toolbar-label">Info</span>
           <span className="badge">{comments.length} comments</span>

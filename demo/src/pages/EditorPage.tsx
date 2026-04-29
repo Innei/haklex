@@ -12,6 +12,7 @@ import type { SerializedEditorState } from 'lexical';
 import { use, useCallback, useMemo, useState } from 'react';
 
 import { Panel } from '../components/Panel';
+import { VariantPicker } from '../components/VariantPicker';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { extraMentionPlatforms } from '../fixtures/extra-mention-platforms';
@@ -168,6 +169,7 @@ export function EditorPage() {
         <div className="page">
           {/* Toolbar */}
           <div className="toolbar">
+            <VariantPicker />
             <div className="toolbar-group">
               <span className="toolbar-label">Colors</span>
               {colorOverridePresets.map((preset) => {

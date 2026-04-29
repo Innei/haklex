@@ -33,8 +33,6 @@ const navItems = [
   { path: '/ai', label: 'AI' },
 ] as const;
 
-const variantRoutes = new Set(['/editor', '/presets', '/comments']);
-
 function useSystemColorScheme(): ColorScheme {
   const [scheme, setScheme] = useState<ColorScheme>(() =>
     window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
@@ -76,7 +74,6 @@ function Layout() {
 
   const themeLabel = themeMode === 'system' ? 'System' : themeMode === 'light' ? 'Light' : 'Dark';
   const ThemeIcon = themeMode === 'system' ? Monitor : themeMode === 'light' ? Sun : Moon;
-  const showVariantSelector = variantRoutes.has(location.pathname);
 
   const isActivePath = useCallback(
     (path: string) => {
@@ -148,17 +145,6 @@ function Layout() {
                   ))}
                 </nav>
                 <div className="app-header-right">
-                  {showVariantSelector && (
-                    <select
-                      className="playground-select"
-                      value={variant}
-                      onChange={(e) => setVariant(e.target.value as RichEditorVariant)}
-                    >
-                      <option value="article">Article</option>
-                      <option value="comment">Comment</option>
-                      <option value="note">Note</option>
-                    </select>
-                  )}
                   <a
                     className="nav-icon-btn"
                     href="https://github.com/innei/haklex"
