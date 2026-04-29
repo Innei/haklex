@@ -1,5 +1,12 @@
 export type { AlertRendererProps } from './components/renderers/AlertRenderer';
 export type { BannerRendererProps } from './components/renderers/BannerRenderer';
+export type {
+  ChatMessage,
+  ChatParticipant,
+  ChatParticipantKind,
+  ChatRendererProps,
+  ChatVariant,
+} from './components/renderers/ChatRendererProps';
 export type { CodeBlockRendererProps } from './components/renderers/CodeBlockRenderer';
 export type { FootnoteRendererProps } from './components/renderers/FootnoteRenderer';
 export { FootnoteRenderer } from './components/renderers/FootnoteRenderer';

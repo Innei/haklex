@@ -2,6 +2,7 @@ import type { ComponentType } from 'react';
 
 import type { AlertRendererProps } from '../components/renderers/AlertRenderer';
 import type { BannerRendererProps } from '../components/renderers/BannerRenderer';
+import type { ChatRendererProps } from '../components/renderers/ChatRendererProps';
 import type { CodeBlockRendererProps } from '../components/renderers/CodeBlockRenderer';
 import type { FootnoteRendererProps } from '../components/renderers/FootnoteRenderer';
 import type { FootnoteSectionRendererProps } from '../components/renderers/FootnoteSectionRenderer';
@@ -50,6 +51,8 @@ export interface RendererConfig {
   Alert?: ComponentType<AlertRendererProps>;
   /** Custom renderer for banner blocks */
   Banner?: ComponentType<BannerRendererProps>;
+  /** Custom renderer for embedded chat snapshots */
+  Chat?: ComponentType<ChatRendererProps>;
   /** Custom renderer for code blocks with syntax highlighting */
   CodeBlock?: ComponentType<CodeBlockRendererProps>;
   /** Custom renderer for multi-file code snippets with tabs */
