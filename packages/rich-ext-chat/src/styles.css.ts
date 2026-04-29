@@ -109,6 +109,43 @@ export const empty = style({
   padding: '8px 0',
 });
 
+export const editContainer = style({
+  position: 'relative',
+});
+
+export const editOverlay = style({
+  position: 'absolute',
+  top: 8,
+  right: 8,
+  background: '#ffffff',
+  border: '1px solid #e5e5e5',
+  borderRadius: 6,
+  padding: '4px 10px',
+  fontSize: 12,
+  fontWeight: 500,
+  color: '#1f1f1f',
+  opacity: 0,
+  transition: 'opacity 120ms ease',
+  cursor: 'pointer',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+  selectors: {
+    [`${editContainer}:hover &`]: { opacity: 1 },
+  },
+});
+
+export const editLabel = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+});
+
+export const editorDialogPopup = style({
+  width: 920,
+  maxWidth: '95vw',
+});
+
 export const semanticClassNames = {
   container: 'rich-chat-container',
   row: 'rich-chat-row',
@@ -117,4 +154,7 @@ export const semanticClassNames = {
   avatar: 'rich-chat-avatar',
   author: 'rich-chat-author',
   empty: 'rich-chat-empty',
+  editContainer: 'rich-chat-edit-container',
+  editOverlay: 'rich-chat-edit-overlay',
+  editLabel: 'rich-chat-edit-label',
 } as const;
