@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
@@ -9,12 +9,87 @@ import { defineConfig } from 'vite';
 
 import { apiProxyPlugin } from './server/proxy';
 
+const packagesDir = path.resolve(__dirname, '../packages');
+
+type WorkspaceExportTarget = string | { import?: string; types?: string };
+
+function readWorkspacePackages() {
+  return readdirSync(packagesDir)
+    .map((entry) => {
+      const pkgDir = path.resolve(packagesDir, entry);
+      const pkgJsonPath = path.resolve(pkgDir, 'package.json');
+      if (!existsSync(pkgJsonPath)) return null;
+
+      const pkg = JSON.parse(readFileSync(pkgJsonPath, 'utf8')) as {
+        exports?: Record<string, WorkspaceExportTarget> | WorkspaceExportTarget;
+        main?: string;
+        name?: string;
+      };
+
+      if (!pkg.name?.startsWith('@haklex/')) return null;
+
+      return { entry, pkg, pkgDir };
+    })
+    .filter((pkg): pkg is NonNullable<typeof pkg> => Boolean(pkg));
+}
+
+function resolveWorkspaceExportTarget(target: WorkspaceExportTarget | undefined) {
+  if (typeof target === 'string') return target;
+  return target?.import;
+}
+
+function workspacePackageAliases(): Alias[] {
+  const aliases: Alias[] = [];
+
+  for (const { pkg, pkgDir } of readWorkspacePackages()) {
+    const exports = pkg.exports;
+    const exportEntries =
+      exports && !Array.isArray(exports) && typeof exports === 'object' && !('import' in exports)
+        ? Object.entries(exports)
+        : [['.', exports ?? pkg.main]];
+
+    for (const [exportPath, target] of exportEntries) {
+      if (exportPath.endsWith('.css')) continue;
+
+      const resolvedTarget = resolveWorkspaceExportTarget(target);
+      if (!resolvedTarget?.startsWith('./src/')) continue;
+
+      const suffix = exportPath === '.' ? '' : exportPath.slice(1);
+      aliases.push({
+        find: new RegExp(`^${pkg.name.replaceAll('/', '\\/')}${suffix.replaceAll('/', '\\/')}$`),
+        replacement: path.resolve(pkgDir, resolvedTarget),
+      });
+    }
+  }
+
+  return aliases;
+}
+
+function workspaceOptimizeDepsExcludes() {
+  const excludes: string[] = [];
+
+  for (const { pkg } of readWorkspacePackages()) {
+    excludes.push(pkg.name);
+
+    const exports = pkg.exports;
+    if (!exports || typeof exports !== 'object' || Array.isArray(exports) || 'import' in exports) {
+      continue;
+    }
+
+    for (const exportPath of Object.keys(exports)) {
+      if (exportPath === '.' || exportPath.endsWith('.css')) continue;
+      excludes.push(`${pkg.name}${exportPath.slice(1)}`);
+    }
+  }
+
+  return excludes;
+}
+
 // Dev-only: resolve workspace style entry to source instead of dist output.
 // - Prefer src/style.css for plain CSS packages.
 // - Fall back to src/styles.css.ts for VE packages when imported from JS.
 // - If imported from CSS (@import), VE entries resolve to empty CSS.
 function watchWorkspacePlugin(): Plugin {
-  const packagesDir = path.resolve(__dirname, '../packages');
   const srcDirs: string[] = [];
   for (const entry of readdirSync(packagesDir)) {
     if (entry.startsWith('rich-')) {
@@ -47,7 +122,6 @@ function watchWorkspacePlugin(): Plugin {
 function workspaceCssPlugin(): Plugin {
   const scopes = new Set(['@haklex', '@shiro']);
   const EMPTY_PREFIX = '\0empty-css:';
-  const VE_PREFIX = '\0ve-css:';
   const RENDERER_STYLE_PREFIX = '\0renderer-style:';
 
   return {
@@ -79,39 +153,28 @@ function workspaceCssPlugin(): Plugin {
 
       const pkgDir = m[2];
       const srcIndex = path.resolve(__dirname, `../packages/${pkgDir}/src/index.ts`);
+      const srcStyleEntry = path.resolve(__dirname, `../packages/${pkgDir}/src/style.ts`);
+      const srcStylesEntry = path.resolve(__dirname, `../packages/${pkgDir}/src/styles-entry.ts`);
       const srcCss = path.resolve(__dirname, `../packages/${pkgDir}/src/style.css`);
       const srcVeCss = path.resolve(__dirname, `../packages/${pkgDir}/src/styles.css.ts`);
 
-      if (existsSync(srcIndex)) {
-        if (importer?.endsWith('.css')) {
-          // Keep CSS graph valid; JS graph will import source modules and emit VE CSS.
-          return existsSync(srcCss) ? srcCss : `${EMPTY_PREFIX}${id}`;
-        }
-        return `${VE_PREFIX}${srcIndex}`;
-      }
-
-      if (existsSync(srcCss)) {
-        return srcCss;
-      }
-
-      if (!existsSync(srcVeCss)) {
-        return null;
-      }
-
       // For CSS @import, VE source cannot be parsed as CSS.
       if (importer?.endsWith('.css')) {
-        return `${EMPTY_PREFIX}${id}`;
+        return existsSync(srcCss) ? srcCss : `${EMPTY_PREFIX}${id}`;
       }
 
-      // For JS imports, route style.css to VE source for real-time compilation.
-      return `${VE_PREFIX}${srcVeCss}`;
+      const styleEntry = [srcStyleEntry, srcStylesEntry, srcCss, srcVeCss, srcIndex].find(
+        (candidate) => existsSync(candidate),
+      );
+
+      if (!styleEntry) return null;
+      if (styleEntry === srcCss) return srcCss;
+
+      // For JS imports, route style.css to the real source module for VE compilation.
+      return styleEntry;
     },
     load(id) {
       if (id.startsWith(EMPTY_PREFIX)) return '';
-      if (id.startsWith(VE_PREFIX)) {
-        const sourcePath = id.slice(VE_PREFIX.length);
-        return `import ${JSON.stringify(sourcePath)}`;
-      }
       if (id.startsWith(RENDERER_STYLE_PREFIX)) {
         const sourcePath = id.slice(RENDERER_STYLE_PREFIX.length);
         return `import ${JSON.stringify(sourcePath)}`;
@@ -174,10 +237,11 @@ export default defineConfig(({ command }) => ({
     'process.env.NODE_ENV': JSON.stringify('development'),
   },
   optimizeDeps: {
+    exclude: workspaceOptimizeDepsExcludes(),
     include: ['react-intersection-observer', 'react-photo-view', '@excalidraw/excalidraw'],
   },
   resolve: {
-    alias: command === 'build' ? workspaceBuildStyleAliases() : [],
+    alias: command === 'build' ? workspaceBuildStyleAliases() : workspacePackageAliases(),
     dedupe: [
       'lexical',
       '@lexical/code-core',
