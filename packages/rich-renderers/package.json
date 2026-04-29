@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderers",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Static renderers aggregator for haklex rich editor",
   "repository": {
     "type": "git",
