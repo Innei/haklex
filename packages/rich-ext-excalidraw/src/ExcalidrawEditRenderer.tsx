@@ -1,4 +1,4 @@
-import type { ExcalidrawImperativeAPI, ExcalidrawProps } from '@excalidraw/excalidraw/types/types';
+import type { ExcalidrawImperativeAPI, ExcalidrawProps } from '@excalidraw/excalidraw/types';
 import { useColorScheme } from '@haklex/rich-editor';
 import { dismissTopDialog, presentDialog, SegmentedControl } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
@@ -457,13 +457,16 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
   }, [initialData]);
 
   useEffect(() => {
-    import('@excalidraw/excalidraw')
-      .then((mod: any) => {
+    Promise.all([import('@excalidraw/excalidraw'), import('@excalidraw/excalidraw/index.css')])
+      .then(([mod]: [any, unknown]) => {
         const Comp = mod.Excalidraw || mod.default?.Excalidraw;
         if (Comp) setExcalidrawComponent(() => Comp);
         setLibLoading(false);
       })
-      .catch(() => setLibLoading(false));
+      .catch((err) => {
+        console.error('[excalidraw] failed to load', err);
+        setLibLoading(false);
+      });
   }, []);
 
   const baseRefRef = useRef(baseRef);

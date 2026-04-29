@@ -1,4 +1,4 @@
-import type { ExcalidrawProps } from '@excalidraw/excalidraw/types/types'
+import type { ExcalidrawProps } from '@excalidraw/excalidraw/types';
 
 export const readonlyUIOptions: ExcalidrawProps['UIOptions'] = {
   canvasActions: {
@@ -8,4 +8,4 @@ export const readonlyUIOptions: ExcalidrawProps['UIOptions'] = {
     loadScene: false,
     changeViewBackgroundColor: false,
   },
-}
+};

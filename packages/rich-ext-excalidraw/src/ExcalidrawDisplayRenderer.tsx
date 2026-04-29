@@ -1,4 +1,4 @@
-import type { ExcalidrawImperativeAPI, ExcalidrawProps } from '@excalidraw/excalidraw/types/types';
+import type { ExcalidrawImperativeAPI, ExcalidrawProps } from '@excalidraw/excalidraw/types';
 import { useColorScheme } from '@haklex/rich-editor';
 import { presentDialog } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
@@ -71,8 +71,8 @@ const ExcalidrawStaticCanvas: FC<{
   const { className: portalClassName } = usePortalTheme();
 
   useEffect(() => {
-    import('@excalidraw/excalidraw')
-      .then((mod) => {
+    Promise.all([import('@excalidraw/excalidraw'), import('@excalidraw/excalidraw/index.css')])
+      .then(([mod]) => {
         const Comp = mod.Excalidraw;
 
         if (Comp) setExcalidrawComponent(() => Comp as ComponentType<ExcalidrawProps>);
