@@ -158,3 +158,163 @@ export const semanticClassNames = {
   editOverlay: 'rich-chat-edit-overlay',
   editLabel: 'rich-chat-edit-label',
 } as const;
+
+export const modal = style({
+  background: '#ffffff',
+  borderRadius: 14,
+  width: 920,
+  maxWidth: '95vw',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'hidden',
+});
+
+export const modalHeader = style({
+  padding: '14px 22px',
+  borderBottom: '1px solid #ececec',
+  fontSize: 14,
+  fontWeight: 600,
+});
+
+export const modalBody = style({
+  display: 'flex',
+  height: 540,
+});
+
+export const rail = style({
+  width: 280,
+  flexShrink: 0,
+  borderRight: '1px solid #ececec',
+  background: '#fafafa',
+  padding: '18px 18px 14px',
+  overflowY: 'auto',
+});
+
+export const pane = style({
+  flex: 1,
+  padding: '14px 22px 18px',
+  overflowY: 'auto',
+  minWidth: 0,
+});
+
+export const sectionLabel = style({
+  fontSize: 11,
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+  color: '#737373',
+  marginBottom: 8,
+  fontWeight: 500,
+  selectors: { '&:not(:first-child)': { marginTop: 22 } },
+});
+
+export const variantStack = style({ display: 'flex', flexDirection: 'column', gap: 6 });
+export const variantPill = style({
+  padding: '9px 11px',
+  border: '1px solid #e5e5e5',
+  borderRadius: 8,
+  cursor: 'pointer',
+  background: '#ffffff',
+});
+export const variantPillActive = style({ borderColor: '#1f1f1f' });
+
+export const participantCard = style({
+  border: '1px solid #ececec',
+  borderRadius: 8,
+  padding: '9px 10px',
+  background: '#ffffff',
+  marginBottom: 8,
+});
+export const participantRow = style({
+  display: 'flex',
+  gap: 6,
+  alignItems: 'center',
+  marginBottom: 5,
+});
+export const participantPill = style({
+  fontSize: 9.5,
+  textTransform: 'uppercase',
+  letterSpacing: '0.08em',
+  padding: '2px 6px',
+  borderRadius: 4,
+  background: '#1f1f1f',
+  color: '#ffffff',
+  fontWeight: 600,
+});
+export const participantPillUser = style({ background: '#737373' });
+export const participantInput = style({
+  flex: 1,
+  border: '1px solid #e5e5e5',
+  borderRadius: 5,
+  padding: '4px 7px',
+  fontSize: 12.5,
+  background: '#ffffff',
+  color: '#1f1f1f',
+  width: 0,
+});
+
+export const messageCard = style({
+  border: '1px solid #ececec',
+  borderRadius: 10,
+  marginBottom: 10,
+  overflow: 'hidden',
+});
+export const messageHead = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  padding: '7px 12px',
+  background: '#fafafa',
+  borderBottom: '1px solid #ececec',
+});
+export const messageActions = style({ display: 'flex', gap: 2 });
+export const messageTextarea = style({
+  width: '100%',
+  border: 0,
+  padding: '10px 12px',
+  fontFamily: '-apple-system, "JetBrains Mono", monospace',
+  fontSize: 13,
+  lineHeight: 1.55,
+  color: '#1f1f1f',
+  resize: 'vertical',
+  minHeight: 70,
+  boxSizing: 'border-box',
+});
+
+export const addMessage = style({
+  display: 'flex',
+  justifyContent: 'center',
+  margin: '10px 0 4px',
+});
+export const addMessageButton = style({
+  border: '1px dashed #cfcfcf',
+  background: 'transparent',
+  color: '#737373',
+  padding: '6px 14px',
+  borderRadius: 6,
+  fontSize: 13,
+  cursor: 'pointer',
+});
+
+export const modalFooter = style({
+  padding: '12px 22px',
+  borderTop: '1px solid #ececec',
+  display: 'flex',
+  justifyContent: 'flex-end',
+  gap: 8,
+  background: '#fafafa',
+});
+export const button = style({
+  fontSize: 13,
+  padding: '6px 12px',
+  borderRadius: 6,
+  border: '1px solid #e5e5e5',
+  background: '#ffffff',
+  color: '#1f1f1f',
+  cursor: 'pointer',
+});
+export const buttonPrimary = style({
+  background: '#1f1f1f',
+  color: '#ffffff',
+  borderColor: '#1f1f1f',
+});
+export const buttonGhost = style({ borderColor: 'transparent', color: '#737373' });
