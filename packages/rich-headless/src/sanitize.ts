@@ -37,10 +37,14 @@ export interface SanitizeOptions {
   onUnknown?: (type: string) => void;
 }
 
-const ROOT_TYPE = 'root';
+// Lexical registers these node types implicitly inside `createEditor` — they
+// won't appear in any user-supplied `nodes` array but they appear in every
+// real document, so they must always be considered known. Dropping them
+// turns the sanitizer into a wood-chipper for normal content.
+const INTRINSIC_TYPES = ['root', 'paragraph', 'text', 'linebreak', 'tab'];
 
 function collectKnownTypes(nodes: Klass<LexicalNode>[]): Set<string> {
-  const out = new Set<string>([ROOT_TYPE]);
+  const out = new Set<string>(INTRINSIC_TYPES);
   for (const klass of nodes) {
     const fn = (klass as unknown as { getType?: () => string }).getType;
     if (typeof fn === 'function') {
