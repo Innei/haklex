@@ -4,7 +4,7 @@ import { style } from '@vanilla-extract/css';
 export const container = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: 18,
+  gap: 20,
   padding: '12px 0',
 });
 
@@ -19,8 +19,8 @@ export const rowRight = style({
 });
 
 export const avatar = style({
-  width: 32,
-  height: 32,
+  width: 28,
+  height: 28,
   borderRadius: '50%',
   background: vars.color.bgTertiary,
   border: `1px solid ${vars.color.border}`,
@@ -32,6 +32,12 @@ export const avatar = style({
   fontWeight: 600,
   color: vars.color.textTertiary,
   overflow: 'hidden',
+});
+
+export const avatarSmall = style({
+  width: 24,
+  height: 24,
+  fontSize: 11,
 });
 
 export const avatarDark = style({
@@ -49,58 +55,69 @@ export const avatarImg = style({
 export const bubble = style({
   'maxWidth': '70%',
   'padding': '10px 14px',
-  'borderRadius': 14,
-  'fontSize': 14.5,
-  'lineHeight': 1.55,
+  'background': vars.color.bgTertiary,
+  'color': vars.color.text,
+  'fontSize': 15,
+  'lineHeight': 1.6,
   '@media': {
     '(max-width: 600px)': { maxWidth: '85%' },
   },
 });
 
-export const userBubble = style({
-  background: vars.color.text,
-  color: vars.color.bg,
+export const bubbleRightTail = style({
   borderRadius: '14px 14px 4px 14px',
 });
 
-export const leftBubble = style({
-  background: vars.color.bgTertiary,
-  color: vars.color.text,
+export const bubbleLeftTail = style({
   borderRadius: '14px 14px 14px 4px',
-  border: `1px solid ${vars.color.border}`,
 });
 
-export const rightBubble = style({
-  background: vars.color.text,
-  color: vars.color.bg,
-  borderRadius: '14px 14px 4px 14px',
+export const agent = style({
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  minWidth: 0,
 });
 
-export const author = style({
-  fontSize: 11,
-  color: vars.color.textTertiary,
-  marginBottom: 4,
+export const agentHeader = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  marginBottom: 8,
+});
+
+export const agentHeaderName = style({
+  fontSize: 13,
   fontWeight: 500,
-});
-
-export const authorOnDark = style({
-  color: `color-mix(in srgb, ${vars.color.bg} 70%, transparent)`,
+  color: vars.color.text,
 });
 
 export const article = style({
-  flex: 1,
   color: 'inherit',
   fontSize: 15,
-  lineHeight: 1.65,
-  padding: '4px 0',
+  lineHeight: 1.7,
 });
 
-export const articleHeader = style({
-  fontSize: 11,
-  color: vars.color.textQuaternary,
-  marginBottom: 6,
-  letterSpacing: '0.04em',
-  textTransform: 'uppercase',
+export const authorCluster = style({
+  'display': 'flex',
+  'flexDirection': 'column',
+  'maxWidth': '70%',
+  'minWidth': 0,
+  '@media': {
+    '(max-width: 600px)': { maxWidth: '85%' },
+  },
+});
+
+export const authorClusterRight = style({
+  alignItems: 'flex-end',
+});
+
+export const authorLabel = style({
+  fontSize: 12,
+  fontWeight: 500,
+  color: vars.color.textTertiary,
+  marginBottom: 4,
+  padding: '0 4px',
 });
 
 export const empty = style({

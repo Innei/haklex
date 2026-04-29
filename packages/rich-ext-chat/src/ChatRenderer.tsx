@@ -30,8 +30,19 @@ function resolveParticipant(
   return participants.find((p) => p.id === participantId) ?? UNKNOWN;
 }
 
-const Avatar: FC<{ participant: ChatParticipant; dark?: boolean }> = ({ participant, dark }) => {
-  const className = `${styles.avatar} ${dark ? styles.avatarDark : ''} ${styles.semanticClassNames.avatar}`;
+const Avatar: FC<{ participant: ChatParticipant; dark?: boolean; small?: boolean }> = ({
+  participant,
+  dark,
+  small,
+}) => {
+  const className = [
+    styles.avatar,
+    small ? styles.avatarSmall : '',
+    dark ? styles.avatarDark : '',
+    styles.semanticClassNames.avatar,
+  ]
+    .filter(Boolean)
+    .join(' ');
   if (participant.avatar) {
     return (
       <span className={className}>
@@ -60,7 +71,7 @@ const UserAgentRow: FC<{
     return (
       <div className={`${styles.row} ${styles.rowRight} ${styles.semanticClassNames.row}`}>
         <div
-          className={`${styles.bubble} ${styles.userBubble} ${styles.semanticClassNames.bubble}`}
+          className={`${styles.bubble} ${styles.bubbleRightTail} ${styles.semanticClassNames.bubble}`}
         >
           <Markdown content={message.content} />
         </div>
@@ -71,10 +82,14 @@ const UserAgentRow: FC<{
 
   return (
     <div className={`${styles.row} ${styles.semanticClassNames.row}`}>
-      <Avatar dark participant={participant} />
-      <div className={`${styles.article} ${styles.semanticClassNames.article}`}>
-        <div className={styles.articleHeader}>{displayName}</div>
-        <Markdown content={message.content} />
+      <div className={styles.agent}>
+        <div className={styles.agentHeader}>
+          <Avatar dark small participant={participant} />
+          <span className={styles.agentHeaderName}>{displayName}</span>
+        </div>
+        <div className={`${styles.article} ${styles.semanticClassNames.article}`}>
+          <Markdown content={message.content} />
+        </div>
       </div>
     </div>
   );
@@ -87,31 +102,32 @@ const UserUserRow: FC<{
 }> = ({ message, participants, isRight }) => {
   const participant = resolveParticipant(participants, message.participantId);
   const displayName = participant.name ?? defaultName(participant.kind);
-  const bubbleClass = isRight ? styles.rightBubble : styles.leftBubble;
-  const authorClass = isRight ? `${styles.author} ${styles.authorOnDark}` : styles.author;
+  const tailClass = isRight ? styles.bubbleRightTail : styles.bubbleLeftTail;
+  const clusterClass = `${styles.authorCluster}${isRight ? ` ${styles.authorClusterRight}` : ''}`;
 
-  const authorEl = (
-    <div className={`${authorClass} ${styles.semanticClassNames.author}`}>{displayName}</div>
-  );
-  const bubble = (
-    <div className={`${styles.bubble} ${bubbleClass} ${styles.semanticClassNames.bubble}`}>
-      {authorEl}
-      <Markdown content={message.content} />
+  const cluster = (
+    <div className={clusterClass}>
+      <span className={`${styles.authorLabel} ${styles.semanticClassNames.author}`}>
+        {displayName}
+      </span>
+      <div className={`${styles.bubble} ${tailClass} ${styles.semanticClassNames.bubble}`}>
+        <Markdown content={message.content} />
+      </div>
     </div>
   );
 
   if (isRight) {
     return (
       <div className={`${styles.row} ${styles.rowRight} ${styles.semanticClassNames.row}`}>
-        {bubble}
-        <Avatar dark participant={participant} />
+        {cluster}
+        <Avatar participant={participant} />
       </div>
     );
   }
   return (
     <div className={`${styles.row} ${styles.semanticClassNames.row}`}>
       <Avatar participant={participant} />
-      {bubble}
+      {cluster}
     </div>
   );
 };
