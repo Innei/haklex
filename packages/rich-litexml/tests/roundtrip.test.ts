@@ -93,4 +93,42 @@ describe('roundtrip', () => {
     expect(result).toContain('op="insert"');
     expect(result).toContain('entry="d1"');
   });
+
+  it('chat user-agent roundtrip', () => {
+    const xml =
+      '<chat variant="user-agent">' +
+      '<participants>' +
+      '<participant id="p_u" kind="user" name="Innei"></participant>' +
+      '<participant id="p_a" kind="agent" name="Claude"></participant>' +
+      '</participants>' +
+      '<messages>' +
+      '<message id="m1" participant="p_u">How are you?</message>' +
+      '<message id="m2" participant="p_a">I am fine.</message>' +
+      '</messages>' +
+      '</chat>';
+    const result = roundtrip(xml);
+    expect(result).toContain('<chat variant="user-agent">');
+    expect(result).toContain('<participant id="p_u" kind="user" name="Innei"');
+    expect(result).toContain('<participant id="p_a" kind="agent" name="Claude"');
+    expect(result).toContain('<message id="m1" participant="p_u">How are you?</message>');
+    expect(result).toContain('<message id="m2" participant="p_a">I am fine.</message>');
+  });
+
+  it('chat user-user roundtrip preserves both bubbles', () => {
+    const xml =
+      '<chat variant="user-user">' +
+      '<participants>' +
+      '<participant id="p_a" kind="user" name="Alice"></participant>' +
+      '<participant id="p_b" kind="user" name="Bob"></participant>' +
+      '</participants>' +
+      '<messages>' +
+      '<message id="m1" participant="p_a">Hi</message>' +
+      '<message id="m2" participant="p_b">Hello</message>' +
+      '</messages>' +
+      '</chat>';
+    const result = roundtrip(xml);
+    expect(result).toContain('<chat variant="user-user">');
+    expect(result).toContain('<participant id="p_a" kind="user" name="Alice"');
+    expect(result).toContain('<participant id="p_b" kind="user" name="Bob"');
+  });
 });

@@ -291,7 +291,7 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
           name: p.name,
           avatar: p.avatar,
         }),
-        selfClosing: true,
+        children: [],
       })),
     };
     const messagesEl: XmlElement = {
