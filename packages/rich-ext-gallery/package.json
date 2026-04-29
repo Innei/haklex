@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-gallery",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Image gallery extension with drag-and-drop",
   "repository": {
     "type": "git",
@@ -26,9 +26,6 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
     "react-intersection-observer": "^10.0.3",
     "react-photo-view": "^1.2.7"
   },
@@ -46,6 +43,9 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "lexical": "^0.44.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",

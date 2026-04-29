@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-alert",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Alert renderer for haklex rich editor",
   "repository": {
     "type": "git",
@@ -22,11 +22,6 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "dependencies": {
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*"
-  },
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -40,6 +35,9 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"

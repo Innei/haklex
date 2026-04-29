@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-codeblock",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Code block renderer with Shiki syntax highlighting",
   "repository": {
     "type": "git",
@@ -30,9 +30,6 @@
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.41.1",
     "@haklex/cm-editor": "workspace:*",
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
     "@iconify-json/material-icon-theme": "^1.2.61",
     "@iconify/utils": "^3.1.1",
     "shiki": "^4.0.2"
@@ -49,6 +46,9 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"

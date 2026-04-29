@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-diff",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Rich diff editor",
   "repository": {
     "type": "git",
@@ -23,9 +23,7 @@
   },
   "dependencies": {
     "@haklex/rich-diff-core": "workspace:*",
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-static-renderer": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*"
+    "@haklex/rich-static-renderer": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
@@ -40,6 +38,8 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "react": ">=19",
     "react-dom": ">=19"
   },

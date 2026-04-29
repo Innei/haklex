@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-nested-doc",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Nested document extension for haklex rich editor",
   "repository": {
     "type": "git",
@@ -23,10 +23,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-static-renderer": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*"
+    "@haklex/rich-static-renderer": "workspace:*"
   },
   "devDependencies": {
     "@lexical/markdown": "^0.44.0",
@@ -44,6 +41,9 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "@lexical/markdown": "^0.44.0",
     "@lexical/react": "^0.44.0",
     "lexical": "^0.44.0",

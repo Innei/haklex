@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-table",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Table editing plugin",
   "repository": {
     "type": "git",
@@ -21,10 +21,6 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "dependencies": {
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*"
-  },
   "devDependencies": {
     "@lexical/react": "^0.44.0",
     "@lexical/table": "^0.44.0",
@@ -41,6 +37,8 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "@lexical/react": "^0.44.0",
     "@lexical/table": "^0.44.0",
     "lexical": "^0.44.0",

@@ -273,11 +273,11 @@ importers:
         specifier: workspace:*
         version: link:../rich-diff-core
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       '@streamdown/code':
         specifier: ^1.1.1
         version: 1.1.1(react@19.2.5)
@@ -356,14 +356,14 @@ importers:
         specifier: workspace:*
         version: link:../rich-diff-core
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-static-renderer':
         specifier: workspace:*
         version: link:../rich-static-renderer
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -551,11 +551,11 @@ importers:
         specifier: workspace:*
         version: link:../rich-diff-core
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-litexml':
         specifier: workspace:*
         version: link:../rich-litexml
@@ -563,8 +563,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-static-renderer
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
@@ -627,11 +627,11 @@ importers:
         specifier: workspace:*
         version: link:../cm-editor
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-headless':
         specifier: workspace:*
         version: link:../rich-headless
@@ -639,8 +639,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-renderer-codeblock
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
@@ -688,14 +688,14 @@ importers:
   packages/rich-ext-embed:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       '@icons-pack/react-simple-icons':
         specifier: ^13.13.0
         version: 13.13.0(react@19.2.5)
@@ -749,17 +749,17 @@ importers:
         specifier: 0.17.0
         version: 0.17.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-headless':
         specifier: workspace:*
         version: link:../rich-headless
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       jsondiffpatch:
         specifier: ^0.7.3
         version: 0.7.3
@@ -813,14 +813,14 @@ importers:
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.5)
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       react-intersection-observer:
         specifier: ^10.0.3
         version: 10.0.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -865,17 +865,17 @@ importers:
   packages/rich-ext-nested-doc:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-static-renderer':
         specifier: workspace:*
         version: link:../rich-static-renderer
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@lexical/markdown':
         specifier: ^0.44.0
@@ -957,11 +957,11 @@ importers:
   packages/rich-kit-shiro:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-ext-code-snippet':
         specifier: workspace:*
         version: link:../rich-ext-code-snippet
@@ -1008,8 +1008,8 @@ importers:
         specifier: workspace:*
         version: link:../rich-static-renderer
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       katex:
         specifier: ^0.16.45
         version: 0.16.45
@@ -1076,11 +1076,11 @@ importers:
   packages/rich-plugin-block-handle:
     dependencies:
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       '@lexical/code-core':
         specifier: ^0.44.0
         version: 0.44.0
@@ -1137,14 +1137,14 @@ importers:
   packages/rich-plugin-floating-toolbar:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@lexical/link':
         specifier: ^0.44.0
@@ -1192,11 +1192,11 @@ importers:
   packages/rich-plugin-link-edit:
     dependencies:
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@lexical/link':
         specifier: ^0.44.0
@@ -1241,14 +1241,14 @@ importers:
   packages/rich-plugin-mention:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-renderer-mention':
         specifier: workspace:*
         version: link:../rich-renderer-mention
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@lexical/react':
         specifier: ^0.44.0
@@ -1290,11 +1290,11 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@lexical/list':
         specifier: ^0.44.0
@@ -1348,11 +1348,11 @@ importers:
   packages/rich-plugin-table:
     dependencies:
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@lexical/react':
         specifier: ^0.44.0
@@ -1397,14 +1397,14 @@ importers:
   packages/rich-plugin-toolbar:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@lexical/list':
         specifier: ^0.44.0
@@ -1458,14 +1458,14 @@ importers:
   packages/rich-renderer-alert:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
@@ -1504,14 +1504,14 @@ importers:
   packages/rich-renderer-banner:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
@@ -1562,14 +1562,14 @@ importers:
         specifier: workspace:*
         version: link:../cm-editor
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       '@iconify-json/material-icon-theme':
         specifier: ^1.2.61
         version: 1.2.61
@@ -1614,14 +1614,14 @@ importers:
   packages/rich-renderer-image:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       jotai:
         specifier: 2.19.1
         version: 2.19.1(@babel/core@7.29.0)(@babel/template@7.28.6)(@types/react@19.2.14)(react@19.2.5)
@@ -1669,14 +1669,14 @@ importers:
   packages/rich-renderer-katex:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
@@ -1724,14 +1724,14 @@ importers:
   packages/rich-renderer-linkcard:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
@@ -1779,14 +1779,14 @@ importers:
   packages/rich-renderer-mention:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       '@icons-pack/react-simple-icons':
         specifier: ^13.13.0
         version: 13.13.0(react@19.2.5)
@@ -1831,14 +1831,14 @@ importers:
   packages/rich-renderer-mermaid:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
@@ -1880,11 +1880,11 @@ importers:
   packages/rich-renderer-ruby:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -1920,14 +1920,14 @@ importers:
         specifier: ^1.4.1
         version: 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
+        specifier: '>=0.3.0'
+        version: 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
@@ -1969,8 +1969,8 @@ importers:
   packages/rich-renderers:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-ext-code-snippet':
         specifier: workspace:*
         version: link:../rich-ext-code-snippet
@@ -2042,8 +2042,8 @@ importers:
   packages/rich-renderers-edit:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-ext-code-snippet':
         specifier: workspace:*
         version: link:../rich-ext-code-snippet
@@ -2130,11 +2130,11 @@ importers:
   packages/rich-static-renderer:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
+        specifier: '>=0.3.0'
+        version: 0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
       '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
+        specifier: '>=0.3.0'
+        version: 0.3.0(react@19.2.5)
       '@lexical/code-core':
         specifier: ^0.44.0
         version: 0.44.0
@@ -3875,6 +3875,62 @@ packages:
       {
         integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==,
       }
+
+  '@haklex/rich-editor-ui@0.3.0':
+    resolution:
+      {
+        integrity: sha512-4HdsTysXOxiTTM2PSSlWUorUMC8tDgf+WtVl+dLJYILjCMVZd71tIbmZQaKTuyOR8JlXusEc7fEh9JFZx3UgJA==,
+      }
+    peerDependencies:
+      lucide-react: ^1.0.0
+      react: '>=19'
+      react-dom: '>=19'
+      shiki: '>=3.0.0'
+    peerDependenciesMeta:
+      shiki:
+        optional: true
+
+  '@haklex/rich-editor@0.3.0':
+    resolution:
+      {
+        integrity: sha512-8rI1iCFA86WB0w/m4LsytlhUhrXycXo82XtT57astqU/yrd60uMftUin7aYRvY1/ezuy3Fp0BfA7t/mgWWhx5Q==,
+      }
+    peerDependencies:
+      '@base-ui/react': ^1.1.0
+      '@lexical/extension': ^0.44.0
+      '@lexical/link': ^0.44.0
+      '@lexical/list': ^0.44.0
+      '@lexical/markdown': ^0.44.0
+      '@lexical/react': ^0.44.0
+      '@lexical/rich-text': ^0.44.0
+      '@lexical/table': ^0.44.0
+      katex: '>=0.16.0'
+      lexical: ^0.44.0
+      lucide-react: ^1.0.0
+      react: '>=19'
+      react-dom: '>=19'
+      shiki: ^3.0.0
+    peerDependenciesMeta:
+      katex:
+        optional: true
+      shiki:
+        optional: true
+
+  '@haklex/rich-headless@0.3.0':
+    resolution:
+      {
+        integrity: sha512-dt73i3MOOCsRN1n6Q0gBhiaCX3jp+y2/ZoOhE2b/WSPF19L9HllBj+MvVkrsNJCZQe4pWfqOnnooVL2itkEa6A==,
+      }
+    peerDependencies:
+      lexical: ^0.44.0
+
+  '@haklex/rich-style-token@0.3.0':
+    resolution:
+      {
+        integrity: sha512-iJTZNt8KruoctqbVMbvJNewnKLD0sLNV1MwfGSxNwPdvsKQVpqhCUgt5cVTXwIpqzl2lIotlEJr9i8be8VASRw==,
+      }
+    peerDependencies:
+      react: '>=19'
 
   '@humanfs/core@0.19.2':
     resolution:
@@ -14097,6 +14153,161 @@ snapshots:
       tabbable: 6.4.0
 
   '@floating-ui/utils@0.2.11': {}
+
+  '@haklex/rich-editor-ui@0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)':
+    dependencies:
+      '@base-ui/react': 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@haklex/rich-style-token': 0.3.0(react@19.2.5)
+      lucide-react: 1.12.0(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+    optionalDependencies:
+      shiki: 3.23.0
+    transitivePeerDependencies:
+      - '@date-fns/tz'
+      - '@types/react'
+      - date-fns
+
+  '@haklex/rich-editor-ui@0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)':
+    dependencies:
+      '@base-ui/react': 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@haklex/rich-style-token': 0.3.0(react@19.2.5)
+      lucide-react: 1.12.0(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+    optionalDependencies:
+      shiki: 4.0.2
+    transitivePeerDependencies:
+      - '@date-fns/tz'
+      - '@types/react'
+      - date-fns
+
+  '@haklex/rich-editor-ui@0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)':
+    dependencies:
+      '@base-ui/react': 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@haklex/rich-style-token': 0.3.0(react@19.2.5)
+      lucide-react: 1.7.0(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+    optionalDependencies:
+      shiki: 3.23.0
+    transitivePeerDependencies:
+      - '@date-fns/tz'
+      - '@types/react'
+      - date-fns
+
+  '@haklex/rich-editor-ui@0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)':
+    dependencies:
+      '@base-ui/react': 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@haklex/rich-style-token': 0.3.0(react@19.2.5)
+      lucide-react: 1.7.0(react@19.2.5)
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+    optionalDependencies:
+      shiki: 4.0.2
+    transitivePeerDependencies:
+      - '@date-fns/tz'
+      - '@types/react'
+      - date-fns
+
+  '@haklex/rich-editor@0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)':
+    dependencies:
+      '@base-ui/react': 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@haklex/rich-editor-ui': 0.3.0(@types/react@19.2.14)(lucide-react@1.12.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
+      '@haklex/rich-headless': 0.3.0(lexical@0.44.0)
+      '@haklex/rich-style-token': 0.3.0(react@19.2.5)
+      '@lexical/code-core': 0.44.0
+      '@lexical/extension': 0.44.0
+      '@lexical/link': 0.44.0
+      '@lexical/list': 0.44.0
+      '@lexical/markdown': 0.44.0
+      '@lexical/react': 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
+      '@lexical/rich-text': 0.44.0
+      '@lexical/table': 0.44.0
+      lexical: 0.44.0
+      lucide-react: 1.12.0(react@19.2.5)
+      nanoid: 5.1.9
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      thumbhash: 0.1.1
+    optionalDependencies:
+      katex: 0.16.45
+      shiki: 3.23.0
+    transitivePeerDependencies:
+      - '@date-fns/tz'
+      - '@types/react'
+      - date-fns
+
+  '@haklex/rich-editor@0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)':
+    dependencies:
+      '@base-ui/react': 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@haklex/rich-editor-ui': 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@3.23.0)
+      '@haklex/rich-headless': 0.3.0(lexical@0.44.0)
+      '@haklex/rich-style-token': 0.3.0(react@19.2.5)
+      '@lexical/code-core': 0.44.0
+      '@lexical/extension': 0.44.0
+      '@lexical/link': 0.44.0
+      '@lexical/list': 0.44.0
+      '@lexical/markdown': 0.44.0
+      '@lexical/react': 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
+      '@lexical/rich-text': 0.44.0
+      '@lexical/table': 0.44.0
+      lexical: 0.44.0
+      lucide-react: 1.7.0(react@19.2.5)
+      nanoid: 5.1.9
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      thumbhash: 0.1.1
+    optionalDependencies:
+      katex: 0.16.45
+      shiki: 3.23.0
+    transitivePeerDependencies:
+      - '@date-fns/tz'
+      - '@types/react'
+      - date-fns
+
+  '@haklex/rich-editor@0.3.0(@base-ui/react@1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@lexical/extension@0.44.0)(@lexical/link@0.44.0)(@lexical/list@0.44.0)(@lexical/markdown@0.44.0)(@lexical/react@0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29))(@lexical/rich-text@0.44.0)(@lexical/table@0.44.0)(@types/react@19.2.14)(katex@0.16.45)(lexical@0.44.0)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)':
+    dependencies:
+      '@base-ui/react': 1.4.1(@types/react@19.2.14)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@haklex/rich-editor-ui': 0.3.0(@types/react@19.2.14)(lucide-react@1.7.0(react@19.2.5))(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(shiki@4.0.2)
+      '@haklex/rich-headless': 0.3.0(lexical@0.44.0)
+      '@haklex/rich-style-token': 0.3.0(react@19.2.5)
+      '@lexical/code-core': 0.44.0
+      '@lexical/extension': 0.44.0
+      '@lexical/link': 0.44.0
+      '@lexical/list': 0.44.0
+      '@lexical/markdown': 0.44.0
+      '@lexical/react': 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
+      '@lexical/rich-text': 0.44.0
+      '@lexical/table': 0.44.0
+      lexical: 0.44.0
+      lucide-react: 1.7.0(react@19.2.5)
+      nanoid: 5.1.9
+      react: 19.2.5
+      react-dom: 19.2.5(react@19.2.5)
+      thumbhash: 0.1.1
+    optionalDependencies:
+      katex: 0.16.45
+      shiki: 4.0.2
+    transitivePeerDependencies:
+      - '@date-fns/tz'
+      - '@types/react'
+      - date-fns
+
+  '@haklex/rich-headless@0.3.0(lexical@0.44.0)':
+    dependencies:
+      '@lexical/code-core': 0.44.0
+      '@lexical/extension': 0.44.0
+      '@lexical/link': 0.44.0
+      '@lexical/list': 0.44.0
+      '@lexical/markdown': 0.44.0
+      '@lexical/rich-text': 0.44.0
+      '@lexical/table': 0.44.0
+      lexical: 0.44.0
+
+  '@haklex/rich-style-token@0.3.0(react@19.2.5)':
+    dependencies:
+      react: 19.2.5
 
   '@humanfs/core@0.19.2':
     dependencies:

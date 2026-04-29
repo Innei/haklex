@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-block-handle",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Block handle plugin with add button and context menu",
   "repository": {
     "type": "git",
@@ -22,8 +22,6 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
     "@lexical/code-core": "^0.44.0"
   },
   "devDependencies": {
@@ -45,6 +43,8 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "@lexical/html": "^0.44.0",
     "@lexical/list": "^0.44.0",
     "@lexical/react": "^0.44.0",

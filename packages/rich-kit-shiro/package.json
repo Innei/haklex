@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-kit-shiro",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Production bundle for Shiroi blog",
   "repository": {
     "type": "git",
@@ -35,8 +35,6 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
@@ -52,7 +50,6 @@
     "@haklex/rich-renderers": "workspace:*",
     "@haklex/rich-renderers-edit": "workspace:*",
     "@haklex/rich-static-renderer": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
     "katex": "^0.16.45",
     "react-shadow": "^20.6.0"
   },
@@ -69,6 +66,9 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "@lexical/react": "^0.44.0",
     "lexical": "^0.44.0",
     "lucide-react": "^1.0.0",

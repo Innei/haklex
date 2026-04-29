@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-code-snippet",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Multi-file code snippet extension",
   "repository": {
     "type": "git",
@@ -30,11 +30,8 @@
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
     "@haklex/cm-editor": "workspace:*",
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
     "shiki": "^4.0.2"
   },
   "devDependencies": {
@@ -52,6 +49,9 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "lexical": "^0.44.0",
     "lucide-react": "^1.0.0",
     "react": ">=19"

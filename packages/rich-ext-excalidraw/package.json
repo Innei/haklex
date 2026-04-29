@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-excalidraw",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Excalidraw whiteboard extension",
   "repository": {
     "type": "git",
@@ -24,10 +24,7 @@
   },
   "dependencies": {
     "@excalidraw/excalidraw": "0.17.0",
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
     "jsondiffpatch": "^0.7.3"
   },
   "devDependencies": {
@@ -45,6 +42,9 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "@lexical/react": "^0.44.0",
     "lexical": "^0.44.0",
     "lucide-react": "^1.0.0",

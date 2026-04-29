@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-agent-chat",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Chat panel UI for AI agent interaction",
   "repository": {
     "type": "git",
@@ -24,8 +24,6 @@
   "dependencies": {
     "@haklex/rich-agent-core": "workspace:*",
     "@haklex/rich-diff-core": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
     "@streamdown/code": "^1.1.1",
     "streamdown": "^2.5.0",
     "zustand": "^5.0.12"
@@ -42,6 +40,8 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor-ui": ">=0.3.0",
+    "@haklex/rich-style-token": ">=0.3.0",
     "lucide-react": ">=1.0.0",
     "react": ">=19",
     "react-dom": ">=19"

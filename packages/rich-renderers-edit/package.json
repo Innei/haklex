@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderers-edit",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Edit renderers aggregator for haklex rich editor",
   "repository": {
     "type": "git",
@@ -32,7 +32,6 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
@@ -64,6 +63,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": ">=0.3.0",
     "@lexical/react": "^0.44.0",
     "lexical": "^0.44.0",
     "react": ">=19",
