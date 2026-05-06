@@ -9,11 +9,12 @@ import {
   PopoverTrigger,
 } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getNodeByKey } from 'lexical';
+import { $getNodeByKey, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
 import { Check, Copy, RotateCcw, Search, Terminal, Trash2 } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { getEditorHistoryShortcut } from './history-shortcuts';
 import { CURSOR_TOKEN, filterKaTeXSnippets, insertSnippetAtSelection } from './snippets';
 import * as styles from './styles.css';
 
@@ -169,6 +170,20 @@ export function KaTeXEditDecorator({
     [commit, cancel, displayMode],
   );
 
+  const handlePanelKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const shortcut = getEditorHistoryShortcut(e, {
+        isDirty: value !== equation || snippetQuery !== '',
+      });
+      if (!shortcut) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      editor.dispatchCommand(shortcut === 'undo' ? UNDO_COMMAND : REDO_COMMAND, undefined);
+    },
+    [editor, equation, snippetQuery, value],
+  );
+
   if (!editable) {
     return children;
   }
@@ -200,6 +215,7 @@ export function KaTeXEditDecorator({
         initialFocus={inputRef}
         side="bottom"
         sideOffset={8}
+        onKeyDown={handlePanelKeyDown}
       >
         {/* Header */}
         <div className={`${styles.header} ${styles.semanticClassNames.header}`}>

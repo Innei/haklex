@@ -8,10 +8,11 @@ import {
 } from '@haklex/rich-editor-ui';
 import { vars } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getNearestNodeFromDOMNode } from 'lexical';
+import { $getNearestNodeFromDOMNode, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
 import { AtSign, ExternalLink, Trash2, User } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { getEditorHistoryShortcut } from './history-shortcuts';
 import type { MentionRendererProps } from './MentionRenderer';
 import { MentionRenderer, platformKeys, platformMetaMap } from './MentionRenderer';
 import * as styles from './styles.css';
@@ -94,6 +95,23 @@ function MentionEditRendererInner({ platform, handle, displayName }: MentionRend
     [commitChanges, platform, handle, displayName],
   );
 
+  const handlePanelKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const shortcut = getEditorHistoryShortcut(e, {
+        isDirty:
+          editPlatform !== platform ||
+          editHandle !== handle ||
+          editDisplayName !== (displayName || ''),
+      });
+      if (!shortcut) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      editor.dispatchCommand(shortcut === 'undo' ? UNDO_COMMAND : REDO_COMMAND, undefined);
+    },
+    [displayName, editDisplayName, editHandle, editPlatform, editor, handle, platform],
+  );
+
   if (!editable) {
     return <MentionRenderer displayName={displayName} handle={handle} platform={platform} />;
   }
@@ -125,6 +143,7 @@ function MentionEditRendererInner({ platform, handle, displayName }: MentionRend
         className={`${styles.editPanel} ${styles.semanticClassNames.editPanel}`}
         side="bottom"
         sideOffset={8}
+        onKeyDown={handlePanelKeyDown}
       >
         <div className={`${styles.editField} ${styles.semanticClassNames.editField}`}>
           <span

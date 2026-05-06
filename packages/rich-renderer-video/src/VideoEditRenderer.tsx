@@ -8,10 +8,11 @@ import {
   PopoverTrigger,
 } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getNearestNodeFromDOMNode } from 'lexical';
+import { $getNearestNodeFromDOMNode, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
 import { ExternalLink, ImageIcon, Trash2, Video } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { getEditorHistoryShortcut } from './history-shortcuts';
 import * as styles from './styles.css';
 import { VideoRenderer } from './VideoRenderer';
 
@@ -96,6 +97,20 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
     [commitChanges, src, poster],
   );
 
+  const handlePanelKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const shortcut = getEditorHistoryShortcut(e, {
+        isDirty: editSrc !== src || editPoster !== (poster || ''),
+      });
+      if (!shortcut) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      editor.dispatchCommand(shortcut === 'undo' ? UNDO_COMMAND : REDO_COMMAND, undefined);
+    },
+    [editPoster, editSrc, editor, poster, src],
+  );
+
   if (!editable) {
     return <VideoRenderer height={height} poster={poster} src={src} width={width} />;
   }
@@ -154,6 +169,7 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
         className={`${styles.editPanel} ${styles.semanticClassNames.editPanel}`}
         side="bottom"
         sideOffset={8}
+        onKeyDown={handlePanelKeyDown}
       >
         <div className={`${styles.editField} ${styles.semanticClassNames.editField}`}>
           <Video

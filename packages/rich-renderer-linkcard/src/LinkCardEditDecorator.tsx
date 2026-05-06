@@ -8,11 +8,18 @@ import {
 } from '@haklex/rich-editor-ui';
 import { $createLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createParagraphNode, $createTextNode, $getNodeByKey } from 'lexical';
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getNodeByKey,
+  REDO_COMMAND,
+  UNDO_COMMAND,
+} from 'lexical';
 import { ExternalLink, Link, RemoveFormatting, Unlink } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { getEditorHistoryShortcut } from './history-shortcuts';
 import * as styles from './styles.css';
 
 interface LinkCardEditDecoratorProps {
@@ -91,6 +98,18 @@ export function LinkCardEditDecorator({ nodeKey, payload, children }: LinkCardEd
     [commitUrl, payload.url],
   );
 
+  const handlePanelKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      const shortcut = getEditorHistoryShortcut(e, { isDirty: url !== payload.url });
+      if (!shortcut) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+      editor.dispatchCommand(shortcut === 'undo' ? UNDO_COMMAND : REDO_COMMAND, undefined);
+    },
+    [editor, payload.url, url],
+  );
+
   const handleOpen = useCallback(() => {
     window.open(payload.url, '_blank', 'noopener,noreferrer');
   }, [payload.url]);
@@ -124,6 +143,7 @@ export function LinkCardEditDecorator({ nodeKey, payload, children }: LinkCardEd
         className={`${styles.editPanel} ${styles.semanticClassNames.editPanel}`}
         side="bottom"
         sideOffset={8}
+        onKeyDown={handlePanelKeyDown}
       >
         <div className={`${styles.editUrlRow} ${styles.semanticClassNames.editUrlRow}`}>
           <Link

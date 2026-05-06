@@ -1,20 +1,70 @@
 import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useAtomValue, useSetAtom } from 'jotai';
+import { REDO_COMMAND, UNDO_COMMAND } from 'lexical';
 import { Copy, Download, ExternalLink, Replace, Trash2, Type } from 'lucide-react';
 
-import { metaOpenAtom, replaceOpenAtom, toolbarVisibleAtom } from './atoms';
+import {
+  altTextAtom,
+  captionAtom,
+  editAltTextAtom,
+  editCaptionAtom,
+  editSrcAtom,
+  metaOpenAtom,
+  replaceOpenAtom,
+  replacePreviewAtom,
+  replaceUrlAtom,
+  srcAtom,
+  toolbarVisibleAtom,
+} from './atoms';
 import { EditMetaPopover } from './EditMetaPopover';
+import { getEditorHistoryShortcut } from './history-shortcuts';
 import { ReplacePanel } from './ReplacePanel';
 import * as styles from './styles.css';
 import { useImageActions } from './useImageActions';
 
 export function ImageEditToolbar() {
+  const [editor] = useLexicalComposerContext();
   const toolbarVisible = useAtomValue(toolbarVisibleAtom);
   const metaOpen = useAtomValue(metaOpenAtom);
   const setMetaOpen = useSetAtom(metaOpenAtom);
   const replaceOpen = useAtomValue(replaceOpenAtom);
+  const src = useAtomValue(srcAtom);
+  const altText = useAtomValue(altTextAtom);
+  const caption = useAtomValue(captionAtom);
+  const editSrc = useAtomValue(editSrcAtom);
+  const editAltText = useAtomValue(editAltTextAtom);
+  const editCaption = useAtomValue(editCaptionAtom);
+  const replaceUrl = useAtomValue(replaceUrlAtom);
+  const replacePreview = useAtomValue(replacePreviewAtom);
   const { handleReplaceOpenChange, handleOpen, handleDuplicate, handleDownload, handleDelete } =
     useImageActions();
+
+  const dispatchHistoryShortcut = (shortcut: 'redo' | 'undo') => {
+    editor.dispatchCommand(shortcut === 'undo' ? UNDO_COMMAND : REDO_COMMAND, undefined);
+  };
+
+  const handleMetaPanelKeyDown = (event: React.KeyboardEvent) => {
+    const shortcut = getEditorHistoryShortcut(event, {
+      isDirty: editSrc !== src || editAltText !== altText || editCaption !== (caption || ''),
+    });
+    if (!shortcut) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    dispatchHistoryShortcut(shortcut);
+  };
+
+  const handleReplacePanelKeyDown = (event: React.KeyboardEvent) => {
+    const shortcut = getEditorHistoryShortcut(event, {
+      isDirty: replaceUrl !== '' || replacePreview !== null,
+    });
+    if (!shortcut) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    dispatchHistoryShortcut(shortcut);
+  };
 
   return (
     <div
@@ -37,7 +87,12 @@ export function ImageEditToolbar() {
         >
           <Type size={14} />
         </PopoverTrigger>
-        <PopoverPanel className={styles.editPanel} side="bottom" sideOffset={8}>
+        <PopoverPanel
+          className={styles.editPanel}
+          side="bottom"
+          sideOffset={8}
+          onKeyDown={handleMetaPanelKeyDown}
+        >
           <EditMetaPopover />
         </PopoverPanel>
       </Popover>
@@ -59,7 +114,12 @@ export function ImageEditToolbar() {
         >
           <Replace size={14} />
         </PopoverTrigger>
-        <PopoverPanel className={styles.editPanel} side="bottom" sideOffset={8}>
+        <PopoverPanel
+          className={styles.editPanel}
+          side="bottom"
+          sideOffset={8}
+          onKeyDown={handleReplacePanelKeyDown}
+        >
           <ReplacePanel />
         </PopoverPanel>
       </Popover>
