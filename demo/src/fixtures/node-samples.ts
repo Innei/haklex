@@ -173,6 +173,22 @@ export const nodeSamples: NodeSample[] = [
     } as any),
   },
   {
+    key: 'image-error',
+    label: 'Image (Error)',
+    description: 'Broken image URL — error badge should sit absolutely centered',
+    category: 'block',
+    data: doc({
+      type: 'image',
+      src: 'https://invalid.example.invalid/broken-image.jpg',
+      altText: 'Broken image mockup',
+      caption: 'Error badge stays centered without being squeezed by the img',
+      width: 1200,
+      height: 720,
+      accent: '#7ba8c4',
+      version: 1,
+    } as any),
+  },
+  {
     key: 'video',
     label: 'Video',
     description: 'Custom player with seek, volume, fullscreen and download',
