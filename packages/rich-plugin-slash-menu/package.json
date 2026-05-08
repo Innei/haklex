@@ -43,8 +43,8 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "@haklex/rich-editor": ">=0.3.0",
-    "@haklex/rich-style-token": ">=0.3.0",
+    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*",
     "@lexical/list": "^0.44.0",
     "@lexical/react": "^0.44.0",
     "@lexical/rich-text": "^0.44.0",

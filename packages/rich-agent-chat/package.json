@@ -40,8 +40,8 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
-    "@haklex/rich-editor-ui": ">=0.3.0",
-    "@haklex/rich-style-token": ">=0.3.0",
+    "@haklex/rich-editor-ui": "workspace:*",
+    "@haklex/rich-style-token": "workspace:*",
     "lucide-react": ">=1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
