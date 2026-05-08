@@ -224,6 +224,13 @@ export default defineConfig(({ command }) => ({
     codeInspectorPlugin({ bundler: 'vite', hotKeys: ['altKey'] }),
     react(),
   ],
+  build: {
+    rolldownOptions: {
+      output: {
+        strictExecutionOrder: true,
+      },
+    },
+  },
   server: {
     port: 5188,
     open: true,
