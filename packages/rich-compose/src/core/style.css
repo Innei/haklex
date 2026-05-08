@@ -1,0 +1,12 @@
+/*
+ * @haklex/rich-compose core styles.
+ *
+ * Currently a placeholder. Module-specific CSS lives next to each module's
+ * renderer.tsx and is imported when the renderer enters the bundle.
+ *
+ * Reserved for future use:
+ *   - Skeleton classes for ssrFallback (rich-excalidraw-skeleton,
+ *     rich-mermaid-skeleton, rich-katex-skeleton) to ensure fallbacks are
+ *     styled before lazy chunks resolve.
+ *   - Container-scope tokens not already covered by @haklex/rich-style-token.
+ */

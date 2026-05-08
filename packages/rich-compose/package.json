@@ -1,0 +1,304 @@
+{
+  "name": "@haklex/rich-compose",
+  "version": "0.2.0",
+  "description": "Compose primitives for haklex rich content renderers — Gundam-style assembly of Lexical nodes, sync/lazy renderers, and Provider stacks.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-compose"
+  },
+  "license": "MIT",
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./modules/embed": "./src/modules/embed/index.ts",
+    "./modules/embed/node": "./src/modules/embed/node.ts",
+    "./modules/code-block": "./src/modules/code-block/index.ts",
+    "./modules/code-block/renderer": "./src/modules/code-block/renderer.tsx",
+    "./modules/link-card": "./src/modules/link-card/index.ts",
+    "./modules/link-card/renderer": "./src/modules/link-card/renderer.tsx",
+    "./modules/gallery": "./src/modules/gallery/index.ts",
+    "./modules/gallery/node": "./src/modules/gallery/node.ts",
+    "./modules/gallery/renderer": "./src/modules/gallery/renderer.tsx",
+    "./modules/code-snippet": "./src/modules/code-snippet/index.ts",
+    "./modules/code-snippet/node": "./src/modules/code-snippet/node.ts",
+    "./modules/code-snippet/renderer": "./src/modules/code-snippet/renderer.tsx",
+    "./modules/chat": "./src/modules/chat/index.ts",
+    "./modules/chat/node": "./src/modules/chat/node.ts",
+    "./modules/chat/renderer": "./src/modules/chat/renderer.tsx",
+    "./modules/alert": "./src/modules/alert/index.ts",
+    "./modules/alert/renderer": "./src/modules/alert/renderer.tsx",
+    "./modules/banner": "./src/modules/banner/index.ts",
+    "./modules/banner/renderer": "./src/modules/banner/renderer.tsx",
+    "./modules/image": "./src/modules/image/index.ts",
+    "./modules/image/renderer": "./src/modules/image/renderer.tsx",
+    "./modules/mention": "./src/modules/mention/index.ts",
+    "./modules/mention/renderer": "./src/modules/mention/renderer.tsx",
+    "./modules/ruby": "./src/modules/ruby/index.ts",
+    "./modules/ruby/renderer": "./src/modules/ruby/renderer.tsx",
+    "./modules/video": "./src/modules/video/index.ts",
+    "./modules/video/renderer": "./src/modules/video/renderer.tsx",
+    "./modules/mermaid": "./src/modules/mermaid/index.ts",
+    "./modules/mermaid/renderer": "./src/modules/mermaid/renderer.tsx",
+    "./modules/excalidraw": "./src/modules/excalidraw/index.ts",
+    "./modules/excalidraw/node": "./src/modules/excalidraw/node.ts",
+    "./modules/nested-doc": "./src/modules/nested-doc/index.ts",
+    "./modules/nested-doc/node": "./src/modules/nested-doc/node.ts",
+    "./style.css": "./dist/rich-compose.css"
+  },
+  "main": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev:build": "vite build --watch",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-ext-chat": "workspace:*",
+    "@haklex/rich-ext-code-snippet": "workspace:*",
+    "@haklex/rich-ext-embed": "workspace:*",
+    "@haklex/rich-ext-excalidraw": "workspace:*",
+    "@haklex/rich-ext-gallery": "workspace:*",
+    "@haklex/rich-ext-nested-doc": "workspace:*",
+    "@haklex/rich-renderer-alert": "workspace:*",
+    "@haklex/rich-renderer-banner": "workspace:*",
+    "@haklex/rich-renderer-codeblock": "workspace:*",
+    "@haklex/rich-renderer-image": "workspace:*",
+    "@haklex/rich-renderer-linkcard": "workspace:*",
+    "@haklex/rich-renderer-mention": "workspace:*",
+    "@haklex/rich-renderer-mermaid": "workspace:*",
+    "@haklex/rich-renderer-ruby": "workspace:*",
+    "@haklex/rich-renderer-video": "workspace:*",
+    "@haklex/rich-static-renderer": "workspace:*",
+    "@lexical/react": "^0.44.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "lexical": "^0.44.0",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.10",
+    "vite-plugin-dts": "^4.5.4",
+    "vitest": "^4.1.5"
+  },
+  "peerDependencies": {
+    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-ext-chat": "workspace:*",
+    "@haklex/rich-ext-code-snippet": "workspace:*",
+    "@haklex/rich-ext-embed": "workspace:*",
+    "@haklex/rich-ext-excalidraw": "workspace:*",
+    "@haklex/rich-ext-gallery": "workspace:*",
+    "@haklex/rich-ext-nested-doc": "workspace:*",
+    "@haklex/rich-renderer-alert": "workspace:*",
+    "@haklex/rich-renderer-banner": "workspace:*",
+    "@haklex/rich-renderer-codeblock": "workspace:*",
+    "@haklex/rich-renderer-image": "workspace:*",
+    "@haklex/rich-renderer-linkcard": "workspace:*",
+    "@haklex/rich-renderer-mention": "workspace:*",
+    "@haklex/rich-renderer-mermaid": "workspace:*",
+    "@haklex/rich-renderer-ruby": "workspace:*",
+    "@haklex/rich-renderer-video": "workspace:*",
+    "@haklex/rich-static-renderer": "workspace:*",
+    "@lexical/react": "^0.44.0",
+    "lexical": "^0.44.0",
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "peerDependenciesMeta": {
+    "@haklex/rich-ext-chat": {
+      "optional": true
+    },
+    "@haklex/rich-ext-code-snippet": {
+      "optional": true
+    },
+    "@haklex/rich-ext-embed": {
+      "optional": true
+    },
+    "@haklex/rich-ext-excalidraw": {
+      "optional": true
+    },
+    "@haklex/rich-ext-gallery": {
+      "optional": true
+    },
+    "@haklex/rich-ext-nested-doc": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-alert": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-banner": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-codeblock": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-image": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-linkcard": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-mention": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-mermaid": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-ruby": {
+      "optional": true
+    },
+    "@haklex/rich-renderer-video": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "import": "./dist/index.mjs",
+        "types": "./dist/index.d.ts"
+      },
+      "./modules/embed": {
+        "import": "./dist/modules/embed/index.mjs",
+        "types": "./dist/modules/embed/index.d.ts"
+      },
+      "./modules/embed/node": {
+        "import": "./dist/modules/embed/node.mjs",
+        "types": "./dist/modules/embed/node.d.ts"
+      },
+      "./modules/code-block": {
+        "import": "./dist/modules/code-block/index.mjs",
+        "types": "./dist/modules/code-block/index.d.ts"
+      },
+      "./modules/code-block/renderer": {
+        "import": "./dist/modules/code-block/renderer.mjs",
+        "types": "./dist/modules/code-block/renderer.d.ts"
+      },
+      "./modules/link-card": {
+        "import": "./dist/modules/link-card/index.mjs",
+        "types": "./dist/modules/link-card/index.d.ts"
+      },
+      "./modules/link-card/renderer": {
+        "import": "./dist/modules/link-card/renderer.mjs",
+        "types": "./dist/modules/link-card/renderer.d.ts"
+      },
+      "./modules/gallery": {
+        "import": "./dist/modules/gallery/index.mjs",
+        "types": "./dist/modules/gallery/index.d.ts"
+      },
+      "./modules/gallery/node": {
+        "import": "./dist/modules/gallery/node.mjs",
+        "types": "./dist/modules/gallery/node.d.ts"
+      },
+      "./modules/gallery/renderer": {
+        "import": "./dist/modules/gallery/renderer.mjs",
+        "types": "./dist/modules/gallery/renderer.d.ts"
+      },
+      "./modules/code-snippet": {
+        "import": "./dist/modules/code-snippet/index.mjs",
+        "types": "./dist/modules/code-snippet/index.d.ts"
+      },
+      "./modules/code-snippet/node": {
+        "import": "./dist/modules/code-snippet/node.mjs",
+        "types": "./dist/modules/code-snippet/node.d.ts"
+      },
+      "./modules/code-snippet/renderer": {
+        "import": "./dist/modules/code-snippet/renderer.mjs",
+        "types": "./dist/modules/code-snippet/renderer.d.ts"
+      },
+      "./modules/chat": {
+        "import": "./dist/modules/chat/index.mjs",
+        "types": "./dist/modules/chat/index.d.ts"
+      },
+      "./modules/chat/node": {
+        "import": "./dist/modules/chat/node.mjs",
+        "types": "./dist/modules/chat/node.d.ts"
+      },
+      "./modules/chat/renderer": {
+        "import": "./dist/modules/chat/renderer.mjs",
+        "types": "./dist/modules/chat/renderer.d.ts"
+      },
+      "./modules/alert": {
+        "import": "./dist/modules/alert/index.mjs",
+        "types": "./dist/modules/alert/index.d.ts"
+      },
+      "./modules/alert/renderer": {
+        "import": "./dist/modules/alert/renderer.mjs",
+        "types": "./dist/modules/alert/renderer.d.ts"
+      },
+      "./modules/banner": {
+        "import": "./dist/modules/banner/index.mjs",
+        "types": "./dist/modules/banner/index.d.ts"
+      },
+      "./modules/banner/renderer": {
+        "import": "./dist/modules/banner/renderer.mjs",
+        "types": "./dist/modules/banner/renderer.d.ts"
+      },
+      "./modules/image": {
+        "import": "./dist/modules/image/index.mjs",
+        "types": "./dist/modules/image/index.d.ts"
+      },
+      "./modules/image/renderer": {
+        "import": "./dist/modules/image/renderer.mjs",
+        "types": "./dist/modules/image/renderer.d.ts"
+      },
+      "./modules/mention": {
+        "import": "./dist/modules/mention/index.mjs",
+        "types": "./dist/modules/mention/index.d.ts"
+      },
+      "./modules/mention/renderer": {
+        "import": "./dist/modules/mention/renderer.mjs",
+        "types": "./dist/modules/mention/renderer.d.ts"
+      },
+      "./modules/ruby": {
+        "import": "./dist/modules/ruby/index.mjs",
+        "types": "./dist/modules/ruby/index.d.ts"
+      },
+      "./modules/ruby/renderer": {
+        "import": "./dist/modules/ruby/renderer.mjs",
+        "types": "./dist/modules/ruby/renderer.d.ts"
+      },
+      "./modules/video": {
+        "import": "./dist/modules/video/index.mjs",
+        "types": "./dist/modules/video/index.d.ts"
+      },
+      "./modules/video/renderer": {
+        "import": "./dist/modules/video/renderer.mjs",
+        "types": "./dist/modules/video/renderer.d.ts"
+      },
+      "./modules/mermaid": {
+        "import": "./dist/modules/mermaid/index.mjs",
+        "types": "./dist/modules/mermaid/index.d.ts"
+      },
+      "./modules/mermaid/renderer": {
+        "import": "./dist/modules/mermaid/renderer.mjs",
+        "types": "./dist/modules/mermaid/renderer.d.ts"
+      },
+      "./modules/excalidraw": {
+        "import": "./dist/modules/excalidraw/index.mjs",
+        "types": "./dist/modules/excalidraw/index.d.ts"
+      },
+      "./modules/excalidraw/node": {
+        "import": "./dist/modules/excalidraw/node.mjs",
+        "types": "./dist/modules/excalidraw/node.d.ts"
+      },
+      "./modules/nested-doc": {
+        "import": "./dist/modules/nested-doc/index.mjs",
+        "types": "./dist/modules/nested-doc/index.d.ts"
+      },
+      "./modules/nested-doc/node": {
+        "import": "./dist/modules/nested-doc/node.mjs",
+        "types": "./dist/modules/nested-doc/node.d.ts"
+      },
+      "./style.css": "./dist/rich-compose.css"
+    },
+    "main": "./dist/index.mjs",
+    "types": "./dist/index.d.ts"
+  }
+}
