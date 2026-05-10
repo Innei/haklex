@@ -1,7 +1,8 @@
 import type { RendererConfig, RichEditorVariant } from '@haklex/rich-editor';
-import type { BuiltinNodeRenderer } from '@haklex/rich-static-renderer';
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
 import type { ComponentType, CSSProperties, ReactNode } from 'react';
+
+import type { BuiltinNodeRenderer } from '../static-renderer/types';
 
 export type RendererKey = keyof RendererConfig;
 

@@ -22,8 +22,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@haklex/rich-diff-core": "workspace:*",
-    "@haklex/rich-static-renderer": "workspace:*"
+    "@haklex/rich-diff-core": "workspace:*"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
@@ -38,6 +37,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-compose": "workspace:*",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
     "react": ">=19",

@@ -38,7 +38,7 @@ import '@haklex/rich-editor/style.css';
 <RichEditor variant="article" initialValue={savedState} onChange={(value) => save(value)} />;
 ```
 
-For read-only rendering, use `@haklex/rich-static-renderer` instead.
+For read-only rendering, use `@haklex/rich-compose` (exports `RichRenderer` and the modular composition API).
 
 ## Exports
 

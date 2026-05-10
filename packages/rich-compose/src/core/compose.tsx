@@ -3,10 +3,10 @@ import {
   type RendererConfig,
   type RichEditorVariant,
 } from '@haklex/rich-editor';
-import { RichRenderer } from '@haklex/rich-static-renderer';
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
 import { type ComponentType, Fragment, memo, type ReactNode, useCallback } from 'react';
 
+import { RichRenderer } from '../static-renderer';
 import { dedupNodes, mergeModules } from './dedup';
 import { wrapLazy } from './lazy';
 import type { ComposeRendererOptions, RichRendererBaseProps, RichRendererModule } from './types';

@@ -1,14 +1,18 @@
 import '@haklex/rich-diff/style.css';
 
+import { RichRenderer } from '@haklex/rich-compose';
 import { RichDiff } from '@haklex/rich-diff';
 import type { RichEditorVariant } from '@haklex/rich-editor';
 import { ColorSchemeProvider, getVariantClass } from '@haklex/rich-editor';
 import type { ChatMessage, ChatParticipant, ChatVariant } from '@haklex/rich-ext-chat';
 import { ChatRenderer } from '@haklex/rich-ext-chat/static';
+import type { CodeFile } from '@haklex/rich-ext-code-snippet';
+import { CodeSnippetRenderer } from '@haklex/rich-ext-code-snippet/static';
 import type { ExcalidrawEditRendererProps, ExcalidrawSnapshot } from '@haklex/rich-ext-excalidraw';
+import { ExcalidrawConfigProvider } from '@haklex/rich-ext-excalidraw/static';
+import type { GalleryImage, GalleryRendererProps } from '@haklex/rich-ext-gallery';
+import { GalleryRenderer } from '@haklex/rich-ext-gallery/static';
 import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static';
-import { ExcalidrawConfigProvider } from '@haklex/rich-renderers/excalidraw';
-import { RichRenderer } from '@haklex/rich-static-renderer';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { type FC, useCallback, useState } from 'react';
 
@@ -520,6 +524,253 @@ function ChatDetail() {
   );
 }
 
+// ── Code Snippet Section ──────────────────────────────────────
+
+interface CodeSnippetSample {
+  description: string;
+  files: CodeFile[];
+  key: string;
+  label: string;
+}
+
+const codeSnippetSamples: CodeSnippetSample[] = [
+  {
+    key: 'single',
+    label: 'Single File',
+    description: 'A single TypeScript module rendered with shiki dual-theme highlighting.',
+    files: [
+      {
+        filename: 'fibonacci.ts',
+        language: 'typescript',
+        code: `export function fibonacci(n: number): number {
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+console.log(fibonacci(10)); // 55`,
+      },
+    ],
+  },
+  {
+    key: 'multi',
+    label: 'Multi-File Tabs',
+    description: 'Multiple files share a tab strip; click to switch active file.',
+    files: [
+      {
+        filename: 'index.ts',
+        language: 'typescript',
+        code: `export function hello(name: string): string {
+  return \`Hello, \${name}!\`;
+}`,
+      },
+      {
+        filename: 'index.test.ts',
+        language: 'typescript',
+        code: `import { hello } from './index';
+
+test('greets', () => {
+  expect(hello('World')).toBe('Hello, World!');
+});`,
+      },
+      {
+        filename: 'README.md',
+        language: 'markdown',
+        code: `# Hello Module
+
+A trivial greeter for the **rich-ext-code-snippet** demo.`,
+      },
+    ],
+  },
+];
+
+interface CodeSnippetEditRendererComponent {
+  (props: { files: CodeFile[]; onFilesChange?: (files: CodeFile[]) => void }): ReturnType<FC>;
+}
+
+function CodeSnippetDetail() {
+  const theme = useTheme();
+  const [editFiles, setEditFiles] = useState<CodeFile[]>(codeSnippetSamples[1].files);
+  const [EditRenderer, setEditRenderer] = useState<CodeSnippetEditRendererComponent | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  if (!loaded) {
+    import('@haklex/rich-ext-code-snippet/edit').then((mod) => {
+      setEditRenderer(() => mod.CodeSnippetEditRenderer);
+      setLoaded(true);
+    });
+  }
+
+  return (
+    <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
+      <ColorSchemeProvider colorScheme={theme}>
+        <p
+          style={{
+            margin: '0 0 16px',
+            color: 'var(--demo-text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Static renderer uses <code>shiki</code> with dual light/dark themes. The edit variant
+          overlays an <strong>Edit</strong> button that opens a CodeMirror modal for tab-based
+          multi-file editing.
+        </p>
+
+        <div className="biz-grid">
+          {codeSnippetSamples.map((sample) => (
+            <Panel
+              badge={`code-snippet · ${sample.files.length} file${sample.files.length > 1 ? 's' : ''}`}
+              key={sample.key}
+              title={sample.label}
+            >
+              <p className="node-description">{sample.description}</p>
+              <div
+                className={`node-render ${getVariantClass('article')}`}
+                data-color-scheme={theme}
+                data-theme={theme}
+              >
+                <CodeSnippetRenderer files={sample.files} />
+              </div>
+            </Panel>
+          ))}
+
+          <Panel badge="code-snippet · edit" title="Edit Mode">
+            <p className="node-description">
+              Hover the snippet to reveal the Edit button. Saves write back into the editable state
+              — try renaming a file or modifying the code.
+            </p>
+            <div
+              className={`node-render ${getVariantClass('article')}`}
+              data-color-scheme={theme}
+              data-theme={theme}
+            >
+              {EditRenderer ? (
+                <EditRenderer files={editFiles} onFilesChange={setEditFiles} />
+              ) : (
+                <p style={{ color: 'var(--demo-text-muted)', fontSize: 14 }}>
+                  Loading edit renderer...
+                </p>
+              )}
+            </div>
+          </Panel>
+        </div>
+      </ColorSchemeProvider>
+    </PortalThemeProvider>
+  );
+}
+
+// ── Gallery Section ───────────────────────────────────────────
+
+const galleryLayouts = ['grid', 'masonry', 'carousel'] as const;
+type GalleryLayout = (typeof galleryLayouts)[number];
+
+const galleryStaticImages: GalleryImage[] = [
+  {
+    src: 'https://picsum.photos/id/1015/800/520',
+    alt: 'Mountain river',
+    width: 800,
+    height: 520,
+  },
+  { src: 'https://picsum.photos/id/1018/800/520', alt: 'Misty peaks', width: 800, height: 520 },
+  { src: 'https://picsum.photos/id/1019/800/520', alt: 'Forest lake', width: 800, height: 520 },
+  { src: 'https://picsum.photos/id/1039/800/520', alt: 'Coastline', width: 800, height: 520 },
+];
+
+const galleryEditInitial: GalleryImage[] = [
+  { src: 'https://picsum.photos/id/1043/800/520', alt: 'Field', width: 800, height: 520 },
+  { src: 'https://picsum.photos/id/1059/800/520', alt: 'Snow', width: 800, height: 520 },
+  { src: 'https://picsum.photos/id/1062/800/520', alt: 'Clouds', width: 800, height: 520 },
+];
+
+function GalleryDetail() {
+  const theme = useTheme();
+  const [staticLayout, setStaticLayout] = useState<GalleryLayout>('grid');
+  const [editImages, setEditImages] = useState<GalleryImage[]>(galleryEditInitial);
+  const [editLayout, setEditLayout] = useState<GalleryLayout>('grid');
+  const [EditRenderer, setEditRenderer] = useState<FC<GalleryRendererProps> | null>(null);
+  const [loaded, setLoaded] = useState(false);
+
+  if (!loaded) {
+    import('@haklex/rich-ext-gallery').then((mod) => {
+      setEditRenderer(() => mod.GalleryEditRenderer);
+      setLoaded(true);
+    });
+  }
+
+  return (
+    <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
+      <ColorSchemeProvider colorScheme={theme}>
+        <p
+          style={{
+            margin: '0 0 16px',
+            color: 'var(--demo-text-muted)',
+            fontSize: 14,
+          }}
+        >
+          Three layouts: <strong>Grid</strong> (uniform columns), <strong>Masonry</strong> (variable
+          height), <strong>Carousel</strong> (horizontal scroll with autoplay and indicators). Click
+          any image to open the lightbox.
+        </p>
+
+        <div className="toolbar" style={{ marginBottom: 16 }}>
+          <div className="toolbar-group">
+            <span className="toolbar-label">Layout</span>
+            {galleryLayouts.map((l) => (
+              <button
+                className={staticLayout === l ? 'btn btn-active' : 'btn'}
+                key={l}
+                onClick={() => setStaticLayout(l)}
+              >
+                {l[0].toUpperCase() + l.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <Panel badge={`gallery · ${staticLayout}`} title="Static Renderer">
+          <p className="node-description">
+            Read-only display. Carousel mode autoplays with bidirectional scroll until the user
+            interacts.
+          </p>
+          <div
+            className={`node-render ${getVariantClass('article')}`}
+            data-color-scheme={theme}
+            data-theme={theme}
+          >
+            <GalleryRenderer images={galleryStaticImages} layout={staticLayout} />
+          </div>
+        </Panel>
+
+        <div style={{ height: 16 }} />
+
+        <Panel badge={`gallery · edit · ${editLayout}`} title="Edit Mode">
+          <p className="node-description">
+            Hover to reveal the Edit button. The dialog supports drag-reorder, add/remove, and a
+            segmented control for layout switching.
+          </p>
+          <div
+            className={`node-render ${getVariantClass('article')}`}
+            data-color-scheme={theme}
+            data-theme={theme}
+          >
+            {EditRenderer ? (
+              <EditRenderer
+                images={editImages}
+                layout={editLayout}
+                onImagesChange={setEditImages}
+                onLayoutChange={setEditLayout}
+              />
+            ) : (
+              <p style={{ color: 'var(--demo-text-muted)', fontSize: 14 }}>
+                Loading edit renderer...
+              </p>
+            )}
+          </div>
+        </Panel>
+      </ColorSchemeProvider>
+    </PortalThemeProvider>
+  );
+}
+
 // ── Detail Router ─────────────────────────────────────────────
 
 function ExtensionDetail({ id }: { id: string }) {
@@ -527,11 +778,17 @@ function ExtensionDetail({ id }: { id: string }) {
     case 'chat': {
       return <ChatDetail />;
     }
+    case 'code-snippet': {
+      return <CodeSnippetDetail />;
+    }
     case 'excalidraw': {
       return <ExcalidrawDetail />;
     }
     case 'diff': {
       return <DiffDetail />;
+    }
+    case 'gallery': {
+      return <GalleryDetail />;
     }
     case 'linkcard': {
       return <LinkCardDetail />;

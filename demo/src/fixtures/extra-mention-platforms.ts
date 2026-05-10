@@ -1,4 +1,4 @@
-import type { MentionPlatformMeta } from '@haklex/rich-kit-shiro';
+import type { MentionPlatformMeta } from '@haklex/rich-renderer-mention/static';
 import {
   SiBilibili,
   SiDiscord,

@@ -119,7 +119,6 @@ haklex/
 │   ├── rich-agent-chat/           # Chat panel UI for AI interaction (used by demo / integrations)
 │   ├── rich-diff-core/            # Lexical diff engine (structural + decoration; shared by agent + diff UI)
 │   ├── rich-ext-*/               # Heavy extensions (ai-agent, chat snapshots, code-snippet, embed, excalidraw, gallery, nested-doc)
-│   ├── rich-kit-shiro/           # Integration bundle for Shiroi (ShiroEditor + ShiroRenderer)
 │   ├── rich-diff/                # Diff viewer
 │   └── cm-editor/                # Shared CodeMirror 6 utilities
 ├── vite.shared.ts                # Shared Vite config factory
@@ -131,21 +130,21 @@ haklex/
 ### Dependency Graph
 
 ```
-@haklex/rich-kit-shiro (integration bundle)
-├── @haklex/rich-editor (core)
-│   ├── @haklex/rich-editor-ui
-│   ├── @haklex/rich-headless
-│   └── @haklex/rich-style-token
-├── @haklex/rich-static-renderer
-├── @haklex/rich-renderers
-├── @haklex/rich-renderers-edit
-├── @haklex/rich-ext-ai-agent (AI writing agent + diff review UI)
-│   ├── @haklex/rich-agent-core → @haklex/rich-litexml
-│   └── @haklex/rich-diff-core
-├── @haklex/rich-agent-chat → @haklex/rich-agent-core, @haklex/rich-diff-core (chat UI; optional integration)
-├── @haklex/rich-ext-{chat, code-snippet, embed, excalidraw, gallery, nested-doc}
-├── @haklex/rich-plugin-{block-handle, floating-toolbar, link-edit, mention, slash-menu, table, toolbar}
-└── @haklex/rich-renderer-katex
+@haklex/rich-editor (core)
+├── @haklex/rich-editor-ui
+├── @haklex/rich-headless
+└── @haklex/rich-style-token
+
+@haklex/rich-compose (modular composition API + SSR engine `RichRenderer`)
+
+@haklex/rich-ext-ai-agent (AI writing agent + diff review UI)
+├── @haklex/rich-agent-core → @haklex/rich-litexml
+└── @haklex/rich-diff-core
+
+@haklex/rich-agent-chat → @haklex/rich-agent-core, @haklex/rich-diff-core (chat UI; optional integration)
+@haklex/rich-ext-{chat, code-snippet, embed, excalidraw, gallery, nested-doc}
+@haklex/rich-plugin-{block-handle, floating-toolbar, link-edit, mention, slash-menu, table, toolbar}
+@haklex/rich-renderer-{alert, banner, codeblock, image, linkcard, mention, mermaid, ruby, video, katex}
 
 @haklex/rich-litexml (standalone; consumed by @haklex/rich-agent-core and others)
 @haklex/rich-diff → @haklex/rich-diff-core (standalone diff viewer)
@@ -155,13 +154,13 @@ haklex/
 
 ### Core
 
-| Package                        | Description                                                                                      |
-| ------------------------------ | ------------------------------------------------------------------------------------------------ |
-| `@haklex/rich-editor`          | Core editor component, all builtin + custom Lexical nodes, built-in plugins, editor contexts     |
-| `@haklex/rich-editor-ui`       | Headless UI primitives — Dialog, Dropdown, Popover, Combobox, Tooltip, ColorPicker, AnimatedTabs |
-| `@haklex/rich-headless`        | Zero-React node registry for server-side Lexical JSON → Markdown conversion                      |
-| `@haklex/rich-style-token`     | Design tokens, CSS variables, and variant presets                                                |
-| `@haklex/rich-static-renderer` | `RichRenderer` — renders Lexical JSON to React without loading the editor                        |
+| Package                    | Description                                                                                      |
+| -------------------------- | ------------------------------------------------------------------------------------------------ |
+| `@haklex/rich-editor`      | Core editor component, all builtin + custom Lexical nodes, built-in plugins, editor contexts     |
+| `@haklex/rich-editor-ui`   | Headless UI primitives — Dialog, Dropdown, Popover, Combobox, Tooltip, ColorPicker, AnimatedTabs |
+| `@haklex/rich-headless`    | Zero-React node registry for server-side Lexical JSON → Markdown conversion                      |
+| `@haklex/rich-style-token` | Design tokens, CSS variables, and variant presets                                                |
+| `@haklex/rich-compose`     | Module composition API (`composeRenderer`, `RichRendererModule`) + `RichRenderer` SSR engine     |
 
 ### Renderers
 
@@ -180,7 +179,7 @@ Each renderer has a **static** variant (display-only) and an **edit** variant (i
 | `rich-renderer-ruby`      | Ruby annotations for CJK text                                   |
 | `rich-renderer-katex`     | KaTeX math (inline and block)                                   |
 
-Aggregated by `@haklex/rich-renderers` (static) and `@haklex/rich-renderers-edit` (edit).
+Composed via `@haklex/rich-compose` modules. Apps that need a pre-baked editor + renderer (the legacy `ShiroEditor` / `ShiroRenderer`) own a local copy — see `demo/src/shiro/` and `admin-vue3/packages/rich-react/src/shiro/`.
 
 ### Plugins
 
@@ -208,15 +207,14 @@ Aggregated by `@haklex/rich-renderers` (static) and `@haklex/rich-renderers-edit
 
 ### Integration & Utilities
 
-| Package                   | Description                                                                               |
-| ------------------------- | ----------------------------------------------------------------------------------------- |
-| `@haklex/rich-kit-shiro`  | Pre-configured bundle — `ShiroEditor` and `ShiroRenderer` with all plugins and extensions |
-| `@haklex/rich-litexml`    | Bidirectional Lexical JSON ↔ XML serialization for LLM-friendly document I/O              |
-| `@haklex/rich-agent-core` | Headless AI agent protocol, LiteXML-backed edits, and document/session state              |
-| `@haklex/rich-agent-chat` | Chat panel UI (tool calls, streaming) built on `rich-agent-core`                          |
-| `@haklex/rich-diff-core`  | Core Lexical diff engine — character-level and structural diff with node decoration       |
-| `@haklex/rich-diff`       | Diff viewer for comparing two editor states (uses `rich-diff-core`)                       |
-| `@haklex/cm-editor`       | Shared CodeMirror 6 editor utilities                                                      |
+| Package                   | Description                                                                         |
+| ------------------------- | ----------------------------------------------------------------------------------- |
+| `@haklex/rich-litexml`    | Bidirectional Lexical JSON ↔ XML serialization for LLM-friendly document I/O        |
+| `@haklex/rich-agent-core` | Headless AI agent protocol, LiteXML-backed edits, and document/session state        |
+| `@haklex/rich-agent-chat` | Chat panel UI (tool calls, streaming) built on `rich-agent-core`                    |
+| `@haklex/rich-diff-core`  | Core Lexical diff engine — character-level and structural diff with node decoration |
+| `@haklex/rich-diff`       | Diff viewer for comparing two editor states (uses `rich-diff-core`)                 |
+| `@haklex/cm-editor`       | Shared CodeMirror 6 editor utilities                                                |
 
 ## Variant System
 
@@ -254,7 +252,7 @@ function MyEditor() {
 ### Static Renderer (Read-Only Display)
 
 ```tsx
-import { RichRenderer } from '@haklex/rich-static-renderer';
+import { RichRenderer } from '@haklex/rich-compose';
 import '@haklex/rich-editor/style.css';
 
 function MyArticle({ content }) {
@@ -277,18 +275,9 @@ editor.read(() => {
 });
 ```
 
-### Integration Bundle (Shiroi)
+### Pre-Baked Editor / Renderer (per-app)
 
-```tsx
-import { ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro'
-import '@haklex/rich-kit-shiro/style.css'
-
-// Editor with all plugins and extensions pre-configured
-<ShiroEditor variant="article" onChange={handleChange} />
-
-// Renderer with all renderers pre-configured
-<ShiroRenderer value={editorState} variant="article" />
-```
+Apps that want a "batteries included" surface own a local `ShiroEditor` / `ShiroRenderer` wrapper composed from `@haklex/rich-compose` modules + per-renderer / per-plugin packages. See `demo/src/shiro/` for a reference copy.
 
 ## Available Scripts
 
@@ -317,11 +306,11 @@ See [`.specstory/README.md`](.specstory/README.md) for a session index and notes
 
 ## Downstream Consumers
 
-| Project                                                  | Stack   | Package                  | Integration                                                       |
-| -------------------------------------------------------- | ------- | ------------------------ | ----------------------------------------------------------------- |
-| **[Shiroi](https://github.com/innei-dev/Shiroi)**        | Next.js | `@haklex/rich-kit-shiro` | Native React                                                      |
-| **[admin-vue3](https://github.com/mx-space/admin-vue3)** | Vue 3   | Multiple `@haklex/*`     | React-in-Vue bridge (`createRoot()` inside Vue `defineComponent`) |
-| **[mx-core](https://github.com/mx-space/core)**          | NestJS  | `@haklex/rich-headless`  | Server-side Lexical JSON → Markdown                               |
+| Project                                                  | Stack   | Package                                    | Integration                                                       |
+| -------------------------------------------------------- | ------- | ------------------------------------------ | ----------------------------------------------------------------- |
+| **[Shiroi](https://github.com/innei-dev/Shiroi)**        | Next.js | `@haklex/rich-compose` + per-renderer pkgs | Native React with local Shiro wrapper                             |
+| **[admin-vue3](https://github.com/mx-space/admin-vue3)** | Vue 3   | Multiple `@haklex/*`                       | React-in-Vue bridge (`createRoot()` inside Vue `defineComponent`) |
+| **[mx-core](https://github.com/mx-space/core)**          | NestJS  | `@haklex/rich-headless`                    | Server-side Lexical JSON → Markdown                               |
 
 ## Contributing
 

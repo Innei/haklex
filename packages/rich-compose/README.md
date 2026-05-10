@@ -2,11 +2,9 @@
 
 Compose primitives for haklex rich content renderers — Gundam-style assembly of Lexical nodes, sync/lazy renderers, and Provider stacks.
 
-Status: experimental (`0.1.0`). The renderer side is being migrated from `@haklex/rich-kit-shiro/renderer`. The editor side is out of scope.
-
 ## Why
 
-`@haklex/rich-kit-shiro/renderer` ships every default renderer eagerly: even when a consumer overrides `CodeBlock` or `LinkCard`, the upstream `shiki` and `LinkCardRenderer` chains stay in the production bundle. `rich-compose` solves three problems at once:
+The legacy `@haklex/rich-kit-shiro/renderer` (now removed) shipped every default renderer eagerly: even when a consumer overrode `CodeBlock` or `LinkCard`, the upstream `shiki` and `LinkCardRenderer` chains stayed in the production bundle. `rich-compose` solves three problems at once:
 
 1. **Subtractable** — drop a module by not importing it.
 2. **Replaceable** — swap a default renderer with no leftover bytes from the original.
@@ -22,12 +20,11 @@ pnpm add @haklex/rich-compose
 
 ## Peer Dependencies
 
-| Package                        | Version   |
-| ------------------------------ | --------- |
-| `react` / `react-dom`          | `>=19`    |
-| `lexical` / `@lexical/react`   | `^0.44.0` |
-| `@haklex/rich-editor`          | workspace |
-| `@haklex/rich-static-renderer` | workspace |
+| Package                      | Version   |
+| ---------------------------- | --------- |
+| `react` / `react-dom`        | `>=19`    |
+| `lexical` / `@lexical/react` | `^0.44.0` |
+| `@haklex/rich-editor`        | workspace |
 
 Per-module upstream packages (`@haklex/rich-ext-*`, `@haklex/rich-renderer-*`) are optional peers — install only those you compose into your renderer.
 

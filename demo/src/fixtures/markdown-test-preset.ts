@@ -1,5 +1,5 @@
-import type { EmbedType, SerializedEmbedNode } from '@haklex/rich-renderers'
-import type { SerializedEditorState } from 'lexical'
+import type { EmbedType, SerializedEmbedNode } from '@haklex/rich-ext-embed/static';
+import type { SerializedEditorState } from 'lexical';
 
 import {
   doc,
@@ -23,8 +23,8 @@ import {
   tableCell,
   tableRow,
   text,
-} from './helpers'
-import type { Preset } from './presets'
+} from './helpers';
+import type { Preset } from './presets';
 
 // task list helpers
 function taskList(...children: any[]) {
@@ -38,7 +38,7 @@ function taskList(...children: any[]) {
     format: '',
     indent: 0,
     version: 1,
-  }
+  };
 }
 
 function taskItem(checked: boolean, value: number, label: string) {
@@ -51,7 +51,7 @@ function taskItem(checked: boolean, value: number, label: string) {
     format: '',
     indent: 0,
     version: 1,
-  }
+  };
 }
 
 function alertQuote(alertType: string, ...children: any[]) {
@@ -69,7 +69,7 @@ function alertQuote(alertType: string, ...children: any[]) {
       },
     },
     version: 1,
-  }
+  };
 }
 
 function banner(bannerType: string, ...children: any[]) {
@@ -81,7 +81,7 @@ function banner(bannerType: string, ...children: any[]) {
     format: '',
     indent: 0,
     version: 1,
-  }
+  };
 }
 
 function details(summary: string, ...children: any[]) {
@@ -94,7 +94,7 @@ function details(summary: string, ...children: any[]) {
     format: '',
     indent: 0,
     version: 1,
-  }
+  };
 }
 
 function grid(cols: number, gap: number, ...children: any[]) {
@@ -107,19 +107,19 @@ function grid(cols: number, gap: number, ...children: any[]) {
     format: '',
     indent: 0,
     version: 1,
-  }
+  };
 }
 
 function codeBlock(language: string, code: string) {
-  return { type: 'code-block', language, code, version: 1 }
+  return { type: 'code-block', language, code, version: 1 };
 }
 
 function katexBlock(equation: string) {
-  return { type: 'katex-block', equation, version: 1 }
+  return { type: 'katex-block', equation, version: 1 };
 }
 
 function katexInline(equation: string) {
-  return { type: 'katex-inline', equation, version: 1 }
+  return { type: 'katex-inline', equation, version: 1 };
 }
 
 function image(
@@ -139,22 +139,19 @@ function image(
     ...(height != null && { height }),
     ...(thumbhash != null && { thumbhash }),
     version: 1,
-  }
+  };
 }
 
 function video(src: string) {
-  return { type: 'video', src, version: 1 }
+  return { type: 'video', src, version: 1 };
 }
 
 function linkCard(url: string, title?: string, description?: string) {
-  return { type: 'link-card', url, title, description, version: 1 }
+  return { type: 'link-card', url, title, description, version: 1 };
 }
 
-function embed(
-  url: string,
-  source: EmbedType | null = null,
-): SerializedEmbedNode {
-  return { type: 'embed', url, source, version: 1 }
+function embed(url: string, source: EmbedType | null = null): SerializedEmbedNode {
+  return { type: 'embed', url, source, version: 1 };
 }
 
 function mention(platform: string, handle: string, displayName?: string) {
@@ -164,35 +161,35 @@ function mention(platform: string, handle: string, displayName?: string) {
     handle,
     ...(displayName ? { displayName } : {}),
     version: 1,
-  }
+  };
 }
 
 function footnote(identifier: string) {
-  return { type: 'footnote', identifier, version: 1 }
+  return { type: 'footnote', identifier, version: 1 };
 }
 
 function spoiler(...children: any[]) {
-  return { type: 'spoiler', children, version: 1 }
+  return { type: 'spoiler', children, version: 1 };
 }
 
 function gallery(
   images: {
-    src: string
-    alt?: string
-    width?: number
-    height?: number
-    thumbhash?: string
+    src: string;
+    alt?: string;
+    width?: number;
+    height?: number;
+    thumbhash?: string;
   }[],
   layout: 'grid' | 'masonry' | 'carousel' = 'grid',
 ) {
-  return { type: 'gallery', images, layout, version: 1 }
+  return { type: 'gallery', images, layout, version: 1 };
 }
 
 function indentedListItem(indent: number, label: string) {
-  return { ...listItem(paragraph(text(label))), indent }
+  return { ...listItem(paragraph(text(label))), indent };
 }
 
-const IMG_BASE = 'https://xcimg.szwego.com/img/f71fe4b2'
+const IMG_BASE = 'https://xcimg.szwego.com/img/f71fe4b2';
 
 export const markdownTestPreset: Preset = {
   key: 'markdown-test',
@@ -224,26 +221,10 @@ export const markdownTestPreset: Preset = {
       text('粗斜体', FORMAT_BOLD | FORMAT_ITALIC),
       text('。'),
     ),
-    paragraph(
-      text('这是'),
-      text('删除线', FORMAT_STRIKETHROUGH),
-      text('文本。'),
-    ),
-    paragraph(
-      text('这是 '),
-      text('高亮标记', FORMAT_HIGHLIGHT),
-      text(' 文本。'),
-    ),
-    paragraph(
-      text('这是 '),
-      text('插入文本', FORMAT_UNDERLINE),
-      text(' 效果。'),
-    ),
-    paragraph(
-      text('这是 '),
-      spoiler(text('剧透文本，鼠标悬停显示')) as any,
-      text(' 效果。'),
-    ),
+    paragraph(text('这是'), text('删除线', FORMAT_STRIKETHROUGH), text('文本。')),
+    paragraph(text('这是 '), text('高亮标记', FORMAT_HIGHLIGHT), text(' 文本。')),
+    paragraph(text('这是 '), text('插入文本', FORMAT_UNDERLINE), text(' 效果。')),
+    paragraph(text('这是 '), spoiler(text('剧透文本，鼠标悬停显示')) as any, text(' 效果。')),
 
     // 引用
     heading('h3', text('引用')),
@@ -298,16 +279,8 @@ export const markdownTestPreset: Preset = {
     heading('h2', text('代码')),
 
     heading('h3', text('行内代码')),
-    paragraph(
-      text('这是 '),
-      text('inline code', FORMAT_CODE),
-      text(' 行内代码示例。'),
-    ),
-    paragraph(
-      text('使用 '),
-      text('npm install', FORMAT_CODE),
-      text(' 安装依赖。'),
-    ),
+    paragraph(text('这是 '), text('inline code', FORMAT_CODE), text(' 行内代码示例。')),
+    paragraph(text('使用 '), text('npm install', FORMAT_CODE), text(' 安装依赖。')),
 
     heading('h3', text('代码块')),
     codeBlock(
@@ -521,15 +494,8 @@ docker compose up -d`,
     paragraph(link('https://github.com/Innei/Shiro', text('Shiroi 项目'))),
 
     heading('h3', text('自动链接')),
-    paragraph(
-      link('https://github.com/Innei', text('https://github.com/Innei')),
-    ),
-    paragraph(
-      link(
-        'https://github.com/Innei/Shiro',
-        text('https://github.com/Innei/Shiro'),
-      ),
-    ),
+    paragraph(link('https://github.com/Innei', text('https://github.com/Innei'))),
+    paragraph(link('https://github.com/Innei/Shiro', text('https://github.com/Innei/Shiro'))),
 
     horizontalRule(),
 
@@ -548,10 +514,7 @@ docker compose up -d`,
     ) as any,
 
     heading('h3', text('GitHub PR')),
-    linkCard(
-      'https://github.com/Innei/Shiro/pull/129',
-      'Innei/Shiro - Pull Request #129',
-    ) as any,
+    linkCard('https://github.com/Innei/Shiro/pull/129', 'Innei/Shiro - Pull Request #129') as any,
 
     heading('h3', text('GitHub 文件预览')),
     embed(
@@ -566,16 +529,10 @@ docker compose up -d`,
     embed('https://www.youtube.com/watch?v=N93cTbtLCIM', 'youtube'),
 
     heading('h3', text('GitHub Gist')),
-    embed(
-      'https://gist.github.com/Innei/94b3e8f078d29e1820813a24a3d8b04e',
-      'github-gist',
-    ),
+    embed('https://gist.github.com/Innei/94b3e8f078d29e1820813a24a3d8b04e', 'github-gist'),
 
     heading('h3', text('CodeSandbox')),
-    embed(
-      'https://codesandbox.io/s/framer-motion-layoutroot-prop-forked-p39g96',
-      'codesandbox',
-    ),
+    embed('https://codesandbox.io/s/framer-motion-layoutroot-prop-forked-p39g96', 'codesandbox'),
 
     heading('h3', text('站内文章链接')),
     paragraph(text('如果链接指向本站的文章，会自动渲染为卡片形式：')),
@@ -608,31 +565,19 @@ docker compose up -d`,
     linkCard('https://bgm.tv/subject/424883', 'Bangumi Subject') as any,
 
     heading('h3', text('LeetCode 题目')),
-    linkCard(
-      'https://leetcode.cn/problems/two-sum',
-      'Two Sum - LeetCode',
-    ) as any,
+    linkCard('https://leetcode.cn/problems/two-sum', 'Two Sum - LeetCode') as any,
 
     heading('h3', text('网易云音乐')),
     linkCard('https://music.163.com/#/song?id=1901371647', '网易云音乐') as any,
 
     heading('h3', text('QQ 音乐')),
-    linkCard(
-      'https://y.qq.com/n/ryqq/songDetail/003aAYrm3GE0Ac',
-      'QQ 音乐',
-    ) as any,
+    linkCard('https://y.qq.com/n/ryqq/songDetail/003aAYrm3GE0Ac', 'QQ 音乐') as any,
 
     heading('h3', text('Bilibili 视频')),
-    linkCard(
-      'https://www.bilibili.com/video/BV1GJ411x7h7',
-      'Bilibili 视频',
-    ) as any,
+    linkCard('https://www.bilibili.com/video/BV1GJ411x7h7', 'Bilibili 视频') as any,
 
     heading('h3', text('TMDB 影视')),
-    linkCard(
-      'https://www.themoviedb.org/movie/550-fight-club',
-      'Fight Club - TMDB',
-    ) as any,
+    linkCard('https://www.themoviedb.org/movie/550-fight-club', 'Fight Club - TMDB') as any,
 
     horizontalRule(),
 
@@ -662,20 +607,11 @@ docker compose up -d`,
       paragraph(text('这是一条提示信息，用户在浏览内容时应该了解的有用信息。')),
     ) as any,
 
-    alertQuote(
-      'tip',
-      paragraph(text('这是一条小技巧，帮助用户更好或更轻松地完成任务。')),
-    ) as any,
+    alertQuote('tip', paragraph(text('这是一条小技巧，帮助用户更好或更轻松地完成任务。'))) as any,
 
-    alertQuote(
-      'important',
-      paragraph(text('这是重要信息，用户需要了解才能实现目标。')),
-    ) as any,
+    alertQuote('important', paragraph(text('这是重要信息，用户需要了解才能实现目标。'))) as any,
 
-    alertQuote(
-      'warning',
-      paragraph(text('这是警告信息，需要用户立即注意以避免问题。')),
-    ) as any,
+    alertQuote('warning', paragraph(text('这是警告信息，需要用户立即注意以避免问题。'))) as any,
 
     alertQuote(
       'caution',
@@ -692,11 +628,7 @@ docker compose up -d`,
     heading('h3', text('Banner 提示框')),
     banner(
       'info',
-      paragraph(
-        text('这是一条信息提示，使用 '),
-        text('info', FORMAT_CODE),
-        text(' 类型。'),
-      ),
+      paragraph(text('这是一条信息提示，使用 '), text('info', FORMAT_CODE), text(' 类型。')),
     ) as any,
     banner('success', paragraph(text('操作成功！这是一条成功提示。'))) as any,
     banner('warning', paragraph(text('请注意！这是一条警告提示。'))) as any,
@@ -752,21 +684,9 @@ docker compose up -d`,
     grid(
       3,
       8,
-      paragraph(
-        text('卡片一', FORMAT_BOLD),
-        lineBreak() as any,
-        text('这是第一个网格项'),
-      ),
-      paragraph(
-        text('卡片二', FORMAT_BOLD),
-        lineBreak() as any,
-        text('这是第二个网格项'),
-      ),
-      paragraph(
-        text('卡片三', FORMAT_BOLD),
-        lineBreak() as any,
-        text('这是第三个网格项'),
-      ),
+      paragraph(text('卡片一', FORMAT_BOLD), lineBreak() as any, text('这是第一个网格项')),
+      paragraph(text('卡片二', FORMAT_BOLD), lineBreak() as any, text('这是第二个网格项')),
+      paragraph(text('卡片三', FORMAT_BOLD), lineBreak() as any, text('这是第三个网格项')),
     ) as any,
 
     heading('h3', text('图片网格')),
@@ -920,11 +840,7 @@ docker compose up -d`,
       '点击展开查看更多内容',
       paragraph(text('这里是被折叠的内容。')),
       paragraph(text('可以包含任何 Markdown 格式：')),
-      list(
-        'bullet',
-        listItem(paragraph(text('列表项 1'))),
-        listItem(paragraph(text('列表项 2'))),
-      ),
+      list('bullet', listItem(paragraph(text('列表项 1'))), listItem(paragraph(text('列表项 2')))),
       codeBlock('javascript', "console.log('折叠内容中的代码');") as any,
     ) as any,
 
@@ -948,9 +864,7 @@ docker compose up -d`,
     // # 视频嵌入
     // ==============================
     heading('h2', text('视频嵌入')),
-    video(
-      'https://xcimg.szwego.com/pvod/f71fe4b2/124790f5-c9f8-4123-a94e-a5ea7034fc26.mp4',
-    ) as any,
+    video('https://xcimg.szwego.com/pvod/f71fe4b2/124790f5-c9f8-4123-a94e-a5ea7034fc26.mp4') as any,
 
     horizontalRule(),
 
@@ -1040,18 +954,8 @@ docker compose up -d`,
     // # HTML 标签支持
     // ==============================
     heading('h2', text('HTML 标签支持')),
-    paragraph(
-      text('Ctrl', FORMAT_CODE),
-      text(' + '),
-      text('C', FORMAT_CODE),
-      text(' 复制'),
-    ),
-    paragraph(
-      text('Ctrl', FORMAT_CODE),
-      text(' + '),
-      text('V', FORMAT_CODE),
-      text(' 粘贴'),
-    ),
+    paragraph(text('Ctrl', FORMAT_CODE), text(' + '), text('C', FORMAT_CODE), text(' 复制')),
+    paragraph(text('Ctrl', FORMAT_CODE), text(' + '), text('V', FORMAT_CODE), text(' 粘贴')),
     paragraph(text('这是使用 HTML mark 标签的高亮', FORMAT_HIGHLIGHT)),
     paragraph(text('HTML', FORMAT_CODE), text(' 是一种标记语言。')),
     paragraph(text('这是插入的文本', FORMAT_UNDERLINE)),
@@ -1095,14 +999,10 @@ docker compose up -d`,
     // # 总结
     // ==============================
     heading('h2', text('总结')),
-    paragraph(
-      text('以上就是 Shiroi 博客系统支持的所有 Markdown 渲染功能测试。包括：'),
-    ),
+    paragraph(text('以上就是 Shiroi 博客系统支持的所有 Markdown 渲染功能测试。包括：')),
     list(
       'number',
-      listItem(
-        paragraph(text('基础 Markdown 语法（标题、粗体、斜体、删除线）')),
-      ),
+      listItem(paragraph(text('基础 Markdown 语法（标题、粗体、斜体、删除线）'))),
       listItem(paragraph(text('GFM 扩展（表格、任务列表）'))),
       listItem(paragraph(text('代码高亮（Shiki 引擎，支持多种语言）'))),
       listItem(paragraph(text('数学公式（KaTeX，行内和块级）'))),
@@ -1121,31 +1021,23 @@ docker compose up -d`,
       indentedListItem(11, 'TMDB 影视') as any,
       indentedListItem(12, '站内文章') as any,
       listItem(paragraph(text('LinkCard 组件（手动指定类型）'))),
-      listItem(
-        paragraph(text('Container 容器（Banner、Grid、Gallery、Masonry）')),
-      ),
+      listItem(paragraph(text('Container 容器（Banner、Grid、Gallery、Masonry）'))),
       listItem(paragraph(text('折叠内容（Details）'))),
       listItem(paragraph(text('Mermaid 图表（流程图、时序图、饼图、甘特图）'))),
       listItem(paragraph(text('Excalidraw 手绘图'))),
       listItem(paragraph(text('远程 React 组件嵌入'))),
-      listItem(
-        paragraph(
-          text('GitHub 风格 Alerts（NOTE、TIP、IMPORTANT、WARNING、CAUTION）'),
-        ),
-      ),
+      listItem(paragraph(text('GitHub 风格 Alerts（NOTE、TIP、IMPORTANT、WARNING、CAUTION）'))),
       listItem(paragraph(text('@ 提及（GitHub/Twitter/Telegram）'))),
       listItem(paragraph(text('剧透文本（||spoiler||）'))),
       listItem(paragraph(text('高亮标记（==mark==）'))),
       listItem(paragraph(text('插入文本（++insert++）'))),
       listItem(paragraph(text('脚注'))),
       listItem(paragraph(text('视频嵌入'))),
-      listItem(
-        paragraph(text('HTML 标签支持（kbd、sup、sub、mark、abbr 等）')),
-      ),
+      listItem(paragraph(text('HTML 标签支持（kbd、sup、sub、mark、abbr 等）'))),
       listItem(paragraph(text('Tag 标签组件'))),
     ),
 
     horizontalRule(),
     paragraph(text('最后更新：2026-01-11', FORMAT_ITALIC)),
   ) as SerializedEditorState,
-}
+};

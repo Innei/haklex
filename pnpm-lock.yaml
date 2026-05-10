@@ -114,6 +114,9 @@ importers:
       '@haklex/rich-agent-core':
         specifier: workspace:*
         version: link:../packages/rich-agent-core
+      '@haklex/rich-compose':
+        specifier: workspace:*
+        version: link:../packages/rich-compose
       '@haklex/rich-diff':
         specifier: workspace:*
         version: link:../packages/rich-diff
@@ -129,30 +132,75 @@ importers:
       '@haklex/rich-ext-chat':
         specifier: workspace:*
         version: link:../packages/rich-ext-chat
+      '@haklex/rich-ext-code-snippet':
+        specifier: workspace:*
+        version: link:../packages/rich-ext-code-snippet
+      '@haklex/rich-ext-embed':
+        specifier: workspace:*
+        version: link:../packages/rich-ext-embed
       '@haklex/rich-ext-excalidraw':
         specifier: workspace:*
         version: link:../packages/rich-ext-excalidraw
+      '@haklex/rich-ext-gallery':
+        specifier: workspace:*
+        version: link:../packages/rich-ext-gallery
       '@haklex/rich-ext-nested-doc':
         specifier: workspace:*
         version: link:../packages/rich-ext-nested-doc
       '@haklex/rich-ext-poll':
         specifier: workspace:*
         version: link:../packages/rich-ext-poll
-      '@haklex/rich-kit-shiro':
+      '@haklex/rich-plugin-block-handle':
         specifier: workspace:*
-        version: link:../packages/rich-kit-shiro
+        version: link:../packages/rich-plugin-block-handle
+      '@haklex/rich-plugin-floating-toolbar':
+        specifier: workspace:*
+        version: link:../packages/rich-plugin-floating-toolbar
+      '@haklex/rich-plugin-link-edit':
+        specifier: workspace:*
+        version: link:../packages/rich-plugin-link-edit
+      '@haklex/rich-plugin-mention':
+        specifier: workspace:*
+        version: link:../packages/rich-plugin-mention
+      '@haklex/rich-plugin-slash-menu':
+        specifier: workspace:*
+        version: link:../packages/rich-plugin-slash-menu
+      '@haklex/rich-plugin-table':
+        specifier: workspace:*
+        version: link:../packages/rich-plugin-table
       '@haklex/rich-plugin-toolbar':
         specifier: workspace:*
         version: link:../packages/rich-plugin-toolbar
+      '@haklex/rich-renderer-alert':
+        specifier: workspace:*
+        version: link:../packages/rich-renderer-alert
+      '@haklex/rich-renderer-banner':
+        specifier: workspace:*
+        version: link:../packages/rich-renderer-banner
+      '@haklex/rich-renderer-codeblock':
+        specifier: workspace:*
+        version: link:../packages/rich-renderer-codeblock
+      '@haklex/rich-renderer-image':
+        specifier: workspace:*
+        version: link:../packages/rich-renderer-image
+      '@haklex/rich-renderer-katex':
+        specifier: workspace:*
+        version: link:../packages/rich-renderer-katex
       '@haklex/rich-renderer-linkcard':
         specifier: workspace:*
         version: link:../packages/rich-renderer-linkcard
-      '@haklex/rich-renderers':
+      '@haklex/rich-renderer-mention':
         specifier: workspace:*
-        version: link:../packages/rich-renderers
-      '@haklex/rich-static-renderer':
+        version: link:../packages/rich-renderer-mention
+      '@haklex/rich-renderer-mermaid':
         specifier: workspace:*
-        version: link:../packages/rich-static-renderer
+        version: link:../packages/rich-renderer-mermaid
+      '@haklex/rich-renderer-ruby':
+        specifier: workspace:*
+        version: link:../packages/rich-renderer-ruby
+      '@haklex/rich-renderer-video':
+        specifier: workspace:*
+        version: link:../packages/rich-renderer-video
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../packages/rich-style-token
@@ -180,6 +228,9 @@ importers:
       '@lexical/table':
         specifier: ^0.44.0
         version: 0.44.0
+      katex:
+        specifier: ^0.16.45
+        version: 0.16.45
       lexical:
         specifier: ^0.44.0
         version: 0.44.0
@@ -354,6 +405,10 @@ importers:
         version: 4.1.5(@types/node@25.6.0)(happy-dom@20.9.0)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
 
   packages/rich-compose:
+    dependencies:
+      '@lexical/headless':
+        specifier: ^0.44.0
+        version: 0.44.0
     devDependencies:
       '@haklex/rich-editor':
         specifier: workspace:*
@@ -406,9 +461,9 @@ importers:
       '@haklex/rich-renderer-video':
         specifier: workspace:*
         version: link:../rich-renderer-video
-      '@haklex/rich-static-renderer':
+      '@haklex/rich-style-token':
         specifier: workspace:*
-        version: link:../rich-static-renderer
+        version: link:../rich-style-token
       '@lexical/react':
         specifier: ^0.44.0
         version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
@@ -418,9 +473,18 @@ importers:
       '@types/react-dom':
         specifier: ^19.2.3
         version: 19.2.3(@types/react@19.2.14)
+      '@vanilla-extract/css':
+        specifier: ^1.20.1
+        version: 1.20.1(babel-plugin-macros@3.1.0)
+      '@vanilla-extract/vite-plugin':
+        specifier: ^5.2.2
+        version: 5.2.2(@types/node@25.6.0)(babel-plugin-macros@3.1.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(yaml@2.8.3)
       lexical:
         specifier: ^0.44.0
         version: 0.44.0
+      lucide-react:
+        specifier: ^1.0.0
+        version: 1.12.0(react@19.2.5)
       react:
         specifier: 19.2.5
         version: 19.2.5
@@ -442,15 +506,15 @@ importers:
 
   packages/rich-diff:
     dependencies:
+      '@haklex/rich-compose':
+        specifier: workspace:*
+        version: link:../rich-compose
       '@haklex/rich-diff-core':
         specifier: workspace:*
         version: link:../rich-diff-core
       '@haklex/rich-editor':
         specifier: workspace:*
         version: link:../rich-editor
-      '@haklex/rich-static-renderer':
-        specifier: workspace:*
-        version: link:../rich-static-renderer
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../rich-style-token
@@ -637,6 +701,9 @@ importers:
       '@haklex/rich-agent-core':
         specifier: workspace:*
         version: link:../rich-agent-core
+      '@haklex/rich-compose':
+        specifier: workspace:*
+        version: link:../rich-compose
       '@haklex/rich-diff-core':
         specifier: workspace:*
         version: link:../rich-diff-core
@@ -649,9 +716,6 @@ importers:
       '@haklex/rich-litexml':
         specifier: workspace:*
         version: link:../rich-litexml
-      '@haklex/rich-static-renderer':
-        specifier: workspace:*
-        version: link:../rich-static-renderer
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../rich-style-token
@@ -1018,9 +1082,6 @@ importers:
       '@haklex/rich-editor-ui':
         specifier: workspace:*
         version: link:../rich-editor-ui
-      '@haklex/rich-static-renderer':
-        specifier: workspace:*
-        version: link:../rich-static-renderer
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../rich-style-token
@@ -1147,109 +1208,6 @@ importers:
       lexical:
         specifier: ^0.44.0
         version: 0.44.0
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      vite:
-        specifier: ^8.0.10
-        version: 8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
-      vite-plugin-dts:
-        specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.6.0)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
-
-  packages/rich-kit-shiro:
-    dependencies:
-      '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
-      '@haklex/rich-editor-ui':
-        specifier: workspace:*
-        version: link:../rich-editor-ui
-      '@haklex/rich-ext-chat':
-        specifier: workspace:*
-        version: link:../rich-ext-chat
-      '@haklex/rich-ext-code-snippet':
-        specifier: workspace:*
-        version: link:../rich-ext-code-snippet
-      '@haklex/rich-ext-embed':
-        specifier: workspace:*
-        version: link:../rich-ext-embed
-      '@haklex/rich-ext-excalidraw':
-        specifier: workspace:*
-        version: link:../rich-ext-excalidraw
-      '@haklex/rich-ext-nested-doc':
-        specifier: workspace:*
-        version: link:../rich-ext-nested-doc
-      '@haklex/rich-ext-poll':
-        specifier: workspace:*
-        version: link:../rich-ext-poll
-      '@haklex/rich-plugin-block-handle':
-        specifier: workspace:*
-        version: link:../rich-plugin-block-handle
-      '@haklex/rich-plugin-floating-toolbar':
-        specifier: workspace:*
-        version: link:../rich-plugin-floating-toolbar
-      '@haklex/rich-plugin-link-edit':
-        specifier: workspace:*
-        version: link:../rich-plugin-link-edit
-      '@haklex/rich-plugin-mention':
-        specifier: workspace:*
-        version: link:../rich-plugin-mention
-      '@haklex/rich-plugin-slash-menu':
-        specifier: workspace:*
-        version: link:../rich-plugin-slash-menu
-      '@haklex/rich-plugin-table':
-        specifier: workspace:*
-        version: link:../rich-plugin-table
-      '@haklex/rich-plugin-toolbar':
-        specifier: workspace:*
-        version: link:../rich-plugin-toolbar
-      '@haklex/rich-renderer-katex':
-        specifier: workspace:*
-        version: link:../rich-renderer-katex
-      '@haklex/rich-renderers':
-        specifier: workspace:*
-        version: link:../rich-renderers
-      '@haklex/rich-renderers-edit':
-        specifier: workspace:*
-        version: link:../rich-renderers-edit
-      '@haklex/rich-static-renderer':
-        specifier: workspace:*
-        version: link:../rich-static-renderer
-      '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
-      katex:
-        specifier: ^0.16.45
-        version: 0.16.45
-      lucide-react:
-        specifier: ^1.0.0
-        version: 1.7.0(react@19.2.5)
-      react-shadow:
-        specifier: ^20.6.0
-        version: 20.6.0(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-    devDependencies:
-      '@lexical/react':
-        specifier: ^0.44.0
-        version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
-      '@types/react':
-        specifier: ^19.2.14
-        version: 19.2.14
-      '@types/react-dom':
-        specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.14)
-      '@vanilla-extract/vite-plugin':
-        specifier: ^5.2.2
-        version: 5.2.2(@types/node@25.6.0)(babel-plugin-macros@3.1.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(yaml@2.8.3)
-      lexical:
-        specifier: ^0.44.0
-        version: 0.44.0
-      react:
-        specifier: 19.2.5
-        version: 19.2.5
-      react-dom:
-        specifier: 19.2.5
-        version: 19.2.5(react@19.2.5)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -2164,234 +2122,6 @@ importers:
         version: 19.2.5
       react-dom:
         specifier: 19.2.5
-        version: 19.2.5(react@19.2.5)
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      vite:
-        specifier: ^8.0.10
-        version: 8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
-      vite-plugin-dts:
-        specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.6.0)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
-
-  packages/rich-renderers:
-    dependencies:
-      '@haklex/rich-ext-chat':
-        specifier: workspace:*
-        version: link:../rich-ext-chat
-      '@haklex/rich-ext-code-snippet':
-        specifier: workspace:*
-        version: link:../rich-ext-code-snippet
-      '@haklex/rich-ext-embed':
-        specifier: workspace:*
-        version: link:../rich-ext-embed
-      '@haklex/rich-ext-excalidraw':
-        specifier: workspace:*
-        version: link:../rich-ext-excalidraw
-      '@haklex/rich-ext-gallery':
-        specifier: workspace:*
-        version: link:../rich-ext-gallery
-      '@haklex/rich-renderer-alert':
-        specifier: workspace:*
-        version: link:../rich-renderer-alert
-      '@haklex/rich-renderer-banner':
-        specifier: workspace:*
-        version: link:../rich-renderer-banner
-      '@haklex/rich-renderer-codeblock':
-        specifier: workspace:*
-        version: link:../rich-renderer-codeblock
-      '@haklex/rich-renderer-image':
-        specifier: workspace:*
-        version: link:../rich-renderer-image
-      '@haklex/rich-renderer-linkcard':
-        specifier: workspace:*
-        version: link:../rich-renderer-linkcard
-      '@haklex/rich-renderer-mention':
-        specifier: workspace:*
-        version: link:../rich-renderer-mention
-      '@haklex/rich-renderer-mermaid':
-        specifier: workspace:*
-        version: link:../rich-renderer-mermaid
-      '@haklex/rich-renderer-ruby':
-        specifier: workspace:*
-        version: link:../rich-renderer-ruby
-      '@haklex/rich-renderer-video':
-        specifier: workspace:*
-        version: link:../rich-renderer-video
-    devDependencies:
-      '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
-      '@lexical/react':
-        specifier: ^0.44.0
-        version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
-      '@types/react':
-        specifier: ^19.2.14
-        version: 19.2.14
-      '@types/react-dom':
-        specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.14)
-      lexical:
-        specifier: ^0.44.0
-        version: 0.44.0
-      react:
-        specifier: 19.2.5
-        version: 19.2.5
-      react-dom:
-        specifier: 19.2.5
-        version: 19.2.5(react@19.2.5)
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      vite:
-        specifier: ^8.0.10
-        version: 8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
-      vite-plugin-dts:
-        specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.6.0)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
-
-  packages/rich-renderers-edit:
-    dependencies:
-      '@haklex/rich-ext-chat':
-        specifier: workspace:*
-        version: link:../rich-ext-chat
-      '@haklex/rich-ext-code-snippet':
-        specifier: workspace:*
-        version: link:../rich-ext-code-snippet
-      '@haklex/rich-ext-embed':
-        specifier: workspace:*
-        version: link:../rich-ext-embed
-      '@haklex/rich-ext-excalidraw':
-        specifier: workspace:*
-        version: link:../rich-ext-excalidraw
-      '@haklex/rich-ext-gallery':
-        specifier: workspace:*
-        version: link:../rich-ext-gallery
-      '@haklex/rich-plugin-block-handle':
-        specifier: workspace:*
-        version: link:../rich-plugin-block-handle
-      '@haklex/rich-plugin-mention':
-        specifier: workspace:*
-        version: link:../rich-plugin-mention
-      '@haklex/rich-plugin-slash-menu':
-        specifier: workspace:*
-        version: link:../rich-plugin-slash-menu
-      '@haklex/rich-renderer-alert':
-        specifier: workspace:*
-        version: link:../rich-renderer-alert
-      '@haklex/rich-renderer-banner':
-        specifier: workspace:*
-        version: link:../rich-renderer-banner
-      '@haklex/rich-renderer-codeblock':
-        specifier: workspace:*
-        version: link:../rich-renderer-codeblock
-      '@haklex/rich-renderer-image':
-        specifier: workspace:*
-        version: link:../rich-renderer-image
-      '@haklex/rich-renderer-katex':
-        specifier: workspace:*
-        version: link:../rich-renderer-katex
-      '@haklex/rich-renderer-linkcard':
-        specifier: workspace:*
-        version: link:../rich-renderer-linkcard
-      '@haklex/rich-renderer-mention':
-        specifier: workspace:*
-        version: link:../rich-renderer-mention
-      '@haklex/rich-renderer-mermaid':
-        specifier: workspace:*
-        version: link:../rich-renderer-mermaid
-      '@haklex/rich-renderer-ruby':
-        specifier: workspace:*
-        version: link:../rich-renderer-ruby
-      '@haklex/rich-renderer-video':
-        specifier: workspace:*
-        version: link:../rich-renderer-video
-      '@haklex/rich-renderers':
-        specifier: workspace:*
-        version: link:../rich-renderers
-    devDependencies:
-      '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
-      '@lexical/react':
-        specifier: ^0.44.0
-        version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
-      '@types/react':
-        specifier: ^19.2.14
-        version: 19.2.14
-      '@types/react-dom':
-        specifier: ^19.2.3
-        version: 19.2.3(@types/react@19.2.14)
-      lexical:
-        specifier: ^0.44.0
-        version: 0.44.0
-      react:
-        specifier: 19.2.5
-        version: 19.2.5
-      react-dom:
-        specifier: 19.2.5
-        version: 19.2.5(react@19.2.5)
-      typescript:
-        specifier: ^5.9.3
-        version: 5.9.3
-      vite:
-        specifier: ^8.0.10
-        version: 8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
-      vite-plugin-dts:
-        specifier: ^4.5.4
-        version: 4.5.4(@types/node@25.6.0)(rollup@4.59.0)(typescript@5.9.3)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
-
-  packages/rich-static-renderer:
-    dependencies:
-      '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
-      '@haklex/rich-style-token':
-        specifier: workspace:*
-        version: link:../rich-style-token
-      '@lexical/code-core':
-        specifier: ^0.44.0
-        version: 0.44.0
-      '@lexical/headless':
-        specifier: ^0.44.0
-        version: 0.44.0
-      lucide-react:
-        specifier: ^1.0.0
-        version: 1.7.0(react@19.2.5)
-    devDependencies:
-      '@lexical/extension':
-        specifier: ^0.44.0
-        version: 0.44.0
-      '@lexical/link':
-        specifier: ^0.44.0
-        version: 0.44.0
-      '@lexical/list':
-        specifier: ^0.44.0
-        version: 0.44.0
-      '@lexical/rich-text':
-        specifier: ^0.44.0
-        version: 0.44.0
-      '@lexical/table':
-        specifier: ^0.44.0
-        version: 0.44.0
-      '@types/react':
-        specifier: ^19.2.14
-        version: 19.2.14
-      '@vanilla-extract/css':
-        specifier: ^1.20.1
-        version: 1.20.1(babel-plugin-macros@3.1.0)
-      '@vanilla-extract/vite-plugin':
-        specifier: ^5.2.2
-        version: 5.2.2(@types/node@25.6.0)(babel-plugin-macros@3.1.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(yaml@2.8.3)
-      lexical:
-        specifier: ^0.44.0
-        version: 0.44.0
-      react:
-        specifier: ^19.2.5
-        version: 19.2.5
-      react-dom:
-        specifier: ^19.2.5
         version: 19.2.5(react@19.2.5)
       typescript:
         specifier: ^5.9.3
@@ -9298,12 +9028,6 @@ packages:
         integrity: sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==,
       }
 
-  humps@2.0.1:
-    resolution:
-      {
-        integrity: sha512-E0eIbrFWUhwfXJmsbdjRQFQPrl5pTEoKlz163j1mTqqUnU9PgR4AgB8AIITzuB3vLBdxZXyZ9TDIrwB2OASz4g==,
-      }
-
   iconv-lite@0.6.3:
     resolution:
       {
@@ -11307,16 +11031,6 @@ packages:
     peerDependenciesMeta:
       react-dom:
         optional: true
-
-  react-shadow@20.6.0:
-    resolution:
-      {
-        integrity: sha512-kY+w4OMNZ8Nj9YI9eiTgvvJ/wYO7XyX1D/LYhvwQZv5vw69iCiDtGB0BX/2U8gLUuZAMN+x/7rHJKqHh8wXFHQ==,
-      }
-    peerDependencies:
-      prop-types: ^15.0.0
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   react-style-singleton@2.2.3:
     resolution:
@@ -17564,8 +17278,6 @@ snapshots:
       domutils: 3.2.2
       entities: 7.0.1
 
-  humps@2.0.1: {}
-
   iconv-lite@0.6.3:
     dependencies:
       safer-buffer: 2.1.2
@@ -18912,13 +18624,6 @@ snapshots:
       react: 19.2.5
       set-cookie-parser: 2.7.2
     optionalDependencies:
-      react-dom: 19.2.5(react@19.2.5)
-
-  react-shadow@20.6.0(prop-types@15.8.1)(react-dom@19.2.5(react@19.2.5))(react@19.2.5):
-    dependencies:
-      humps: 2.0.1
-      prop-types: 15.8.1
-      react: 19.2.5
       react-dom: 19.2.5(react@19.2.5)
 
   react-style-singleton@2.2.3(@types/react@19.2.14)(react@19.2.5):

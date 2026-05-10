@@ -1,4 +1,5 @@
 import type { AgentStore } from '@haklex/rich-agent-core';
+import { RichRenderer } from '@haklex/rich-compose';
 import { decorateSubtree, diffModifiedNode } from '@haklex/rich-diff-core';
 import {
   useColorScheme,
@@ -6,7 +7,6 @@ import {
   useRendererConfig,
   useVariant,
 } from '@haklex/rich-editor/static';
-import { RichRenderer } from '@haklex/rich-static-renderer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getRoot,

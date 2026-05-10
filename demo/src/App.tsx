@@ -1,6 +1,5 @@
 import 'modern-normalize/modern-normalize.css';
-import '@haklex/rich-kit-shiro/style.css';
-import '@haklex/rich-kit-shiro/style-renderer.css';
+import './shiro/style';
 import './demo.css';
 
 import type { ColorScheme, RichEditorVariant } from '@haklex/rich-editor';

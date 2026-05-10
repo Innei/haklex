@@ -1,5 +1,5 @@
 import type { RichEditorVariant } from '@haklex/rich-editor';
-import { MentionPlatformProvider, ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro';
+import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import type { SerializedEditorState } from 'lexical';
 import { use, useCallback, useEffect, useState } from 'react';
 
@@ -11,6 +11,7 @@ import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { presets } from '../fixtures';
 import { allExtraPlatformMeta } from '../fixtures/extra-mention-platforms';
+import { ShiroEditor, ShiroRenderer } from '../shiro';
 
 // ── Helpers ──
 

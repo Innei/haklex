@@ -1,6 +1,5 @@
 import type { ColorScheme } from '@haklex/rich-editor';
 import { pollEditNodes, pollNodes } from '@haklex/rich-ext-poll';
-import { ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro';
 import type { SerializedEditorState } from 'lexical';
 import { Masonry } from 'masonic';
 import { createContext, use, useCallback, useMemo, useState } from 'react';
@@ -9,6 +8,7 @@ import { JsonViewer } from '../components/JsonViewer';
 import { useTheme } from '../context/ThemeContext';
 import type { NodeSample } from '../fixtures';
 import { nodeSamples } from '../fixtures';
+import { ShiroEditor, ShiroRenderer } from '../shiro';
 
 type Filter = 'all' | 'inline' | 'block' | 'container';
 

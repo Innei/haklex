@@ -1,5 +1,5 @@
 import type { CommentAnchor } from '@haklex/rich-editor';
-import { MentionPlatformProvider, ShiroRenderer } from '@haklex/rich-kit-shiro';
+import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import type { SerializedEditorState } from 'lexical';
 import { nanoid } from 'nanoid';
 import { use, useCallback, useMemo, useRef, useState } from 'react';
@@ -12,6 +12,7 @@ import { VariantPicker } from '../components/VariantPicker';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { initialContent } from '../fixtures/initial-content';
+import { ShiroRenderer } from '../shiro';
 import type { BlockInfo, Comment } from '../types/comments';
 
 function extractTextContent(node: any): string {

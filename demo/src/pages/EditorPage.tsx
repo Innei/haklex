@@ -6,8 +6,8 @@ import {
   NestedDocPlugin,
 } from '@haklex/rich-ext-nested-doc';
 import { pollEditNodes, pollNodes } from '@haklex/rich-ext-poll';
-import { MentionPlatformProvider, ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
+import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import { createThemeStyle } from '@haklex/rich-style-token';
 import type { SerializedEditorState } from 'lexical';
 import { use, useCallback, useMemo, useState } from 'react';
@@ -18,6 +18,7 @@ import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { extraMentionPlatforms } from '../fixtures/extra-mention-platforms';
 import { initialContent } from '../fixtures/initial-content';
+import { ShiroEditor, ShiroRenderer } from '../shiro';
 
 interface ColorSet {
   accent: string;
@@ -275,13 +276,13 @@ export function EditorPage() {
           </Panel>
 
           {/* Renderer panel */}
-          {showRenderer && editorState && (
+          {showRenderer && (
             <Panel badge={variant} title="Renderer (readonly)">
               <ShiroRenderer
                 extraNodes={[...nestedDocNodes, ...pollNodes]}
                 style={themeOverrideStyle}
                 theme={theme}
-                value={editorState}
+                value={editorState ?? initialContent}
                 variant={variant}
               />
             </Panel>

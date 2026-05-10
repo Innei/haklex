@@ -25,8 +25,7 @@
   "dependencies": {
     "@haklex/rich-agent-core": "workspace:*",
     "@haklex/rich-diff-core": "workspace:*",
-    "@haklex/rich-litexml": "workspace:*",
-    "@haklex/rich-static-renderer": "workspace:*"
+    "@haklex/rich-litexml": "workspace:*"
   },
   "devDependencies": {
     "@lexical/react": "^0.44.0",
@@ -42,6 +41,7 @@
     "vite-plugin-dts": "^4.5.4"
   },
   "peerDependencies": {
+    "@haklex/rich-compose": "workspace:*",
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",

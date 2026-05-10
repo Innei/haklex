@@ -1,8 +1,6 @@
 /**
- * Enhanced renderer configuration for demo
+ * Enhanced renderer configuration for demo (local copy of the legacy preset).
  */
-import '@haklex/rich-renderers/style.css'
+import { enhancedRendererConfig } from '../shiro/configs/enhanced-renderer-config';
 
-import { enhancedRendererConfig } from '@haklex/rich-renderers'
-
-export { enhancedRendererConfig }
+export { enhancedRendererConfig };

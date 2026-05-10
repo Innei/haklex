@@ -11,8 +11,8 @@ import {
   DiffReviewOverlayPlugin,
   useAgentLoop,
 } from '@haklex/rich-ext-ai-agent';
-import { MentionPlatformProvider, ShiroEditor } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
+import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
@@ -27,6 +27,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useFullWidth } from '../context/FullWidthContext';
 import { useTheme } from '../context/ThemeContext';
+import { ShiroEditor } from '../shiro';
 
 interface DemoProviderConfig {
   apiKey: string;

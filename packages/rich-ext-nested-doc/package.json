@@ -22,9 +22,6 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "dependencies": {
-    "@haklex/rich-static-renderer": "workspace:*"
-  },
   "devDependencies": {
     "@lexical/markdown": "^0.44.0",
     "@lexical/react": "^0.44.0",

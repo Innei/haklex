@@ -40,5 +40,5 @@ export default createViteConfig({
     'modules/poll/node': 'src/modules/poll/node.ts',
     'modules/poll/renderer': 'src/modules/poll/renderer.tsx',
   },
-  vanillaExtract: false,
+  vanillaExtract: true,
 });

@@ -45,25 +45,23 @@ Registration:
 
 - `@haklex/rich-editor` `src/config.ts` → static nodes → `RichRenderer`
 - `@haklex/rich-editor` `src/config-edit.ts` → edit nodes → `RichEditor`
-- `@haklex/rich-renderers` `src/config.ts` → `enhancedRendererConfig` (static renderers)
-- `@haklex/rich-renderers-edit` `src/config.ts` → `enhancedEditRendererConfig` (edit renderers)
+- `@haklex/rich-compose` `src/modules/<name>/module.ts` → per-feature `RichRendererModule` (recommended composition API)
+- Downstream apps compose their own `RendererConfig` from `compose/modules/*` (or inline a per-app preset). The legacy `enhancedRendererConfig` shipped by `@haklex/rich-kit-shiro` is gone.
 
-**Adding a new node with edit UI**: Create `FooNode` with `RendererWrapper` in `decorate()`, then `FooEditNode extends FooNode` overriding `decorate()` with edit decorator. Register base in `config.ts`, edit in `config-edit.ts`. Create `FooRenderer` (static) + `FooEditRenderer` (edit). Add to respective aggregator configs.
+**Adding a new node with edit UI**: Create `FooNode` with `RendererWrapper` in `decorate()`, then `FooEditNode extends FooNode` overriding `decorate()` with edit decorator. Register base in `config.ts`, edit in `config-edit.ts`. Create `FooRenderer` (static) + `FooEditRenderer` (edit). Add a module under `rich-compose/src/modules/<name>/`.
 
 ## Package Dependency Graph
 
 ```
-@haklex/rich-kit-shiro (integration bundle — ShiroEditor / ShiroRenderer)
-├── @haklex/rich-editor (core: nodes + plugins + styles + contexts)
-│   ├── @haklex/rich-editor-ui (Dialog, Dropdown, Popover via @base-ui/react)
-│   ├── @haklex/rich-headless (server-side node registry, zero React)
-│   └── @haklex/rich-style-token (theme tokens, CSS variables, variant presets)
-├── @haklex/rich-static-renderer (SSR engine, RichRenderer component)
-├── @haklex/rich-renderers (static renderer aggregator)
-├── @haklex/rich-renderers-edit (edit renderer aggregator)
-├── @haklex/rich-ext-{chat,code-snippet,embed,excalidraw,gallery,nested-doc} (heavy extensions)
-├── @haklex/rich-plugin-{block-handle,floating-toolbar,link-edit,mention,slash-menu,table,toolbar}
-└── @haklex/rich-renderer-katex (KaTeX edit nodes)
+@haklex/rich-editor (core: nodes + plugins + styles + contexts)
+├── @haklex/rich-editor-ui (Dialog, Dropdown, Popover via @base-ui/react)
+├── @haklex/rich-headless (server-side node registry, zero React)
+└── @haklex/rich-style-token (theme tokens, CSS variables, variant presets)
+
+@haklex/rich-compose (modular composition + SSR engine: composeRenderer, RichRenderer, per-feature modules)
+@haklex/rich-ext-{chat,code-snippet,embed,excalidraw,gallery,nested-doc} (heavy extensions)
+@haklex/rich-plugin-{block-handle,floating-toolbar,link-edit,mention,slash-menu,table,toolbar}
+@haklex/rich-renderer-{alert,banner,codeblock,image,linkcard,mention,mermaid,ruby,video,katex}
 
 @haklex/rich-diff → @haklex/rich-diff-core (standalone diff viewer)
 @haklex/rich-agent-core → @haklex/rich-litexml (headless agent protocol; used by rich-ext-ai-agent)
@@ -81,11 +79,12 @@ Registration:
 ## Downstream Consumers
 
 ```
-Shiroi (Next.js frontend, ../Shiroi)
-  └── @haklex/rich-kit-shiro (npm, native React)
+Shiroi / Yohaku (Next.js frontends)
+  └── @haklex/{rich-compose, rich-editor, rich-ext-*, rich-renderer-*, rich-style-token}
+      Compose modules + a per-app ShiroEditor/ShiroRenderer wrapper
 
 admin-vue3 (Vue 3 dashboard, ../admin-vue3)
-  └── @haklex/{rich-editor,rich-editor-ui,rich-kit-shiro,rich-plugin-toolbar,rich-style-token,rich-diff,rich-ext-nested-doc}
+  └── packages/rich-react/src/shiro/ — local ShiroEditor + ShiroRenderer copies
       React-in-Vue bridge: createRoot() inside Vue defineComponent (src/components/editor/rich/RichEditor.tsx)
 
 mx-core (NestJS backend, ../mx-core)
