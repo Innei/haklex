@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-diff-core",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Lexical diff engine — character-level and structural diff with node decoration",
   "repository": {
     "type": "git",

@@ -39,8 +39,8 @@ export default createViteConfig({
     'modules/poll/index': 'src/modules/poll/index.ts',
     'modules/poll/node': 'src/modules/poll/node.ts',
     'modules/poll/renderer': 'src/modules/poll/renderer.tsx',
-    'style-token/index': 'src/style-token-entry.ts',
-    'style-token/styles': 'src/style-token-styles-entry.ts',
+    'style-token/index': 'src/style-token/index.ts',
+    'style-token/styles': 'src/style-token/styles.ts',
   },
   vanillaExtract: true,
 });

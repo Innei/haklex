@@ -406,13 +406,6 @@ importers:
 
   packages/rich-compose:
     dependencies:
-      '@lexical/headless':
-        specifier: ^0.44.0
-        version: 0.44.0
-    devDependencies:
-      '@haklex/rich-editor':
-        specifier: workspace:*
-        version: link:../rich-editor
       '@haklex/rich-ext-chat':
         specifier: workspace:*
         version: link:../rich-ext-chat
@@ -446,6 +439,9 @@ importers:
       '@haklex/rich-renderer-image':
         specifier: workspace:*
         version: link:../rich-renderer-image
+      '@haklex/rich-renderer-katex':
+        specifier: workspace:*
+        version: link:../rich-renderer-katex
       '@haklex/rich-renderer-linkcard':
         specifier: workspace:*
         version: link:../rich-renderer-linkcard
@@ -464,6 +460,13 @@ importers:
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../rich-style-token
+      '@lexical/headless':
+        specifier: ^0.44.0
+        version: 0.44.0
+    devDependencies:
+      '@haklex/rich-editor':
+        specifier: workspace:*
+        version: link:../rich-editor
       '@lexical/react':
         specifier: ^0.44.0
         version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)

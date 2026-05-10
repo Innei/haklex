@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-compose",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "description": "Compose primitives for haklex rich content renderers — Gundam-style assembly of Lexical nodes, sync/lazy renderers, and Provider stacks.",
   "repository": {
     "type": "git",
@@ -50,8 +50,8 @@
     "./modules/poll": "./src/modules/poll/index.ts",
     "./modules/poll/node": "./src/modules/poll/node.ts",
     "./modules/poll/renderer": "./src/modules/poll/renderer.tsx",
-    "./style-token": "./src/style-token-entry.ts",
-    "./style-token/styles": "./src/style-token-styles-entry.ts",
+    "./style-token": "./src/style-token/index.ts",
+    "./style-token/styles": "./src/style-token/styles.ts",
     "./style.css": "./dist/rich-compose.css"
   },
   "main": "./src/index.ts",
