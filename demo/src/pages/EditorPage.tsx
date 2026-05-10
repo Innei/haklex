@@ -5,6 +5,7 @@ import {
   nestedDocNodes,
   NestedDocPlugin,
 } from '@haklex/rich-ext-nested-doc';
+import { pollEditNodes, pollNodes } from '@haklex/rich-ext-poll';
 import { MentionPlatformProvider, ShiroEditor, ShiroRenderer } from '@haklex/rich-kit-shiro';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { createThemeStyle } from '@haklex/rich-style-token';
@@ -75,7 +76,7 @@ const colorOverridePresets: ColorPreset[] = [
 function NestedDocDialogEditor({ initialValue, onEditorReady }: NestedDocDialogEditorProps) {
   return (
     <ShiroEditor
-      extraNodes={nestedDocEditNodes}
+      extraNodes={[...nestedDocEditNodes, ...pollEditNodes]}
       header={<ToolbarPlugin insertItemOrder={insertItemOrder} maxVisibleInsertItems={5} />}
       initialValue={initialValue}
       onEditorReady={onEditorReady}
@@ -259,7 +260,7 @@ export function EditorPage() {
             <ShiroEditor
               autoFocus
               extraMentionPlatforms={activePlatforms.length > 0 ? activePlatforms : undefined}
-              extraNodes={nestedDocEditNodes}
+              extraNodes={[...nestedDocEditNodes, ...pollEditNodes]}
               header={<ToolbarPlugin insertItemOrder={insertItemOrder} maxVisibleInsertItems={5} />}
               initialValue={initialContent}
               placeholder="Start typing... Try markdown shortcuts like # heading, **bold**, *italic*, > quote, ||spoiler||"
@@ -277,7 +278,7 @@ export function EditorPage() {
           {showRenderer && editorState && (
             <Panel badge={variant} title="Renderer (readonly)">
               <ShiroRenderer
-                extraNodes={nestedDocNodes}
+                extraNodes={[...nestedDocNodes, ...pollNodes]}
                 style={themeOverrideStyle}
                 theme={theme}
                 value={editorState}

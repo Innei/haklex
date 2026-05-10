@@ -5,25 +5,26 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { $getNodeByKey, $insertNodes, DecoratorNode } from 'lexical'
-import { Workflow } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { $getNodeByKey, $insertNodes, DecoratorNode } from 'lexical';
+import { Workflow } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { MermaidRenderer } from '../components/renderers/MermaidRenderer'
-import { createRendererDecoration } from '../components/RendererWrapper'
-import type { CommandItemConfig } from '../types/slash-menu'
+import { MermaidRenderer } from '../components/renderers/MermaidRenderer';
+import { createRendererDecoration } from '../components/RendererWrapper';
+import { MERMAID_NODE_KEY } from '../types/renderer-keys';
+import type { CommandItemConfig } from '../types/slash-menu';
 
 export type SerializedMermaidNode = Spread<
   {
-    diagram: string
+    diagram: string;
   },
   SerializedLexicalNode
->
+>;
 
 export class MermaidNode extends DecoratorNode<ReactElement> {
-  __diagram: string
+  __diagram: string;
 
   static commandItems: CommandItemConfig[] = [
     {
@@ -36,43 +37,41 @@ export class MermaidNode extends DecoratorNode<ReactElement> {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([
-            $createMermaidNode('graph TD\n    A[Start] --> B[End]'),
-          ])
-        })
+          $insertNodes([$createMermaidNode('graph TD\n    A[Start] --> B[End]')]);
+        });
       },
     },
-  ]
+  ];
 
   static getType(): string {
-    return 'mermaid'
+    return 'mermaid';
   }
 
   static clone(node: MermaidNode): MermaidNode {
-    return new MermaidNode(node.__diagram, node.__key)
+    return new MermaidNode(node.__diagram, node.__key);
   }
 
   constructor(diagram: string, key?: NodeKey) {
-    super(key)
-    this.__diagram = diagram
+    super(key);
+    this.__diagram = diagram;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = 'rich-mermaid-wrapper'
-    return div
+    const div = document.createElement('div');
+    div.className = 'rich-mermaid-wrapper';
+    return div;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
   static importJSON(serializedNode: SerializedMermaidNode): MermaidNode {
-    return $createMermaidNode(serializedNode.diagram)
+    return $createMermaidNode(serializedNode.diagram);
   }
 
   exportJSON(): SerializedMermaidNode {
@@ -81,40 +80,38 @@ export class MermaidNode extends DecoratorNode<ReactElement> {
       type: 'mermaid',
       diagram: this.__diagram,
       version: 1,
-    }
+    };
   }
 
   getDiagram(): string {
-    return this.__diagram
+    return this.__diagram;
   }
 
   setDiagram(diagram: string): void {
-    const writable = this.getWritable()
-    writable.__diagram = diagram
+    const writable = this.getWritable();
+    writable.__diagram = diagram;
   }
 
   decorate(editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    const nodeKey = this.__key
-    return createRendererDecoration('Mermaid', MermaidRenderer, {
+    const nodeKey = this.__key;
+    return createRendererDecoration(MERMAID_NODE_KEY, MermaidRenderer, {
       content: this.__diagram,
       onContentChange: (newDiagram: string) => {
         editor.update(() => {
-          const node = $getNodeByKey(nodeKey) as MermaidNode | null
+          const node = $getNodeByKey(nodeKey) as MermaidNode | null;
           if (node) {
-            node.setDiagram(newDiagram)
+            node.setDiagram(newDiagram);
           }
-        })
+        });
       },
-    })
+    });
   }
 }
 
 export function $createMermaidNode(diagram: string): MermaidNode {
-  return new MermaidNode(diagram)
+  return new MermaidNode(diagram);
 }
 
-export function $isMermaidNode(
-  node: LexicalNode | null | undefined,
-): node is MermaidNode {
-  return node instanceof MermaidNode
+export function $isMermaidNode(node: LexicalNode | null | undefined): node is MermaidNode {
+  return node instanceof MermaidNode;
 }

@@ -26,6 +26,7 @@
     "@haklex/rich-ext-chat": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
+    "@haklex/rich-ext-poll": "workspace:*",
     "@haklex/rich-kit-shiro": "workspace:*",
     "@haklex/rich-plugin-toolbar": "workspace:*",
     "@haklex/rich-renderer-linkcard": "workspace:*",

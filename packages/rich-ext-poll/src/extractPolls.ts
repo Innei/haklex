@@ -1,6 +1,6 @@
 import type { SerializedEditorState, SerializedLexicalNode } from 'lexical';
 
-import type { PollMetadata } from '../types/poll';
+import type { PollMetadata } from './types';
 
 interface MaybeSerializedPollNode extends SerializedLexicalNode {
   children?: SerializedLexicalNode[];

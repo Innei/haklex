@@ -116,9 +116,54 @@ For read-only rendering, use `@haklex/rich-static-renderer` instead.
 | `buildBlockAnchor`, `buildRangeAnchor` | Comment anchor utilities                         |
 | `ALL_TRANSFORMERS`                     | All Markdown transformers (inline + block)       |
 
+### Slot Keys
+
+`RendererConfig` keys are exposed as `as const` constants for safer call sites. Use them in `createRendererDecoration` and module override maps instead of bare string literals:
+
+```ts
+import {
+  ALERT_NODE_KEY,
+  BANNER_NODE_KEY,
+  CODE_BLOCK_NODE_KEY,
+  FOOTNOTE_NODE_KEY,
+  FOOTNOTE_SECTION_NODE_KEY,
+  IMAGE_NODE_KEY,
+  KATEX_NODE_KEY,
+  LINK_CARD_NODE_KEY,
+  MENTION_NODE_KEY,
+  MERMAID_NODE_KEY,
+  RUBY_NODE_KEY,
+  TAG_NODE_KEY,
+  VIDEO_NODE_KEY,
+} from '@haklex/rich-editor';
+```
+
+Extension packages (`@haklex/rich-ext-*`) expose their own slot keys (e.g. `POLL_NODE_KEY`, `CHAT_NODE_KEY`).
+
+### Extending `RendererConfig`
+
+`@haklex/rich-editor` ships only the built-in slots. Extension and downstream packages add their own slots via TypeScript module augmentation:
+
+```ts
+import type { ComponentType } from 'react';
+import type { MyChartProps } from './MyChart';
+// Force the augmentation target to resolve as an external module.
+import type {} from '@haklex/rich-editor';
+
+declare module '@haklex/rich-editor' {
+  interface RendererConfig {
+    MyChart?: ComponentType<MyChartProps>;
+  }
+}
+
+export {};
+```
+
+Re-export the augmentation file as a side-effect from every public entry (`/node`, `/renderer`, `/edit`, `/static`, `/index`) so consumers see the slot regardless of which sub-path they import.
+
 ### Types
 
-`RichEditorProps`, `RichEditorVariant`, `RendererConfig`, `ColorScheme`, `RendererMode`, `ImageUploadFn`, `ImageUploadResult`, `CommandItemConfig`, `SlashMenuItemConfig`, `ToolbarGroup`, `CommandPlacement`, and renderer prop types (`AlertRendererProps`, `ImageRendererProps`, `CodeBlockRendererProps`, etc.).
+`RichEditorProps`, `RichEditorVariant`, `RendererConfig`, `ColorScheme`, `RendererMode`, `ImageUploadFn`, `ImageUploadResult`, `CommandItemConfig`, `SlashMenuItemConfig`, `ToolbarGroup`, `CommandPlacement`, and **built-in** renderer prop types (`AlertRendererProps`, `ImageRendererProps`, `CodeBlockRendererProps`, etc.). Extension renderer props (`PollRendererProps`, `ChatRendererProps`, `CodeFile`, `GalleryRendererProps`, …) live in their owning packages — import from `@haklex/rich-ext-<name>/node`.
 
 ### Sub-path Exports
 
@@ -126,6 +171,10 @@ For read-only rendering, use `@haklex/rich-static-renderer` instead.
 | ------------------------------- | ------------------------------------------------------------------- |
 | `@haklex/rich-editor`           | Full export (components, nodes, plugins, commands, contexts, types) |
 | `@haklex/rich-editor/editor`    | Editor-specific entry (RichEditor + node configs)                   |
+| `@haklex/rich-editor/nodes`     | Node classes + edit-mode node classes                               |
+| `@haklex/rich-editor/plugins`   | Built-in plugins                                                    |
+| `@haklex/rich-editor/commands`  | Insert / open commands + `CommandItemConfig`                        |
+| `@haklex/rich-editor/renderers` | Built-in renderer components, prop types, and slot key constants    |
 | `@haklex/rich-editor/static`    | Static/SSR utilities (for renderer and extension packages)          |
 | `@haklex/rich-editor/styles`    | Style variables and variant class exports                           |
 | `@haklex/rich-editor/style.css` | Compiled editor stylesheet                                          |

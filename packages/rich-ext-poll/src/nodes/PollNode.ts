@@ -1,3 +1,6 @@
+import '../augment';
+
+import { createRendererDecoration } from '@haklex/rich-editor/renderers';
 import type {
   EditorConfig,
   LexicalEditor,
@@ -10,9 +13,8 @@ import { DecoratorNode } from 'lexical';
 import { customAlphabet } from 'nanoid';
 import type { ReactElement } from 'react';
 
-import { PollRenderer } from '../components/renderers/PollRenderer';
-import { createRendererDecoration } from '../components/RendererWrapper';
-import type { PollMode, PollOption, PollShowResults } from '../types/poll';
+import { POLL_NODE_KEY } from '../slot';
+import type { PollMode, PollOption, PollShowResults } from '../types';
 
 const idAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const makePollIdSuffix = customAlphabet(idAlphabet, 10);
@@ -178,7 +180,7 @@ export class PollNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('Poll', PollRenderer, {
+    return createRendererDecoration(POLL_NODE_KEY, undefined, {
       pollId: this.__pollId,
       question: this.__question,
       options: this.__options,

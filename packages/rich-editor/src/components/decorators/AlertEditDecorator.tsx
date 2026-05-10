@@ -22,6 +22,7 @@ import { useCallback, useEffect } from 'react';
 
 import type { AlertType } from '../../nodes/AlertQuoteNode';
 import { $isAlertQuoteNode } from '../../nodes/AlertQuoteNode';
+import { ALERT_NODE_KEY } from '../../types/renderer-keys';
 import { AlertRenderer } from '../renderers/AlertRenderer';
 import { RendererWrapper } from '../RendererWrapper';
 
@@ -168,7 +169,7 @@ export function AlertEditDecorator({ nodeKey, alertType, contentEditor }: AlertE
     <>
       <RendererWrapper
         defaultRenderer={AlertRenderer}
-        rendererKey="Alert"
+        rendererKey={ALERT_NODE_KEY}
         props={{
           type: alertType,
           editable,

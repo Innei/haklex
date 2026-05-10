@@ -1,4 +1,3 @@
-import type { CodeFile } from '@haklex/rich-editor/renderers';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { NodeKey } from 'lexical';
 import { $getNodeByKey } from 'lexical';
@@ -7,6 +6,7 @@ import { useCallback } from 'react';
 
 import { CodeSnippetEditRenderer } from './CodeSnippetEditRenderer';
 import { $isCodeSnippetNode } from './nodes/CodeSnippetNode';
+import type { CodeFile } from './types';
 
 export interface CodeSnippetEditDecoratorProps {
   files: CodeFile[];

@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-kit-shiro",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Production bundle for Shiroi blog",
   "repository": {
     "type": "git",
@@ -40,6 +40,7 @@
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
+    "@haklex/rich-ext-poll": "workspace:*",
     "@haklex/rich-plugin-block-handle": "workspace:*",
     "@haklex/rich-plugin-floating-toolbar": "workspace:*",
     "@haklex/rich-plugin-link-edit": "workspace:*",

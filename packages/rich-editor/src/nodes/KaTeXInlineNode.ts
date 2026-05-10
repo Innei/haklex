@@ -12,6 +12,7 @@ import { createElement } from 'react';
 
 import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
+import { KATEX_NODE_KEY } from '../types/renderer-keys';
 import { getRegisteredNodeKlass } from '../utils/getRegisteredNodeKlass';
 import { resolveKaTeXEquation } from '../utils/katex-defaults';
 
@@ -104,7 +105,7 @@ export class KaTeXInlineNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    const decoration = createRendererDecoration('KaTeX', KaTeXRenderer, {
+    const decoration = createRendererDecoration(KATEX_NODE_KEY, KaTeXRenderer, {
       equation: this.__equation,
       displayMode: false,
     });

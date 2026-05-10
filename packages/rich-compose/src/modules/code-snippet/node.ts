@@ -1,7 +1,7 @@
-export type { SerializedCodeSnippetNode } from '@haklex/rich-ext-code-snippet/static';
+export type { SerializedCodeSnippetNode } from '@haklex/rich-ext-code-snippet/node';
 export {
   $createCodeSnippetNode,
   $isCodeSnippetNode,
   CodeSnippetNode,
   codeSnippetNodes,
-} from '@haklex/rich-ext-code-snippet/static';
+} from '@haklex/rich-ext-code-snippet/node';

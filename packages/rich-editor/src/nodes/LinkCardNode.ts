@@ -13,6 +13,7 @@ import { createElement } from 'react';
 
 import { LinkCardRenderer } from '../components/renderers/LinkCardRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
+import { LINK_CARD_NODE_KEY } from '../types/renderer-keys';
 import type { CommandItemConfig } from '../types/slash-menu';
 
 export type SerializedLinkCardNode = Spread<
@@ -163,7 +164,7 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('LinkCard', LinkCardRenderer, {
+    return createRendererDecoration(LINK_CARD_NODE_KEY, LinkCardRenderer, {
       url: this.__url,
       source: this.__source,
       id: this.__id,

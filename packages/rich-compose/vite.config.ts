@@ -36,6 +36,9 @@ export default createViteConfig({
     'modules/excalidraw/node': 'src/modules/excalidraw/node.ts',
     'modules/nested-doc/index': 'src/modules/nested-doc/index.ts',
     'modules/nested-doc/node': 'src/modules/nested-doc/node.ts',
+    'modules/poll/index': 'src/modules/poll/index.ts',
+    'modules/poll/node': 'src/modules/poll/node.ts',
+    'modules/poll/renderer': 'src/modules/poll/renderer.tsx',
   },
   vanillaExtract: false,
 });

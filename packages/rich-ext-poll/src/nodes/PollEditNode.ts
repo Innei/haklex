@@ -1,11 +1,11 @@
+import type { CommandItemConfig } from '@haklex/rich-editor/commands';
 import type { EditorConfig, LexicalEditor, NodeKey } from 'lexical';
 import { $insertNodes } from 'lexical';
 import { Vote } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
-import { PollEditDecorator } from '../components/decorators/PollEditDecorator';
-import type { CommandItemConfig } from '../types/slash-menu';
+import { PollEditDecorator } from '../PollEditDecorator';
 import { PollNode, type PollNodePayload, type SerializedPollNode } from './PollNode';
 
 export class PollEditNode extends PollNode {

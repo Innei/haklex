@@ -1,4 +1,5 @@
-import type { GalleryImage, GalleryRendererProps } from '@haklex/rich-editor/renderers';
+import './augment';
+
 import { createRendererDecoration } from '@haklex/rich-editor/renderers';
 import type {
   EditorConfig,
@@ -11,7 +12,8 @@ import type {
 import { DecoratorNode } from 'lexical';
 import type { ReactElement } from 'react';
 
-import { GalleryRenderer } from './GalleryRenderer';
+import { GALLERY_NODE_KEY } from './slot';
+import type { GalleryImage, GalleryRendererProps } from './types';
 
 export type SerializedGalleryNode = Spread<
   {
@@ -104,7 +106,7 @@ export class GalleryNode extends DecoratorNode<ReactElement> {
       images: this.__images,
       layout: this.__layout,
     };
-    return createRendererDecoration('Gallery', GalleryRenderer, props);
+    return createRendererDecoration(GALLERY_NODE_KEY, undefined, props);
   }
 }
 

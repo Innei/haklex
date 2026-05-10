@@ -2,7 +2,6 @@ import type { ComponentType } from 'react';
 
 import type { AlertRendererProps } from '../components/renderers/AlertRenderer';
 import type { BannerRendererProps } from '../components/renderers/BannerRenderer';
-import type { ChatRendererProps } from '../components/renderers/ChatRendererProps';
 import type { CodeBlockRendererProps } from '../components/renderers/CodeBlockRenderer';
 import type { FootnoteRendererProps } from '../components/renderers/FootnoteRenderer';
 import type { FootnoteSectionRendererProps } from '../components/renderers/FootnoteSectionRenderer';
@@ -14,55 +13,49 @@ import type { MermaidRendererProps } from '../components/renderers/MermaidRender
 import type { RubyRendererProps } from '../components/renderers/RubyRenderer';
 import type { TagRendererProps } from '../components/renderers/TagRenderer';
 import type { VideoRendererProps } from '../components/renderers/VideoRenderer';
-import type { PollRendererProps } from './poll';
-
-export interface CodeFile {
-  code: string;
-  filename: string;
-  highlightLines?: number[];
-  language?: string;
-}
-
-export interface CodeSnippetRendererProps {
-  files: CodeFile[];
-}
-
-export interface GalleryImage {
-  alt?: string;
-  height?: number;
-  src: string;
-  thumbhash?: string;
-  width?: number;
-}
-
-export interface GalleryRendererProps {
-  images: GalleryImage[];
-  layout: 'grid' | 'masonry' | 'carousel';
-  onImagesChange?: (images: GalleryImage[]) => void;
-  onLayoutChange?: (layout: 'grid' | 'masonry' | 'carousel') => void;
-}
 
 /**
  * Configuration for custom renderers.
- * Allows overriding default renderers with custom implementations.
+ *
+ * Built-in slots live below. Extension packages and downstream apps add their
+ * own slots via TypeScript module augmentation:
+ *
+ * ```ts
+ * import type { ComponentType } from 'react'
+ * import type { MyChartProps } from './MyChart'
+ *
+ * // Force the augmentation target to resolve as an external module.
+ * import type {} from '@haklex/rich-editor'
+ *
+ * declare module '@haklex/rich-editor' {
+ *   interface RendererConfig {
+ *     MyChart?: ComponentType<MyChartProps>
+ *   }
+ * }
+ *
+ * export {}
+ * ```
+ *
+ * Conventions:
+ * - Keep slots optional (`?`) — wrappers fall back to `null` when neither an
+ *   override nor a default is provided.
+ * - Keep prop types stable; renaming a slot's props is a breaking change for
+ *   every override module already in the wild.
+ * - Re-export the augmentation file as a side-effect from every public entry
+ *   (`/node`, `/renderer`, `/edit`, `/static`, `/index`) so consumers see the
+ *   slot regardless of which sub-path they import.
  */
 export interface RendererConfig {
   /** Custom renderer for alert/callout headers */
   Alert?: ComponentType<AlertRendererProps>;
   /** Custom renderer for banner blocks */
   Banner?: ComponentType<BannerRendererProps>;
-  /** Custom renderer for embedded chat snapshots */
-  Chat?: ComponentType<ChatRendererProps>;
   /** Custom renderer for code blocks with syntax highlighting */
   CodeBlock?: ComponentType<CodeBlockRendererProps>;
-  /** Custom renderer for multi-file code snippets with tabs */
-  CodeSnippet?: ComponentType<CodeSnippetRendererProps>;
   /** Custom renderer for footnote references */
   Footnote?: ComponentType<FootnoteRendererProps>;
   /** Custom renderer for footnote definition section */
   FootnoteSection?: ComponentType<FootnoteSectionRendererProps>;
-  /** Custom renderer for image galleries */
-  Gallery?: ComponentType<GalleryRendererProps>;
   /** Custom renderer for images with captions */
   Image?: ComponentType<ImageRendererProps>;
   /** Custom renderer for KaTeX mathematical expressions (inline and block) */
@@ -73,8 +66,6 @@ export interface RendererConfig {
   Mention?: ComponentType<MentionRendererProps>;
   /** Custom renderer for Mermaid diagrams */
   Mermaid?: ComponentType<MermaidRendererProps>;
-  /** Custom renderer for reader-facing vote/poll widgets */
-  Poll?: ComponentType<PollRendererProps>;
   /** Custom renderer for ruby annotations */
   Ruby?: ComponentType<RubyRendererProps>;
   /** Custom renderer for inline tag badges */

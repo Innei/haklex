@@ -5,27 +5,28 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { $insertNodes, DecoratorNode } from 'lexical'
-import { Code } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { $insertNodes, DecoratorNode } from 'lexical';
+import { Code } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { CodeBlockRenderer } from '../components/renderers/CodeBlockRenderer'
-import { createRendererDecoration } from '../components/RendererWrapper'
-import type { CommandItemConfig } from '../types/slash-menu'
+import { CodeBlockRenderer } from '../components/renderers/CodeBlockRenderer';
+import { createRendererDecoration } from '../components/RendererWrapper';
+import { CODE_BLOCK_NODE_KEY } from '../types/renderer-keys';
+import type { CommandItemConfig } from '../types/slash-menu';
 
 export type SerializedCodeBlockNode = Spread<
   {
-    code: string
-    language: string
+    code: string;
+    language: string;
   },
   SerializedLexicalNode
->
+>;
 
 export class CodeBlockNode extends DecoratorNode<ReactElement> {
-  __code: string
-  __language: string
+  __code: string;
+  __language: string;
 
   static commandItems: CommandItemConfig[] = [
     {
@@ -38,46 +39,46 @@ export class CodeBlockNode extends DecoratorNode<ReactElement> {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createCodeBlockNode('', 'text')])
-        })
+          $insertNodes([$createCodeBlockNode('', 'text')]);
+        });
       },
     },
-  ]
+  ];
 
   static getType(): string {
-    return 'code-block'
+    return 'code-block';
   }
 
   static clone(node: CodeBlockNode): CodeBlockNode {
-    return new CodeBlockNode(node.__code, node.__language, node.__key)
+    return new CodeBlockNode(node.__code, node.__language, node.__key);
   }
 
   constructor(code: string, language: string, key?: NodeKey) {
-    super(key)
-    this.__code = code
-    this.__language = language
+    super(key);
+    this.__code = code;
+    this.__language = language;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = 'rich-code-block-wrapper'
-    return div
+    const div = document.createElement('div');
+    div.className = 'rich-code-block-wrapper';
+    return div;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
   isKeyboardSelectable(): boolean {
-    return true
+    return true;
   }
 
   static importJSON(serializedNode: SerializedCodeBlockNode): CodeBlockNode {
-    return $createCodeBlockNode(serializedNode.code, serializedNode.language)
+    return $createCodeBlockNode(serializedNode.code, serializedNode.language);
   }
 
   exportJSON(): SerializedCodeBlockNode {
@@ -87,44 +88,39 @@ export class CodeBlockNode extends DecoratorNode<ReactElement> {
       code: this.__code,
       language: this.__language,
       version: 1,
-    }
+    };
   }
 
   getCode(): string {
-    return this.__code
+    return this.__code;
   }
 
   setCode(code: string): void {
-    const writable = this.getWritable()
-    writable.__code = code
+    const writable = this.getWritable();
+    writable.__code = code;
   }
 
   getLanguage(): string {
-    return this.__language
+    return this.__language;
   }
 
   setLanguage(language: string): void {
-    const writable = this.getWritable()
-    writable.__language = language
+    const writable = this.getWritable();
+    writable.__language = language;
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('CodeBlock', CodeBlockRenderer, {
+    return createRendererDecoration(CODE_BLOCK_NODE_KEY, CodeBlockRenderer, {
       code: this.__code,
       language: this.__language,
-    })
+    });
   }
 }
 
-export function $createCodeBlockNode(
-  code: string,
-  language: string,
-): CodeBlockNode {
-  return new CodeBlockNode(code, language)
+export function $createCodeBlockNode(code: string, language: string): CodeBlockNode {
+  return new CodeBlockNode(code, language);
 }
 
-export function $isCodeBlockNode(
-  node: LexicalNode | null | undefined,
-): node is CodeBlockNode {
-  return node instanceof CodeBlockNode
+export function $isCodeBlockNode(node: LexicalNode | null | undefined): node is CodeBlockNode {
+  return node instanceof CodeBlockNode;
 }

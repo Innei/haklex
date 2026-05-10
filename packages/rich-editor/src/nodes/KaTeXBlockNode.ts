@@ -13,6 +13,7 @@ import { createElement } from 'react';
 
 import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
+import { KATEX_NODE_KEY } from '../types/renderer-keys';
 import type { SlashMenuItemConfig } from '../types/slash-menu';
 import { getRegisteredNodeKlass } from '../utils/getRegisteredNodeKlass';
 import { resolveKaTeXEquation } from '../utils/katex-defaults';
@@ -103,7 +104,7 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('KaTeX', KaTeXRenderer, {
+    return createRendererDecoration(KATEX_NODE_KEY, KaTeXRenderer, {
       equation: this.__equation,
       displayMode: true,
     });

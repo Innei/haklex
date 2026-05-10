@@ -1,12 +1,5 @@
 export type { AlertRendererProps } from './components/renderers/AlertRenderer';
 export type { BannerRendererProps } from './components/renderers/BannerRenderer';
-export type {
-  ChatMessage,
-  ChatParticipant,
-  ChatParticipantKind,
-  ChatRendererProps,
-  ChatVariant,
-} from './components/renderers/ChatRendererProps';
 export type { CodeBlockRendererProps } from './components/renderers/CodeBlockRenderer';
 export type { FootnoteRendererProps } from './components/renderers/FootnoteRenderer';
 export { FootnoteRenderer } from './components/renderers/FootnoteRenderer';
@@ -25,10 +18,19 @@ export { RubyRenderer } from './components/renderers/RubyRenderer';
 export type { VideoRendererProps } from './components/renderers/VideoRenderer';
 export type { RendererKey } from './components/RendererWrapper';
 export { createRendererDecoration, RendererWrapper } from './components/RendererWrapper';
-export type {
-  CodeFile,
-  CodeSnippetRendererProps,
-  GalleryImage,
-  GalleryRendererProps,
-} from './types/renderer-config';
+export {
+  ALERT_NODE_KEY,
+  BANNER_NODE_KEY,
+  CODE_BLOCK_NODE_KEY,
+  FOOTNOTE_NODE_KEY,
+  FOOTNOTE_SECTION_NODE_KEY,
+  IMAGE_NODE_KEY,
+  KATEX_NODE_KEY,
+  LINK_CARD_NODE_KEY,
+  MENTION_NODE_KEY,
+  MERMAID_NODE_KEY,
+  RUBY_NODE_KEY,
+  TAG_NODE_KEY,
+  VIDEO_NODE_KEY,
+} from './types/renderer-keys';
 export { computeImageMeta, decodeThumbHash } from './utils/thumbhash';

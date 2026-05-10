@@ -1,0 +1,81 @@
+{
+  "name": "@haklex/rich-ext-poll",
+  "version": "0.5.0",
+  "description": "Reader-facing vote/poll widget extension",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-ext-poll"
+  },
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./node": "./src/node.ts",
+    "./renderer": "./src/renderer.ts",
+    "./edit": "./src/edit.ts",
+    "./static": "./src/static.ts",
+    "./style.css": "./dist/rich-ext-poll.css"
+  },
+  "main": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev:build": "vite build --watch"
+  },
+  "dependencies": {
+    "@haklex/rich-style-token": "workspace:*",
+    "nanoid": "^5.1.9"
+  },
+  "devDependencies": {
+    "@haklex/rich-editor": "workspace:*",
+    "@lexical/react": "^0.44.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vanilla-extract/css": "^1.20.1",
+    "@vanilla-extract/vite-plugin": "^5.2.2",
+    "lexical": "^0.44.0",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.10",
+    "vite-plugin-dts": "^4.5.4"
+  },
+  "peerDependencies": {
+    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-editor-ui": "workspace:*",
+    "lexical": "^0.44.0",
+    "lucide-react": "^1.0.0",
+    "react": ">=19"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "import": "./dist/index.mjs",
+        "types": "./dist/index.d.ts"
+      },
+      "./node": {
+        "import": "./dist/node.mjs",
+        "types": "./dist/node.d.ts"
+      },
+      "./renderer": {
+        "import": "./dist/renderer.mjs",
+        "types": "./dist/renderer.d.ts"
+      },
+      "./edit": {
+        "import": "./dist/edit.mjs",
+        "types": "./dist/edit.d.ts"
+      },
+      "./static": {
+        "import": "./dist/static.mjs",
+        "types": "./dist/static.d.ts"
+      },
+      "./style.css": "./dist/rich-ext-poll.css"
+    },
+    "main": "./dist/index.mjs",
+    "types": "./dist/index.d.ts"
+  }
+}

@@ -7,6 +7,15 @@ export interface PollOption {
   label: string;
 }
 
+export interface PollRendererProps {
+  closeAt?: string;
+  mode: PollMode;
+  options: PollOption[];
+  pollId: string;
+  question: string;
+  showResults?: PollShowResults;
+}
+
 export interface PollState {
   canVote: boolean;
   closed: boolean;
@@ -23,15 +32,6 @@ export interface PollDataAdapter {
 }
 
 export interface PollMetadata {
-  closeAt?: string;
-  mode: PollMode;
-  options: PollOption[];
-  pollId: string;
-  question: string;
-  showResults?: PollShowResults;
-}
-
-export interface PollRendererProps {
   closeAt?: string;
   mode: PollMode;
   options: PollOption[];

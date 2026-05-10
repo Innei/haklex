@@ -2,6 +2,7 @@ import type { SerializedEditorState } from 'lexical';
 
 import { useNestedContentRenderer } from '../../context/NestedContentRendererContext';
 import type { BannerType } from '../../nodes/BannerNode';
+import { BANNER_NODE_KEY } from '../../types/renderer-keys';
 import { RendererWrapper } from '../RendererWrapper';
 import { BannerRenderer } from './BannerRenderer';
 
@@ -18,7 +19,7 @@ export function BannerStaticDecorator({ bannerType, contentState }: BannerStatic
       <RendererWrapper
         defaultRenderer={BannerRenderer}
         props={{ type: bannerType }}
-        rendererKey="Banner"
+        rendererKey={BANNER_NODE_KEY}
       />
       <div className="rich-banner-content">{renderContent(contentState)}</div>
     </div>

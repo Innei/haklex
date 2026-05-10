@@ -14,6 +14,7 @@ import { createElement } from 'react';
 import { ImageRenderer } from '../components/renderers/ImageRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
 import { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from '../plugins/image-upload-command';
+import { IMAGE_NODE_KEY } from '../types/renderer-keys';
 import type { CommandItemConfig } from '../types/slash-menu';
 
 export type SerializedImageNode = Spread<
@@ -216,7 +217,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('Image', ImageRenderer, {
+    return createRendererDecoration(IMAGE_NODE_KEY, ImageRenderer, {
       src: this.__src,
       altText: this.__altText,
       width: this.__width,

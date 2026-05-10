@@ -19,7 +19,6 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { getThemeExtensions, loadLanguageExtension } from '@haklex/cm-editor';
 import type { ColorScheme } from '@haklex/rich-editor';
-import type { CodeFile } from '@haklex/rich-editor/renderers';
 import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants';
 import { FileIcon } from '@haklex/rich-renderer-codeblock/icons';
 import { usePortalTheme } from '@haklex/rich-style-token';
@@ -29,6 +28,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import * as styles from './styles.css';
+import type { CodeFile } from './types';
 import { getLanguageFromFilename } from './utils';
 
 export interface CodeEditorModalProps {

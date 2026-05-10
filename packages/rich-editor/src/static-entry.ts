@@ -1,6 +1,5 @@
 // Static entry point for SSR engine - includes editorTheme (has Lexical types)
 export { LinkFavicon } from './components/LinkFavicon';
-export { PollRenderer } from './components/renderers/PollRenderer';
 export type { RubyRendererProps } from './components/renderers/RubyRenderer';
 export { RubyRenderer } from './components/renderers/RubyRenderer';
 export type { TagRendererProps } from './components/renderers/TagRenderer';
@@ -25,12 +24,6 @@ export {
   useNestedContentRenderer,
   useOptionalNestedContentRenderer,
 } from './context/NestedContentRendererContext';
-export type { PollDataProviderProps } from './context/PollDataContext';
-export {
-  PollDataProvider,
-  useInitialPollState,
-  usePollDataAdapter,
-} from './context/PollDataContext';
 export type { PresentDialogFn, PresentDialogProps } from './context/PresentDialogContext';
 export { PresentDialogProvider, usePresentDialog } from './context/PresentDialogContext';
 export type { RendererMode } from './context/RendererConfigContext';
@@ -54,17 +47,22 @@ export {
 } from './styles/shared.css';
 export { editorTheme } from './styles/theme';
 export type { RichEditorVariant } from './types';
-export type {
-  PollDataAdapter,
-  PollMetadata,
-  PollMode,
-  PollOption,
-  PollRendererProps,
-  PollShowResults,
-  PollState,
-} from './types/poll';
 export type { RendererConfig } from './types/renderer-config';
-export { extractPolls } from './utils/extractPolls';
+export {
+  ALERT_NODE_KEY,
+  BANNER_NODE_KEY,
+  CODE_BLOCK_NODE_KEY,
+  FOOTNOTE_NODE_KEY,
+  FOOTNOTE_SECTION_NODE_KEY,
+  IMAGE_NODE_KEY,
+  KATEX_NODE_KEY,
+  LINK_CARD_NODE_KEY,
+  MENTION_NODE_KEY,
+  MERMAID_NODE_KEY,
+  RUBY_NODE_KEY,
+  TAG_NODE_KEY,
+  VIDEO_NODE_KEY,
+} from './types/renderer-keys';
 export { extractTextContent } from './utils/extractTextContent';
 export { normalizeSerializedEditorState } from './utils/normalizeSerializedEditorState';
 export { articleTheme, commentTheme, noteTheme, vars } from '@haklex/rich-style-token/styles';

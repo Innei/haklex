@@ -4,8 +4,8 @@ import '@haklex/rich-kit-shiro/style-renderer.css';
 import './demo.css';
 
 import type { ColorScheme, RichEditorVariant } from '@haklex/rich-editor';
-import { PollDataProvider } from '@haklex/rich-editor';
 import { DialogStackProvider } from '@haklex/rich-editor-ui';
+import { PollDataProvider } from '@haklex/rich-ext-poll';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-router-dom';

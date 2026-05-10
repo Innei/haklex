@@ -1,4 +1,4 @@
-import type { PollDataAdapter, PollState } from '@haklex/rich-editor';
+import type { PollDataAdapter, PollState } from '@haklex/rich-ext-poll';
 import { useSyncExternalStore } from 'react';
 
 interface PollStore {

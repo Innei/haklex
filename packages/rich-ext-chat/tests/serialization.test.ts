@@ -12,10 +12,6 @@ vi.mock('@haklex/rich-editor/renderers', () => ({
   createRendererDecoration: vi.fn(),
 }));
 
-vi.mock('../src/ChatRenderer', () => ({
-  ChatRenderer: vi.fn(),
-}));
-
 function makeEditor() {
   return createEditor({
     namespace: 'ChatNodeTest',

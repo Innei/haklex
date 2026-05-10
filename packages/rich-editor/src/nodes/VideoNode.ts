@@ -13,6 +13,7 @@ import { createElement } from 'react';
 
 import { VideoRenderer } from '../components/renderers/VideoRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
+import { VIDEO_NODE_KEY } from '../types/renderer-keys';
 import type { CommandItemConfig } from '../types/slash-menu';
 
 export type SerializedVideoNode = Spread<
@@ -124,7 +125,7 @@ export class VideoNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('Video', VideoRenderer, {
+    return createRendererDecoration(VIDEO_NODE_KEY, VideoRenderer, {
       src: this.__src,
       poster: this.__poster,
       width: this.__width,

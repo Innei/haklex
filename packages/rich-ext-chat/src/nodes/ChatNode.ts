@@ -1,9 +1,11 @@
+import '../augment';
+
 import { createRendererDecoration } from '@haklex/rich-editor/renderers';
 import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical';
 import { DecoratorNode } from 'lexical';
 import type { ReactElement } from 'react';
 
-import { ChatRenderer } from '../ChatRenderer';
+import { CHAT_NODE_KEY } from '../slot';
 import type { ChatMessage, ChatParticipant, ChatVariant, SerializedChatNode } from '../types';
 import { createDefaultParticipants } from '../utils';
 
@@ -106,7 +108,7 @@ export class ChatNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('Chat', ChatRenderer, {
+    return createRendererDecoration(CHAT_NODE_KEY, undefined, {
       variant: this.__variant,
       participants: this.__participants,
       messages: this.__messages,

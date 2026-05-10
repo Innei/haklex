@@ -3,14 +3,6 @@ export type {
   ColorScheme,
   FootnoteDefinitionsContextValue,
   LinkFaviconProps,
-  PollDataAdapter,
-  PollDataProviderProps,
-  PollMetadata,
-  PollMode,
-  PollOption,
-  PollRendererProps,
-  PollShowResults,
-  PollState,
   PresentDialogFn,
   PresentDialogProps,
   RendererConfig,
@@ -20,15 +12,11 @@ export type {
 } from '@haklex/rich-editor';
 export {
   ColorSchemeProvider,
-  extractPolls,
   getVariantClass,
   LinkFavicon,
-  PollDataProvider,
   PresentDialogProvider,
   RichEditor,
   useColorScheme,
-  useInitialPollState,
-  usePollDataAdapter,
   useRendererConfig,
   useRendererMode,
 } from '@haklex/rich-editor';
@@ -38,6 +26,24 @@ export {
   useFootnoteDefinitions,
   useFootnoteDisplayNumber,
 } from '@haklex/rich-editor';
+
+// Re-export from @haklex/rich-ext-poll
+export type {
+  PollDataAdapter,
+  PollDataProviderProps,
+  PollMetadata,
+  PollMode,
+  PollOption,
+  PollRendererProps,
+  PollShowResults,
+  PollState,
+} from '@haklex/rich-ext-poll';
+export {
+  extractPolls,
+  PollDataProvider,
+  useInitialPollState,
+  usePollDataAdapter,
+} from '@haklex/rich-ext-poll';
 
 // Re-export from @haklex/rich-editor/commands
 export type { SlashMenuItemConfig } from '@haklex/rich-editor/commands';

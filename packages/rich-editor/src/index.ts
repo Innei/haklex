@@ -21,12 +21,6 @@ export {
   useNestedContentRenderer,
   useOptionalNestedContentRenderer,
 } from './context/NestedContentRendererContext';
-export type { PollDataProviderProps } from './context/PollDataContext';
-export {
-  PollDataProvider,
-  useInitialPollState,
-  usePollDataAdapter,
-} from './context/PollDataContext';
 export type { PresentDialogFn, PresentDialogProps } from './context/PresentDialogContext';
 export { PresentDialogProvider, usePresentDialog } from './context/PresentDialogContext';
 export type { RendererMode } from './context/RendererConfigContext';
@@ -46,16 +40,22 @@ export {
 export { blockIdState } from './plugins/BlockIdPlugin';
 export * from './styles';
 export type { RichEditorProps, RichEditorVariant } from './types';
-export type {
-  PollDataAdapter,
-  PollMetadata,
-  PollMode,
-  PollOption,
-  PollRendererProps,
-  PollShowResults,
-  PollState,
-} from './types/poll';
 export type { RendererConfig } from './types/renderer-config';
+export {
+  ALERT_NODE_KEY,
+  BANNER_NODE_KEY,
+  CODE_BLOCK_NODE_KEY,
+  FOOTNOTE_NODE_KEY,
+  FOOTNOTE_SECTION_NODE_KEY,
+  IMAGE_NODE_KEY,
+  KATEX_NODE_KEY,
+  LINK_CARD_NODE_KEY,
+  MENTION_NODE_KEY,
+  MERMAID_NODE_KEY,
+  RUBY_NODE_KEY,
+  TAG_NODE_KEY,
+  VIDEO_NODE_KEY,
+} from './types/renderer-keys';
 export type {
   AnchorError,
   AnchorResult,
@@ -70,7 +70,6 @@ export {
   buildBlockAnchor,
   buildRangeAnchor,
 } from './utils/comment-anchor';
-export { extractPolls } from './utils/extractPolls';
 export type { DOMSelectionTarget, TextSelectionSnapshot } from './utils/text-selection';
 export {
   $captureTextSelection,

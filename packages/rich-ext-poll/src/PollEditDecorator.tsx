@@ -10,12 +10,12 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { $getNodeByKey } from 'lexical';
 import { CalendarClock, ChevronDown, ChevronUp, Plus, X } from 'lucide-react';
 import { customAlphabet } from 'nanoid';
-import type { KeyboardEvent } from 'react';
-import { useCallback } from 'react';
+import type { CompositionEvent, InputHTMLAttributes, KeyboardEvent } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { $isPollNode, type PollNode } from '../../nodes/PollNode';
-import { pollEditClasses } from '../../styles/poll-edit.css';
-import type { PollMode, PollOption, PollShowResults } from '../../types/poll';
+import { $isPollNode, type PollNode } from './nodes/PollNode';
+import { pollEditClasses } from './poll-edit.css';
+import type { PollMode, PollOption, PollShowResults } from './types';
 
 const optionIdAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
 const makeOptionId = customAlphabet(optionIdAlphabet, 6);
@@ -41,6 +41,58 @@ function moveItem<T>(arr: T[], from: number, to: number): T[] {
   const [item] = next.splice(from, 1);
   next.splice(to, 0, item);
   return next;
+}
+
+type ImeSafeInputProps = Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'value' | 'onChange' | 'defaultValue'
+> & {
+  value: string;
+  onValueChange: (next: string) => void;
+};
+
+function ImeSafeInput({ value, onValueChange, onCompositionEnd, ...rest }: ImeSafeInputProps) {
+  const [local, setLocal] = useState(value);
+  const composingRef = useRef(false);
+  const lastCommittedRef = useRef(value);
+
+  useEffect(() => {
+    if (composingRef.current) return;
+    if (value !== lastCommittedRef.current) {
+      lastCommittedRef.current = value;
+      setLocal(value);
+    }
+  }, [value]);
+
+  const commit = useCallback(
+    (next: string) => {
+      lastCommittedRef.current = next;
+      if (next !== value) onValueChange(next);
+    },
+    [onValueChange, value],
+  );
+
+  return (
+    <input
+      {...rest}
+      value={local}
+      onChange={(event) => {
+        const next = event.target.value;
+        setLocal(next);
+        if (!composingRef.current) commit(next);
+      }}
+      onCompositionEnd={(event: CompositionEvent<HTMLInputElement>) => {
+        composingRef.current = false;
+        const next = event.currentTarget.value;
+        setLocal(next);
+        commit(next);
+        onCompositionEnd?.(event);
+      }}
+      onCompositionStart={() => {
+        composingRef.current = true;
+      }}
+    />
+  );
 }
 
 export function PollEditDecorator({
@@ -154,13 +206,13 @@ export function PollEditDecorator({
       <div className={pollEditClasses.meta}>
         Poll · {mode === 'single' ? 'Single choice' : 'Multiple choice'}
       </div>
-      <input
+      <ImeSafeInput
         aria-label="Poll question"
         className={pollEditClasses.question}
         disabled={!editable}
         placeholder="Question"
         value={question}
-        onChange={(event) => handleQuestionChange(event.target.value)}
+        onValueChange={handleQuestionChange}
       />
       <ul className={pollEditClasses.optionList}>
         {options.map((option, index) => (
@@ -187,14 +239,14 @@ export function PollEditDecorator({
                 </button>
               </span>
             )}
-            <input
+            <ImeSafeInput
               aria-label="Option label"
               className={pollEditClasses.optionInput}
               disabled={!editable}
               placeholder="Option"
               value={option.label}
-              onChange={(event) => handleOptionLabelChange(option.id, event.target.value)}
               onKeyDown={(event) => handleOptionKeyDown(event, index)}
+              onValueChange={(next) => handleOptionLabelChange(option.id, next)}
             />
             {editable && options.length > 2 && (
               <button

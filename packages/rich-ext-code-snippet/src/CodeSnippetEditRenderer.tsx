@@ -1,5 +1,4 @@
 import { useColorScheme } from '@haklex/rich-editor';
-import type { CodeFile } from '@haklex/rich-editor/renderers';
 import { presentDialog } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import { Pencil } from 'lucide-react';
@@ -15,6 +14,7 @@ import {
   editOverlay,
   semanticClassNames,
 } from './styles.css';
+import type { CodeFile } from './types';
 
 export interface CodeSnippetEditRendererProps {
   files: CodeFile[];

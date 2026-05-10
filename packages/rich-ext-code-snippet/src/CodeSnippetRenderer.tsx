@@ -1,4 +1,3 @@
-import type { CodeSnippetRendererProps } from '@haklex/rich-editor/renderers';
 import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants';
 import { FileIcon } from '@haklex/rich-renderer-codeblock/icons';
 import { getHighlighterWithLang, SHIKI_DUAL_THEMES } from '@haklex/rich-renderer-codeblock/shiki';
@@ -7,6 +6,7 @@ import type { ComponentType, FC } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import * as styles from './styles.css';
+import type { CodeSnippetRendererProps } from './types';
 import { getLanguageFromFilename } from './utils';
 
 const CopyButton: FC<{ text: string }> = ({ text }) => {

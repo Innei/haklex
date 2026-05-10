@@ -1,4 +1,4 @@
-import { GalleryRenderer } from '@haklex/rich-ext-gallery/static';
+import { GalleryRenderer } from '@haklex/rich-ext-gallery/renderer';
 
 export { GalleryRenderer };
 export default GalleryRenderer;

@@ -1,4 +1,5 @@
-import type { CodeFile } from '@haklex/rich-editor/renderers';
+import '../augment';
+
 import { createRendererDecoration } from '@haklex/rich-editor/renderers';
 import type {
   EditorConfig,
@@ -11,7 +12,8 @@ import type {
 import { DecoratorNode } from 'lexical';
 import type { ReactElement } from 'react';
 
-import { CodeSnippetRenderer } from '../CodeSnippetRenderer';
+import { CODE_SNIPPET_NODE_KEY } from '../slot';
+import type { CodeFile } from '../types';
 
 export type SerializedCodeSnippetNode = Spread<
   {
@@ -73,7 +75,7 @@ export class CodeSnippetNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('CodeSnippet', CodeSnippetRenderer, {
+    return createRendererDecoration(CODE_SNIPPET_NODE_KEY, undefined, {
       files: this.__files,
     });
   }

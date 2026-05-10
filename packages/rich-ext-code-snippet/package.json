@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-code-snippet",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "description": "Multi-file code snippet extension",
   "repository": {
     "type": "git",
@@ -11,6 +11,9 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./node": "./src/node.ts",
+    "./renderer": "./src/renderer.ts",
+    "./edit": "./src/edit.ts",
     "./static": "./src/static.ts",
     "./style.css": "./dist/rich-ext-code-snippet.css"
   },
@@ -62,6 +65,18 @@
       ".": {
         "import": "./dist/index.mjs",
         "types": "./dist/index.d.ts"
+      },
+      "./node": {
+        "import": "./dist/node.mjs",
+        "types": "./dist/node.d.ts"
+      },
+      "./renderer": {
+        "import": "./dist/renderer.mjs",
+        "types": "./dist/renderer.d.ts"
+      },
+      "./edit": {
+        "import": "./dist/edit.mjs",
+        "types": "./dist/edit.d.ts"
       },
       "./static": {
         "import": "./dist/static.mjs",

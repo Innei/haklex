@@ -1,5 +1,4 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
-import type { CodeFile } from '@haklex/rich-editor/renderers';
 import type { EditorConfig, LexicalEditor, LexicalNode } from 'lexical';
 import { $insertNodes } from 'lexical';
 import { FileCode } from 'lucide-react';
@@ -7,6 +6,7 @@ import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
 import { CodeSnippetEditDecorator } from '../CodeSnippetEditDecorator';
+import type { CodeFile } from '../types';
 import { CodeSnippetNode, type SerializedCodeSnippetNode } from './CodeSnippetNode';
 
 export class CodeSnippetEditNode extends CodeSnippetNode {

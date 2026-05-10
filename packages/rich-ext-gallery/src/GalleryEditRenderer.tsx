@@ -15,7 +15,6 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useColorScheme } from '@haklex/rich-editor';
-import type { GalleryImage, GalleryRendererProps } from '@haklex/rich-editor/renderers';
 import { presentDialog, SegmentedControl } from '@haklex/rich-editor-ui';
 import { usePortalTheme, vars } from '@haklex/rich-style-token';
 import { GripVertical, ImageIcon, Images, Pencil, Plus, Trash2, X } from 'lucide-react';
@@ -25,6 +24,7 @@ import { createPortal } from 'react-dom';
 
 import { GalleryRenderer } from './GalleryRenderer';
 import * as css from './styles.css';
+import type { GalleryImage, GalleryRendererProps } from './types';
 
 type LayoutType = 'grid' | 'masonry' | 'carousel';
 

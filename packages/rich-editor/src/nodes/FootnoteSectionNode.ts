@@ -12,6 +12,7 @@ import type { ReactElement } from 'react';
 import { FootnoteSectionRenderer } from '../components/renderers/FootnoteSectionRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
 import { semanticClassNames, sharedStyles } from '../styles/shared.css';
+import { FOOTNOTE_SECTION_NODE_KEY } from '../types/renderer-keys';
 
 export type SerializedFootnoteSectionNode = Spread<
   {
@@ -91,7 +92,7 @@ export class FootnoteSectionNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration('FootnoteSection', FootnoteSectionRenderer, {
+    return createRendererDecoration(FOOTNOTE_SECTION_NODE_KEY, FootnoteSectionRenderer, {
       definitions: this.__definitions,
       nodeKey: this.__key,
     });

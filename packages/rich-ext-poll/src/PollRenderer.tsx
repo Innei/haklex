@@ -1,14 +1,14 @@
 import { useCallback, useMemo, useState } from 'react';
 
-import { useInitialPollState, usePollDataAdapter } from '../../context/PollDataContext';
-import { pollClasses } from '../../styles/poll.css';
+import { pollClasses } from './poll.css';
+import { useInitialPollState, usePollDataAdapter } from './PollDataContext';
 import type {
   PollDataAdapter,
   PollOption,
   PollRendererProps,
   PollShowResults,
   PollState,
-} from '../../types/poll';
+} from './types';
 
 function shouldShowTallies(state: PollState, showResults?: PollShowResults): boolean {
   if (showResults === 'after-vote') return state.userVote !== undefined || state.closed;

@@ -1,10 +1,6 @@
 import 'react-photo-view/dist/react-photo-view.css';
 
-import {
-  decodeThumbHash,
-  type GalleryImage,
-  type GalleryRendererProps,
-} from '@haklex/rich-editor/renderers';
+import { decodeThumbHash } from '@haklex/rich-editor/renderers';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ComponentType, UIEventHandler } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -12,6 +8,7 @@ import { useInView } from 'react-intersection-observer';
 import { PhotoProvider, PhotoView } from 'react-photo-view';
 
 import * as css from './styles.css';
+import type { GalleryImage, GalleryRendererProps } from './types';
 
 const IMAGE_CONTAINER_MARGIN_INSET = 60;
 const CHILD_GAP = 15;

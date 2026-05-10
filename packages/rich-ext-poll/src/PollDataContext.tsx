@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { createContext, use, useMemo } from 'react';
 
-import type { PollDataAdapter, PollState } from '../types/poll';
+import type { PollDataAdapter, PollState } from './types';
 
 interface PollDataContextValue {
   adapter: PollDataAdapter | null;

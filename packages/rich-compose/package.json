@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-compose",
-  "version": "0.2.0",
+  "version": "0.5.0",
   "description": "Compose primitives for haklex rich content renderers — Gundam-style assembly of Lexical nodes, sync/lazy renderers, and Provider stacks.",
   "repository": {
     "type": "git",
@@ -47,6 +47,9 @@
     "./modules/excalidraw/node": "./src/modules/excalidraw/node.ts",
     "./modules/nested-doc": "./src/modules/nested-doc/index.ts",
     "./modules/nested-doc/node": "./src/modules/nested-doc/node.ts",
+    "./modules/poll": "./src/modules/poll/index.ts",
+    "./modules/poll/node": "./src/modules/poll/node.ts",
+    "./modules/poll/renderer": "./src/modules/poll/renderer.tsx",
     "./style.css": "./dist/rich-compose.css"
   },
   "main": "./src/index.ts",
@@ -66,6 +69,7 @@
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-gallery": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
+    "@haklex/rich-ext-poll": "workspace:*",
     "@haklex/rich-renderer-alert": "workspace:*",
     "@haklex/rich-renderer-banner": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
@@ -95,6 +99,7 @@
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-gallery": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
+    "@haklex/rich-ext-poll": "workspace:*",
     "@haklex/rich-renderer-alert": "workspace:*",
     "@haklex/rich-renderer-banner": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
@@ -127,6 +132,9 @@
       "optional": true
     },
     "@haklex/rich-ext-nested-doc": {
+      "optional": true
+    },
+    "@haklex/rich-ext-poll": {
       "optional": true
     },
     "@haklex/rich-renderer-alert": {
@@ -295,6 +303,18 @@
       "./modules/nested-doc/node": {
         "import": "./dist/modules/nested-doc/node.mjs",
         "types": "./dist/modules/nested-doc/node.d.ts"
+      },
+      "./modules/poll": {
+        "import": "./dist/modules/poll/index.mjs",
+        "types": "./dist/modules/poll/index.d.ts"
+      },
+      "./modules/poll/node": {
+        "import": "./dist/modules/poll/node.mjs",
+        "types": "./dist/modules/poll/node.d.ts"
+      },
+      "./modules/poll/renderer": {
+        "import": "./dist/modules/poll/renderer.mjs",
+        "types": "./dist/modules/poll/renderer.d.ts"
       },
       "./style.css": "./dist/rich-compose.css"
     },

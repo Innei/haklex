@@ -10,10 +10,10 @@ pnpm add @haklex/rich-ext-code-snippet
 
 ## Peer Dependencies
 
-| Package | Version |
-| --- | --- |
+| Package   | Version   |
+| --------- | --------- |
 | `lexical` | `^0.41.0` |
-| `react` | `>= 19` |
+| `react`   | `>= 19`   |
 
 Key runtime dependencies include `@codemirror/*` (editor engine), `@dnd-kit/*` (drag-and-drop), and `shiki` (syntax highlighting).
 
@@ -21,45 +21,58 @@ Key runtime dependencies include `@codemirror/*` (editor engine), `@dnd-kit/*` (
 
 ### Register nodes in your editor config
 
-```ts
-import { codeSnippetEditNodes } from '@haklex/rich-ext-code-snippet'
+Edit (read + write):
 
-// Add to your Lexical editor node list
-const editorConfig = {
-  nodes: [...codeSnippetEditNodes],
-}
+```ts
+import { codeSnippetEditNodes } from '@haklex/rich-ext-code-snippet/edit';
+
+const editorConfig = { nodes: [...codeSnippetEditNodes] };
 ```
 
-For static/read-only rendering:
+Static / read-only:
 
 ```ts
-import { codeSnippetNodes } from '@haklex/rich-ext-code-snippet/static'
+import { codeSnippetNodes } from '@haklex/rich-ext-code-snippet/node';
 
-const staticConfig = {
-  nodes: [...codeSnippetNodes],
-}
+const staticConfig = { nodes: [...codeSnippetNodes] };
 ```
 
 ### Use renderers
 
 ```tsx
-import { CodeSnippetEditRenderer } from '@haklex/rich-ext-code-snippet'
-import { CodeSnippetRenderer } from '@haklex/rich-ext-code-snippet/static'
+import { CodeSnippetEditRenderer } from '@haklex/rich-ext-code-snippet/edit';
+import { CodeSnippetRenderer } from '@haklex/rich-ext-code-snippet/renderer';
 ```
 
 ### Markdown transformer
 
 ```ts
-import { CODE_SNIPPET_BLOCK_TRANSFORMER } from '@haklex/rich-ext-code-snippet'
+import { CODE_SNIPPET_BLOCK_TRANSFORMER } from '@haklex/rich-ext-code-snippet/node';
 
-// Add to your Lexical markdown transformers array
-const transformers = [CODE_SNIPPET_BLOCK_TRANSFORMER]
+const transformers = [CODE_SNIPPET_BLOCK_TRANSFORMER];
 ```
+
+### Tree-shake the default renderer
+
+The default `CodeSnippetRenderer` is **not** statically imported by `CodeSnippetNode`. Register a custom renderer through `RendererConfig` to drop the heavy default chunk:
+
+```ts
+import { CODE_SNIPPET_NODE_KEY, codeSnippetNodes } from '@haklex/rich-ext-code-snippet/node';
+import type { RichRendererModule } from '@haklex/rich-compose';
+
+const lightModule: RichRendererModule = {
+  name: 'code-snippet',
+  nodes: codeSnippetNodes,
+  renderers: { [CODE_SNIPPET_NODE_KEY]: MyLightCodeSnippet },
+};
+```
+
+`@haklex/rich-compose`'s `codeSnippetModule` lazy-loads the default renderer via `lazyRenderers`; the override pattern above bypasses it entirely.
 
 ### Import styles
 
 ```ts
-import '@haklex/rich-ext-code-snippet/style.css'
+import '@haklex/rich-ext-code-snippet/style.css';
 ```
 
 ## Exports
@@ -77,17 +90,24 @@ import '@haklex/rich-ext-code-snippet/style.css'
 - `CodeSnippetRenderer` -- static renderer (no heavy UI deps)
 - `CodeSnippetEditRenderer` -- edit renderer with CodeMirror, drag-and-drop tabs
 
+### Slot Key
+
+- `CODE_SNIPPET_NODE_KEY` -- `'CodeSnippet'` constant for `RendererConfig` slot lookup
+
 ### Transformers
 
 - `CODE_SNIPPET_BLOCK_TRANSFORMER` -- Markdown block transformer
 
-### Sub-path Exports
+## Sub-path Exports
 
-| Path | Description |
-| --- | --- |
-| `@haklex/rich-ext-code-snippet` | Full exports (edit + static) |
-| `@haklex/rich-ext-code-snippet/static` | Static-only (no CodeMirror/dnd-kit deps) |
-| `@haklex/rich-ext-code-snippet/style.css` | Stylesheet |
+| Path                                      | Description                                               |
+| ----------------------------------------- | --------------------------------------------------------- |
+| `@haklex/rich-ext-code-snippet`           | Full exports (node + renderer + edit)                     |
+| `@haklex/rich-ext-code-snippet/node`      | Lightweight node + slot key + types — no default renderer |
+| `@haklex/rich-ext-code-snippet/renderer`  | Default `CodeSnippetRenderer` (heavy)                     |
+| `@haklex/rich-ext-code-snippet/edit`      | Edit-mode node + `CodeSnippetEditRenderer`                |
+| `@haklex/rich-ext-code-snippet/static`    | Convenience: node + renderer (SSR bundle)                 |
+| `@haklex/rich-ext-code-snippet/style.css` | Stylesheet                                                |
 
 ## Part of Haklex
 

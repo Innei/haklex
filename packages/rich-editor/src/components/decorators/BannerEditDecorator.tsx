@@ -11,6 +11,7 @@ import { useCallback } from 'react';
 
 import type { BannerType } from '../../nodes/BannerNode';
 import { $isBannerNode } from '../../nodes/BannerNode';
+import { BANNER_NODE_KEY } from '../../types/renderer-keys';
 import { BannerRenderer } from '../renderers/BannerRenderer';
 import { RendererWrapper } from '../RendererWrapper';
 
@@ -44,7 +45,7 @@ export function BannerEditDecorator({
     <div className="rich-banner-inner">
       <RendererWrapper
         defaultRenderer={BannerRenderer}
-        rendererKey="Banner"
+        rendererKey={BANNER_NODE_KEY}
         props={{
           type: bannerType,
           editable,

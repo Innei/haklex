@@ -13,6 +13,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 
 import { $isCodeBlockNode } from '../../nodes/CodeBlockNode';
+import { CODE_BLOCK_NODE_KEY } from '../../types/renderer-keys';
 import {
   consumeCodeBlockCursorIntent,
   setCodeBlockCursorIntent,
@@ -183,7 +184,7 @@ export function CodeBlockEditDecorator({ nodeKey, code, language }: CodeBlockEdi
   return (
     <RendererWrapper
       defaultRenderer={CodeBlockRenderer}
-      rendererKey="CodeBlock"
+      rendererKey={CODE_BLOCK_NODE_KEY}
       props={{
         code,
         language,

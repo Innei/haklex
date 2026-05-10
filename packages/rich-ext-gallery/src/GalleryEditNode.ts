@@ -1,6 +1,4 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
-import type { GalleryImage, GalleryRendererProps } from '@haklex/rich-editor/renderers';
-import { createRendererDecoration } from '@haklex/rich-editor/renderers';
 import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical';
 import { $getNodeByKey, $insertNodes } from 'lexical';
 import { Images } from 'lucide-react';
@@ -9,6 +7,7 @@ import { createElement } from 'react';
 
 import { GalleryNode, type GalleryNodePayload, type SerializedGalleryNode } from './GalleryNode';
 import { GalleryRenderer } from './GalleryRenderer';
+import type { GalleryImage, GalleryRendererProps } from './types';
 
 export class GalleryEditNode extends GalleryNode {
   static commandItems: CommandItemConfig[] = [
@@ -67,7 +66,7 @@ export class GalleryEditNode extends GalleryNode {
         });
       },
     };
-    return createRendererDecoration('Gallery', GalleryRenderer, props);
+    return createElement(GalleryRenderer, props);
   }
 }
 
