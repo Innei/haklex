@@ -1,8 +1,8 @@
 import './poll.css';
-import './augment';
 
 import { PollRenderer } from './PollRenderer';
 
+export * from './augment';
 export type { PollDataProviderProps } from './PollDataContext';
 export { PollDataProvider, useInitialPollState, usePollDataAdapter } from './PollDataContext';
 export type {

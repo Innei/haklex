@@ -1,9 +1,8 @@
-import './augment';
-
 import type { Klass, LexicalNode } from 'lexical';
 
 import { ChatNode } from './nodes/ChatNode';
 
+export * from './augment';
 export { $createChatNode, $isChatNode, ChatNode } from './nodes/ChatNode';
 export { CHAT_NODE_KEY } from './slot';
 export type {

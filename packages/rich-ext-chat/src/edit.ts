@@ -4,6 +4,7 @@ import type { Klass, LexicalNode } from 'lexical';
 
 import { ChatEditNode } from './nodes/ChatEditNode';
 
+export * from './augment';
 export type { ChatEditDecoratorProps } from './ChatEditDecorator';
 export { ChatEditDecorator } from './ChatEditDecorator';
 export type { ChatEditorModalProps } from './ChatEditorModal';

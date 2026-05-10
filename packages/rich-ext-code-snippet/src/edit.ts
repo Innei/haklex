@@ -4,6 +4,7 @@ import type { Klass, LexicalNode } from 'lexical';
 
 import { CodeSnippetEditNode } from './nodes/CodeSnippetEditNode';
 
+export * from './augment';
 export type { CodeSnippetEditRendererProps } from './CodeSnippetEditRenderer';
 export { CodeSnippetEditRenderer } from './CodeSnippetEditRenderer';
 export {

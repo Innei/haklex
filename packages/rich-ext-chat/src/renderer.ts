@@ -1,8 +1,8 @@
 import './styles.css';
-import './augment';
 
 import { ChatRenderer } from './ChatRenderer';
 
+export * from './augment';
 export type {
   ChatMessage,
   ChatParticipant,

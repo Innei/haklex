@@ -4,6 +4,7 @@ import type { Klass, LexicalNode } from 'lexical';
 
 import { GalleryEditNode } from './GalleryEditNode';
 
+export * from './augment';
 export { $createGalleryEditNode, $isGalleryEditNode, GalleryEditNode } from './GalleryEditNode';
 export { GalleryEditRenderer } from './GalleryEditRenderer';
 

@@ -1,9 +1,8 @@
-import './augment';
-
 import type { Klass, LexicalNode } from 'lexical';
 
 import { CodeSnippetNode } from './nodes/CodeSnippetNode';
 
+export * from './augment';
 export type { SerializedCodeSnippetNode } from './nodes/CodeSnippetNode';
 export {
   $createCodeSnippetNode,

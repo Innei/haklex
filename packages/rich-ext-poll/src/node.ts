@@ -1,9 +1,8 @@
-import './augment';
-
 import type { Klass, LexicalNode } from 'lexical';
 
 import { PollNode } from './nodes/PollNode';
 
+export * from './augment';
 export { extractPolls } from './extractPolls';
 export type { PollNodePayload, SerializedPollNode } from './nodes/PollNode';
 export {

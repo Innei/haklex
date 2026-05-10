@@ -9,4 +9,4 @@ declare module '@haklex/rich-editor' {
   }
 }
 
-export {};
+export const __augmentLoaded_chat = true;
