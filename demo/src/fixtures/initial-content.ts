@@ -12,6 +12,7 @@ import {
   listItem,
   nestedDoc,
   paragraph,
+  poll,
   quote,
   table,
   tableCell,
@@ -356,6 +357,33 @@ console.log(greet('nested'))`,
     paragraph(text('Paragraph 11: Only visible after expanding.')),
     paragraph(text('Paragraph 12: Final paragraph of the nested document.')),
   ) as any,
+
+  heading('h2', text('Poll')),
+
+  paragraph(text('Polls render interactively in the readonly renderer below — try voting:')),
+
+  poll({
+    pollId: 'p_demo_single',
+    question: 'Which cat species do you prefer?',
+    options: [
+      { id: 'o_ragdoll', label: 'Ragdoll' },
+      { id: 'o_amshort', label: 'American Shorthair' },
+      { id: 'o_orange', label: 'Orange tabby' },
+    ],
+    mode: 'single',
+  }) as any,
+
+  poll({
+    pollId: 'p_demo_multi',
+    question: 'Which pets have you raised? (multi-select)',
+    options: [
+      { id: 'o_cat', label: 'Cat' },
+      { id: 'o_dog', label: 'Dog' },
+      { id: 'o_hamster', label: 'Hamster' },
+      { id: 'o_fish', label: 'Fish' },
+    ],
+    mode: 'multiple',
+  }) as any,
 
   heading('h2', text('Link Card')),
 

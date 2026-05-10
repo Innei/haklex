@@ -1,8 +1,8 @@
 import { vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
-const tintIdle = 'rgba(0, 0, 0, 0.04)';
-const tintActive = 'rgba(0, 0, 0, 0.08)';
+const tintIdle = vars.color.fillTertiary;
+const tintActive = vars.color.fillSecondary;
 
 export const pollContainer = style({
   borderTop: `1px solid ${vars.color.hrBorder}`,

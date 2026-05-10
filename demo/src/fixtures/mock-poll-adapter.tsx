@@ -5,7 +5,7 @@ interface PollStore {
   byPollId: Record<string, PollState>;
 }
 
-const STORAGE_KEY = 'haklex-demo-poll-store-v1';
+const STORAGE_KEY = 'haklex-demo-poll-store-v2';
 
 const seedTallies: Record<string, Record<string, number>> = {
   p_demo_single: {
@@ -36,6 +36,7 @@ function totalOf(tallies: Record<string, number>): number {
   return Object.values(tallies).reduce((acc, n) => acc + n, 0);
 }
 
+// unlimited mode：永远可投（canVote 恒 true），保留 userVote 以显示反馈
 function buildState(pollId: string, prev: PollState | undefined): PollState {
   const tallies = prev?.tallies ?? { ...seedTallies[pollId] };
   return {
@@ -44,7 +45,7 @@ function buildState(pollId: string, prev: PollState | undefined): PollState {
     userVote: prev?.userVote,
     status: 'ready',
     closed: false,
-    canVote: prev?.userVote === undefined,
+    canVote: true,
   };
 }
 
@@ -82,11 +83,17 @@ class PollMockBackend {
           tallies,
           totalVotes: totalOf(tallies),
           userVote: optionIds,
-          canVote: false,
+          canVote: true,
           status: 'ready',
         },
       },
     };
+    this.persist();
+    this.emit();
+  };
+
+  reset = (): void => {
+    this.store = { byPollId: {} };
     this.persist();
     this.emit();
   };
@@ -116,3 +123,5 @@ export const mockPollAdapter: PollDataAdapter = {
     ),
   useSubmit: (pollId) => (optionIds) => backend.submit(pollId, optionIds),
 };
+
+export const resetMockPolls = (): void => backend.reset();

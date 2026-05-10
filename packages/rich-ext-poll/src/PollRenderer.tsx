@@ -74,7 +74,7 @@ function PollInteractive({
   const showTallies = shouldShowTallies(state, showResults);
   const userVoted = state.userVote !== undefined;
   const isClosed = state.closed;
-  const canInteract = !userVoted && !isClosed && state.canVote && state.status !== 'loading';
+  const canInteract = !isClosed && state.canVote && state.status !== 'loading';
 
   const tallyShare = useCallback(
     (optionId: string): number => {
@@ -113,6 +113,7 @@ function PollInteractive({
     setIsSubmitting(true);
     try {
       await submit([...pendingSelection]);
+      setPendingSelection([]);
     } finally {
       setIsSubmitting(false);
     }
