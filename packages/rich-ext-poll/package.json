@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-poll",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Reader-facing vote/poll widget extension",
   "repository": {
     "type": "git",
