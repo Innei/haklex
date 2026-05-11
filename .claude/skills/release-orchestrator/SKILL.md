@@ -110,15 +110,74 @@ until npm view "@haklex/$pkg@$NEW_VERSION" version > /dev/null 2>&1; do sleep 5;
 
 Do **not** proceed to downstream updates until every published package is resolvable from the registry.
 
-## Phase 5 — Commit and push haklex
+## Phase 5 — Commit, tag, push haklex
 
 ```bash
 git add packages/*/package.json pnpm-lock.yaml
 git commit -m "release: v$NEW_VERSION"
+git tag "v$NEW_VERSION"
 git push
+git push origin "v$NEW_VERSION"
 ```
 
 Only stage the bumped manifests and lockfile. If the worktree has unrelated edits, stop and ask the user.
+
+Phase 4 invoked `bumpp -r --no-tag` to defer tagging until after manifests land on `main` — keep that flag so a single annotated tag points at the release commit, not at the pre-publish state.
+
+## Phase 5.5 — Draft GitHub release (note authored by user)
+
+Release notes (incl. breaking changes, new features, migration steps) live on GitHub Releases. The skill drafts the note from the changeset and creates a **draft** release — the user reviews and publishes from the GitHub UI.
+
+1. Build the draft note from `git log` and Phase 2's classification. Group commits by type, surface breaking changes first:
+
+   ```bash
+   COMMITS=$(git log --pretty=format:'- %s (%h)' "$LAST"..HEAD)
+   # Bucket lines by leading conventional-commit type:
+   #   feat!: / fix!: / BREAKING CHANGE in body → ## Breaking Changes
+   #   feat:                                    → ## Features
+   #   fix:                                     → ## Bug Fixes
+   #   refactor: / perf: / docs: / chore:       → ## Other
+   ```
+
+   Header the note with the Phase 2 bump classification table so reviewers see _why_ the level was chosen.
+
+2. Write the draft to a temp file (`mktemp`) so the user can edit before publishing:
+
+   ```bash
+   NOTE=$(mktemp)
+   cat > "$NOTE" << 'EOF'
+   ## Summary
+   <one-paragraph synthesis of the changeset — written by the orchestrator>
+   
+   ## Breaking Changes
+   <bullets — explicit migration steps per item, or "None">
+   
+   ## Features
+   <bullets>
+   
+   ## Bug Fixes
+   <bullets>
+   
+   ## Bump rationale
+   <Phase 2 table>
+   EOF
+   ```
+
+3. Create the release as a **draft** bound to the pushed tag:
+
+   ```bash
+   gh release create "v$NEW_VERSION" \
+     --title "v$NEW_VERSION" \
+     --notes-file "$NOTE" \
+     --draft \
+     --verify-tag
+   ```
+
+   `--draft` means the release is invisible to the public until the user publishes it. `--verify-tag` fails fast if Phase 5's `git push origin "v$NEW_VERSION"` didn't land — do not silently fall back to `--target HEAD`.
+
+4. Print the draft URL (`gh release view "v$NEW_VERSION" --json url -q .url`) so the user can review and publish. Do **not** wait for publication — downstream propagation proceeds in parallel.
+
+If `gh` is missing or unauthenticated (`gh auth status` fails), stop and ask the user — do not skip the release step and push downstream anyway. The release is a required artefact, not an optional convenience.
 
 ## Phase 6 — Downstream update in parallel worktrees
 
@@ -176,6 +235,12 @@ Run the three repos in parallel (one subagent per worktree). Collect pass/fail p
 1. **Local revert (safe, automatic):**
 
    ```bash
+   # Delete draft release first (safe — never published, never indexed)
+   gh release delete "v$NEW_VERSION" --yes 2> /dev/null || true
+   # Delete the tag locally and on the remote
+   git -C haklex tag -d "v$NEW_VERSION" 2> /dev/null || true
+   git -C haklex push origin ":refs/tags/v$NEW_VERSION" 2> /dev/null || true
+   
    git -C haklex reset --hard HEAD~1     # undo "release: v$NEW_VERSION"
    git -C haklex push --force-with-lease # ONLY if already pushed — ASK user first
    for repo in Yohaku admin-vue3 mx-core; do
@@ -183,6 +248,8 @@ Run the three repos in parallel (one subagent per worktree). Collect pass/fail p
      git -C "/Users/innei/git/innei-repo/$repo" branch -D "chore/haklex-$NEW_VERSION"
    done
    ```
+
+   If the user has **already published** the draft release on GitHub, treat the version as in-the-wild — fall through to step 2 (publish a fix as a new patch) instead of deleting the release.
 
 2. **npm unpublish (risky — always ask user first):** within 72 h of publish, if no other package has installed it:
 
@@ -245,6 +312,15 @@ Print:
 | admin-vue3 | main   | …          | —    | ✅ / ✅ / ✅                    |
 | mx-core    | main   | …          | —    | ✅ / ✅ / (skipped)             |
 
+Then surface the **draft GitHub release URL** as a separate, prominent line — this is the user's next action:
+
+```
+👉 Draft release pending review: https://github.com/Innei/haklex/releases/tag/v$NEW_VERSION
+   Edit the auto-drafted notes (breaking changes, features, migration steps) and click "Publish release".
+```
+
+Do not mark the release as "complete" in the summary until the user publishes it.
+
 ## Quick reference
 
 | Step             | Command                                                                                           |
@@ -260,23 +336,30 @@ Print:
 | Default branch   | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master) |
 | Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                            |
 | Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                   |
+| Tag haklex       | `git tag v$V && git push origin v$V` (after commit, before downstream)                            |
+| Draft release    | `gh release create v$V --title v$V --notes-file $NOTE --draft --verify-tag`                       |
+| Delete draft     | `gh release delete v$V --yes && git push origin :refs/tags/v$V` (rollback only)                   |
 
 ## Common mistakes
 
-| Mistake                                            | Fix                                                                                     |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| Asking the caller for release metadata             | Infer the changeset summary and affected packages from `git log` and `git diff`         |
-| Publishing before registry poll succeeds           | Downstream `pnpm install` 404s or resolves stale mirror                                 |
-| Treating a Context-creating lib as a regular dep   | Promote to peer (reference: commit 88bb7a0 — lucide-react)                              |
-| Attempting per-package bumps                       | Not supported — shared version; highest-wins                                            |
-| `git add -A` in a dirty downstream worktree        | Stage only the pinned-version files per Repo layout table                               |
-| Running `pnpm run release:rich` inside this skill  | That script compresses bump/build/publish into one step; this skill needs them separate |
-| `npm unpublish` without user confirmation          | Always ask — unpublish is public, permanent, and time-limited                           |
-| Force-pushing reverts without `--force-with-lease` | Use `--force-with-lease`; ask user before pushing any force                             |
-| Opening a PR for the downstream bump               | Bumps go direct to the default branch — no PR, no `gh pr create`                        |
-| Pushing the `chore/haklex-$V` branch to origin     | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch |
-| Skipping `git fetch` + rebase before push          | Default branch may have advanced during the release; rebase on `origin/$D` first        |
-| Targeting a feature branch or guessing `main`      | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`              |
+| Mistake                                            | Fix                                                                                                                 |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Asking the caller for release metadata             | Infer the changeset summary and affected packages from `git log` and `git diff`                                     |
+| Publishing before registry poll succeeds           | Downstream `pnpm install` 404s or resolves stale mirror                                                             |
+| Treating a Context-creating lib as a regular dep   | Promote to peer (reference: commit 88bb7a0 — lucide-react)                                                          |
+| Attempting per-package bumps                       | Not supported — shared version; highest-wins                                                                        |
+| `git add -A` in a dirty downstream worktree        | Stage only the pinned-version files per Repo layout table                                                           |
+| Running `pnpm run release:rich` inside this skill  | That script compresses bump/build/publish into one step; this skill needs them separate                             |
+| `npm unpublish` without user confirmation          | Always ask — unpublish is public, permanent, and time-limited                                                       |
+| Force-pushing reverts without `--force-with-lease` | Use `--force-with-lease`; ask user before pushing any force                                                         |
+| Opening a PR for the downstream bump               | Bumps go direct to the default branch — no PR, no `gh pr create`                                                    |
+| Pushing the `chore/haklex-$V` branch to origin     | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch                             |
+| Skipping `git fetch` + rebase before push          | Default branch may have advanced during the release; rebase on `origin/$D` first                                    |
+| Targeting a feature branch or guessing `main`      | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`                                          |
+| Writing release notes into README                  | Notes live on GitHub Releases — README only links there; never paste a "What's new" block back into any in-repo doc |
+| Publishing the GitHub release as non-draft         | Always `--draft` from the skill; the user reviews and publishes from the GitHub UI                                  |
+| Skipping `--verify-tag` on `gh release create`     | Without it, gh silently creates a tag at HEAD, decoupling the release from the bump commit                          |
+| Forgetting to delete the draft on rollback         | A lingering draft + tag confuses the next release attempt — always clean up in Phase 8a                             |
 
 ## Red flags — STOP and ask
 
@@ -289,6 +372,8 @@ Print:
 - Downstream repo has no `main` branch (ask the user which branch is canonical; never guess)
 - Rebase against `origin/main` surfaces conflicts (something else landed during the release)
 - `main` is protected in a way that rejects direct push (fall back to opening a PR, but ask first)
+- `gh auth status` fails or `gh` is not installed — release artefact is required, do not skip
+- A draft release for `v$NEW_VERSION` already exists (stale from a previous failed attempt) — delete it before re-creating, or the user will edit the wrong one
 
 ## Real-world anchors
 

@@ -7,22 +7,6 @@
 
 ---
 
-## What's New in 0.5.0
-
-- **Sub-path split for `@haklex/rich-ext-{chat,code-snippet,gallery,poll}`** — each ext now exposes `/node` (light), `/renderer` (heavy default), `/edit`, `/static`, and `/` (full) entries. Default renderers are no longer statically imported by their nodes, so consumers can drop them via custom `RendererConfig` overrides.
-- **Slot key constants** — every renderer slot now ships an `XXX_NODE_KEY` constant (e.g. `IMAGE_NODE_KEY`, `POLL_NODE_KEY`) from each owning package. Use these in `createRendererDecoration` and `RichRendererModule.renderers` instead of bare string literals.
-- **`RendererConfig` decoupling** — `@haklex/rich-editor` no longer carries ext type definitions. Each ext package reverse-augments `RendererConfig` via `declare module '@haklex/rich-editor'`. Downstream apps follow the same pattern to add bespoke slots.
-- **Lazy module renderers** — `@haklex/rich-compose` modules register heavy defaults via `lazyRenderers: { Key: () => import('@haklex/rich-ext-X/renderer') }`, enabling chunk-splitting out of the box.
-
-### Breaking Changes
-
-- `@haklex/rich-editor` no longer re-exports ext renderer prop types. Move imports as follows:
-  - `PollRendererProps`, `PollDataAdapter`, etc. → `@haklex/rich-ext-poll/node`
-  - `ChatRendererProps`, `ChatMessage`, etc. → `@haklex/rich-ext-chat/node`
-  - `CodeFile`, `CodeSnippetRendererProps` → `@haklex/rich-ext-code-snippet/node`
-  - `GalleryImage`, `GalleryRendererProps` → `@haklex/rich-ext-gallery/node`
-- `RichRendererModule.renderers` keys still type-check against `keyof RendererConfig`; use the new slot-key constants for safer call sites.
-
 ## Key Features
 
 - **AI Agent Integration** — Built-in AI writing agent with LiteXML serialization, diff review overlay, selection-aware context capture, and streaming document edits — the editor is designed as a human–AI collaborative surface
