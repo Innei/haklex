@@ -19,7 +19,7 @@ import {
   $getRoot,
   $getState,
   $parseSerializedNode,
-  type LexicalEditor,
+  type LexicalEditor as LexicalEditorInstance,
   type LexicalNode,
   type SerializedEditorState,
 } from 'lexical';
@@ -27,7 +27,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useFullWidth } from '../context/FullWidthContext';
 import { useTheme } from '../context/ThemeContext';
-import { ShiroEditor } from '../shiro';
+import { LexicalEditor } from '../lexical';
 
 interface DemoProviderConfig {
   apiKey: string;
@@ -296,7 +296,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
   const [selectedModel, setSelectedModel] = useState<SelectedModel | null>(loadSelectedModel);
 
   const agentLoopRef = useRef<ReturnType<typeof useAgentLoop> | null>(null);
-  const editorRef = useRef<LexicalEditor | null>(null);
+  const editorRef = useRef<LexicalEditorInstance | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const provider = useMemo(() => {
@@ -419,7 +419,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
     <div className="agent-split">
       <div className="agent-pane-editor">
         <MentionPlatformProvider platforms={{}}>
-          <ShiroEditor
+          <LexicalEditor
             floatingToolbarActions={provider ? <AgentAskAIAction /> : undefined}
             header={<ToolbarPlugin />}
             initialValue={initialContent}
@@ -433,7 +433,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
               provider={provider}
               store={store}
             />
-          </ShiroEditor>
+          </LexicalEditor>
         </MentionPlatformProvider>
       </div>
       <div className="agent-pane-chat" data-theme={theme}>
@@ -461,7 +461,7 @@ function AgentLoopCapture({
   provider,
   store,
 }: {
-  editorRef: React.RefObject<LexicalEditor | null>;
+  editorRef: React.RefObject<LexicalEditorInstance | null>;
   loopRef: React.RefObject<ReturnType<typeof useAgentLoop> | null>;
   provider: LLMProvider | null;
   store: ReturnType<typeof createAgentStore>;
@@ -486,7 +486,7 @@ function AgentLoopCaptureInner({
   provider,
   store,
 }: {
-  editorRef: React.RefObject<LexicalEditor | null>;
+  editorRef: React.RefObject<LexicalEditorInstance | null>;
   loopRef: React.RefObject<ReturnType<typeof useAgentLoop> | null>;
   provider: LLMProvider;
   store: ReturnType<typeof createAgentStore>;

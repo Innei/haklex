@@ -8,14 +8,14 @@ import type { RichRendererModule } from './types';
  *   2. Same module.name → replace previous module entirely; warn in dev
  *   3. Else → append
  */
-export function mergeModules(
-  preset: RichRendererModule[] | undefined,
-  modules: RichRendererModule[] | undefined,
-): RichRendererModule[] {
+export function mergeModules<M extends RichRendererModule>(
+  preset: M[] | undefined,
+  modules: M[] | undefined,
+): M[] {
   const all = [...(preset ?? []), ...(modules ?? [])];
-  const refSeen = new Set<RichRendererModule>();
+  const refSeen = new Set<M>();
   const byName = new Map<string, number>();
-  const result: RichRendererModule[] = [];
+  const result: M[] = [];
 
   for (const m of all) {
     if (refSeen.has(m)) continue;
@@ -23,7 +23,6 @@ export function mergeModules(
 
     const existingIdx = byName.get(m.name);
     if (existingIdx !== undefined) {
-       
       console.warn(
         `[rich-compose] module name collision: "${m.name}" — replacing previous registration. ` +
           `Pass the same module reference to silence this warning.`,
@@ -40,13 +39,14 @@ export function mergeModules(
 }
 
 /**
- * Dedup by class reference. Throws if two distinct Klasses share the same
- * `getType()` — multiple Klass instances will break `instanceof` checks
- * across module boundaries.
+ * Dedup by class reference. When two Klasses share the same `getType()`,
+ * a subclass relationship (edit Klass extends base Klass) auto-resolves:
+ * the subclass replaces its parent. Unrelated collisions throw — `instanceof`
+ * would break across module boundaries.
  */
 export function dedupNodes(nodes: Klass<LexicalNode>[]): Klass<LexicalNode>[] {
   const seen = new Set<Klass<LexicalNode>>();
-  const byType = new Map<string, Klass<LexicalNode>>();
+  const byType = new Map<string, number>();
   const result: Klass<LexicalNode>[] = [];
 
   for (const Node of nodes) {
@@ -54,18 +54,33 @@ export function dedupNodes(nodes: Klass<LexicalNode>[]): Klass<LexicalNode>[] {
     seen.add(Node);
 
     const type = typeof Node.getType === 'function' ? Node.getType() : undefined;
-    if (type !== undefined) {
-      const prev = byType.get(type);
-      if (prev !== undefined && prev !== Node) {
-        throw new Error(
-          `[rich-compose] node type collision on "${type}": two distinct Klass references registered. ` +
-            `This breaks \`instanceof\` checks. Ensure peerDeps/lexical version are pinned and a single module exports each type.`,
-        );
-      }
-      byType.set(type, Node);
+    if (type === undefined) {
+      result.push(Node);
+      continue;
     }
 
-    result.push(Node);
+    const prevIdx = byType.get(type);
+    if (prevIdx === undefined) {
+      byType.set(type, result.length);
+      result.push(Node);
+      continue;
+    }
+
+    const prev = result[prevIdx];
+    if (Node === prev) continue;
+
+    if (Node.prototype instanceof prev) {
+      result[prevIdx] = Node;
+      continue;
+    }
+    if (prev.prototype instanceof Node) {
+      continue;
+    }
+
+    throw new Error(
+      `[rich-compose] node type collision on "${type}": two distinct Klass references registered. ` +
+        `This breaks \`instanceof\` checks. Ensure peerDeps/lexical version are pinned and a single module exports each type.`,
+    );
   }
 
   return result;

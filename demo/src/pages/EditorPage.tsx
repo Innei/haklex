@@ -1,11 +1,8 @@
 import {
   type NestedDocDialogEditorProps,
   NestedDocDialogEditorProvider,
-  nestedDocEditNodes,
-  nestedDocNodes,
   NestedDocPlugin,
 } from '@haklex/rich-ext-nested-doc';
-import { pollEditNodes, pollNodes } from '@haklex/rich-ext-poll';
 import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import { createThemeStyle } from '@haklex/rich-style-token';
@@ -18,7 +15,7 @@ import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { extraMentionPlatforms } from '../fixtures/extra-mention-platforms';
 import { initialContent } from '../fixtures/initial-content';
-import { ShiroEditor, ShiroRenderer } from '../shiro';
+import { LexicalEditor, LexicalRenderer } from '../lexical';
 
 interface ColorSet {
   accent: string;
@@ -76,8 +73,7 @@ const colorOverridePresets: ColorPreset[] = [
 
 function NestedDocDialogEditor({ initialValue, onEditorReady }: NestedDocDialogEditorProps) {
   return (
-    <ShiroEditor
-      extraNodes={[...nestedDocEditNodes, ...pollEditNodes]}
+    <LexicalEditor
       header={<ToolbarPlugin insertItemOrder={insertItemOrder} maxVisibleInsertItems={5} />}
       initialValue={initialValue}
       onEditorReady={onEditorReady}
@@ -258,10 +254,9 @@ export function EditorPage() {
 
           {/* Editor panel */}
           <Panel badge={variant} bodyStyle={{ padding: 0 }} title="Editor">
-            <ShiroEditor
+            <LexicalEditor
               autoFocus
               extraMentionPlatforms={activePlatforms.length > 0 ? activePlatforms : undefined}
-              extraNodes={[...nestedDocEditNodes, ...pollEditNodes]}
               header={<ToolbarPlugin insertItemOrder={insertItemOrder} maxVisibleInsertItems={5} />}
               initialValue={initialContent}
               placeholder="Start typing... Try markdown shortcuts like # heading, **bold**, *italic*, > quote, ||spoiler||"
@@ -272,14 +267,13 @@ export function EditorPage() {
               onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
             >
               <NestedDocPlugin />
-            </ShiroEditor>
+            </LexicalEditor>
           </Panel>
 
           {/* Renderer panel */}
           {showRenderer && (
             <Panel badge={variant} title="Renderer (readonly)">
-              <ShiroRenderer
-                extraNodes={[...nestedDocNodes, ...pollNodes]}
+              <LexicalRenderer
                 style={themeOverrideStyle}
                 theme={theme}
                 value={editorState ?? initialContent}

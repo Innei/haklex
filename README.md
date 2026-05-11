@@ -135,7 +135,7 @@ haklex/
 ├── @haklex/rich-headless
 └── @haklex/rich-style-token
 
-@haklex/rich-compose (modular composition API + SSR engine `RichRenderer`)
+@haklex/rich-compose (modular composition API: `composeRenderer`, `composeEditor` + SSR engine `RichRenderer`)
 
 @haklex/rich-ext-ai-agent (AI writing agent + diff review UI)
 ├── @haklex/rich-agent-core → @haklex/rich-litexml
@@ -154,13 +154,13 @@ haklex/
 
 ### Core
 
-| Package                    | Description                                                                                      |
-| -------------------------- | ------------------------------------------------------------------------------------------------ |
-| `@haklex/rich-editor`      | Core editor component, all builtin + custom Lexical nodes, built-in plugins, editor contexts     |
-| `@haklex/rich-editor-ui`   | Headless UI primitives — Dialog, Dropdown, Popover, Combobox, Tooltip, ColorPicker, AnimatedTabs |
-| `@haklex/rich-headless`    | Zero-React node registry for server-side Lexical JSON → Markdown conversion                      |
-| `@haklex/rich-style-token` | Design tokens, CSS variables, and variant presets                                                |
-| `@haklex/rich-compose`     | Module composition API (`composeRenderer`, `RichRendererModule`) + `RichRenderer` SSR engine     |
+| Package                    | Description                                                                                                                         |
+| -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `@haklex/rich-editor`      | Core editor component, all builtin + custom Lexical nodes, built-in plugins, editor contexts                                        |
+| `@haklex/rich-editor-ui`   | Headless UI primitives — Dialog, Dropdown, Popover, Combobox, Tooltip, ColorPicker, AnimatedTabs                                    |
+| `@haklex/rich-headless`    | Zero-React node registry for server-side Lexical JSON → Markdown conversion                                                         |
+| `@haklex/rich-style-token` | Design tokens, CSS variables, and variant presets                                                                                   |
+| `@haklex/rich-compose`     | Module composition API (`composeRenderer` + `composeEditor`, `RichRendererModule` / `RichEditorModule`) + `RichRenderer` SSR engine |
 
 ### Renderers
 
@@ -179,7 +179,7 @@ Each renderer has a **static** variant (display-only) and an **edit** variant (i
 | `rich-renderer-ruby`      | Ruby annotations for CJK text                                   |
 | `rich-renderer-katex`     | KaTeX math (inline and block)                                   |
 
-Composed via `@haklex/rich-compose` modules. Apps that need a pre-baked editor + renderer (the legacy `ShiroEditor` / `ShiroRenderer`) own a local copy — see `demo/src/shiro/` and `admin-vue3/packages/rich-react/src/shiro/`.
+Composed via `@haklex/rich-compose` modules. Apps that need a pre-baked editor + renderer wire `composeEditor` / `composeRenderer` with the aggregate barrels `@haklex/rich-compose/editor` and `@haklex/rich-compose/renderer` — see `demo/src/lexical/` for a reference.
 
 ### Plugins
 
@@ -252,8 +252,11 @@ function MyEditor() {
 ### Static Renderer (Read-Only Display)
 
 ```tsx
-import { RichRenderer } from '@haklex/rich-compose';
+import { composeRenderer } from '@haklex/rich-compose';
+import { allRendererModules } from '@haklex/rich-compose/renderer';
 import '@haklex/rich-editor/style.css';
+
+const RichRenderer = composeRenderer({ modules: allRendererModules });
 
 function MyArticle({ content }) {
   return <RichRenderer value={content} variant="article" theme="light" />;
@@ -277,7 +280,18 @@ editor.read(() => {
 
 ### Pre-Baked Editor / Renderer (per-app)
 
-Apps that want a "batteries included" surface own a local `ShiroEditor` / `ShiroRenderer` wrapper composed from `@haklex/rich-compose` modules + per-renderer / per-plugin packages. See `demo/src/shiro/` for a reference copy.
+For a "batteries included" surface, `composeEditor` + `composeRenderer` with the aggregate barrels yield wired-up components in two lines:
+
+```tsx
+import { composeEditor, composeRenderer } from '@haklex/rich-compose';
+import { allEditorModules } from '@haklex/rich-compose/editor';
+import { allRendererModules } from '@haklex/rich-compose/renderer';
+
+export const MyEditor = composeEditor({ modules: allEditorModules });
+export const MyRenderer = composeRenderer({ modules: allRendererModules });
+```
+
+Cherry-pick individual modules from `@haklex/rich-compose/modules/<name>` and `@haklex/rich-compose/modules/<name>/edit` for smaller bundles. See `demo/src/lexical/` for a reference wrapper that adds plugin wiring (slash menu, block handle, floating toolbar, etc.).
 
 ## Available Scripts
 

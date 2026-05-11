@@ -14,42 +14,61 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./renderer": "./src/renderer.ts",
+    "./editor": "./src/editor.ts",
     "./modules/embed": "./src/modules/embed/index.ts",
+    "./modules/embed/edit": "./src/modules/embed/edit.ts",
     "./modules/embed/node": "./src/modules/embed/node.ts",
     "./modules/code-block": "./src/modules/code-block/index.ts",
+    "./modules/code-block/edit": "./src/modules/code-block/edit.ts",
     "./modules/code-block/renderer": "./src/modules/code-block/renderer.tsx",
     "./modules/link-card": "./src/modules/link-card/index.ts",
+    "./modules/link-card/edit": "./src/modules/link-card/edit.tsx",
     "./modules/link-card/renderer": "./src/modules/link-card/renderer.tsx",
     "./modules/gallery": "./src/modules/gallery/index.ts",
+    "./modules/gallery/edit": "./src/modules/gallery/edit.ts",
     "./modules/gallery/node": "./src/modules/gallery/node.ts",
     "./modules/gallery/renderer": "./src/modules/gallery/renderer.tsx",
     "./modules/code-snippet": "./src/modules/code-snippet/index.ts",
+    "./modules/code-snippet/edit": "./src/modules/code-snippet/edit.ts",
     "./modules/code-snippet/node": "./src/modules/code-snippet/node.ts",
     "./modules/code-snippet/renderer": "./src/modules/code-snippet/renderer.tsx",
     "./modules/chat": "./src/modules/chat/index.ts",
+    "./modules/chat/edit": "./src/modules/chat/edit.ts",
     "./modules/chat/node": "./src/modules/chat/node.ts",
     "./modules/chat/renderer": "./src/modules/chat/renderer.tsx",
     "./modules/alert": "./src/modules/alert/index.ts",
+    "./modules/alert/edit": "./src/modules/alert/edit.ts",
     "./modules/alert/renderer": "./src/modules/alert/renderer.tsx",
     "./modules/banner": "./src/modules/banner/index.ts",
+    "./modules/banner/edit": "./src/modules/banner/edit.ts",
     "./modules/banner/renderer": "./src/modules/banner/renderer.tsx",
     "./modules/image": "./src/modules/image/index.ts",
+    "./modules/image/edit": "./src/modules/image/edit.ts",
     "./modules/image/renderer": "./src/modules/image/renderer.tsx",
     "./modules/mention": "./src/modules/mention/index.ts",
+    "./modules/mention/edit": "./src/modules/mention/edit.ts",
     "./modules/mention/renderer": "./src/modules/mention/renderer.tsx",
     "./modules/ruby": "./src/modules/ruby/index.ts",
+    "./modules/ruby/edit": "./src/modules/ruby/edit.ts",
     "./modules/ruby/renderer": "./src/modules/ruby/renderer.tsx",
     "./modules/video": "./src/modules/video/index.ts",
+    "./modules/video/edit": "./src/modules/video/edit.ts",
     "./modules/video/renderer": "./src/modules/video/renderer.tsx",
     "./modules/mermaid": "./src/modules/mermaid/index.ts",
+    "./modules/mermaid/edit": "./src/modules/mermaid/edit.ts",
     "./modules/mermaid/renderer": "./src/modules/mermaid/renderer.tsx",
     "./modules/excalidraw": "./src/modules/excalidraw/index.ts",
+    "./modules/excalidraw/edit": "./src/modules/excalidraw/edit.tsx",
     "./modules/excalidraw/node": "./src/modules/excalidraw/node.ts",
     "./modules/nested-doc": "./src/modules/nested-doc/index.ts",
+    "./modules/nested-doc/edit": "./src/modules/nested-doc/edit.ts",
     "./modules/nested-doc/node": "./src/modules/nested-doc/node.ts",
     "./modules/poll": "./src/modules/poll/index.ts",
+    "./modules/poll/edit": "./src/modules/poll/edit.ts",
     "./modules/poll/node": "./src/modules/poll/node.ts",
     "./modules/poll/renderer": "./src/modules/poll/renderer.tsx",
+    "./modules/katex/edit": "./src/modules/katex/edit.ts",
     "./style-token": "./src/style-token/index.ts",
     "./style-token/styles": "./src/style-token/styles.ts",
     "./style.css": "./dist/rich-compose.css"
@@ -114,6 +133,14 @@
       ".": {
         "import": "./dist/index.mjs",
         "types": "./dist/index.d.ts"
+      },
+      "./renderer": {
+        "import": "./dist/renderer.mjs",
+        "types": "./dist/renderer.d.ts"
+      },
+      "./editor": {
+        "import": "./dist/editor.mjs",
+        "types": "./dist/editor.d.ts"
       },
       "./modules/embed": {
         "import": "./dist/modules/embed/index.mjs",
@@ -258,6 +285,74 @@
       "./modules/poll/renderer": {
         "import": "./dist/modules/poll/renderer.mjs",
         "types": "./dist/modules/poll/renderer.d.ts"
+      },
+      "./modules/alert/edit": {
+        "import": "./dist/modules/alert/edit.mjs",
+        "types": "./dist/modules/alert/edit.d.ts"
+      },
+      "./modules/banner/edit": {
+        "import": "./dist/modules/banner/edit.mjs",
+        "types": "./dist/modules/banner/edit.d.ts"
+      },
+      "./modules/chat/edit": {
+        "import": "./dist/modules/chat/edit.mjs",
+        "types": "./dist/modules/chat/edit.d.ts"
+      },
+      "./modules/code-block/edit": {
+        "import": "./dist/modules/code-block/edit.mjs",
+        "types": "./dist/modules/code-block/edit.d.ts"
+      },
+      "./modules/code-snippet/edit": {
+        "import": "./dist/modules/code-snippet/edit.mjs",
+        "types": "./dist/modules/code-snippet/edit.d.ts"
+      },
+      "./modules/embed/edit": {
+        "import": "./dist/modules/embed/edit.mjs",
+        "types": "./dist/modules/embed/edit.d.ts"
+      },
+      "./modules/excalidraw/edit": {
+        "import": "./dist/modules/excalidraw/edit.mjs",
+        "types": "./dist/modules/excalidraw/edit.d.ts"
+      },
+      "./modules/gallery/edit": {
+        "import": "./dist/modules/gallery/edit.mjs",
+        "types": "./dist/modules/gallery/edit.d.ts"
+      },
+      "./modules/image/edit": {
+        "import": "./dist/modules/image/edit.mjs",
+        "types": "./dist/modules/image/edit.d.ts"
+      },
+      "./modules/katex/edit": {
+        "import": "./dist/modules/katex/edit.mjs",
+        "types": "./dist/modules/katex/edit.d.ts"
+      },
+      "./modules/link-card/edit": {
+        "import": "./dist/modules/link-card/edit.mjs",
+        "types": "./dist/modules/link-card/edit.d.ts"
+      },
+      "./modules/mention/edit": {
+        "import": "./dist/modules/mention/edit.mjs",
+        "types": "./dist/modules/mention/edit.d.ts"
+      },
+      "./modules/mermaid/edit": {
+        "import": "./dist/modules/mermaid/edit.mjs",
+        "types": "./dist/modules/mermaid/edit.d.ts"
+      },
+      "./modules/nested-doc/edit": {
+        "import": "./dist/modules/nested-doc/edit.mjs",
+        "types": "./dist/modules/nested-doc/edit.d.ts"
+      },
+      "./modules/poll/edit": {
+        "import": "./dist/modules/poll/edit.mjs",
+        "types": "./dist/modules/poll/edit.d.ts"
+      },
+      "./modules/ruby/edit": {
+        "import": "./dist/modules/ruby/edit.mjs",
+        "types": "./dist/modules/ruby/edit.d.ts"
+      },
+      "./modules/video/edit": {
+        "import": "./dist/modules/video/edit.mjs",
+        "types": "./dist/modules/video/edit.d.ts"
       },
       "./style-token": {
         "import": "./dist/style-token/index.mjs",

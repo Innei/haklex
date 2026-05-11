@@ -12,7 +12,7 @@ import { VariantPicker } from '../components/VariantPicker';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { initialContent } from '../fixtures/initial-content';
-import { ShiroRenderer } from '../shiro';
+import { LexicalRenderer as ShiroRenderer } from '../lexical';
 import type { BlockInfo, Comment } from '../types/comments';
 
 function extractTextContent(node: any): string {

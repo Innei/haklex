@@ -78,4 +78,24 @@ describe('dedupNodes', () => {
     const B = class {} as any;
     expect(dedupNodes([A, B, A])).toEqual([A, B]);
   });
+
+  it('subclass with same getType() replaces parent', () => {
+    class Base {
+      static getType() {
+        return 'foo';
+      }
+    }
+    class Edit extends Base {}
+    expect(dedupNodes([Base as any, Edit as any])).toEqual([Edit]);
+  });
+
+  it('parent registered after subclass is skipped', () => {
+    class Base {
+      static getType() {
+        return 'foo';
+      }
+    }
+    class Edit extends Base {}
+    expect(dedupNodes([Edit as any, Base as any])).toEqual([Edit]);
+  });
 });

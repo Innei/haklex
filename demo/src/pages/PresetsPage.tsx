@@ -11,7 +11,7 @@ import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { presets } from '../fixtures';
 import { allExtraPlatformMeta } from '../fixtures/extra-mention-platforms';
-import { ShiroEditor, ShiroRenderer } from '../shiro';
+import { LexicalEditor, LexicalRenderer } from '../lexical';
 
 // ── Helpers ──
 
@@ -111,7 +111,7 @@ export function PresetsPage() {
           </div>
           <Panel badge={`${variant} · ${mode}`} title={selected.label}>
             {mode === 'edit' ? (
-              <ShiroEditor
+              <LexicalEditor
                 initialValue={selected.data}
                 key={`${selected.key}-edit`}
                 theme={theme}
@@ -119,7 +119,7 @@ export function PresetsPage() {
                 onChange={setLiveState}
               />
             ) : (
-              <ShiroRenderer
+              <LexicalRenderer
                 key={`${selected.key}-readonly`}
                 theme={theme}
                 value={selected.data}

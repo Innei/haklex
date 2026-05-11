@@ -1,5 +1,4 @@
 import type { ColorScheme } from '@haklex/rich-editor';
-import { pollEditNodes, pollNodes } from '@haklex/rich-ext-poll';
 import type { SerializedEditorState } from 'lexical';
 import { Masonry } from 'masonic';
 import { createContext, use, useCallback, useMemo, useState } from 'react';
@@ -8,7 +7,7 @@ import { JsonViewer } from '../components/JsonViewer';
 import { useTheme } from '../context/ThemeContext';
 import type { NodeSample } from '../fixtures';
 import { nodeSamples } from '../fixtures';
-import { ShiroEditor, ShiroRenderer } from '../shiro';
+import { LexicalEditor, LexicalRenderer } from '../lexical';
 
 type Filter = 'all' | 'inline' | 'block' | 'container';
 
@@ -53,8 +52,7 @@ function NodeCard({ data: sample }: { data: NodeSample }) {
         <div className="node-card-desc">{sample.description}</div>
         <div className="node-card-preview">
           {isEdit ? (
-            <ShiroEditor
-              extraNodes={pollEditNodes}
+            <LexicalEditor
               initialValue={sample.data}
               key={`${sample.key}-edit`}
               theme={theme}
@@ -62,8 +60,8 @@ function NodeCard({ data: sample }: { data: NodeSample }) {
               onChange={(state) => onEditorChange(sample.key, state)}
             />
           ) : (
-            <ShiroRenderer
-              extraNodes={pollNodes}
+            <LexicalRenderer
+              key={`${sample.key}-readonly`}
               theme={theme}
               value={sample.data}
               variant={variant}
