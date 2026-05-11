@@ -19,15 +19,16 @@ If no package has publishable `src/**` changes, stop and report that there is no
 
 ## Repo layout
 
-| Concern                | Path / Rule                                                                                                                                                                                                                                         |
-| ---------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| haklex root            | Run the release from the **same worktree** where `git status` is clean. Use `git worktree list` to confirm. Never switch checkouts mid-release.                                                                                                     |
-| Published namespace    | `@haklex/*`, via `pnpm run publish:packages` (excludes `@haklex/rich-editor-demo`).                                                                                                                                                                 |
-| Version strategy       | **Shared** — every `@haklex/*` lives on the same version (read from `packages/rich-editor/package.json`).                                                                                                                                           |
-| Downstream: Yohaku     | `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json` — `rich-editor`, `rich-kit-shiro`, `rich-static-renderer`                                                                                                                                |
-| Downstream: admin-vue3 | `/Users/innei/git/innei-repo/admin-vue3/package.json` — `rich-diff`, `rich-ext-nested-doc`, `rich-editor`, `rich-editor-ui`, `rich-kit-shiro`, `rich-plugin-toolbar`, `rich-style-token`, `rich-agent-chat`, `rich-agent-core`, `rich-ext-ai-agent` |
-| Downstream: mx-core    | `/Users/innei/git/innei-repo/mx-core/apps/core/package.json` — `rich-headless` only                                                                                                                                                                 |
-| mx-space               | Same repo as `mx-core` (mx-core is mx-space/core).                                                                                                                                                                                                  |
+| Concern                | Path / Rule                                                                                                                                                                                                         |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| haklex root            | Run the release from the **same worktree** where `git status` is clean. Use `git worktree list` to confirm. Never switch checkouts mid-release.                                                                     |
+| Published namespace    | `@haklex/*`, via `pnpm run publish:packages` (excludes `@haklex/rich-editor-demo`).                                                                                                                                 |
+| Version strategy       | **Shared** — every `@haklex/*` lives on the same version (read from `packages/rich-editor/package.json`).                                                                                                           |
+| Downstream: Yohaku     | `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json` — actual pin set varies; derive via `grep '"@haklex/' apps/web/package.json` at release time                                                             |
+| Downstream: admin-vue3 | `/Users/innei/git/innei-repo/admin-vue3/packages/rich-react/package.json` — actual pin set varies; derive via `grep '"@haklex/' packages/rich-react/package.json` at release time                                   |
+| Downstream: mx-core    | `/Users/innei/git/innei-repo/mx-core/apps/core/package.json` — `rich-headless` only                                                                                                                                 |
+| mx-space               | Same repo as `mx-core` (mx-core is mx-space/core).                                                                                                                                                                  |
+| Deleted packages       | `@haklex/rich-kit-shiro`, `@haklex/rich-static-renderer` were retired. If a downstream's tracked branch still lists them, drop them entirely instead of bumping (re-pinning a deleted package will 404 at install). |
 
 ## Phase 1 — Pre-flight
 
