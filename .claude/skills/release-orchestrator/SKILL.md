@@ -99,7 +99,7 @@ Compute topological order from the workspace graph:
 pnpm -r ls --depth -1 --json
 ```
 
-Typical leaf-first order: `rich-style-token` → `rich-headless` → `rich-editor-ui` → `rich-editor` → renderer packages → plugin packages → extension packages → `rich-renderers` / `rich-renderers-edit` → `rich-static-renderer` → `rich-kit-shiro`.
+Typical leaf-first order: `rich-style-token` → `rich-headless` → `rich-editor-ui` → `rich-editor` → renderer packages → plugin packages → extension packages → `rich-compose` (composition + SSR top of tree).
 
 Publish leaves first, one at a time, polling the registry after each (npm CDN propagation typically lags 30–120 s):
 
