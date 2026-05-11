@@ -1,4 +1,5 @@
 import { vars } from '@haklex/rich-style-token';
+import { Flame, Percent, Tag, ThumbsUp } from 'lucide-react';
 
 import type {
   LinkCardData,
@@ -29,7 +30,7 @@ export const leetcodePlugin: LinkCardPlugin = {
   name: 'leetcode',
   displayName: 'LeetCode',
   priority: 65,
-  typeClass: 'wide',
+  shape: 'wide',
   provider: 'leetcode',
 
   matchUrl(url: URL): UrlMatchResult | null {
@@ -82,7 +83,7 @@ export const leetcodePlugin: LinkCardPlugin = {
                   color: '#fb923c',
                 }}
               >
-                👍
+                <ThumbsUp aria-hidden size={13} strokeWidth={2} />
                 <span style={{ fontFamily: 'sans-serif', fontWeight: 500 }}>
                   {questionTitleData.likes}
                 </span>
@@ -92,21 +93,44 @@ export const leetcodePlugin: LinkCardPlugin = {
         </span>
       ),
       desc: (
-        <>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
           <span
             style={{
-              marginRight: '16px',
-              fontWeight: 'bold',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontWeight: 600,
               color: getDifficultyColor(questionTitleData.difficulty),
             }}
           >
+            <Flame aria-hidden size={13} strokeWidth={2} />
             {questionTitleData.difficulty}
           </span>
-          <span style={{ overflow: 'hidden' }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+            }}
+          >
+            <Tag aria-hidden size={12} strokeWidth={2} />
             {questionTitleData.topicTags.map((tag: any) => tag.translatedName).join(' / ')}
           </span>
-          <span style={{ float: 'right', overflow: 'hidden' }}>AR: {stats.acRate}</span>
-        </>
+          <span
+            style={{
+              marginLeft: 'auto',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              color: '#a3a3a3',
+            }}
+          >
+            <Percent aria-hidden size={12} strokeWidth={2} />
+            {stats.acRate}
+          </span>
+        </span>
       ),
       image: 'https://upload.wikimedia.org/wikipedia/commons/1/19/LeetCode_logo_black.png',
       color: getDifficultyColor(questionTitleData.difficulty),

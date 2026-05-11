@@ -4,11 +4,6 @@ import type { ReactNode } from 'react';
  * 卡片数据 - 插件只提供数据，渲染统一
  */
 export interface LinkCardData {
-  /** CSS 类名覆盖 */
-  classNames?: {
-    image?: string;
-    cardRoot?: string;
-  };
   /** 高亮/主题色 (hex 格式) */
   color?: string;
   /** 卡片描述 */
@@ -53,8 +48,14 @@ export interface LinkCardFetchContext {
   fetchJson?: <T = unknown>(input: string, init?: RequestInit) => Promise<T>;
 }
 
-/** 卡片类型样式 */
-export type LinkCardTypeClass = 'media' | 'github' | 'academic' | 'wide';
+/**
+ * 卡片形状（layout shape）
+ * - compact:  默认横版小图，标题 + 双行 desc
+ * - expanded: 较宽，三行 desc（长摘要场景）
+ * - wide:     全宽，多行块状 desc（音乐 / 题目）
+ * - poster:   全宽 + 直立海报图（影 / 番剧）
+ */
+export type LinkCardShape = 'compact' | 'expanded' | 'wide' | 'poster';
 
 /**
  * 插件接口 - 每个插件自包含
@@ -90,8 +91,8 @@ export interface LinkCardPlugin<TMeta = Record<string, unknown>> {
   /** 插件依赖的 provider 名称，用于路由到对应请求适配器 */
   readonly provider?: string;
 
-  /** 卡片样式类型 */
-  readonly typeClass?: LinkCardTypeClass;
+  /** 卡片形状 */
+  readonly shape?: LinkCardShape;
 }
 
 /**

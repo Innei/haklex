@@ -1,37 +1,38 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token';
+import { Star, Users } from 'lucide-react';
 
 import type {
   LinkCardData,
   LinkCardFetchContext,
   LinkCardPlugin,
   UrlMatchResult,
-} from '../../types'
+} from '../../types';
 import {
   allowedBangumiTypes,
   bangumiTypeMap,
   fetchJsonWithContext,
   generateColor,
-} from '../../utils'
+} from '../../utils';
 
 export const bangumiPlugin: LinkCardPlugin = {
   name: 'bangumi',
   displayName: 'Bangumi',
   priority: 70,
-  typeClass: 'media',
+  shape: 'poster',
   provider: 'bangumi',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'bgm.tv' && url.hostname !== 'bangumi.tv') return null
-    const parts = url.pathname.split('/').filter(Boolean)
-    if (parts.length < 2) return null
-    const [type, realId] = parts
-    if (!allowedBangumiTypes.includes(type)) return null
-    return { id: `${type}/${realId}`, fullUrl: url.toString(), meta: { type } }
+    if (url.hostname !== 'bgm.tv' && url.hostname !== 'bangumi.tv') return null;
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts.length < 2) return null;
+    const [type, realId] = parts;
+    if (!allowedBangumiTypes.includes(type)) return null;
+    return { id: `${type}/${realId}`, fullUrl: url.toString(), meta: { type } };
   },
 
   isValidId(id: string): boolean {
-    const [type, realId] = id.split('/')
-    return allowedBangumiTypes.includes(type) && realId?.length > 0
+    const [type, realId] = id.split('/');
+    return allowedBangumiTypes.includes(type) && realId?.length > 0;
   },
 
   async fetch(
@@ -39,43 +40,40 @@ export const bangumiPlugin: LinkCardPlugin = {
     _meta?: Record<string, unknown>,
     context?: LinkCardFetchContext,
   ): Promise<LinkCardData> {
-    const [type, realId] = id.split('/')
+    const [type, realId] = id.split('/');
     const json = await fetchJsonWithContext(
       `https://api.bgm.tv/v0/${bangumiTypeMap[type]}/${realId}`,
       context,
       'bangumi',
-    )
+    );
 
-    let title = ''
-    let originalTitle = ''
+    let title = '';
+    let originalTitle = '';
 
     if (type === 'subject') {
       if (json.name_cn && json.name_cn !== json.name && json.name_cn !== '') {
-        title = json.name_cn
-        originalTitle = json.name
+        title = json.name_cn;
+        originalTitle = json.name;
       } else {
-        title = json.name
-        originalTitle = json.name
+        title = json.name;
+        originalTitle = json.name;
       }
     } else if (type === 'character' || type === 'person') {
-      const { infobox } = json
-      infobox.forEach(
-        (item: { key: string; value: string | { v: string }[] }) => {
-          if (item.key === '简体中文名') {
-            title =
-              typeof item.value === 'string' ? item.value : item.value[0].v
-          } else if (item.key === '别名') {
-            const aliases = item.value as { v: string }[]
-            aliases.forEach((alias) => {
-              originalTitle += `${alias.v} / `
-            })
-            originalTitle = originalTitle.slice(0, -3)
-          }
-        },
-      )
+      const { infobox } = json;
+      infobox.forEach((item: { key: string; value: string | { v: string }[] }) => {
+        if (item.key === '简体中文名') {
+          title = typeof item.value === 'string' ? item.value : item.value[0].v;
+        } else if (item.key === '别名') {
+          const aliases = item.value as { v: string }[];
+          aliases.forEach((alias) => {
+            originalTitle += `${alias.v} / `;
+          });
+          originalTitle = originalTitle.slice(0, -3);
+        }
+      });
     }
 
-    const starStyle = {
+    const ratingStyle = {
       display: 'inline-flex',
       flexShrink: 0,
       alignItems: 'center',
@@ -83,7 +81,17 @@ export const bangumiPlugin: LinkCardPlugin = {
       alignSelf: 'center' as const,
       fontSize: vars.typography.fontSizeXs,
       color: '#fb923c',
-    }
+    } as const;
+
+    const collectStyle = {
+      display: 'inline-flex',
+      flexShrink: 0,
+      alignItems: 'center',
+      gap: '4px',
+      alignSelf: 'center' as const,
+      fontSize: vars.typography.fontSizeXs,
+      color: '#a3a3a3',
+    } as const;
 
     return {
       title: (
@@ -97,9 +105,7 @@ export const bangumiPlugin: LinkCardPlugin = {
         >
           <span>{title}</span>
           {title !== originalTitle && (
-            <span
-              style={{ fontSize: vars.typography.fontSizeMd, opacity: 0.7 }}
-            >
+            <span style={{ fontSize: vars.typography.fontSizeMd, opacity: 0.7 }}>
               ({originalTitle})
             </span>
           )}
@@ -113,14 +119,14 @@ export const bangumiPlugin: LinkCardPlugin = {
                 alignSelf: 'center',
               }}
             >
-              <span style={starStyle}>
-                ★
+              <span style={ratingStyle}>
+                <Star aria-hidden size={13} strokeWidth={2} />
                 <span style={{ fontFamily: 'sans-serif', fontWeight: 500 }}>
                   {json.rating.score > 0 && json.rating.score.toFixed(1)}
                 </span>
               </span>
-              <span style={starStyle}>
-                ☆
+              <span style={collectStyle}>
+                <Users aria-hidden size={13} strokeWidth={2} />
                 <span style={{ fontFamily: 'sans-serif', fontWeight: 500 }}>
                   {json.collection &&
                     json.collection.on_hold +
@@ -133,8 +139,8 @@ export const bangumiPlugin: LinkCardPlugin = {
             </span>
           )}
           {(type === 'character' || type === 'person') && (
-            <span style={starStyle}>
-              ☆
+            <span style={collectStyle}>
+              <Users aria-hidden size={13} strokeWidth={2} />
               <span style={{ fontFamily: 'sans-serif', fontWeight: 500 }}>
                 {json.stat.collects > 0 && json.stat.collects}
               </span>
@@ -142,17 +148,9 @@ export const bangumiPlugin: LinkCardPlugin = {
           )}
         </span>
       ),
-      desc: (
-        <span style={{ overflow: 'visible', whiteSpace: 'pre-wrap' }}>
-          {json.summary}
-        </span>
-      ),
+      desc: <span style={{ overflow: 'visible', whiteSpace: 'pre-wrap' }}>{json.summary}</span>,
       image: json.images.grid,
       color: generateColor(title),
-      classNames: {
-        image: 'link-card__image--poster',
-        cardRoot: 'link-card--poster',
-      },
-    }
+    };
   },
-}
+};

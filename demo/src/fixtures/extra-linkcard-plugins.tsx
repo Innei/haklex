@@ -9,7 +9,7 @@ import type {
   LinkCardPlugin,
   PluginRegistry,
   UrlMatchResult,
-} from '@haklex/rich-renderer-linkcard/static'
+} from '@haklex/rich-renderer-linkcard/static';
 
 /**
  * 示例 1: 豆瓣读书插件
@@ -19,18 +19,18 @@ export const doubanBookPlugin: LinkCardPlugin = {
   name: 'douban-book',
   displayName: 'Douban Book',
   priority: 75,
-  typeClass: 'media',
+  shape: 'poster',
   provider: 'douban',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'book.douban.com') return null
-    const match = url.pathname.match(/^\/subject\/(\d+)/)
-    if (!match) return null
-    return { id: match[1], fullUrl: url.toString() }
+    if (url.hostname !== 'book.douban.com') return null;
+    const match = url.pathname.match(/^\/subject\/(\d+)/);
+    if (!match) return null;
+    return { id: match[1], fullUrl: url.toString() };
   },
 
   isValidId(id: string): boolean {
-    return /^\d+$/.test(id)
+    return /^\d+$/.test(id);
   },
 
   async fetch(id: string): Promise<LinkCardData> {
@@ -40,13 +40,9 @@ export const doubanBookPlugin: LinkCardPlugin = {
       desc: `豆瓣评分 9.3 · Steve McConnell · 软件开发的百科全书 (ID: ${id})`,
       image: `https://picsum.photos/seed/douban-${id}/200/280`,
       color: '#319046',
-      classNames: {
-        image: 'link-card__image--poster',
-        cardRoot: 'link-card--poster',
-      },
-    }
+    };
   },
-}
+};
 
 /**
  * 示例 2: 内部工单系统插件
@@ -56,16 +52,17 @@ export const internalIssuePlugin: LinkCardPlugin = {
   name: 'internal-issue',
   displayName: 'Internal Issue Tracker',
   priority: 50,
+  shape: 'compact',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'issues.example.com') return null
-    const match = url.pathname.match(/^\/([\w-]+-\d+)/)
-    if (!match) return null
-    return { id: match[1], fullUrl: url.toString() }
+    if (url.hostname !== 'issues.example.com') return null;
+    const match = url.pathname.match(/^\/([\w-]+-\d+)/);
+    if (!match) return null;
+    return { id: match[1], fullUrl: url.toString() };
   },
 
   isValidId(id: string): boolean {
-    return /^[\w-]+-\d+$/.test(id)
+    return /^[\w-]+-\d+$/.test(id);
   },
 
   async fetch(id: string): Promise<LinkCardData> {
@@ -73,9 +70,9 @@ export const internalIssuePlugin: LinkCardPlugin = {
       title: `${id}: Implement dark mode for dashboard`,
       desc: 'Status: In Progress · Assignee: @innei · Sprint 24',
       color: '#6366f1',
-    }
+    };
   },
-}
+};
 
 /**
  * 示例 3: 覆盖内置 GitHub repo 插件（同名 "gh-repo" 替换内置）
@@ -85,17 +82,17 @@ export const customGithubRepoPlugin: LinkCardPlugin = {
   name: 'gh-repo',
   displayName: 'Custom GitHub Repo',
   priority: 100,
-  typeClass: 'github',
+  shape: 'compact',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'github.com') return null
-    const parts = url.pathname.split('/').filter(Boolean)
-    if (parts.length !== 2) return null
-    return { id: `${parts[0]}/${parts[1]}`, fullUrl: url.toString() }
+    if (url.hostname !== 'github.com') return null;
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts.length !== 2) return null;
+    return { id: `${parts[0]}/${parts[1]}`, fullUrl: url.toString() };
   },
 
   isValidId(id: string): boolean {
-    return /^[\w.-]+\/[\w.-]+$/.test(id)
+    return /^[\w.-]+\/[\w.-]+$/.test(id);
   },
 
   async fetch(id: string): Promise<LinkCardData> {
@@ -104,16 +101,13 @@ export const customGithubRepoPlugin: LinkCardPlugin = {
       desc: 'This card is rendered by the overridden gh-repo plugin',
       image: `https://opengraph.githubassets.com/1/${id}`,
       color: '#238636',
-    }
+    };
   },
-}
+};
 
 /**
  * 导出业务扩展插件列表
  * 使用方式：<LinkCardRenderer plugins={extraLinkCardPlugins} />
  * 内部会与 11 个内置插件合并（同名覆盖，按 priority 排序）
  */
-export const extraLinkCardPlugins: PluginRegistry = [
-  doubanBookPlugin,
-  internalIssuePlugin,
-]
+export const extraLinkCardPlugins: PluginRegistry = [doubanBookPlugin, internalIssuePlugin];

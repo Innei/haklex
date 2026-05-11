@@ -1,20 +1,16 @@
-export type { ConvertToLinkCardActionProps } from './ConvertToLinkCardAction'
-export { ConvertToLinkCardAction } from './ConvertToLinkCardAction'
-export { LinkCardFetchProvider, useLinkCardFetchContext } from './FetchContext'
-export type { UrlMatchInfo } from './hooks/useUrlMatcher'
-export { matchUrl, useUrlMatcher } from './hooks/useUrlMatcher'
-export { LinkCardEditDecorator } from './LinkCardEditDecorator'
-export {
-  $createLinkCardEditNode,
-  LinkCardEditNode,
-  linkCardEditNodes,
-} from './LinkCardEditNode'
-export type { EnhancedLinkCardProps } from './LinkCardRenderer'
-export { LinkCardRenderer } from './LinkCardRenderer'
-export { LinkCardSkeleton } from './LinkCardSkeleton'
-export type { PasteLinkCardPluginProps } from './PasteLinkCardPlugin'
-export { PasteLinkCardPlugin } from './PasteLinkCardPlugin'
-export { getPluginByName, pluginMap, plugins } from './plugins'
+export type { ConvertToLinkCardActionProps } from './ConvertToLinkCardAction';
+export { ConvertToLinkCardAction } from './ConvertToLinkCardAction';
+export { LinkCardFetchProvider, useLinkCardFetchContext } from './FetchContext';
+export type { UrlMatchInfo } from './hooks/useUrlMatcher';
+export { matchUrl, useUrlMatcher } from './hooks/useUrlMatcher';
+export { LinkCardEditDecorator } from './LinkCardEditDecorator';
+export { $createLinkCardEditNode, LinkCardEditNode, linkCardEditNodes } from './LinkCardEditNode';
+export type { EnhancedLinkCardProps } from './LinkCardRenderer';
+export { LinkCardRenderer } from './LinkCardRenderer';
+export { LinkCardSkeleton } from './LinkCardSkeleton';
+export type { PasteLinkCardPluginProps } from './PasteLinkCardPlugin';
+export { PasteLinkCardPlugin } from './PasteLinkCardPlugin';
+export { getPluginByName, pluginMap, plugins } from './plugins';
 export {
   arxivPlugin,
   bangumiPlugin,
@@ -27,22 +23,22 @@ export {
   neteaseMusicPlugin,
   qqMusicPlugin,
   tmdbPlugin,
-} from './plugins'
-export { createMxSpacePlugin } from './plugins'
-export type { MxSpacePluginConfig } from './plugins/self'
+} from './plugins';
+export { createMxSpacePlugin } from './plugins';
+export type { MxSpacePluginConfig } from './plugins/self';
 export type {
   LinkCardApiAdapter,
   LinkCardData,
   LinkCardFetchContext,
   LinkCardPlugin,
-  LinkCardTypeClass,
+  LinkCardShape,
   PluginRegistry,
   UrlMatchResult,
-} from './types'
+} from './types';
 export {
   camelcaseKeys,
   fetchGitHubApi,
   fetchJsonWithContext,
   generateColor,
   LanguageToColorMap,
-} from './utils'
+} from './utils';

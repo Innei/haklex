@@ -12,7 +12,7 @@ export const githubRepoPlugin: LinkCardPlugin = {
   name: 'gh-repo',
   displayName: 'GitHub Repository',
   priority: 100,
-  typeClass: 'github',
+  shape: 'compact',
   provider: 'github',
 
   matchUrl(url: URL): UrlMatchResult | null {

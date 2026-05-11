@@ -6,27 +6,29 @@ export const semanticClassNames = {
   cardShortDesc: 'link-card--short-desc',
   cardSkeleton: 'link-card--skeleton',
   cardError: 'link-card--error',
-  cardPoster: 'link-card--poster',
+  cardCompact: 'link-card--compact',
+  cardExpanded: 'link-card--expanded',
   cardWide: 'link-card--wide',
-  cardMedia: 'link-card--media',
-  cardGithub: 'link-card--github',
-  cardAcademic: 'link-card--academic',
+  cardPoster: 'link-card--poster',
   bg: 'link-card__bg',
   image: 'link-card__image',
-  imagePoster: 'link-card__image--poster',
-
   icon: 'link-card__icon',
   content: 'link-card__content',
   title: 'link-card__title',
   titleText: 'link-card__title-text',
   desc: 'link-card__desc',
   desc2: 'link-card__desc-2',
+  errorContent: 'link-card__error-content',
+  errorUrl: 'link-card__error-url',
+  errorHint: 'link-card__error-hint',
   editWrapper: 'rich-link-card-edit-wrapper',
   editPanel: 'rich-link-card-edit-panel',
   editUrlRow: 'rich-link-card-edit-url-row',
   editLinkIcon: 'rich-link-card-edit-link-icon',
   editInput: 'rich-link-card-edit-input',
 } as const;
+
+const hoverBorder = `color-mix(in srgb, ${vars.color.border}, ${vars.color.text} 25%)`;
 
 export const card = style({
   position: 'relative',
@@ -37,37 +39,32 @@ export const card = style({
   width: '32rem',
   maxWidth: '100%',
   margin: '1.25rem auto',
-  padding: '1rem',
-  borderRadius: '0.5rem',
+  padding: '0.875rem 1rem',
+  borderRadius: '0.625rem',
   overflow: 'hidden',
   cursor: 'pointer',
   textDecoration: 'none',
   color: 'inherit',
   textIndent: 0,
   fontFamily: vars.typography.fontFamilySans,
-  border: `1px solid color-mix(in srgb, ${vars.color.border} 80%, transparent)`,
-  backgroundColor: `color-mix(in srgb, ${vars.color.bgSecondary} 80%, transparent)`,
+  border: `1px solid ${vars.color.border}`,
+  backgroundColor: `color-mix(in srgb, ${vars.color.bgSecondary} 60%, transparent)`,
   backdropFilter: 'blur(12px) saturate(150%)',
-  transition: 'background-color 0.2s',
+  transition: 'border-color 0.15s, background-color 0.15s',
   selectors: {
     '&:hover': {
-      borderColor: vars.color.border,
+      borderColor: hoverBorder,
       backgroundColor: vars.color.fillTertiary,
       textDecoration: 'none',
     },
-    '&:focus': { textDecoration: 'none' },
-    '&:focus-visible': { textDecoration: 'none' },
-    '&:active': { textDecoration: 'none' },
+    '&:focus, &:focus-visible, &:active': { textDecoration: 'none' },
   },
 });
 
-export const cardShortDesc = style({
-  alignItems: 'center',
-});
+export const cardShortDesc = style({ alignItems: 'center' });
 
 globalStyle(`${card} *`, { fontStyle: 'normal !important' as any });
 globalStyle(`${card} span`, { borderBottom: '0 !important' as any });
-/* Prevent underline in any state (e.g. when holding Command/Ctrl) */
 globalStyle(`${card}, ${card}:hover, ${card}:focus, ${card}:focus-visible, ${card}:active`, {
   textDecoration: 'none !important' as any,
 });
@@ -88,16 +85,9 @@ export const image = style({
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
-  backgroundColor: vars.color.bgSecondary,
+  backgroundColor: vars.color.bgTertiary,
+  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.04)',
   zIndex: 1,
-});
-
-export const imagePoster = style({
-  width: '6.25rem !important' as any,
-  height: 'auto !important' as any,
-  minHeight: '8.75rem',
-  aspectRatio: '2 / 3',
-  alignSelf: 'stretch',
 });
 
 export const icon = style({
@@ -108,7 +98,8 @@ export const icon = style({
   width: '2.5rem',
   height: '2.5rem',
   borderRadius: '0.5rem',
-  backgroundColor: vars.color.bgSecondary,
+  backgroundColor: vars.color.bgTertiary,
+  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.04)',
   zIndex: 1,
 });
 
@@ -121,7 +112,7 @@ globalStyle(`${icon} img`, {
 globalStyle(`${icon} svg`, {
   width: '1.25rem',
   height: '1.25rem',
-  color: vars.color.textSecondary,
+  color: vars.color.textTertiary,
 });
 
 export const content = style({
@@ -161,140 +152,154 @@ export const desc = style({
   marginTop: '0.375rem',
   fontSize: vars.typography.fontSizeMd,
   lineHeight: '1.5',
-  color: vars.color.textSecondary,
+  color: vars.color.textTertiary,
   minWidth: 0,
 });
 
 export const desc2 = style({});
 
-export const cardPoster = style({
-  width: '100% !important' as any,
-  height: 'auto !important' as any,
+/* ───── shape: compact (default, matches base) ───── */
+export const shapeCompact = style({});
+
+/* ───── shape: expanded ───── */
+export const shapeExpanded = style({ width: '36rem' });
+globalStyle(`${shapeExpanded} ${desc}`, { WebkitLineClamp: 3 });
+
+/* ───── shape: wide ───── */
+export const shapeWide = style({
+  width: '100%',
+  maxWidth: '42rem',
+});
+globalStyle(`${shapeWide} ${desc}`, { WebkitLineClamp: 4 });
+
+/* ───── shape: poster ───── */
+export const shapePoster = style({
+  width: '100%',
   maxWidth: '40rem',
   padding: 0,
+  gap: 0,
+  alignItems: 'stretch',
 });
 
-globalStyle(`${cardPoster} ${image}`, {
+globalStyle(`${shapePoster} ${image}`, {
+  width: '6.75rem !important' as any,
+  height: 'auto !important' as any,
+  aspectRatio: '2 / 3',
   borderRadius: 0,
   alignSelf: 'stretch',
-  height: 'auto !important' as any,
-  marginLeft: '0 !important' as any,
+  boxShadow: 'none',
 });
 
-globalStyle(`${cardPoster} ${image}::after`, {
-  content: "''",
-  position: 'absolute',
-  inset: 0,
-  background: `linear-gradient(to right, transparent 60%, ${vars.color.bgSecondary})`,
-  pointerEvents: 'none',
-});
-
-globalStyle(`${cardPoster} ${content}`, {
-  padding: '1rem',
+globalStyle(`${shapePoster} ${content}`, {
+  padding: '1rem 1.125rem',
   display: 'flex',
   flexDirection: 'column',
   justifyContent: 'center',
 });
 
-export const cardWide = style({ width: '100%', maxWidth: '40rem' });
-export const cardMedia = style({
-  width: '100% !important' as any,
-  maxWidth: 'unset !important' as any,
-});
-globalStyle(`${cardMedia} ${desc}`, { WebkitLineClamp: 4 });
+globalStyle(`${shapePoster} ${desc}`, { WebkitLineClamp: 3 });
 
-export const cardGithub = style({
-  'width': '36rem',
-  '@media': { '(max-width: 640px)': { width: '100%' } },
-});
-
-export const cardAcademic = style({ width: '38rem' });
-globalStyle(`${cardAcademic} ${desc}`, { WebkitLineClamp: 3 });
-
-globalStyle(`${card}[data-source='gh-repo']`, { height: '6.25rem' });
-globalStyle(
-  `${card}[data-source='gh-commit'], ${card}[data-source='gh-pr'], ${card}[data-source='gh-issue'], ${card}[data-source='gh-discussion']`,
-  { height: '5rem' },
-);
-globalStyle(`${card}[data-source='gh-discussion'] ${titleText}`, {
-  WebkitLineClamp: 1,
-  lineClamp: 1,
-});
-globalStyle(`${card}[data-source='leetcode']`, { height: '5.25rem' });
-globalStyle(`${card}[data-source='arxiv']`, { height: '6rem' });
-globalStyle(`${card}[data-source='netease-music-song'], ${card}[data-source='qq-music-song']`, {
-  height: '5.75rem',
-});
-
-export const cardSkeleton = style({ animationPlayState: 'paused' });
-
-globalStyle(`${cardSkeleton} ${titleText}`, {
-  width: '8rem',
-  height: '1.25rem',
-  borderRadius: '0.375rem',
-  backgroundColor: vars.color.border,
-});
-
-globalStyle(`${cardSkeleton} ${desc}`, {
-  width: '100%',
-  marginTop: '0.5rem',
-  height: '0.875rem',
-  borderRadius: '0.375rem',
-  backgroundColor: vars.color.border,
-});
-
-globalStyle(`${cardSkeleton} ${desc2}`, {
-  width: '80%',
-});
-/* Compact cards: skeleton content = 2 lines (title + desc), hide desc2 */
-globalStyle(
-  `${cardSkeleton}[data-source='gh-commit'] ${desc2}, ${cardSkeleton}[data-source='gh-pr'] ${desc2}, ${cardSkeleton}[data-source='gh-issue'] ${desc2}, ${cardSkeleton}[data-source='gh-discussion'] ${desc2}`,
-  { display: 'none' },
-);
-
-globalStyle(`${cardSkeleton} ${image}`, {
-  backgroundColor: vars.color.border,
-});
+/* ───── skeleton ───── */
+export const cardSkeleton = style({});
 
 const linkCardPulse = keyframes({
   '0%, 100%': { opacity: 1 },
   '50%': { opacity: 0.5 },
 });
 
-globalStyle(`${cardSkeleton} ${titleText}, ${cardSkeleton} ${desc}, ${cardSkeleton} ${image}`, {
-  animation: `${linkCardPulse} 2s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
+globalStyle(`${cardSkeleton} ${titleText}`, {
+  width: '8rem',
+  height: '1rem',
+  borderRadius: '0.25rem',
+  backgroundColor: vars.color.bgTertiary,
 });
 
-export const cardError = style({});
-
-globalStyle(`${cardSkeleton}${cardError}`, {
-  backgroundColor:
-    `color-mix(in srgb, ${vars.color.alertCaution} 12%, transparent) !important` as any,
-  border: 0,
+globalStyle(`${cardSkeleton} ${desc}`, {
+  width: '100%',
+  marginTop: '0.5rem',
+  height: '0.75rem',
+  borderRadius: '0.25rem',
+  backgroundColor: vars.color.bgTertiary,
 });
 
-globalStyle(
-  `${cardSkeleton}${cardError} ${titleText}, ${cardSkeleton}${cardError} ${desc}, ${cardSkeleton}${cardError} ${image}`,
-  {
-    backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 47%, transparent)`,
-    color: 'transparent',
-    animation: 'none',
-  },
-);
+globalStyle(`${cardSkeleton} ${desc2}`, { width: '75%' });
 
-globalStyle(`${cardSkeleton}${cardError} ${content}`, {
-  overflow: 'hidden',
-  minWidth: 0,
-});
-
-globalStyle(`${cardSkeleton}${cardError} ${desc}`, {
-  width: '80%',
-});
-
-globalStyle(`${cardSkeleton}${cardError} ${image}`, {
+globalStyle(`${cardSkeleton} ${image}`, {
+  backgroundColor: vars.color.bgTertiary,
   backgroundImage: 'none !important' as any,
 });
 
+globalStyle(`${cardSkeleton} ${titleText}, ${cardSkeleton} ${desc}, ${cardSkeleton} ${image}`, {
+  animation: `${linkCardPulse} 1.6s cubic-bezier(0.4, 0, 0.6, 1) infinite`,
+});
+
+/* ───── error (degraded link, dashed border) ───── */
+export const cardError = style({
+  width: '32rem',
+  maxWidth: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  gap: '0.75rem',
+  margin: '1.25rem auto',
+  padding: '0.75rem 0.875rem',
+  borderRadius: '0.625rem',
+  border: `1px dashed ${vars.color.border}`,
+  backgroundColor: vars.color.bg,
+  color: vars.color.textTertiary,
+  textDecoration: 'none',
+  fontFamily: vars.typography.fontFamilySans,
+  cursor: 'pointer',
+  transition: 'border-color 0.15s, background-color 0.15s',
+  selectors: {
+    '&:hover': {
+      borderColor: hoverBorder,
+      backgroundColor: vars.color.fillQuaternary,
+      textDecoration: 'none',
+    },
+    '&:focus, &:focus-visible, &:active': { textDecoration: 'none' },
+  },
+});
+
+export const errorIcon = style({
+  flexShrink: 0,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '2rem',
+  height: '2rem',
+  borderRadius: '0.5rem',
+  backgroundColor: vars.color.bgSecondary,
+});
+
+globalStyle(`${errorIcon} svg`, {
+  width: '0.875rem',
+  height: '0.875rem',
+  color: vars.color.textQuaternary,
+});
+
+export const errorContent = style({
+  flex: 1,
+  minWidth: 0,
+});
+
+export const errorUrl = style({
+  display: 'block',
+  fontSize: vars.typography.fontSizeMd,
+  fontWeight: 500,
+  color: vars.color.textSecondary,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+});
+
+export const errorHint = style({
+  display: 'block',
+  marginTop: '0.125rem',
+  fontSize: vars.typography.fontSizeXs,
+  color: vars.color.textQuaternary,
+});
+
+/* ───── edit decorator (unchanged) ───── */
 export const editWrapper = style({
   display: 'block',
 });
@@ -339,28 +344,17 @@ export const editInput = style({
   minWidth: 0,
 });
 
-export const typeCardModifier = {
-  media: cardMedia,
-  github: cardGithub,
-  academic: cardAcademic,
-  wide: cardWide,
+/* ───── shape lookup ───── */
+export const shapeClass = {
+  compact: shapeCompact,
+  expanded: shapeExpanded,
+  wide: shapeWide,
+  poster: shapePoster,
 } as const;
 
-export const semanticTypeClassNames = {
-  media: semanticClassNames.cardMedia,
-  github: semanticClassNames.cardGithub,
-  academic: semanticClassNames.cardAcademic,
+export const semanticShapeClass = {
+  compact: semanticClassNames.cardCompact,
+  expanded: semanticClassNames.cardExpanded,
   wide: semanticClassNames.cardWide,
+  poster: semanticClassNames.cardPoster,
 } as const;
-
-export const semanticClassToStyle: Record<string, string> = {
-  [semanticClassNames.cardShortDesc]: cardShortDesc,
-  [semanticClassNames.cardSkeleton]: cardSkeleton,
-  [semanticClassNames.cardError]: cardError,
-  [semanticClassNames.cardPoster]: cardPoster,
-  [semanticClassNames.cardWide]: cardWide,
-  [semanticClassNames.cardMedia]: cardMedia,
-  [semanticClassNames.cardGithub]: cardGithub,
-  [semanticClassNames.cardAcademic]: cardAcademic,
-  [semanticClassNames.imagePoster]: imagePoster,
-};

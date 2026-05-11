@@ -1,42 +1,39 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token';
+import { GitCommitHorizontal } from 'lucide-react';
 
-import type { LinkCardData, LinkCardPlugin, UrlMatchResult } from '../../types'
-import { camelcaseKeys, fetchGitHubApi } from '../../utils'
+import type { LinkCardData, LinkCardPlugin, UrlMatchResult } from '../../types';
+import { camelcaseKeys, fetchGitHubApi } from '../../utils';
 
 export const githubCommitPlugin: LinkCardPlugin = {
   name: 'gh-commit',
   displayName: 'GitHub Commit',
   priority: 95,
-  typeClass: 'github',
+  shape: 'compact',
   provider: 'github',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'github.com') return null
-    const parts = url.pathname.split('/').filter(Boolean)
-    if (parts.length < 4 || parts[2] !== 'commit') return null
-    const [owner, repo, , commitId] = parts
+    if (url.hostname !== 'github.com') return null;
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts.length < 4 || parts[2] !== 'commit') return null;
+    const [owner, repo, , commitId] = parts;
     return {
       id: `${owner}/${repo}/commit/${commitId}`,
       fullUrl: url.toString(),
-    }
+    };
   },
 
   isValidId(id: string): boolean {
-    const parts = id.split('/')
-    return (
-      parts.length === 4 &&
-      parts.every((p) => p.length > 0) &&
-      parts[2] === 'commit'
-    )
+    const parts = id.split('/');
+    return parts.length === 4 && parts.every((p) => p.length > 0) && parts[2] === 'commit';
   },
 
   async fetch(id: string, _meta, context): Promise<LinkCardData> {
-    const [owner, repo, , commitId] = id.split('/')
+    const [owner, repo, , commitId] = id.split('/');
     const response = await fetchGitHubApi(
       `https://api.github.com/repos/${owner}/${repo}/commits/${commitId}`,
       context,
-    )
-    const data = camelcaseKeys(response)
+    );
+    const data = camelcaseKeys(response);
 
     return {
       title: (
@@ -64,7 +61,15 @@ export const githubCommitPlugin: LinkCardPlugin = {
             <span style={{ color: '#238636' }}>+{data.stats.additions}</span>
             <span style={{ color: '#f85149' }}>-{data.stats.deletions}</span>
           </span>
-          <span style={{ fontSize: vars.typography.fontSizeMd }}>
+          <span
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: vars.typography.fontSizeMd,
+            }}
+          >
+            <GitCommitHorizontal aria-hidden size={13} strokeWidth={2} />
             {data.sha.slice(0, 7)}
           </span>
           <span style={{ fontSize: vars.typography.fontSizeMd, opacity: 0.8 }}>
@@ -73,6 +78,6 @@ export const githubCommitPlugin: LinkCardPlugin = {
         </span>
       ),
       image: data.author?.avatarUrl,
-    }
+    };
   },
-}
+};

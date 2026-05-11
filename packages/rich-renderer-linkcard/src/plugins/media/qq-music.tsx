@@ -1,4 +1,5 @@
 import { vars } from '@haklex/rich-style-token';
+import { Disc3, Mic2 } from 'lucide-react';
 
 import type {
   LinkCardData,
@@ -12,7 +13,7 @@ export const qqMusicPlugin: LinkCardPlugin = {
   name: 'qq-music-song',
   displayName: 'QQ Music Song',
   priority: 60,
-  typeClass: 'wide',
+  shape: 'wide',
   provider: 'qq-music',
 
   matchUrl(url: URL): UrlMatchResult | null {
@@ -57,12 +58,16 @@ export const qqMusicPlugin: LinkCardPlugin = {
       ),
       desc: (
         <>
-          <span style={{ display: 'block' }}>
-            <span style={{ fontWeight: 'bold' }}>歌手：</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Mic2 aria-hidden size={12} strokeWidth={2} />
+            <span style={{ color: '#525252', fontWeight: 500 }}>歌手</span>
             <span>{songInfo.singer.map((p: any) => p.name).join(' / ')}</span>
           </span>
-          <span style={{ display: 'block' }}>
-            <span style={{ fontWeight: 'bold' }}>专辑：</span>
+          <span
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginTop: '2px' }}
+          >
+            <Disc3 aria-hidden size={12} strokeWidth={2} />
+            <span style={{ color: '#525252', fontWeight: 500 }}>专辑</span>
             <span>{songInfo.album.name}</span>
           </span>
         </>

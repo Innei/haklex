@@ -1,58 +1,70 @@
-import { vars } from '@haklex/rich-style-token'
+import { vars } from '@haklex/rich-style-token';
+import { GitMerge, GitPullRequest, GitPullRequestClosed } from 'lucide-react';
+import type { ComponentType } from 'react';
 
-import type { LinkCardData, LinkCardPlugin, UrlMatchResult } from '../../types'
-import { camelcaseKeys, fetchGitHubApi } from '../../utils'
+import type { LinkCardData, LinkCardPlugin, UrlMatchResult } from '../../types';
+import { camelcaseKeys, fetchGitHubApi } from '../../utils';
 
-type PrState = 'open' | 'merged' | 'closed'
+type PrState = 'open' | 'merged' | 'closed';
 
 const getPrState = (data: { state: string; merged: boolean }): PrState => {
-  if (data.merged) return 'merged'
-  return data.state as PrState
-}
+  if (data.merged) return 'merged';
+  return data.state as PrState;
+};
 
 const stateColorMap: Record<PrState, string> = {
   open: '#238636',
   merged: '#8957e5',
   closed: '#f85149',
-}
+};
 
 const stateTextMap: Record<PrState, string> = {
   open: 'Open',
   merged: 'Merged',
   closed: 'Closed',
-}
+};
+
+const stateIconMap: Record<
+  PrState,
+  ComponentType<{ 'size'?: number; 'strokeWidth'?: number; 'aria-hidden'?: boolean }>
+> = {
+  open: GitPullRequest,
+  merged: GitMerge,
+  closed: GitPullRequestClosed,
+};
 
 export const githubPrPlugin: LinkCardPlugin = {
   name: 'gh-pr',
   displayName: 'GitHub Pull Request',
   priority: 95,
-  typeClass: 'github',
+  shape: 'compact',
   provider: 'github',
 
   matchUrl(url: URL): UrlMatchResult | null {
-    if (url.hostname !== 'github.com') return null
-    if (!url.pathname.includes('/pull/')) return null
-    const parts = url.pathname.split('/').filter(Boolean)
-    if (parts.length < 4 || parts[2] !== 'pull') return null
-    const [owner, repo, , prNumber] = parts
-    return { id: `${owner}/${repo}/${prNumber}`, fullUrl: url.toString() }
+    if (url.hostname !== 'github.com') return null;
+    if (!url.pathname.includes('/pull/')) return null;
+    const parts = url.pathname.split('/').filter(Boolean);
+    if (parts.length < 4 || parts[2] !== 'pull') return null;
+    const [owner, repo, , prNumber] = parts;
+    return { id: `${owner}/${repo}/${prNumber}`, fullUrl: url.toString() };
   },
 
   isValidId(id: string): boolean {
-    const parts = id.split('/')
-    return parts.length === 3 && parts.every((p) => p.length > 0)
+    const parts = id.split('/');
+    return parts.length === 3 && parts.every((p) => p.length > 0);
   },
 
   async fetch(id: string, _meta, context): Promise<LinkCardData> {
-    const [owner, repo, prNumber] = id.split('/')
+    const [owner, repo, prNumber] = id.split('/');
     const response = await fetchGitHubApi(
       `https://api.github.com/repos/${owner}/${repo}/pulls/${prNumber}`,
       context,
-    )
-    const data = camelcaseKeys(response)
-    const state = getPrState(data)
-    const color = stateColorMap[state]
-    const stateText = stateTextMap[state]
+    );
+    const data = camelcaseKeys(response);
+    const state = getPrState(data);
+    const color = stateColorMap[state];
+    const stateText = stateTextMap[state];
+    const StateIcon = stateIconMap[state];
 
     return {
       title: `PR: ${data.title}`,
@@ -67,7 +79,10 @@ export const githubPrPlugin: LinkCardPlugin = {
             fontFamily: vars.typography.fontMono,
           }}
         >
-          <span style={{ color }}>{stateText}</span>
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', color }}>
+            <StateIcon aria-hidden size={13} strokeWidth={2} />
+            {stateText}
+          </span>
           <span
             style={{
               display: 'inline-flex',
@@ -85,6 +100,6 @@ export const githubPrPlugin: LinkCardPlugin = {
         </span>
       ),
       image: data.user.avatarUrl,
-    }
+    };
   },
-}
+};

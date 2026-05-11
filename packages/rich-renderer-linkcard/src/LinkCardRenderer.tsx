@@ -1,5 +1,5 @@
 import type { LinkCardRendererProps } from '@haklex/rich-editor/renderers';
-import { Globe } from 'lucide-react';
+import { Globe, Unlink } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -36,15 +36,13 @@ function FallbackIcon({ favicon }: { favicon?: string }) {
   );
 }
 
-function mapSemanticClasses(classNames?: string): string {
-  if (!classNames) return '';
-  return classNames
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((cls) =>
-      styles.semanticClassToStyle[cls] ? `${styles.semanticClassToStyle[cls]} ${cls}` : cls,
-    )
-    .join(' ');
+function displayHost(url: string): string {
+  try {
+    const u = new URL(url);
+    return `${u.hostname}${u.pathname === '/' ? '' : u.pathname}`;
+  } catch {
+    return url;
+  }
 }
 
 export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (props) => {
@@ -94,18 +92,14 @@ export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (props) =>
     context: fetchContext,
   });
 
-  const typeClass = selectedPlugin?.typeClass;
-  const typeStyleClass = typeClass ? styles.typeCardModifier[typeClass] : '';
-  const typeSemanticClass = typeClass ? styles.semanticTypeClassNames[typeClass] : '';
+  const shape = selectedPlugin?.shape ?? 'compact';
+  const shapeStyleClass = styles.shapeClass[shape];
+  const shapeSemanticClass = styles.semanticShapeClass[shape];
 
-  const isErrorState = useDynamicFetch && isError;
-  const finalTitle = cardInfo?.title || title || (isErrorState ? '' : url);
+  const finalTitle = cardInfo?.title || title || url;
   const finalDesc = cardInfo?.desc || description;
   const finalImage = cardInfo?.image || image;
   const finalColor = cardInfo?.color;
-  const classNames = cardInfo?.classNames || {};
-  const mappedCardRootClass = mapSemanticClasses(classNames.cardRoot);
-  const mappedImageClass = mapSemanticClasses(classNames.image);
 
   const [shortDesc, setShortDesc] = useState(false);
   const descRef = useRef<HTMLSpanElement | null>(null);
@@ -134,8 +128,35 @@ export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (props) =>
     );
   }
 
+  if (useDynamicFetch && isError) {
+    return (
+      <a
+        data-hide-print
+        data-source={source || undefined}
+        href={fullUrl}
+        ref={ref}
+        rel="noopener noreferrer"
+        target="_blank"
+        className={[styles.cardError, styles.semanticClassNames.cardError, 'not-prose', className]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        <span className={styles.errorIcon}>
+          <Unlink aria-hidden="true" />
+        </span>
+        <span className={`${styles.errorContent} ${styles.semanticClassNames.errorContent}`}>
+          <span className={`${styles.errorUrl} ${styles.semanticClassNames.errorUrl}`}>
+            {displayHost(fullUrl)}
+          </span>
+          <span className={`${styles.errorHint} ${styles.semanticClassNames.errorHint}`}>
+            无法预览 · 仍可访问
+          </span>
+        </span>
+      </a>
+    );
+  }
+
   const hasImage = !!finalImage;
-  const showImagePlaceholder = isErrorState && !hasImage;
   const shouldCenterContent = !finalDesc || shortDesc;
 
   return (
@@ -149,17 +170,12 @@ export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (props) =>
       className={[
         styles.card,
         styles.semanticClassNames.card,
-        typeStyleClass,
-        typeSemanticClass,
+        shapeStyleClass,
+        shapeSemanticClass,
         shouldCenterContent && styles.cardShortDesc,
         shouldCenterContent && styles.semanticClassNames.cardShortDesc,
-        useDynamicFetch && (loading || isError) && styles.cardSkeleton,
-        useDynamicFetch && (loading || isError) && styles.semanticClassNames.cardSkeleton,
-        useDynamicFetch && isError && styles.cardError,
-        useDynamicFetch && isError && styles.semanticClassNames.cardError,
         'not-prose',
         className,
-        mappedCardRootClass,
       ]
         .filter(Boolean)
         .join(' ')}
@@ -176,14 +192,12 @@ export const LinkCardRenderer: ComponentType<EnhancedLinkCardProps> = (props) =>
           }}
         />
       )}
-      {hasImage || showImagePlaceholder ? (
+      {hasImage ? (
         <span
+          className={`${styles.image} ${styles.semanticClassNames.image}`}
           data-image={finalImage || ''}
-          className={[styles.image, styles.semanticClassNames.image, mappedImageClass]
-            .filter(Boolean)
-            .join(' ')}
           style={{
-            backgroundImage: finalImage ? `url(${finalImage})` : undefined,
+            backgroundImage: `url(${finalImage})`,
           }}
         />
       ) : (

@@ -243,37 +243,120 @@ interface DemoCard {
 }
 
 const demoCards: DemoCard[] = [
+  // ── compact: github family ──
+  {
+    key: 'gh-repo',
+    label: 'GitHub Repo',
+    url: 'https://github.com/facebook/react',
+    description: 'shape=compact · gh-repo · star count + description',
+  },
+  {
+    key: 'gh-pr',
+    label: 'GitHub PR',
+    url: 'https://github.com/facebook/react/pull/28000',
+    description: 'shape=compact · gh-pr · state badge + diff stats',
+  },
+  {
+    key: 'gh-issue',
+    label: 'GitHub Issue',
+    url: 'https://github.com/facebook/react/issues/26380',
+    description: 'shape=compact · gh-issue · state + repo path',
+  },
+  {
+    key: 'gh-commit',
+    label: 'GitHub Commit',
+    url: 'https://github.com/facebook/react/commit/4ea0b8c',
+    description: 'shape=compact · gh-commit · sha + diff stats',
+  },
+  {
+    key: 'gh-discussion',
+    label: 'GitHub Discussion',
+    url: 'https://github.com/vercel/next.js/discussions/55205',
+    description: 'shape=compact · gh-discussion · category badge',
+  },
+
+  // ── expanded ──
+  {
+    key: 'arxiv',
+    label: 'arXiv Paper',
+    url: 'https://arxiv.org/abs/1706.03762',
+    description: 'shape=expanded · mono id badge · 3-line abstract',
+  },
+
+  // ── wide ──
+  {
+    key: 'leetcode',
+    label: 'LeetCode Problem',
+    url: 'https://leetcode.cn/problems/two-sum/',
+    description: 'shape=wide · difficulty color + tags + AR',
+  },
+  {
+    key: 'netease',
+    label: 'Netease Music Song',
+    url: 'https://music.163.com/song?id=186016',
+    description: 'shape=wide · block desc (歌手 / 专辑)',
+  },
+  {
+    key: 'qq-music',
+    label: 'QQ Music Song',
+    url: 'https://y.qq.com/n/ryqq/songDetail/001Qu4I30eVFYb',
+    description: 'shape=wide · block desc (歌手 / 专辑)',
+  },
+
+  // ── poster ──
+  {
+    key: 'bangumi',
+    label: 'Bangumi Subject',
+    url: 'https://bgm.tv/subject/253',
+    description: 'shape=poster · vertical poster + rating',
+  },
+  {
+    key: 'tmdb-movie',
+    label: 'TMDB Movie',
+    url: 'https://www.themoviedb.org/movie/129',
+    description: 'shape=poster · vertical poster + ★ rating',
+  },
+  {
+    key: 'tmdb-tv',
+    label: 'TMDB TV',
+    url: 'https://www.themoviedb.org/tv/72636',
+    description: 'shape=poster · vertical poster + ★ rating',
+  },
+
+  // ── custom plugin examples ──
   {
     key: 'douban',
     label: 'Douban Book (custom plugin)',
     url: 'https://book.douban.com/subject/1477390',
-    description: 'doubanBookPlugin matches book.douban.com, merged with built-in 11 plugins',
+    description: 'shape=poster · custom plugin merged into builtins',
   },
   {
     key: 'issue',
     label: 'Internal Issue (custom plugin)',
     url: 'https://issues.example.com/PROJ-1234',
-    description: 'internalIssuePlugin matches issues.example.com, added alongside built-ins',
-  },
-  {
-    key: 'github',
-    label: 'GitHub Repo (builtin)',
-    url: 'https://github.com/facebook/react',
-    description: 'Built-in gh-repo plugin auto-matches, no extra config needed',
+    description: 'shape=compact · custom plugin added alongside builtins',
   },
   {
     key: 'github-override',
     label: 'GitHub Repo (overridden)',
     url: 'https://github.com/vercel/next.js',
-    description: 'Same-name "gh-repo" plugin overrides the built-in implementation',
+    description: 'Same-name "gh-repo" overrides the built-in implementation',
     useOverride: true,
   },
+
+  // ── fallback / error ──
   {
     key: 'static',
     label: 'Static fallback (no plugin match)',
     url: 'https://example.com/article',
     title: 'Example Article',
     description: 'Falls back to static props rendering when no plugin matches',
+  },
+  {
+    key: 'error',
+    label: 'Error state (404 repo)',
+    url: 'https://github.com/this-org-does-not-exist-xyz/no-repo',
+    description: 'fetch fail → dashed degraded link with host + hint',
   },
 ];
 

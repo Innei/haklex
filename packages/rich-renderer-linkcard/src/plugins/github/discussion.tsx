@@ -1,4 +1,5 @@
 import { vars } from '@haklex/rich-style-token';
+import { MessagesSquare } from 'lucide-react';
 
 import type { LinkCardData, LinkCardPlugin, UrlMatchResult } from '../../types';
 import { camelcaseKeys, fetchGitHubApi } from '../../utils';
@@ -7,7 +8,7 @@ export const githubDiscussionPlugin: LinkCardPlugin = {
   name: 'gh-discussion',
   displayName: 'GitHub Discussion',
   priority: 95,
-  typeClass: 'github',
+  shape: 'compact',
   provider: 'github',
 
   matchUrl(url: URL): UrlMatchResult | null {
@@ -52,12 +53,16 @@ export const githubDiscussionPlugin: LinkCardPlugin = {
         >
           <span
             style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '4px',
               borderRadius: '4px',
               backgroundColor: 'rgba(128,128,128,0.15)',
               padding: '2px 6px',
               fontSize: vars.typography.fontSizeXs,
             }}
           >
+            <MessagesSquare aria-hidden size={11} strokeWidth={2} />
             {categoryName}
           </span>
           <span style={{ fontSize: vars.typography.fontSizeMd, opacity: 0.8 }}>
