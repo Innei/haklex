@@ -88,13 +88,23 @@ globalStyle(article(sharedStyles.quote), {
   quotes: '"\\201C""\\201D""\\2018""\\2019"',
 });
 
-globalStyle(article(`${sharedStyles.quote} ${sharedStyles.paragraph}:first-of-type::before`), {
-  content: 'open-quote',
-});
+globalStyle(
+  article(
+    `${sharedStyles.quote}:not([data-no-open-quote]) ${sharedStyles.paragraph}:first-of-type::before`,
+  ),
+  {
+    content: 'open-quote',
+  },
+);
 
-globalStyle(article(`${sharedStyles.quote} ${sharedStyles.paragraph}:last-of-type::after`), {
-  content: 'close-quote',
-});
+globalStyle(
+  article(
+    `${sharedStyles.quote}:not([data-no-close-quote]) ${sharedStyles.paragraph}:last-of-type::after`,
+  ),
+  {
+    content: 'close-quote',
+  },
+);
 
 globalStyle(article(`${sharedStyles.quote} ${sharedStyles.paragraph}:first-child`), {
   marginTop: 0,

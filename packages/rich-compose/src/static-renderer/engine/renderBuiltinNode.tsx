@@ -44,6 +44,9 @@ function extractText(node: any): string {
   return '';
 }
 
+const OPEN_QUOTE_RE = /^["'«‘“‹「『＂＇]/;
+const CLOSE_QUOTE_RE = /["'»’”›」』＂＇]$/;
+
 export function renderBuiltinNode(
   node: any,
   key: string,
@@ -89,8 +92,16 @@ export function renderBuiltinNode(
       );
     }
     case 'quote': {
+      const quoteText = (textContent || extractText(node)).trim();
+      const hasOpenQuote = OPEN_QUOTE_RE.test(quoteText);
+      const hasCloseQuote = CLOSE_QUOTE_RE.test(quoteText);
       return (
-        <blockquote className={shared('quote')} key={key}>
+        <blockquote
+          className={shared('quote')}
+          data-no-close-quote={hasCloseQuote ? '' : undefined}
+          data-no-open-quote={hasOpenQuote ? '' : undefined}
+          key={key}
+        >
           {children}
         </blockquote>
       );
