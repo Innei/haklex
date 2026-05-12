@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-excalidraw",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Excalidraw whiteboard extension",
   "repository": {
     "type": "git",
