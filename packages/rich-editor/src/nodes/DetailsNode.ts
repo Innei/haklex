@@ -1,5 +1,5 @@
 import type { EditorConfig, LexicalNode, NodeKey, SerializedElementNode, Spread } from 'lexical';
-import { $insertNodes, ElementNode } from 'lexical';
+import { $createParagraphNode, $insertNodes, ElementNode } from 'lexical';
 import { ChevronRight } from 'lucide-react';
 import { createElement } from 'react';
 
@@ -32,7 +32,11 @@ export class DetailsNode extends ElementNode {
       section: 'ADVANCED',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createDetailsNode('Details')]);
+          const details = $createDetailsNode('Details', true);
+          const paragraph = $createParagraphNode();
+          details.append(paragraph);
+          $insertNodes([details]);
+          paragraph.selectStart();
         });
       },
     },
