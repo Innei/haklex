@@ -1,5 +1,3 @@
-import '@haklex/rich-ext-code-snippet/style.css';
-
 import { codeSnippetEditNodes, CodeSnippetEditRenderer } from '@haklex/rich-ext-code-snippet/edit';
 
 import type { RichEditorModule } from '../../core/types';

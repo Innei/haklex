@@ -1,5 +1,3 @@
-import '@haklex/rich-ext-poll/style.css';
-
 import { pollEditNodes } from '@haklex/rich-ext-poll/edit';
 
 import type { RichEditorModule } from '../../core/types';

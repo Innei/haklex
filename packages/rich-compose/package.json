@@ -71,14 +71,15 @@
     "./modules/katex/edit": "./src/modules/katex/edit.ts",
     "./style-token": "./src/style-token/index.ts",
     "./style-token/styles": "./src/style-token/styles.ts",
-    "./style.css": "./dist/rich-compose.css"
+    "./style.css": "./dist/style.css",
+    "./style/*": "./dist/style/*"
   },
   "main": "./src/index.ts",
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && tsx scripts/build-css.ts",
     "dev:build": "vite build --watch",
     "test": "vitest run"
   },
@@ -362,7 +363,8 @@
         "import": "./dist/style-token/styles.mjs",
         "types": "./dist/style-token/styles.d.ts"
       },
-      "./style.css": "./dist/rich-compose.css"
+      "./style.css": "./dist/style.css",
+      "./style/*": "./dist/style/*"
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"

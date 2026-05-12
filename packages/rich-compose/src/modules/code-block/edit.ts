@@ -1,5 +1,3 @@
-import '@haklex/rich-renderer-codeblock/style.css';
-
 import { CodeBlockEditRenderer } from '@haklex/rich-renderer-codeblock';
 
 import type { RichEditorModule } from '../../core/types';

@@ -1,5 +1,3 @@
-import '@haklex/rich-renderer-linkcard/style.css';
-
 import { linkCardEditNodes, PasteLinkCardPlugin } from '@haklex/rich-renderer-linkcard';
 
 import type { RichEditorModule } from '../../core/types';

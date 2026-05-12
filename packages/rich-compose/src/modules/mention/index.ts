@@ -1,5 +1,3 @@
-import '@haklex/rich-renderer-mention/style.css';
-
 export { mentionModule } from './module';
 export { MentionRenderer } from './renderer';
 export type { MentionPlatformMeta } from '@haklex/rich-renderer-mention/static';

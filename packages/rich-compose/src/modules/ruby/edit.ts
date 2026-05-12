@@ -1,5 +1,3 @@
-import '@haklex/rich-renderer-ruby/style.css';
-
 import { RubyEditRenderer } from '@haklex/rich-renderer-ruby';
 
 import type { RichEditorModule } from '../../core/types';

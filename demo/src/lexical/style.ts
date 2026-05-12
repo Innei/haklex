@@ -1,12 +1,15 @@
 /**
  * CSS imports for LexicalEditor + LexicalRenderer.
  *
- * Feature CSS (alert, banner, image, link-card, ruby, video, etc.) is
- * auto-injected by the corresponding `@haklex/rich-compose/modules/*`
- * entries via vanilla-extract sideEffects. Only editor-shell and plugin
- * CSS needs to be imported manually here.
+ * `@haklex/rich-compose/style.css` is the all-in-one bundle: prose body
+ * + theme tokens + variants + every feature module's CSS (alert, banner,
+ * image, link-card, ruby, video, table, etc.). Consumers that override
+ * specific renderers can use the per-module subpaths under
+ * `@haklex/rich-compose/style/*.css` for finer-grained selection.
+ *
+ * Editor-shell + plugin CSS still ships from per-plugin packages.
  */
-import '@haklex/rich-editor/style.css';
+import '@haklex/rich-compose/style.css';
 import '@haklex/rich-editor-ui/style.css';
 import '@haklex/rich-plugin-block-handle/style.css';
 import '@haklex/rich-plugin-floating-toolbar/style.css';

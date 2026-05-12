@@ -1,5 +1,3 @@
-import '@haklex/rich-renderer-image/style.css';
-
 import { ImageEditRenderer } from '@haklex/rich-renderer-image';
 
 import type { RichEditorModule } from '../../core/types';

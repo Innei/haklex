@@ -1,5 +1,3 @@
-import '@haklex/rich-ext-poll/style.css';
-
 export { pollModule } from './module';
 export type { SerializedPollNode } from './node';
 export { $createPollNode, $isPollNode, PollNode, pollNodes } from './node';

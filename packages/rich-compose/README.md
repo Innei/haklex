@@ -211,9 +211,38 @@ The lazy chunk is still emitted but never fetched at runtime.
 | `@haklex/rich-compose/modules/<name>/edit`     | editor-side module (extends the renderer module)                |
 | `@haklex/rich-compose/modules/<name>/node`     | Klass(es) only (when applicable)                                |
 | `@haklex/rich-compose/modules/<name>/renderer` | default renderer only                                           |
-| `@haklex/rich-compose/style.css`               | core styles (skeletons, layout shell)                           |
+| `@haklex/rich-compose/style.css`               | all-in-one CSS bundle — prose body + tokens + every module      |
+| `@haklex/rich-compose/style/foundation.css`    | prose body + theme tokens + variant classes (no modules)        |
+| `@haklex/rich-compose/style/table.css`         | built-in table renderer                                         |
+| `@haklex/rich-compose/style/<name>.css`        | per-module CSS (alert, banner, image, video, …)                 |
 
 Aggregate barrels are convenient defaults; the fine-grained `/modules/<name>` and `/modules/<name>/edit` subpaths stay available for dynamic-import and selective inclusion.
+
+## CSS strategy
+
+Two consumer patterns:
+
+**All-in-one (default).** One import covers everything `rich-compose` can render:
+
+```ts
+import '@haklex/rich-compose/style.css';
+```
+
+**Fine-grained (advanced).** Use this when you've overridden one or more default renderers and want to drop their CSS from your bundle. Import `foundation.css` plus the modules you keep — never reach into `rich-renderer-*` or `rich-ext-*` packages directly:
+
+```ts
+import '@haklex/rich-compose/style/foundation.css';
+import '@haklex/rich-compose/style/alert.css';
+import '@haklex/rich-compose/style/image.css';
+import '@haklex/rich-compose/style/ruby.css';
+// …only modules whose default renderer you kept
+```
+
+Module subpaths mirror the JS module subpaths (`modules/<name>` ↔ `style/<name>.css`).
+
+### Why not auto-injected via `import` side effects
+
+Earlier versions tried to side-effect-import each module's CSS from inside `modules/<name>/index.ts`. Combined with `sideEffects: ["**/*.css"]` (which marks `.mjs` files as side-effect-free) and bundler optimizations such as Next.js `optimizePackageImports`, those bare CSS imports were tree-shaken away — modules rendered but their styling was missing. The explicit subpath model above eliminates that footgun: the consumer states which CSS they want, and the bundler honors it deterministically.
 
 ## Part of Haklex
 

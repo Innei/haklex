@@ -1,5 +1,3 @@
-import '@haklex/rich-renderer-video/style.css';
-
 import { VideoEditRenderer } from '@haklex/rich-renderer-video';
 
 import type { RichEditorModule } from '../../core/types';

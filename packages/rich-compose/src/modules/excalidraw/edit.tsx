@@ -1,5 +1,3 @@
-import '@haklex/rich-ext-excalidraw/style.css';
-
 import { ExcalidrawEditNode, ExcalidrawPlugin } from '@haklex/rich-ext-excalidraw';
 import type { Klass, LexicalNode } from 'lexical';
 
