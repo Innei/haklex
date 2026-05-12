@@ -4,6 +4,7 @@ import { RichRenderer } from '@haklex/rich-compose';
 import { RichDiff } from '@haklex/rich-diff';
 import type { RichEditorVariant } from '@haklex/rich-editor';
 import { ColorSchemeProvider, getVariantClass } from '@haklex/rich-editor';
+import { AgentDiffEditNode } from '@haklex/rich-ext-ai-agent';
 import type { ChatMessage, ChatParticipant, ChatVariant } from '@haklex/rich-ext-chat';
 import { ChatRenderer } from '@haklex/rich-ext-chat/static';
 import type { CodeFile } from '@haklex/rich-ext-code-snippet';
@@ -12,8 +13,15 @@ import type { ExcalidrawEditRendererProps, ExcalidrawSnapshot } from '@haklex/ri
 import { ExcalidrawConfigProvider } from '@haklex/rich-ext-excalidraw/static';
 import type { GalleryImage, GalleryRendererProps } from '@haklex/rich-ext-gallery';
 import { GalleryRenderer } from '@haklex/rich-ext-gallery/static';
+import {
+  type NestedDocDialogEditorProps,
+  NestedDocDialogEditorProvider,
+  NestedDocPlugin,
+} from '@haklex/rich-ext-nested-doc';
+import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
+import type { SerializedEditorState } from 'lexical';
 import { type FC, useCallback, useState } from 'react';
 
 import { Panel } from '../components/Panel';
@@ -21,6 +29,8 @@ import { useFullWidth } from '../context/FullWidthContext';
 import { useTheme } from '../context/ThemeContext';
 import { diffSamples } from '../fixtures/diff-samples';
 import { customGithubRepoPlugin, extraLinkCardPlugins } from '../fixtures/extra-linkcard-plugins';
+import { liteXmlPasteSample } from '../fixtures/litexml-paste-sample';
+import { LexicalEditor } from '../lexical';
 
 // ── Extension definitions ─────────────────────────────────────
 
@@ -33,6 +43,13 @@ interface Extension {
 }
 
 const extensions: Extension[] = [
+  {
+    id: 'litexml-import',
+    name: 'LiteXML Import',
+    description: 'Plain-text XML paste path for Markdown Flavor LiteXML nodes.',
+    packageName: 'rich-litexml',
+    preview: 'XML',
+  },
   {
     id: 'excalidraw',
     name: 'Excalidraw',
@@ -76,6 +93,109 @@ const extensions: Extension[] = [
     preview: 'Chat',
   },
 ];
+
+const liteXmlEditorExtraNodes = [AgentDiffEditNode];
+
+const liteXmlInitialContent: SerializedEditorState = {
+  root: {
+    type: 'root',
+    children: [
+      {
+        type: 'paragraph',
+        children: [],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        textFormat: 0,
+        textStyle: '',
+        version: 1,
+      },
+    ],
+    direction: 'ltr',
+    format: '',
+    indent: 0,
+    version: 1,
+  },
+};
+
+const liteXmlInsertItemOrder = [
+  'Image',
+  'Code Block',
+  'Table',
+  'Link Card',
+  'Callout',
+  'Banner',
+  'Gallery',
+  'Video',
+  'Mermaid Diagram',
+  'Code Snippet',
+  'Embed',
+  'Whiteboard',
+  'Nested Document',
+];
+
+function LiteXmlNestedDocDialogEditor({ initialValue, onEditorReady }: NestedDocDialogEditorProps) {
+  return (
+    <LexicalEditor
+      header={<ToolbarPlugin insertItemOrder={liteXmlInsertItemOrder} maxVisibleInsertItems={5} />}
+      initialValue={initialValue}
+      onEditorReady={onEditorReady}
+    />
+  );
+}
+
+// ── LiteXML Import Section ───────────────────────────────────
+
+function LiteXmlImportDetail() {
+  const theme = useTheme();
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <NestedDocDialogEditorProvider value={LiteXmlNestedDocDialogEditor}>
+      <div className="biz-grid">
+        <Panel
+          badge="xml"
+          title="Markdown Flavor LiteXML"
+          headerExtra={
+            <button
+              className="btn btn-sm"
+              onClick={() => {
+                void navigator.clipboard.writeText(liteXmlPasteSample).then(() => {
+                  setCopied(true);
+                  window.setTimeout(() => setCopied(false), 1200);
+                });
+              }}
+            >
+              {copied ? 'Copied' : 'Copy XML'}
+            </button>
+          }
+        >
+          <textarea
+            readOnly
+            className="import-textarea litexml-sample-textarea"
+            rows={22}
+            value={liteXmlPasteSample}
+          />
+        </Panel>
+
+        <Panel badge="editor" bodyStyle={{ padding: 0 }} title="Paste Target">
+          <LexicalEditor
+            extraNodes={liteXmlEditorExtraNodes}
+            initialValue={liteXmlInitialContent}
+            placeholder="Paste XML plain text here..."
+            theme={theme}
+            variant="article"
+            header={
+              <ToolbarPlugin insertItemOrder={liteXmlInsertItemOrder} maxVisibleInsertItems={5} />
+            }
+          >
+            <NestedDocPlugin />
+          </LexicalEditor>
+        </Panel>
+      </div>
+    </NestedDocDialogEditorProvider>
+  );
+}
 
 // ── Excalidraw Demo Data ──────────────────────────────────────
 
@@ -858,6 +978,9 @@ function GalleryDetail() {
 
 function ExtensionDetail({ id }: { id: string }) {
   switch (id) {
+    case 'litexml-import': {
+      return <LiteXmlImportDetail />;
+    }
     case 'chat': {
       return <ChatDetail />;
     }

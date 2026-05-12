@@ -11,6 +11,7 @@
  */
 import '@haklex/rich-compose/style.css';
 import '@haklex/rich-editor-ui/style.css';
+import '@haklex/rich-ext-ai-agent/style.css';
 import '@haklex/rich-plugin-block-handle/style.css';
 import '@haklex/rich-plugin-floating-toolbar/style.css';
 import '@haklex/rich-plugin-link-edit/style.css';

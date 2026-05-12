@@ -88,8 +88,8 @@ describe('roundtrip', () => {
   });
 
   it('agent-diff roundtrip', () => {
-    const result = roundtrip('<agentdiff id="ad1" op="insert" entry="d1" />');
-    expect(result).toContain('<agentdiff');
+    const result = roundtrip('<agent-diff id="ad1" op="insert" entry="d1" />');
+    expect(result).toContain('<agent-diff');
     expect(result).toContain('op="insert"');
     expect(result).toContain('entry="d1"');
   });

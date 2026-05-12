@@ -71,7 +71,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
   );
 
   registry.registerReader(
-    'linkcard',
+    'link-card',
     (el) =>
       ({
         type: 'link-card',
@@ -187,7 +187,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
     } as any;
   });
 
-  registry.registerReader('nesteddoc', (el, ctx) => {
+  registry.registerReader('nested-doc', (el, ctx) => {
     const children = ctx.parseChildren(el);
     const content: SerializedEditorState = {
       root: {
@@ -308,7 +308,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       }) as any,
   );
 
-  registry.registerReader('footnotesection', (el) => {
+  registry.registerReader('footnote-section', (el) => {
     const definitions: Record<string, string> = {};
     for (const child of el.children) {
       if (child.tagName.toLowerCase() === 'def') {
@@ -388,7 +388,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
   // -- Agent diff: editing marker --
 
   registry.registerReader(
-    'agentdiff',
+    'agent-diff',
     (el) =>
       ({
         type: 'agent-diff',
@@ -399,7 +399,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       }) as any,
   );
 
-  registry.registerReader('codesnippet', (el) => {
+  registry.registerReader('code-snippet', (el) => {
     const files: Array<{ filename: string; code: string; language: string }> = [];
     for (const child of el.children) {
       if (child.tagName.toLowerCase() === 'file') {

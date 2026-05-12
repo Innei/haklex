@@ -46,7 +46,7 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
   registry.registerWriter('link-card', (node) => {
     const n = node as any;
     return {
-      tag: 'linkcard',
+      tag: 'link-card',
       attrs: optAttr({
         ...blockId(n),
         url: n.url,
@@ -132,7 +132,7 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
   registry.registerWriter('nested-doc', (node, ctx) => {
     const n = node as any;
     return {
-      tag: 'nesteddoc',
+      tag: 'nested-doc',
       attrs: blockId(n),
       children: ctx.serializeNestedState(n.content ?? n.contentState),
     };
@@ -180,7 +180,7 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
   registry.registerWriter('agent-diff', (node) => {
     const n = node as any;
     return {
-      tag: 'agentdiff',
+      tag: 'agent-diff',
       attrs: optAttr({ ...blockId(n), op: n.opType, entry: n.diffEntryId }),
       selfClosing: true,
     };
@@ -252,7 +252,7 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
       attrs: { ref },
       children: [text as string],
     }));
-    return { tag: 'footnotesection', attrs: blockId(n), children };
+    return { tag: 'footnote-section', attrs: blockId(n), children };
   });
 
   registry.registerWriter('gallery', (node) => {
@@ -276,7 +276,7 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
       attrs: optAttr({ name: f.filename, lang: f.language }),
       children: [f.code ?? ''],
     }));
-    return { tag: 'codesnippet', attrs: blockId(n), children: files };
+    return { tag: 'code-snippet', attrs: blockId(n), children: files };
   });
 
   registry.registerWriter('chat', (node) => {

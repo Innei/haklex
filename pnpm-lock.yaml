@@ -568,6 +568,9 @@ importers:
       '@haklex/rich-headless':
         specifier: workspace:*
         version: link:../rich-headless
+      '@haklex/rich-litexml':
+        specifier: workspace:*
+        version: link:../rich-litexml
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../rich-style-token

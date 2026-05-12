@@ -112,14 +112,16 @@ describe('custom readers', () => {
     expect(fn.identifier).toBe('1');
   });
 
-  it('reads <footnotesection>', () => {
-    const nodes = parse('<footnotesection id="fs1"><def ref="1">Note one</def></footnotesection>');
+  it('reads <footnote-section>', () => {
+    const nodes = parse(
+      '<footnote-section id="fs1"><def ref="1">Note one</def></footnote-section>',
+    );
     expect(nodes[0].type).toBe('footnote-section');
     expect(nodes[0].definitions['1']).toBe('Note one');
   });
 
-  it('reads <linkcard />', () => {
-    const nodes = parse('<linkcard id="lc1" url="https://example.com" title="Ex" />');
+  it('reads <link-card />', () => {
+    const nodes = parse('<link-card id="lc1" url="https://example.com" title="Ex" />');
     expect(nodes[0].type).toBe('link-card');
     expect(nodes[0].url).toBe('https://example.com');
   });
@@ -145,9 +147,9 @@ describe('custom readers', () => {
     expect(nodes[0].images[0].src).toBe('/a.jpg');
   });
 
-  it('reads <codesnippet>', () => {
+  it('reads <code-snippet>', () => {
     const nodes = parse(
-      '<codesnippet id="cs1"><file name="index.ts" lang="ts">export {}</file></codesnippet>',
+      '<code-snippet id="cs1"><file name="index.ts" lang="ts">export {}</file></code-snippet>',
     );
     expect(nodes[0].type).toBe('code-snippet');
     expect(nodes[0].files[0].filename).toBe('index.ts');
@@ -198,8 +200,8 @@ describe('custom readers', () => {
     expect(nodes[0].gap).toBe('16px');
   });
 
-  it('reads <agentdiff />', () => {
-    const nodes = parse('<agentdiff id="ad1" op="replace" entry="diff-123" />');
+  it('reads <agent-diff />', () => {
+    const nodes = parse('<agent-diff id="ad1" op="replace" entry="diff-123" />');
     expect(nodes[0].type).toBe('agent-diff');
     expect(nodes[0].opType).toBe('replace');
     expect(nodes[0].diffEntryId).toBe('diff-123');

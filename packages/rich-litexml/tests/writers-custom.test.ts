@@ -61,7 +61,7 @@ describe('custom writers', () => {
         version: 1,
       },
     ]);
-    expect(xml).toContain('<linkcard id="lc1" url="https://example.com" title="Example" />');
+    expect(xml).toContain('<link-card id="lc1" url="https://example.com" title="Example" />');
   });
 
   it('embed', () => {
@@ -417,7 +417,7 @@ describe('custom writers', () => {
         version: 1,
       },
     ]);
-    expect(xml).toContain('<footnotesection id="fs1">');
+    expect(xml).toContain('<footnote-section id="fs1">');
     expect(xml).toContain('<def ref="1">First note</def>');
     expect(xml).toContain('<def ref="2">Second note</def>');
   });
@@ -555,7 +555,7 @@ describe('custom writers', () => {
         version: 1,
       },
     ]);
-    expect(xml).toContain('<agentdiff id="ad1" op="replace" entry="diff-123" />');
+    expect(xml).toContain('<agent-diff id="ad1" op="replace" entry="diff-123" />');
   });
 
   it('code-snippet', () => {
@@ -570,7 +570,7 @@ describe('custom writers', () => {
         version: 1,
       },
     ]);
-    expect(xml).toContain('<codesnippet id="cs1">');
+    expect(xml).toContain('<code-snippet id="cs1">');
     expect(xml).toContain('<file name="index.ts" lang="ts">export {}</file>');
     expect(xml).toContain('<file name="main.ts" lang="ts">console.log(1)</file>');
   });
