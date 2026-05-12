@@ -2,14 +2,17 @@ import {
   $createNodeSelection,
   $getRoot,
   $getSelection,
+  $isElementNode,
   $isNodeSelection,
   $isRangeSelection,
+  $isTextNode,
   $setSelection,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_HIGH,
   COPY_COMMAND,
   CUT_COMMAND,
   DELETE_CHARACTER_COMMAND,
+  type ElementNode,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
   KEY_BACKSPACE_COMMAND,
@@ -20,6 +23,7 @@ import {
   type LexicalNode,
   PASTE_COMMAND,
   PASTE_TAG,
+  type RangeSelection,
   REMOVE_TEXT_COMMAND,
   SELECT_ALL_COMMAND,
 } from 'lexical';
@@ -59,6 +63,34 @@ function getTopLevelKey(node: LexicalNode): string | null {
   }
 
   return current?.getParent() === $getRoot() ? current.getKey() : null;
+}
+
+function $rangeCoversEntireContent(sel: RangeSelection, target: ElementNode): boolean {
+  if (target.getChildrenSize() === 0) return false;
+  const [startPoint, endPoint] = sel.isBackward()
+    ? [sel.focus, sel.anchor]
+    : [sel.anchor, sel.focus];
+  const targetKey = target.getKey();
+
+  const firstDesc = target.getFirstDescendant();
+  const isStart =
+    (startPoint.type === 'element' && startPoint.key === targetKey && startPoint.offset === 0) ||
+    (startPoint.type === 'text' &&
+      firstDesc !== null &&
+      firstDesc.getKey() === startPoint.key &&
+      startPoint.offset === 0);
+  if (!isStart) return false;
+
+  const lastDesc = target.getLastDescendant();
+  const isEnd =
+    (endPoint.type === 'element' &&
+      endPoint.key === targetKey &&
+      endPoint.offset === target.getChildrenSize()) ||
+    (endPoint.type === 'text' &&
+      $isTextNode(lastDesc) &&
+      lastDesc.getKey() === endPoint.key &&
+      endPoint.offset === lastDesc.getTextContentSize());
+  return isEnd;
 }
 
 function $selectBlockRange(anchorKey: string, focusKey: string): void {
@@ -447,7 +479,10 @@ export function useBlockSelection(editor: LexicalEditor) {
       COMMAND_PRIORITY_CRITICAL,
     );
 
-    // Progressive Cmd+A: current block → all blocks.
+    // Progressive Cmd+A:
+    //   1) RangeSelection covering all content of the top-level block at cursor
+    //   2) NodeSelection of that top-level block
+    //   3) NodeSelection of all root-level blocks
     const unregSelectAll = editor.registerCommand(
       SELECT_ALL_COMMAND,
       () => {
@@ -468,25 +503,39 @@ export function useBlockSelection(editor: LexicalEditor) {
 
         const sel = $getSelection();
         let topLevelKey: string | null = null;
+        let topLevelNode: LexicalNode | null = null;
 
         if ($isRangeSelection(sel)) {
-          let node = sel.anchor.getNode();
-          while (node.getParent() && node.getParent() !== $getRoot()) {
-            node = node.getParent()!;
+          let node: LexicalNode | null = sel.anchor.getNode();
+          while (node && node.getParent() && node.getParent() !== $getRoot()) {
+            node = node.getParent();
           }
-          if (node.getParent() === $getRoot()) {
+          if (node && node.getParent() === $getRoot()) {
             topLevelKey = node.getKey();
+            topLevelNode = node;
           }
         } else if ($isNodeSelection(sel)) {
           const nodes = sel.getNodes();
           if (nodes.length > 0) {
-            let node = nodes[0];
-            while (node.getParent() && node.getParent() !== $getRoot()) {
-              node = node.getParent()!;
+            let node: LexicalNode | null = nodes[0];
+            while (node && node.getParent() && node.getParent() !== $getRoot()) {
+              node = node.getParent();
             }
-            if (node.getParent() === $getRoot()) {
+            if (node && node.getParent() === $getRoot()) {
               topLevelKey = node.getKey();
+              topLevelNode = node;
             }
+          }
+        }
+
+        if (topLevelNode && $isElementNode(topLevelNode)) {
+          const childrenSize = topLevelNode.getChildrenSize();
+          const isContentRangeAlready =
+            $isRangeSelection(sel) && $rangeCoversEntireContent(sel, topLevelNode);
+
+          if (childrenSize > 0 && !isContentRangeAlready) {
+            topLevelNode.select(0, childrenSize);
+            return true;
           }
         }
 
