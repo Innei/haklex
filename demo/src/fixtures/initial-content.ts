@@ -396,5 +396,14 @@ console.log(greet('nested'))`,
     version: 1,
   } as any,
 
+  {
+    type: 'link-card',
+    url: 'https://github.com/Innei/haklex/pull/7',
+    title: 'Innei/haklex - Pull Request #7',
+    description: 'feat(style): use KaiTi font for blockquote',
+    favicon: 'https://github.githubassets.com/favicons/favicon.svg',
+    version: 1,
+  } as any,
+
   paragraph(text('Start editing above, or import JSON via the toolbar.', FORMAT_ITALIC)),
 );
