@@ -2,7 +2,7 @@ import {
   NestedContentRendererProvider,
   type RendererConfig,
   type RichEditorVariant,
-} from '@haklex/rich-editor';
+} from '@haklex/rich-editor/static';
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
 import { type ComponentType, Fragment, memo, type ReactNode, useCallback } from 'react';
 

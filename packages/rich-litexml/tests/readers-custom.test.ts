@@ -37,6 +37,21 @@ describe('custom readers', () => {
     expect(nodes[0].language).toBe('ts');
   });
 
+  it('reads <codeblock> CDATA without dropping code content', () => {
+    const code = [
+      '#!/usr/bin/env node',
+      "import { spawnSync } from 'node:child_process'",
+      'for (const [cmd, args] of steps) {',
+      "  console.log(`run ${cmd} ${args.join(' ')}`)",
+      '  if (r.status !== 0) process.exit(r.status ?? 1)',
+      '}',
+    ].join('\n');
+    const nodes = parse(`<codeblock id="cb1" lang="js"><![CDATA[${code}]]></codeblock>`);
+    expect(nodes[0].type).toBe('code-block');
+    expect(nodes[0].code).toBe(code);
+    expect(nodes[0].language).toBe('js');
+  });
+
   it('reads <math display="block">', () => {
     const nodes = parse('<math id="kb1" display="block">E=mc^2</math>');
     expect(nodes[0].type).toBe('katex-block');

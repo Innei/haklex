@@ -23,6 +23,8 @@ export const card = style({
     '--rr-code-accent': '#737373',
   },
   position: 'relative',
+  maxWidth: '100%',
+  minWidth: 0,
   margin: '1.5rem 0',
   borderRadius: '0.5rem',
   overflow: 'hidden',
@@ -121,6 +123,8 @@ export const bodyBackgroundStatic = style([
 export const scroll = style({
   position: 'relative',
   width: '100%',
+  maxWidth: '100%',
+  minWidth: 0,
   overflow: 'auto',
 });
 
@@ -132,6 +136,8 @@ export const scrollCollapsed = style({
 /* ---- Code body (shikicode host) ---- */
 export const body = style({
   position: 'relative',
+  maxWidth: '100%',
+  minWidth: 0,
   overflow: 'auto',
   backgroundColor: 'transparent !important' as any,
 });
@@ -244,6 +250,8 @@ globalStyle(`${card} pre`, {
   padding: '0 !important' as any,
   borderRadius: 0,
   fontSize: '1em',
+  maxWidth: '100%',
+  overflow: 'auto',
 });
 
 globalStyle(`${card} pre code`, {

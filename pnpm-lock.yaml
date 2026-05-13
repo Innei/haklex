@@ -416,6 +416,9 @@ importers:
       '@haklex/rich-ext-poll':
         specifier: workspace:*
         version: link:../rich-ext-poll
+      '@haklex/rich-litexml':
+        specifier: workspace:*
+        version: link:../rich-litexml
       '@haklex/rich-renderer-alert':
         specifier: workspace:*
         version: link:../rich-renderer-alert

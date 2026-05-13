@@ -1,12 +1,12 @@
 ---
 name: litexml-authoring
-description: Use when writing Haklex articles with Markdown plus LiteXML, choosing the appropriate Haklex node for content, authoring LiteXML fragments, or converting a LightXML/LiteXML string or file into Lexical SerializedEditorState JSON with the litexml-to-lexical CLI.
+description: Use when writing Haklex articles with Markdown plus LiteXML, choosing the appropriate Haklex node for content, authoring LiteXML fragments, or converting a LightXML/LiteXML string or file into Lexical SerializedEditorState JSON or Static Render HTML.
 user_invocable: true
 ---
 
 # LiteXML Authoring
 
-Use this skill when an article needs Haklex-specific rich nodes or when the user asks to convert LightXML/LiteXML into Lexical JSON.
+Use this skill when an article needs Haklex-specific rich nodes or when the user asks to convert LightXML/LiteXML into Lexical JSON or Static Render HTML.
 
 ## Conversion CLI
 
@@ -34,6 +34,36 @@ npm exec --yes --package @haklex/rich-litexml -- litexml-to-lexical input.xml > 
 ```
 
 The CLI emits a full Lexical `SerializedEditorState`, not only root children.
+
+## HTML Preview CLI
+
+The `@haklex/rich-compose` package publishes the `litexml-to-html` binary. It writes a browser-openable HTML preview and inlines `@haklex/rich-compose/style.css`.
+
+The generated HTML is a self-contained React preview shell. The CLI embeds the original LiteXML as a JSON payload; the browser bundle then parses that LiteXML and renders it through the same Rich Compose renderer stack used by the static renderer.
+
+| Input form           | Command                                                 |
+| -------------------- | ------------------------------------------------------- |
+| File to stdout       | `litexml-to-html input.xml > article.html`              |
+| File to output       | `litexml-to-html input.xml -o article.html`             |
+| String to output     | `litexml-to-html '<p>Hello</p>' -o article.html`        |
+| Stdin                | `cat input.xml \| litexml-to-html - > article.html`     |
+| Open browser preview | `litexml-to-html input.xml --open`                      |
+| Write and open       | `litexml-to-html input.xml -o article.html --open`      |
+| Dark theme           | `litexml-to-html input.xml --theme dark -o dark.html`   |
+| Note/comment variant | `litexml-to-html input.xml --variant note -o note.html` |
+
+Inside this repository, use:
+
+```bash
+pnpm --silent litexml-to-html input.xml -o article.html
+pnpm --silent litexml-to-html input.xml --open
+```
+
+Outside this repository, use an installed package binary or:
+
+```bash
+npm exec --yes --package @haklex/rich-compose -- litexml-to-html input.xml -o article.html
+```
 
 ## Format Decision
 
@@ -92,8 +122,8 @@ All block-like extension tags may use `id="..."` when a stable Lexical `$.blockI
 | `<video>`            | `src`                                    | `id`, `poster`, `width`, `height`                                | Self-closing.                                                                                      | Use for direct video assets. `poster` is the preview image URL.                                                                                                                                                                                                        |
 | `<link-card>`        | `url`                                    | `id`, `source`, `title`, `description`, `favicon`, `image`       | Self-closing.                                                                                      | Use for rich previews of standalone references.                                                                                                                                                                                                                        |
 | `<embed>`            | `url`                                    | `id`, `source`                                                   | Self-closing.                                                                                      | Use for provider embeds. `source` is a provider hint such as a platform name.                                                                                                                                                                                          |
-| `<codeblock>`        | none                                     | `id`, `lang`                                                     | Raw code text.                                                                                     | Use `lang` for syntax highlighting. Escape XML-sensitive characters or wrap difficult code in a safe source form before conversion.                                                                                                                                    |
-| `<code-snippet>`     | none                                     | `id`                                                             | One or more `<file name="..." lang="...">code</file>`.                                             | Each `<file>` requires `name`; `lang` is optional but recommended. Use for multi-file examples.                                                                                                                                                                        |
+| `<codeblock>`        | none                                     | `id`, `lang`                                                     | Raw code text.                                                                                     | Use `lang` for syntax highlighting. For shebangs, imports, template strings, XML-sensitive characters, or multi-line code, prefer `<![CDATA[...]]>` so the exact code body is preserved.                                                                               |
+| `<code-snippet>`     | none                                     | `id`                                                             | One or more `<file name="..." lang="...">code</file>`.                                             | Each `<file>` requires `name`; `lang` is optional but recommended. Use CDATA inside `<file>` for multi-line code or XML-sensitive source. Use for multi-file examples.                                                                                                 |
 | `<mermaid>`          | none                                     | `id`                                                             | Mermaid diagram source text.                                                                       | Use escaped newlines (`&#10;`) or normal element text. Do not use for arbitrary drawings.                                                                                                                                                                              |
 | `<math>`             | equation body                            | `display`, `color`                                               | Equation text.                                                                                     | Omit `display` for inline math. Use `display="block"` for standalone math. `color` only applies to inline math.                                                                                                                                                        |
 | `<alert>`            | none                                     | `id`, `type`                                                     | Nested LiteXML block content, usually `<p>...</p>`.                                                | `type`: `note`, `tip`, `important`, `warning`, or `caution`. Defaults to `note`.                                                                                                                                                                                       |
@@ -120,7 +150,7 @@ All block-like extension tags may use `id="..."` when a stable Lexical `$.blockI
 - Use `<codeblock>`, not `<code-block>`.
 - Quote all attribute values.
 - Escape XML-sensitive text: `&amp;`, `&lt;`, `&gt;`, and `&quot;`.
-- Use CDATA for opaque JSON or drawing snapshots.
+- Use CDATA for opaque JSON, drawing snapshots, and multi-line code bodies.
 - Use nested LiteXML block children inside `<alert>`, `<banner>`, `<nested-doc>`, `<details>`, `<grid><cell>`, and similar containers.
 - Do not rely on Markdown syntax inside a LiteXML fragment. If the fragment contains LiteXML extension tags, represent surrounding text as LiteXML blocks.
 

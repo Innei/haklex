@@ -75,11 +75,14 @@
     "./style/*": "./dist/style/*"
   },
   "main": "./src/index.ts",
+  "bin": {
+    "litexml-to-html": "./dist/litexml-to-html.mjs"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build && tsx scripts/build-css.ts",
+    "build": "vite build && vite build -c vite.cli.config.ts --mode node-cli && vite build -c vite.cli.config.ts --mode browser-preview && tsx scripts/build-css.ts",
     "dev:build": "vite build --watch",
     "test": "vitest run"
   },
@@ -91,6 +94,7 @@
     "@haklex/rich-ext-gallery": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
     "@haklex/rich-ext-poll": "workspace:*",
+    "@haklex/rich-litexml": "workspace:*",
     "@haklex/rich-renderer-alert": "workspace:*",
     "@haklex/rich-renderer-banner": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
@@ -130,6 +134,9 @@
   },
   "publishConfig": {
     "access": "public",
+    "bin": {
+      "litexml-to-html": "./dist/litexml-to-html.mjs"
+    },
     "exports": {
       ".": {
         "import": "./dist/index.mjs",

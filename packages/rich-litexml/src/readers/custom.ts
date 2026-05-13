@@ -24,7 +24,7 @@ function numAttr(el: Element, name: string): number | undefined {
  * linkedom (HTML parser) converts <![CDATA[...]]> to a comment node
  * with value "[CDATA[...]]", so we detect that pattern.
  */
-function extractCdataText(el: Element): string {
+function extractCdataText(el: Element): string | null {
   for (const child of el.childNodes) {
     if (child.nodeType === 8 /* COMMENT_NODE */) {
       const val = child.nodeValue ?? '';
@@ -33,7 +33,11 @@ function extractCdataText(el: Element): string {
       }
     }
   }
-  return el.textContent?.trim() ?? '';
+  return null;
+}
+
+function extractRawText(el: Element): string {
+  return extractCdataText(el) ?? el.textContent ?? '';
 }
 
 export function registerCustomReaders(registry: LitexmlRegistry): void {
@@ -106,7 +110,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       ({
         type: 'code-block',
         ...extractBlockId(el),
-        code: el.textContent ?? '',
+        code: extractRawText(el),
         language: el.getAttribute('lang') ?? '',
         version: 1,
       }) as any,
@@ -118,7 +122,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       ({
         type: 'mermaid',
         ...extractBlockId(el),
-        diagram: el.textContent ?? '',
+        diagram: extractRawText(el),
         version: 1,
       }) as any,
   );
@@ -130,14 +134,14 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       return {
         type: 'katex-block',
         ...extractBlockId(el),
-        equation: el.textContent ?? '',
+        equation: extractRawText(el),
         version: 1,
       } as any;
     }
     const color = el.getAttribute('color');
     return {
       type: 'katex-inline',
-      equation: el.textContent ?? '',
+      equation: extractRawText(el),
       ...(color ? { color } : {}),
       version: 1,
     } as any;
@@ -405,7 +409,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       if (child.tagName.toLowerCase() === 'file') {
         files.push({
           filename: child.getAttribute('name') ?? '',
-          code: child.textContent ?? '',
+          code: extractRawText(child),
           language: child.getAttribute('lang') ?? '',
         });
       }
