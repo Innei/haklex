@@ -14,6 +14,7 @@
     "build:rich": "pnpm run build:packages",
     "dev": "turbo dev --filter=./demo",
     "lint": "eslint . --fix",
+    "litexml-to-lexical": "tsx scripts/litexml-to-lexical/index.ts",
     "prepare": "pnpm exec simple-git-hooks",
     "publish:packages": "pnpm run build:packages && pnpm -r publish --no-git-checks --filter '@haklex/*' --filter '!@haklex/rich-editor-demo'",
     "publish:rich": "pnpm run publish:packages",

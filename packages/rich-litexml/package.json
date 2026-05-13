@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-litexml",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "Bidirectional Lexical SerializedNode <-> XML conversion with plugin registry",
   "repository": {
     "type": "git",
@@ -13,6 +13,9 @@
     ".": "./src/index.ts"
   },
   "main": "./src/index.ts",
+  "bin": {
+    "litexml-to-lexical": "./dist/cli.mjs"
+  },
   "files": [
     "dist"
   ],
@@ -32,6 +35,9 @@
   },
   "publishConfig": {
     "access": "public",
+    "bin": {
+      "litexml-to-lexical": "./dist/cli.mjs"
+    },
     "exports": {
       ".": {
         "import": "./dist/index.mjs",

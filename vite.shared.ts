@@ -40,6 +40,7 @@ export async function createViteConfig(options: SharedViteOptions = {}): Promise
   ]);
 
   const rollupExternal = (id: string) => {
+    if (id.startsWith('node:')) return true;
     if (id[0] === '.' || id[0] === '/' || id[0] === '\0') return false;
     if (depNames.has(id)) return true;
     const slashIdx = id.indexOf('/');

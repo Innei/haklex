@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-ai-agent",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "description": "AI agent editor integration: diff UI, action registry, agent panel plugin",
   "repository": {
     "type": "git",
