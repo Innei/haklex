@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-litexml",
-  "version": "0.9.3",
+  "version": "0.10.0",
   "description": "Bidirectional Lexical SerializedNode <-> XML conversion with plugin registry",
   "repository": {
     "type": "git",
