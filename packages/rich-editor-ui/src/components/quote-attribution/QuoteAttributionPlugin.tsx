@@ -8,7 +8,9 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
 import type {
+  ClipboardEvent,
   CompositionEvent,
+  DragEvent,
   FocusEvent,
   FormEvent,
   KeyboardEvent,
@@ -182,15 +184,24 @@ export function QuoteAttributionPlugin(): ReactElement | null {
         type="text"
         value={inputValue}
         onBeforeInput={stop as (e: FormEvent<HTMLInputElement>) => void}
-        onChange={(e) => setInputValue(e.target.value)}
         onClick={stop as (e: MouseEvent<HTMLInputElement>) => void}
         onCompositionEnd={stop as (e: CompositionEvent<HTMLInputElement>) => void}
         onCompositionStart={stop as (e: CompositionEvent<HTMLInputElement>) => void}
         onCompositionUpdate={stop as (e: CompositionEvent<HTMLInputElement>) => void}
+        onCopy={stop as (e: ClipboardEvent<HTMLInputElement>) => void}
+        onCut={stop as (e: ClipboardEvent<HTMLInputElement>) => void}
+        onDragStart={stop as (e: DragEvent<HTMLInputElement>) => void}
+        onDrop={stop as (e: DragEvent<HTMLInputElement>) => void}
+        onInput={stop as (e: FormEvent<HTMLInputElement>) => void}
         onKeyDown={handleKeyDown}
         onKeyUp={stop as (e: KeyboardEvent<HTMLInputElement>) => void}
         onMouseDown={stop as (e: MouseEvent<HTMLInputElement>) => void}
+        onPaste={stop as (e: ClipboardEvent<HTMLInputElement>) => void}
         onPointerDown={stop as (e: PointerEvent<HTMLInputElement>) => void}
+        onChange={(e) => {
+          e.stopPropagation();
+          setInputValue(e.target.value);
+        }}
       />
     </div>,
     quoteState.quoteDom,
