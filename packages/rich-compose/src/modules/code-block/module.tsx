@@ -4,7 +4,7 @@ import { CodeBlockSsrFallback } from './ssr-fallback';
 export const codeBlockModule: RichRendererModule = {
   name: 'code-block',
   lazyRenderers: {
-    CodeBlock: () => import('./renderer'),
+    CodeBlock: () => import('./renderer').then((m) => ({ default: m.CodeBlockRenderer })),
   },
   ssrFallback: {
     CodeBlock: <CodeBlockSsrFallback />,

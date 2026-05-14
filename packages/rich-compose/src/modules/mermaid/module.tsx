@@ -4,7 +4,7 @@ import { MermaidSsrFallback } from './ssr-fallback';
 export const mermaidModule: RichRendererModule = {
   name: 'mermaid',
   lazyRenderers: {
-    Mermaid: () => import('./renderer'),
+    Mermaid: () => import('./renderer').then((m) => ({ default: m.MermaidRenderer })),
   },
   ssrFallback: {
     Mermaid: <MermaidSsrFallback />,
