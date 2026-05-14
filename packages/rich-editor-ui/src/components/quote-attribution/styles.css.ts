@@ -2,44 +2,47 @@ import { vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
-  panel: 'rich-quote-attribution-panel',
-  row: 'rich-quote-attribution-row',
+  editor: 'rich-quote-attribution-editor',
   input: 'rich-quote-attribution-input',
 } as const;
 
-export const panel = style({
+export const editor = style({
+  position: 'absolute',
+  bottom: '4px',
+  right: '8px',
+  maxWidth: '60%',
   display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  width: '320px',
-  padding: '12px',
-  fontSize: '13px',
-});
-
-export const row = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '8px 12px',
-  backgroundColor: vars.color.bgSecondary,
-  borderRadius: vars.borderRadius.md,
-  minWidth: 0,
+  justifyContent: 'flex-end',
+  pointerEvents: 'auto',
 });
 
 export const input = style({
-  flex: 1,
   appearance: 'none',
+  background: 'transparent',
   border: 'none',
-  backgroundColor: 'transparent',
-  color: vars.color.text,
-  fontFamily: vars.typography.fontFamily,
-  fontSize: '13px',
-  padding: 0,
-  outline: 'none',
+  borderBottom: '1px dotted transparent',
+  borderRadius: 0,
+  padding: '0 2px',
+  margin: 0,
+  width: '100%',
   minWidth: 0,
+  textAlign: 'right',
+  fontStyle: 'italic',
+  fontFamily: vars.typography.fontFamily,
+  fontSize: '12px',
+  color: vars.color.textSecondary,
+  outline: 'none',
+  transition: 'border-color 120ms ease, background-color 120ms ease',
   selectors: {
     '&::placeholder': {
-      color: vars.color.textSecondary,
+      color: vars.color.textQuaternary,
+      fontStyle: 'italic',
+    },
+    '&:hover': {
+      borderBottomColor: vars.color.textQuaternary,
+    },
+    '&:focus': {
+      borderBottomColor: vars.color.textTertiary,
     },
   },
 });

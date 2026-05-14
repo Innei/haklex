@@ -7,12 +7,10 @@ import {
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import { Quote, Trash2 } from 'lucide-react';
-import type { KeyboardEvent, ReactElement } from 'react';
+import type { FocusEvent, KeyboardEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-import { ActionBar, ActionButton } from '../action-button';
-import { Popover, PopoverPopup, PopoverPortal, PopoverPositioner } from '../popover';
 import * as styles from './styles.css';
 
 const RICH_QUOTE_TYPE = 'rich-quote';
@@ -118,11 +116,6 @@ export function QuoteAttributionPlugin(): ReactElement | null {
     commitAttribution(trimmed || null);
   }, [commitAttribution, inputValue]);
 
-  const handleClear = useCallback(() => {
-    setInputValue('');
-    commitAttribution(null);
-  }, [commitAttribution]);
-
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
@@ -143,7 +136,7 @@ export function QuoteAttributionPlugin(): ReactElement | null {
   }, []);
 
   const handlePanelFocusOut = useCallback(
-    (e: React.FocusEvent) => {
+    (e: FocusEvent<HTMLDivElement>) => {
       const panel = e.currentTarget;
       if (!panel.contains(e.relatedTarget as Node)) {
         panelFocusedRef.current = false;
@@ -154,38 +147,25 @@ export function QuoteAttributionPlugin(): ReactElement | null {
   );
 
   if (!editor.isEditable()) return null;
+  if (!visible || !quoteState.quoteDom) return null;
 
-  return (
-    <Popover open={visible}>
-      <PopoverPortal>
-        <PopoverPositioner align="center" anchor={quoteState.quoteDom} side="bottom" sideOffset={8}>
-          <PopoverPopup
-            className={`${styles.panel} ${styles.semanticClassNames.panel}`}
-            onBlur={handlePanelFocusOut}
-            onFocus={handlePanelFocusIn}
-          >
-            <div className={`${styles.row} ${styles.semanticClassNames.row}`}>
-              <Quote size={14} />
-              <input
-                className={`${styles.input} ${styles.semanticClassNames.input}`}
-                placeholder="Attribution (e.g. — Author, Work)"
-                ref={inputRef}
-                type="text"
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-            <ActionBar>
-              <ActionButton onClick={handleSave}>Save</ActionButton>
-              <ActionButton danger onClick={handleClear}>
-                <Trash2 size={14} />
-                Clear
-              </ActionButton>
-            </ActionBar>
-          </PopoverPopup>
-        </PopoverPositioner>
-      </PopoverPortal>
-    </Popover>
+  return createPortal(
+    <div
+      className={`${styles.editor} ${styles.semanticClassNames.editor}`}
+      contentEditable={false}
+      onBlur={handlePanelFocusOut}
+      onFocus={handlePanelFocusIn}
+    >
+      <input
+        className={`${styles.input} ${styles.semanticClassNames.input}`}
+        placeholder="— Author, Work"
+        ref={inputRef}
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+      />
+    </div>,
+    quoteState.quoteDom,
   );
 }
