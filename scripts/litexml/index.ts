@@ -5,12 +5,12 @@ import { existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
 const cliPath = fileURLToPath(
-  new URL('../../packages/rich-compose/dist/litexml-to-html.mjs', import.meta.url),
+  new URL('../../packages/rich-litexml-cli/dist/cli.mjs', import.meta.url),
 );
 
 if (!existsSync(cliPath)) {
   process.stderr.write(
-    'litexml-to-html: missing packages/rich-compose/dist/litexml-to-html.mjs. Run `pnpm --filter @haklex/rich-compose build` first.\n',
+    'litexml: missing packages/rich-litexml-cli/dist/cli.mjs. Run `pnpm --filter @haklex/rich-litexml-cli build` first.\n',
   );
   process.exit(1);
 }

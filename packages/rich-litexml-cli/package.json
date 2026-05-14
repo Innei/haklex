@@ -1,0 +1,42 @@
+{
+  "name": "@haklex/rich-litexml-cli",
+  "version": "0.12.0",
+  "description": "Unified CLI for haklex LiteXML: convert LiteXML or Lexical JSON to HTML, JSON, or Markdown.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Innei/haklex.git",
+    "directory": "packages/rich-litexml-cli"
+  },
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "litexml": "./dist/cli.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "vite build",
+    "dev:build": "vite build --watch",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@haklex/rich-compose": "workspace:*",
+    "@haklex/rich-headless": "workspace:*",
+    "@haklex/rich-litexml": "workspace:*",
+    "@lexical/headless": "^0.44.0",
+    "lexical": "^0.44.0"
+  },
+  "devDependencies": {
+    "@types/node": "25.6.0",
+    "typescript": "^5.9.3",
+    "vite": "^8.0.10",
+    "vitest": "^4.1.5"
+  },
+  "publishConfig": {
+    "access": "public",
+    "bin": {
+      "litexml": "./dist/cli.mjs"
+    }
+  }
+}

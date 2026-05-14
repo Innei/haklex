@@ -1,4 +1,4 @@
-import { createDefaultRegistry, deserializeFromXml } from '@haklex/rich-litexml';
+import type { SerializedEditorState } from 'lexical';
 import { createRoot } from 'react-dom/client';
 
 import { composeRenderer } from '../core/compose';
@@ -15,9 +15,9 @@ type Theme = 'light' | 'dark';
 type Variant = 'article' | 'note' | 'comment';
 
 interface LiteXmlPreviewPayload {
+  state?: SerializedEditorState;
   theme?: Theme;
   variant?: Variant;
-  xml?: string;
 }
 
 declare global {
@@ -60,14 +60,14 @@ function readPayload(): Required<LiteXmlPreviewPayload> {
   }
 
   const parsed = JSON.parse(payloadElement.textContent) as LiteXmlPreviewPayload;
-  if (!parsed.xml) {
+  if (!parsed.state) {
     throw new Error('LiteXML preview payload is empty.');
   }
 
   return {
+    state: parsed.state,
     theme: parsed.theme === 'dark' ? 'dark' : 'light',
     variant: parsed.variant === 'note' || parsed.variant === 'comment' ? parsed.variant : 'article',
-    xml: parsed.xml,
   };
 }
 
@@ -93,11 +93,9 @@ function main(): void {
 
   try {
     const payload = readPayload();
-    const registry = createDefaultRegistry();
-    const editorState = deserializeFromXml(payload.xml, registry);
     const root = createRoot(rootElement);
     root.render(
-      <HtmlRenderer theme={payload.theme} value={editorState} variant={payload.variant} />,
+      <HtmlRenderer theme={payload.theme} value={payload.state} variant={payload.variant} />,
     );
     window.__HAKLEX_LITEXML_PREVIEW_READY__ = true;
   } catch (error) {

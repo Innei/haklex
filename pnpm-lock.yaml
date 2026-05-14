@@ -1244,6 +1244,37 @@ importers:
         specifier: ^4.5.4
         version: 4.5.4(@types/node@25.6.0)(typescript@5.9.3)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
 
+  packages/rich-litexml-cli:
+    dependencies:
+      '@haklex/rich-compose':
+        specifier: workspace:*
+        version: link:../rich-compose
+      '@haklex/rich-headless':
+        specifier: workspace:*
+        version: link:../rich-headless
+      '@haklex/rich-litexml':
+        specifier: workspace:*
+        version: link:../rich-litexml
+      '@lexical/headless':
+        specifier: ^0.44.0
+        version: 0.44.0
+      lexical:
+        specifier: ^0.44.0
+        version: 0.44.0
+    devDependencies:
+      '@types/node':
+        specifier: 25.6.0
+        version: 25.6.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vite:
+        specifier: ^8.0.10
+        version: 8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3)
+      vitest:
+        specifier: ^4.1.5
+        version: 4.1.5(@types/node@25.6.0)(happy-dom@20.9.0)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))
+
   packages/rich-plugin-block-handle:
     dependencies:
       '@haklex/rich-editor-ui':

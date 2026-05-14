@@ -72,17 +72,16 @@
     "./style-token": "./src/style-token/index.ts",
     "./style-token/styles": "./src/style-token/styles.ts",
     "./style.css": "./dist/style.css",
-    "./style/*": "./dist/style/*"
+    "./style/*": "./dist/style/*",
+    "./litexml-html-preview-client.js": "./dist/litexml-html-preview-client.js",
+    "./litexml-html-preview-client.css": "./dist/litexml-html-preview-client.css"
   },
   "main": "./src/index.ts",
-  "bin": {
-    "litexml-to-html": "./dist/litexml-to-html.mjs"
-  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "vite build && vite build -c vite.cli.config.ts --mode node-cli && vite build -c vite.cli.config.ts --mode browser-preview && tsx scripts/build-css.ts",
+    "build": "vite build && vite build -c vite.preview-client.config.ts && tsx scripts/build-css.ts",
     "dev:build": "vite build --watch",
     "test": "vitest run"
   },
@@ -134,9 +133,6 @@
   },
   "publishConfig": {
     "access": "public",
-    "bin": {
-      "litexml-to-html": "./dist/litexml-to-html.mjs"
-    },
     "exports": {
       ".": {
         "import": "./dist/index.mjs",
@@ -371,7 +367,9 @@
         "types": "./dist/style-token/styles.d.ts"
       },
       "./style.css": "./dist/style.css",
-      "./style/*": "./dist/style/*"
+      "./style/*": "./dist/style/*",
+      "./litexml-html-preview-client.js": "./dist/litexml-html-preview-client.js",
+      "./litexml-html-preview-client.css": "./dist/litexml-html-preview-client.css"
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"

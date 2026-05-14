@@ -10,59 +10,60 @@ Use this skill when an article needs Haklex-specific rich nodes or when the user
 
 ## Conversion CLI
 
-The `@haklex/rich-litexml` package publishes the `litexml-to-lexical` binary.
+The `@haklex/rich-litexml-cli` package publishes the `litexml` binary. It accepts LiteXML or Lexical JSON input (auto-detected) and emits HTML, JSON, or Markdown.
 
-| Input form           | Command                                               |
-| -------------------- | ----------------------------------------------------- |
-| File                 | `litexml-to-lexical input.xml > state.json`           |
-| String               | `litexml-to-lexical '<p>Hello</p>' > state.json`      |
-| Stdin                | `cat input.xml \| litexml-to-lexical - > state.json`  |
-| Compact JSON         | `litexml-to-lexical input.xml --compact > state.json` |
-| Explicit output file | `litexml-to-lexical input.xml -o state.json`          |
+`--format` is required. Use `--input-format litexml|json` to force input detection.
 
-Inside this repository, use:
+### JSON output (Lexical SerializedEditorState)
 
-```bash
-pnpm --silent litexml-to-lexical input.xml > state.json
-pnpm --silent litexml-to-lexical '<p>Hello</p>' --compact
-```
-
-Outside this repository, use an installed package binary or:
-
-```bash
-npm exec --yes --package @haklex/rich-litexml -- litexml-to-lexical input.xml > state.json
-```
+| Input form           | Command                                             |
+| -------------------- | --------------------------------------------------- |
+| File                 | `litexml input.xml --format json > state.json`      |
+| String               | `litexml '<p>Hello</p>' --format json > state.json` |
+| Stdin                | `cat input.xml \| litexml - --format json`          |
+| Compact JSON         | `litexml input.xml --format json --compact`         |
+| Explicit output file | `litexml input.xml --format json -o state.json`     |
 
 The CLI emits a full Lexical `SerializedEditorState`, not only root children.
 
-## HTML Preview CLI
+### Markdown output
 
-The `@haklex/rich-compose` package publishes the `litexml-to-html` binary. It writes a browser-openable HTML preview and inlines `@haklex/rich-compose/style.css`.
+```bash
+litexml input.xml --format markdown > article.md
+litexml state.json --format markdown # Lexical JSON input is auto-detected
+litexml state.json --format markdown --input-format json
+```
 
-The generated HTML is a self-contained React preview shell. The CLI embeds the original LiteXML as a JSON payload; the browser bundle then parses that LiteXML and renders it through the same Rich Compose renderer stack used by the static renderer.
+Markdown coverage is driven by `@haklex/rich-headless` `$toMarkdown()` — all haklex nodes (mentions, footnotes, spoilers, KaTeX, code blocks, tables, etc.) are included.
 
-| Input form           | Command                                                 |
-| -------------------- | ------------------------------------------------------- |
-| File to stdout       | `litexml-to-html input.xml > article.html`              |
-| File to output       | `litexml-to-html input.xml -o article.html`             |
-| String to output     | `litexml-to-html '<p>Hello</p>' -o article.html`        |
-| Stdin                | `cat input.xml \| litexml-to-html - > article.html`     |
-| Open browser preview | `litexml-to-html input.xml --open`                      |
-| Write and open       | `litexml-to-html input.xml -o article.html --open`      |
-| Dark theme           | `litexml-to-html input.xml --theme dark -o dark.html`   |
-| Note/comment variant | `litexml-to-html input.xml --variant note -o note.html` |
+### HTML preview output
+
+Writes a browser-openable HTML preview that inlines `@haklex/rich-compose/style.css` and a React hydration bundle. The CLI parses LiteXML on the server side, embeds the resulting `SerializedEditorState` as JSON payload, and the browser bundle renders it through the same Rich Compose renderer stack as the static renderer.
+
+| Input form           | Command                                                       |
+| -------------------- | ------------------------------------------------------------- |
+| File to stdout       | `litexml input.xml --format html > article.html`              |
+| File to output       | `litexml input.xml --format html -o article.html`             |
+| String to output     | `litexml '<p>Hello</p>' --format html -o article.html`        |
+| Stdin                | `cat input.xml \| litexml - --format html > article.html`     |
+| Open browser preview | `litexml input.xml --format html --open`                      |
+| Write and open       | `litexml input.xml --format html -o article.html --open`      |
+| Dark theme           | `litexml input.xml --format html --theme dark -o dark.html`   |
+| Note/comment variant | `litexml input.xml --format html --variant note -o note.html` |
 
 Inside this repository, use:
 
 ```bash
-pnpm --silent litexml-to-html input.xml -o article.html
-pnpm --silent litexml-to-html input.xml --open
+pnpm --silent litexml input.xml --format html -o article.html
+pnpm --silent litexml input.xml --format html --open
+pnpm --silent litexml input.xml --format markdown > article.md
+pnpm --silent litexml input.xml --format json > state.json
 ```
 
 Outside this repository, use an installed package binary or:
 
 ```bash
-npm exec --yes --package @haklex/rich-compose -- litexml-to-html input.xml -o article.html
+npm exec --yes --package @haklex/rich-litexml-cli -- litexml input.xml --format html -o article.html
 ```
 
 ## Format Decision
@@ -171,7 +172,7 @@ All block-like extension tags may use `id="..."` when a stable Lexical `$.blockI
 For generated LiteXML, validate the resulting Lexical JSON before handing it off:
 
 ```bash
-pnpm --silent litexml-to-lexical '<doc><p>Hello</p></doc>' --compact
+pnpm --silent litexml '<doc><p>Hello</p></doc>' --format json --compact
 ```
 
 If the command succeeds but a downstream editor cannot materialize a node, check whether that runtime has registered the corresponding Haklex node class.

@@ -13,9 +13,6 @@
     ".": "./src/index.ts"
   },
   "main": "./src/index.ts",
-  "bin": {
-    "litexml-to-lexical": "./dist/cli.mjs"
-  },
   "files": [
     "dist"
   ],
@@ -35,9 +32,6 @@
   },
   "publishConfig": {
     "access": "public",
-    "bin": {
-      "litexml-to-lexical": "./dist/cli.mjs"
-    },
     "exports": {
       ".": {
         "import": "./dist/index.mjs",
