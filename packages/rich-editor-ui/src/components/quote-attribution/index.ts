@@ -1,0 +1,1 @@
+export { QuoteAttributionPlugin } from './QuoteAttributionPlugin';

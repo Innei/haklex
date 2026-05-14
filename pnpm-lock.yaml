@@ -663,6 +663,9 @@ importers:
         specifier: '>=3.0.0'
         version: 4.0.1
     devDependencies:
+      '@lexical/react':
+        specifier: ^0.44.0
+        version: 0.44.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(yjs@13.6.29)
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.14
@@ -678,6 +681,9 @@ importers:
       '@vanilla-extract/vite-plugin':
         specifier: ^5.2.2
         version: 5.2.2(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(vite@8.0.10(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.6.1)(tsx@4.21.0)(yaml@2.8.3))(yaml@2.8.3)
+      lexical:
+        specifier: ^0.44.0
+        version: 0.44.0
       react:
         specifier: 19.2.5
         version: 19.2.5

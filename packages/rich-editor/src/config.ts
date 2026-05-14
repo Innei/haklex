@@ -4,7 +4,7 @@ import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import type { Klass, LexicalNode } from 'lexical';
+import type { Klass, LexicalNode, LexicalNodeReplacement } from 'lexical';
 
 import { AlertQuoteNode } from './nodes/AlertQuoteNode';
 import { BannerNode } from './nodes/BannerNode';
@@ -20,14 +20,17 @@ import { KaTeXInlineNode } from './nodes/KaTeXInlineNode';
 import { LinkCardNode } from './nodes/LinkCardNode';
 import { MentionNode } from './nodes/MentionNode';
 import { MermaidNode } from './nodes/MermaidNode';
+import { RichQuoteNode } from './nodes/RichQuoteNode';
 import { RubyNode } from './nodes/RubyNode';
 import { SpoilerNode } from './nodes/SpoilerNode';
 import { TagNode } from './nodes/TagNode';
 import { VideoNode } from './nodes/VideoNode';
 
-export const builtinNodes: Array<Klass<LexicalNode>> = [
+export const builtinNodes: Array<Klass<LexicalNode> | LexicalNodeReplacement> = [
   HeadingNode,
   QuoteNode,
+  RichQuoteNode,
+  { replace: QuoteNode, with: () => new RichQuoteNode() },
   ListNode,
   ListItemNode,
   LinkNode,
@@ -39,7 +42,7 @@ export const builtinNodes: Array<Klass<LexicalNode>> = [
   CodeNode,
 ];
 
-export const customNodes: Array<Klass<LexicalNode>> = [
+export const customNodes: Array<Klass<LexicalNode> | LexicalNodeReplacement> = [
   SpoilerNode,
   MentionNode,
   KaTeXInlineNode,
@@ -60,4 +63,7 @@ export const customNodes: Array<Klass<LexicalNode>> = [
   TagNode,
 ];
 
-export const allNodes: Array<Klass<LexicalNode>> = [...builtinNodes, ...customNodes];
+export const allNodes: Array<Klass<LexicalNode> | LexicalNodeReplacement> = [
+  ...builtinNodes,
+  ...customNodes,
+];

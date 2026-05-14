@@ -1,4 +1,4 @@
-import type { Klass, LexicalNode } from 'lexical';
+import type { Klass, LexicalNode, LexicalNodeReplacement } from 'lexical';
 
 import { builtinNodes } from './config';
 import { AlertQuoteEditNode } from './nodes/AlertQuoteEditNode';
@@ -20,7 +20,7 @@ import { SpoilerNode } from './nodes/SpoilerNode';
 import { TagNode } from './nodes/TagNode';
 import { VideoNode } from './nodes/VideoNode';
 
-export const customEditNodes: Array<Klass<LexicalNode>> = [
+export const customEditNodes: Array<Klass<LexicalNode> | LexicalNodeReplacement> = [
   SpoilerNode,
   MentionNode,
   KaTeXInlineNode,
@@ -41,4 +41,7 @@ export const customEditNodes: Array<Klass<LexicalNode>> = [
   TagNode,
 ];
 
-export const allEditNodes: Array<Klass<LexicalNode>> = [...builtinNodes, ...customEditNodes];
+export const allEditNodes: Array<Klass<LexicalNode> | LexicalNodeReplacement> = [
+  ...builtinNodes,
+  ...customEditNodes,
+];

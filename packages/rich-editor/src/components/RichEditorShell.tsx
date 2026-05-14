@@ -3,7 +3,13 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import type { Klass, LexicalEditor, LexicalNode, SerializedEditorState } from 'lexical';
+import type {
+  Klass,
+  LexicalEditor,
+  LexicalNode,
+  LexicalNodeReplacement,
+  SerializedEditorState,
+} from 'lexical';
 import type { ReactNode } from 'react';
 
 import type { ColorScheme } from '../context/ColorSchemeContext';
@@ -32,7 +38,7 @@ export interface RichEditorShellProps {
   debounceMs?: number;
   header?: ReactNode;
   initialValue?: SerializedEditorState;
-  nodes: Array<Klass<LexicalNode>>;
+  nodes: Array<Klass<LexicalNode> | LexicalNodeReplacement>;
   onChange?: (value: SerializedEditorState) => void;
   onEditorReady?: (editor: LexicalEditor | null) => void;
   onSubmit?: () => void;

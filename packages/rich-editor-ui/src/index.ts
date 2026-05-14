@@ -124,6 +124,7 @@ export {
   PopoverTrigger,
   usePopover,
 } from './components/popover';
+export { QuoteAttributionPlugin } from './components/quote-attribution';
 export type { ScrollAreaProps } from './components/scroll-area';
 export { ScrollArea } from './components/scroll-area';
 export type { SegmentedControlItem, SegmentedControlProps } from './components/segmented-control';
