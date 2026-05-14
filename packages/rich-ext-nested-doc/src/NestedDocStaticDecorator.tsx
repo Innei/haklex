@@ -1,6 +1,7 @@
 import {
   ColorSchemeProvider,
   NestedContentRendererProvider,
+  RendererWrapper,
   useColorScheme,
   useOptionalNestedContentRenderer,
   usePresentDialog,
@@ -12,6 +13,7 @@ import { Maximize2 } from 'lucide-react';
 import { useCallback, useMemo } from 'react';
 
 import { NestedDocRenderer } from './NestedDocRenderer';
+import { NESTED_DOC_NODE_KEY } from './slot';
 import * as css from './styles.css';
 import { hasRenderableEditorState, truncateEditorState } from './utils';
 
@@ -21,7 +23,7 @@ interface NestedDocStaticDecoratorProps {
   contentState: SerializedEditorState;
 }
 
-export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecoratorProps) {
+function DefaultNestedDocStaticRenderer({ contentState }: NestedDocStaticDecoratorProps) {
   const colorScheme = useColorScheme();
   const { className: portalClassName } = usePortalTheme();
   const presentDialogFromCtx = usePresentDialog();
@@ -105,5 +107,15 @@ export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecora
         <Maximize2 size={24} />
       </div>
     </div>
+  );
+}
+
+export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecoratorProps) {
+  return (
+    <RendererWrapper
+      defaultRenderer={DefaultNestedDocStaticRenderer}
+      props={{ contentState }}
+      rendererKey={NESTED_DOC_NODE_KEY}
+    />
   );
 }
