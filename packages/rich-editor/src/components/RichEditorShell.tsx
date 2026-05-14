@@ -1,3 +1,4 @@
+import { QuoteAttributionPlugin } from '@haklex/rich-editor-ui';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
@@ -113,6 +114,7 @@ export function RichEditorShell({
                   <OnChangePlugin debounceMs={debounceMs} onChange={onChange} />
                   <SubmitShortcutPlugin onSubmit={onSubmit} />
                   <EditorRefPlugin onEditorReady={onEditorReady} />
+                  <QuoteAttributionPlugin />
                   {autoFocus && <AutoFocusPlugin />}
                   {children}
                   {actions && <div className="rich-editor__actions">{actions}</div>}
