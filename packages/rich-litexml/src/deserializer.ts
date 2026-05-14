@@ -50,6 +50,7 @@ const BLOCK_TAGS = new Set([
   'ol',
   'table',
   'tr',
+  'blockquote',
   'alert',
   'banner',
   'details',

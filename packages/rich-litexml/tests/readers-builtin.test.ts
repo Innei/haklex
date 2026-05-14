@@ -32,6 +32,23 @@ describe('builtin readers', () => {
     expect(nodes[0].type).toBe('quote');
   });
 
+  it('ignores formatting whitespace around blockquote block children', () => {
+    const nodes = parse(`
+      <blockquote id="q1">
+        <p>&quot;loadYohakuHome 为什么要 fetch aggregate data。&quot;</p>
+      </blockquote>
+    `);
+    const quote = nodes[0];
+    const paragraph = quote.children[0];
+    const text = paragraph.children.map((child: any) => child.text).join('');
+
+    expect(quote.type).toBe('quote');
+    expect(quote.$?.blockId).toBe('q1');
+    expect(quote.children).toHaveLength(1);
+    expect(paragraph.type).toBe('paragraph');
+    expect(text).toBe('"loadYohakuHome 为什么要 fetch aggregate data。"');
+  });
+
   it('reads <hr />', () => {
     const nodes = parse('<hr id="hr1" />');
     expect(nodes[0].type).toBe('horizontalrule');

@@ -19,6 +19,7 @@ import { SubmitShortcutPlugin } from '../plugins/SubmitShortcutPlugin';
 import { editorTheme } from '../styles/theme';
 import type { RichEditorVariant } from '../types';
 import type { RendererConfig } from '../types/renderer-config';
+import { normalizeSerializedEditorState } from '../utils/normalizeSerializedEditorState';
 import { ContentEditable } from './ContentEditable';
 import { clsx, getVariantClass } from './utils';
 
@@ -62,6 +63,9 @@ export function RichEditorShell({
   children,
 }: RichEditorShellProps) {
   setResolvedEditNodes(nodes);
+  const normalizedInitialValue = initialValue
+    ? normalizeSerializedEditorState(initialValue)
+    : undefined;
   const initialConfig = {
     namespace: 'RichEditor',
     theme: editorTheme,
@@ -70,7 +74,7 @@ export function RichEditorShell({
     onError: (error: Error) => {
       console.error('[RichEditor]', error);
     },
-    ...(initialValue ? { editorState: JSON.stringify(initialValue) } : {}),
+    ...(normalizedInitialValue ? { editorState: JSON.stringify(normalizedInitialValue) } : {}),
   };
 
   const variantClass = getVariantClass(variant);
