@@ -7,7 +7,16 @@ import {
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import type { FocusEvent, KeyboardEvent, ReactElement } from 'react';
+import type {
+  CompositionEvent,
+  FocusEvent,
+  FormEvent,
+  KeyboardEvent,
+  MouseEvent,
+  PointerEvent,
+  ReactElement,
+  SyntheticEvent,
+} from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -127,9 +136,14 @@ export function QuoteAttributionPlugin(): ReactElement | null {
         setInputValue(quoteState.attribution);
         editor.focus();
       }
+      e.stopPropagation();
     },
     [editor, handleSave, quoteState.attribution],
   );
+
+  const stop = useCallback((e: SyntheticEvent) => {
+    e.stopPropagation();
+  }, []);
 
   const handlePanelFocusIn = useCallback(() => {
     panelFocusedRef.current = true;
@@ -151,10 +165,15 @@ export function QuoteAttributionPlugin(): ReactElement | null {
 
   return createPortal(
     <div
+      suppressContentEditableWarning
       className={`${styles.editor} ${styles.semanticClassNames.editor}`}
       contentEditable={false}
+      data-lexical-editor="false"
       onBlur={handlePanelFocusOut}
+      onClick={stop as (e: MouseEvent<HTMLDivElement>) => void}
       onFocus={handlePanelFocusIn}
+      onMouseDown={stop as (e: MouseEvent<HTMLDivElement>) => void}
+      onPointerDown={stop as (e: PointerEvent<HTMLDivElement>) => void}
     >
       <input
         className={`${styles.input} ${styles.semanticClassNames.input}`}
@@ -162,8 +181,16 @@ export function QuoteAttributionPlugin(): ReactElement | null {
         ref={inputRef}
         type="text"
         value={inputValue}
+        onBeforeInput={stop as (e: FormEvent<HTMLInputElement>) => void}
         onChange={(e) => setInputValue(e.target.value)}
+        onClick={stop as (e: MouseEvent<HTMLInputElement>) => void}
+        onCompositionEnd={stop as (e: CompositionEvent<HTMLInputElement>) => void}
+        onCompositionStart={stop as (e: CompositionEvent<HTMLInputElement>) => void}
+        onCompositionUpdate={stop as (e: CompositionEvent<HTMLInputElement>) => void}
         onKeyDown={handleKeyDown}
+        onKeyUp={stop as (e: KeyboardEvent<HTMLInputElement>) => void}
+        onMouseDown={stop as (e: MouseEvent<HTMLInputElement>) => void}
+        onPointerDown={stop as (e: PointerEvent<HTMLInputElement>) => void}
       />
     </div>,
     quoteState.quoteDom,
