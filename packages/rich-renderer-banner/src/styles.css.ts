@@ -1,7 +1,7 @@
-import { noteVariant } from '@haklex/rich-editor/styles'
-import { vars } from '@haklex/rich-style-token/styles'
-import { globalStyle, style } from '@vanilla-extract/css'
-import { recipe } from '@vanilla-extract/recipes'
+import { noteVariant } from '@haklex/rich-editor/styles';
+import { vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 
 const bannerTypeColors = {
   note: vars.color.alertInfo,
@@ -9,7 +9,7 @@ const bannerTypeColors = {
   important: vars.color.alertImportant,
   warning: vars.color.alertWarning,
   caution: vars.color.alertCaution,
-} as const
+} as const;
 
 const bannerTypeStyles = {
   note: {
@@ -32,7 +32,7 @@ const bannerTypeStyles = {
     backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 8%, transparent)`,
     borderColor: `color-mix(in srgb, ${vars.color.alertCaution} 30%, transparent)`,
   },
-} as const
+} as const;
 
 const bannerIconTypeStyles = {
   note: { color: vars.color.alertInfo },
@@ -40,7 +40,7 @@ const bannerIconTypeStyles = {
   important: { color: vars.color.alertImportant },
   warning: { color: vars.color.alertWarning },
   caution: { color: vars.color.alertCaution },
-} as const
+} as const;
 
 export const semanticClassNames = {
   root: 'rich-banner',
@@ -48,7 +48,7 @@ export const semanticClassNames = {
   icon: 'rich-banner-icon',
   content: 'rich-banner-content',
   contentEditable: 'rich-banner-content-editable',
-} as const
+} as const;
 
 export const semanticTypeClassNames = {
   root: {
@@ -65,7 +65,7 @@ export const semanticTypeClassNames = {
     warning: 'rich-banner-icon-warning',
     caution: 'rich-banner-icon-caution',
   },
-} as const
+} as const;
 
 const bannerRootStyles = {
   borderRadius: vars.borderRadius.md,
@@ -74,55 +74,56 @@ const bannerRootStyles = {
   margin: `${vars.spacing.md} 0`,
   color: vars.color.text,
   lineHeight: '1.8',
-} as const
+} as const;
 
-export const bannerRoot = style(bannerRootStyles)
+export const bannerRoot = style(bannerRootStyles);
 
 const bannerInnerStyles = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
   gap: vars.spacing.md,
-} as const
+} as const;
 
-export const bannerInner = style(bannerInnerStyles)
+export const bannerInner = style(bannerInnerStyles);
 
 const bannerIconStyles = {
   display: 'inline-flex',
   flexShrink: 0,
   fontSize: '1.5em',
   alignSelf: 'flex-start',
-} as const
+} as const;
 
-export const bannerIcon = style(bannerIconStyles)
+export const bannerIcon = style(bannerIconStyles);
 
 const bannerContentStyles = {
   flex: 1,
   minWidth: 0,
   minHeight: '1em',
-} as const
+} as const;
 
 export const bannerContent = style({
   ...bannerContentStyles,
-})
+});
 
 const bannerContentEditableStyles = {
   outline: 'none',
-} as const
+  width: '100%',
+} as const;
 
-export const bannerContentEditable = style(bannerContentEditableStyles)
+export const bannerContentEditable = style(bannerContentEditableStyles);
 
 export const bannerType = recipe({
   variants: {
     type: bannerTypeStyles,
   },
-})
+});
 
 export const bannerIconType = recipe({
   variants: {
     type: bannerIconTypeStyles,
   },
-})
+});
 
 export const bannerTrigger = style({
   cursor: 'pointer',
@@ -137,54 +138,43 @@ export const bannerTrigger = style({
       backgroundColor: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
     },
   },
-})
+});
 
 export const bannerMenuIcon = style({
   width: '16px',
   height: '16px',
   flexShrink: 0,
-})
+});
 
 // Content node classes stay global because they are consumed across editor/renderer boundaries.
-globalStyle(`.${semanticClassNames.root}`, bannerRootStyles)
-globalStyle(`.${semanticClassNames.inner}`, bannerInnerStyles)
-globalStyle(`.${semanticClassNames.icon}`, bannerIconStyles)
-globalStyle(`.${semanticClassNames.content}`, bannerContentStyles)
-globalStyle(
-  `.${semanticClassNames.contentEditable}`,
-  bannerContentEditableStyles,
-)
+globalStyle(`.${semanticClassNames.root}`, bannerRootStyles);
+globalStyle(`.${semanticClassNames.inner}`, bannerInnerStyles);
+globalStyle(`.${semanticClassNames.icon}`, bannerIconStyles);
+globalStyle(`.${semanticClassNames.content}`, bannerContentStyles);
+globalStyle(`.${semanticClassNames.contentEditable}`, bannerContentEditableStyles);
 
 globalStyle(`.${semanticClassNames.content} > .rich-paragraph:first-child`, {
   marginTop: 0,
-})
+});
 
 globalStyle(`.${semanticClassNames.content} > .rich-paragraph:last-child`, {
   marginBottom: 0,
-})
+});
 
 globalStyle(`.${semanticClassNames.content} .rich-paragraph`, {
   margin: 0,
   marginBottom: '0.5em',
-})
+});
 
 globalStyle(`.${semanticClassNames.content} .rich-paragraph:last-child`, {
   marginBottom: 0,
-})
+});
 
-globalStyle(
-  `.${noteVariant} .${semanticClassNames.content} > .rich-paragraph`,
-  {
-    textIndent: '2em',
-  },
-)
+globalStyle(`.${noteVariant} .${semanticClassNames.content} > .rich-paragraph`, {
+  textIndent: '2em',
+});
 
-for (const type of Object.keys(bannerTypeColors) as Array<
-  keyof typeof bannerTypeColors
->) {
-  globalStyle(
-    `.${semanticTypeClassNames.icon[type]}`,
-    bannerIconTypeStyles[type],
-  )
-  globalStyle(`.${semanticTypeClassNames.root[type]}`, bannerTypeStyles[type])
+for (const type of Object.keys(bannerTypeColors) as Array<keyof typeof bannerTypeColors>) {
+  globalStyle(`.${semanticTypeClassNames.icon[type]}`, bannerIconTypeStyles[type]);
+  globalStyle(`.${semanticTypeClassNames.root[type]}`, bannerTypeStyles[type]);
 }

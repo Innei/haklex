@@ -120,6 +120,7 @@ export const cell = style({
 
 export const cellEditable = style({
   outline: 'none',
+  width: '100%',
 });
 
 globalStyle(`${container}:hover ${toolbar}, ${container}:focus-within ${toolbar}`, {

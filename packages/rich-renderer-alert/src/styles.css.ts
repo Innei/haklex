@@ -1,9 +1,9 @@
-import { noteVariant } from '@haklex/rich-editor/styles'
-import { vars } from '@haklex/rich-style-token/styles'
-import { createVar, globalStyle, style } from '@vanilla-extract/css'
-import { recipe } from '@vanilla-extract/recipes'
+import { noteVariant } from '@haklex/rich-editor/styles';
+import { vars } from '@haklex/rich-style-token/styles';
+import { createVar, globalStyle, style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 
-const alertColor = createVar()
+const alertColor = createVar();
 
 const alertTypeColors = {
   note: vars.color.alertInfo,
@@ -11,7 +11,7 @@ const alertTypeColors = {
   important: vars.color.alertImportant,
   warning: vars.color.alertWarning,
   caution: vars.color.alertCaution,
-} as const
+} as const;
 
 const alertTypeStyles = {
   note: { vars: { [alertColor]: vars.color.alertInfo } },
@@ -19,7 +19,7 @@ const alertTypeStyles = {
   important: { vars: { [alertColor]: vars.color.alertImportant } },
   warning: { vars: { [alertColor]: vars.color.alertWarning } },
   caution: { vars: { [alertColor]: vars.color.alertCaution } },
-} as const
+} as const;
 
 export const semanticClassNames = {
   root: 'rich-alert',
@@ -28,7 +28,7 @@ export const semanticClassNames = {
   label: 'rich-alert-label',
   content: 'rich-alert-content',
   contentEditable: 'rich-alert-content-editable',
-} as const
+} as const;
 
 export const semanticTypeClassNames = {
   root: {
@@ -45,13 +45,13 @@ export const semanticTypeClassNames = {
     warning: 'rich-alert-header-warning',
     caution: 'rich-alert-header-caution',
   },
-} as const
+} as const;
 
 export const alertType = recipe({
   variants: {
     type: alertTypeStyles,
   },
-})
+});
 
 export const alertHeader = style({
   display: 'flex',
@@ -63,7 +63,7 @@ export const alertHeader = style({
   fontSize: vars.typography.fontSizeMd,
   lineHeight: 1,
   marginBottom: 6,
-})
+});
 
 export const alertTrigger = style({
   display: 'inline-flex',
@@ -87,7 +87,7 @@ export const alertTrigger = style({
       backgroundColor: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
     },
   },
-})
+});
 
 export const alertChevron = style({
   opacity: 0,
@@ -103,28 +103,28 @@ export const alertChevron = style({
       opacity: 0.8,
     },
   },
-})
+});
 
 export const alertIcon = style({
   width: '16px',
   height: '16px',
   flexShrink: 0,
   color: alertColor,
-})
+});
 
 export const alertLabel = style({
   color: alertColor,
-})
+});
 
 export const alertMenuIcon = style({
   width: '16px',
   height: '16px',
   flexShrink: 0,
   color: alertColor,
-})
+});
 
 // ─── Alert / Callout (from editor shared) ─────────────────
-const alertBarWidth = 4
+const alertBarWidth = 4;
 
 const alertRootStyles = {
   position: 'relative',
@@ -133,7 +133,7 @@ const alertRootStyles = {
   borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
   margin: `${vars.spacing.md} 0`,
   backgroundColor: vars.color.bgSecondary,
-} as const
+} as const;
 
 const alertRootBarStyles = {
   content: '""',
@@ -143,7 +143,7 @@ const alertRootBarStyles = {
   bottom: 0,
   width: `${alertBarWidth}px`,
   borderRadius: vars.borderRadius.sm,
-} as const
+} as const;
 
 const alertHeaderStyles = {
   position: 'relative',
@@ -156,66 +156,59 @@ const alertHeaderStyles = {
   textTransform: 'uppercase',
   letterSpacing: '0.02em',
   lineHeight: 1,
-} as const
+} as const;
 
 const alertContentStyles = {
   minHeight: '1em',
-} as const
+} as const;
 
 const alertContentEditableStyles = {
   outline: 'none',
-} as const
+  width: '100%',
+} as const;
 
-globalStyle(`.${semanticClassNames.root}`, alertRootStyles)
-globalStyle(`.${semanticClassNames.root}::before`, alertRootBarStyles)
+globalStyle(`.${semanticClassNames.root}`, alertRootStyles);
+globalStyle(`.${semanticClassNames.root}::before`, alertRootBarStyles);
 
-globalStyle(`.${semanticClassNames.header}`, alertHeaderStyles)
+globalStyle(`.${semanticClassNames.header}`, alertHeaderStyles);
 
 globalStyle(`.${semanticClassNames.icon}`, {
   display: 'inline-flex',
   width: '16px',
   height: '16px',
   flexShrink: 0,
-})
+});
 
-globalStyle(`.${semanticClassNames.content}`, alertContentStyles)
-globalStyle(
-  `.${semanticClassNames.contentEditable}`,
-  alertContentEditableStyles,
-)
+globalStyle(`.${semanticClassNames.content}`, alertContentStyles);
+globalStyle(`.${semanticClassNames.contentEditable}`, alertContentEditableStyles);
 
 globalStyle(`.${semanticClassNames.content} > .rich-paragraph:first-child`, {
   marginTop: 0,
-})
+});
 
 globalStyle(`.${semanticClassNames.content} > .rich-paragraph:last-child`, {
   marginBottom: 0,
-})
+});
 
 globalStyle(`.${semanticClassNames.content} .rich-paragraph`, {
   margin: 0,
   marginBottom: '0.5em',
-})
+});
 
 globalStyle(`.${semanticClassNames.content} .rich-paragraph:last-child`, {
   marginBottom: 0,
-})
+});
 
-globalStyle(
-  `.${noteVariant} .${semanticClassNames.content} > .rich-paragraph`,
-  {
-    textIndent: '2em',
-  },
-)
+globalStyle(`.${noteVariant} .${semanticClassNames.content} > .rich-paragraph`, {
+  textIndent: '2em',
+});
 
-for (const type of Object.keys(alertTypeColors) as Array<
-  keyof typeof alertTypeColors
->) {
+for (const type of Object.keys(alertTypeColors) as Array<keyof typeof alertTypeColors>) {
   globalStyle(`.${semanticTypeClassNames.root[type]}::before`, {
     backgroundColor: alertTypeColors[type],
-  })
+  });
 
   globalStyle(`.${semanticTypeClassNames.header[type]}`, {
     color: alertTypeColors[type],
-  })
+  });
 }
