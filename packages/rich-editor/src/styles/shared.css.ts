@@ -28,6 +28,7 @@ export const semanticClassNames = {
   listItemChecked: 'rich-list-item-checked',
   listItemUnchecked: 'rich-list-item-unchecked',
   quote: 'rich-quote',
+  quoteAttribution: 'rich-quote-attribution',
   hr: 'rich-hr',
   tableScrollableWrapper: 'rich-table-scrollable-wrapper',
   table: 'rich-table',
@@ -435,6 +436,15 @@ export const quote = style({
       backgroundColor: vars.color.quoteBorder,
     },
   },
+});
+
+export const quoteAttribution = style({
+  display: 'block',
+  textAlign: 'right',
+  fontSize: '12px',
+  color: vars.color.textSecondary,
+  marginTop: vars.spacing.sm,
+  fontStyle: 'normal',
 });
 
 export const hr = style({
@@ -951,6 +961,7 @@ export const sharedStyles = {
   listItemChecked,
   listItemUnchecked,
   quote,
+  quoteAttribution,
   hr,
   tableScrollableWrapper,
   table,

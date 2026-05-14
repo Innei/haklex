@@ -1,12 +1,16 @@
 import type { MultilineElementTransformer } from '@lexical/markdown';
-import type { Klass, LexicalNode } from 'lexical';
+import type { Klass, LexicalNode, LexicalNodeReplacement } from 'lexical';
 import { $createNodeSelection, $isRootNode, $setSelection } from 'lexical';
 
 import { getResolvedEditNodes } from '../node-registry';
 import { CodeBlockNode } from '../nodes/CodeBlockNode';
 
-function findCodeBlockKlass(nodes: Array<Klass<LexicalNode>>): Klass<LexicalNode> {
-  return nodes.find((n: any) => n.getType?.() === 'code-block') || CodeBlockNode;
+function findCodeBlockKlass(
+  nodes: Array<Klass<LexicalNode> | LexicalNodeReplacement>,
+): Klass<LexicalNode> {
+  return (
+    (nodes.find((n: any) => n.getType?.() === 'code-block') as Klass<LexicalNode>) || CodeBlockNode
+  );
 }
 
 export const CODE_BLOCK_MULTILINE_TRANSFORMER: MultilineElementTransformer = {

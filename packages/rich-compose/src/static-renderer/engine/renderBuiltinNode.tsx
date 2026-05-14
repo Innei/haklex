@@ -91,10 +91,12 @@ export function renderBuiltinNode(
         </Tag>
       );
     }
+    case 'rich-quote':
     case 'quote': {
       const quoteText = (textContent || extractText(node)).trim();
       const hasOpenQuote = OPEN_QUOTE_RE.test(quoteText);
       const hasCloseQuote = CLOSE_QUOTE_RE.test(quoteText);
+      const attribution = (node as any).attribution as string | null | undefined;
       return (
         <blockquote
           className={shared('quote')}
@@ -103,6 +105,7 @@ export function renderBuiltinNode(
           key={key}
         >
           {children}
+          {attribution && <footer className={shared('quoteAttribution')}>— {attribution}</footer>}
         </blockquote>
       );
     }

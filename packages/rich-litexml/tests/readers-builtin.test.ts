@@ -32,6 +32,21 @@ describe('builtin readers', () => {
     expect(nodes[0].type).toBe('quote');
   });
 
+  it('reads <blockquote attribution="...">', () => {
+    const nodes = parse('<blockquote id="q2" attribution="— Wang Xizhi">text</blockquote>');
+    expect(nodes[0].type).toBe('rich-quote');
+    expect(nodes[0].attribution).toBe('— Wang Xizhi');
+    expect(nodes[0].$?.blockId).toBe('q2');
+    expect(nodes[0].children[0].type).toBe('text');
+    expect(nodes[0].children[0].text).toBe('text');
+  });
+
+  it('reads <blockquote> without attribution as type quote', () => {
+    const nodes = parse('<blockquote id="q3">text</blockquote>');
+    expect(nodes[0].type).toBe('quote');
+    expect(nodes[0].attribution).toBeUndefined();
+  });
+
   it('ignores formatting whitespace around blockquote block children', () => {
     const nodes = parse(`
       <blockquote id="q1">

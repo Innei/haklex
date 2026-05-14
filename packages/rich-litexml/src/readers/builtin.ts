@@ -43,16 +43,18 @@ export function registerBuiltinReaders(registry: LitexmlRegistry): void {
   }
 
   // blockquote
-  registry.registerReader(
-    'blockquote',
-    (el, ctx) =>
-      ({
-        type: 'quote',
-        ...extractBlockId(el),
-        children: ctx.parseChildren(el),
-        ...ELEMENT_DEFAULTS,
-      }) as any,
-  );
+  registry.registerReader('blockquote', (el, ctx) => {
+    const attribution = el.getAttribute('attribution');
+    const base = {
+      ...extractBlockId(el),
+      children: ctx.parseChildren(el),
+      ...ELEMENT_DEFAULTS,
+    };
+    if (attribution !== null) {
+      return { type: 'rich-quote', attribution, ...base } as any;
+    }
+    return { type: 'quote', ...base } as any;
+  });
 
   // horizontal rule
   registry.registerReader(

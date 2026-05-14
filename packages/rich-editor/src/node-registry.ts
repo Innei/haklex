@@ -1,13 +1,15 @@
-import type { Klass, LexicalNode } from 'lexical'
+import type { Klass, LexicalNode, LexicalNodeReplacement } from 'lexical';
 
-import { allEditNodes } from './config-edit'
+import { allEditNodes } from './config-edit';
 
-let _resolvedEditNodes: Array<Klass<LexicalNode>> | null = null
+type EditorNodeConfig = Klass<LexicalNode> | LexicalNodeReplacement;
 
-export function setResolvedEditNodes(nodes: Array<Klass<LexicalNode>>): void {
-  _resolvedEditNodes = nodes
+let _resolvedEditNodes: Array<EditorNodeConfig> | null = null;
+
+export function setResolvedEditNodes(nodes: Array<EditorNodeConfig>): void {
+  _resolvedEditNodes = nodes;
 }
 
-export function getResolvedEditNodes(): Array<Klass<LexicalNode>> {
-  return _resolvedEditNodes ?? allEditNodes
+export function getResolvedEditNodes(): Array<EditorNodeConfig> {
+  return _resolvedEditNodes ?? allEditNodes;
 }
