@@ -112,6 +112,18 @@ Read `packages/rich-editor/docs/markdown-flavor-litexml.md` for the complete can
 | `<excalidraw>`                        | Opaque Excalidraw snapshot that must be preserved.                      | Mermaid-compatible diagrams.                                              |
 | `<agent-diff>`                        | Internal agent review/diff markers.                                     | Normal article authoring; do not introduce unless implementing review UI. |
 
+## Quote Attribution
+
+`<blockquote>` accepts an optional `attribution` attribute for the citation line (author, source, work). Omit when the quote has no source.
+
+```xml
+<blockquote attribution="— Wang Xizhi, Lantingji Xu">
+  <p>未尝不临文嗟悼，不能喻之于怀。</p>
+</blockquote>
+```
+
+The reader emits `type: "rich-quote"` when `attribution` is present, otherwise `type: "quote"`. Both hydrate to `RichQuoteNode` in the editor; the distinction is a writer-side optimization for fixtures without attribution.
+
 ## Extension Node Parameters
 
 All block-like extension tags may use `id="..."` when a stable Lexical `$.blockId` is needed. Omit `id` for fresh authored content unless later tool calls need to target that exact block.

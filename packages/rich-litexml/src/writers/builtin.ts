@@ -1,4 +1,5 @@
 import type { LitexmlRegistry } from '../registry';
+import type { XmlWriterFn } from '../types';
 
 function blockId(node: any): Record<string, string> {
   return node.$?.blockId ? { id: node.$.blockId } : {};
@@ -26,15 +27,21 @@ export function registerBuiltinWriters(registry: LitexmlRegistry): void {
     };
   });
 
-  // quote
-  registry.registerWriter('quote', (node, ctx) => {
+  // quote / rich-quote (same XML output; rich-quote adds optional attribution)
+  const writeQuote: XmlWriterFn = (node, ctx) => {
     const n = node as any;
+    const attrs: Record<string, string> = { ...blockId(n) };
+    if (typeof n.attribution === 'string' && n.attribution.trim() !== '') {
+      attrs.attribution = n.attribution;
+    }
     return {
       tag: 'blockquote',
-      attrs: blockId(n),
+      attrs,
       children: ctx.serializeChildren(n.children ?? []),
     };
-  });
+  };
+  registry.registerWriter('quote', writeQuote);
+  registry.registerWriter('rich-quote', writeQuote);
 
   // horizontalrule
   registry.registerWriter('horizontalrule', (node) => {

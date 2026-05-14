@@ -31,6 +31,16 @@ describe('roundtrip', () => {
     expect(roundtrip('<h2 id="h1">Title</h2>')).toBe('<h2 id="h1">Title</h2>');
   });
 
+  it('blockquote with attribution', () => {
+    const input = '<blockquote id="q1" attribution="— Wang Xizhi">quoted</blockquote>';
+    expect(roundtrip(input)).toBe(input);
+  });
+
+  it('blockquote without attribution stays as plain quote', () => {
+    const input = '<blockquote id="q1">quoted</blockquote>';
+    expect(roundtrip(input)).toBe(input);
+  });
+
   it('unordered list', () => {
     const input = '<ul id="u1">\n  <li id="l1">A</li>\n  <li id="l2">B</li>\n</ul>';
     const result = roundtrip(input);

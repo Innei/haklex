@@ -97,6 +97,48 @@ describe('builtin writers', () => {
     expect(xml).toContain('<blockquote id="q1">quoted</blockquote>');
   });
 
+  it('rich-quote with attribution', () => {
+    const xml = serialize([
+      {
+        type: 'rich-quote',
+        $: { blockId: 'q1' },
+        attribution: '— Author, Work',
+        children: [TEXT('quoted')],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        textFormat: 0,
+        textStyle: '',
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain('<blockquote id="q1" attribution="— Author, Work">quoted</blockquote>');
+  });
+
+  it('quote without attribution emits no attribute', () => {
+    const base = {
+      $: { blockId: 'q1' },
+      children: [TEXT('quoted')],
+      direction: 'ltr',
+      format: '',
+      indent: 0,
+      textFormat: 0,
+      textStyle: '',
+      version: 1,
+    };
+    for (const variant of [
+      { type: 'quote', ...base },
+      { type: 'rich-quote', attribution: null, ...base },
+      { type: 'rich-quote', attribution: undefined, ...base },
+      { type: 'rich-quote', attribution: '', ...base },
+      { type: 'rich-quote', attribution: '   ', ...base },
+    ]) {
+      const xml = serialize([variant]);
+      expect(xml).not.toContain('attribution=');
+      expect(xml).toContain('<blockquote id="q1">quoted</blockquote>');
+    }
+  });
+
   it('horizontal rule', () => {
     const xml = serialize([{ type: 'horizontalrule', $: { blockId: 'hr1' }, version: 1 }]);
     expect(xml).toContain('<hr id="hr1" />');
