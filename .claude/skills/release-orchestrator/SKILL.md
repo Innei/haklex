@@ -19,16 +19,17 @@ If no package has publishable `src/**` changes, stop and report that there is no
 
 ## Repo layout
 
-| Concern                | Path / Rule                                                                                                                                                                                                         |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| haklex root            | Run the release from the **same worktree** where `git status` is clean. Use `git worktree list` to confirm. Never switch checkouts mid-release.                                                                     |
-| Published namespace    | `@haklex/*`, via `pnpm run publish:packages` (excludes `@haklex/rich-editor-demo`).                                                                                                                                 |
-| Version strategy       | **Shared** — every `@haklex/*` lives on the same version (read from `packages/rich-editor/package.json`).                                                                                                           |
-| Downstream: Yohaku     | `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json` — actual pin set varies; derive via `grep '"@haklex/' apps/web/package.json` at release time                                                             |
-| Downstream: admin-vue3 | `/Users/innei/git/innei-repo/admin-vue3/packages/rich-react/package.json` — actual pin set varies; derive via `grep '"@haklex/' packages/rich-react/package.json` at release time                                   |
-| Downstream: mx-core    | `/Users/innei/git/innei-repo/mx-core/apps/core/package.json` — `rich-headless` only                                                                                                                                 |
-| mx-space               | Same repo as `mx-core` (mx-core is mx-space/core).                                                                                                                                                                  |
-| Deleted packages       | `@haklex/rich-kit-shiro`, `@haklex/rich-static-renderer` were retired. If a downstream's tracked branch still lists them, drop them entirely instead of bumping (re-pinning a deleted package will 404 at install). |
+| Concern                | Path / Rule                                                                                                                                                                                                                                                                                                                                                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| haklex root            | Run the release from the **same worktree** where `git status` is clean. Use `git worktree list` to confirm. Never switch checkouts mid-release.                                                                                                                                                                                                                                                    |
+| Published namespace    | `@haklex/*`, via `pnpm run publish:packages` (excludes `@haklex/rich-editor-demo`).                                                                                                                                                                                                                                                                                                                |
+| CLI package            | `@haklex/rich-litexml-cli` ships the `litexml` binary. It depends on the published **dist assets** of `@haklex/rich-compose` (`dist/style.css`, `dist/litexml-html-preview-client.js`) at runtime via `require.resolve`, so the compose build must succeed before the CLI is published. Also one of the few packages whose installed binary should be sanity-checked post-publish — see Phase 4.5. |
+| Version strategy       | **Shared** — every `@haklex/*` lives on the same version (read from `packages/rich-editor/package.json`).                                                                                                                                                                                                                                                                                          |
+| Downstream: Yohaku     | `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json` — actual pin set varies; derive via `grep '"@haklex/' apps/web/package.json` at release time                                                                                                                                                                                                                                            |
+| Downstream: admin-vue3 | `/Users/innei/git/innei-repo/admin-vue3/packages/rich-react/package.json` — actual pin set varies; derive via `grep '"@haklex/' packages/rich-react/package.json` at release time                                                                                                                                                                                                                  |
+| Downstream: mx-core    | `/Users/innei/git/innei-repo/mx-core/apps/core/package.json` — `rich-headless` only                                                                                                                                                                                                                                                                                                                |
+| mx-space               | Same repo as `mx-core` (mx-core is mx-space/core).                                                                                                                                                                                                                                                                                                                                                 |
+| Deleted packages       | `@haklex/rich-kit-shiro`, `@haklex/rich-static-renderer` were retired. If a downstream's tracked branch still lists them, drop them entirely instead of bumping (re-pinning a deleted package will 404 at install).                                                                                                                                                                                |
 
 ## Phase 1 — Pre-flight
 
@@ -99,7 +100,7 @@ Compute topological order from the workspace graph:
 pnpm -r ls --depth -1 --json
 ```
 
-Typical leaf-first order: `rich-style-token` → `rich-headless` → `rich-editor-ui` → `rich-editor` → renderer packages → plugin packages → extension packages → `rich-compose` (composition + SSR top of tree).
+Typical leaf-first order: `rich-style-token` → `rich-headless` → `rich-litexml` → `rich-editor-ui` → `rich-editor` → renderer packages → plugin packages → extension packages → `rich-compose` (composition + SSR top of tree) → `rich-litexml-cli` (`litexml` binary; depends on the freshly built `rich-compose`/`rich-headless`/`rich-litexml` dists).
 
 Publish leaves first, one at a time, polling the registry after each (npm CDN propagation typically lags 30–120 s):
 
@@ -109,6 +110,22 @@ until npm view "@haklex/$pkg@$NEW_VERSION" version > /dev/null 2>&1; do sleep 5;
 ```
 
 Do **not** proceed to downstream updates until every published package is resolvable from the registry.
+
+## Phase 4.5 — CLI binary smoke (`@haklex/rich-litexml-cli`)
+
+The CLI is the only published package that runs end-user code through a `bin` field, and it loads `@haklex/rich-compose` dist assets at runtime via `require.resolve`. A successful `pnpm publish` only proves the tarball uploaded — it does not prove the binary can boot. Run a one-shot smoke against the freshly published tarball:
+
+```bash
+npx --yes -p "@haklex/rich-litexml-cli@$NEW_VERSION" \
+  litexml '<p>release smoke</p>' --format json --compact \
+  | jq -e '.root.children[0].type == "paragraph"' > /dev/null
+```
+
+If the smoke fails, do **not** proceed to Phase 5 — fall back to Phase 8a. Typical causes:
+
+- Missing `dist/style.css` or `dist/litexml-html-preview-client.js` in the published `@haklex/rich-compose` tarball → `pnpm run build:packages` did not run cleanly; republish `rich-compose` first.
+- `dependencies.@haklex/rich-compose` pinned to a stale version → `pnpm bumpp -r` did not update workspace cross-deps; verify the CLI's `package.json` resolves to `$NEW_VERSION`.
+- Bin missing the `#!/usr/bin/env node` shebang → vite config regression in `packages/rich-litexml-cli/vite.config.ts`.
 
 ## Phase 5 — Commit, tag, push haklex
 
@@ -333,6 +350,7 @@ Do not mark the release as "complete" in the summary until the user publishes it
 | Build            | `pnpm run build:packages`                                                                         |
 | Publish one      | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                             |
 | Registry poll    | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                       |
+| CLI smoke        | `npx --yes -p @haklex/rich-litexml-cli@$V litexml '<p>x</p>' --format json --compact`             |
 | Default branch   | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master) |
 | Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                            |
 | Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                   |
@@ -358,6 +376,7 @@ Do not mark the release as "complete" in the summary until the user publishes it
 | Targeting a feature branch or guessing `main`      | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`                                          |
 | Writing release notes into README                  | Notes live on GitHub Releases — README only links there; never paste a "What's new" block back into any in-repo doc |
 | Publishing the GitHub release as non-draft         | Always `--draft` from the skill; the user reviews and publishes from the GitHub UI                                  |
+| Skipping the `rich-litexml-cli` binary smoke       | Bin packages can publish "successfully" yet fail to boot — always run Phase 4.5                                     |
 | Skipping `--verify-tag` on `gh release create`     | Without it, gh silently creates a tag at HEAD, decoupling the release from the bump commit                          |
 | Forgetting to delete the draft on rollback         | A lingering draft + tag confuses the next release attempt — always clean up in Phase 8a                             |
 

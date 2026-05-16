@@ -1,178 +1,86 @@
 ---
 name: litexml-authoring
-description: Use when writing Haklex articles with Markdown plus LiteXML, choosing the appropriate Haklex node for content, authoring LiteXML fragments, or converting a LightXML/LiteXML string or file into Lexical SerializedEditorState JSON or Static Render HTML.
+description: Use when writing Haklex articles with Markdown plus LiteXML, choosing the appropriate Haklex node for content, authoring LiteXML fragments, or converting a LightXML/LiteXML string or file into Lexical SerializedEditorState JSON, Markdown, or Static Render HTML via the `litexml` CLI.
 user_invocable: true
 ---
 
 # LiteXML Authoring
 
-Use this skill when an article needs Haklex-specific rich nodes or when the user asks to convert LightXML/LiteXML into Lexical JSON or Static Render HTML.
+Use this skill when an article needs Haklex-specific rich nodes, or when the user asks to convert LiteXML to Lexical JSON / Markdown / HTML via the `litexml` CLI.
 
-## Conversion CLI
+The skill is split into a thin index (this file) plus per-topic references. Load the matching reference when you start the actual work — the index is intentionally short so the format decision table and node selection map fit in one read.
 
-The `@haklex/rich-litexml-cli` package publishes the `litexml` binary. It accepts LiteXML or Lexical JSON input (auto-detected) and emits HTML, JSON, or Markdown.
+## References
 
-`--format` is required. Use `--input-format litexml|json` to force input detection.
+| File                                                                   | When to load                                                                                                               |
+| ---------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| [`references/cli.md`](./references/cli.md)                             | Running the `litexml` binary — every flag, every input/output mode, every runtime caveat.                                  |
+| [`references/nodes-structural.md`](./references/nodes-structural.md)   | Authoring with structural tags (`<p>`, headings, lists, tables, links) and inline formatting (`<b>`, `<em>`, `<code>`, …). |
+| [`references/nodes-extensions.md`](./references/nodes-extensions.md)   | Authoring with Haklex extension tags (media, code, math, callouts, containers, footnotes, chat, poll, …).                  |
+| [`references/authoring-recipes.md`](./references/authoring-recipes.md) | CDATA usage, block IDs, nested-content rules, similar-node disambiguation, validation, adding new nodes.                   |
 
-### JSON output (Lexical SerializedEditorState)
+`packages/rich-editor/docs/markdown-flavor-litexml.md` is the canonical tag contract — read it before changing any tag name or attribute schema.
 
-| Input form           | Command                                             |
-| -------------------- | --------------------------------------------------- |
-| File                 | `litexml input.xml --format json > state.json`      |
-| String               | `litexml '<p>Hello</p>' --format json > state.json` |
-| Stdin                | `cat input.xml \| litexml - --format json`          |
-| Compact JSON         | `litexml input.xml --format json --compact`         |
-| Explicit output file | `litexml input.xml --format json -o state.json`     |
+## Format decision
 
-The CLI emits a full Lexical `SerializedEditorState`, not only root children.
-
-### Markdown output
-
-```bash
-litexml input.xml --format markdown > article.md
-litexml state.json --format markdown # Lexical JSON input is auto-detected
-litexml state.json --format markdown --input-format json
-```
-
-Markdown coverage is driven by `@haklex/rich-headless` `$toMarkdown()` — all haklex nodes (mentions, footnotes, spoilers, KaTeX, code blocks, tables, etc.) are included.
-
-### HTML preview output
-
-Writes a browser-openable HTML preview that inlines `@haklex/rich-compose/style.css` and a React hydration bundle. The CLI parses LiteXML on the server side, embeds the resulting `SerializedEditorState` as JSON payload, and the browser bundle renders it through the same Rich Compose renderer stack as the static renderer.
-
-| Input form           | Command                                                       |
-| -------------------- | ------------------------------------------------------------- |
-| File to stdout       | `litexml input.xml --format html > article.html`              |
-| File to output       | `litexml input.xml --format html -o article.html`             |
-| String to output     | `litexml '<p>Hello</p>' --format html -o article.html`        |
-| Stdin                | `cat input.xml \| litexml - --format html > article.html`     |
-| Open browser preview | `litexml input.xml --format html --open`                      |
-| Write and open       | `litexml input.xml --format html -o article.html --open`      |
-| Dark theme           | `litexml input.xml --format html --theme dark -o dark.html`   |
-| Note/comment variant | `litexml input.xml --format html --variant note -o note.html` |
-
-Inside this repository, use:
-
-```bash
-pnpm --silent litexml input.xml --format html -o article.html
-pnpm --silent litexml input.xml --format html --open
-pnpm --silent litexml input.xml --format markdown > article.md
-pnpm --silent litexml input.xml --format json > state.json
-```
-
-Outside this repository, use an installed package binary or:
-
-```bash
-npm exec --yes --package @haklex/rich-litexml-cli -- litexml input.xml --format html -o article.html
-```
-
-## Format Decision
-
-| Content requirement                                                     | Preferred format                                                  |
+| Content requirement                                                     | Use                                                               |
 | ----------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| Plain prose, headings, simple links, lists, quotes, tables, code fences | Markdown                                                          |
-| Haklex-only decorator nodes or semantic containers                      | LiteXML                                                           |
-| A fragment that mixes extension nodes with normal prose                 | LiteXML for the whole fragment; wrap prose in `<p>`, `<h2>`, etc. |
-| A block needs stable identity for later edits                           | Add `id="..."`; it maps to `$.blockId`                            |
-| Fresh poll/chat content                                                 | Omit generated IDs unless stable references are required          |
+| Plain prose, headings, simple links, lists, quotes, tables, code fences | **Markdown**                                                      |
+| Any Haklex extension tag is required                                    | **LiteXML** — for the whole fragment, including surrounding prose |
+| A block needs stable identity for later edits                           | LiteXML with `id="..."` (maps to `$.blockId`)                     |
+| Fresh poll/chat content                                                 | LiteXML without IDs — the reader mints them                       |
 
-Read `packages/rich-editor/docs/markdown-flavor-litexml.md` for the complete canonical tag contract before changing tag names or attributes.
+Once a fragment contains any LiteXML tag, **all** surrounding prose in that fragment must also be LiteXML. Markdown is not parsed inside a LiteXML fragment.
 
-## Node Selection Guide
+## CLI quick start
 
-| Node                                  | Use when                                                                | Avoid when                                                                |
-| ------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `<p>`                                 | Ordinary prose paragraph.                                               | The content is a heading, list item, or specialized callout.              |
-| `<h1>`-`<h6>`                         | Section hierarchy and scan anchors.                                     | Styling text without creating document structure.                         |
-| `<blockquote>`                        | Quoted external text or cited excerpt.                                  | Warnings or editorial callouts; use `<alert>` or `<banner>`.              |
-| `<ul>`, `<ol>`                        | Ordered or unordered sequences.                                         | Two-dimensional comparison; use `<table>` or `<grid>`.                    |
-| `<ul type="check">`                   | Task state or checklist content.                                        | Boolean survey choices; use `<poll>`.                                     |
-| `<table>`                             | Dense factual comparison with rows and columns.                         | Responsive editorial layout; use `<grid>`.                                |
-| `<img>`                               | A single image with optional caption and dimensions.                    | Multiple related images; use `<gallery>`.                                 |
-| `<video>`                             | A playable media item.                                                  | External platform embeds; use `<embed>`.                                  |
-| `<link-card>`                         | A rich preview for an important standalone URL.                         | Ordinary inline citation; use `<a>`.                                      |
-| `<embed>`                             | External interactive/media embed such as YouTube or another provider.   | Static screenshots; use `<img>`.                                          |
-| `<codeblock>`                         | One code listing with one language.                                     | Multi-file examples; use `<code-snippet>`.                                |
-| `<code-snippet>`                      | Multi-file code examples or a named file set.                           | A short inline code phrase; use `<code>`.                                 |
-| `<mermaid>`                           | Diagrams expressible as Mermaid source.                                 | Hand-drawn or freeform diagrams; use `<excalidraw>`.                      |
-| `<math>`                              | Inline equation; add `display="block"` for standalone equations.        | Ordinary code or variables that should not render as math.                |
-| `<alert>`                             | Semantic admonitions such as note, warning, tip, important, or caution. | Promotional or high-level announcement blocks; use `<banner>`.            |
-| `<banner>`                            | Prominent editorial notice, announcement, or contextual banner.         | Inline warning within a paragraph; use `<alert>`.                         |
-| `<details>`                           | Optional secondary explanation that should be collapsible.              | Required content the reader must see immediately.                         |
-| `<nested-doc>`                        | A nested editable document section with its own block content.          | Simple grouped layout; use `<grid>` or normal sections.                   |
-| `<grid>`                              | Editorial layout with independent cells.                                | Data tables requiring row/column semantics; use `<table>`.                |
-| `<gallery>`                           | Related image set.                                                      | A single figure; use `<img>`.                                             |
-| `<spoiler>`                           | Hidden inline text that should be intentionally revealed.               | Collapsible block explanations; use `<details>`.                          |
-| `<ruby>`                              | East Asian base text with pronunciation/reading.                        | Simple parenthetical explanation.                                         |
-| `<mention>`                           | A person/account reference with platform and handle metadata.           | Plain prose names with no identity metadata.                              |
-| `<tag>`                               | Inline topical label.                                                   | Section categories that should be headings.                               |
-| `<comment>`                           | Inline annotation or reviewer note embedded in content.                 | Reader-facing aside; use prose, `<alert>`, or `<details>`.                |
-| `<footnote>` and `<footnote-section>` | Academic-style references and explanatory notes.                        | Primary content that belongs in the body.                                 |
-| `<chat>`                              | Conversation transcript or user-agent exchange.                         | A normal quoted passage; use `<blockquote>`.                              |
-| `<poll>`                              | Reader choice, vote, or survey interaction.                             | Static list of options; use `<ul>` or `<ol>`.                             |
-| `<excalidraw>`                        | Opaque Excalidraw snapshot that must be preserved.                      | Mermaid-compatible diagrams.                                              |
-| `<agent-diff>`                        | Internal agent review/diff markers.                                     | Normal article authoring; do not introduce unless implementing review UI. |
+```bash
+# inside the haklex monorepo
+pnpm --silent litexml input.xml --format json --compact # → SerializedEditorState
+pnpm --silent litexml input.xml --format markdown       # → Markdown
+pnpm --silent litexml input.xml --format html --open    # → HTML preview, browser
 
-## Quote Attribution
-
-`<blockquote>` accepts an optional `attribution` attribute for the citation line (author, source, work). Omit when the quote has no source.
-
-```xml
-<blockquote attribution="— Wang Xizhi, Lantingji Xu">
-  <p>未尝不临文嗟悼，不能喻之于怀。</p>
-</blockquote>
+# outside the monorepo
+npx --yes -p @haklex/rich-litexml-cli litexml input.xml --format json
 ```
 
-The reader emits `type: "rich-quote"` when `attribution` is present, otherwise `type: "quote"`. Both hydrate to `RichQuoteNode` in the editor; the distinction is a writer-side optimization for fixtures without attribution.
+Full flag reference, output forms, theme/variant/lang options, error modes, validation pipelines: [`references/cli.md`](./references/cli.md).
 
-## Extension Node Parameters
+## Node selection map
 
-All block-like extension tags may use `id="..."` when a stable Lexical `$.blockId` is needed. Omit `id` for fresh authored content unless later tool calls need to target that exact block.
+Detailed `When` / `Avoid when` / params / body rules for each tag live in [`nodes-structural.md`](./references/nodes-structural.md) and [`nodes-extensions.md`](./references/nodes-extensions.md). Use this table only to decide which reference to open.
 
-| Tag                  | Required                                 | Optional                                                         | Children / Body                                                                                    | Notes                                                                                                                                                                                                                                                                  |
-| -------------------- | ---------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<img>`              | `src`                                    | `id`, `alt`, `width`, `height`, `caption`, `thumbhash`, `accent` | Self-closing.                                                                                      | `width` and `height` are numbers. `accent` is a color string used by image rendering. Inside `<gallery>`, `<img>` becomes a gallery image item rather than a standalone image node.                                                                                    |
-| `<video>`            | `src`                                    | `id`, `poster`, `width`, `height`                                | Self-closing.                                                                                      | Use for direct video assets. `poster` is the preview image URL.                                                                                                                                                                                                        |
-| `<link-card>`        | `url`                                    | `id`, `source`, `title`, `description`, `favicon`, `image`       | Self-closing.                                                                                      | Use for rich previews of standalone references.                                                                                                                                                                                                                        |
-| `<embed>`            | `url`                                    | `id`, `source`                                                   | Self-closing.                                                                                      | Use for provider embeds. `source` is a provider hint such as a platform name.                                                                                                                                                                                          |
-| `<codeblock>`        | none                                     | `id`, `lang`                                                     | Raw code text.                                                                                     | Use `lang` for syntax highlighting. For shebangs, imports, template strings, XML-sensitive characters, or multi-line code, prefer `<![CDATA[...]]>` so the exact code body is preserved.                                                                               |
-| `<code-snippet>`     | none                                     | `id`                                                             | One or more `<file name="..." lang="...">code</file>`.                                             | Each `<file>` requires `name`; `lang` is optional but recommended. Use CDATA inside `<file>` for multi-line code or XML-sensitive source. Use for multi-file examples.                                                                                                 |
-| `<mermaid>`          | none                                     | `id`                                                             | Mermaid diagram source text.                                                                       | Use escaped newlines (`&#10;`) or normal element text. Do not use for arbitrary drawings.                                                                                                                                                                              |
-| `<math>`             | equation body                            | `display`, `color`                                               | Equation text.                                                                                     | Omit `display` for inline math. Use `display="block"` for standalone math. `color` only applies to inline math.                                                                                                                                                        |
-| `<alert>`            | none                                     | `id`, `type`                                                     | Nested LiteXML block content, usually `<p>...</p>`.                                                | `type`: `note`, `tip`, `important`, `warning`, or `caution`. Defaults to `note`.                                                                                                                                                                                       |
-| `<banner>`           | none                                     | `id`, `type`                                                     | Nested LiteXML block content.                                                                      | Common types include `note`, `tip`, `important`, `warning`, `caution`; existing renderer data also uses informational variants such as `info` and `success`. Prefer semantic consistency with the target renderer.                                                     |
-| `<nested-doc>`       | none                                     | `id`                                                             | Nested LiteXML block content.                                                                      | Creates a nested editor state. Use for independently editable nested content.                                                                                                                                                                                          |
-| `<details>`          | none                                     | `id`, `summary`, `open`                                          | Child block nodes.                                                                                 | `summary` is the visible collapsed label. `open="true"` starts expanded; omit or set false for collapsed.                                                                                                                                                              |
-| `<grid>`             | none                                     | `id`, `cols`, `gap`                                              | One or more `<cell>...</cell>` children.                                                           | `cols` is numeric and defaults to `2`. `gap` defaults to `16px`. Each `<cell>` contains LiteXML block content.                                                                                                                                                         |
-| `<gallery>`          | one or more child images                 | `id`, `layout`                                                   | Child `<img src="..." alt="..." />` elements.                                                      | `layout` defaults to `grid`; use only image children.                                                                                                                                                                                                                  |
-| `<excalidraw>`       | snapshot body or `snapshot`              | `id`, `snapshot`                                                 | Prefer CDATA snapshot body for JSON.                                                               | Use `<![CDATA[...]]>` for opaque Excalidraw JSON. Empty snapshots may be self-closing.                                                                                                                                                                                 |
-| `<spoiler>`          | none                                     | none                                                             | Inline children.                                                                                   | Use inside paragraph-like inline content.                                                                                                                                                                                                                              |
-| `<ruby>`             | base text body                           | `rt`                                                             | Inline children for base text.                                                                     | `rt` is the reading/pronunciation.                                                                                                                                                                                                                                     |
-| `<mention>`          | `platform`, `handle`                     | none                                                             | Display name text.                                                                                 | Body defaults to display name. Preserve `platform` and `handle` for identity metadata.                                                                                                                                                                                 |
-| `<tag>`              | text body                                | none                                                             | Plain text.                                                                                        | Produces an inline tag node.                                                                                                                                                                                                                                           |
-| `<comment>`          | text body                                | none                                                             | Plain text.                                                                                        | Produces an inline comment annotation node.                                                                                                                                                                                                                            |
-| `<footnote>`         | `ref`                                    | none                                                             | Self-closing.                                                                                      | References a definition in `<footnote-section>`.                                                                                                                                                                                                                       |
-| `<footnote-section>` | one or more definitions                  | `id`                                                             | `<def ref="...">definition text</def>`.                                                            | Keep `ref` values aligned with `<footnote ref="..."/>`.                                                                                                                                                                                                                |
-| `<chat>`             | participants and messages                | `id`, `variant`                                                  | `<participants><participant ... /></participants><messages><message ...>...</message></messages>`. | `variant`: `user-agent` or `user-user`; defaults to `user-agent`. Participant `kind`: `user` or `agent`. Participant optional attrs: `id`, `name`, `avatar`; missing `id` is generated. Message optional attrs: `id`; `participant` should reference a participant id. |
-| `<poll>`             | `<question>` plus one or more `<option>` | `id`, `poll-id`, `mode`, `close-at`, `show-results`              | `<question>...</question><option id="...">...</option>`.                                           | `mode`: `single` or `multiple`. `show-results`: `always`, `after-vote`, or `after-close`. `close-at` is an ISO-like timestamp string. For new polls, omit `poll-id` and option `id`; the reader mints IDs. Preserve existing IDs when editing.                         |
-| `<agent-diff>`       | none                                     | `id`, `op`, `entry`                                              | Self-closing.                                                                                      | Internal review marker. `op` defaults to `insert`; `entry` links to a diff entry id. Avoid in normal articles.                                                                                                                                                         |
+| Need                                                   | Tag                                                                         | Reference  |
+| ------------------------------------------------------ | --------------------------------------------------------------------------- | ---------- |
+| Paragraph, heading, list, table, link, inline format   | `<p>` / `<h*>` / `<ul>` / `<ol>` / `<table>` / `<a>` / `<b>` / `<code>` / … | structural |
+| Quote (with optional `attribution`)                    | `<blockquote>`                                                              | structural |
+| Single image / multi-image / video / embed / link card | `<img>` / `<gallery>` / `<video>` / `<embed>` / `<link-card>`               | extensions |
+| Code (single / multi-file)                             | `<codeblock>` / `<code-snippet>`                                            | extensions |
+| Diagram (Mermaid / opaque)                             | `<mermaid>` / `<excalidraw>`                                                | extensions |
+| Math (inline / block)                                  | `<math>` / `<math display="block">`                                         | extensions |
+| Callout (semantic / page-wide)                         | `<alert>` / `<banner>`                                                      | extensions |
+| Collapsible / nested doc / multi-column                | `<details>` / `<nested-doc>` / `<grid><cell>`                               | extensions |
+| Inline annotation                                      | `<spoiler>` / `<ruby>` / `<mention>` / `<tag>` / `<comment>`                | extensions |
+| Footnote                                               | `<footnote>` + `<footnote-section>`                                         | extensions |
+| Chat / poll                                            | `<chat>` / `<poll>`                                                         | extensions |
+| Internal review marker                                 | `<agent-diff>`                                                              | extensions |
 
-## Authoring Rules
+## Cross-cutting rules
 
-- Use canonical lowercase tags. Do not emit legacy aliases such as `<linkcard>`, `<codesnippet>`, or `<nesteddoc>`.
-- Use `<codeblock>`, not `<code-block>`.
-- Quote all attribute values.
-- Escape XML-sensitive text: `&amp;`, `&lt;`, `&gt;`, and `&quot;`.
-- Use CDATA for opaque JSON, drawing snapshots, and multi-line code bodies.
-- Use nested LiteXML block children inside `<alert>`, `<banner>`, `<nested-doc>`, `<details>`, `<grid><cell>`, and similar containers.
-- Do not rely on Markdown syntax inside a LiteXML fragment. If the fragment contains LiteXML extension tags, represent surrounding text as LiteXML blocks.
+- Canonical lowercase tag names. Do **not** emit legacy aliases (`<linkcard>`, `<codesnippet>`, `<nesteddoc>`, `<code-block>`).
+- Quote every attribute value.
+- Escape XML-sensitive text (`&amp;`, `&lt;`, `&gt;`, `&quot;`). Use CDATA for opaque JSON, drawing snapshots, and multi-line code bodies.
+- `<alert>`, `<banner>`, `<nested-doc>`, `<grid><cell>` hold a **fresh nested editor state** — wrap their body in block tags (`<p>`, `<h*>`, …), not bare text.
+- A fragment that mixes any extension tag with prose must be wholly LiteXML; Markdown syntax is not parsed inside.
+
+Details, gotchas, and the full disambiguation matrix: [`references/authoring-recipes.md`](./references/authoring-recipes.md).
 
 ## Validation
 
-For generated LiteXML, validate the resulting Lexical JSON before handing it off:
+After producing or editing LiteXML, round-trip to compact JSON to confirm the registry parses every tag:
 
 ```bash
 pnpm --silent litexml '<doc><p>Hello</p></doc>' --format json --compact
 ```
 
-If the command succeeds but a downstream editor cannot materialize a node, check whether that runtime has registered the corresponding Haklex node class.
+If the command succeeds but a downstream editor cannot materialize a node, the runtime is missing that Haklex node class — re-check the consumer's `nodes` registration, not the CLI.
