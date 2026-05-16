@@ -9,7 +9,7 @@ This file is the canonical reference for every flag, every input/output mode, an
 ### Inside this monorepo
 
 ```bash
-pnpm --silent litexml < input > --format < fmt > [options]
+pnpm --silent litexml INPUT --format FMT [options]
 ```
 
 The repo's root `package.json` exposes `litexml` as a pnpm-runnable script that resolves the local workspace build. Always pair with `--silent` so pnpm chatter does not corrupt stdout when piping into a file.
@@ -17,15 +17,17 @@ The repo's root `package.json` exposes `litexml` as a pnpm-runnable script that 
 ### Outside the repo
 
 ```bash
-npx --yes -p @haklex/rich-litexml-cli@ < version > litexml < input > --format < fmt > [options]
+npx --yes -p @haklex/rich-litexml-cli@VERSION litexml INPUT --format FMT [options]
 ```
 
 Or after a global install:
 
 ```bash
 npm install -g @haklex/rich-litexml-cli
-litexml < input > --format < fmt > [options]
+litexml INPUT --format FMT [options]
 ```
+
+`INPUT` is a file path, `-`, or an inline LiteXML / JSON string; `FMT` is one of `html | json | markdown`; `VERSION` is the published version tag. See the next sections for the concrete forms.
 
 The package depends on `@haklex/rich-compose`, `@haklex/rich-headless`, and `@haklex/rich-litexml` at the same version, and reads `@haklex/rich-compose/dist/style.css` plus `dist/litexml-html-preview-client.js` at runtime via `require.resolve`. Do not strip those packages in a custom install.
 
