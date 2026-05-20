@@ -24,7 +24,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "mermaid": "^11.14.0",
+    "mermaid": "^11.15.0",
     "react-zoom-pan-pinch": "^4.0.3"
   },
   "devDependencies": {
