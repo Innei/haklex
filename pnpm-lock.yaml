@@ -1040,9 +1040,6 @@ importers:
       react-intersection-observer:
         specifier: ^10.0.3
         version: 10.0.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      react-photo-view:
-        specifier: ^1.2.7
-        version: 1.2.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
     devDependencies:
       '@types/react':
         specifier: ^19.2.14
@@ -1830,9 +1827,6 @@ importers:
       lucide-react:
         specifier: ^1.0.0
         version: 1.7.0(react@19.2.5)
-      react-photo-view:
-        specifier: ^1.2.7
-        version: 1.2.7(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
     devDependencies:
       '@lexical/react':
         specifier: ^0.44.0
