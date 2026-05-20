@@ -200,11 +200,14 @@ export const dialogFooter = style({
 export const staticOverlayRoot = style({
   position: 'relative',
   display: 'block',
-  cursor: 'pointer',
   margin: `${vars.spacing.md} 0`,
   borderRadius: vars.borderRadius.md,
   border: `1px solid ${vars.color.border}`,
   overflow: 'clip',
+});
+
+export const staticOverlayRootInteractive = style({
+  cursor: 'pointer',
 });
 
 export const staticOverlay = style({
@@ -234,26 +237,6 @@ export const staticGradientMask = style({
   height: '4rem',
   background: `linear-gradient(to bottom, transparent, ${vars.color.bg})`,
   pointerEvents: 'none',
-});
-
-export const staticDialogPopup = style({});
-
-globalStyle(`${staticDialogPopup}${staticDialogPopup}`, {
-  display: 'flex',
-  flexDirection: 'column',
-  width: '700px',
-  maxWidth: '90vw',
-  height: 'min(800px, calc(100vh - 2rem))',
-  maxHeight: 'min(800px, calc(100vh - 2rem))',
-  overflow: 'hidden',
-});
-
-export const staticDialogBody = style({
-  flex: 1,
-  minHeight: 0,
-  padding: '0 1.5rem 1.5rem',
-  overflowY: 'auto',
-  overflowX: 'hidden',
 });
 
 export const previewSurface = style({

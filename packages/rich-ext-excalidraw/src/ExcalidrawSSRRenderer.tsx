@@ -2,9 +2,11 @@ import { ViewportGate } from '@haklex/rich-editor-ui';
 import type { FC } from 'react';
 import { lazy, Suspense } from 'react';
 
+import type { OnExcalidrawExpand } from './ExcalidrawDisplayRenderer';
 import * as css from './styles.css';
 
 export interface ExcalidrawSSRRendererProps {
+  onExpand?: OnExcalidrawExpand;
   snapshot: string;
 }
 
@@ -35,11 +37,11 @@ const ExcalidrawPlaceholder: FC<{ snapshot: string }> = ({ snapshot }) => {
   );
 };
 
-export const ExcalidrawSSRRenderer: FC<ExcalidrawSSRRendererProps> = ({ snapshot }) => {
+export const ExcalidrawSSRRenderer: FC<ExcalidrawSSRRendererProps> = ({ onExpand, snapshot }) => {
   return (
     <ViewportGate fallback={<ExcalidrawPlaceholder snapshot={snapshot} />}>
       <Suspense fallback={<ExcalidrawPlaceholder snapshot={snapshot} />}>
-        <LazyDisplayRenderer snapshot={snapshot} />
+        <LazyDisplayRenderer snapshot={snapshot} onExpand={onExpand} />
       </Suspense>
     </ViewportGate>
   );

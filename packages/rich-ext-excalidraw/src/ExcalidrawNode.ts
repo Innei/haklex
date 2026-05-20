@@ -1,3 +1,4 @@
+import { createRendererDecoration } from '@haklex/rich-editor/static';
 import type {
   EditorConfig,
   LexicalEditor,
@@ -5,50 +6,47 @@ import type {
   NodeKey,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { DecoratorNode } from 'lexical'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { DecoratorNode } from 'lexical';
+import type { ReactElement } from 'react';
 
-import { ExcalidrawSSRRenderer } from './ExcalidrawSSRRenderer'
+import { ExcalidrawSSRRenderer } from './ExcalidrawSSRRenderer';
+import { EXCALIDRAW_NODE_KEY } from './slot';
 
-export type SerializedExcalidrawNode = Spread<
-  { snapshot: string },
-  SerializedLexicalNode
->
+export type SerializedExcalidrawNode = Spread<{ snapshot: string }, SerializedLexicalNode>;
 
 export class ExcalidrawNode extends DecoratorNode<ReactElement> {
-  __snapshot: string
+  __snapshot: string;
 
   static getType(): string {
-    return 'excalidraw'
+    return 'excalidraw';
   }
 
   static clone(node: ExcalidrawNode): ExcalidrawNode {
-    return new ExcalidrawNode(node.__snapshot, node.__key)
+    return new ExcalidrawNode(node.__snapshot, node.__key);
   }
 
   constructor(snapshot: string, key?: NodeKey) {
-    super(key)
-    this.__snapshot = snapshot
+    super(key);
+    this.__snapshot = snapshot;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = 'rich-excalidraw-wrapper'
-    return div
+    const div = document.createElement('div');
+    div.className = 'rich-excalidraw-wrapper';
+    return div;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
   static importJSON(serializedNode: SerializedExcalidrawNode): ExcalidrawNode {
-    return $createExcalidrawNode(serializedNode.snapshot)
+    return $createExcalidrawNode(serializedNode.snapshot);
   }
 
   exportJSON(): SerializedExcalidrawNode {
@@ -57,31 +55,29 @@ export class ExcalidrawNode extends DecoratorNode<ReactElement> {
       type: 'excalidraw',
       snapshot: this.__snapshot,
       version: 1,
-    }
+    };
   }
 
   getSnapshot(): string {
-    return this.__snapshot
+    return this.__snapshot;
   }
 
   setSnapshot(snapshot: string): void {
-    const writable = this.getWritable()
-    writable.__snapshot = snapshot
+    const writable = this.getWritable();
+    writable.__snapshot = snapshot;
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createElement(ExcalidrawSSRRenderer, {
+    return createRendererDecoration(EXCALIDRAW_NODE_KEY, ExcalidrawSSRRenderer, {
       snapshot: this.__snapshot,
-    })
+    });
   }
 }
 
 export function $createExcalidrawNode(snapshot: string): ExcalidrawNode {
-  return new ExcalidrawNode(snapshot)
+  return new ExcalidrawNode(snapshot);
 }
 
-export function $isExcalidrawNode(
-  node: LexicalNode | null | undefined,
-): node is ExcalidrawNode {
-  return node instanceof ExcalidrawNode
+export function $isExcalidrawNode(node: LexicalNode | null | undefined): node is ExcalidrawNode {
+  return node instanceof ExcalidrawNode;
 }

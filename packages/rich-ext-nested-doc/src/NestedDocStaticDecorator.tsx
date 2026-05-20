@@ -1,16 +1,7 @@
-import {
-  ColorSchemeProvider,
-  NestedContentRendererProvider,
-  RendererWrapper,
-  useColorScheme,
-  useOptionalNestedContentRenderer,
-  usePresentDialog,
-  useVariant,
-} from '@haklex/rich-editor/static';
-import { usePortalTheme } from '@haklex/rich-style-token';
+import { RendererWrapper } from '@haklex/rich-editor/static';
 import type { SerializedEditorState } from 'lexical';
 import { Maximize2 } from 'lucide-react';
-import { useCallback, useMemo } from 'react';
+import { useMemo } from 'react';
 
 import { NestedDocRenderer } from './NestedDocRenderer';
 import { NESTED_DOC_NODE_KEY } from './slot';
@@ -19,16 +10,12 @@ import { hasRenderableEditorState, truncateEditorState } from './utils';
 
 const PREVIEW_NODE_LIMIT = 6;
 
-interface NestedDocStaticDecoratorProps {
+export interface NestedDocPreviewCardProps {
   contentState: SerializedEditorState;
+  onActivate?: (target: HTMLElement) => void;
 }
 
-function DefaultNestedDocStaticRenderer({ contentState }: NestedDocStaticDecoratorProps) {
-  const colorScheme = useColorScheme();
-  const { className: portalClassName } = usePortalTheme();
-  const presentDialogFromCtx = usePresentDialog();
-  const renderNestedContent = useOptionalNestedContentRenderer();
-
+export function NestedDocPreviewCard({ contentState, onActivate }: NestedDocPreviewCardProps) {
   const children = contentState.root?.children ?? [];
   const needsTruncation = children.length > PREVIEW_NODE_LIMIT;
   const previewState = useMemo(
@@ -37,65 +24,30 @@ function DefaultNestedDocStaticRenderer({ contentState }: NestedDocStaticDecorat
   );
   const hasPreview = hasRenderableEditorState(contentState);
 
-  const title = useMemo(() => {
-    const firstChild = children[0] as any;
-    if (!firstChild) return '';
-    const walk = (node: any): string => {
-      if (node.text) return node.text;
-      if (node.children) return node.children.map(walk).join('');
-      return '';
-    };
-    return walk(firstChild).slice(0, 80);
-  }, [children]);
+  if (!hasPreview) return null;
 
-  const contextVariant = useVariant();
-  const handleOpen = useCallback(async () => {
-    const present = presentDialogFromCtx ?? (await import('@haklex/rich-editor-ui')).presentDialog;
-
-    present({
-      title: title || undefined,
-      content: () => (
-        <ColorSchemeProvider colorScheme={colorScheme}>
-          <NestedContentRendererProvider value={renderNestedContent}>
-            <div className={css.staticDialogBody}>
-              <NestedDocRenderer value={contentState} variant={contextVariant} />
-            </div>
-          </NestedContentRendererProvider>
-        </ColorSchemeProvider>
-      ),
-      className: css.staticDialogPopup,
-      portalClassName,
-      theme: colorScheme,
-      showCloseButton: true,
-      clickOutsideToDismiss: true,
-      sheet: 'auto',
-    });
-  }, [
-    colorScheme,
-    contentState,
-    portalClassName,
-    presentDialogFromCtx,
-    renderNestedContent,
-    title,
-    contextVariant,
-  ]);
-
-  if (!hasPreview) {
-    return null;
-  }
+  const interactive = Boolean(onActivate);
 
   return (
     <div
-      className={css.staticOverlayRoot}
-      role="button"
-      tabIndex={0}
-      onClick={handleOpen}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          handleOpen();
-        }
-      }}
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      className={
+        interactive
+          ? `${css.staticOverlayRoot} ${css.staticOverlayRootInteractive}`
+          : css.staticOverlayRoot
+      }
+      onClick={interactive ? (e) => onActivate?.(e.currentTarget as HTMLElement) : undefined}
+      onKeyDown={
+        interactive
+          ? (e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onActivate?.(e.currentTarget as HTMLElement);
+              }
+            }
+          : undefined
+      }
     >
       <div className={`${css.rendererContent} rich-nested-doc-content`}>
         <div className={css.previewSurface}>
@@ -103,11 +55,21 @@ function DefaultNestedDocStaticRenderer({ contentState }: NestedDocStaticDecorat
         </div>
       </div>
       {needsTruncation && <div aria-hidden className={css.staticGradientMask} />}
-      <div aria-hidden className={css.staticOverlay}>
-        <Maximize2 size={24} />
-      </div>
+      {interactive && (
+        <div aria-hidden className={css.staticOverlay}>
+          <Maximize2 size={24} />
+        </div>
+      )}
     </div>
   );
+}
+
+interface NestedDocStaticDecoratorProps {
+  contentState: SerializedEditorState;
+}
+
+function DefaultNestedDocStaticRenderer({ contentState }: NestedDocStaticDecoratorProps) {
+  return <NestedDocPreviewCard contentState={contentState} />;
 }
 
 export function NestedDocStaticDecorator({ contentState }: NestedDocStaticDecoratorProps) {

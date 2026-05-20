@@ -1,74 +1,52 @@
 import type { ExcalidrawImperativeAPI, ExcalidrawProps } from '@excalidraw/excalidraw/types';
 import { useColorScheme } from '@haklex/rich-editor';
-import { presentDialog } from '@haklex/rich-editor-ui';
-import { usePortalTheme } from '@haklex/rich-style-token';
-import { Maximize2, ScanSearch, X, ZoomIn, ZoomOut } from 'lucide-react';
-import { Component, type ComponentType, type FC, type ReactNode } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Maximize2, ScanSearch, ZoomIn, ZoomOut } from 'lucide-react';
+import {
+  Component,
+  type ComponentType,
+  type FC,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { readonlyUIOptions } from './constants';
 import * as css from './styles.css';
 import { useExcalidrawData } from './useExcalidrawData';
 
+export interface ExcalidrawExpandPayload {
+  content: ReactNode;
+  target: HTMLElement;
+  theme: 'light' | 'dark';
+}
+
+export type OnExcalidrawExpand = (payload: ExcalidrawExpandPayload) => void;
+
 export interface ExcalidrawStaticRendererProps {
+  onExpand?: OnExcalidrawExpand;
   snapshot: string;
 }
 
-export const ExcalidrawDisplayRenderer: FC<ExcalidrawStaticRendererProps> = ({ snapshot }) => {
+export const ExcalidrawDisplayRenderer: FC<ExcalidrawStaticRendererProps> = ({
+  onExpand,
+  snapshot,
+}) => {
   const theme = useColorScheme();
-  return <ExcalidrawStaticCanvas snapshot={snapshot} theme={theme} />;
+  return <ExcalidrawStaticCanvas snapshot={snapshot} theme={theme} onExpand={onExpand} />;
 };
-
-// --- Fullscreen readonly content ---
-
-const ExcalidrawExpandContent: FC<{
-  dismiss: () => void;
-  ExcalidrawComponent: ComponentType<ExcalidrawProps>;
-  data: Record<string, any>;
-  theme: 'light' | 'dark';
-}> = ({ dismiss, ExcalidrawComponent, data, theme }) => {
-  const apiRef = useRef<any>(null);
-
-  return (
-    <>
-      <div className={css.excalidrawDialogHeader}>
-        <div className={css.excalidrawDialogHeaderTitle}>
-          <span className={css.excalidrawDialogTitle}>Whiteboard</span>
-          <span className={css.excalidrawDialogMeta}>excalidraw</span>
-        </div>
-        <button className={css.excalidrawHeaderClose} type="button" onClick={dismiss}>
-          <X size={18} />
-        </button>
-      </div>
-      <div className={css.excalidrawDialogCanvas}>
-        <ExcalidrawComponent
-          viewModeEnabled
-          zenModeEnabled
-          UIOptions={readonlyUIOptions}
-          initialData={data}
-          theme={theme}
-          excalidrawAPI={(api: ExcalidrawImperativeAPI) => {
-            apiRef.current = api;
-            setTimeout(() => api.scrollToContent(), 100);
-          }}
-        />
-      </div>
-    </>
-  );
-};
-
-// --- Main Canvas ---
 
 const ExcalidrawStaticCanvas: FC<{
+  onExpand?: OnExcalidrawExpand;
   snapshot: string;
   theme: 'light' | 'dark';
-}> = ({ snapshot, theme }) => {
+}> = ({ onExpand, snapshot, theme }) => {
   const { snapshot: data, loading: dataLoading, error: dataError } = useExcalidrawData(snapshot);
   const [ExcalidrawComponent, setExcalidrawComponent] =
     useState<ComponentType<ExcalidrawProps> | null>(null);
   const [libLoading, setLibLoading] = useState(true);
   const apiRef = useRef<any>(null);
-  const { className: portalClassName } = usePortalTheme();
 
   useEffect(() => {
     Promise.all([import('@excalidraw/excalidraw'), import('@excalidraw/excalidraw/index.css')])
@@ -84,24 +62,25 @@ const ExcalidrawStaticCanvas: FC<{
       });
   }, []);
 
-  const handleExpand = useCallback(() => {
-    if (!ExcalidrawComponent || !data) return;
-    presentDialog({
-      content: ({ dismiss }) => (
-        <ExcalidrawExpandContent
-          ExcalidrawComponent={ExcalidrawComponent}
-          data={data}
-          dismiss={dismiss}
+  const handleExpand = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!onExpand || !ExcalidrawComponent || !data) return;
+      const content = (
+        <ExcalidrawComponent
+          viewModeEnabled
+          zenModeEnabled
+          UIOptions={readonlyUIOptions}
+          initialData={data}
           theme={theme}
+          excalidrawAPI={(api: ExcalidrawImperativeAPI) => {
+            setTimeout(() => api.scrollToContent(), 100);
+          }}
         />
-      ),
-      className: css.excalidrawFullscreenPopup,
-      portalClassName,
-      theme,
-      showCloseButton: false,
-      clickOutsideToDismiss: true,
-    });
-  }, [ExcalidrawComponent, data, theme, portalClassName]);
+      );
+      onExpand({ content, target: e.currentTarget, theme });
+    },
+    [onExpand, ExcalidrawComponent, data, theme],
+  );
 
   const loading = dataLoading || libLoading;
 
@@ -128,6 +107,8 @@ const ExcalidrawStaticCanvas: FC<{
       </div>
     );
   }
+
+  const canExpand = Boolean(onExpand);
 
   return (
     <div
@@ -187,21 +168,23 @@ const ExcalidrawStaticCanvas: FC<{
         >
           <ScanSearch size={20} />
         </button>
-        <button
-          className={css.excalidrawActionButton}
-          title="Expand"
-          type="button"
-          onClick={handleExpand}
-        >
-          <Maximize2 size={20} />
-        </button>
+        {canExpand && (
+          <button
+            className={css.excalidrawActionButton}
+            title="Expand"
+            type="button"
+            onClick={handleExpand}
+          >
+            <Maximize2 size={20} />
+          </button>
+        )}
       </div>
     </div>
   );
 };
 
 class ExcalidrawErrorBoundary extends Component<
-  { fallback: ReactNode; children: ReactNode },
+  { children: ReactNode; fallback: ReactNode },
   { hasError: boolean }
 > {
   state = { hasError: false };
