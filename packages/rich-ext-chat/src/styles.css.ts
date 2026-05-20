@@ -101,6 +101,8 @@ export const article = style({
 export const authorCluster = style({
   'display': 'flex',
   'flexDirection': 'column',
+  'flex': '1 1 auto',
+  'alignItems': 'flex-start',
   'maxWidth': '70%',
   'minWidth': 0,
   '@media': {
