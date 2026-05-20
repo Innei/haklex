@@ -1,4 +1,4 @@
-import type { RendererConfig, RichEditorVariant } from '@haklex/rich-editor';
+import type { RendererConfig, RichEditorVariant } from '@haklex/rich-editor/static';
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
 import type { ComponentType, CSSProperties, ReactNode } from 'react';
 

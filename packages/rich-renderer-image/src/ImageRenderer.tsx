@@ -1,10 +1,7 @@
-import 'react-photo-view/dist/react-photo-view.css';
-
 import { vars } from '@haklex/rich-editor';
 import { decodeThumbHash, type ImageRendererProps } from '@haklex/rich-editor/renderers';
-import type { ComponentType, CSSProperties } from 'react';
-import { useMemo, useState } from 'react';
-import { PhotoProvider, PhotoView } from 'react-photo-view';
+import type { CSSProperties, KeyboardEvent, Ref } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import * as styles from './styles.css';
 
@@ -25,7 +22,12 @@ function getCaptionText(altText: string, caption?: string): string | undefined {
   return undefined;
 }
 
-export const ImageRenderer: ComponentType<ImageRendererProps> = ({
+export interface ImageRendererInteractiveProps extends ImageRendererProps {
+  onActivate?: (target: HTMLElement) => void;
+  ref?: Ref<HTMLElement>;
+}
+
+export function ImageRenderer({
   src,
   altText,
   width,
@@ -33,8 +35,11 @@ export const ImageRenderer: ComponentType<ImageRendererProps> = ({
   caption,
   thumbhash,
   accent,
-}) => {
+  onActivate,
+  ref,
+}: ImageRendererInteractiveProps) {
   const [state, setState] = useState<ImageLoadState>('loading');
+  const imgRef = useRef<HTMLImageElement>(null);
 
   const captionText = useMemo(() => getCaptionText(altText, caption), [altText, caption]);
 
@@ -44,6 +49,8 @@ export const ImageRenderer: ComponentType<ImageRendererProps> = ({
   );
 
   if (!src) return null;
+
+  const interactive = Boolean(onActivate);
 
   const frameStyle: CSSProperties = {
     backgroundColor:
@@ -55,47 +62,51 @@ export const ImageRenderer: ComponentType<ImageRendererProps> = ({
     ...(width && height ? { aspectRatio: `${width} / ${height}` } : {}),
   };
 
+  const activate = () => {
+    if (imgRef.current) onActivate?.(imgRef.current);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    activate();
+  };
+
   return (
-    <figure className={`${styles.root} ${styles.semanticClassNames.root}`}>
-      <PhotoProvider photoClosable>
-        <PhotoView src={src}>
-          <div
-            aria-label={`Open image: ${altText || 'image'}`}
-            className={`${styles.frame} ${styles.semanticClassNames.frame} ${styles.imageState[state]} ${frameStateSemanticClass[state]}`.trim()}
-            role="button"
-            style={frameStyle}
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key !== 'Enter' && e.key !== ' ') return;
-              e.preventDefault();
-              e.currentTarget.click();
-            }}
-          >
-            <img
-              alt={altText}
-              className={`${styles.image} ${state === 'loaded' ? styles.imageVisible : ''} ${styles.semanticClassNames.image}`}
-              data-state={state}
-              height={height}
-              loading="lazy"
-              src={src}
-              style={width && height ? { height: '100%', objectFit: 'cover' } : undefined}
-              width={width}
-              onError={() => setState('error')}
-              onLoad={() => setState('loaded')}
-            />
+    <figure className={`${styles.root} ${styles.semanticClassNames.root}`} ref={ref}>
+      <div
+        aria-label={interactive ? `Open image: ${altText || 'image'}` : undefined}
+        className={`${styles.frame} ${interactive ? '' : styles.frameStatic} ${styles.semanticClassNames.frame} ${styles.imageState[state]} ${frameStateSemanticClass[state]}`.trim()}
+        role={interactive ? 'button' : undefined}
+        style={frameStyle}
+        tabIndex={interactive ? 0 : undefined}
+        onClick={interactive ? activate : undefined}
+        onKeyDown={interactive ? handleKeyDown : undefined}
+      >
+        <img
+          alt={altText}
+          className={`${styles.image} ${state === 'loaded' ? styles.imageVisible : ''} ${styles.semanticClassNames.image}`}
+          data-state={state}
+          height={height}
+          loading="lazy"
+          ref={imgRef}
+          src={src}
+          style={width && height ? { height: '100%', objectFit: 'cover' } : undefined}
+          width={width}
+          onError={() => setState('error')}
+          onLoad={() => setState('loaded')}
+        />
 
-            {state === 'loading' && (
-              <span className={`${styles.loader} ${styles.semanticClassNames.loader}`} />
-            )}
+        {state === 'loading' && (
+          <span className={`${styles.loader} ${styles.semanticClassNames.loader}`} />
+        )}
 
-            {state === 'error' && (
-              <span className={`${styles.errorBadge} ${styles.semanticClassNames.errorBadge}`}>
-                Image failed to load
-              </span>
-            )}
-          </div>
-        </PhotoView>
-      </PhotoProvider>
+        {state === 'error' && (
+          <span className={`${styles.errorBadge} ${styles.semanticClassNames.errorBadge}`}>
+            Image failed to load
+          </span>
+        )}
+      </div>
 
       {captionText && (
         <figcaption className={`${styles.caption} ${styles.semanticClassNames.caption}`}>
@@ -104,4 +115,4 @@ export const ImageRenderer: ComponentType<ImageRendererProps> = ({
       )}
     </figure>
   );
-};
+}

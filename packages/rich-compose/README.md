@@ -33,7 +33,7 @@ Per-module upstream packages (`@haklex/rich-ext-*`, `@haklex/rich-renderer-*`) a
 ### Read-only renderer
 
 ```tsx
-import { composeRenderer } from '@haklex/rich-compose';
+import { composeRenderer } from '@haklex/rich-compose/core';
 import { allRendererModules } from '@haklex/rich-compose/renderer';
 
 const RichContent = composeRenderer({ modules: allRendererModules });
@@ -45,7 +45,7 @@ const RichContent = composeRenderer({ modules: allRendererModules });
 Or cherry-pick:
 
 ```tsx
-import { composeRenderer } from '@haklex/rich-compose';
+import { composeRenderer } from '@haklex/rich-compose/core';
 import { embedModule } from '@haklex/rich-compose/modules/embed';
 import { codeBlockModule } from '@haklex/rich-compose/modules/code-block';
 
@@ -202,19 +202,20 @@ The lazy chunk is still emitted but never fetched at runtime.
 
 ## Sub-path exports
 
-| Path                                           | Description                                                     |
-| ---------------------------------------------- | --------------------------------------------------------------- |
-| `@haklex/rich-compose`                         | core: `composeRenderer`, `composeEditor`, types, helpers        |
-| `@haklex/rich-compose/renderer`                | aggregate barrel — every renderer module + `allRendererModules` |
-| `@haklex/rich-compose/editor`                  | aggregate barrel — every editor module + `allEditorModules`     |
-| `@haklex/rich-compose/modules/<name>`          | renderer-side module barrel                                     |
-| `@haklex/rich-compose/modules/<name>/edit`     | editor-side module (extends the renderer module)                |
-| `@haklex/rich-compose/modules/<name>/node`     | Klass(es) only (when applicable)                                |
-| `@haklex/rich-compose/modules/<name>/renderer` | default renderer only                                           |
-| `@haklex/rich-compose/style.css`               | all-in-one CSS bundle — prose body + tokens + every module      |
-| `@haklex/rich-compose/style/foundation.css`    | prose body + theme tokens + variant classes (no modules)        |
-| `@haklex/rich-compose/style/table.css`         | built-in table renderer                                         |
-| `@haklex/rich-compose/style/<name>.css`        | per-module CSS (alert, banner, image, video, …)                 |
+| Path                                           | Description                                                                  |
+| ---------------------------------------------- | ---------------------------------------------------------------------------- |
+| `@haklex/rich-compose`                         | compatibility barrel: core helpers plus aggregate conveniences               |
+| `@haklex/rich-compose/core`                    | renderer composition core: `composeRenderer`, `RichRenderer`, renderer types |
+| `@haklex/rich-compose/renderer`                | aggregate barrel — every renderer module + `allRendererModules`              |
+| `@haklex/rich-compose/editor`                  | aggregate barrel — every editor module + `allEditorModules`                  |
+| `@haklex/rich-compose/modules/<name>`          | renderer-side module barrel                                                  |
+| `@haklex/rich-compose/modules/<name>/edit`     | editor-side module (extends the renderer module)                             |
+| `@haklex/rich-compose/modules/<name>/node`     | Klass(es) only (when applicable)                                             |
+| `@haklex/rich-compose/modules/<name>/renderer` | default renderer only                                                        |
+| `@haklex/rich-compose/style.css`               | all-in-one CSS bundle — prose body + tokens + every module                   |
+| `@haklex/rich-compose/style/foundation.css`    | prose body + theme tokens + variant classes (no modules)                     |
+| `@haklex/rich-compose/style/table.css`         | built-in table renderer                                                      |
+| `@haklex/rich-compose/style/<name>.css`        | per-module CSS (alert, banner, image, video, …)                              |
 
 Aggregate barrels are convenient defaults; the fine-grained `/modules/<name>` and `/modules/<name>/edit` subpaths stay available for dynamic-import and selective inclusion.
 

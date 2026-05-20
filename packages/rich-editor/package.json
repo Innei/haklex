@@ -15,6 +15,7 @@
     "./plugins": "./src/plugins-entry.ts",
     "./commands": "./src/commands-entry.ts",
     "./renderers": "./src/renderers-entry.ts",
+    "./present-dialog": "./src/present-dialog-entry.ts",
     "./static": "./src/static-entry.ts",
     "./style.css": "./dist/rich-editor.css",
     "./styles": "./src/styles-entry.ts"
@@ -104,6 +105,10 @@
       "./renderers": {
         "import": "./dist/renderers-entry.mjs",
         "types": "./dist/renderers-entry.d.ts"
+      },
+      "./present-dialog": {
+        "import": "./dist/present-dialog-entry.mjs",
+        "types": "./dist/present-dialog-entry.d.ts"
       },
       "./static": {
         "import": "./dist/static-entry.mjs",

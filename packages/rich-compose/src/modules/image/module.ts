@@ -1,8 +1,8 @@
-import { ImageRenderer } from '@haklex/rich-renderer-image/static';
+import { createImageModule } from './module-config';
+import { ImageRegistryProvider } from './registry';
+import { ComposedImageRenderer } from './renderer';
 
-import type { RichRendererModule } from '../../core/types';
-
-export const imageModule: RichRendererModule = {
-  name: 'image',
-  renderers: { Image: ImageRenderer },
-};
+export const imageModule = createImageModule({
+  renderers: { Image: ComposedImageRenderer },
+  Provider: ImageRegistryProvider,
+});

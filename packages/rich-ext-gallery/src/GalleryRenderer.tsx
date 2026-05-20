@@ -1,14 +1,11 @@
-import 'react-photo-view/dist/react-photo-view.css';
-
 import { decodeThumbHash } from '@haklex/rich-editor/renderers';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { ComponentType, UIEventHandler } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import { PhotoProvider, PhotoView } from 'react-photo-view';
 
 import * as css from './styles.css';
-import type { GalleryImage, GalleryRendererProps } from './types';
+import type { GalleryImage, GalleryOnImageClick, GalleryRendererProps } from './types';
 
 const IMAGE_CONTAINER_MARGIN_INSET = 60;
 const CHILD_GAP = 15;
@@ -39,7 +36,11 @@ function useThumbhashStyle(image: GalleryImage): React.CSSProperties | undefined
   }, [image.thumbhash]);
 }
 
-export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({ images, layout }) => {
+export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
+  images,
+  layout,
+  onImageClick,
+}) => {
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
   const [, setUpdated] = useState({});
   const memoedChildContainerWidthRef = useRef(0);
@@ -154,95 +155,124 @@ export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({ images, l
 
   if (images.length === 1 || layout === 'grid' || layout === 'masonry') {
     return (
-      <PhotoProvider>
-        <div className={clsx(css.gallery, layoutClass)}>
-          {images.map((image, index) => (
-            <GalleryFigure image={image} key={index} />
-          ))}
-        </div>
-      </PhotoProvider>
+      <div className={clsx(css.gallery, layoutClass)}>
+        {images.map((image, index) => (
+          <GalleryFigure
+            image={image}
+            images={images}
+            index={index}
+            key={index}
+            onImageClick={onImageClick}
+          />
+        ))}
+      </div>
     );
   }
 
   return (
-    <PhotoProvider>
+    <div
+      className={clsx(css.gallery, css.galleryCarousel)}
+      ref={ref}
+      onTouchMove={handleCancelAutoplay}
+      onWheel={handleCancelAutoplay}
+    >
       <div
-        className={clsx(css.gallery, css.galleryCarousel)}
-        ref={ref}
-        onTouchMove={handleCancelAutoplay}
-        onWheel={handleCancelAutoplay}
+        className={css.galleryContainer}
+        ref={setContainerRef}
+        onScroll={handleOnScroll}
+        onTouchStart={handleCancelAutoplay}
       >
-        <div
-          className={css.galleryContainer}
-          ref={setContainerRef}
-          onScroll={handleOnScroll}
-          onTouchStart={handleCancelAutoplay}
-        >
-          {images.map((image, index) => (
-            <GalleryFigure
-              image={image}
-              key={index}
-              style={{
-                width: `calc(100% - ${IMAGE_CONTAINER_MARGIN_INSET}px)`,
-                marginRight: `${CHILD_GAP}px`,
-              }}
-            />
-          ))}
-        </div>
-
-        {currentIndex > 0 && (
-          <button
-            className={clsx(css.galleryNav, css.galleryNavPrev)}
-            onClick={() => handleScrollTo(currentIndex - 1)}
-          >
-            <ChevronLeft size={18} />
-          </button>
-        )}
-        {currentIndex < images.length - 1 && (
-          <button
-            className={clsx(css.galleryNav, css.galleryNavNext)}
-            onClick={() => handleScrollTo(currentIndex + 1)}
-          >
-            <ChevronRight size={18} />
-          </button>
-        )}
-
-        <div className={css.galleryIndicators}>
-          {images.map((_, i) => (
-            <div
-              key={i}
-              className={clsx(
-                css.galleryIndicator,
-                currentIndex === i && css.galleryIndicatorActive,
-              )}
-              onClick={() => handleScrollTo(i)}
-            />
-          ))}
-        </div>
+        {images.map((image, index) => (
+          <GalleryFigure
+            image={image}
+            images={images}
+            index={index}
+            key={index}
+            style={{
+              width: `calc(100% - ${IMAGE_CONTAINER_MARGIN_INSET}px)`,
+              marginRight: `${CHILD_GAP}px`,
+            }}
+            onImageClick={onImageClick}
+          />
+        ))}
       </div>
-    </PhotoProvider>
+
+      {currentIndex > 0 && (
+        <button
+          className={clsx(css.galleryNav, css.galleryNavPrev)}
+          onClick={() => handleScrollTo(currentIndex - 1)}
+        >
+          <ChevronLeft size={18} />
+        </button>
+      )}
+      {currentIndex < images.length - 1 && (
+        <button
+          className={clsx(css.galleryNav, css.galleryNavNext)}
+          onClick={() => handleScrollTo(currentIndex + 1)}
+        >
+          <ChevronRight size={18} />
+        </button>
+      )}
+
+      <div className={css.galleryIndicators}>
+        {images.map((_, i) => (
+          <div
+            className={clsx(css.galleryIndicator, currentIndex === i && css.galleryIndicatorActive)}
+            key={i}
+            onClick={() => handleScrollTo(i)}
+          />
+        ))}
+      </div>
+    </div>
   );
 };
 
-const GalleryFigure = memo(
-  ({ image, style }: { image: GalleryImage; style?: React.CSSProperties }) => {
-    const thumbStyle = useThumbhashStyle(image);
+interface GalleryFigureProps {
+  image: GalleryImage;
+  images: GalleryImage[];
+  index: number;
+  onImageClick?: GalleryOnImageClick;
+  style?: React.CSSProperties;
+}
 
-    return (
-      <PhotoView src={image.src}>
-        <figure className={css.galleryItem} style={{ ...thumbStyle, ...style }}>
-          <img
-            alt={image.alt || ''}
-            height={image.height}
-            loading="lazy"
-            src={image.src}
-            style={{ maxWidth: '100%', height: 'auto' }}
-            width={image.width}
-          />
-        </figure>
-      </PhotoView>
-    );
-  },
-);
+const GalleryFigure = memo(({ image, images, index, onImageClick, style }: GalleryFigureProps) => {
+  const thumbStyle = useThumbhashStyle(image);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const interactive = Boolean(onImageClick);
+
+  const activate = () => {
+    if (imgRef.current) {
+      onImageClick?.({ current: image, images, index, target: imgRef.current });
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    activate();
+  };
+
+  return (
+    <figure
+      aria-label={interactive ? `Open image: ${image.alt || 'image'}` : undefined}
+      className={css.galleryItem}
+      role={interactive ? 'button' : undefined}
+      style={{ ...thumbStyle, ...style, ...(interactive ? null : { cursor: 'default' }) }}
+      tabIndex={interactive ? 0 : undefined}
+      onClick={interactive ? activate : undefined}
+      onKeyDown={interactive ? handleKeyDown : undefined}
+    >
+      <img
+        alt={image.alt || ''}
+        height={image.height}
+        loading="lazy"
+        ref={imgRef}
+        src={image.src}
+        style={{ maxWidth: '100%', height: 'auto' }}
+        width={image.width}
+      />
+    </figure>
+  );
+});
 
 export default memo(GalleryRenderer);

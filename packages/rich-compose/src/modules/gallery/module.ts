@@ -1,11 +1,9 @@
 import { galleryNodes } from '@haklex/rich-ext-gallery/node';
 
-import type { RichRendererModule } from '../../core/types';
+import { createGalleryModule } from './module-config';
+import { ComposedGalleryRenderer } from './renderer';
 
-export const galleryModule: RichRendererModule = {
-  name: 'gallery',
+export const galleryModule = createGalleryModule({
   nodes: galleryNodes,
-  lazyRenderers: {
-    Gallery: () => import('@haklex/rich-ext-gallery/renderer'),
-  },
-};
+  renderers: { Gallery: ComposedGalleryRenderer },
+});

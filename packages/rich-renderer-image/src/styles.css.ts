@@ -88,6 +88,15 @@ export const frameEditMode = style({
   },
 });
 
+export const frameStatic = style({
+  cursor: 'default',
+  selectors: {
+    '&:hover': {
+      transform: 'none',
+    },
+  },
+});
+
 const spin = keyframes({ to: { transform: 'rotate(360deg)' } });
 
 export const loader = style({

@@ -1,3 +1,4 @@
+import { GalleryRenderer } from '@haklex/rich-ext-gallery/renderer';
 import type { SerializedEditorState } from 'lexical';
 import { createRoot } from 'react-dom/client';
 
@@ -6,7 +7,6 @@ import type { RichRendererModule } from '../core/types';
 import { ChatRenderer } from '../modules/chat/renderer';
 import { CodeBlockRenderer } from '../modules/code-block/renderer';
 import { CodeSnippetRenderer } from '../modules/code-snippet/renderer';
-import { GalleryRenderer } from '../modules/gallery/renderer';
 import { MermaidRenderer } from '../modules/mermaid/renderer';
 import { PollRenderer } from '../modules/poll/renderer';
 import { allRendererModules } from '../renderer';

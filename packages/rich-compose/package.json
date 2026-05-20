@@ -14,6 +14,7 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
+    "./core": "./src/core-entry.ts",
     "./renderer": "./src/renderer.ts",
     "./editor": "./src/editor.ts",
     "./modules/embed": "./src/modules/embed/index.ts",
@@ -137,6 +138,10 @@
       ".": {
         "import": "./dist/index.mjs",
         "types": "./dist/index.d.ts"
+      },
+      "./core": {
+        "import": "./dist/core.mjs",
+        "types": "./dist/core-entry.d.ts"
       },
       "./renderer": {
         "import": "./dist/renderer.mjs",

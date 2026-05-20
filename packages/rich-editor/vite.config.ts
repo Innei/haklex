@@ -10,5 +10,6 @@ export default createViteConfig({
     'plugins-entry': 'src/plugins-entry.ts',
     'commands-entry': 'src/commands-entry.ts',
     'renderers-entry': 'src/renderers-entry.ts',
+    'present-dialog-entry': 'src/present-dialog-entry.ts',
   },
 });

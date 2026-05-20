@@ -1,4 +1,12 @@
 import { composeRenderer } from '@haklex/rich-compose';
-import { allRendererModules } from '@haklex/rich-compose/renderer';
+import { allRendererModules, galleryModule, imageModule } from '@haklex/rich-compose/renderer';
 
-export const LexicalRenderer = composeRenderer({ modules: allRendererModules });
+import { onImageClick } from '../lightbox/lightbox-store';
+
+const modules = allRendererModules.map((module) => {
+  if (module === imageModule) return imageModule.setup({ onImageClick });
+  if (module === galleryModule) return galleryModule.setup({ onImageClick });
+  return module;
+});
+
+export const LexicalRenderer = composeRenderer({ modules });

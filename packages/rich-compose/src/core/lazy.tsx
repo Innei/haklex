@@ -1,4 +1,4 @@
-import type { RendererConfig } from '@haklex/rich-editor';
+import type { RendererConfig } from '@haklex/rich-editor/static';
 import type { ComponentType, ReactNode } from 'react';
 import { lazy, Suspense } from 'react';
 

@@ -3,6 +3,7 @@ import { createViteConfig } from '../vite.shared';
 export default createViteConfig({
   entry: {
     'index': 'src/index.ts',
+    'core': 'src/core-entry.ts',
     'renderer': 'src/renderer.ts',
     'editor': 'src/editor.ts',
     'modules/embed/index': 'src/modules/embed/index.ts',
