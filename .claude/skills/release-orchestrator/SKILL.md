@@ -192,7 +192,14 @@ Release notes (incl. breaking changes, new features, migration steps) live on Gi
 
    `--draft` means the release is invisible to the public until the user publishes it. `--verify-tag` fails fast if Phase 5's `git push origin "v$NEW_VERSION"` didn't land — do not silently fall back to `--target HEAD`.
 
-4. Print the draft URL (`gh release view "v$NEW_VERSION" --json url -q .url`) so the user can review and publish. Do **not** wait for publication — downstream propagation proceeds in parallel.
+4. Print the **edit** URL so the user lands directly in the editor with the "Publish release" button. `gh release view ... --json url` returns the `/releases/tag/<slug>` URL, which for an unpublished draft uses an `untagged-<hex>` slug and renders the read-only view page (no edit affordance). Swap `/tag/` → `/edit/` to surface the editor:
+
+   ```bash
+   EDIT_URL=$(gh release view "v$NEW_VERSION" --json url -q .url | sed 's#/releases/tag/#/releases/edit/#')
+   echo "$EDIT_URL"
+   ```
+
+   Do **not** wait for publication — downstream propagation proceeds in parallel.
 
 If `gh` is missing or unauthenticated (`gh auth status` fails), stop and ask the user — do not skip the release step and push downstream anyway. The release is a required artefact, not an optional convenience.
 
@@ -332,9 +339,11 @@ Print:
 Then surface the **draft GitHub release URL** as a separate, prominent line — this is the user's next action:
 
 ```
-👉 Draft release pending review: https://github.com/Innei/haklex/releases/tag/v$NEW_VERSION
+👉 Draft release pending review: <EDIT_URL from Phase 5.5 step 4>
    Edit the auto-drafted notes (breaking changes, features, migration steps) and click "Publish release".
 ```
+
+The URL must point at `/releases/edit/<slug>`, not `/releases/tag/<slug>`. The latter is the read-only view page; for an unpublished draft it has no edit affordance and the user has to manually click into the editor. Always surface the edit form so the next click is "Publish release".
 
 Do not mark the release as "complete" in the summary until the user publishes it.
 
@@ -356,29 +365,31 @@ Do not mark the release as "complete" in the summary until the user publishes it
 | Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                   |
 | Tag haklex       | `git tag v$V && git push origin v$V` (after commit, before downstream)                            |
 | Draft release    | `gh release create v$V --title v$V --notes-file $NOTE --draft --verify-tag`                       |
+| Draft edit URL   | `gh release view v$V --json url -q .url \| sed 's#/releases/tag/#/releases/edit/#'`               |
 | Delete draft     | `gh release delete v$V --yes && git push origin :refs/tags/v$V` (rollback only)                   |
 
 ## Common mistakes
 
-| Mistake                                            | Fix                                                                                                                 |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Asking the caller for release metadata             | Infer the changeset summary and affected packages from `git log` and `git diff`                                     |
-| Publishing before registry poll succeeds           | Downstream `pnpm install` 404s or resolves stale mirror                                                             |
-| Treating a Context-creating lib as a regular dep   | Promote to peer (reference: commit 88bb7a0 — lucide-react)                                                          |
-| Attempting per-package bumps                       | Not supported — shared version; highest-wins                                                                        |
-| `git add -A` in a dirty downstream worktree        | Stage only the pinned-version files per Repo layout table                                                           |
-| Running `pnpm run release:rich` inside this skill  | That script compresses bump/build/publish into one step; this skill needs them separate                             |
-| `npm unpublish` without user confirmation          | Always ask — unpublish is public, permanent, and time-limited                                                       |
-| Force-pushing reverts without `--force-with-lease` | Use `--force-with-lease`; ask user before pushing any force                                                         |
-| Opening a PR for the downstream bump               | Bumps go direct to the default branch — no PR, no `gh pr create`                                                    |
-| Pushing the `chore/haklex-$V` branch to origin     | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch                             |
-| Skipping `git fetch` + rebase before push          | Default branch may have advanced during the release; rebase on `origin/$D` first                                    |
-| Targeting a feature branch or guessing `main`      | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`                                          |
-| Writing release notes into README                  | Notes live on GitHub Releases — README only links there; never paste a "What's new" block back into any in-repo doc |
-| Publishing the GitHub release as non-draft         | Always `--draft` from the skill; the user reviews and publishes from the GitHub UI                                  |
-| Skipping the `rich-litexml-cli` binary smoke       | Bin packages can publish "successfully" yet fail to boot — always run Phase 4.5                                     |
-| Skipping `--verify-tag` on `gh release create`     | Without it, gh silently creates a tag at HEAD, decoupling the release from the bump commit                          |
-| Forgetting to delete the draft on rollback         | A lingering draft + tag confuses the next release attempt — always clean up in Phase 8a                             |
+| Mistake                                            | Fix                                                                                                                                                                                         |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Asking the caller for release metadata             | Infer the changeset summary and affected packages from `git log` and `git diff`                                                                                                             |
+| Publishing before registry poll succeeds           | Downstream `pnpm install` 404s or resolves stale mirror                                                                                                                                     |
+| Treating a Context-creating lib as a regular dep   | Promote to peer (reference: commit 88bb7a0 — lucide-react)                                                                                                                                  |
+| Attempting per-package bumps                       | Not supported — shared version; highest-wins                                                                                                                                                |
+| `git add -A` in a dirty downstream worktree        | Stage only the pinned-version files per Repo layout table                                                                                                                                   |
+| Running `pnpm run release:rich` inside this skill  | That script compresses bump/build/publish into one step; this skill needs them separate                                                                                                     |
+| `npm unpublish` without user confirmation          | Always ask — unpublish is public, permanent, and time-limited                                                                                                                               |
+| Force-pushing reverts without `--force-with-lease` | Use `--force-with-lease`; ask user before pushing any force                                                                                                                                 |
+| Opening a PR for the downstream bump               | Bumps go direct to the default branch — no PR, no `gh pr create`                                                                                                                            |
+| Pushing the `chore/haklex-$V` branch to origin     | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch                                                                                                     |
+| Skipping `git fetch` + rebase before push          | Default branch may have advanced during the release; rebase on `origin/$D` first                                                                                                            |
+| Targeting a feature branch or guessing `main`      | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`                                                                                                                  |
+| Writing release notes into README                  | Notes live on GitHub Releases — README only links there; never paste a "What's new" block back into any in-repo doc                                                                         |
+| Publishing the GitHub release as non-draft         | Always `--draft` from the skill; the user reviews and publishes from the GitHub UI                                                                                                          |
+| Skipping the `rich-litexml-cli` binary smoke       | Bin packages can publish "successfully" yet fail to boot — always run Phase 4.5                                                                                                             |
+| Skipping `--verify-tag` on `gh release create`     | Without it, gh silently creates a tag at HEAD, decoupling the release from the bump commit                                                                                                  |
+| Forgetting to delete the draft on rollback         | A lingering draft + tag confuses the next release attempt — always clean up in Phase 8a                                                                                                     |
+| Surfacing the `/releases/tag/` URL for a draft     | That's the read-only view page; for unpublished drafts it has no "Publish release" button. Swap to `/releases/edit/` so the user lands in the editor with the publish action one click away |
 
 ## Red flags — STOP and ask
 
