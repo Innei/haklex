@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-litexml",
-  "version": "0.14.1",
+  "version": "0.15.0",
   "description": "Bidirectional Lexical SerializedNode <-> XML conversion with plugin registry",
   "repository": {
     "type": "git",
@@ -40,19 +40,19 @@
       ".": {
         "browser": {
           "import": "./dist/browser.mjs",
-          "types": "./dist/browser.d.ts"
+          "types": "./dist/index-browser.d.ts"
         },
         "node": {
           "import": "./dist/node.mjs",
-          "types": "./dist/node.d.ts"
+          "types": "./dist/index-node.d.ts"
         },
         "default": {
           "import": "./dist/node.mjs",
-          "types": "./dist/node.d.ts"
+          "types": "./dist/index-node.d.ts"
         }
       }
     },
     "main": "./dist/node.mjs",
-    "types": "./dist/node.d.ts"
+    "types": "./dist/index-node.d.ts"
   }
 }
