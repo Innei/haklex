@@ -1,5 +1,5 @@
 import type { ExcalidrawImperativeAPI, ExcalidrawProps } from '@excalidraw/excalidraw/types';
-import { useColorScheme } from '@haklex/rich-editor';
+import { useColorScheme } from '@haklex/rich-editor/static';
 import { Maximize2, ScanSearch, ZoomIn, ZoomOut } from 'lucide-react';
 import {
   Component,

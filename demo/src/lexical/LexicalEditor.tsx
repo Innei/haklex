@@ -5,6 +5,7 @@ import { EmbedPlugin } from '@haklex/rich-ext-embed';
 import { BlockHandlePlugin } from '@haklex/rich-plugin-block-handle';
 import { FloatingToolbarPlugin } from '@haklex/rich-plugin-floating-toolbar';
 import { FloatingLinkEditorPlugin } from '@haklex/rich-plugin-link-edit';
+import { LiteXmlPastePlugin } from '@haklex/rich-plugin-litexml-paste';
 import type { MentionPlatformDef } from '@haklex/rich-plugin-mention';
 import { MentionMenuPlugin } from '@haklex/rich-plugin-mention';
 import { SlashMenuPlugin } from '@haklex/rich-plugin-slash-menu';
@@ -60,6 +61,7 @@ export function LexicalEditor({
       }
     >
       <BlockHandlePlugin />
+      <LiteXmlPastePlugin />
       <FloatingToolbarPlugin actions={floatingToolbarActions} />
       <FloatingLinkEditorPlugin renderExtraActions={renderLinkExtraActions} />
       <EmbedPlugin selfHostnames={selfHostnames} />

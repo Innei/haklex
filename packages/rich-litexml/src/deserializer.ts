@@ -1,14 +1,12 @@
 import type { SerializedEditorState, SerializedLexicalNode } from 'lexical';
-import { parseHTML } from 'linkedom';
 
+import { parseHTML } from './parse-html';
 import type { LitexmlRegistry } from './registry';
 import { getFormatBit, isFormatTag } from './text-format';
 import type { ReaderContext } from './types';
 
 function parseXml(xml: string): Document {
-  // linkedom's parseHTML handles XML-like content in a Node-compatible way
-  const { document } = parseHTML(`<!DOCTYPE html><html><body>${xml}</body></html>`);
-  return document;
+  return parseHTML(`<!DOCTYPE html><html><body>${xml}</body></html>`);
 }
 
 export function deserializeFromXml(xml: string, registry: LitexmlRegistry): SerializedEditorState {

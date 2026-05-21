@@ -6,7 +6,7 @@ export interface ExcalidrawSlotProps {
   snapshot: string;
 }
 
-declare module '@haklex/rich-editor' {
+declare module '@haklex/rich-editor/static' {
   interface RendererConfig {
     Excalidraw?: ComponentType<ExcalidrawSlotProps>;
   }

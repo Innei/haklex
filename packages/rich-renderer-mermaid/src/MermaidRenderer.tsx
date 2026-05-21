@@ -1,5 +1,5 @@
-import type { ColorScheme } from '@haklex/rich-editor';
 import type { MermaidRendererProps } from '@haklex/rich-editor/renderers';
+import type { ColorScheme } from '@haklex/rich-editor/static';
 import type { FC } from 'react';
 
 import * as css from './styles.css';

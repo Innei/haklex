@@ -1,5 +1,5 @@
-import { useRendererMode } from '@haklex/rich-editor';
 import type { ImageRendererProps } from '@haklex/rich-editor/renderers';
+import { useRendererMode } from '@haklex/rich-editor/static';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { useCallback } from 'react';

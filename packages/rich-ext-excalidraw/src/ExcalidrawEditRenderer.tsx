@@ -1,5 +1,5 @@
 import type { ExcalidrawImperativeAPI, ExcalidrawProps } from '@excalidraw/excalidraw/types';
-import { useColorScheme } from '@haklex/rich-editor';
+import { useColorScheme } from '@haklex/rich-editor/static';
 import { dismissTopDialog, presentDialog, SegmentedControl } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import { Clipboard, Download, Pencil, Save, X } from 'lucide-react';

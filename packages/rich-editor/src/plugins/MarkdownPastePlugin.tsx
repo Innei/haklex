@@ -13,7 +13,6 @@ import { useEffect } from 'react';
 import { getResolvedEditNodes } from '../node-registry';
 import { $createCodeBlockEditNode } from '../nodes/CodeBlockEditNode';
 import { ALL_TRANSFORMERS } from '../transformers';
-import { detectLiteXml, parseLiteXmlSerializedNodes } from '../utils/litexml-import';
 
 function getVSCodePasteData(clipboardData: DataTransfer): { language: string } | null {
   const raw = clipboardData.getData('vscode-editor-data');
@@ -135,19 +134,6 @@ function convertAndInsert(markdown: string): boolean {
   return true;
 }
 
-function insertSerializedNodes(serializedNodes: SerializedLexicalNode[]): boolean {
-  if (!serializedNodes.length) return false;
-
-  const nodes = serializedNodes.map((s) => $parseSerializedNode(s));
-  $insertNodes(nodes);
-  return true;
-}
-
-function convertLiteXmlAndInsert(xml: string): boolean {
-  const serializedNodes = parseLiteXmlSerializedNodes(xml);
-  return serializedNodes ? insertSerializedNodes(serializedNodes) : false;
-}
-
 export function MarkdownPastePlugin() {
   const [editor] = useLexicalComposerContext();
 
@@ -185,25 +171,11 @@ export function MarkdownPastePlugin() {
           }
         }
 
-        // LiteXML import for Haklex nodes that do not have native Markdown syntax.
-        const text = clipboardData.getData('text/plain');
-        if (text && detectLiteXml(text)) {
-          try {
-            if (!convertLiteXmlAndInsert(text)) {
-              return false;
-            }
-            event.preventDefault();
-            return true;
-          } catch (error) {
-            console.error('MarkdownPastePlugin: LiteXML paste error', error);
-            return false;
-          }
-        }
-
         // Rich HTML → let Lexical default handle
         if (hasRichHTML(clipboardData)) return false;
 
         // Markdown detection
+        const text = clipboardData.getData('text/plain');
         if (!text || !detectMarkdown(text)) return false;
 
         try {

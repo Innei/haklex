@@ -1,6 +1,6 @@
 import '../styles.css.ts';
 
-import { useColorScheme } from '@haklex/rich-editor';
+import { useColorScheme } from '@haklex/rich-editor/static';
 import { SiGithub } from '@icons-pack/react-simple-icons';
 import type { ReactNode } from 'react';
 import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react';

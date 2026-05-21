@@ -1,5 +1,5 @@
-import { useRendererMode } from '@haklex/rich-editor';
 import type { RubyRendererProps } from '@haklex/rich-editor/renderers';
+import { useRendererMode } from '@haklex/rich-editor/static';
 
 import { RubyRenderer } from './RubyRenderer';
 

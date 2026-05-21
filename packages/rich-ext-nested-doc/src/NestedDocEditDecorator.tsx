@@ -1,4 +1,4 @@
-import { useColorScheme } from '@haklex/rich-editor';
+import { useColorScheme } from '@haklex/rich-editor/static';
 import { ActionBar, ActionButton } from '@haklex/rich-editor-ui';
 import { PortalContainerProvider, usePortalTheme } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';

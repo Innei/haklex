@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { detectLiteXml, parseLiteXmlSerializedNodes } from '../src/utils/litexml-import';
+import { detectLiteXml, parseLiteXmlSerializedNodes } from '../src/litexml-import';
 
 describe('LiteXML import detection', () => {
   it('detects Haklex custom LiteXML fragments', () => {

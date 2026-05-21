@@ -7,8 +7,8 @@ import {
   isOnLastLine,
   loadLanguageExtension,
 } from '@haklex/cm-editor';
-import { useColorScheme, useVariant } from '@haklex/rich-editor';
 import type { CodeBlockRendererProps } from '@haklex/rich-editor/renderers';
+import { useColorScheme, useVariant } from '@haklex/rich-editor/static';
 import type { ComponentType } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 

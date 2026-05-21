@@ -1,6 +1,6 @@
-import { editorTheme } from '@haklex/rich-editor';
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
 import { getResolvedEditNodes } from '@haklex/rich-editor/nodes';
+import { editorTheme } from '@haklex/rich-editor/static';
 import type { EditorConfig, LexicalEditor, SerializedEditorState } from 'lexical';
 import { $insertNodes, createEditor } from 'lexical';
 import { FileText } from 'lucide-react';

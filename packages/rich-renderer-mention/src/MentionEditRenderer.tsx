@@ -1,4 +1,4 @@
-import { useRendererMode } from '@haklex/rich-editor';
+import { useRendererMode } from '@haklex/rich-editor/static';
 import {
   ActionBar,
   ActionButton,

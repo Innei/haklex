@@ -18,7 +18,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getThemeExtensions, loadLanguageExtension } from '@haklex/cm-editor';
-import type { ColorScheme } from '@haklex/rich-editor';
+import type { ColorScheme } from '@haklex/rich-editor/static';
 import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants';
 import { FileIcon } from '@haklex/rich-renderer-codeblock/icons';
 import { usePortalTheme } from '@haklex/rich-style-token';

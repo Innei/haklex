@@ -1,5 +1,5 @@
-import { useRendererMode } from '@haklex/rich-editor';
 import type { VideoRendererProps } from '@haklex/rich-editor/renderers';
+import { useRendererMode } from '@haklex/rich-editor/static';
 import {
   ActionBar,
   ActionButton,

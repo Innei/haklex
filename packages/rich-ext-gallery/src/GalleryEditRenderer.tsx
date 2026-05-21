@@ -14,7 +14,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useColorScheme } from '@haklex/rich-editor';
+import { useColorScheme } from '@haklex/rich-editor/static';
 import { presentDialog, SegmentedControl } from '@haklex/rich-editor-ui';
 import { usePortalTheme, vars } from '@haklex/rich-style-token';
 import { GripVertical, ImageIcon, Images, Pencil, Plus, Trash2, X } from 'lucide-react';

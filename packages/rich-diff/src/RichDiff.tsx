@@ -2,7 +2,7 @@ import type { RichRendererProps } from '@haklex/rich-compose';
 import { RichRenderer } from '@haklex/rich-compose';
 import type { DiffHunk } from '@haklex/rich-diff-core';
 import { computeDiff } from '@haklex/rich-diff-core';
-import { ColorSchemeProvider, getVariantClass } from '@haklex/rich-editor';
+import { ColorSchemeProvider, getVariantClass } from '@haklex/rich-editor/static';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import type { SerializedEditorState, SerializedLexicalNode } from 'lexical';
 import { useMemo } from 'react';

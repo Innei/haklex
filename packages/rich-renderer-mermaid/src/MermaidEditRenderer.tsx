@@ -1,5 +1,5 @@
-import { type ColorScheme, useColorScheme } from '@haklex/rich-editor';
 import type { MermaidRendererProps } from '@haklex/rich-editor/renderers';
+import { type ColorScheme, useColorScheme } from '@haklex/rich-editor/static';
 import { presentDialog, usePortalTheme } from '@haklex/rich-editor-ui';
 import {
   CircleAlert,

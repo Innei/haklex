@@ -1,4 +1,4 @@
-import { useColorScheme } from '@haklex/rich-editor';
+import { useColorScheme } from '@haklex/rich-editor/static';
 import { presentDialog } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import { Pencil } from 'lucide-react';

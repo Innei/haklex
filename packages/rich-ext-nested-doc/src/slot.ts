@@ -7,7 +7,7 @@ export interface NestedDocRendererProps {
   contentState: SerializedEditorState;
 }
 
-declare module '@haklex/rich-editor' {
+declare module '@haklex/rich-editor/static' {
   interface RendererConfig {
     NestedDoc?: ComponentType<NestedDocRendererProps>;
   }

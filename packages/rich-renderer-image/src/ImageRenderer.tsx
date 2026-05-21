@@ -1,5 +1,5 @@
-import { vars } from '@haklex/rich-editor';
 import { decodeThumbHash, type ImageRendererProps } from '@haklex/rich-editor/renderers';
+import { vars } from '@haklex/rich-editor/static';
 import type { CSSProperties, KeyboardEvent, Ref } from 'react';
 import { useMemo, useRef, useState } from 'react';
 
