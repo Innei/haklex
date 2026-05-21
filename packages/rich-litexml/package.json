@@ -10,9 +10,13 @@
   "license": "MIT",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "browser": "./src/index-browser.ts",
+      "node": "./src/index-node.ts",
+      "default": "./src/index-node.ts"
+    }
   },
-  "main": "./src/index.ts",
+  "main": "./src/index-node.ts",
   "files": [
     "dist"
   ],
@@ -23,22 +27,32 @@
   "dependencies": {
     "lexical": "^0.44.0",
     "linkedom": "^0.18.12",
-    "nanoid": "^5.1.9"
+    "nanoid": "^5.1.11"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "vite": "^8.0.10",
-    "vite-plugin-dts": "^4.5.4"
+    "unplugin-dts": "^1.0.1",
+    "vite": "^8.0.13"
   },
   "publishConfig": {
     "access": "public",
     "exports": {
       ".": {
-        "import": "./dist/index.mjs",
-        "types": "./dist/index.d.ts"
+        "browser": {
+          "import": "./dist/browser.mjs",
+          "types": "./dist/browser.d.ts"
+        },
+        "node": {
+          "import": "./dist/node.mjs",
+          "types": "./dist/node.d.ts"
+        },
+        "default": {
+          "import": "./dist/node.mjs",
+          "types": "./dist/node.d.ts"
+        }
       }
     },
-    "main": "./dist/index.mjs",
-    "types": "./dist/index.d.ts"
+    "main": "./dist/node.mjs",
+    "types": "./dist/node.d.ts"
   }
 }

@@ -1,27 +1,20 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
-  "workspaces": {
-    "packages/*": {
-      "project": [
-        "src/**/*.{ts,tsx}"
-      ],
-      "ignore": [
-        "dist/**",
-        "**/*.css.ts"
-      ],
-      "vite": false
-    }
-  },
-  "ignore": [
-    "demo/**"
-  ],
+  "ignore": ["demo/**"],
   "ignoreDependencies": [
     "@vanilla-extract/css",
     "@vanilla-extract/recipes",
     "@vanilla-extract/vite-plugin",
-    "vite-plugin-dts",
+    "unplugin-dts",
     "typescript",
     "vite",
     "rollup-plugin-visualizer"
-  ]
+  ],
+  "workspaces": {
+    "packages/*": {
+      "project": ["src/**/*.{ts,tsx}"],
+      "ignore": ["dist/**", "**/*.css.ts"],
+      "vite": false
+    }
+  }
 }

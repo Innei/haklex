@@ -14,7 +14,7 @@ const BASE_EXTERNALS = ['react', 'react-dom', 'react/jsx-runtime'];
 export async function createViteConfig(options: SharedViteOptions = {}): Promise<UserConfig> {
   const { entry = 'src/index.ts', vanillaExtract = true, esbuild } = options;
 
-  const dts = (await import('vite-plugin-dts')).default;
+  const dts = (await import('unplugin-dts/vite')).default;
   const plugins: UserConfig['plugins'] = [];
 
   if (vanillaExtract) {
