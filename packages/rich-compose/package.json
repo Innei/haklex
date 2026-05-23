@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-compose",
-  "version": "0.15.1",
+  "version": "0.15.4",
   "description": "Compose primitives for haklex rich content renderers — Gundam-style assembly of Lexical nodes, sync/lazy renderers, and Provider stacks.",
   "repository": {
     "type": "git",
