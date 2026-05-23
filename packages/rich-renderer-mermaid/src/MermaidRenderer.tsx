@@ -10,18 +10,9 @@ export const MermaidRenderer: FC<MermaidRendererProps & { colorScheme?: ColorSch
   content,
   colorScheme,
 }) => {
-  const { loading, error, imgSrc, width, height } = useMermaidRender(content, colorScheme);
+  const { error, imgSrc, width, height } = useMermaidRender(content, colorScheme);
   const minHeight = estimateMermaidHeight(content);
   const wrapperStyle = { minHeight };
-
-  if (loading) {
-    return (
-      <div className={css.mermaidLoading} style={wrapperStyle}>
-        <span aria-hidden="true" className={css.mermaidSpinner} />
-        <span>Rendering diagram…</span>
-      </div>
-    );
-  }
 
   if (!imgSrc) {
     return (

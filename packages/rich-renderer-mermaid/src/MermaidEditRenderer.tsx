@@ -41,10 +41,6 @@ const TEMPLATES: { label: string; code: string }[] = [
     label: 'State',
     code: 'stateDiagram-v2\n  [*] --> Idle\n  Idle --> Processing: Submit\n  Processing --> Success: Complete\n  Processing --> Error: Fail\n  Error --> Idle: Retry\n  Success --> [*]',
   },
-  {
-    label: 'Git',
-    code: 'gitGraph\n  commit\n  branch develop\n  checkout develop\n  commit\n  checkout main\n  merge develop\n  commit',
-  },
 ];
 
 // ── Icons (Lucide) ───────────────────────────────────────────────
@@ -65,7 +61,7 @@ const MermaidLivePreview: FC<{
     return () => clearTimeout(t);
   }, [code]);
 
-  const { loading, error, imgSrc, svg, width, height } = useMermaidRender(debounced, colorScheme);
+  const { error, imgSrc, svg, width, height } = useMermaidRender(debounced, colorScheme);
 
   useEffect(() => {
     svgRef.current = svg;
@@ -75,14 +71,6 @@ const MermaidLivePreview: FC<{
     return (
       <div className={css.editorPreviewWrap}>
         <span className={css.editorPreviewEmpty}>Enter Mermaid code to see the preview</span>
-      </div>
-    );
-  }
-
-  if (loading && !imgSrc) {
-    return (
-      <div className={css.editorPreviewWrap}>
-        <div className={css.mermaidLoading}>Rendering</div>
       </div>
     );
   }
@@ -338,7 +326,7 @@ const ZoomControls: FC = () => {
 
 export const MermaidEditRenderer: FC<MermaidRendererProps> = ({ content, onContentChange }) => {
   const colorScheme = useColorScheme();
-  const { loading, error, imgSrc, width, height } = useMermaidRender(content);
+  const { error, imgSrc, width, height } = useMermaidRender(content);
   const { className: portalClassName } = usePortalTheme();
 
   const handleClick = useCallback(() => {
@@ -359,10 +347,6 @@ export const MermaidEditRenderer: FC<MermaidRendererProps> = ({ content, onConte
       clickOutsideToDismiss: false,
     });
   }, [onContentChange, content, portalClassName, colorScheme]);
-
-  if (loading) {
-    return <div className={css.mermaidLoading}>Mermaid Loading</div>;
-  }
 
   if (!imgSrc) {
     return <div className={css.mermaidError}>{error || 'Render failed'}</div>;

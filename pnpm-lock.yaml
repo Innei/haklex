@@ -2069,12 +2069,12 @@ importers:
       '@haklex/rich-style-token':
         specifier: workspace:*
         version: link:../rich-style-token
+      beautiful-mermaid:
+        specifier: ^1.1.3
+        version: 1.1.3
       lucide-react:
         specifier: ^1.0.0
         version: 1.16.0(react@19.2.5)
-      mermaid:
-        specifier: ^11.15.0
-        version: 11.15.0
       react-zoom-pan-pinch:
         specifier: ^4.0.3
         version: 4.0.3(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -6270,6 +6270,12 @@ packages:
     engines: { node: '>=6.0.0' }
     hasBin: true
 
+  beautiful-mermaid@1.1.3:
+    resolution:
+      {
+        integrity: sha512-TItrtrAyHp1vwFfFVYauWGrquouk/6SS21Aq3RsxindSYZODcN4xYrPZD6BiZRU+o5mKJzDPz9MUSMvELdylyg==,
+      }
+
   binary-extensions@2.3.0:
     resolution:
       {
@@ -7248,6 +7254,12 @@ packages:
     resolution:
       {
         integrity: sha512-4MxfbmNDm+KPh066EZy+eUnkcDPcZ35wNmOWzFuh/ijvHsve6kbLTLURy88uCNK5FbpN+yk2nQY6BYh1GEt+wg==,
+      }
+
+  elkjs@0.11.1:
+    resolution:
+      {
+        integrity: sha512-zxxR9k+rx5ktMwT/FwyLdPCrq7xN6e4VGGHH8hA01vVYKjTFik7nHOxBnAYtrgYUB1RpAiLvA1/U2YraWxyKKg==,
       }
 
   emoji-regex@10.6.0:
@@ -14930,6 +14942,11 @@ snapshots:
 
   baseline-browser-mapping@2.10.24: {}
 
+  beautiful-mermaid@1.1.3:
+    dependencies:
+      elkjs: 0.11.1
+      entities: 7.0.1
+
   binary-extensions@2.3.0: {}
 
   birecord@0.1.1: {}
@@ -15504,6 +15521,8 @@ snapshots:
       gopd: 1.2.0
 
   electron-to-chromium@1.5.344: {}
+
+  elkjs@0.11.1: {}
 
   emoji-regex@10.6.0: {}
 

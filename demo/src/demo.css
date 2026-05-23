@@ -844,6 +844,18 @@ html {
   gap: 16px;
 }
 
+.biz-masonry {
+  column-count: 2;
+  column-gap: 16px;
+}
+
+.biz-masonry > * {
+  break-inside: avoid;
+  margin-bottom: 16px;
+  display: inline-block;
+  width: 100%;
+}
+
 /* ── Agent Page ── */
 .agent-split {
   flex: 1;
@@ -934,6 +946,10 @@ html {
 
   .biz-grid {
     grid-template-columns: 1fr;
+  }
+
+  .biz-masonry {
+    column-count: 1;
   }
 
   .agent-split {
