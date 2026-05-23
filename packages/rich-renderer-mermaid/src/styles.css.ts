@@ -83,9 +83,11 @@ export const zoomBtn = style({
 
 export const mermaidLoading = style({
   display: 'flex',
+  flexDirection: 'column',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: 80,
+  gap: 12,
+  margin: '1rem 0',
   color: vars.color.textSecondary,
   fontSize: vars.typography.fontSizeMd,
 });
@@ -94,13 +96,11 @@ const spin = keyframes({
   to: { transform: 'rotate(360deg)' },
 });
 
-globalStyle(`${mermaidLoading}::after`, {
-  content: '""',
+export const mermaidSpinner = style({
   display: 'inline-block',
-  width: 16,
-  height: 16,
-  marginLeft: 8,
-  border: '2px solid currentColor',
+  width: 24,
+  height: 24,
+  border: '2.5px solid currentColor',
   borderRightColor: 'transparent',
   borderRadius: '50%',
   animation: `${spin} 0.6s linear infinite`,
@@ -110,8 +110,8 @@ export const mermaidError = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minHeight: 50,
   padding: '0.75rem 1rem',
+  margin: '1rem 0',
   borderRadius: '0.5rem',
   backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
   color: vars.color.alertCaution,
