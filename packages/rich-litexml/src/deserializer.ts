@@ -5,8 +5,72 @@ import type { LitexmlRegistry } from './registry';
 import { getFormatBit, isFormatTag } from './text-format';
 import type { ReaderContext } from './types';
 
+/**
+ * HTML5 void elements — tags the HTML parser already treats as self-closing
+ * regardless of `/>` syntax. Custom or non-void tags written as `<tag … />`
+ * are otherwise interpreted as opening tags by the HTML parser, which then
+ * swallows all following siblings as children until a matching close tag (or
+ * end of document) is found. We expand those into explicit `<tag …></tag>`
+ * before handing the string to linkedom / DOMParser.
+ */
+const HTML_VOID_ELEMENTS = new Set([
+  'area',
+  'base',
+  'br',
+  'col',
+  'embed',
+  'hr',
+  'img',
+  'input',
+  'link',
+  'meta',
+  'param',
+  'source',
+  'track',
+  'wbr',
+]);
+
+const SELF_CLOSING_RE = /<([\w-]+)((?:\s+[\w-]+(?:\s*=\s*(?:"[^"]*"|'[^']*'))?)*)\s*\/>/g;
+
+const CDATA_OPEN = '<![CDATA[';
+const CDATA_CLOSE = ']]>';
+
+function expandSelfClosing(chunk: string): string {
+  return chunk.replaceAll(SELF_CLOSING_RE, (match, tag: string, attrs: string) => {
+    if (HTML_VOID_ELEMENTS.has(tag.toLowerCase())) return match;
+    return `<${tag}${attrs}></${tag}>`;
+  });
+}
+
+/**
+ * Expand `<custom-tag … />` to `<custom-tag …></custom-tag>` outside CDATA.
+ * Leaves HTML void elements and already-paired tags untouched. CDATA content
+ * is sliced out verbatim with `indexOf` to avoid regex pitfalls around `]]>`.
+ */
+function normalizeSelfClosingTags(xml: string): string {
+  const out: string[] = [];
+  let cursor = 0;
+  while (cursor < xml.length) {
+    const start = xml.indexOf(CDATA_OPEN, cursor);
+    if (start < 0) {
+      out.push(expandSelfClosing(xml.slice(cursor)));
+      break;
+    }
+    out.push(expandSelfClosing(xml.slice(cursor, start)));
+    const end = xml.indexOf(CDATA_CLOSE, start + CDATA_OPEN.length);
+    if (end < 0) {
+      // Unterminated CDATA — keep verbatim and stop processing.
+      out.push(xml.slice(start));
+      break;
+    }
+    out.push(xml.slice(start, end + CDATA_CLOSE.length));
+    cursor = end + CDATA_CLOSE.length;
+  }
+  return out.join('');
+}
+
 function parseXml(xml: string): Document {
-  return parseHTML(`<!DOCTYPE html><html><body>${xml}</body></html>`);
+  return parseHTML(`<!DOCTYPE html><html><body>${normalizeSelfClosingTags(xml)}</body></html>`);
 }
 
 export function deserializeFromXml(xml: string, registry: LitexmlRegistry): SerializedEditorState {
