@@ -30,8 +30,8 @@
     "@vanilla-extract/vite-plugin": "^5.2.2",
     "katex": "^0.16.47",
     "lexical": "^0.44.0",
-    "react": "^19.2.6",
-    "react-dom": "^19.2.6",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
     "typescript": "^5.9.3",
     "unplugin-dts": "^1.0.1",
     "vite": "^8.0.13"
