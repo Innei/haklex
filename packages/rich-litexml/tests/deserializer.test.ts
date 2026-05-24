@@ -133,6 +133,30 @@ describe('self-closing tag normalization', () => {
     expect(children[0].code).toContain('<self-closing attr="x" />');
   });
 
+  it('coalesces adjacent text nodes from character references', () => {
+    const registry = createDefaultRegistry();
+    const xml = '<doc><p>before <code>&lt;alert&gt;</code> after</p></doc>';
+    const state = deserializeFromXml(xml, registry);
+    const para = (state.root as any).children[0];
+    expect(para.type).toBe('paragraph');
+    const kids = para.children;
+    expect(kids).toHaveLength(3);
+    expect(kids[0].text).toBe('before ');
+    expect(kids[0].format).toBe(0);
+    expect(kids[1].text).toBe('<alert>');
+    expect(kids[1].format).not.toBe(0);
+    expect(kids[2].text).toBe(' after');
+    expect(kids[2].format).toBe(0);
+  });
+
+  it('coalesces adjacent text but keeps nested format elements separate', () => {
+    const registry = createDefaultRegistry();
+    const xml = '<doc><p>a<b>bold</b>b&lt;c</p></doc>';
+    const state = deserializeFromXml(xml, registry);
+    const kids = (state.root as any).children[0].children;
+    expect(kids.map((k: any) => k.text)).toEqual(['a', 'bold', 'b<c']);
+  });
+
   it('leaves HTML void elements untouched', () => {
     const registry = new LitexmlRegistry();
     registry.registerReader('hr', () => ({ type: 'horizontalrule', version: 1 }) as any);

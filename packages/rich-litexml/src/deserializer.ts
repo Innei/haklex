@@ -135,15 +135,26 @@ function createReaderContext(registry: LitexmlRegistry): ReaderContext {
     parseChildren(element: Element): SerializedLexicalNode[] {
       const blockLevel = isBlockContainer(element);
       const nodes: SerializedLexicalNode[] = [];
+      let pendingText = '';
+      const flushText = () => {
+        if (pendingText === '') return;
+        // Only skip whitespace-only text in block-level containers.
+        // In inline contexts, preserve all text including spaces.
+        if (blockLevel && pendingText.trim() === '') {
+          pendingText = '';
+          return;
+        }
+        nodes.push(makeTextNode(pendingText, 0));
+        pendingText = '';
+      };
       for (const child of element.childNodes) {
         if (child.nodeType === 3 /* TEXT_NODE */) {
-          const text = child.textContent ?? '';
-          // Only skip whitespace-only text in block-level containers
-          // In inline contexts, preserve all text including spaces
-          if (blockLevel && text.trim() === '') continue;
-          if (text === '') continue;
-          nodes.push(makeTextNode(text, 0));
+          // Coalesce adjacent text nodes — linkedom emits one text node per
+          // character reference (`&lt;` → separate node from the chars around
+          // it), and Lexical expects a single text node per contiguous run.
+          pendingText += child.textContent ?? '';
         } else if (child.nodeType === 1 /* ELEMENT_NODE */) {
+          flushText();
           const el = child as Element;
           const parsed = parseElement(el, registry, ctx, 0);
           if (parsed) {
@@ -152,6 +163,7 @@ function createReaderContext(registry: LitexmlRegistry): ReaderContext {
           }
         }
       }
+      flushText();
       return nodes;
     },
 
@@ -204,12 +216,17 @@ function parseInlineChildren(
   format: number,
 ): SerializedLexicalNode[] {
   const nodes: SerializedLexicalNode[] = [];
+  let pendingText = '';
+  const flushText = () => {
+    if (pendingText === '') return;
+    nodes.push(makeTextNode(pendingText, format));
+    pendingText = '';
+  };
   for (const child of element.childNodes) {
     if (child.nodeType === 3 /* TEXT_NODE */) {
-      const text = child.textContent ?? '';
-      if (text === '') continue;
-      nodes.push(makeTextNode(text, format));
+      pendingText += child.textContent ?? '';
     } else if (child.nodeType === 1 /* ELEMENT_NODE */) {
+      flushText();
       const el = child as Element;
       const parsed = parseElement(el, registry, ctx, format);
       if (parsed) {
@@ -218,6 +235,7 @@ function parseInlineChildren(
       }
     }
   }
+  flushText();
   return nodes;
 }
 
