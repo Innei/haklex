@@ -12,6 +12,17 @@ const require = createRequire(import.meta.url);
 function resolveComposeAsset(name: string): string {
   const candidates: string[] = [];
 
+  // Preferred: use the package's own exported subpath (e.g. `./style.css`).
+  // Works under Node's strict exports enforcement regardless of where the
+  // package is installed.
+  try {
+    candidates.push(require.resolve(`@haklex/rich-compose/${name}`));
+  } catch {
+    // fall through to other resolution strategies
+  }
+
+  // Fallback: locate the installed package via package.json and read dist/
+  // directly. Requires `./package.json` to be in the exports field.
   try {
     const pkgPath = require.resolve('@haklex/rich-compose/package.json');
     candidates.push(path.join(path.dirname(pkgPath), 'dist', name));

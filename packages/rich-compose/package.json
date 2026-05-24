@@ -75,7 +75,8 @@
     "./style.css": "./dist/style.css",
     "./style/*": "./dist/style/*",
     "./litexml-html-preview-client.js": "./dist/litexml-html-preview-client.js",
-    "./litexml-html-preview-client.css": "./dist/litexml-html-preview-client.css"
+    "./litexml-html-preview-client.css": "./dist/litexml-html-preview-client.css",
+    "./package.json": "./package.json"
   },
   "main": "./src/index.ts",
   "files": [
