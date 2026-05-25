@@ -1,8 +1,4 @@
-import {
-  $selectionTouchesSpoiler,
-  $toggleSpoilerSelection,
-  collectCommandItems,
-} from '@haklex/rich-editor/commands';
+import { $toggleSpoilerSelection, collectCommandItems } from '@haklex/rich-editor/commands';
 import type { TooltipRootProps } from '@haklex/rich-editor-ui';
 import {
   createTooltipHandle,
@@ -16,29 +12,17 @@ import {
   TooltipTrigger,
 } from '@haklex/rich-editor-ui';
 import {
-  $isListNode,
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
 } from '@lexical/list';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text';
-import {
-  $getSelectionStyleValueForProperty,
-  $patchStyleText,
-  $setBlocksType,
-} from '@lexical/selection';
-import { $findMatchingParent } from '@lexical/utils';
-import type { ElementFormatType, ElementNode } from 'lexical';
+import { $createHeadingNode } from '@lexical/rich-text';
+import { $setBlocksType } from '@lexical/selection';
 import {
   $createParagraphNode,
   $getSelection,
-  $isElementNode,
   $isRangeSelection,
-  $isRootOrShadowRoot,
-  CAN_REDO_COMMAND,
-  CAN_UNDO_COMMAND,
-  COMMAND_PRIORITY_LOW,
   FORMAT_ELEMENT_COMMAND,
   FORMAT_TEXT_COMMAND,
   REDO_COMMAND,
@@ -68,116 +52,19 @@ import {
   Undo,
 } from 'lucide-react';
 import type { CSSProperties, ReactElement } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
+import { applyFontFamily } from './actions';
+import { BLOCK_TYPE_LABELS, FONT_FAMILIES, getFontLabel } from './constants';
 import * as css from './styles.css';
 import { ToolbarButton } from './ToolbarButton';
 import { ToolbarDropdown } from './ToolbarDropdown';
 import { ToolbarSeparator } from './ToolbarSeparator';
 import type { ToolbarTooltipPayload } from './types';
+import { useToolbarState } from './use-toolbar-state';
 
 const ICON_SIZE = 15;
 const ICON_STROKE = 2;
-
-// ─── Font Family ────────────────────────────────────────
-
-interface FontFamilyDef {
-  label: string;
-  value: string;
-}
-
-const FONT_FAMILIES: FontFamilyDef[] = [
-  { label: '默认', value: '' },
-  {
-    label: '宋体',
-    value: '"Noto Serif CJK SC", "Source Han Serif SC", SimSun, serif',
-  },
-  {
-    label: '黑体',
-    value: '"Noto Sans CJK SC", "Source Han Sans SC", SimHei, sans-serif',
-  },
-  { label: '楷体', value: 'KaiTi, STKaiti, serif' },
-  { label: 'Sans', value: 'system-ui, -apple-system, sans-serif' },
-  { label: 'Serif', value: 'Georgia, "Times New Roman", serif' },
-  { label: 'Mono', value: 'ui-monospace, "SF Mono", "Fira Code", monospace' },
-];
-
-function getFontLabel(fontFamily: string): string {
-  if (!fontFamily) return '默认';
-  const match = FONT_FAMILIES.find((f) => f.value === fontFamily);
-  if (match) return match.label;
-  for (const def of FONT_FAMILIES) {
-    if (def.value && fontFamily.startsWith(def.value.split(',')[0]!)) {
-      return def.label;
-    }
-  }
-  return '默认';
-}
-
-// ─── Block Type ─────────────────────────────────────────
-
-type BlockType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'bullet' | 'number' | 'check' | 'other';
-
-const BLOCK_TYPE_LABELS: Record<BlockType, string> = {
-  paragraph: 'Text',
-  h1: 'Heading 1',
-  h2: 'Heading 2',
-  h3: 'Heading 3',
-  bullet: 'Bulleted List',
-  number: 'Numbered List',
-  check: 'To-do List',
-  other: 'Other',
-};
-
-// ─── State ──────────────────────────────────────────────
-
-interface ToolbarState {
-  blockType: BlockType;
-  canRedo: boolean;
-  canUndo: boolean;
-  elementFormat: ElementFormatType;
-  fontFamily: string;
-  isBold: boolean;
-  isCode: boolean;
-  isHighlight: boolean;
-  isItalic: boolean;
-  isSpoiler: boolean;
-  isStrikethrough: boolean;
-  isUnderline: boolean;
-}
-
-const INITIAL_STATE: ToolbarState = {
-  canUndo: false,
-  canRedo: false,
-  blockType: 'paragraph',
-  fontFamily: '',
-  elementFormat: 'left',
-  isBold: false,
-  isItalic: false,
-  isUnderline: false,
-  isStrikethrough: false,
-  isCode: false,
-  isHighlight: false,
-  isSpoiler: false,
-};
-
-function getBlockType(anchorNode: ElementNode): BlockType {
-  if ($isHeadingNode(anchorNode)) {
-    const tag = anchorNode.getTag();
-    if (tag === 'h1' || tag === 'h2' || tag === 'h3') return tag;
-    return 'other';
-  }
-  if ($isListNode(anchorNode)) {
-    const listType = anchorNode.getListType();
-    if (listType === 'bullet') return 'bullet';
-    if (listType === 'number') return 'number';
-    if (listType === 'check') return 'check';
-    return 'other';
-  }
-  const type = anchorNode.getType();
-  if (type === 'paragraph') return 'paragraph';
-  return 'other';
-}
 
 // ─── Component ──────────────────────────────────────────
 
@@ -195,7 +82,7 @@ export function ToolbarPlugin({
   insertItemOrder,
 }: ToolbarPluginProps): ReactElement {
   const [editor] = useLexicalComposerContext();
-  const [state, setState] = useState<ToolbarState>(INITIAL_STATE);
+  const state = useToolbarState();
   const [tooltipHandle] = useState(() => createTooltipHandle<ToolbarTooltipPayload>());
 
   const toolbarItems = useMemo(() => {
@@ -210,105 +97,15 @@ export function ToolbarPlugin({
     });
   }, [editor, insertItemOrder]);
 
-  const updateToolbar = useCallback(() => {
-    const selection = $getSelection();
-    if (!$isRangeSelection(selection)) return;
-
-    const anchorNode = selection.anchor.getNode();
-    let element =
-      anchorNode.getKey() === 'root'
-        ? anchorNode
-        : ($findMatchingParent(anchorNode, (e) => {
-            const parent = e.getParent();
-            return parent !== null && $isRootOrShadowRoot(parent);
-          }) ?? anchorNode.getTopLevelElementOrThrow());
-
-    if ($isListNode(element)) {
-      const parentList = $findMatchingParent(anchorNode, (node) => $isListNode(node));
-      if (parentList) {
-        element = parentList;
-      }
-    }
-
-    const blockType = getBlockType(element as ElementNode);
-    const fontFamily = $getSelectionStyleValueForProperty(selection, 'font-family', '');
-    const elementFormat: ElementFormatType = $isElementNode(element)
-      ? element.getFormatType()
-      : 'left';
-
-    const isBold = selection.hasFormat('bold');
-    const isItalic = selection.hasFormat('italic');
-    const isUnderline = selection.hasFormat('underline');
-    const isStrikethrough = selection.hasFormat('strikethrough');
-    const isCode = selection.hasFormat('code');
-    const isHighlight = selection.hasFormat('highlight');
-    const isSpoiler = $selectionTouchesSpoiler(selection);
-
-    setState((prev) => ({
-      ...prev,
-      blockType,
-      fontFamily,
-      elementFormat,
-      isBold,
-      isItalic,
-      isUnderline,
-      isStrikethrough,
-      isCode,
-      isHighlight,
-      isSpoiler,
-    }));
-  }, []);
-
-  useEffect(() => {
-    const unregisterUndo = editor.registerCommand(
-      CAN_UNDO_COMMAND,
-      (payload) => {
-        setState((prev) => ({ ...prev, canUndo: payload }));
-        return false;
-      },
-      COMMAND_PRIORITY_LOW,
-    );
-    const unregisterRedo = editor.registerCommand(
-      CAN_REDO_COMMAND,
-      (payload) => {
-        setState((prev) => ({ ...prev, canRedo: payload }));
-        return false;
-      },
-      COMMAND_PRIORITY_LOW,
-    );
-    const unregisterUpdate = editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        updateToolbar();
-      });
-    });
-    return () => {
-      unregisterUndo();
-      unregisterRedo();
-      unregisterUpdate();
-    };
-  }, [editor, updateToolbar]);
-
-  const applyFontFamily = useCallback(
-    (value: string) => {
-      editor.update(() => {
-        const selection = $getSelection();
-        if ($isRangeSelection(selection)) {
-          $patchStyleText(selection, { 'font-family': value || '' });
-        }
-      });
-    },
-    [editor],
-  );
-
   const fontFamilyItems = useMemo(
     () =>
       FONT_FAMILIES.map((def) => ({
         label: def.label,
         active: state.fontFamily === def.value,
         style: def.value ? ({ fontFamily: def.value } as CSSProperties) : undefined,
-        onSelect: () => applyFontFamily(def.value),
+        onSelect: () => applyFontFamily(editor, def.value),
       })),
-    [state.fontFamily, applyFontFamily],
+    [editor, state.fontFamily],
   );
 
   const headingItems = useMemo(

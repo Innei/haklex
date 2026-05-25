@@ -1,2 +1,10 @@
-export type { ToolbarPluginProps } from './ToolbarPlugin'
-export { ToolbarPlugin } from './ToolbarPlugin'
+export { applyBlockType, applyFontFamily, getBlockType } from './actions';
+export type { BlockType, FontFamilyDef } from './constants';
+export { BLOCK_TYPE_LABELS, FONT_FAMILIES, getFontLabel } from './constants';
+export { ToolbarButton } from './ToolbarButton';
+export { ToolbarDropdown } from './ToolbarDropdown';
+export type { ToolbarPluginProps } from './ToolbarPlugin';
+export { ToolbarPlugin } from './ToolbarPlugin';
+export { ToolbarSeparator } from './ToolbarSeparator';
+export type { ToolbarState } from './use-toolbar-state';
+export { INITIAL_TOOLBAR_STATE, useToolbarState } from './use-toolbar-state';
