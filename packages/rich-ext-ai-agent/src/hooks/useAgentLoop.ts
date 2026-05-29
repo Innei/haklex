@@ -13,6 +13,7 @@ import { useCallback, useRef } from 'react';
 
 import { $captureSelection } from '../captureSelection';
 import { AgentMessagesEngine } from '../messageEngine';
+import { projectAgentDiffNodesToFactualState } from '../nodes/diff-node-state';
 
 export type UseAgentLoopOptions = {
   provider: LLMProvider;
@@ -33,7 +34,8 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
         const controller = new AbortController();
         abortRef.current = controller;
 
-        const serialized = editor.getEditorState().toJSON() as SerializedEditorState;
+        const serializedWithDiffNodes = editor.getEditorState().toJSON() as SerializedEditorState;
+        const serialized = projectAgentDiffNodesToFactualState(serializedWithDiffNodes);
         const snapshot = createSnapshot(serialized);
 
         const pinned = options.store.getState().pinnedSelection;

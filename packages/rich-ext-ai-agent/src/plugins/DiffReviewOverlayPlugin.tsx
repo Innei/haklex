@@ -1,751 +1,394 @@
-import type { AgentStore } from '@haklex/rich-agent-core';
-import { RichRenderer } from '@haklex/rich-compose';
-import { decorateSubtree, diffModifiedNode } from '@haklex/rich-diff-core';
-import {
-  useColorScheme,
-  useExtraNodes,
-  useRendererConfig,
-  useVariant,
-} from '@haklex/rich-editor/static';
+import type { AgentStore, ReviewBatch, ReviewEntry } from '@haklex/rich-agent-core';
+import { ActionButton } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
+  $getNodeByKey,
   $getRoot,
   $parseSerializedNode,
-  type LexicalEditor,
   type LexicalNode,
   type SerializedLexicalNode,
 } from 'lexical';
+import { CheckCheck, XCircle } from 'lucide-react';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { createPortal } from 'react-dom';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { $createAgentDiffEditNode, AgentDiffEditNode } from '../nodes/AgentDiffEditNode';
+import { $isAgentDiffNode } from '../nodes/AgentDiffNode';
+import type { AgentDiffNodePayload } from '../nodes/diff-node-state';
 import {
-  batchHeader,
-  batchHeaderAccept,
-  batchHeaderActions,
-  batchHeaderReject,
-  batchPanel,
-  deleteActionBar,
-  diffCompact,
-  floatingBar,
-  floatingBarAccept,
-  floatingBarLabel,
-  floatingBarReject,
-  newBlock,
-  oldBlock,
-  overlayContainer,
-  rendererFrame,
-} from './diff-review-overlay.css';
-import { getSanitizedOperationNode } from './sanitize-operation-node';
+  diffGlobalActions,
+  diffGlobalBar,
+  diffGlobalCount,
+  diffGlobalMeta,
+  diffGlobalTitle,
+} from '../styles.css';
+import { setAgentDiffReviewController } from './diff-node-controller';
+import { stripBlockIdFromSerializedNode } from './sanitize-operation-node';
 
-const INSERT_GAP = 8;
-const DELETE_BG = 'color-mix(in srgb, var(--rc-alert-caution) 7%, transparent)';
-const DELETE_BORDER = '2px solid var(--rc-alert-caution)';
-
-function getBlockId(node: SerializedLexicalNode): string | undefined {
-  return (node as any).$?.blockId as string | undefined;
+function getBlockId(node: SerializedLexicalNode | undefined | null): string | undefined {
+  return (node as any)?.$?.blockId as string | undefined;
 }
 
-function wrapDoc(nodes: SerializedLexicalNode[]) {
+function getSnapshotChildren(batch: ReviewBatch): SerializedLexicalNode[] {
+  return ((batch.baseSnapshot.root as any).children ?? []) as SerializedLexicalNode[];
+}
+
+function getOriginalNode(batch: ReviewBatch, blockId: string | undefined) {
+  if (!blockId) return null;
+  return getSnapshotChildren(batch).find((child) => getBlockId(child) === blockId) ?? null;
+}
+
+function getNodeBlockId(node: LexicalNode): string | undefined {
+  return getBlockId(node.exportJSON() as SerializedLexicalNode);
+}
+
+function $findBlockByBlockId(blockId: string): LexicalNode | null {
+  const root = $getRoot();
+  return root.getChildren().find((child) => getNodeBlockId(child) === blockId) ?? null;
+}
+
+function getPayload(batch: ReviewBatch, entry: ReviewEntry): AgentDiffNodePayload {
+  if (entry.op.op === 'insert') {
+    return {
+      batchId: batch.id,
+      diffEntryId: entry.id,
+      opType: 'insert',
+      originalNode: null,
+      proposedNode: stripBlockIdFromSerializedNode(entry.op.node),
+    };
+  }
+
+  if (entry.op.op === 'replace') {
+    return {
+      batchId: batch.id,
+      diffEntryId: entry.id,
+      opType: 'replace',
+      originalNode: getOriginalNode(batch, entry.op.blockId),
+      proposedNode: entry.op.node,
+    };
+  }
+
   return {
-    root: {
-      children: nodes,
-      direction: 'ltr' as const,
-      format: '' as const,
-      indent: 0,
-      type: 'root',
-      version: 1,
-    },
+    batchId: batch.id,
+    diffEntryId: entry.id,
+    opType: 'delete',
+    originalNode: getOriginalNode(batch, entry.op.blockId),
+    proposedNode: null,
   };
 }
 
-function getRenderedBlockId(editor: LexicalEditor, node: LexicalNode): string | null {
-  return editor.getElementByKey(node.getKey())?.getAttribute('data-block-id') ?? null;
+function $parseMaterializedNode(
+  payload: AgentDiffNodePayload,
+  side: 'accepted' | 'rejected',
+): LexicalNode | null {
+  if (side === 'accepted') {
+    if (payload.opType === 'delete') return null;
+    if (!payload.proposedNode) return null;
+
+    const nextNode =
+      payload.opType === 'insert'
+        ? stripBlockIdFromSerializedNode(payload.proposedNode)
+        : payload.proposedNode;
+    return $parseSerializedNode(nextNode);
+  }
+
+  if (payload.opType === 'insert') return null;
+  return payload.originalNode ? $parseSerializedNode(payload.originalNode) : null;
 }
 
-function $findBlockByBlockId(editor: LexicalEditor, blockId: string) {
-  const root = $getRoot();
-  for (const child of root.getChildren()) {
-    if (getRenderedBlockId(editor, child) === blockId) {
-      return child;
-    }
+function $resolveDiffNode(node: LexicalNode, side: 'accepted' | 'rejected') {
+  if (!$isAgentDiffNode(node)) return;
+
+  const materialized = $parseMaterializedNode(node.getPayload(), side);
+  if (materialized) {
+    node.replace(materialized);
+    return;
   }
+
+  node.remove();
+}
+
+function isVisibleBatch(batch: ReviewBatch): boolean {
+  return batch.status === 'pending' || batch.status === 'order_dependent';
+}
+
+function getPendingReviewSummary(store: AgentStore) {
+  const reviewState = store.getState().reviewState;
+  const batches = reviewState?.batches.filter(isVisibleBatch) ?? [];
+
+  return {
+    batchIds: batches.map((batch) => batch.id),
+    pendingCount: batches.reduce(
+      (total, batch) => total + batch.entries.filter((entry) => entry.status === 'pending').length,
+      0,
+    ),
+  };
+}
+
+function getDocumentDiffSummary() {
+  const batchIds = new Set<string>();
+  let pendingCount = 0;
+
+  for (const child of $getRoot().getChildren()) {
+    if (!$isAgentDiffNode(child)) continue;
+    batchIds.add(child.getBatchId());
+    pendingCount += 1;
+  }
+
+  return {
+    batchIds: [...batchIds],
+    pendingCount,
+  };
+}
+
+function getBatchResolution(batch: ReviewBatch): 'accepted' | 'rejected' | null {
+  if (batch.status === 'accepted') return 'accepted';
+  if (batch.status === 'rejected') return 'rejected';
   return null;
 }
 
-function preserveBlockState(target: LexicalNode, nextNode: LexicalNode) {
-  const currentState = (target.getLatest() as any).__state;
-  if (currentState) {
-    (nextNode as any).__state = currentState;
+function getEntryResolution(entry: ReviewEntry): 'accepted' | 'rejected' | null {
+  if (entry.status === 'accepted') return 'accepted';
+  if (entry.status === 'rejected') return 'rejected';
+  return null;
+}
+
+function insertAfterAnchor(
+  insertedByAnchor: Map<string, LexicalNode>,
+  anchorKey: string,
+  anchor: LexicalNode,
+  node: LexicalNode,
+) {
+  const previous = insertedByAnchor.get(anchorKey);
+  if (previous) {
+    previous.insertAfter(node);
+  } else {
+    anchor.insertAfter(node);
   }
+  insertedByAnchor.set(anchorKey, node);
 }
 
-type OverlayEntry = {
-  id: string;
-  batchId: string;
-  type: 'insert' | 'delete' | 'replace';
-  blockEl: HTMLElement | null;
-  blockTop: number;
-  blockHeight: number;
-  previewTop?: number;
-  oldNode?: SerializedLexicalNode;
-  newNode?: SerializedLexicalNode;
-  spacing: 'none' | 'before' | 'after' | 'overlay';
-};
-
-function applyDeleteDecorations(entry: OverlayEntry) {
-  if (!entry.blockEl) return;
-  entry.blockEl.style.background = DELETE_BG;
-  entry.blockEl.style.borderLeft = DELETE_BORDER;
-  entry.blockEl.style.textDecoration = 'line-through';
-  entry.blockEl.style.textDecorationColor = 'var(--rc-alert-caution)';
-  entry.blockEl.style.opacity = '0.72';
-}
-
-function resetBlockDecorations(entry: OverlayEntry) {
-  if (!entry.blockEl) return;
-  entry.blockEl.style.background = '';
-  entry.blockEl.style.borderLeft = '';
-  entry.blockEl.style.textDecoration = '';
-  entry.blockEl.style.textDecorationColor = '';
-  entry.blockEl.style.opacity = '';
-  entry.blockEl.style.visibility = '';
-  entry.blockEl.style.marginTop = '';
-  entry.blockEl.style.marginBottom = '';
-}
-
-function InlineEntryPanel({
-  entry,
-  batchId,
-  extraNodes,
-  rendererConfig,
-  theme,
-  variant,
-  onAcceptEntry,
-  onRejectEntry,
-  previewRefCallback,
-}: {
-  entry: OverlayEntry;
-  batchId: string;
-  extraNodes: ReturnType<typeof useExtraNodes>;
-  rendererConfig: ReturnType<typeof useRendererConfig>;
-  theme: ReturnType<typeof useColorScheme>;
-  variant: ReturnType<typeof useVariant>;
-  onAcceptEntry: (batchId: string, entryId: string) => void;
-  onRejectEntry: (batchId: string, entryId: string) => void;
-  previewRefCallback: (id: string) => (el: HTMLDivElement | null) => void;
-}): ReactElement {
-  return (
-    <div
-      className={`${batchPanel} ${diffCompact}`}
-      ref={previewRefCallback(entry.id)}
-      style={{ top: entry.previewTop }}
-    >
-      <div className={batchHeader}>
-        <div className={batchHeaderActions}>
-          <button
-            className={batchHeaderReject}
-            type="button"
-            onClick={() => onRejectEntry(batchId, entry.id)}
-          >
-            Reject
-          </button>
-          <button
-            className={batchHeaderAccept}
-            type="button"
-            onClick={() => onAcceptEntry(batchId, entry.id)}
-          >
-            Accept
-          </button>
-        </div>
-      </div>
-      {entry.oldNode && (
-        <div className={oldBlock}>
-          <div className={rendererFrame}>
-            <RichRenderer
-              extraNodes={extraNodes}
-              rendererConfig={rendererConfig}
-              theme={theme}
-              value={wrapDoc([entry.oldNode])}
-              variant={variant}
-            />
-          </div>
-        </div>
-      )}
-      {entry.newNode && (
-        <div className={newBlock}>
-          <div className={rendererFrame}>
-            <RichRenderer
-              extraNodes={extraNodes}
-              rendererConfig={rendererConfig}
-              theme={theme}
-              value={wrapDoc([entry.newNode])}
-              variant={variant}
-            />
-          </div>
-        </div>
-      )}
-    </div>
-  );
+function insertBeforeAnchor(
+  insertedByAnchor: Map<string, LexicalNode>,
+  anchorKey: string,
+  anchor: LexicalNode,
+  node: LexicalNode,
+) {
+  const previous = insertedByAnchor.get(anchorKey);
+  if (previous) {
+    previous.insertAfter(node);
+  } else {
+    anchor.insertBefore(node);
+  }
+  insertedByAnchor.set(anchorKey, node);
 }
 
 export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): ReactElement | null {
   const [editor] = useLexicalComposerContext();
-  const [overlays, setOverlays] = useState<OverlayEntry[]>([]);
-  const [containerEl, setContainerEl] = useState<HTMLElement | null>(null);
-  const theme = useColorScheme();
-  const variant = useVariant();
-  const rendererConfig = useRendererConfig();
-  const extraNodes = useExtraNodes();
+  const [pendingSummary, setPendingSummary] = useState(() => getPendingReviewSummary(store));
 
-  const previewRefs = useRef(new Map<string, HTMLDivElement>());
-  const deleteBarRefs = useRef(new Map<string, HTMLDivElement>());
-  const observerRef = useRef<ResizeObserver | null>(null);
-  const repositionRef = useRef<() => void>(() => {});
-  const rafPendingRef = useRef(false);
-
-  const batchGroups = useMemo(() => {
-    const groups = new Map<string, OverlayEntry[]>();
-    for (const entry of overlays) {
-      if (entry.type === 'delete') continue;
-      const list = groups.get(entry.batchId) ?? [];
-      list.push(entry);
-      groups.set(entry.batchId, list);
-    }
-    return groups;
-  }, [overlays]);
-
-  const deleteEntries = useMemo(() => overlays.filter((o) => o.type === 'delete'), [overlays]);
-
-  const applyEntryOp = useCallback(
-    (op: import('@haklex/rich-agent-core').AgentOperation) => {
-      editor.update(() => {
-        const root = $getRoot();
-
-        if (op.op === 'insert') {
-          const serializedNode = getSanitizedOperationNode(op);
-          if (!serializedNode) return;
-          const newNode = $parseSerializedNode(serializedNode);
-          if (op.position.type === 'root') {
-            const idx = op.position.index ?? root.getChildrenSize();
-            const children = root.getChildren();
-            if (idx >= children.length) root.append(newNode);
-            else children[idx].insertBefore(newNode);
-          } else {
-            const target = $findBlockByBlockId(editor, op.position.blockId);
-            if (!target) return;
-            if (op.position.type === 'after') target.insertAfter(newNode);
-            else target.insertBefore(newNode);
-          }
-          return;
-        }
-
-        if (op.op === 'replace') {
-          const serializedNode = getSanitizedOperationNode(op);
-          if (!serializedNode) return;
-          const target = $findBlockByBlockId(editor, op.blockId);
-          if (!target) return;
-          const newNode = $parseSerializedNode(serializedNode);
-          preserveBlockState(target, newNode);
-          target.replace(newNode);
-          return;
-        }
-
-        if (op.op === 'delete') {
-          const target = $findBlockByBlockId(editor, op.blockId);
-          if (!target) return;
-          target.remove();
-        }
-      });
-    },
-    [editor],
-  );
-
-  const handleAcceptEntry = useCallback(
-    (batchId: string, entryId: string) => {
-      const reviewState = store.getState().reviewState;
-      const batch = reviewState?.batches.find((item) => item.id === batchId);
-      const entry = batch?.entries.find((e) => e.id === entryId);
-      if (!entry) return;
-
-      store.getState().acceptReviewEntry(batchId, entryId);
-      applyEntryOp(entry.op);
-    },
-    [store, applyEntryOp],
-  );
-
-  const handleRejectEntry = useCallback(
-    (batchId: string, entryId: string) => {
-      store.getState().rejectReviewEntry(batchId, entryId);
-    },
-    [store],
-  );
-
-  const handleAcceptAllBatch = useCallback(
-    (batchId: string) => {
-      const reviewState = store.getState().reviewState;
-      const batch = reviewState?.batches.find((item) => item.id === batchId);
-      if (!batch) return;
-
-      const pendingEntries = batch.entries.filter((e) => e.status === 'pending');
-      for (const entry of pendingEntries) {
-        store.getState().acceptReviewEntry(batchId, entry.id);
-      }
-
-      editor.update(() => {
-        const root = $getRoot();
-        const lastInserted = new Map<string, LexicalNode>();
-
-        for (const entry of pendingEntries) {
-          const { op } = entry;
-
-          if (op.op === 'insert') {
-            const serializedNode = getSanitizedOperationNode(op);
-            if (!serializedNode) continue;
-            const newNode = $parseSerializedNode(serializedNode);
-            if (op.position.type === 'root') {
-              const idx = op.position.index ?? root.getChildrenSize();
-              const children = root.getChildren();
-              if (idx >= children.length) root.append(newNode);
-              else children[idx].insertBefore(newNode);
-            } else {
-              const anchorKey = `${op.position.type}:${op.position.blockId}`;
-              const prev = lastInserted.get(anchorKey);
-              if (prev) {
-                prev.insertAfter(newNode);
-              } else {
-                const target = $findBlockByBlockId(editor, op.position.blockId);
-                if (!target) continue;
-                if (op.position.type === 'after') target.insertAfter(newNode);
-                else target.insertBefore(newNode);
-              }
-              lastInserted.set(anchorKey, newNode);
-            }
-            continue;
-          }
-
-          if (op.op === 'replace') {
-            const serializedNode = getSanitizedOperationNode(op);
-            if (!serializedNode) continue;
-            const target = $findBlockByBlockId(editor, op.blockId);
-            if (!target) continue;
-            const newNode = $parseSerializedNode(serializedNode);
-            preserveBlockState(target, newNode);
-            target.replace(newNode);
-            continue;
-          }
-
-          if (op.op === 'delete') {
-            const target = $findBlockByBlockId(editor, op.blockId);
-            if (!target) continue;
-            target.remove();
-          }
-        }
-      });
-    },
-    [store, editor],
-  );
-
-  const handleRejectAllBatch = useCallback(
-    (batchId: string) => {
-      store.getState().rejectReviewBatch(batchId);
-    },
-    [store],
-  );
-
-  const repositionPanels = useCallback(() => {
-    if (!containerEl) return;
-    const containerRect = containerEl.getBoundingClientRect();
-
-    const afterAccum = new Map<HTMLElement, number>();
-    const beforeAccum = new Map<HTMLElement, number>();
-
-    for (const overlay of overlays) {
-      if (!overlay.blockEl || overlay.type === 'delete') continue;
-      const previewEl = previewRefs.current.get(overlay.id);
-      const previewHeight = previewEl?.offsetHeight ?? 0;
-
-      if (overlay.spacing === 'overlay') {
-        overlay.blockEl.style.visibility = 'hidden';
-        const heightDiff = previewHeight - overlay.blockEl.offsetHeight;
-        overlay.blockEl.style.marginBottom = heightDiff > 0 ? `${heightDiff}px` : '';
-      } else if (overlay.spacing === 'before') {
-        const prev = beforeAccum.get(overlay.blockEl) ?? 0;
-        beforeAccum.set(overlay.blockEl, prev + previewHeight + INSERT_GAP);
-        overlay.blockEl.style.marginTop = `${beforeAccum.get(overlay.blockEl)!}px`;
-      } else if (overlay.spacing === 'after') {
-        const prev = afterAccum.get(overlay.blockEl) ?? 0;
-        afterAccum.set(overlay.blockEl, prev + previewHeight + INSERT_GAP);
-        overlay.blockEl.style.marginBottom = `${afterAccum.get(overlay.blockEl)!}px`;
-      }
-    }
-
-    const afterOffset = new Map<HTMLElement, number>();
-    const beforeOffset = new Map<HTMLElement, number>();
-
-    for (const overlay of overlays) {
-      if (!overlay.blockEl || overlay.type === 'delete') continue;
-      const panelEl = previewRefs.current.get(overlay.id);
-      if (!panelEl) continue;
-
-      const blockRect = overlay.blockEl.getBoundingClientRect();
-      let newTop: number;
-      if (overlay.spacing === 'overlay') {
-        newTop = blockRect.top - containerRect.top;
-      } else if (overlay.spacing === 'after') {
-        const offset = afterOffset.get(overlay.blockEl) ?? 0;
-        newTop = blockRect.bottom - containerRect.top + INSERT_GAP + offset;
-        afterOffset.set(overlay.blockEl, offset + (panelEl.offsetHeight ?? 0) + INSERT_GAP);
-      } else {
-        const offset = beforeOffset.get(overlay.blockEl) ?? 0;
-        newTop =
-          blockRect.top - containerRect.top - (beforeAccum.get(overlay.blockEl) ?? 0) + offset;
-        beforeOffset.set(overlay.blockEl, offset + (panelEl.offsetHeight ?? 0) + INSERT_GAP);
-      }
-      panelEl.style.top = `${newTop}px`;
-    }
-
-    // 定位 delete action bar：悬浮于 block 上缘右侧，right 对齐 block.right
-    for (const overlay of overlays) {
-      if (overlay.type !== 'delete' || !overlay.blockEl) continue;
-      const barEl = deleteBarRefs.current.get(overlay.id);
-      if (!barEl) continue;
-      const blockRect = overlay.blockEl.getBoundingClientRect();
-      barEl.style.top = `${blockRect.top - containerRect.top}px`;
-      barEl.style.right = `${containerRect.right - blockRect.right}px`;
-    }
-  }, [overlays, containerEl]);
-
-  useEffect(() => {
-    repositionRef.current = repositionPanels;
-  }, [repositionPanels]);
-
-  const scheduleReposition = useCallback(() => {
-    if (rafPendingRef.current) return;
-    rafPendingRef.current = true;
-    requestAnimationFrame(() => {
-      rafPendingRef.current = false;
-      repositionRef.current();
-    });
-  }, []);
-
-  useLayoutEffect(() => {
-    repositionPanels();
-    // 次轮补正：上方 overlay 插 margin 后连锁偏移
-    scheduleReposition();
-  }, [repositionPanels, scheduleReposition]);
-
-  useEffect(() => {
-    const observer = new ResizeObserver(() => scheduleReposition());
-    observerRef.current = observer;
-    for (const el of previewRefs.current.values()) {
-      observer.observe(el);
-    }
-    // 监听 block 与容器尺寸变化
-    const blockEls = new Set<HTMLElement>();
-    for (const overlay of overlays) {
-      if (overlay.blockEl && !blockEls.has(overlay.blockEl)) {
-        blockEls.add(overlay.blockEl);
-        observer.observe(overlay.blockEl);
-      }
-    }
-    if (containerEl) observer.observe(containerEl);
-
-    const onWinChange = () => scheduleReposition();
-    window.addEventListener('resize', onWinChange, { passive: true });
-    window.addEventListener('scroll', onWinChange, { passive: true, capture: true });
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', onWinChange);
-      window.removeEventListener('scroll', onWinChange, { capture: true } as any);
-      // 不 cancel rAF：effect 因 overlays 变动而反复 cleanup，若 cancel 则 reposition 永不跑
-    };
-  }, [scheduleReposition, overlays, containerEl]);
-
-  const previewRefCallback = useCallback(
-    (id: string) => (el: HTMLDivElement | null) => {
-      if (el) {
-        previewRefs.current.set(id, el);
-        observerRef.current?.observe(el);
-      } else {
-        previewRefs.current.delete(id);
-      }
-    },
-    [],
-  );
-
-  const deleteBarRefCallback = useCallback(
-    (id: string) => (el: HTMLDivElement | null) => {
-      if (el) {
-        deleteBarRefs.current.set(id, el);
-      } else {
-        deleteBarRefs.current.delete(id);
-      }
-    },
-    [],
-  );
-
-  const computeOverlays = useCallback(() => {
-    const reviewState = store.getState().reviewState;
-    if (!reviewState) {
-      setOverlays([]);
-      return;
-    }
-
-    const visibleBatches = reviewState.batches.filter(
-      (batch) => batch.status === 'pending' || batch.status === 'order_dependent',
-    );
-    if (visibleBatches.length === 0) {
-      setOverlays([]);
-      return;
-    }
-
-    const rootEl = editor.getRootElement();
-    if (!rootEl) {
-      setOverlays([]);
-      return;
-    }
-
-    const container = rootEl.parentElement ?? rootEl;
-    const containerRect = container.getBoundingClientRect();
-    const entries: OverlayEntry[] = [];
-
+  const refreshPendingSummary = useCallback(() => {
     editor.getEditorState().read(() => {
-      const root = $getRoot();
-      const children = root.getChildren();
+      const documentSummary = getDocumentDiffSummary();
+      setPendingSummary(
+        documentSummary.pendingCount > 0 ? documentSummary : getPendingReviewSummary(store),
+      );
+    });
+  }, [editor, store]);
 
-      for (const batch of visibleBatches) {
-        const baseChildren = (batch.baseSnapshot.root as any).children as SerializedLexicalNode[];
-        const blockMap = new Map<string, SerializedLexicalNode>();
-        for (const child of baseChildren) {
-          const blockId = getBlockId(child);
-          if (blockId) blockMap.set(blockId, child);
+  const reconcileDiffNodes = useCallback(() => {
+    const reviewState = store.getState().reviewState;
+    if (!reviewState || !editor.hasNodes([AgentDiffEditNode])) return;
+
+    editor.update(() => {
+      const root = $getRoot();
+      const batchesById = new Map(reviewState.batches.map((batch) => [batch.id, batch]));
+      const entriesById = new Map<string, { batch: ReviewBatch; entry: ReviewEntry }>();
+      const activeNodeIds = new Set<string>();
+
+      for (const batch of reviewState.batches) {
+        for (const entry of batch.entries) {
+          entriesById.set(`${batch.id}:${entry.id}`, { batch, entry });
         }
+      }
+
+      for (const child of root.getChildren()) {
+        if (!$isAgentDiffNode(child)) continue;
+
+        const nodeBatchId = child.getBatchId();
+        const nodeEntryId = child.getDiffEntryId();
+        const batch = batchesById.get(nodeBatchId);
+        const matched = entriesById.get(`${nodeBatchId}:${nodeEntryId}`);
+
+        if (!batch || !matched) {
+          $resolveDiffNode(child, 'rejected');
+          continue;
+        }
+
+        const resolution = getEntryResolution(matched.entry) ?? getBatchResolution(batch);
+        if (resolution) {
+          $resolveDiffNode(child, resolution);
+          continue;
+        }
+
+        activeNodeIds.add(`${nodeBatchId}:${nodeEntryId}`);
+      }
+
+      const insertedByAnchor = new Map<string, LexicalNode>();
+
+      for (const batch of reviewState.batches) {
+        if (!isVisibleBatch(batch)) continue;
 
         for (const entry of batch.entries) {
           if (entry.status !== 'pending') continue;
+          const entryKey = `${batch.id}:${entry.id}`;
+          if (activeNodeIds.has(entryKey)) continue;
 
-          if (entry.op.op === 'insert') {
-            if (!entry.op.node?.type) continue;
+          const diffNode = $createAgentDiffEditNode(getPayload(batch, entry));
 
-            if (entry.anchorBeforeId) {
-              const beforeChild = children.find(
-                (child) => getRenderedBlockId(editor, child) === entry.anchorBeforeId,
+          if (entry.op.op === 'replace' || entry.op.op === 'delete') {
+            const target = $findBlockByBlockId(entry.op.blockId);
+            if (target) target.replace(diffNode);
+            continue;
+          }
+
+          if (entry.anchorBeforeId) {
+            const anchor = $findBlockByBlockId(entry.anchorBeforeId);
+            if (anchor) {
+              insertAfterAnchor(
+                insertedByAnchor,
+                `after:${entry.anchorBeforeId}`,
+                anchor,
+                diffNode,
               );
-              if (!beforeChild) continue;
-              const domEl = editor.getElementByKey(beforeChild.getKey());
-              if (!domEl) continue;
-              const rect = domEl.getBoundingClientRect();
-
-              entries.push({
-                id: entry.id,
-                batchId: batch.id,
-                type: 'insert',
-                blockEl: domEl,
-                blockTop: rect.bottom - containerRect.top,
-                blockHeight: rect.height,
-                newNode: decorateSubtree(entry.op.node, 'insert'),
-                previewTop: rect.bottom - containerRect.top + INSERT_GAP,
-                spacing: 'after',
-              });
               continue;
             }
+          }
 
-            if (entry.anchorAfterId) {
-              const afterChild = children.find(
-                (child) => getRenderedBlockId(editor, child) === entry.anchorAfterId,
+          if (entry.anchorAfterId) {
+            const anchor = $findBlockByBlockId(entry.anchorAfterId);
+            if (anchor) {
+              insertBeforeAnchor(
+                insertedByAnchor,
+                `before:${entry.anchorAfterId}`,
+                anchor,
+                diffNode,
               );
-              if (!afterChild) continue;
-              const domEl = editor.getElementByKey(afterChild.getKey());
-              if (!domEl) continue;
-              const rect = domEl.getBoundingClientRect();
-
-              entries.push({
-                id: entry.id,
-                batchId: batch.id,
-                type: 'insert',
-                blockEl: domEl,
-                blockTop: rect.top - containerRect.top,
-                blockHeight: rect.height,
-                newNode: decorateSubtree(entry.op.node, 'insert'),
-                previewTop: rect.top - containerRect.top,
-                spacing: 'before',
-              });
+              continue;
             }
-
-            continue;
           }
 
-          const blockId = entry.targetBlockId;
-          if (!blockId) continue;
-
-          const child = children.find((item) => getRenderedBlockId(editor, item) === blockId);
-          if (!child) continue;
-          const domEl = editor.getElementByKey(child.getKey());
-          if (!domEl) continue;
-          const rect = domEl.getBoundingClientRect();
-
-          if (entry.op.op === 'delete') {
-            entries.push({
-              id: entry.id,
-              batchId: batch.id,
-              type: 'delete',
-              blockEl: domEl,
-              blockTop: rect.top - containerRect.top,
-              blockHeight: rect.height,
-              spacing: 'none',
-            });
-            continue;
+          if (entry.op.position.type === 'root') {
+            const idx = entry.op.position.index ?? root.getChildrenSize();
+            const children = root.getChildren();
+            if (idx >= children.length) root.append(diffNode);
+            else children[idx].insertBefore(diffNode);
           }
-
-          const baseNode = blockMap.get(blockId);
-          if (!baseNode || !entry.op.node?.type) continue;
-          const modified = diffModifiedNode(baseNode, entry.op.node);
-
-          entries.push({
-            id: entry.id,
-            batchId: batch.id,
-            type: 'replace',
-            blockEl: domEl,
-            blockTop: rect.top - containerRect.top,
-            blockHeight: rect.height,
-            oldNode: modified.oldNode,
-            newNode: modified.newNode,
-            previewTop: rect.top - containerRect.top,
-            spacing: 'overlay',
-          });
         }
       }
-    });
-
-    setOverlays((prev) => {
-      // 结构等价则复用旧数组，避 editor 频发 update 触发全链重渲而闪
-      if (prev.length !== entries.length) return entries;
-      for (let i = 0; i < entries.length; i++) {
-        const a = prev[i];
-        const b = entries[i];
-        if (
-          a.id !== b.id ||
-          a.batchId !== b.batchId ||
-          a.type !== b.type ||
-          a.blockEl !== b.blockEl ||
-          a.spacing !== b.spacing
-        ) {
-          return entries;
-        }
-      }
-      return prev;
     });
   }, [editor, store]);
 
   useEffect(() => {
-    for (const overlay of overlays) {
-      resetBlockDecorations(overlay);
-      if (overlay.type === 'delete') {
-        applyDeleteDecorations(overlay);
-      }
-    }
+    reconcileDiffNodes();
+    refreshPendingSummary();
 
-    return () => {
-      for (const overlay of overlays) {
-        resetBlockDecorations(overlay);
-      }
-    };
-  }, [overlays]);
+    return store.subscribe(() => {
+      reconcileDiffNodes();
+      refreshPendingSummary();
+    });
+  }, [reconcileDiffNodes, refreshPendingSummary, store]);
 
   useEffect(() => {
-    const rootEl = editor.getRootElement();
-    if (rootEl) {
-      const wrapper = rootEl.parentElement;
-      if (wrapper) {
-        wrapper.style.position = 'relative';
-        setContainerEl(wrapper);
+    return editor.registerUpdateListener(({ editorState }) => {
+      editorState.read(() => {
+        const documentSummary = getDocumentDiffSummary();
+        setPendingSummary(
+          documentSummary.pendingCount > 0 ? documentSummary : getPendingReviewSummary(store),
+        );
+      });
+    });
+  }, [editor, store]);
+
+  const resolveAllDiffNodes = useCallback(
+    (side: 'accepted' | 'rejected') => {
+      const batchIds = new Set<string>();
+
+      editor.update(() => {
+        for (const child of $getRoot().getChildren()) {
+          if (!$isAgentDiffNode(child)) continue;
+          batchIds.add(child.getBatchId());
+          $resolveDiffNode(child, side);
+        }
+      });
+
+      const targetBatchIds = batchIds.size > 0 ? [...batchIds] : pendingSummary.batchIds;
+      for (const batchId of targetBatchIds) {
+        if (side === 'accepted') {
+          store.getState().acceptReviewBatch(batchId);
+        } else {
+          store.getState().rejectReviewBatch(batchId);
+        }
       }
-    }
-  }, [editor]);
+    },
+    [editor, pendingSummary.batchIds, store],
+  );
 
-  useEffect(() => {
-    const unsub = store.subscribe(() => computeOverlays());
-    return unsub;
-  }, [computeOverlays, store]);
-
-  useEffect(
-    () => editor.registerUpdateListener(() => computeOverlays()),
-    [computeOverlays, editor],
+  const actions = useMemo(
+    () => ({
+      acceptNode: (nodeKey: string, batchId: string, entryId: string) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey);
+          if (node) $resolveDiffNode(node, 'accepted');
+        });
+        store.getState().acceptReviewEntry(batchId, entryId);
+      },
+      rejectNode: (nodeKey: string, batchId: string, entryId: string) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey);
+          if (node) $resolveDiffNode(node, 'rejected');
+        });
+        store.getState().rejectReviewEntry(batchId, entryId);
+      },
+    }),
+    [editor, store],
   );
 
   useEffect(() => {
-    computeOverlays();
-  }, [computeOverlays]);
+    setAgentDiffReviewController(editor, actions);
+    return () => setAgentDiffReviewController(editor, null);
+  }, [actions, editor]);
 
-  const pendingCount = overlays.length;
+  if (pendingSummary.pendingCount === 0) return null;
 
-  if (!containerEl || overlays.length === 0) return null;
-
-  return createPortal(
-    <div className={overlayContainer}>
-      {Array.from(batchGroups.entries()).map(([batchId, entries]) =>
-        entries.map((entry) => {
-          if (entry.previewTop == null) return null;
-          return (
-            <InlineEntryPanel
-              batchId={batchId}
-              entry={entry}
-              extraNodes={extraNodes}
-              key={entry.id}
-              previewRefCallback={previewRefCallback}
-              rendererConfig={rendererConfig}
-              theme={theme}
-              variant={variant}
-              onAcceptEntry={handleAcceptEntry}
-              onRejectEntry={handleRejectEntry}
-            />
-          );
-        }),
-      )}
-      {deleteEntries.map((entry) => (
-        <div className={deleteActionBar} key={entry.id} ref={deleteBarRefCallback(entry.id)}>
-          <button
-            className={batchHeaderReject}
-            type="button"
-            onClick={() => handleRejectEntry(entry.batchId, entry.id)}
-          >
-            Reject
-          </button>
-          <button
-            className={batchHeaderAccept}
-            type="button"
-            onClick={() => handleAcceptEntry(entry.batchId, entry.id)}
-          >
-            Accept
-          </button>
-        </div>
-      ))}
-      {pendingCount > 1 && (
-        <div className={floatingBar}>
-          <span className={floatingBarLabel}>{pendingCount} changes</span>
-          {Array.from(batchGroups.keys()).map((batchId) => (
-            <span key={batchId}>
-              <button
-                className={floatingBarReject}
-                type="button"
-                onClick={() => handleRejectAllBatch(batchId)}
-              >
-                Reject All
-              </button>
-              <button
-                className={floatingBarAccept}
-                type="button"
-                onClick={() => handleAcceptAllBatch(batchId)}
-              >
-                Accept All
-              </button>
-            </span>
-          ))}
-        </div>
-      )}
-    </div>,
-    containerEl,
+  return (
+    <div className={diffGlobalBar}>
+      <div className={diffGlobalMeta}>
+        <span className={diffGlobalTitle}>AI review</span>
+        <span className={diffGlobalCount}>
+          {pendingSummary.pendingCount} pending change
+          {pendingSummary.pendingCount === 1 ? '' : 's'}
+        </span>
+      </div>
+      <div className={diffGlobalActions}>
+        <ActionButton
+          danger
+          title="Reject all changes"
+          variant="outline"
+          onClick={() => resolveAllDiffNodes('rejected')}
+        >
+          <XCircle size={14} />
+          Reject all
+        </ActionButton>
+        <ActionButton
+          title="Accept all changes"
+          variant="solid"
+          onClick={() => resolveAllDiffNodes('accepted')}
+        >
+          <CheckCheck size={14} />
+          Accept all
+        </ActionButton>
+      </div>
+    </div>
   );
 }

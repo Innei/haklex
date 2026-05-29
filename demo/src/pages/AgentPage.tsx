@@ -3,9 +3,9 @@ import { ChatPanel } from '@haklex/rich-agent-chat';
 import type { LLMProvider } from '@haklex/rich-agent-core';
 import { createAgentStore, createDirectTransport, createProvider } from '@haklex/rich-agent-core';
 import { getVariantClass } from '@haklex/rich-editor';
-import { blockIdState } from '@haklex/rich-editor/plugins';
 import {
   AgentAskAIAction,
+  AgentDiffEditNode,
   AgentPanelPlugin,
   AgentSelectionPinPlugin,
   DiffReviewOverlayPlugin,
@@ -15,14 +15,7 @@ import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import {
-  $getRoot,
-  $getState,
-  $parseSerializedNode,
-  type LexicalEditor as LexicalEditorInstance,
-  type LexicalNode,
-  type SerializedEditorState,
-} from 'lexical';
+import { type LexicalEditor as LexicalEditorInstance, type SerializedEditorState } from 'lexical';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useFullWidth } from '../context/FullWidthContext';
@@ -280,16 +273,6 @@ const initialContent: SerializedEditorState = {
   },
 } as any;
 
-function $findBlockByBlockId(blockId: string): LexicalNode | null {
-  const root = $getRoot();
-  for (const child of root.getChildren()) {
-    if ($getState(child, blockIdState) === blockId) {
-      return child;
-    }
-  }
-  return null;
-}
-
 function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentStore> }) {
   const theme = useTheme();
   const [providers] = useState<DemoProviderConfig[]>(loadProviders);
@@ -361,49 +344,6 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
   const handleAcceptBatch = useCallback(
     (batchId: string) => {
       store.getState().acceptReviewBatch(batchId);
-      const reviewState = store.getState().reviewState;
-      const batch = reviewState?.batches.find((b) => b.id === batchId);
-      if (!batch || !editorRef.current) return;
-
-      const editor = editorRef.current;
-      editor.update(() => {
-        const root = $getRoot();
-        const lastInserted = new Map<string, LexicalNode>();
-        for (const entry of batch.entries) {
-          const { op } = entry;
-          if (op.op === 'insert') {
-            if (!op.node?.type) continue;
-            const newNode = $parseSerializedNode(op.node);
-            if (op.position.type === 'root') {
-              const idx = op.position.index ?? root.getChildrenSize();
-              const children = root.getChildren();
-              if (idx >= children.length) root.append(newNode);
-              else children[idx].insertBefore(newNode);
-            } else {
-              const anchorKey = `${op.position.type}:${op.position.blockId}`;
-              const prev = lastInserted.get(anchorKey);
-              if (prev) {
-                prev.insertAfter(newNode);
-              } else {
-                const target = $findBlockByBlockId(op.position.blockId);
-                if (!target) continue;
-                if (op.position.type === 'after') target.insertAfter(newNode);
-                else target.insertBefore(newNode);
-              }
-              lastInserted.set(anchorKey, newNode);
-            }
-          } else if (op.op === 'replace') {
-            if (!op.node?.type) continue;
-            const target = $findBlockByBlockId(op.blockId);
-            if (!target) continue;
-            target.replace($parseSerializedNode(op.node));
-          } else if (op.op === 'delete') {
-            const target = $findBlockByBlockId(op.blockId);
-            if (!target) continue;
-            target.remove();
-          }
-        }
-      });
     },
     [store],
   );
@@ -420,6 +360,7 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
       <div className="agent-pane-editor">
         <MentionPlatformProvider platforms={{}}>
           <LexicalEditor
+            extraNodes={[AgentDiffEditNode]}
             floatingToolbarActions={provider ? <AgentAskAIAction /> : undefined}
             header={<ToolbarPlugin />}
             initialValue={initialContent}

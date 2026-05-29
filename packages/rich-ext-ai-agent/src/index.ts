@@ -5,6 +5,8 @@ export { AgentAskAIAction } from './components/AgentAskAIAction';
 export { useAgentLoop } from './hooks/useAgentLoop';
 export { defaultAgentSystemMessage, defaultAgentSystemRole } from './messageEngine';
 export { AgentDiffEditNode } from './nodes/AgentDiffEditNode';
+export type { AgentDiffNodePayload, AgentDiffOpType } from './nodes/diff-node-state';
+export { projectAgentDiffNodesToFactualState } from './nodes/diff-node-state';
 export { AgentPanelPlugin } from './plugins/AgentPanelPlugin';
 export { AgentSelectionPinPlugin } from './plugins/AgentSelectionPinPlugin';
 export { DiffApplyPlugin } from './plugins/DiffApplyPlugin';

@@ -4,28 +4,32 @@ import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
 import { AgentDiffRenderer } from '../renderers/AgentDiffRenderer';
+import type { AgentDiffNodePayload, AgentDiffOpType } from './diff-node-state';
 
-export type SerializedAgentDiffNode = Spread<
-  { diffEntryId: string; opType: 'insert' | 'replace' | 'delete' },
-  SerializedLexicalNode
->;
+export type SerializedAgentDiffNode = Spread<AgentDiffNodePayload, SerializedLexicalNode>;
 
 export class AgentDiffNode extends DecoratorNode<ReactElement> {
+  __batchId: string;
   __diffEntryId: string;
-  __opType: 'insert' | 'replace' | 'delete';
+  __opType: AgentDiffOpType;
+  __originalNode: SerializedLexicalNode | null;
+  __proposedNode: SerializedLexicalNode | null;
 
   static getType(): string {
     return 'agent-diff';
   }
 
   static clone(node: AgentDiffNode): AgentDiffNode {
-    return new AgentDiffNode(node.__diffEntryId, node.__opType, node.__key);
+    return new AgentDiffNode(node.getPayload(), node.__key);
   }
 
-  constructor(diffEntryId: string, opType: 'insert' | 'replace' | 'delete', key?: NodeKey) {
+  constructor(payload: AgentDiffNodePayload, key?: NodeKey) {
     super(key);
-    this.__diffEntryId = diffEntryId;
-    this.__opType = opType;
+    this.__batchId = payload.batchId;
+    this.__diffEntryId = payload.diffEntryId;
+    this.__opType = payload.opType;
+    this.__originalNode = payload.originalNode ?? null;
+    this.__proposedNode = payload.proposedNode ?? null;
   }
 
   createDOM(): HTMLElement {
@@ -43,32 +47,63 @@ export class AgentDiffNode extends DecoratorNode<ReactElement> {
   }
 
   static importJSON(json: SerializedAgentDiffNode): AgentDiffNode {
-    return new AgentDiffNode(json.diffEntryId, json.opType);
+    return new AgentDiffNode({
+      batchId: json.batchId ?? '',
+      diffEntryId: json.diffEntryId,
+      opType: json.opType,
+      originalNode: json.originalNode ?? null,
+      proposedNode: json.proposedNode ?? null,
+    });
+  }
+
+  getPayload(): AgentDiffNodePayload {
+    return {
+      batchId: this.__batchId,
+      diffEntryId: this.__diffEntryId,
+      opType: this.__opType,
+      originalNode: this.__originalNode,
+      proposedNode: this.__proposedNode,
+    };
+  }
+
+  getBatchId(): string {
+    return this.__batchId;
+  }
+
+  getDiffEntryId(): string {
+    return this.__diffEntryId;
+  }
+
+  getOpType(): AgentDiffOpType {
+    return this.__opType;
   }
 
   exportJSON(): SerializedAgentDiffNode {
     return {
       ...super.exportJSON(),
+      batchId: this.__batchId,
       diffEntryId: this.__diffEntryId,
       opType: this.__opType,
+      originalNode: this.__originalNode,
+      proposedNode: this.__proposedNode,
       type: 'agent-diff',
-      version: 1,
+      version: 2,
     };
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createElement(AgentDiffRenderer, {
+      batchId: this.__batchId,
       diffEntryId: this.__diffEntryId,
       opType: this.__opType,
+      originalNode: this.__originalNode,
+      proposedNode: this.__proposedNode,
     });
   }
 }
 
-export function $createAgentDiffNode(
-  diffEntryId: string,
-  opType: 'insert' | 'replace' | 'delete',
-): AgentDiffNode {
-  return new AgentDiffNode(diffEntryId, opType);
+export function $createAgentDiffNode(payload: AgentDiffNodePayload): AgentDiffNode {
+  return new AgentDiffNode(payload);
 }
 
 export function $isAgentDiffNode(node: unknown): node is AgentDiffNode {

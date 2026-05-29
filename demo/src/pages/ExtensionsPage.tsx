@@ -1,10 +1,11 @@
 import '@haklex/rich-diff/style.css';
 
+import { createAgentStore, createReviewBatch } from '@haklex/rich-agent-core';
 import { RichRenderer } from '@haklex/rich-compose';
 import { RichDiff } from '@haklex/rich-diff';
 import type { RichEditorVariant } from '@haklex/rich-editor';
 import { ColorSchemeProvider, getVariantClass } from '@haklex/rich-editor';
-import { AgentDiffEditNode } from '@haklex/rich-ext-ai-agent';
+import { AgentDiffEditNode, DiffReviewOverlayPlugin } from '@haklex/rich-ext-ai-agent';
 import type { ChatMessage, ChatParticipant, ChatVariant } from '@haklex/rich-ext-chat';
 import { ChatRenderer } from '@haklex/rich-ext-chat/static';
 import type { CodeFile } from '@haklex/rich-ext-code-snippet';
@@ -23,7 +24,7 @@ import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static';
 import { MermaidEditRenderer, MermaidRenderer } from '@haklex/rich-renderer-mermaid';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import type { SerializedEditorState } from 'lexical';
-import { type FC, useCallback, useState } from 'react';
+import { type FC, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { Panel } from '../components/Panel';
 import { useFullWidth } from '../context/FullWidthContext';
@@ -66,6 +67,13 @@ const extensions: Extension[] = [
     preview: 'Diff',
   },
   {
+    id: 'agent-diff-node',
+    name: 'Agent Diff Node',
+    description: 'Reviewable AI-edit proposal rendered as a real Lexical node.',
+    packageName: 'rich-ext-ai-agent',
+    preview: 'Agent Diff',
+  },
+  {
     id: 'linkcard',
     name: 'Link Card',
     description: 'URL preview cards with extensible plugin matching.',
@@ -103,6 +111,32 @@ const extensions: Extension[] = [
 ];
 
 const liteXmlEditorExtraNodes = [AgentDiffEditNode];
+
+function demoTextNode(text: string, format = 0) {
+  return {
+    type: 'text',
+    text,
+    detail: 0,
+    format,
+    mode: 'normal',
+    style: '',
+    version: 1,
+  };
+}
+
+function demoParagraph(text: string, blockId: string) {
+  return {
+    type: 'paragraph',
+    children: [demoTextNode(text)],
+    direction: 'ltr',
+    format: '',
+    indent: 0,
+    textFormat: 0,
+    textStyle: '',
+    version: 1,
+    $: { blockId },
+  };
+}
 
 const liteXmlInitialContent: SerializedEditorState = {
   root: {
@@ -617,6 +651,86 @@ function DiffDetail() {
         </Panel>
       </div>
     </>
+  );
+}
+
+// ── Agent Diff Node Section ──────────────────────────────────
+
+const agentDiffBaseContent: SerializedEditorState = {
+  root: {
+    type: 'root',
+    children: [
+      demoParagraph(
+        'The agent proposes changes as persistent Lexical nodes, not external overlay DOM.',
+        'agent-diff-source-1',
+      ),
+      demoParagraph(
+        'Pending proposals remain reviewable while undo and redo can traverse the node insertion.',
+        'agent-diff-source-2',
+      ),
+      demoParagraph(
+        'The next agent turn should read the factual document by projecting pending diff nodes back to the pre-accept side.',
+        'agent-diff-source-3',
+      ),
+    ],
+    direction: 'ltr',
+    format: '',
+    indent: 0,
+    version: 1,
+  },
+};
+
+const agentDiffOperations = [
+  {
+    op: 'replace' as const,
+    blockId: 'agent-diff-source-1',
+    node: demoParagraph(
+      'The agent now proposes changes as durable Lexical diff nodes with real document placement.',
+      'agent-diff-source-1',
+    ),
+  },
+  {
+    op: 'insert' as const,
+    position: { type: 'after' as const, blockId: 'agent-diff-source-2' },
+    node: demoParagraph(
+      'Inserted proposals occupy their final document position before acceptance.',
+      'agent-diff-inserted-1',
+    ),
+  },
+  {
+    op: 'delete' as const,
+    blockId: 'agent-diff-source-3',
+  },
+];
+
+function AgentDiffSeed({ store }: { store: ReturnType<typeof createAgentStore> }) {
+  useEffect(() => {
+    const batch = createReviewBatch(agentDiffOperations, agentDiffBaseContent, 0);
+    store.getState().setReviewState({ documentRevision: 0, batches: [] });
+    store.getState().addReviewBatch(batch);
+  }, [store]);
+
+  return null;
+}
+
+function AgentDiffNodeDetail() {
+  const theme = useTheme();
+  const store = useMemo(() => createAgentStore(), []);
+
+  return (
+    <Panel badge={`real node · ${theme}`} bodyStyle={{ padding: 0 }} title="AI Agent Diff Node">
+      <LexicalEditor
+        extraNodes={[AgentDiffEditNode]}
+        header={<ToolbarPlugin />}
+        initialValue={agentDiffBaseContent}
+        placeholder="Agent diff node demo"
+        theme={theme}
+        variant="article"
+      >
+        <DiffReviewOverlayPlugin store={store} />
+        <AgentDiffSeed store={store} />
+      </LexicalEditor>
+    </Panel>
   );
 }
 
@@ -1166,6 +1280,9 @@ function ExtensionDetail({ id }: { id: string }) {
     }
     case 'diff': {
       return <DiffDetail />;
+    }
+    case 'agent-diff-node': {
+      return <AgentDiffNodeDetail />;
     }
     case 'gallery': {
       return <GalleryDetail />;
