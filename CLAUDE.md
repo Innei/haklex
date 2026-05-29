@@ -83,16 +83,15 @@ Shiroi / Yohaku (Next.js frontends)
   └── @haklex/{rich-compose, rich-editor, rich-ext-*, rich-renderer-*, rich-style-token}
       Compose modules + a per-app ShiroEditor/ShiroRenderer wrapper
 
-admin-vue3 (Vue 3 dashboard, ../admin-vue3)
-  └── packages/rich-react/src/shiro/ — local ShiroEditor + ShiroRenderer copies
-      React-in-Vue bridge: createRoot() inside Vue defineComponent (src/components/editor/rich/RichEditor.tsx)
+mx-core/apps/admin (React dashboard, ../mx-core/apps/admin)
+  └── @haklex/rich-editor + @haklex/rich-renderer-* as ordinary React components
 
 mx-core (NestJS backend, ../mx-core)
   └── @haklex/rich-headless
       Server-side: createHeadlessEditor() + allHeadlessNodes + $toMarkdown() for Lexical JSON → Markdown
 ```
 
-**Release flow**: `pnpm release:rich` → bump + build + publish to npm. Then update pinned versions in `admin-vue3/package.json` and `mx-core/apps/core/package.json`.
+**Release flow**: `pnpm release:rich` → bump + build + publish to npm. Then update pinned versions in `mx-core/apps/admin/package.json` (dashboard) and `mx-core/apps/core/package.json` (server).
 
 ## Adding New Nodes Checklist
 
