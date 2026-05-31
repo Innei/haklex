@@ -1,7 +1,9 @@
 import type { LexicalEditor } from 'lexical';
 
 export type AgentDiffReviewActions = {
+  acceptBatch: (batchId: string) => void;
   acceptNode: (nodeKey: string, batchId: string, entryId: string) => void;
+  rejectBatch: (batchId: string) => void;
   rejectNode: (nodeKey: string, batchId: string, entryId: string) => void;
 };
 

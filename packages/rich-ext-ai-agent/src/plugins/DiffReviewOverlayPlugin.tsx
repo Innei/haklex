@@ -355,14 +355,39 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     [editor, pendingSummary.batchIds, store],
   );
 
+  const resolveBatchDiffNodes = useCallback(
+    (batchId: string, side: 'accepted' | 'rejected') => {
+      editor.update(() => {
+        for (const child of $getRoot().getChildren()) {
+          if (!$isAgentDiffNode(child)) continue;
+          if (child.getBatchId() !== batchId) continue;
+          $resolveDiffNode(child, side);
+        }
+      });
+
+      if (side === 'accepted') {
+        store.getState().acceptReviewBatch(batchId);
+      } else {
+        store.getState().rejectReviewBatch(batchId);
+      }
+    },
+    [editor, store],
+  );
+
   const actions = useMemo(
     () => ({
+      acceptBatch: (batchId: string) => {
+        resolveBatchDiffNodes(batchId, 'accepted');
+      },
       acceptNode: (nodeKey: string, batchId: string, entryId: string) => {
         editor.update(() => {
           const node = $getNodeByKey(nodeKey);
           if (node) $resolveDiffNode(node, 'accepted');
         });
         store.getState().acceptReviewEntry(batchId, entryId);
+      },
+      rejectBatch: (batchId: string) => {
+        resolveBatchDiffNodes(batchId, 'rejected');
       },
       rejectNode: (nodeKey: string, batchId: string, entryId: string) => {
         editor.update(() => {
@@ -372,7 +397,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
         store.getState().rejectReviewEntry(batchId, entryId);
       },
     }),
-    [editor, store],
+    [editor, resolveBatchDiffNodes, store],
   );
 
   useEffect(() => {

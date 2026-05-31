@@ -230,6 +230,7 @@ export class AgentMessagesEngine extends MessagesEngine {
 
   processWithEditor(params: {
     editorState: SerializedEditorState;
+    messages?: ChatMessage[];
     userInput: string;
     title?: string;
     selection?: CapturedSelection | null;
@@ -249,7 +250,7 @@ export class AgentMessagesEngine extends MessagesEngine {
         : undefined;
 
     return this.process({
-      messages: [userMessage],
+      messages: [...(params.messages ?? []), userMessage],
       pageContentContext: {
         metadata: { title: params.title ?? 'Current Document' },
         xml: buildDocumentContext(params.editorState, {

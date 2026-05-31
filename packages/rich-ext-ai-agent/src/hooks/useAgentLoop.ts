@@ -14,6 +14,7 @@ import { useCallback, useRef } from 'react';
 import { $captureSelection } from '../captureSelection';
 import { AgentMessagesEngine } from '../messageEngine';
 import { projectAgentDiffNodesToFactualState } from '../nodes/diff-node-state';
+import { chatBubblesToHistoryMessages } from './historyMessages';
 
 export type UseAgentLoopOptions = {
   provider: LLMProvider;
@@ -49,6 +50,7 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
           new AgentMessagesEngine({ systemMessages: options.systemMessages });
         const preparedMessages = messageEngine.processWithEditor({
           editorState: serialized,
+          messages: chatBubblesToHistoryMessages(options.store.getState().bubbles, userInput),
           userInput,
           selection,
         });
