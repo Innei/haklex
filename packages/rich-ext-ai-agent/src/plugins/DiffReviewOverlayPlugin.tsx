@@ -160,7 +160,7 @@ function insertAfterAnchor(
   node: LexicalNode,
 ) {
   const previous = insertedByAnchor.get(anchorKey);
-  if (previous) {
+  if (previous?.isAttached()) {
     previous.insertAfter(node);
   } else {
     anchor.insertAfter(node);
@@ -175,7 +175,7 @@ function insertBeforeAnchor(
   node: LexicalNode,
 ) {
   const previous = insertedByAnchor.get(anchorKey);
-  if (previous) {
+  if (previous?.isAttached()) {
     previous.insertAfter(node);
   } else {
     anchor.insertBefore(node);
@@ -234,6 +234,25 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
         activeNodeIds.add(`${nodeBatchId}:${nodeEntryId}`);
       }
 
+      // blockId → live LexicalNode. Initialized AFTER resolving stale diff
+      // nodes so we don't index orphans. Updated as we mutate so a diff node
+      // that replaced an original block stays addressable by the old blockId,
+      // letting chained inserts (e.g. replace `X` then N×insert after `X`)
+      // still anchor instead of silently dropping.
+      const blockIndex = new Map<string, LexicalNode>();
+      for (const child of root.getChildren()) {
+        const id = getNodeBlockId(child);
+        if (id) blockIndex.set(id, child);
+      }
+
+      const resolveAnchor = (blockId: string): LexicalNode | null => {
+        const cached = blockIndex.get(blockId);
+        if (cached?.isAttached()) return cached;
+        const found = $findBlockByBlockId(blockId);
+        if (found) blockIndex.set(blockId, found);
+        return found;
+      };
+
       const insertedByAnchor = new Map<string, LexicalNode>();
 
       for (const batch of reviewState.batches) {
@@ -247,13 +266,15 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           const diffNode = $createAgentDiffEditNode(getPayload(batch, entry));
 
           if (entry.op.op === 'replace' || entry.op.op === 'delete') {
-            const target = $findBlockByBlockId(entry.op.blockId);
-            if (target) target.replace(diffNode);
+            const target = resolveAnchor(entry.op.blockId);
+            if (!target) continue;
+            target.replace(diffNode);
+            blockIndex.set(entry.op.blockId, diffNode);
             continue;
           }
 
           if (entry.anchorBeforeId) {
-            const anchor = $findBlockByBlockId(entry.anchorBeforeId);
+            const anchor = resolveAnchor(entry.anchorBeforeId);
             if (anchor) {
               insertAfterAnchor(
                 insertedByAnchor,
@@ -266,7 +287,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           }
 
           if (entry.anchorAfterId) {
-            const anchor = $findBlockByBlockId(entry.anchorAfterId);
+            const anchor = resolveAnchor(entry.anchorAfterId);
             if (anchor) {
               insertBeforeAnchor(
                 insertedByAnchor,
