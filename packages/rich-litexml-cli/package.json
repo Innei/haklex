@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-litexml-cli",
-  "version": "0.17.0",
+  "version": "0.17.1",
   "description": "Unified CLI for haklex LiteXML: convert LiteXML or Lexical JSON to HTML, JSON, or Markdown.",
   "repository": {
     "type": "git",
