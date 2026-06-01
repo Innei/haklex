@@ -25,6 +25,27 @@ export type ToolSchema = {
 export type LLMChunk =
   | { type: 'text'; text: string }
   | { type: 'thinking'; text: string }
+  /**
+   * Opens a streaming tool call. Emitted as soon as `(id, name)` are both known,
+   * before any argument bytes arrive — useful for upstream providers (e.g. pi-ai)
+   * that surface a dedicated start event. The executor renders a placeholder row
+   * immediately with empty params; subsequent `tool_call_partial` / `tool_call`
+   * frames with the same `id` overwrite it.
+   */
+  | { type: 'tool_call_start'; id: string; name: string }
+  /**
+   * Streaming snapshot of a tool call still under construction. `argumentsPartial`
+   * is the accumulated raw JSON text up to this frame (may be unparseable mid-stream)
+   * — providers emit the latest snapshot per id, not incremental deltas, so the
+   * executor can render the in-progress params without maintaining accumulator state.
+   */
+  | { type: 'tool_call_partial'; id: string; name: string; argumentsPartial: string }
+  /**
+   * Final, complete tool call. Serves as the implicit "end" of a streaming call
+   * (if `tool_call_start` / `tool_call_partial` were previously emitted with the
+   * same `id`, the executor reuses the existing item) and as a standalone atomic
+   * tool call for providers that don't stream arguments.
+   */
   | { type: 'tool_call'; id: string; name: string; arguments: string }
   | { type: 'done' };
 

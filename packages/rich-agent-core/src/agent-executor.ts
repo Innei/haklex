@@ -115,21 +115,64 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
       // Assistant bubble is created lazily so a tool_call_group inserted
       // mid-stream doesn't get clobbered by subsequent updateLastBubble calls.
       let assistantBubbleOpen = false;
+      // Ids whose item was already inserted via a `tool_call_partial` snapshot.
+      // The final `tool_call` chunk for these must overwrite params + execute, NOT
+      // addToolCallItem again (which would render a duplicate row).
+      const partialToolIds = new Set<string>();
 
-      const runToolCallMidStream = async (tc: { id: string; name: string; arguments: string }) => {
-        // Finalize any open assistant text bubble before inserting the tool group,
-        // so subsequent text chunks will start a fresh assistant bubble below the group.
+      const ensureStreamGroup = (): string => {
         if (assistantBubbleOpen) {
           updateLastBubble({ type: 'assistant', content: textAccum, streaming: false });
           assistantBubbleOpen = false;
           textAccum = '';
         }
-
         if (!streamGroupId) {
           streamGroupId = nextGroupId();
           addBubble({ type: 'tool_call_group', id: streamGroupId, items: [] });
           setStatus('calling_tool');
         }
+        return streamGroupId;
+      };
+
+      const handleToolCallPartial = (chunk: {
+        id: string;
+        name: string;
+        argumentsPartial: string;
+      }) => {
+        const groupId = ensureStreamGroup();
+        let params: Record<string, unknown>;
+        try {
+          const parsed = JSON.parse(chunk.argumentsPartial);
+          params =
+            parsed && typeof parsed === 'object' && !Array.isArray(parsed)
+              ? (parsed as Record<string, unknown>)
+              : {};
+        } catch {
+          params = {};
+        }
+        const { addToolCallItem, updateToolCallItem } = store.getState();
+        if (!partialToolIds.has(chunk.id)) {
+          partialToolIds.add(chunk.id);
+          addToolCallItem(groupId, {
+            id: chunk.id,
+            toolName: chunk.name,
+            description: describeToolCall(toolMap.get(chunk.name), params),
+            params,
+            status: 'running',
+            startedAt: Date.now(),
+          });
+        } else {
+          updateToolCallItem(groupId, chunk.id, {
+            params,
+            description: describeToolCall(toolMap.get(chunk.name), params),
+          });
+        }
+      };
+
+      const runToolCallMidStream = async (tc: { id: string; name: string; arguments: string }) => {
+        ensureStreamGroup();
+        const groupId = streamGroupId!;
+        const alreadyAdded = partialToolIds.has(tc.id);
 
         let params: Record<string, unknown>;
         let parseError: string | null = null;
@@ -141,17 +184,31 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
         }
 
         const { addToolCallItem, updateToolCallItem } = store.getState();
-        addToolCallItem(streamGroupId, {
-          id: tc.id,
-          toolName: tc.name,
-          description: describeToolCall(toolMap.get(tc.name), params),
-          params,
-          status: parseError ? 'error' : 'running',
-          startedAt: Date.now(),
-          ...(parseError
-            ? { error: `JSON parse error: ${parseError}`, finishedAt: Date.now() }
-            : {}),
-        });
+        if (!alreadyAdded) {
+          addToolCallItem(groupId, {
+            id: tc.id,
+            toolName: tc.name,
+            description: describeToolCall(toolMap.get(tc.name), params),
+            params,
+            status: parseError ? 'error' : 'running',
+            startedAt: Date.now(),
+            ...(parseError
+              ? { error: `JSON parse error: ${parseError}`, finishedAt: Date.now() }
+              : {}),
+          });
+        } else {
+          updateToolCallItem(groupId, tc.id, {
+            params,
+            description: describeToolCall(toolMap.get(tc.name), params),
+            ...(parseError
+              ? {
+                  status: 'error',
+                  error: `JSON parse error: ${parseError}`,
+                  finishedAt: Date.now(),
+                }
+              : { status: 'running' }),
+          });
+        }
 
         if (parseError) {
           streamToolTurns.push({
@@ -166,7 +223,7 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
         const result = await executeTool(tc.name, tc.arguments);
         const content = result.ok ? result.content : JSON.stringify(result.error);
 
-        updateToolCallItem(streamGroupId, tc.id, {
+        updateToolCallItem(groupId, tc.id, {
           status: result.ok ? 'completed' : 'error',
           result: result.ok ? result.content : undefined,
           resultPreview: result.ok ? result.content.slice(0, 80) : undefined,
@@ -232,6 +289,27 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
               streaming: true,
             });
           }
+          continue;
+        }
+
+        if (chunk.type === 'tool_call_start') {
+          const groupId = ensureStreamGroup();
+          if (!partialToolIds.has(chunk.id)) {
+            partialToolIds.add(chunk.id);
+            store.getState().addToolCallItem(groupId, {
+              id: chunk.id,
+              toolName: chunk.name,
+              description: describeToolCall(toolMap.get(chunk.name), {}),
+              params: {},
+              status: 'running',
+              startedAt: Date.now(),
+            });
+          }
+          continue;
+        }
+
+        if (chunk.type === 'tool_call_partial') {
+          handleToolCallPartial(chunk);
           continue;
         }
 
