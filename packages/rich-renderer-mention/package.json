@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-mention",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "Social mention renderer with platform badges",
   "repository": {
     "type": "git",
@@ -42,8 +42,8 @@
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "@lexical/react": "^0.44.0",
-    "lexical": "^0.44.0",
+    "@lexical/react": "^0.45.0",
+    "lexical": "^0.45.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"

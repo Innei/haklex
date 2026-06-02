@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-nested-doc",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "Nested document extension for haklex rich editor",
   "repository": {
     "type": "git",
@@ -41,9 +41,9 @@
     "@haklex/rich-editor": "workspace:*",
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "@lexical/markdown": "^0.44.0",
-    "@lexical/react": "^0.44.0",
-    "lexical": "^0.44.0",
+    "@lexical/markdown": "^0.45.0",
+    "@lexical/react": "^0.45.0",
+    "lexical": "^0.45.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"

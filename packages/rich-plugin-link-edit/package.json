@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-link-edit",
-  "version": "0.19.0",
+  "version": "0.20.0",
   "description": "Link editing plugin",
   "repository": {
     "type": "git",
@@ -39,9 +39,9 @@
   "peerDependencies": {
     "@haklex/rich-editor-ui": "workspace:*",
     "@haklex/rich-style-token": "workspace:*",
-    "@lexical/link": "^0.44.0",
-    "@lexical/react": "^0.44.0",
-    "lexical": "^0.44.0",
+    "@lexical/link": "^0.45.0",
+    "@lexical/react": "^0.45.0",
+    "lexical": "^0.45.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"

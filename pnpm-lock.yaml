@@ -863,9 +863,6 @@ importers:
       lucide-react:
         specifier: ^1.0.0
         version: 1.16.0(react@19.2.6)
-      shiki:
-        specifier: ^4.1.0
-        version: 4.1.0
     devDependencies:
       '@lexical/react':
         specifier: ^0.45.0
@@ -894,6 +891,9 @@ importers:
       react-dom:
         specifier: 19.2.6
         version: 19.2.6(react@19.2.6)
+      shiki:
+        specifier: ^4.1.0
+        version: 4.1.0
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -1815,9 +1815,6 @@ importers:
       lucide-react:
         specifier: ^1.0.0
         version: 1.16.0(react@19.2.6)
-      shiki:
-        specifier: ^4.1.0
-        version: 4.1.0
     devDependencies:
       '@types/react':
         specifier: ^19.2.15
@@ -1837,6 +1834,9 @@ importers:
       react-dom:
         specifier: 19.2.6
         version: 19.2.6(react@19.2.6)
+      shiki:
+        specifier: ^4.1.0
+        version: 4.1.0
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -2149,9 +2149,6 @@ importers:
 
   packages/rich-renderer-video:
     dependencies:
-      '@base-ui/react':
-        specifier: ^1.5.0
-        version: 1.5.0(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@haklex/rich-editor':
         specifier: workspace:*
         version: link:../rich-editor
@@ -2165,6 +2162,9 @@ importers:
         specifier: ^1.0.0
         version: 1.16.0(react@19.2.6)
     devDependencies:
+      '@base-ui/react':
+        specifier: ^1.5.0
+        version: 1.5.0(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@lexical/react':
         specifier: ^0.45.0
         version: 0.45.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(yjs@13.6.29)
