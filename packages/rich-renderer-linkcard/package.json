@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-linkcard",
-  "version": "0.18.0",
+  "version": "0.19.0",
   "description": "Rich link preview card renderer with extensible URL plugins",
   "repository": {
     "type": "git",
