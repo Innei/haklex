@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Lexical-based rich editor ecosystem. Modular packages: core editor, UI primitives, content renderers, plugins, extensions, and integration bundles.
 
-**Build**: Vite 8 + Vanilla Extract CSS-in-TS. ESM only (`.mjs`). TypeScript 5.9. Lexical 0.44. pnpm 11 (pinned via `packageManager`). Node >= 20.
+**Build**: Vite 8 + Vanilla Extract CSS-in-TS. ESM only (`.mjs`). TypeScript 5.9. Lexical 0.45. pnpm 11 (pinned via `packageManager`). Node >= 20.
 
 > **pnpm 11 config note**: pnpm 11 no longer reads the `pnpm` field in `package.json` or `public-hoist-pattern` from `.npmrc`. Hoist patterns and workspace settings live in `pnpm-workspace.yaml` (`publicHoistPattern`, `allowBuilds`). `react`/`react-dom` are public-hoisted there so transitive deps (e.g. `tunnel-rat` via `@excalidraw/excalidraw`) resolve them when `rich-compose` bundles the standalone `litexml-html-preview-client`.
 

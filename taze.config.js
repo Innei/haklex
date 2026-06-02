@@ -1,13 +1,6 @@
-import { defineConfig } from 'taze'
+import { defineConfig } from 'taze';
 
 export default defineConfig({
-  // ignore packages from bumping
-  exclude: [
-    'tailwindcss',
-    'crossbell',
-    '@excalidraw/excalidraw',
-    'tailwind-variants',
-  ],
   // fetch latest package info from registry without cache
   force: true,
   // write to package.json
@@ -26,4 +19,4 @@ export default defineConfig({
   },
   recursive: true,
   mode: 'latest',
-})
+});

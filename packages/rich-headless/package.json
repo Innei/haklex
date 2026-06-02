@@ -22,20 +22,20 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@lexical/code-core": "^0.44.0",
-    "@lexical/extension": "^0.44.0",
-    "@lexical/link": "^0.44.0",
-    "@lexical/list": "^0.44.0",
-    "@lexical/markdown": "^0.44.0",
-    "@lexical/rich-text": "^0.44.0",
-    "@lexical/table": "^0.44.0"
+    "@lexical/code-core": "^0.45.0",
+    "@lexical/extension": "^0.45.0",
+    "@lexical/link": "^0.45.0",
+    "@lexical/list": "^0.45.0",
+    "@lexical/markdown": "^0.45.0",
+    "@lexical/rich-text": "^0.45.0",
+    "@lexical/table": "^0.45.0"
   },
   "devDependencies": {
-    "@lexical/headless": "^0.44.0",
-    "lexical": "^0.44.0",
+    "@lexical/headless": "^0.45.0",
+    "lexical": "^0.45.0",
     "typescript": "^5.9.3",
     "unplugin-dts": "^1.0.1",
-    "vite": "^8.0.13"
+    "vite": "^8.0.14"
   },
   "peerDependencies": {
     "lexical": "^0.44.0"

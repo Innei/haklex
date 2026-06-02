@@ -30,7 +30,7 @@
   "devDependencies": {
     "typescript": "^5.9.3",
     "unplugin-dts": "^1.0.1",
-    "vite": "^8.0.13"
+    "vite": "^8.0.14"
   },
   "publishConfig": {
     "access": "public",

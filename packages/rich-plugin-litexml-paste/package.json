@@ -24,15 +24,15 @@
     "@haklex/rich-litexml": "workspace:*"
   },
   "devDependencies": {
-    "@lexical/react": "^0.44.0",
+    "@lexical/react": "^0.45.0",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
-    "lexical": "^0.44.0",
+    "lexical": "^0.45.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "typescript": "^5.9.3",
     "unplugin-dts": "^1.0.1",
-    "vite": "^8.0.13"
+    "vite": "^8.0.14"
   },
   "peerDependencies": {
     "@lexical/react": "^0.44.0",
