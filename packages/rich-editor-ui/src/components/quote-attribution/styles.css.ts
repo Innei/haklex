@@ -2,11 +2,21 @@ import { vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
-  editor: 'rich-quote-attribution-editor',
+  overlay: 'rich-quote-attribution-overlay',
+  panel: 'rich-quote-attribution-panel',
   input: 'rich-quote-attribution-input',
 } as const;
 
-export const editor = style({
+// A fixed-positioned rectangle anchored to the active quote's bounding box.
+// `pointer-events: none` lets clicks pass through the empty area while the
+// inner panel still receives them.
+export const overlay = style({
+  position: 'fixed',
+  zIndex: 50,
+  pointerEvents: 'none',
+});
+
+export const panel = style({
   position: 'absolute',
   bottom: '4px',
   right: '8px',
