@@ -14,7 +14,7 @@ Do not require caller-supplied release metadata. Infer the release context from 
 
 1. **Changeset summary** — derive from `git log --oneline "$LAST"..HEAD` and `git diff --stat "$LAST"..HEAD`.
 2. **Affected packages** — derive mechanically from `git diff --name-only "$LAST"..HEAD`; do not ask the caller for a package list.
-3. **Release mode** — see Phase 0.5; defaults to `incremental` (publish only changed packages), upgradeable to `full` either by user opt-in keyword or by Phase 2 auto-fallback on a `major` bump.
+3. **Release mode** — see Phase 0.5; defaults to `incremental` (publish the workspace closure of changed packages — Phase 4 expands `CHANGED_PKGS` to `PUBLISH_SET` via forward closure over workspace cross-deps), upgradeable to `full` either by user opt-in keyword or by Phase 2 auto-fallback on a `major` bump.
 
 If no package has publishable `src/**` changes, stop and report that there is no releasable package diff.
 
@@ -36,7 +36,7 @@ If no package has publishable `src/**` changes, stop and report that there is no
 
 Two release modes:
 
-- **incremental** (default) — publish only packages whose `src/**` changed since `$LAST`.
+- **incremental** (default) — publish the **workspace closure** of packages whose `src/**` changed since `$LAST`. `CHANGED_PKGS` (from Phase 1) seeds the closure; Phase 4 walks workspace cross-deps + peerDeps until fixed point to produce `PUBLISH_SET`. Required because this repo uses `workspace:*` (pnpm publishes as exact version) — see Phase 2.
 - **full** — publish every `@haklex/*` package (excluding `@haklex/rich-editor-demo`), regardless of diff. Matches the legacy "publish everything" behaviour.
 
 Default to `incremental`. Promote to `full` only via one of:
@@ -101,19 +101,27 @@ diff \
 
 Because haklex uses a **shared version**, compute `max(bumps)` across all changed packages and apply to all. Print the per-package classification table for visibility, then proceed directly to Phase 3 — do **not** gate on user approval, including for `major` classifications. Run fully autonomously.
 
+**Workspace-pinning reality (`workspace:*` → exact at publish):**
+
+This repo writes every `@haklex/*` cross-dep as `workspace:*`. pnpm replaces `workspace:*` with the **exact** current workspace version at publish time — so `@haklex/rich-ext-ai-agent@0.21.0`'s tarball declares `"@haklex/rich-litexml": "0.21.0"`, not `^0.21.0`. The consequence is structural: every shared-version bump (patch / minor / major alike) requires the workspace closure of each changed package to be published in lockstep. If `rich-ext-ai-agent@0.21.0` is published but `rich-litexml@0.21.0` is not, downstream `pnpm install` fails with `ERR_PNPM_NO_MATCHING_VERSION`.
+
+The old `^old.x.y` minor/patch reasoning is **wrong for this repo**. It would only be safe under `workspace:^` (publishes as `^0.21.0`) — which we don't use. Real-world failure: the v0.21.0 cycle initially published only `rich-agent-core` + `rich-ext-ai-agent`; downstream installs broke until `rich-litexml@0.21.0` + `rich-diff-core@0.21.0` were also published. See Real-world anchors.
+
+`MODE=incremental` therefore always means **closure-expanded** incremental — `PUBLISH_SET` is computed by walking workspace cross-deps + peerDeps forward from `CHANGED_PKGS` until fixed point (algorithm in Phase 4). For a leaf package (e.g. a renderer that no other package imports as workspace dep), the closure equals `CHANGED_PKGS` and the savings vs `full` are real. For a deep dep (e.g. `rich-editor`), the closure can approach the full set — but `full` is still distinct: it includes packages whose closure wouldn't have reached them (e.g. the CLI), which is the right behaviour for `major` and for explicit user opt-in.
+
 **Major-bump auto-fallback to full mode:**
 
 If `max(bumps) == major` and `MODE == incremental`, flip `MODE=full` here and print:
 
 ```
 Major bump detected → switching to full release mode.
-Reason: workspace cross-deps in unpublished packages still pin "^<old>" ranges that
-do not satisfy the new major. Republishing every package re-syncs those internal pins.
+Reason: every package's exact-pinned workspace cross-deps point at the new major.
+Republishing the closure would still work, but full mode is safer at the major
+boundary — it also catches packages whose closure happens not to reach them
+(e.g. the CLI) but which downstream consumers still install at the new version.
 ```
 
-Concretely: suppose `rich-editor` jumps `0.16.1 → 1.0.0`. `rich-compose@0.16.1`'s published tarball declares `"@haklex/rich-editor": "^0.16.1"`, which does **not** satisfy `1.0.0`. If we skipped publishing `rich-compose`, downstream `pnpm install` would either fail to resolve or pull in a stale workspace. `full` mode forces every package to be rebuilt-and-republished so the internal pins advance in lockstep.
-
-`minor`/`patch` bumps stay safely incremental — `^old.x.y` ranges cover both.
+`minor`/`patch` stay in closure-expanded `incremental` (see Phase 4) unless the user opts into `full`.
 
 ## Phase 3 — peerDependencies audit (critical)
 
@@ -142,7 +150,7 @@ pnpm run build:packages
 
 Do **not** use `pnpm run release:rich` here — that path runs bumpp + build + publish in one step and bypasses the ordered/polled publish this skill needs. Replace it with explicit phases.
 
-**Publish set is mode-dependent:**
+**Publish set is mode-dependent. In `incremental` mode it is computed as the workspace-closure of `CHANGED_PKGS`, not `CHANGED_PKGS` itself** (see Phase 2 — workspace-pinning reality):
 
 ```bash
 case "$MODE" in
@@ -152,11 +160,48 @@ case "$MODE" in
       | jq -r '.[].name' | grep '^@haklex/' | grep -v '@haklex/rich-editor-demo')
     ;;
   incremental)
-    # Only packages with src/** diffs (from Phase 1's CHANGED_PKGS)
-    PUBLISH_SET=$(printf '@haklex/%s\n' $CHANGED_PKGS)
+    # Forward closure: start with CHANGED_PKGS, then absorb every @haklex/*
+    # that appears in any included package's dependencies / peerDependencies /
+    # optionalDependencies under a "workspace:" specifier. Iterate to fixed point.
+    declare -A IN_SET
+    for p in $CHANGED_PKGS; do IN_SET["@haklex/$p"]=1; done
+    changed=1
+    while [ "$changed" -eq 1 ]; do
+      changed=0
+      for pkg in "${!IN_SET[@]}"; do
+        manifest="packages/${pkg#@haklex/}/package.json"
+        [ -f "$manifest" ] || continue
+        while read -r dep; do
+          [ -z "$dep" ] && continue
+          [ "$dep" = "@haklex/rich-editor-demo" ] && continue
+          if [ -z "${IN_SET[$dep]:-}" ]; then
+            IN_SET[$dep]=1
+            changed=1
+          fi
+        done < <(jq -r '
+          ((.dependencies // {}) + (.peerDependencies // {}) + (.optionalDependencies // {}))
+          | to_entries[]
+          | select(.key | startswith("@haklex/"))
+          | select(.value | startswith("workspace:"))
+          | .key
+        ' "$manifest")
+      done
+    done
+    PUBLISH_SET=$(printf '%s\n' "${!IN_SET[@]}" | sort)
     ;;
 esac
 echo "Publish set ($MODE): $(wc -l <<< "$PUBLISH_SET") packages"
+```
+
+The closure walks **forward** (what a published package's tarball references), not backward (who imports it). It includes `dependencies` (mandatory for install graph) and `peerDependencies` (otherwise pnpm's `auto-install-peers` 404s on the new exact peer pin). `optionalDependencies` are included too — if a manifest declares one and we publish without it, the optional resolution still hits the registry. Devdeps are excluded (consumers never see them).
+
+Print which packages were absorbed by closure expansion so the user can see why `PUBLISH_SET` is larger than `CHANGED_PKGS`:
+
+```
+Closure expansion: rich-agent-core, rich-ext-ai-agent (changed)
+                 + rich-litexml, rich-diff-core (workspace deps of changed packages)
+                 + rich-compose, rich-editor-ui, rich-editor, rich-style-token (peerDeps of rich-ext-ai-agent)
+                 = 8 packages
 ```
 
 Compute topological order from the workspace graph and **intersect** with `PUBLISH_SET`:
@@ -444,54 +489,55 @@ Do not mark the release as "complete" in the summary until the user publishes it
 
 ## Quick reference
 
-| Step             | Command                                                                                                                                                                             |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last release SHA | `git log --grep='^release: v' -n1 --format=%H`                                                                                                                                      |
-| Mode detect      | `grep -iqE '(^\|[^a-z])(full\|全量\|all)([^a-z]\|$)' <<<"$INVOCATION_TEXT" && echo full \|\| echo incremental`                                                                      |
-| Changed pkgs     | `git diff --name-only $LAST..HEAD -- 'packages/*/src/**'`                                                                                                                           |
-| Publish set      | `case $MODE in full) all @haklex/* sans demo;; incremental) printf '@haklex/%s\n' $CHANGED_PKGS;; esac`                                                                             |
-| Export diff      | `diff <(git show $LAST:…/index.ts \| grep ^export) <(git show HEAD:…/index.ts \| grep ^export)`                                                                                     |
-| Peer audit       | `jq '.dependencies, .peerDependencies' packages/<pkg>/package.json`                                                                                                                 |
-| Bump             | `pnpm bumpp -r <level> --no-git --no-tag`                                                                                                                                           |
-| Build            | `pnpm run build:packages`                                                                                                                                                           |
-| Publish one      | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                                                                                                               |
-| Registry poll    | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                                                                                                         |
-| CLI smoke        | `npx --yes -p @haklex/rich-litexml-cli@$CLI_VER litexml '<p>x</p>' --format json --compact` (`$CLI_VER` = `$V` if in PUBLISH_SET, else `npm view @haklex/rich-litexml-cli version`) |
-| Default branch   | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master)                                                                                   |
-| Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                                                                                                              |
-| Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                                                                                                     |
-| Tag haklex       | `git tag v$V && git push origin v$V` (after commit, before downstream)                                                                                                              |
-| Draft release    | `gh release create v$V --title v$V --notes-file $NOTE --draft --verify-tag`                                                                                                         |
-| Draft edit URL   | `gh release view v$V --json url -q .url \| sed 's#/releases/tag/#/releases/edit/#'`                                                                                                 |
-| Delete draft     | `gh release delete v$V --yes && git push origin :refs/tags/v$V` (rollback only)                                                                                                     |
+| Step             | Command                                                                                                                                                                                                                                       |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Last release SHA | `git log --grep='^release: v' -n1 --format=%H`                                                                                                                                                                                                |
+| Mode detect      | `grep -iqE '(^\|[^a-z])(full\|全量\|all)([^a-z]\|$)' <<<"$INVOCATION_TEXT" && echo full \|\| echo incremental`                                                                                                                                |
+| Changed pkgs     | `git diff --name-only $LAST..HEAD -- 'packages/*/src/**'`                                                                                                                                                                                     |
+| Publish set      | `full` → all `@haklex/*` sans demo. `incremental` → forward closure of `CHANGED_PKGS` over `dependencies + peerDependencies + optionalDependencies` whose value starts with `workspace:`; iterate to fixed point. See Phase 4 for the script. |
+| Export diff      | `diff <(git show $LAST:…/index.ts \| grep ^export) <(git show HEAD:…/index.ts \| grep ^export)`                                                                                                                                               |
+| Peer audit       | `jq '.dependencies, .peerDependencies' packages/<pkg>/package.json`                                                                                                                                                                           |
+| Bump             | `pnpm bumpp -r <level> --no-git --no-tag`                                                                                                                                                                                                     |
+| Build            | `pnpm run build:packages`                                                                                                                                                                                                                     |
+| Publish one      | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                                                                                                                                                                         |
+| Registry poll    | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                                                                                                                                                                   |
+| CLI smoke        | `npx --yes -p @haklex/rich-litexml-cli@$CLI_VER litexml '<p>x</p>' --format json --compact` (`$CLI_VER` = `$V` if in PUBLISH_SET, else `npm view @haklex/rich-litexml-cli version`)                                                           |
+| Default branch   | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master)                                                                                                                                             |
+| Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                                                                                                                                                                        |
+| Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                                                                                                                                                               |
+| Tag haklex       | `git tag v$V && git push origin v$V` (after commit, before downstream)                                                                                                                                                                        |
+| Draft release    | `gh release create v$V --title v$V --notes-file $NOTE --draft --verify-tag`                                                                                                                                                                   |
+| Draft edit URL   | `gh release view v$V --json url -q .url \| sed 's#/releases/tag/#/releases/edit/#'`                                                                                                                                                           |
+| Delete draft     | `gh release delete v$V --yes && git push origin :refs/tags/v$V` (rollback only)                                                                                                                                                               |
 
 ## Common mistakes
 
-| Mistake                                                                    | Fix                                                                                                                                                                                         |
-| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Asking the caller for release metadata                                     | Infer the changeset summary and affected packages from `git log` and `git diff`                                                                                                             |
-| Defaulting to full release every cycle                                     | Default is `incremental`. Only enter `full` via user keyword (`full`/`全量`/`all`) or Phase 2 major auto-fallback                                                                           |
-| Treating a `major` bump as safely incremental                              | A major breaks `^old.x.y` cross-dep ranges in unpublished packages. Phase 2 must flip `MODE=full` and republish everything                                                                  |
-| Re-pinning a downstream `@haklex/*` not in `PUBLISH_SET` to `$NEW_VERSION` | That version was never published for unchanged packages — `pnpm install` 404s. Only rewrite pins for packages in `PUBLISH_SET`                                                              |
-| Running the CLI smoke against `$NEW_VERSION` when CLI wasn't republished   | The version doesn't exist on the registry. Read the prior version via `npm view @haklex/rich-litexml-cli version` and smoke against that with the new `rich-compose` resolved at install    |
-| Bumping `package.json` but skipping publish in `full` mode                 | `full` means publish every `@haklex/*` (sans demo). Don't conflate "didn't change" with "don't publish" when `MODE=full`                                                                    |
-| Publishing before registry poll succeeds                                   | Downstream `pnpm install` 404s or resolves stale mirror                                                                                                                                     |
-| Treating a Context-creating lib as a regular dep                           | Promote to peer (reference: commit 88bb7a0 — lucide-react)                                                                                                                                  |
-| Attempting per-package **bumps**                                           | Not supported — shared version; highest-wins. (Per-package **publish** in incremental mode is fine; it's the version field that stays shared)                                               |
-| `git add -A` in a dirty downstream worktree                                | Stage only the pinned-version files per Repo layout table                                                                                                                                   |
-| Running `pnpm run release:rich` inside this skill                          | That script compresses bump/build/publish into one step; this skill needs them separate                                                                                                     |
-| `npm unpublish` without user confirmation                                  | Always ask — unpublish is public, permanent, and time-limited                                                                                                                               |
-| Force-pushing reverts without `--force-with-lease`                         | Use `--force-with-lease`; ask user before pushing any force                                                                                                                                 |
-| Opening a PR for the downstream bump                                       | Bumps go direct to the default branch — no PR, no `gh pr create`                                                                                                                            |
-| Pushing the `chore/haklex-$V` branch to origin                             | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch                                                                                                     |
-| Skipping `git fetch` + rebase before push                                  | Default branch may have advanced during the release; rebase on `origin/$D` first                                                                                                            |
-| Targeting a feature branch or guessing `main`                              | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`                                                                                                                  |
-| Writing release notes into README                                          | Notes live on GitHub Releases — README only links there; never paste a "What's new" block back into any in-repo doc                                                                         |
-| Publishing the GitHub release as non-draft                                 | Always `--draft` from the skill; the user reviews and publishes from the GitHub UI                                                                                                          |
-| Skipping the `rich-litexml-cli` binary smoke                               | Bin packages can publish "successfully" yet fail to boot — always run Phase 4.5                                                                                                             |
-| Skipping `--verify-tag` on `gh release create`                             | Without it, gh silently creates a tag at HEAD, decoupling the release from the bump commit                                                                                                  |
-| Forgetting to delete the draft on rollback                                 | A lingering draft + tag confuses the next release attempt — always clean up in Phase 8a                                                                                                     |
-| Surfacing the `/releases/tag/` URL for a draft                             | That's the read-only view page; for unpublished drafts it has no "Publish release" button. Swap to `/releases/edit/` so the user lands in the editor with the publish action one click away |
+| Mistake                                                                    | Fix                                                                                                                                                                                                                                                                                                                                                                |
+| -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Asking the caller for release metadata                                     | Infer the changeset summary and affected packages from `git log` and `git diff`                                                                                                                                                                                                                                                                                    |
+| Defaulting to full release every cycle                                     | Default is `incremental`. Only enter `full` via user keyword (`full`/`全量`/`all`) or Phase 2 major auto-fallback                                                                                                                                                                                                                                                  |
+| Treating a `major` bump as safely incremental                              | A major breaks every cross-dep pin in unpublished packages. Phase 2 must flip `MODE=full` and republish everything                                                                                                                                                                                                                                                 |
+| Equating `PUBLISH_SET` with `CHANGED_PKGS` in `incremental` mode           | This repo uses `workspace:*` — pnpm publishes those as exact versions. `PUBLISH_SET` must be the forward closure of `CHANGED_PKGS` over `dependencies + peerDependencies + optionalDependencies` (Phase 4). Publishing only `CHANGED_PKGS` leaves transitive workspace deps unpublished → downstream `ERR_PNPM_NO_MATCHING_VERSION`. Real-world hit: v0.21.0 cycle |
+| Re-pinning a downstream `@haklex/*` not in `PUBLISH_SET` to `$NEW_VERSION` | That version was never published for unchanged packages — `pnpm install` 404s. Only rewrite pins for packages in `PUBLISH_SET`                                                                                                                                                                                                                                     |
+| Running the CLI smoke against `$NEW_VERSION` when CLI wasn't republished   | The version doesn't exist on the registry. Read the prior version via `npm view @haklex/rich-litexml-cli version` and smoke against that with the new `rich-compose` resolved at install                                                                                                                                                                           |
+| Bumping `package.json` but skipping publish in `full` mode                 | `full` means publish every `@haklex/*` (sans demo). Don't conflate "didn't change" with "don't publish" when `MODE=full`                                                                                                                                                                                                                                           |
+| Publishing before registry poll succeeds                                   | Downstream `pnpm install` 404s or resolves stale mirror                                                                                                                                                                                                                                                                                                            |
+| Treating a Context-creating lib as a regular dep                           | Promote to peer (reference: commit 88bb7a0 — lucide-react)                                                                                                                                                                                                                                                                                                         |
+| Attempting per-package **bumps**                                           | Not supported — shared version; highest-wins. (Per-package **publish** in incremental mode is fine; it's the version field that stays shared)                                                                                                                                                                                                                      |
+| `git add -A` in a dirty downstream worktree                                | Stage only the pinned-version files per Repo layout table                                                                                                                                                                                                                                                                                                          |
+| Running `pnpm run release:rich` inside this skill                          | That script compresses bump/build/publish into one step; this skill needs them separate                                                                                                                                                                                                                                                                            |
+| `npm unpublish` without user confirmation                                  | Always ask — unpublish is public, permanent, and time-limited                                                                                                                                                                                                                                                                                                      |
+| Force-pushing reverts without `--force-with-lease`                         | Use `--force-with-lease`; ask user before pushing any force                                                                                                                                                                                                                                                                                                        |
+| Opening a PR for the downstream bump                                       | Bumps go direct to the default branch — no PR, no `gh pr create`                                                                                                                                                                                                                                                                                                   |
+| Pushing the `chore/haklex-$V` branch to origin                             | That branch is worktree-local; push commits as `HEAD:$D` where $D is the default branch                                                                                                                                                                                                                                                                            |
+| Skipping `git fetch` + rebase before push                                  | Default branch may have advanced during the release; rebase on `origin/$D` first                                                                                                                                                                                                                                                                                   |
+| Targeting a feature branch or guessing `main`                              | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`                                                                                                                                                                                                                                                                                         |
+| Writing release notes into README                                          | Notes live on GitHub Releases — README only links there; never paste a "What's new" block back into any in-repo doc                                                                                                                                                                                                                                                |
+| Publishing the GitHub release as non-draft                                 | Always `--draft` from the skill; the user reviews and publishes from the GitHub UI                                                                                                                                                                                                                                                                                 |
+| Skipping the `rich-litexml-cli` binary smoke                               | Bin packages can publish "successfully" yet fail to boot — always run Phase 4.5                                                                                                                                                                                                                                                                                    |
+| Skipping `--verify-tag` on `gh release create`                             | Without it, gh silently creates a tag at HEAD, decoupling the release from the bump commit                                                                                                                                                                                                                                                                         |
+| Forgetting to delete the draft on rollback                                 | A lingering draft + tag confuses the next release attempt — always clean up in Phase 8a                                                                                                                                                                                                                                                                            |
+| Surfacing the `/releases/tag/` URL for a draft                             | That's the read-only view page; for unpublished drafts it has no "Publish release" button. Swap to `/releases/edit/` so the user lands in the editor with the publish action one click away                                                                                                                                                                        |
 
 ## Red flags — STOP and ask
 
@@ -512,4 +558,5 @@ Do not mark the release as "complete" in the summary until the user publishes it
 
 - `88bb7a0` — rich-agent-chat + lucide-react peer dep (the motivating Context-mismatch bug)
 - `0.0.106..0.0.108` — pure patch cadence; the first `minor`/`major` under this skill warrants extra caution
+- `v0.21.0` — incremental closure bug. Initial run published only `CHANGED_PKGS = {rich-agent-core, rich-ext-ai-agent}`. Downstreams hit `ERR_PNPM_NO_MATCHING_VERSION: No matching version found for @haklex/rich-diff-core@0.21.0` because `workspace:*` had published as exact `0.21.0` but the dep wasn't republished. Recovered by publishing `rich-litexml@0.21.0` + `rich-diff-core@0.21.0` after the fact. Motivated the Phase 4 closure-expansion algorithm.
 - Previous per-repo playbook: `.claude/commands/release.md` (now superseded by this skill)
