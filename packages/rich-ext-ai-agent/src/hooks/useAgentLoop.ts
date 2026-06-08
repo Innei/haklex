@@ -5,6 +5,7 @@ import {
   createAgentExecutor,
   createReviewBatch,
   createSnapshot,
+  type LitexmlRegistryProvider,
   type LLMProvider,
 } from '@haklex/rich-agent-core';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -20,6 +21,7 @@ export type UseAgentLoopOptions = {
   provider: LLMProvider;
   store: AgentStore;
   tools?: AgentToolConfig[];
+  litexmlRegistry?: LitexmlRegistryProvider;
   messageEngine?: AgentMessagesEngine;
   systemMessages?: ChatMessage[];
 };
@@ -47,7 +49,10 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
 
         const messageEngine =
           options.messageEngine ??
-          new AgentMessagesEngine({ systemMessages: options.systemMessages });
+          new AgentMessagesEngine({
+            litexmlRegistry: options.litexmlRegistry,
+            systemMessages: options.systemMessages,
+          });
         const preparedMessages = messageEngine.processWithEditor({
           editorState: serialized,
           messages: chatBubblesToHistoryMessages(options.store.getState().bubbles, userInput),
@@ -62,6 +67,7 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
           snapshot,
           store: options.store,
           tools: options.tools ?? [],
+          litexmlRegistry: options.litexmlRegistry,
           signal: controller.signal,
           onOperationsChanged: (ops) => {
             const revision = options.store.getState().reviewState?.documentRevision ?? 0;

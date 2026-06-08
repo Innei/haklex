@@ -1,5 +1,6 @@
 import { createDocumentTools } from './document-tools';
 import type { ChatBubble } from './initialState';
+import type { LitexmlRegistryProvider } from './litexml';
 import { buildMessages } from './messages-engine';
 import type {
   AgentToolConfig,
@@ -18,6 +19,7 @@ export type AgentExecutorConfig = {
   snapshot: EditorSnapshot;
   store: AgentStore;
   tools: AgentToolConfig[];
+  litexmlRegistry?: LitexmlRegistryProvider;
   signal?: AbortSignal;
   onOperationsChanged?: (operations: AgentOperation[]) => void;
 };
@@ -70,7 +72,9 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
   const { provider, snapshot, store, signal, onOperationsChanged } = config;
   const operations: AgentOperation[] = [];
   let lastOpsLength = 0;
-  const documentTools = createDocumentTools(snapshot, operations);
+  const documentTools = createDocumentTools(snapshot, operations, {
+    litexmlRegistry: config.litexmlRegistry,
+  });
   const allTools = [...documentTools, ...config.tools];
   const toolMap = new Map(allTools.map((t) => [t.name, t]));
   const toolSchemas = allTools.map(toolConfigToSchema);

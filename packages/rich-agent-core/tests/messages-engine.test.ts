@@ -1,3 +1,4 @@
+import { createDefaultRegistry } from '@haklex/rich-litexml';
 import { describe, expect, it } from 'vitest';
 
 import { buildDocumentContext } from '../src/document-context';
@@ -208,5 +209,36 @@ describe('buildDocumentContext', () => {
     } as any;
     const xml = buildDocumentContext(state, { mode: 'full', compact: false });
     expect(xml).toBe('<doc>\n</doc>\n');
+  });
+
+  it('uses a caller-provided LiteXML registry', () => {
+    const registry = createDefaultRegistry();
+    registry.registerWriter('callout', (node) => ({
+      attrs: { tone: String((node as any).tone ?? 'info') },
+      children: [String((node as any).label ?? '')],
+      tag: 'callout',
+    }));
+
+    const state = {
+      root: {
+        type: 'root',
+        children: [
+          {
+            type: 'callout',
+            tone: 'warning',
+            label: 'Check this',
+            version: 1,
+            $: { blockId: 'c1' },
+          },
+        ],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    } as any;
+
+    const xml = buildDocumentContext(state, { mode: 'full', litexmlRegistry: registry });
+    expect(xml).toBe('<doc><callout tone="warning">Check this</callout></doc>');
   });
 });

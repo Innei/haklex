@@ -7,6 +7,7 @@ import {
   type CapturedSelection,
   type CapturedTextSelection,
   type ChatMessage,
+  type LitexmlRegistryProvider,
   type MessageEngineContext,
   MessagesEngine,
   type PageContentContext,
@@ -29,9 +30,15 @@ export const defaultAgentSystemMessage: Extract<ChatMessage, { role: 'system' }>
 };
 
 export type AgentMessagesEngineOptions = {
+  litexmlRegistry?: LitexmlRegistryProvider;
   systemMessages?: ChatMessage[];
   toolSystemRole?: string;
 };
+
+function resolveLitexmlRegistry(provider?: LitexmlRegistryProvider) {
+  if (!provider) return createDefaultRegistry();
+  return typeof provider === 'function' ? provider() : provider;
+}
 
 function normalizeSystemMessages(
   messages: ChatMessage[] | undefined,
@@ -179,6 +186,7 @@ class PageEditorContextInjector extends BaseLastUserContentProvider {
 function buildTextSelectionContext(
   editorState: SerializedEditorState,
   selection: Extract<CapturedSelection, { type: 'text' }>,
+  litexmlRegistry?: LitexmlRegistryProvider,
 ): CapturedTextSelection {
   const root = editorState.root as any;
   const children: any[] = root.children ?? [];
@@ -204,7 +212,7 @@ function buildTextSelectionContext(
     return blockId && blockIds.has(blockId);
   });
 
-  const registry = createDefaultRegistry();
+  const registry = resolveLitexmlRegistry(litexmlRegistry);
   const containingBlocksXml = serializeNodesToXml(containingNodes, registry, { compact: true });
 
   return {
@@ -218,6 +226,8 @@ function buildTextSelectionContext(
 }
 
 export class AgentMessagesEngine extends MessagesEngine {
+  private readonly litexmlRegistry?: LitexmlRegistryProvider;
+
   constructor(options: AgentMessagesEngineOptions = {}) {
     super([
       new DefaultSystemRoleInjector(normalizeSystemMessages(options.systemMessages)),
@@ -226,6 +236,7 @@ export class AgentMessagesEngine extends MessagesEngine {
       new TextSelectionInjector(),
       new PageEditorContextInjector(),
     ]);
+    this.litexmlRegistry = options.litexmlRegistry;
   }
 
   processWithEditor(params: {
@@ -246,7 +257,7 @@ export class AgentMessagesEngine extends MessagesEngine {
 
     const textSelection =
       params.selection?.type === 'text'
-        ? buildTextSelectionContext(params.editorState, params.selection)
+        ? buildTextSelectionContext(params.editorState, params.selection, this.litexmlRegistry)
         : undefined;
 
     return this.process({
@@ -254,6 +265,7 @@ export class AgentMessagesEngine extends MessagesEngine {
       pageContentContext: {
         metadata: { title: params.title ?? 'Current Document' },
         xml: buildDocumentContext(params.editorState, {
+          litexmlRegistry: this.litexmlRegistry,
           mode: 'full',
           compact: true,
           selectedBlockIds,

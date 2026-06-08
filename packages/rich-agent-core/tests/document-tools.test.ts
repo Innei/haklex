@@ -1,3 +1,4 @@
+import { createDefaultRegistry } from '@haklex/rich-litexml';
 import { describe, expect, it } from 'vitest';
 
 import { createDocumentTools } from '../src/document-tools';
@@ -118,6 +119,35 @@ describe('createDocumentTools', () => {
 
     expect(result.ok).toBe(true);
     expect(operations[0].op).toBe('replace');
+  });
+
+  it('uses a caller-provided LiteXML registry to parse tool XML', async () => {
+    const registry = createDefaultRegistry();
+    registry.registerReader('callout', (element) => ({
+      type: 'callout',
+      tone: element.getAttribute('tone') ?? 'info',
+      children: [],
+      direction: null,
+      format: '',
+      indent: 0,
+      version: 1,
+    }));
+
+    const { snapshot, operations } = makeSnapshot();
+    const tools = createDocumentTools(snapshot, operations, { litexmlRegistry: registry });
+    const insertTool = tools.find((t) => t.name === 'insert_node')!;
+
+    const result = await insertTool.execute({
+      position: { type: 'after', blockId: 'p1' },
+      xml: '<callout tone="warning" />',
+    });
+
+    expect(result.ok).toBe(true);
+    expect(operations).toHaveLength(1);
+    expect((operations[0] as any).node).toMatchObject({
+      type: 'callout',
+      tone: 'warning',
+    });
   });
 
   it('replace_node preserves original blockId on the primary replacement node', async () => {

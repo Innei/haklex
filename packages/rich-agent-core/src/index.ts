@@ -11,6 +11,7 @@ export { buildDocumentContext } from './document-context';
 export { createDocumentTools } from './document-tools';
 export type { AgentStoreStatus, ToolCallGroupItem, ToolCallItemStatus } from './initialState';
 export { createInitialAgentStoreState } from './initialState';
+export type { LitexmlRegistryOptions, LitexmlRegistryProvider } from './litexml';
 export {
   BaseEveryUserContentProvider,
   BaseFirstUserContentProvider,

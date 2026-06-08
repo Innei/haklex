@@ -2,6 +2,7 @@ import type {
   AgentStore,
   AgentToolConfig,
   ChatMessage,
+  LitexmlRegistryProvider,
   LLMProvider,
 } from '@haklex/rich-agent-core';
 import { useTextSelectionSnapshot } from '@haklex/rich-editor';
@@ -13,6 +14,7 @@ import { useAgentLoop } from '../hooks/useAgentLoop';
 import type { AgentMessagesEngine } from '../messageEngine';
 
 export interface AgentPanelPluginProps {
+  litexmlRegistry?: LitexmlRegistryProvider;
   messageEngine?: AgentMessagesEngine;
   provider: LLMProvider;
   store: AgentStore;
@@ -24,6 +26,7 @@ export function AgentPanelPlugin({
   messageEngine,
   provider,
   store,
+  litexmlRegistry,
   tools,
   systemMessages,
 }: AgentPanelPluginProps): ReactElement | null {
@@ -53,6 +56,6 @@ export function AgentPanelPlugin({
     };
   }, [store]);
 
-  useAgentLoop({ provider, store, tools, systemMessages, messageEngine });
+  useAgentLoop({ provider, store, tools, litexmlRegistry, systemMessages, messageEngine });
   return null;
 }

@@ -1,3 +1,5 @@
+import type { LitexmlRegistryProvider } from './litexml';
+
 export type ChatMessage =
   | { role: 'system'; content: string; cacheBreakpoint?: boolean }
   | {
@@ -72,6 +74,7 @@ export type AgentToolConfig = {
 
 export type DocumentContextOptions = {
   compact?: boolean;
+  litexmlRegistry?: LitexmlRegistryProvider;
   mode: 'full' | 'structure' | 'selection-window';
   selectedBlockIds?: Set<string>;
   windowSize?: number;

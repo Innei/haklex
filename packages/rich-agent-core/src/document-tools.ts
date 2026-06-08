@@ -1,6 +1,7 @@
-import { createDefaultRegistry, deserializeNodesFromXml } from '@haklex/rich-litexml';
+import { deserializeNodesFromXml } from '@haklex/rich-litexml';
 import type { SerializedLexicalNode } from 'lexical';
 
+import { type LitexmlRegistryOptions, resolveLitexmlRegistry } from './litexml';
 import type { AgentToolConfig, AgentToolResult } from './protocol';
 import type { EditorSnapshot } from './snapshot';
 import type { AgentOperation } from './types';
@@ -15,8 +16,9 @@ function extractText(node: SerializedLexicalNode): string {
 export function createDocumentTools(
   snapshot: EditorSnapshot,
   operations: AgentOperation[],
+  options?: LitexmlRegistryOptions,
 ): AgentToolConfig[] {
-  const registry = createDefaultRegistry();
+  const registry = resolveLitexmlRegistry(options);
 
   const insertNodeTool: AgentToolConfig = {
     name: 'insert_node',
