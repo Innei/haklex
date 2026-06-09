@@ -1,0 +1,28 @@
+{
+  "fixtures": [
+    {
+      "match": { "toolCallId": "call_f2" },
+      "response": {
+        "content": "Follow-up edits proposed while the previous batch is still pending."
+      }
+    },
+    {
+      "match": { "userMessage": "follow up" },
+      "response": {
+        "content": "Adding a follow-up: delete one untouched block, then insert right after a block that is currently occupied by a pending replace diff.",
+        "toolCalls": [
+          {
+            "id": "call_f1",
+            "name": "delete_node",
+            "arguments": "{\"blockId\":\"b-011\"}"
+          },
+          {
+            "id": "call_f2",
+            "name": "insert_node",
+            "arguments": "{\"position\":{\"type\":\"after\",\"blockId\":\"b-002\"},\"xml\":\"<p>F2-INSERTED: anchored after a block occupied by a pending replace diff.</p>\"}"
+          }
+        ]
+      }
+    }
+  ]
+}

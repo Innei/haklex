@@ -1,0 +1,48 @@
+{
+  "fixtures": [
+    {
+      "match": { "toolCallId": "call_m6" },
+      "response": {
+        "content": "All six edits proposed across adjacent and trailing blocks."
+      }
+    },
+    {
+      "match": { "userMessage": "multi edit" },
+      "response": {
+        "content": "Applying six edits: adjacent replace/delete pairs, a multi-block replace, an insert, and a trailing replace on the last block.",
+        "toolCalls": [
+          {
+            "id": "call_m1",
+            "name": "replace_node",
+            "arguments": "{\"blockId\":\"b-002\",\"xml\":\"<p>M1-REPLACED: intro paragraph rewritten.</p>\"}"
+          },
+          {
+            "id": "call_m2",
+            "name": "delete_node",
+            "arguments": "{\"blockId\":\"b-003\"}"
+          },
+          {
+            "id": "call_m3",
+            "name": "replace_node",
+            "arguments": "{\"blockId\":\"b-005\",\"xml\":\"<p>M3a-REPLACED: architecture paragraph rewritten.</p><p>M3b-INSERTED: spill-over paragraph from multi-block replace.</p>\"}"
+          },
+          {
+            "id": "call_m4",
+            "name": "insert_node",
+            "arguments": "{\"position\":{\"type\":\"after\",\"blockId\":\"b-006\"},\"xml\":\"<p>M4-INSERTED: new paragraph after the batch description.</p>\"}"
+          },
+          {
+            "id": "call_m5",
+            "name": "delete_node",
+            "arguments": "{\"blockId\":\"b-009\"}"
+          },
+          {
+            "id": "call_m6",
+            "name": "replace_node",
+            "arguments": "{\"blockId\":\"b-031\",\"xml\":\"<p>M6-REPLACED: the very last block of the document, rewritten.</p>\"}"
+          }
+        ]
+      }
+    }
+  ]
+}

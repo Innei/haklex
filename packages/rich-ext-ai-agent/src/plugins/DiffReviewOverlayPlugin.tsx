@@ -1,10 +1,12 @@
 import type { AgentStore, ReviewBatch, ReviewEntry } from '@haklex/rich-agent-core';
+import { blockIdState } from '@haklex/rich-editor';
 import { ActionButton } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getNodeByKey,
   $getRoot,
   $parseSerializedNode,
+  $setState,
   type LexicalNode,
   type SerializedLexicalNode,
 } from 'lexical';
@@ -267,7 +269,19 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
 
           if (entry.op.op === 'replace' || entry.op.op === 'delete') {
             const target = resolveAnchor(entry.op.blockId);
-            if (!target) continue;
+            if (!target) {
+              console.warn(
+                '[DiffReviewOverlay] dropped diff entry: target block not found',
+                entry.op,
+              );
+              continue;
+            }
+            // Carry the target's blockId on the diff node itself. While the
+            // diff node occupies the block's position the id must stay
+            // resolvable in the live document, or later ops anchored to it
+            // (chained tool calls, follow-up turns) silently fail; without
+            // this, BlockIdPlugin also assigns the node a fresh random id.
+            $setState(diffNode, blockIdState, entry.op.blockId);
             target.replace(diffNode);
             blockIndex.set(entry.op.blockId, diffNode);
             continue;
@@ -304,7 +318,13 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
             const children = root.getChildren();
             if (idx >= children.length) root.append(diffNode);
             else children[idx].insertBefore(diffNode);
+            continue;
           }
+
+          console.warn(
+            '[DiffReviewOverlay] dropped diff entry: no resolvable insert anchor',
+            entry.op,
+          );
         }
       }
     });
