@@ -139,14 +139,15 @@ createGlobalTheme(':root', vars, {
   ...articleLayout,
 });
 
-// Global dark fallback (for elements without a variant theme class)
-const darkGlobalConfig = {
-  color: darkColors,
-  ...articleLayout,
-  boxShadow: darkBoxShadow,
-} as const;
-createGlobalTheme(':root.dark', vars, darkGlobalConfig);
-createGlobalTheme('[data-theme="dark"]', vars, darkGlobalConfig);
+// Global dark fallback: colors/shadows ONLY. Must not redefine typography —
+// `[data-theme="dark"]` lands on the same element as the variant theme class
+// with equal specificity, so a full createGlobalTheme here would let CSS
+// bundle order decide whether note's serif font survives in dark mode.
+const darkColorVars = assignVars(vars.color, darkColors);
+const darkShadowVars = assignVars(vars.boxShadow, darkBoxShadow);
+globalStyle(':root.dark, [data-theme="dark"]', {
+  vars: { ...darkColorVars, ...darkShadowVars },
+});
 
 // Three variant theme classes (light colors only; dark handled by CSS override)
 export const articleTheme = createTheme(vars, {
@@ -165,13 +166,11 @@ export const commentTheme = createTheme(vars, {
 });
 
 // Per-variant dark override (higher specificity for variant-specific color tweaks)
-const darkColorOverrides = assignVars(vars.color, darkColors);
-const darkShadowOverrides = assignVars(vars.boxShadow, darkBoxShadow);
 for (const themeClass of [articleTheme, noteTheme, commentTheme]) {
   globalStyle(`.dark .${themeClass}, [data-theme="dark"] .${themeClass}`, {
-    vars: { ...darkColorOverrides, ...darkShadowOverrides },
+    vars: { ...darkColorVars, ...darkShadowVars },
   });
   globalStyle(`.dark.${themeClass}, [data-theme="dark"].${themeClass}`, {
-    vars: { ...darkColorOverrides, ...darkShadowOverrides },
+    vars: { ...darkColorVars, ...darkShadowVars },
   });
 }
