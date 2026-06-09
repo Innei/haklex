@@ -87,6 +87,7 @@ export function AgentDiffEditRenderer({
           <div className={`${diffInlineRow} ${diffRowDelete}`}>
             <div className={rendererFrame}>
               <RichRenderer
+                nested
                 extraNodes={extraNodes}
                 rendererConfig={rendererConfig}
                 theme={theme}
@@ -101,6 +102,7 @@ export function AgentDiffEditRenderer({
           <div className={`${diffInlineRow} ${diffRowInsert}`}>
             <div className={rendererFrame}>
               <RichRenderer
+                nested
                 extraNodes={extraNodes}
                 rendererConfig={rendererConfig}
                 theme={theme}

@@ -84,6 +84,7 @@ function HunkRenderer({
   return (
     <div className={diffStyles.diffCompact}>
       <RichRenderer
+        nested
         extraNodes={extraNodes}
         rendererConfig={rendererConfig}
         theme={theme}
