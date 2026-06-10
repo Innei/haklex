@@ -355,7 +355,11 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       ({
         type: 'excalidraw',
         ...extractBlockId(el),
-        snapshot: extractCdataText(el) || el.getAttribute('snapshot') || '',
+        // Plain text body covers remote snapshots (a bare http/blob:/ref: URL,
+        // optionally followed by a JSON delta) — see parseSnapshot in
+        // rich-ext-excalidraw.
+        snapshot:
+          extractCdataText(el) || el.getAttribute('snapshot') || el.textContent?.trim() || '',
         version: 1,
       }) as any,
   );

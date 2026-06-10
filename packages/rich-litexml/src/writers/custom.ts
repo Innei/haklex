@@ -149,6 +149,15 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
         selfClosing: true,
       };
     }
+    // Remote refs (bare URL line, no JSON) are XML-safe — write as plain text
+    // so the markup stays readable; inline JSON keeps the CDATA wrapper.
+    if (/^(?:https?:\/\/|blob:|ref:)\S+$/.test(n.snapshot.trim())) {
+      return {
+        tag: 'excalidraw',
+        attrs: optAttr(blockId(n)),
+        children: [n.snapshot.trim()],
+      };
+    }
     return {
       tag: 'excalidraw',
       attrs: optAttr(blockId(n)),

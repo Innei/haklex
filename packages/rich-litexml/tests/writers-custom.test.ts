@@ -452,6 +452,21 @@ describe('custom writers', () => {
     expect(xml).toContain('<excalidraw id="ex1"><![CDATA[{"elements":[]}]]></excalidraw>');
   });
 
+  it('excalidraw remote URL snapshot writes as plain text', () => {
+    const xml = serialize([
+      {
+        type: 'excalidraw',
+        $: { blockId: 'ex1' },
+        snapshot: 'https://cdn.example.com/diagram.excalidraw',
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain(
+      '<excalidraw id="ex1">https://cdn.example.com/diagram.excalidraw</excalidraw>',
+    );
+    expect(xml).not.toContain('CDATA');
+  });
+
   it('excalidraw empty snapshot', () => {
     const xml = serialize([
       {

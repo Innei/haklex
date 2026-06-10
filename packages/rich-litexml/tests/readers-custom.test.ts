@@ -185,6 +185,14 @@ describe('custom readers', () => {
     expect(nodes[0].$?.blockId).toBe('ex1');
   });
 
+  it('reads <excalidraw> with a remote URL body', () => {
+    const nodes = parse(
+      '<excalidraw id="ex1">https://cdn.example.com/diagram.excalidraw</excalidraw>',
+    );
+    expect(nodes[0].type).toBe('excalidraw');
+    expect(nodes[0].snapshot).toBe('https://cdn.example.com/diagram.excalidraw');
+  });
+
   it('reads <excalidraw> with snapshot attribute (backward compat)', () => {
     const nodes = parse('<excalidraw id="ex1" snapshot="{&quot;elements&quot;:[]}" />');
     expect(nodes[0].type).toBe('excalidraw');
