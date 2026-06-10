@@ -1,5 +1,6 @@
 export { CorePlugins } from './components/CorePlugins';
 export { ImageUploadProvider, useImageUpload } from './context/ImageUploadContext';
+export { useVideoUpload, VideoUploadProvider } from './context/VideoUploadContext';
 export { AlertPlugin } from './plugins/AlertPlugin';
 export { AutoFocusPlugin } from './plugins/AutoFocusPlugin';
 export { AutoLinkPlugin } from './plugins/AutoLinkPlugin';
@@ -25,4 +26,9 @@ export { MermaidPlugin } from './plugins/MermaidPlugin';
 export { OnChangePlugin } from './plugins/OnChangePlugin';
 export { SubmitShortcutPlugin } from './plugins/SubmitShortcutPlugin';
 export { TextSelectionPlugin } from './plugins/TextSelectionPlugin';
+export {
+  type VideoUploadFn,
+  VideoUploadPlugin,
+  type VideoUploadResult,
+} from './plugins/VideoUploadPlugin';
 export { ALL_TRANSFORMERS } from './transformers';

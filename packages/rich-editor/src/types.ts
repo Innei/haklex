@@ -31,4 +31,8 @@ export interface RichEditorProps {
   style?: React.CSSProperties;
   theme?: ColorScheme;
   variant?: RichEditorVariant;
+  videoUpload?: (
+    file: File,
+    opts?: { onProgress?: (percent: number) => void },
+  ) => Promise<{ src: string }>;
 }

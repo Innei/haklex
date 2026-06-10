@@ -1,5 +1,5 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { keyframes, style } from '@vanilla-extract/css'
+import { vars } from '@haklex/rich-style-token/styles';
+import { keyframes, style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
   root: 'rr-video-root',
@@ -23,9 +23,10 @@ export const semanticClassNames = {
   editField: 'rr-video-edit-field',
   editFieldIcon: 'rr-video-edit-field-icon',
   editInput: 'rr-video-edit-input',
-} as const
+  editError: 'rr-video-edit-error',
+} as const;
 
-export const root = style({ margin: '1.25rem 0' })
+export const root = style({ margin: '1.25rem 0' });
 
 export const player = style({
   position: 'relative',
@@ -33,7 +34,7 @@ export const player = style({
   background: '#000',
   borderRadius: '0.75rem',
   overflow: 'hidden',
-})
+});
 
 export const element = style({
   width: '100%',
@@ -42,12 +43,12 @@ export const element = style({
   objectFit: 'contain',
   background: '#000',
   cursor: 'pointer',
-})
+});
 
 const indicatorFlash = keyframes({
   '0%': { opacity: 1, transform: 'scale(1)' },
   '100%': { opacity: 0, transform: 'scale(1.3)' },
-})
+});
 
 export const indicator = style({
   position: 'absolute',
@@ -63,29 +64,29 @@ export const indicator = style({
   color: '#fff',
   pointerEvents: 'none',
   animation: `${indicatorFlash} 0.5s ease forwards`,
-})
+});
 
 export const controls = style({
-  position: 'absolute',
-  left: '2rem',
-  right: '2rem',
-  bottom: '0.5rem',
-  height: '2.5rem',
-  borderRadius: '999px',
-  border: `1px solid color-mix(in srgb, ${vars.color.border} 20%, transparent)`,
-  background: `color-mix(in srgb, ${vars.color.bgSecondary} 90%, transparent)`,
-  backdropFilter: 'blur(24px) saturate(180%)',
-  color: vars.color.text,
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.75rem',
-  padding: '0 1rem',
-  maxWidth: '80vw',
-  margin: '0 auto',
-  opacity: 0,
-  transform: 'translateY(4px)',
-  transition: 'opacity 0.2s ease, transform 0.2s ease',
-  selectors: {
+  'position': 'absolute',
+  'left': '2rem',
+  'right': '2rem',
+  'bottom': '0.5rem',
+  'height': '2.5rem',
+  'borderRadius': '999px',
+  'border': `1px solid color-mix(in srgb, ${vars.color.border} 20%, transparent)`,
+  'background': `color-mix(in srgb, ${vars.color.bgSecondary} 90%, transparent)`,
+  'backdropFilter': 'blur(24px) saturate(180%)',
+  'color': vars.color.text,
+  'display': 'flex',
+  'alignItems': 'center',
+  'gap': '0.75rem',
+  'padding': '0 1rem',
+  'maxWidth': '80vw',
+  'margin': '0 auto',
+  'opacity': 0,
+  'transform': 'translateY(4px)',
+  'transition': 'opacity 0.2s ease, transform 0.2s ease',
+  'selectors': {
     [`${player}:hover &, ${player}:focus-within &`]: {
       opacity: 1,
       transform: 'translateY(0)',
@@ -101,7 +102,7 @@ export const controls = style({
       padding: '0 0.75rem',
     },
   },
-})
+});
 
 export const button = style({
   appearance: 'none',
@@ -126,9 +127,9 @@ export const button = style({
     },
     '&:disabled': { opacity: 0.5, pointerEvents: 'none' },
   },
-})
+});
 
-export const progress = style({ flex: 1, height: '100%' })
+export const progress = style({ flex: 1, height: '100%' });
 
 export const progressControl = style({
   position: 'relative',
@@ -138,7 +139,7 @@ export const progressControl = style({
   height: '100%',
   touchAction: 'none',
   userSelect: 'none',
-})
+});
 
 export const progressTrack = style({
   position: 'relative',
@@ -146,14 +147,14 @@ export const progressTrack = style({
   height: '0.25rem',
   borderRadius: '999px',
   background: vars.color.bg,
-})
+});
 
 export const progressRange = style({
   position: 'absolute',
   height: '100%',
   borderRadius: '999px',
   background: `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent)`,
-})
+});
 
 export const progressThumb = style({
   display: 'block',
@@ -162,21 +163,21 @@ export const progressThumb = style({
   borderRadius: '1px',
   border: 'none',
   background: vars.color.textSecondary,
-})
+});
 
 const videoSpin = keyframes({
   from: { transform: 'rotate(0deg)' },
   to: { transform: 'rotate(360deg)' },
-})
+});
 
 export const spin = style({
   animation: `${videoSpin} 0.8s linear infinite`,
-})
+});
 
 export const editTrigger = style({
   display: 'block',
   cursor: 'pointer',
-})
+});
 
 export const editPreview = style({
   position: 'relative',
@@ -187,7 +188,7 @@ export const editPreview = style({
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   cursor: 'pointer',
-})
+});
 
 export const editVideo = style({
   width: '100%',
@@ -195,7 +196,7 @@ export const editVideo = style({
   display: 'block',
   objectFit: 'contain',
   pointerEvents: 'none',
-})
+});
 
 export const editOverlay = style({
   position: 'absolute',
@@ -211,7 +212,7 @@ export const editOverlay = style({
       background: 'rgba(0, 0, 0, 0.5)',
     },
   },
-})
+});
 
 export const editPlaceholder = style({
   display: 'flex',
@@ -231,7 +232,7 @@ export const editPlaceholder = style({
       color: vars.color.text,
     },
   },
-})
+});
 
 export const editPanel = style({
   display: 'flex',
@@ -241,7 +242,7 @@ export const editPanel = style({
   padding: '12px',
 
   fontFamily: vars.typography.fontFamilySans,
-})
+});
 
 export const editField = style({
   display: 'flex',
@@ -251,12 +252,17 @@ export const editField = style({
   backgroundColor: vars.color.bgSecondary,
   borderRadius: '6px',
   minWidth: 0,
-})
+});
 
 export const editFieldIcon = style({
   flexShrink: 0,
   color: vars.color.textSecondary,
-})
+});
+
+export const editError = style({
+  color: vars.color.alertCaution,
+  fontSize: vars.typography.fontSizeSm,
+});
 
 export const editInput = style({
   flex: 1,
@@ -273,4 +279,4 @@ export const editInput = style({
       color: vars.color.textSecondary,
     },
   },
-})
+});

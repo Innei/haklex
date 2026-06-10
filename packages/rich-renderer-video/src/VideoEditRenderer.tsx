@@ -1,3 +1,4 @@
+import { useVideoUpload } from '@haklex/rich-editor/plugins';
 import type { VideoRendererProps } from '@haklex/rich-editor/renderers';
 import { useRendererMode } from '@haklex/rich-editor/static';
 import {
@@ -9,7 +10,7 @@ import {
 } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNearestNodeFromDOMNode, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
-import { ExternalLink, ImageIcon, Trash2, Video } from 'lucide-react';
+import { ExternalLink, ImageIcon, Trash2, Upload, Video } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { getEditorHistoryShortcut } from './history-shortcuts';
@@ -33,10 +34,15 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
   const editable = editor.isEditable();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const srcInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoUpload = useVideoUpload();
 
   const [open, setOpen] = useState(!src);
   const [editSrc, setEditSrc] = useState(src);
   const [editPoster, setEditPoster] = useState(poster || '');
+  const [uploading, setUploading] = useState(false);
+  const [uploadPercent, setUploadPercent] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
 
   useEffect(() => {
     setEditSrc(src);
@@ -81,6 +87,39 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
   const handleOpen = useCallback(() => {
     if (src) window.open(src, '_blank', 'noopener,noreferrer');
   }, [src]);
+
+  const handleUploadFile = useCallback(
+    async (file: File | null) => {
+      if (!file || !videoUpload) return;
+      if (!file.type.startsWith('video/')) return;
+
+      setUploading(true);
+      setUploadPercent(0);
+      setUploadError(null);
+
+      try {
+        const result = await videoUpload(file, {
+          onProgress: (percent) => setUploadPercent(Math.round(percent)),
+        });
+
+        if (!wrapperRef.current) return;
+        editor.update(() => {
+          const node = $getNearestNodeFromDOMNode(wrapperRef.current!);
+          if (!node) return;
+          const writable = node.getWritable() as unknown as Record<string, unknown>;
+          writable.__src = result.src;
+        });
+        setEditSrc(result.src);
+        setOpen(false);
+      } catch (err: unknown) {
+        console.error('[VideoEditRenderer]', err);
+        setUploadError('Upload failed');
+      } finally {
+        setUploading(false);
+      }
+    },
+    [editor, videoUpload],
+  );
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -201,7 +240,30 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
             onKeyDown={handleKeyDown}
           />
         </div>
+        {uploadError && (
+          <span className={`${styles.editError} ${styles.semanticClassNames.editError}`}>
+            {uploadError}
+          </span>
+        )}
         <ActionBar>
+          {videoUpload && (
+            <>
+              <input
+                accept="video/*"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                type="file"
+                onChange={(e) => {
+                  void handleUploadFile(e.currentTarget.files?.[0] ?? null);
+                  e.currentTarget.value = '';
+                }}
+              />
+              <ActionButton disabled={uploading} onClick={() => fileInputRef.current?.click()}>
+                <Upload size={14} />
+                {uploading ? `Uploading ${uploadPercent}%` : 'Upload'}
+              </ActionButton>
+            </>
+          )}
           <ActionButton onClick={handleOpen}>
             <ExternalLink size={14} />
             Open
