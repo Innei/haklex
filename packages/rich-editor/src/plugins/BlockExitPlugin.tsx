@@ -318,36 +318,44 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
     COMMAND_PRIORITY_CRITICAL,
   );
 
-  // Cmd+Enter: exit any non-paragraph top-level block (including DecoratorNodes)
-  const unregisterCmdEnter = editor.registerCommand(
+  // Enter on a selected DecoratorNode inserts a paragraph after it;
+  // Cmd+Enter jumps to (or creates) the next block, and also exits
+  // any non-paragraph top-level block from a RangeSelection
+  const unregisterEnter = editor.registerCommand(
     KEY_ENTER_COMMAND,
     (event) => {
-      if (!event?.metaKey && !event?.ctrlKey) return false;
-
       const selection = $getSelection();
 
-      // Handle NodeSelection (selected DecoratorNode)
-      if ($isNodeSelection(selection)) {
+      if ($isNodeSelection(selection) && !event?.shiftKey) {
         const nodes = selection.getNodes();
         if (nodes.length !== 1) return false;
         const node = nodes[0];
         if (!$isDecoratorNode(node)) return false;
 
-        event.preventDefault();
-        let next = node.getNextSibling();
-        if (!next) {
-          next = $createParagraphNode();
-          node.insertAfter(next);
+        event?.preventDefault();
+
+        if (event?.metaKey || event?.ctrlKey) {
+          let next = node.getNextSibling();
+          if (!next) {
+            next = $createParagraphNode();
+            node.insertAfter(next);
+          }
+
+          if ($isElementNode(next)) {
+            next.selectStart();
+          } else if ($isDecoratorNode(next)) {
+            selectDecoratorNode(next, 'start');
+          }
+          return true;
         }
 
-        if ($isElementNode(next)) {
-          next.selectStart();
-        } else if ($isDecoratorNode(next)) {
-          selectDecoratorNode(next, 'start');
-        }
+        const paragraph = $createParagraphNode();
+        node.insertAfter(paragraph);
+        paragraph.selectStart();
         return true;
       }
 
+      if (!event?.metaKey && !event?.ctrlKey) return false;
       if (!$isRangeSelection(selection)) return false;
 
       const anchorNode = selection.anchor.getNode();
@@ -517,7 +525,7 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
     unregisterVirtualParagraphCleanup();
     unregisterArrowRight();
     unregisterArrowDown();
-    unregisterCmdEnter();
+    unregisterEnter();
     unregisterBackspace();
     unregisterDelete();
     unregisterArrowUpDecorator();

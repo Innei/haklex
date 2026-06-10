@@ -6,6 +6,7 @@ import { TablePlugin } from '@lexical/react/LexicalTablePlugin';
 
 import { AutoLinkPlugin } from '../plugins/AutoLinkPlugin';
 import { BlockExitPlugin } from '../plugins/BlockExitPlugin';
+import { ClickBelowPlugin } from '../plugins/ClickBelowPlugin';
 import { HorizontalRulePlugin } from '../plugins/HorizontalRulePlugin';
 import { MarkdownPastePlugin } from '../plugins/MarkdownPastePlugin';
 import { MarkdownShortcutsPlugin } from '../plugins/MarkdownShortcutsPlugin';
@@ -21,6 +22,7 @@ export function CorePlugins() {
       <MarkdownShortcutsPlugin />
       <MarkdownPastePlugin />
       <BlockExitPlugin />
+      <ClickBelowPlugin />
       <HorizontalRulePlugin />
       <AutoLinkPlugin />
     </>

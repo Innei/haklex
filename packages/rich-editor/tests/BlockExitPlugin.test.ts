@@ -1,13 +1,17 @@
 import {
+  $createNodeSelection,
   $createParagraphNode,
   $createTextNode,
   $getRoot,
   $getSelection,
   $isParagraphNode,
   $isRangeSelection,
+  $setSelection,
   createEditor,
+  DecoratorNode,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_UP_COMMAND,
+  KEY_ENTER_COMMAND,
 } from 'lexical';
 import { describe, expect, it } from 'vitest';
 
@@ -20,9 +24,40 @@ function createKeyboardEventStub(): KeyboardEvent {
   } as KeyboardEvent;
 }
 
+class TestDecoratorNode extends DecoratorNode<null> {
+  static getType() {
+    return 'test-decorator';
+  }
+
+  static clone(node: TestDecoratorNode) {
+    return new TestDecoratorNode(node.__key);
+  }
+
+  static importJSON() {
+    return new TestDecoratorNode();
+  }
+
+  exportJSON() {
+    return { type: 'test-decorator', version: 1 };
+  }
+
+  createDOM() {
+    return document.createElement('div');
+  }
+
+  updateDOM() {
+    return false;
+  }
+
+  decorate() {
+    return null;
+  }
+}
+
 function createTestEditor() {
   const editor = createEditor({
     namespace: 'BlockExitPluginTest',
+    nodes: [TestDecoratorNode],
     onError: (error) => {
       throw error;
     },
@@ -190,6 +225,48 @@ describe('registerBlockExitCommands', () => {
         expect(root.getChildrenSize()).toBe(2);
         expect($isParagraphNode(last)).toBe(true);
         expect(last?.getTextContent()).toBe('');
+        expect($isRangeSelection(selection)).toBe(true);
+
+        if ($isParagraphNode(last) && $isRangeSelection(selection)) {
+          expect(selection.anchor.getNode().getTopLevelElementOrThrow().getKey()).toBe(
+            last.getKey(),
+          );
+        }
+      });
+    } finally {
+      unregister();
+    }
+  });
+
+  it('inserts a paragraph after a node-selected decorator on plain Enter', async () => {
+    const { editor, unregister } = createTestEditor();
+
+    try {
+      editor.update(() => {
+        const root = $getRoot();
+        const decorator = new TestDecoratorNode();
+        root.append(decorator);
+        const selection = $createNodeSelection();
+        selection.add(decorator.getKey());
+        $setSelection(selection);
+      });
+
+      await flushEditor();
+
+      const handled = editor.dispatchCommand(KEY_ENTER_COMMAND, createKeyboardEventStub());
+
+      expect(handled).toBe(true);
+
+      await flushEditor();
+
+      editor.getEditorState().read(() => {
+        const root = $getRoot();
+        const last = root.getLastChild();
+        const selection = $getSelection();
+
+        expect(root.getChildrenSize()).toBe(2);
+        expect(root.getFirstChild()?.getType()).toBe('test-decorator');
+        expect($isParagraphNode(last)).toBe(true);
         expect($isRangeSelection(selection)).toBe(true);
 
         if ($isParagraphNode(last) && $isRangeSelection(selection)) {

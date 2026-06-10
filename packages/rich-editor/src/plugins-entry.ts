@@ -6,6 +6,7 @@ export { AutoLinkPlugin } from './plugins/AutoLinkPlugin';
 export { BlockExitPlugin } from './plugins/BlockExitPlugin';
 export { BlockIdPlugin } from './plugins/BlockIdPlugin';
 export { blockIdState } from './plugins/BlockIdPlugin';
+export { ClickBelowPlugin, registerClickBelowCommand } from './plugins/ClickBelowPlugin';
 export { EditorRefPlugin } from './plugins/EditorRefPlugin';
 export { FootnotePlugin } from './plugins/FootnotePlugin';
 export { HorizontalRulePlugin } from './plugins/HorizontalRulePlugin';
