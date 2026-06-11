@@ -35,6 +35,8 @@ export function ImageRenderer({
   caption,
   thumbhash,
   accent,
+  displayWidth,
+  layout,
   onActivate,
   ref,
 }: ImageRendererInteractiveProps) {
@@ -72,8 +74,17 @@ export function ImageRenderer({
     activate();
   };
 
+  const figureStyle = displayWidth
+    ? ({ '--rich-image-display-width': `${displayWidth}%` } as CSSProperties)
+    : undefined;
+
   return (
-    <figure className={`${styles.root} ${styles.semanticClassNames.root}`} ref={ref}>
+    <figure
+      className={`${styles.root} ${styles.semanticClassNames.root}`}
+      data-layout={layout}
+      ref={ref}
+      style={figureStyle}
+    >
       <div
         aria-label={interactive ? `Open image: ${altText || 'image'}` : undefined}
         className={`${styles.frame} ${interactive ? '' : styles.frameStatic} ${styles.semanticClassNames.frame} ${styles.imageState[state]} ${frameStateSemanticClass[state]}`.trim()}

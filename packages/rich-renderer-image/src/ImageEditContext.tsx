@@ -7,11 +7,13 @@ import {
   accentAtom,
   altTextAtom,
   captionAtom,
+  displayWidthAtom,
   editAltTextAtom,
   editCaptionAtom,
   editSrcAtom,
   fileInputRefAtom,
   heightAtom,
+  layoutAtom,
   loadStateAtom,
   replaceOpenAtom,
   srcAtom,
@@ -39,6 +41,8 @@ export function ImageEditProvider({
     s.set(captionAtom, props.caption);
     s.set(thumbhashAtom, props.thumbhash);
     s.set(accentAtom, props.accent);
+    s.set(displayWidthAtom, props.displayWidth);
+    s.set(layoutAtom, props.layout);
     s.set(editSrcAtom, props.src);
     s.set(editAltTextAtom, props.altText);
     s.set(editCaptionAtom, props.caption || '');
@@ -57,6 +61,8 @@ export function ImageEditProvider({
     store.set(captionAtom, props.caption);
     store.set(thumbhashAtom, props.thumbhash);
     store.set(accentAtom, props.accent);
+    store.set(displayWidthAtom, props.displayWidth);
+    store.set(layoutAtom, props.layout);
   }, [
     store,
     props.src,
@@ -66,6 +72,8 @@ export function ImageEditProvider({
     props.caption,
     props.thumbhash,
     props.accent,
+    props.displayWidth,
+    props.layout,
   ]);
 
   useEffect(() => {

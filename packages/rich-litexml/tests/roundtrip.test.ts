@@ -59,6 +59,14 @@ describe('roundtrip', () => {
     expect(roundtrip('<img id="i1" src="/a.jpg" alt="Photo" />')).toContain('src="/a.jpg"');
   });
 
+  it('image with display-width and layout', () => {
+    const result = roundtrip(
+      '<img id="i1" src="/a.jpg" alt="Photo" display-width="60" layout="float-right" />',
+    );
+    expect(result).toContain('display-width="60"');
+    expect(result).toContain('layout="float-right"');
+  });
+
   it('link inside paragraph', () => {
     const result = roundtrip('<p id="p1">See <a href="https://x.com">link</a></p>');
     expect(result).toContain('<a href="https://x.com">link</a>');

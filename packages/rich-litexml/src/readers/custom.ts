@@ -19,6 +19,19 @@ function numAttr(el: Element, name: string): number | undefined {
   return v !== null ? Number(v) : undefined;
 }
 
+// Duplicated from @haklex/rich-editor ImageNode (not a dependency of this package)
+const IMAGE_LAYOUTS = new Set(['align-left', 'align-right', 'float-left', 'float-right']);
+
+function imageDisplayWidthAttr(el: Element): number | undefined {
+  const v = numAttr(el, 'display-width');
+  return v !== undefined && Number.isFinite(v) && v >= 10 && v <= 100 ? v : undefined;
+}
+
+function imageLayoutAttr(el: Element): string | undefined {
+  const v = el.getAttribute('layout');
+  return v !== null && IMAGE_LAYOUTS.has(v) ? v : undefined;
+}
+
 /**
  * Extract CDATA text content from an element.
  * linkedom (HTML parser) converts <![CDATA[...]]> to a comment node
@@ -56,6 +69,8 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       caption: el.getAttribute('caption') ?? undefined,
       thumbhash: el.getAttribute('thumbhash') ?? undefined,
       accent: el.getAttribute('accent') ?? undefined,
+      displayWidth: imageDisplayWidthAttr(el),
+      layout: imageLayoutAttr(el),
       version: 1,
     } as any;
   });

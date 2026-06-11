@@ -23,6 +23,27 @@ describe('custom readers', () => {
     expect(nodes[0].$?.blockId).toBe('i1');
   });
 
+  it('reads <img /> display-width and layout', () => {
+    const nodes = parse('<img src="/a.jpg" alt="A" display-width="60" layout="float-right" />');
+    expect(nodes[0].displayWidth).toBe(60);
+    expect(nodes[0].layout).toBe('float-right');
+  });
+
+  it('rejects invalid <img /> layout values', () => {
+    const nodes = parse('<img src="/a.jpg" alt="A" layout="banana" />');
+    expect(nodes[0].layout).toBeUndefined();
+  });
+
+  it('rejects out-of-range or non-numeric <img /> display-width', () => {
+    expect(parse('<img src="/a.jpg" alt="A" display-width="5" />')[0].displayWidth).toBeUndefined();
+    expect(
+      parse('<img src="/a.jpg" alt="A" display-width="150" />')[0].displayWidth,
+    ).toBeUndefined();
+    expect(
+      parse('<img src="/a.jpg" alt="A" display-width="abc" />')[0].displayWidth,
+    ).toBeUndefined();
+  });
+
   it('reads <video />', () => {
     const nodes = parse('<video id="v1" src="/clip.mp4" poster="/thumb.jpg" />');
     expect(nodes[0].type).toBe('video');

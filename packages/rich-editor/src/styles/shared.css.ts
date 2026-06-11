@@ -83,6 +83,9 @@ const headingLevelBadge = {
 const quoteBarWidth = 4;
 
 export const richContent = style({
+  // flow-root establishes a BFC so floated images (data-layout^="float")
+  // cannot overflow past the end of the rendered content
+  display: 'flow-root',
   fontFamily: vars.typography.fontFamily,
   fontSize: vars.typography.fontSizeBase,
   lineHeight: vars.typography.lineHeight,
@@ -937,6 +940,88 @@ globalStyle(`${tableCellHeader} > :first-child`, {
 
 globalStyle(`${tableCellHeader} > :last-child`, {
   marginBottom: 0,
+});
+
+const mobileMedia = '(max-width: 640px)';
+
+// ─── Image display width & layout ───────────────────────
+// `--rich-image-display-width` is set inline by ImageRenderer when
+// displayWidth is present. In the editor, float is carried by the
+// `.rich-image-wrapper` block (from ImageNode.createDOM); in static SSR
+// output the figure is the top-level block and floats itself.
+globalStyle('figure.rich-image', {
+  width: 'var(--rich-image-display-width, auto)',
+  maxWidth: '100%',
+  marginInline: 'auto',
+});
+
+globalStyle('figure.rich-image[data-layout="align-left"]', {
+  marginLeft: 0,
+  marginRight: 'auto',
+  textAlign: 'left',
+});
+
+globalStyle('figure.rich-image[data-layout="align-right"]', {
+  marginLeft: 'auto',
+  marginRight: 0,
+  textAlign: 'right',
+});
+
+globalStyle('figure.rich-image[data-layout="float-left"]', {
+  float: 'left',
+  width: 'var(--rich-image-display-width, 50%)',
+  margin: '0.25rem 1.5rem 1rem 0',
+});
+
+globalStyle('figure.rich-image[data-layout="float-right"]', {
+  float: 'right',
+  width: 'var(--rich-image-display-width, 50%)',
+  margin: '0.25rem 0 1rem 1.5rem',
+});
+
+// width: 50% matches the static renderer's var() fallback for floats without
+// an explicit displayWidth; the wrapper's inline width overrides it when set.
+globalStyle('.rich-image-wrapper[data-layout="float-left"]', {
+  float: 'left',
+  width: '50%',
+  maxWidth: '100%',
+  margin: '0.25rem 1.5rem 1rem 0',
+});
+
+globalStyle('.rich-image-wrapper[data-layout="float-right"]', {
+  float: 'right',
+  width: '50%',
+  maxWidth: '100%',
+  margin: '0.25rem 0 1rem 1.5rem',
+});
+
+// Inside a floated wrapper the wrapper already carries float + width;
+// the inner figure must fill it instead of double-applying both.
+globalStyle('.rich-image-wrapper[data-layout^="float"] figure.rich-image', {
+  float: 'none',
+  width: 'auto',
+  margin: 0,
+});
+
+globalStyle('figure.rich-image[data-layout^="float"]', {
+  '@media': {
+    [mobileMedia]: {
+      float: 'none',
+      width: 'auto',
+      margin: '1.25rem auto',
+    },
+  },
+});
+
+globalStyle('.rich-image-wrapper[data-layout^="float"]', {
+  '@media': {
+    [mobileMedia]: {
+      float: 'none',
+      // overrides the inline width set by ImageNode.createDOM/updateDOM
+      width: '100% !important',
+      margin: 0,
+    },
+  },
 });
 
 export const sharedStyles = {

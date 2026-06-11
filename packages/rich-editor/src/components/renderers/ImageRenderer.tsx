@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import type { ImageLayout } from '../../nodes/ImageNode';
 import { decodeThumbHash } from '../../utils/thumbhash';
 
 export interface ImageRendererProps {
   accent?: string;
   altText: string;
   caption?: string;
+  displayWidth?: number;
   height?: number;
+  layout?: ImageLayout;
   src: string;
   thumbhash?: string;
   width?: number;
@@ -20,6 +23,8 @@ export function ImageRenderer({
   caption,
   thumbhash,
   accent,
+  displayWidth,
+  layout,
 }: ImageRendererProps) {
   const [loaded, setLoaded] = useState(false);
   const [zoomed, setZoomed] = useState(false);
@@ -71,8 +76,12 @@ export function ImageRenderer({
       ? { aspectRatio: `${width} / ${height}`, maxWidth: '100%', width }
       : { maxWidth: '100%' };
 
+  const figureStyle = displayWidth
+    ? ({ '--rich-image-display-width': `${displayWidth}%` } as React.CSSProperties)
+    : undefined;
+
   return (
-    <figure className="rich-image">
+    <figure className="rich-image" data-layout={layout} style={figureStyle}>
       <div
         aria-label={loaded ? `Zoom image: ${altText}` : undefined}
         className={`rich-image-container${loaded ? ' rich-image-loaded' : ''}`}

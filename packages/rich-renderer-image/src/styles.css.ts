@@ -24,11 +24,56 @@ export const semanticClassNames = {
   replaceUploadArea: 'rr-image-replace-upload-area',
   replacePreview: 'rr-image-replace-preview',
   panelHint: 'rr-image-panel-hint',
+  resizeHandle: 'rr-image-resize-handle',
 } as const;
 
 export const root = style({
-  margin: '1.25rem 0',
-  textAlign: 'center',
+  'margin': '1.25rem auto',
+  'textAlign': 'center',
+  'width': 'var(--rich-image-display-width, auto)',
+  'maxWidth': '100%',
+  'selectors': {
+    '&[data-layout="align-left"]': {
+      marginLeft: 0,
+      marginRight: 'auto',
+      textAlign: 'left',
+    },
+    '&[data-layout="align-right"]': {
+      marginLeft: 'auto',
+      marginRight: 0,
+      textAlign: 'right',
+    },
+    '&[data-layout="float-left"]': {
+      float: 'left',
+      width: 'var(--rich-image-display-width, 50%)',
+      margin: '0.25rem 1.5rem 1rem 0',
+    },
+    '&[data-layout="float-right"]': {
+      float: 'right',
+      width: 'var(--rich-image-display-width, 50%)',
+      margin: '0.25rem 0 1rem 1.5rem',
+    },
+  },
+  '@media': {
+    '(max-width: 640px)': {
+      selectors: {
+        '&[data-layout="float-left"], &[data-layout="float-right"]': {
+          float: 'none',
+          width: 'auto',
+          margin: '1.25rem auto',
+        },
+      },
+    },
+  },
+});
+
+// In a live editor the `.rich-image-wrapper` block (from ImageNode.createDOM)
+// carries float + width; the inner figure must fill it instead of
+// double-applying both.
+globalStyle(`.rich-image-wrapper[data-layout^="float"] ${root}`, {
+  float: 'none',
+  width: 'auto',
+  margin: 0,
 });
 
 const imageLoad = keyframes({
@@ -378,4 +423,65 @@ export const panelHint = style({
   gap: '0.4rem',
   color: vars.color.textSecondary,
   fontSize: vars.typography.fontSizeXs,
+});
+
+export const resizeHandle = style({
+  position: 'absolute',
+  top: '50%',
+  transform: 'translateY(-50%)',
+  width: 6,
+  height: 36,
+  maxHeight: '50%',
+  borderRadius: 9999,
+  background: 'rgba(255, 255, 255, 0.92)',
+  border: '1px solid rgba(0, 0, 0, 0.18)',
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.25)',
+  cursor: 'ew-resize',
+  touchAction: 'none',
+  opacity: 0,
+  transition: 'opacity 0.15s ease',
+  zIndex: 10,
+});
+
+export const resizeHandleLeft = style({ left: 6 });
+export const resizeHandleRight = style({ right: 6 });
+
+export const resizeHandleVisible = style({
+  opacity: 1,
+});
+
+export const controlPanel = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '4px',
+  padding: '4px',
+  fontFamily: vars.typography.fontFamily,
+  zIndex: 30,
+});
+
+export const sizeOption = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  height: 26,
+  padding: '0 8px',
+  borderRadius: '6px',
+  border: 'none',
+  background: 'transparent',
+  color: vars.color.textSecondary,
+  fontSize: vars.typography.fontSizeXs,
+  fontWeight: 500,
+  cursor: 'pointer',
+  transition: 'background-color 0.15s ease, color 0.15s ease',
+  selectors: {
+    '&:hover': {
+      color: vars.color.text,
+      backgroundColor: vars.color.fillSecondary,
+    },
+  },
+});
+
+export const editToolbarButtonActive = style({
+  color: vars.color.text,
+  backgroundColor: vars.color.fillSecondary,
 });

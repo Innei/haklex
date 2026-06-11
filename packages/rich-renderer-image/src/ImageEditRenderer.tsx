@@ -2,15 +2,18 @@ import type { ImageRendererProps } from '@haklex/rich-editor/renderers';
 import { useRendererMode } from '@haklex/rich-editor/static';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useAtomValue, useSetAtom } from 'jotai';
+import type { CSSProperties } from 'react';
 import { useCallback } from 'react';
 
 import {
   altTextAtom,
   captionTextAtom,
+  displayWidthAtom,
   focusCaptionOnOpenAtom,
   frameStyleAtom,
   heightAtom,
   hoveringAtom,
+  layoutAtom,
   loadStateAtom,
   metaOpenAtom,
   replaceOpenAtom,
@@ -22,6 +25,7 @@ import { ImageEditProvider } from './ImageEditContext';
 import { ImageEditToolbar } from './ImageEditToolbar';
 import { ImageRenderer } from './ImageRenderer';
 import { ReplacePopover } from './ReplacePopover';
+import { ResizeHandles } from './ResizeHandles';
 import * as styles from './styles.css';
 
 const frameStateSemanticClass = {
@@ -69,6 +73,8 @@ function ImageEditContent() {
   const setMetaOpen = useSetAtom(metaOpenAtom);
   const setReplaceOpen = useSetAtom(replaceOpenAtom);
   const setFocusCaptionOnOpen = useSetAtom(focusCaptionOnOpenAtom);
+  const displayWidth = useAtomValue(displayWidthAtom);
+  const layout = useAtomValue(layoutAtom);
 
   const handleCaptionClick = useCallback(
     (e: React.MouseEvent) => {
@@ -85,6 +91,10 @@ function ImageEditContent() {
     [setMetaOpen, setReplaceOpen, setFocusCaptionOnOpen],
   );
 
+  const figureStyle = displayWidth
+    ? ({ '--rich-image-display-width': `${displayWidth}%` } as CSSProperties)
+    : undefined;
+
   return (
     <div
       className={`${styles.editTrigger} ${styles.semanticClassNames.editTrigger}`}
@@ -93,7 +103,11 @@ function ImageEditContent() {
       onMouseLeave={() => setHovering(false)}
     >
       {src ? (
-        <figure className={`${styles.root} ${styles.semanticClassNames.root}`}>
+        <figure
+          className={`${styles.root} ${styles.semanticClassNames.root}`}
+          data-layout={layout}
+          style={figureStyle}
+        >
           <div
             className={`${styles.frame} ${styles.semanticClassNames.frame} ${styles.frameEditMode} ${styles.imageState[loadState]} ${frameStateSemanticClass[loadState]}`.trim()}
             style={frameStyle}
@@ -116,6 +130,7 @@ function ImageEditContent() {
                 Image failed to load
               </span>
             )}
+            <ResizeHandles />
           </div>
           {captionText && (
             <figcaption

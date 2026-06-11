@@ -175,6 +175,42 @@ export class DetailsNode extends ElementNode {
   }
 }
 
+// ── RichQuoteNode (QuoteNode with attribution, block) ──
+
+export class RichQuoteNode extends QuoteNode {
+  __attribution: string | null = null;
+
+  static getType(): string {
+    return 'rich-quote';
+  }
+  static clone(node: RichQuoteNode): RichQuoteNode {
+    const n = new RichQuoteNode((node as any).__key);
+    n.__attribution = node.__attribution;
+    return n;
+  }
+  constructor(key?: NodeKey) {
+    super(key);
+  }
+  static importJSON(json: SerializedElementNode & { attribution?: string | null }): RichQuoteNode {
+    const node = new RichQuoteNode();
+    node.__attribution = json.attribution ?? null;
+    return node;
+  }
+  exportJSON(): SerializedElementNode & { attribution: string | null } {
+    return {
+      ...super.exportJSON(),
+      type: 'rich-quote',
+      attribution: this.__attribution,
+    };
+  }
+  createDOM(): HTMLElement {
+    return stubDOM();
+  }
+  updateDOM(): boolean {
+    return false;
+  }
+}
+
 // ── Generic headless DecoratorNode ──
 
 type Props = Record<string, unknown>;
@@ -539,6 +575,7 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   SpoilerNode,
   RubyNode,
   DetailsNode,
+  RichQuoteNode,
   ImageNode,
   VideoNode,
   LinkCardNode,

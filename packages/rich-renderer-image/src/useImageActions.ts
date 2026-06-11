@@ -1,3 +1,4 @@
+import type { ImageLayout } from '@haklex/rich-editor/nodes';
 import { $createImageNode, $isImageNode } from '@haklex/rich-editor/nodes';
 import { type ImageUploadFn, useImageUpload } from '@haklex/rich-editor/plugins';
 import { computeImageMeta } from '@haklex/rich-editor/renderers';
@@ -123,10 +124,30 @@ export function useImageActions() {
         caption: node.getCaption(),
         thumbhash: node.getThumbhash(),
         accent: node.getAccent(),
+        displayWidth: node.getDisplayWidth(),
+        layout: node.getLayout(),
       });
       node.insertAfter(copy);
     });
   }, [withImageNode]);
+
+  const handleSetDisplayWidth = useCallback(
+    (width?: number) => {
+      withImageNode((node) => {
+        node.setDisplayWidth(width);
+      });
+    },
+    [withImageNode],
+  );
+
+  const handleSetLayout = useCallback(
+    (layout?: ImageLayout) => {
+      withImageNode((node) => {
+        node.setLayout(layout);
+      });
+    },
+    [withImageNode],
+  );
 
   const handleReplaceFile = useCallback(
     async (file: File | null) => {
@@ -208,5 +229,7 @@ export function useImageActions() {
     handleDuplicate,
     handleDownload,
     handleDelete,
+    handleSetDisplayWidth,
+    handleSetLayout,
   };
 }

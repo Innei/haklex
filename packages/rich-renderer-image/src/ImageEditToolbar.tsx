@@ -19,6 +19,7 @@ import {
 } from './atoms';
 import { EditMetaPopover } from './EditMetaPopover';
 import { getEditorHistoryShortcut } from './history-shortcuts';
+import { ImageLayoutControl, ImageSizeControl } from './ImageLayoutControls';
 import { ReplacePanel } from './ReplacePanel';
 import * as styles from './styles.css';
 import { useImageActions } from './useImageActions';
@@ -123,6 +124,9 @@ export function ImageEditToolbar() {
           <ReplacePanel />
         </PopoverPanel>
       </Popover>
+
+      <ImageSizeControl />
+      <ImageLayoutControl />
 
       <button
         className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}

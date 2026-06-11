@@ -11,12 +11,15 @@ Every block-level extension may carry `id="..."` → `$.blockId`. Omit for fresh
 - **When**: A single image, optionally with caption and explicit dimensions.
 - **Avoid when**: Multiple related images — use `<gallery>`. Decorative inline glyph — use the renderer's icon system.
 - **Required**: `src`.
-- **Optional**: `id`, `alt`, `width` (numeric), `height` (numeric), `caption`, `thumbhash`, `accent` (color string for image rendering).
+- **Optional**: `id`, `alt`, `width` (numeric), `height` (numeric), `caption`, `thumbhash`, `accent` (color string for image rendering), `display-width` (integer 10–100), `layout` (`align-left` | `align-right` | `float-left` | `float-right`).
 - **Body**: self-closing.
 - **Inside `<gallery>`**: `<img>` becomes a gallery image item instead of a standalone image node — only `src` and `alt` are read.
+- **`display-width`**: display width as a percent of the content column. Omit for natural sizing (capped at 1200px).
+- **`layout`**: `align-left` / `align-right` keep the image a standalone block aligned to a side; `float-left` / `float-right` float it so following text wraps around (on screens ≤640px floats collapse to a full-width block). Omit for the default centered block. Invalid values for either attribute are dropped.
 
 ```xml
 <img src="/photo.jpg" alt="Cover" width="1200" height="800" caption="At dusk." accent="#ff8855" />
+<img src="/portrait.jpg" alt="Portrait" layout="float-right" display-width="40" />
 ```
 
 ### `<video>` — video

@@ -34,6 +34,12 @@ Use the document editing tools according to the following contract.
 
 ## Node-Specific Guidance
 
+### `<img>` (image block)
+
+- Shape: `<img src="..." [alt="..."] [width="..."] [height="..."] [caption="..."] [display-width="10-100"] [layout="align-left|align-right|float-left|float-right"] />`
+- `display-width` is an integer 10–100: display width as a percent of the content column. Omit for natural sizing (capped at 1200px).
+- `layout`: `align-left` / `align-right` keep a standalone block aligned to a side; `float-left` / `float-right` float the image so following text wraps around. Omit for the default centered block.
+
 ### `<poll>` (interactive vote widget)
 
 - Shape: `<poll mode="single|multiple" [poll-id="..."] [close-at="ISO8601"] [show-results="always|after-vote|after-close"]><question>...</question><option [id="..."]>...</option>...</poll>`

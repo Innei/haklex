@@ -1,3 +1,4 @@
+import type { ImageLayout } from '@haklex/rich-editor/nodes';
 import { decodeThumbHash } from '@haklex/rich-editor/renderers';
 import { atom } from 'jotai';
 import type { CSSProperties, RefObject } from 'react';
@@ -22,14 +23,25 @@ export const heightAtom = atom<number | undefined>();
 export const captionAtom = atom<string | undefined>();
 export const thumbhashAtom = atom<string | undefined>();
 export const accentAtom = atom<string | undefined>();
+export const displayWidthAtom = atom<number | undefined>();
+export const layoutAtom = atom<ImageLayout | undefined>();
 
 // --- UI state ---
 export const loadStateAtom = atom<ImageLoadState>('loading');
 export const hoveringAtom = atom(false);
 export const metaOpenAtom = atom(false);
 export const replaceOpenAtom = atom(false);
+export const sizeOpenAtom = atom(false);
+export const layoutOpenAtom = atom(false);
+export const resizingAtom = atom(false);
 export const toolbarVisibleAtom = atom(
-  (get) => get(hoveringAtom) || get(metaOpenAtom) || get(replaceOpenAtom),
+  (get) =>
+    get(hoveringAtom) ||
+    get(metaOpenAtom) ||
+    get(replaceOpenAtom) ||
+    get(sizeOpenAtom) ||
+    get(layoutOpenAtom) ||
+    get(resizingAtom),
 );
 
 export const focusCaptionOnOpenAtom = atom(false);

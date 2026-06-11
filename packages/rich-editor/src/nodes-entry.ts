@@ -5,8 +5,14 @@ export { getResolvedEditNodes, setResolvedEditNodes } from './node-registry';
 export { NESTED_EDITOR_NODES } from './nodes/shared';
 
 // ImageNode
-export type { ImageNodePayload, SerializedImageNode } from './nodes/ImageNode';
-export { $createImageNode, $isImageNode, ImageNode } from './nodes/ImageNode';
+export type { ImageLayout, ImageNodePayload, SerializedImageNode } from './nodes/ImageNode';
+export {
+  $createImageNode,
+  $isImageNode,
+  ImageNode,
+  sanitizeImageDisplayWidth,
+  sanitizeImageLayout,
+} from './nodes/ImageNode';
 
 // KaTeX nodes
 export type { SerializedKaTeXBlockNode } from './nodes/KaTeXBlockNode';

@@ -38,6 +38,28 @@ describe('custom writers', () => {
     );
   });
 
+  it('image with displayWidth and layout', () => {
+    const xml = serialize([
+      {
+        type: 'image',
+        $: { blockId: 'img2' },
+        src: '/photo.jpg',
+        altText: 'A photo',
+        displayWidth: 60,
+        layout: 'float-right',
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain('display-width="60"');
+    expect(xml).toContain('layout="float-right"');
+  });
+
+  it('image without displayWidth and layout omits the attributes', () => {
+    const xml = serialize([{ type: 'image', src: '/photo.jpg', altText: 'A photo', version: 1 }]);
+    expect(xml).not.toContain('display-width');
+    expect(xml).not.toContain('layout');
+  });
+
   it('video', () => {
     const xml = serialize([
       {
