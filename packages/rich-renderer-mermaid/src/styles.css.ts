@@ -110,6 +110,7 @@ export const mermaidError = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  fontFamily: vars.typography.fontFamilySans,
   padding: '0.75rem 1rem',
   margin: '1rem 0',
   borderRadius: '0.5rem',

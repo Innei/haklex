@@ -67,6 +67,7 @@ export const indicator = style({
 });
 
 export const controls = style({
+  'fontFamily': vars.typography.fontFamilySans,
   'position': 'absolute',
   'left': '2rem',
   'right': '2rem',

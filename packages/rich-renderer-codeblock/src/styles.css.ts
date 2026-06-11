@@ -434,6 +434,7 @@ const contentHeaderStyles = {
   justifyContent: 'space-between',
   padding: `${vars.spacing.sm} ${vars.spacing.md}`,
   borderBottom: `1px solid ${vars.color.border}`,
+  fontFamily: vars.typography.fontFamilySans,
   fontSize: vars.typography.fontSizeMd,
   color: vars.color.textSecondary,
   userSelect: 'none',

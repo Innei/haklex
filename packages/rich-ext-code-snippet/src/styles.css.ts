@@ -1,6 +1,6 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { globalStyle, style } from '@vanilla-extract/css'
-import { recipe } from '@vanilla-extract/recipes'
+import { vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
+import { recipe } from '@vanilla-extract/recipes';
 
 export const semanticClassNames = {
   container: 'rcs-container',
@@ -43,7 +43,7 @@ export const semanticClassNames = {
   breadcrumbLang: 'rcs-breadcrumb-lang',
   editorContainer: 'rcs-editor-container',
   dragOverlay: 'rcs-drag-overlay',
-} as const
+} as const;
 
 export const container = style({
   position: 'relative',
@@ -51,8 +51,9 @@ export const container = style({
   overflow: 'hidden',
   border: `1px solid color-mix(in srgb, ${vars.color.border} 60%, transparent)`,
   background: vars.color.codeBg,
+  fontFamily: vars.typography.fontFamilySans,
   fontSize: vars.typography.fontSizeMd,
-})
+});
 
 export const header = style({
   display: 'flex',
@@ -60,7 +61,7 @@ export const header = style({
   justifyContent: 'space-between',
   padding: '0 12px',
   minHeight: 40,
-})
+});
 
 export const tabs = style({
   display: 'flex',
@@ -73,7 +74,7 @@ export const tabs = style({
       display: 'none',
     },
   },
-})
+});
 
 const tabBase = style({
   display: 'flex',
@@ -97,7 +98,7 @@ const tabBase = style({
       background: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
     },
   },
-})
+});
 
 export const tab = recipe({
   base: tabBase,
@@ -113,7 +114,7 @@ export const tab = recipe({
   defaultVariants: {
     active: false,
   },
-})
+});
 
 export const titleBar = style({
   display: 'flex',
@@ -124,7 +125,7 @@ export const titleBar = style({
   fontFamily: vars.typography.fontMono,
   fontWeight: 500,
   color: vars.color.textSecondary,
-})
+});
 
 export const headerActions = style({
   display: 'flex',
@@ -136,7 +137,7 @@ export const headerActions = style({
       opacity: 1,
     },
   },
-})
+});
 
 export const copyButton = style({
   display: 'inline-flex',
@@ -156,18 +157,18 @@ export const copyButton = style({
       color: vars.color.text,
     },
   },
-})
+});
 
 export const separator = style({
   height: 1,
   background: vars.color.border,
   opacity: 0.6,
-})
+});
 
 /** Wrapper for tab panels; overflow hidden for height transition */
 export const codePanelsWrapper = style({
   position: 'relative',
-})
+});
 
 /** Panel: grid-template-rows 0fr/1fr for smooth bidirectional height transition */
 export const codePanel = style({
@@ -179,7 +180,7 @@ export const codePanel = style({
       gridTemplateRows: '1fr',
     },
   },
-})
+});
 
 export const codeScroll = style({
   overflow: 'hidden',
@@ -188,7 +189,7 @@ export const codeScroll = style({
       overflowX: 'auto',
     },
   },
-})
+});
 
 export const codeBody = style({
   padding: '12px 16px',
@@ -196,16 +197,16 @@ export const codeBody = style({
   fontSize: vars.typography.fontSizeSmall,
   lineHeight: 1.7,
   fontFamily: vars.typography.fontMono,
-})
+});
 
 globalStyle(`${codeBody} pre`, {
   margin: 0,
   background: 'transparent !important',
-})
+});
 
 globalStyle(`${codeBody} code`, {
   fontFamily: 'inherit',
-})
+});
 
 /* ---- Shiki dual-theme: dark mode variable switch ---- */
 globalStyle(
@@ -216,21 +217,21 @@ globalStyle(
     fontWeight: 'var(--shiki-dark-font-weight) !important' as any,
     textDecoration: 'var(--shiki-dark-text-decoration) !important' as any,
   },
-)
+);
 
 export const fileIcon = style({
   display: 'inline-flex',
   flexShrink: 0,
-})
+});
 
 globalStyle(`${fileIcon} svg`, {
   width: '100%',
   height: '100%',
-})
+});
 
 export const editContainer = style({
   position: 'relative',
-})
+});
 
 export const editOverlay = style({
   position: 'absolute',
@@ -247,7 +248,7 @@ export const editOverlay = style({
       background: 'color-mix(in srgb, currentColor 6%, transparent)',
     },
   },
-})
+});
 
 export const editLabel = style({
   display: 'flex',
@@ -267,34 +268,31 @@ export const editLabel = style({
       opacity: 1,
     },
   },
-})
+});
 
-const _codeSnippetDialogPopup = style({})
+const _codeSnippetDialogPopup = style({});
 globalStyle(`${_codeSnippetDialogPopup}${_codeSnippetDialogPopup}`, {
-  padding: 0,
-  gap: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-  width: 'calc(100vw - 2rem)',
-  height: 'min(720px, 80vh)',
-  borderRadius: '0.75rem',
+  'padding': 0,
+  'gap': 0,
+  'display': 'flex',
+  'flexDirection': 'column',
+  'overflow': 'hidden',
+  'width': 'calc(100vw - 2rem)',
+  'height': 'min(720px, 80vh)',
+  'borderRadius': '0.75rem',
   '@media': {
     '(min-width: 640px)': {
       maxWidth: '64rem',
     },
   },
-})
+});
 globalStyle(`${_codeSnippetDialogPopup}${_codeSnippetDialogPopup}[data-open]`, {
   animation: 'none',
-})
-globalStyle(
-  `${_codeSnippetDialogPopup}${_codeSnippetDialogPopup}[data-closed]`,
-  {
-    animation: 'none',
-  },
-)
-export { _codeSnippetDialogPopup as codeSnippetDialogPopup }
+});
+globalStyle(`${_codeSnippetDialogPopup}${_codeSnippetDialogPopup}[data-closed]`, {
+  animation: 'none',
+});
+export { _codeSnippetDialogPopup as codeSnippetDialogPopup };
 
 export const modal = style({
   display: 'flex',
@@ -302,7 +300,7 @@ export const modal = style({
   flex: 1,
   minHeight: 0,
   overflow: 'hidden',
-})
+});
 
 export const modalTitlebar = style({
   display: 'flex',
@@ -312,13 +310,13 @@ export const modalTitlebar = style({
   padding: '0 16px',
   borderBottom: `1px solid ${vars.color.border}`,
   flexShrink: 0,
-})
+});
 
 export const modalTitle = style({
   fontSize: vars.typography.fontSizeXs,
   fontFamily: vars.typography.fontMono,
   color: vars.color.textSecondary,
-})
+});
 
 export const modalIconButton = style({
   display: 'inline-flex',
@@ -338,13 +336,13 @@ export const modalIconButton = style({
       color: vars.color.text,
     },
   },
-})
+});
 
 export const modalBody = style({
   display: 'flex',
   flex: 1,
   minHeight: 0,
-})
+});
 
 export const modalSidebar = style({
   width: 224,
@@ -353,7 +351,7 @@ export const modalSidebar = style({
   display: 'flex',
   flexDirection: 'column',
   overflow: 'hidden',
-})
+});
 
 export const sidebarHeader = style({
   display: 'flex',
@@ -365,7 +363,7 @@ export const sidebarHeader = style({
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
   color: `color-mix(in srgb, ${vars.color.textSecondary} 60%, transparent)`,
-})
+});
 
 export const sidebarAddButton = style({
   display: 'inline-flex',
@@ -385,13 +383,13 @@ export const sidebarAddButton = style({
       color: vars.color.text,
     },
   },
-})
+});
 
 export const fileList = style({
   flex: 1,
   overflowY: 'auto',
   padding: '0 6px 8px',
-})
+});
 
 const fileItemBase = style({
   display: 'flex',
@@ -411,7 +409,7 @@ const fileItemBase = style({
       color: vars.color.text,
     },
   },
-})
+});
 
 export const fileItem = recipe({
   base: fileItemBase,
@@ -434,7 +432,7 @@ export const fileItem = recipe({
     active: false,
     dragging: false,
   },
-})
+});
 
 export const fileDragHandle = style({
   display: 'inline-flex',
@@ -448,14 +446,14 @@ export const fileDragHandle = style({
       cursor: 'grabbing',
     },
   },
-})
+});
 
 export const fileName = style({
   flex: 1,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-})
+});
 
 export const fileDelete = style({
   display: 'none',
@@ -478,7 +476,7 @@ export const fileDelete = style({
       background: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
     },
   },
-})
+});
 
 export const renameInput = style({
   flex: 1,
@@ -496,14 +494,14 @@ export const renameInput = style({
       borderColor: `color-mix(in srgb, ${vars.color.text} 30%, transparent)`,
     },
   },
-})
+});
 
 export const modalEditor = style({
   flex: 1,
   display: 'flex',
   flexDirection: 'column',
   minWidth: 0,
-})
+});
 
 export const breadcrumb = style({
   display: 'flex',
@@ -513,7 +511,7 @@ export const breadcrumb = style({
   padding: '0 16px',
   borderBottom: `1px solid color-mix(in srgb, ${vars.color.border} 50%, transparent)`,
   flexShrink: 0,
-})
+});
 
 export const breadcrumbLeft = style({
   display: 'flex',
@@ -523,18 +521,18 @@ export const breadcrumbLeft = style({
   fontFamily: vars.typography.fontMono,
   color: vars.color.textSecondary,
   overflow: 'hidden',
-})
+});
 
 export const breadcrumbName = style({
   color: vars.color.text,
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-})
+});
 
 export const breadcrumbLang = style({
   opacity: 0.5,
-})
+});
 
 export const editorContainer = style({
   flex: 1,
@@ -542,7 +540,7 @@ export const editorContainer = style({
   position: 'relative',
   overflow: 'auto',
   backgroundColor: 'transparent !important' as any,
-})
+});
 
 /* ---- CodeMirror editor styling ---- */
 globalStyle(`${editorContainer} .cm-editor`, {
@@ -551,12 +549,12 @@ globalStyle(`${editorContainer} .cm-editor`, {
   color: vars.color.text,
   fontFamily: vars.typography.fontMono,
   fontSize: vars.typography.fontSizeSm,
-})
+});
 
 globalStyle(`${editorContainer} .cm-scroller`, {
   fontFamily: `${vars.typography.fontMono} !important` as any,
   lineHeight: 1.7,
-})
+});
 
 globalStyle(`${editorContainer} .cm-content`, {
   paddingTop: 0,
@@ -564,27 +562,26 @@ globalStyle(`${editorContainer} .cm-content`, {
   paddingLeft: '0.5rem',
   paddingRight: '1rem',
   minHeight: '1.6em',
-})
+});
 
 globalStyle(`${editorContainer} .cm-line`, {
   padding: 0,
-})
+});
 
 globalStyle(`${editorContainer} .cm-gutters`, {
   borderRight: 'none',
   paddingLeft: '1rem',
-})
+});
 
 globalStyle(`${editorContainer} .cm-lineNumbers .cm-gutterElement`, {
   minWidth: '3em',
   textAlign: 'right',
   paddingRight: '2em',
-  color:
-    `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent) !important` as any,
-})
+  color: `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent) !important` as any,
+});
 
 export const dragOverlay = style({
   background: vars.color.fillQuaternary,
   borderRadius: 6,
   boxShadow: vars.boxShadow.modal,
-})
+});

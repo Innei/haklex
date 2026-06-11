@@ -9,7 +9,7 @@ export const pollContainer = style({
   borderBottom: `1px solid ${vars.color.hrBorder}`,
   padding: `${vars.spacing.lg} 0`,
   margin: `${vars.spacing.lg} 0`,
-  fontFamily: 'inherit',
+  fontFamily: vars.typography.fontFamilySans,
 });
 
 export const pollMeta = style({

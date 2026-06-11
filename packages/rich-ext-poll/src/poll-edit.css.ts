@@ -6,6 +6,7 @@ export const editContainer = style({
   borderBottom: `1px solid ${vars.color.hrBorder}`,
   padding: `${vars.spacing.md} 0`,
   margin: `${vars.spacing.lg} 0`,
+  fontFamily: vars.typography.fontFamilySans,
 });
 
 export const editMeta = style({
