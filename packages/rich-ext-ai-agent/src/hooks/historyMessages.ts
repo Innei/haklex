@@ -16,7 +16,13 @@ export function chatBubblesToHistoryMessages(
   for (const bubble of bubbles) {
     if (bubble.type === 'user') {
       const content = bubble.content.trim();
-      if (content) messages.push({ role: 'user', content });
+      if (content) {
+        messages.push(
+          bubble.selection
+            ? { role: 'user', content, metadata: { capturedSelection: bubble.selection } }
+            : { role: 'user', content },
+        );
+      }
       continue;
     }
 

@@ -108,6 +108,7 @@ export type CapturedTextSelection = {
 
 export type UserMessageMetadata = {
   pageSelections?: PageSelection[];
+  capturedSelection?: CapturedSelection;
 } & Record<string, unknown>;
 
 export type PageContentMetadata = {

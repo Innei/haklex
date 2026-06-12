@@ -18,7 +18,7 @@ export type ToolCallGroupItem = {
 };
 
 export type ChatBubble =
-  | { type: 'user'; content: string }
+  | { type: 'user'; content: string; selection?: CapturedSelection }
   | { type: 'assistant'; content: string; streaming?: boolean }
   | { type: 'tool_call'; toolName: string; params: Record<string, unknown> }
   | { type: 'tool_result'; toolName: string; success: boolean; summary: string }

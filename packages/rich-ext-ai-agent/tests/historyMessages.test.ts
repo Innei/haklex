@@ -30,6 +30,42 @@ describe('chatBubblesToHistoryMessages', () => {
     ]);
   });
 
+  it('carries the bubble selection into the history message metadata', () => {
+    const bubbles: ChatBubble[] = [
+      {
+        type: 'user',
+        content: 'Rewrite this',
+        selection: {
+          type: 'text',
+          text: 'Selected sentence',
+          anchorBlockId: 'a',
+          anchorOffset: 0,
+          focusBlockId: 'a',
+          focusOffset: 17,
+        },
+      },
+      { type: 'assistant', content: 'Done' },
+    ];
+
+    expect(chatBubblesToHistoryMessages(bubbles)).toEqual([
+      {
+        role: 'user',
+        content: 'Rewrite this',
+        metadata: {
+          capturedSelection: {
+            type: 'text',
+            text: 'Selected sentence',
+            anchorBlockId: 'a',
+            anchorOffset: 0,
+            focusBlockId: 'a',
+            focusOffset: 17,
+          },
+        },
+      },
+      { role: 'assistant', content: 'Done' },
+    ]);
+  });
+
   it('removes the duplicated current user input when the host already added it to the store', () => {
     const bubbles: ChatBubble[] = [
       { type: 'user', content: 'Previous request' },
@@ -68,6 +104,36 @@ describe('AgentMessagesEngine history', () => {
     });
     expect(prepared.preambleMessages[2]).toMatchObject({
       content: expect.stringContaining('<current_page title="Current Document">'),
+    });
+  });
+
+  it('injects captured selections into prior user turns but not the current one', () => {
+    const history: ChatMessage[] = [
+      {
+        role: 'user',
+        content: 'Earlier request',
+        metadata: {
+          capturedSelection: { type: 'block', blockIds: ['b1', 'b2'] },
+        },
+      },
+      { role: 'assistant', content: 'Earlier response' },
+    ];
+
+    const prepared = new AgentMessagesEngine({
+      systemMessages: [{ role: 'system', content: 'System prompt' }],
+    }).processWithEditor({
+      editorState: emptyEditorState,
+      messages: history,
+      userInput: 'Current request',
+    });
+
+    expect(prepared.preambleMessages[0]).toMatchObject({
+      role: 'user',
+      content: expect.stringContaining('<block_selection blockIds="b1,b2" />'),
+    });
+    expect(prepared.preambleMessages[2]).toMatchObject({
+      role: 'user',
+      content: expect.not.stringContaining('block_selection'),
     });
   });
 });

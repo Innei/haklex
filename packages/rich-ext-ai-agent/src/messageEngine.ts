@@ -153,6 +153,34 @@ class PageSelectionsInjector extends BaseEveryUserContentProvider {
   }
 }
 
+function formatCapturedSelection(selection: CapturedSelection): string {
+  if (selection.type === 'text') {
+    return `<text_selection>
+<selected_text>${selection.text}</selected_text>
+</text_selection>`;
+  }
+  return `<block_selection blockIds="${selection.blockIds.join(',')}" />`;
+}
+
+class CapturedSelectionInjector extends BaseEveryUserContentProvider {
+  protected buildContentForMessage(
+    message: Extract<ChatMessage, { role: 'user' }>,
+    _index: number,
+    isLastUser: boolean,
+  ) {
+    // The current turn gets the richer TextSelectionInjector context instead.
+    if (isLastUser) return null;
+
+    const selection = message.metadata?.capturedSelection as CapturedSelection | undefined;
+    if (!selection) return null;
+
+    return {
+      content: formatCapturedSelection(selection),
+      contextType: 'user_selection',
+    };
+  }
+}
+
 class TextSelectionInjector extends BaseLastUserContentProvider {
   protected buildContent(context: MessageEngineContext) {
     const textSelection = context.textSelection;
@@ -233,6 +261,7 @@ export class AgentMessagesEngine extends MessagesEngine {
       new DefaultSystemRoleInjector(normalizeSystemMessages(options.systemMessages)),
       new DocumentToolSystemInjector(options.toolSystemRole ?? defaultDocumentToolSystemRole),
       new PageSelectionsInjector(),
+      new CapturedSelectionInjector(),
       new TextSelectionInjector(),
       new PageEditorContextInjector(),
     ]);
