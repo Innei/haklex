@@ -1,5 +1,6 @@
 import { allEditNodes } from '../config-edit';
 import { ExtraNodesProvider } from '../context/ExtraNodesContext';
+import { ImagePreprocessProvider } from '../context/ImagePreprocessContext';
 import { ImageUploadProvider } from '../context/ImageUploadContext';
 import { VideoUploadProvider } from '../context/VideoUploadContext';
 import { AlertPlugin } from '../plugins/AlertPlugin';
@@ -26,24 +27,26 @@ export function RichEditor({
   const resolvedImageUpload = imageUpload ?? defaultImageUpload;
 
   return (
-    <ImageUploadProvider upload={resolvedImageUpload}>
-      <VideoUploadProvider upload={videoUpload ?? null}>
-        <ExtraNodesProvider extraNodes={extraNodes}>
-          <RichEditorShell nodes={nodes} {...shellProps}>
-            <CorePlugins />
-            <ImagePlugin />
-            <ImageUploadPlugin onUpload={resolvedImageUpload} />
-            {videoUpload ? <VideoUploadPlugin onUpload={videoUpload} /> : null}
-            <KaTeXPlugin />
-            <AlertPlugin />
-            <MermaidPlugin />
-            <LinkFaviconPlugin />
-            <BlockIdPlugin />
-            <TextSelectionPlugin />
-            {children}
-          </RichEditorShell>
-        </ExtraNodesProvider>
-      </VideoUploadProvider>
-    </ImageUploadProvider>
+    <ImagePreprocessProvider>
+      <ImageUploadProvider upload={resolvedImageUpload}>
+        <VideoUploadProvider upload={videoUpload ?? null}>
+          <ExtraNodesProvider extraNodes={extraNodes}>
+            <RichEditorShell nodes={nodes} {...shellProps}>
+              <CorePlugins />
+              <ImagePlugin />
+              <ImageUploadPlugin onUpload={resolvedImageUpload} />
+              {videoUpload ? <VideoUploadPlugin onUpload={videoUpload} /> : null}
+              <KaTeXPlugin />
+              <AlertPlugin />
+              <MermaidPlugin />
+              <LinkFaviconPlugin />
+              <BlockIdPlugin />
+              <TextSelectionPlugin />
+              {children}
+            </RichEditorShell>
+          </ExtraNodesProvider>
+        </VideoUploadProvider>
+      </ImageUploadProvider>
+    </ImagePreprocessProvider>
   );
 }

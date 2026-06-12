@@ -33,6 +33,7 @@
     "@haklex/rich-ext-poll": "workspace:*",
     "@haklex/rich-plugin-block-handle": "workspace:*",
     "@haklex/rich-plugin-floating-toolbar": "workspace:*",
+    "@haklex/rich-plugin-image-editor": "workspace:*",
     "@haklex/rich-plugin-link-edit": "workspace:*",
     "@haklex/rich-plugin-litexml-paste": "workspace:*",
     "@haklex/rich-plugin-mention": "workspace:*",

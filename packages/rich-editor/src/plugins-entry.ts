@@ -1,4 +1,11 @@
 export { CorePlugins } from './components/CorePlugins';
+export {
+  type ImagePreprocessContextValue,
+  type ImagePreprocessFn,
+  ImagePreprocessProvider,
+  type ImagePreprocessResult,
+  useImagePreprocess,
+} from './context/ImagePreprocessContext';
 export { ImageUploadProvider, useImageUpload } from './context/ImageUploadContext';
 export { useVideoUpload, VideoUploadProvider } from './context/VideoUploadContext';
 export { AlertPlugin } from './plugins/AlertPlugin';

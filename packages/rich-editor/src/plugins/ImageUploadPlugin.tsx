@@ -17,7 +17,9 @@ import {
 import { Check, Info, Link2, Upload } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useImagePreprocess } from '../context/ImagePreprocessContext';
 import { $createImageNode } from '../nodes/ImageNode';
+import { resolvePreprocessTargets } from '../utils/image-preprocess';
 import { computeImageMeta } from '../utils/thumbhash';
 import * as css from './image-upload.css';
 import { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from './image-upload-command';
@@ -87,6 +89,9 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   const [editor] = useLexicalComposerContext();
   const uploadRef = useRef(onUpload);
   uploadRef.current = onUpload;
+  const preprocessContext = useImagePreprocess();
+  const preprocessRef = preprocessContext?.ref ?? null;
+  const getPreprocess = useCallback(() => preprocessRef?.current ?? null, [preprocessRef]);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const toastTimerRef = useRef<number | null>(null);
 
@@ -171,22 +176,25 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   );
 
   const handleFiles = useCallback(
-    (files: File[]): boolean => {
+    (files: File[], source: 'drop' | 'paste'): boolean => {
       const images = files.filter(isImageFile);
       if (images.length === 0) return false;
 
-      for (const file of images) {
-        void insertByUpload(file);
-      }
+      void (async () => {
+        const targets = await resolvePreprocessTargets(images, source, getPreprocess());
+        for (const file of targets) {
+          void insertByUpload(file);
+        }
+      })();
       return true;
     },
-    [insertByUpload],
+    [insertByUpload, getPreprocess],
   );
 
   useEffect(() => {
     const unregisterDragDrop = editor.registerCommand(
       DRAG_DROP_PASTE,
-      (files: File[]) => handleFiles(files),
+      (files: File[]) => handleFiles(files, 'drop'),
       COMMAND_PRIORITY_HIGH,
     );
 
@@ -199,7 +207,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
 
         const files = [...clipboardData.files];
         if (files.some(isImageFile)) {
-          return handleFiles(files);
+          return handleFiles(files, 'paste');
         }
         return false;
       },
@@ -286,9 +294,15 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   const handleDialogFile = useCallback(
     async (file: File | null) => {
       if (!file) return;
-      await insertByUpload(file, { closeDialog: true });
+
+      let target: File | undefined = file;
+      if (isImageFile(file)) {
+        [target] = await resolvePreprocessTargets([file], 'dialog', getPreprocess());
+      }
+      if (!target) return;
+      await insertByUpload(target, { closeDialog: true });
     },
-    [insertByUpload],
+    [insertByUpload, getPreprocess],
   );
 
   const handleUrlPreview = useCallback(async () => {

@@ -5,6 +5,8 @@ export interface DialogStackItemProps {
   clickOutsideToDismiss?: boolean;
   content: FC<{ dismiss: () => void }>;
   description?: ReactNode;
+  /** Fired once when the dialog transitions open -> closed (Esc, backdrop, or programmatic dismiss). */
+  onClose?: () => void;
   portalClassName?: string;
   sheet?: boolean | 'auto';
   showCloseButton?: boolean;
@@ -49,8 +51,11 @@ export function removeDialog(id: string) {
 }
 
 export function dismissDialog(id: string) {
+  const target = stack.find((item) => item.id === id);
+  if (!target || !target.open) return;
   stack = stack.map((item) => (item.id === id ? { ...item, open: false } : item));
   emit();
+  target.onClose?.();
 }
 
 export function dismissTopDialog() {
@@ -63,6 +68,8 @@ export function dismissTopDialog() {
 }
 
 export function dismissAllDialogs() {
+  const closing = stack.filter((item) => item.open);
   stack = stack.map((item) => ({ ...item, open: false }));
   emit();
+  for (const item of closing) item.onClose?.();
 }
