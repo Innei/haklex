@@ -12,7 +12,7 @@ pnpm add @haklex/rich-ext-chat
 
 | Package   | Version   |
 | --------- | --------- |
-| `lexical` | `^0.44.0` |
+| `lexical` | `^0.45.0` |
 | `react`   | `>= 19`   |
 
 ## Usage

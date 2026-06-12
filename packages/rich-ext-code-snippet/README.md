@@ -12,7 +12,7 @@ pnpm add @haklex/rich-ext-code-snippet
 
 | Package   | Version   |
 | --------- | --------- |
-| `lexical` | `^0.41.0` |
+| `lexical` | `^0.45.0` |
 | `react`   | `>= 19`   |
 
 Key runtime dependencies include `@codemirror/*` (editor engine), `@dnd-kit/*` (drag-and-drop), and `shiki` (syntax highlighting).

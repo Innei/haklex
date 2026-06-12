@@ -1,12 +1,22 @@
 # @haklex/rich-ext-poll
 
-Reader-facing vote/poll widget extension. Single- or multi-choice polls with optional close time and result-visibility policy.
+Reader-facing vote/poll widget extension. Single- or multi-choice polls with optional close time and result-visibility policy for the Haklex rich editor.
 
 ## Installation
 
 ```bash
 pnpm add @haklex/rich-ext-poll
 ```
+
+## Peer Dependencies
+
+| Package                  | Version   |
+| ------------------------ | --------- |
+| `@haklex/rich-editor`    | workspace |
+| `@haklex/rich-editor-ui` | workspace |
+| `lexical`                | `^0.45.0` |
+| `lucide-react`           | `^1.0.0`  |
+| `react`                  | `>=19`    |
 
 ## Usage
 
@@ -67,13 +77,50 @@ const lightPollModule: RichRendererModule = {
 
 `@haklex/rich-compose` ships a `pollModule` that lazy-loads the default renderer via `lazyRenderers`; importing the module above instead keeps the heavy default chunk out entirely.
 
-### Stylesheet
+### Import styles
 
 ```ts
 import '@haklex/rich-ext-poll/style.css';
 ```
 
-## Sub-path Exports
+## Exports
+
+### Nodes
+
+| Export                                | Description                                     |
+| ------------------------------------- | ----------------------------------------------- |
+| `PollNode`                            | Static (read-only) poll node                    |
+| `PollEditNode`                        | Edit-mode poll node with interactive UI         |
+| `$createPollNode()` / `$isPollNode()` | Lexical helpers                                 |
+| `pollNodes`                           | Array of static nodes for config registration   |
+| `pollEditNodes`                       | Array of edit nodes for config registration     |
+| `extractPolls(state)`                 | Extract poll metadata from editor state for SSR |
+
+### Renderers
+
+| Export              | Description                                 |
+| ------------------- | ------------------------------------------- |
+| `PollRenderer`      | Static poll renderer with vote display      |
+| `PollEditDecorator` | Edit-mode decorator with poll configuration |
+| `PollDataProvider`  | Context provider for vote tally adapter     |
+| `usePollData()`     | Hook to access poll data context            |
+
+### Slot Key
+
+| Export          | Description                                        |
+| --------------- | -------------------------------------------------- |
+| `POLL_NODE_KEY` | `'Poll'` constant for `RendererConfig` slot lookup |
+
+### Types
+
+| Export               | Description                                          |
+| -------------------- | ---------------------------------------------------- |
+| `PollChoice`         | Individual poll choice type                          |
+| `PollConfig`         | Poll configuration (choices, close time, visibility) |
+| `PollDataAdapter`    | Adapter interface for vote submission and tally      |
+| `SerializedPollNode` | Serialized poll node type                            |
+
+### Sub-path Exports
 
 | Path                              | Description                                               |
 | --------------------------------- | --------------------------------------------------------- |
@@ -83,6 +130,10 @@ import '@haklex/rich-ext-poll/style.css';
 | `@haklex/rich-ext-poll/edit`      | Edit-mode node + `PollEditDecorator`                      |
 | `@haklex/rich-ext-poll/static`    | Convenience: node + renderer (SSR bundle)                 |
 | `@haklex/rich-ext-poll/style.css` | Stylesheet                                                |
+
+## Part of Haklex
+
+This package is part of the [Haklex](../../README.md) rich editor ecosystem.
 
 ## License
 

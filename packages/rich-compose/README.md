@@ -23,7 +23,7 @@ pnpm add @haklex/rich-compose
 | Package                      | Version   |
 | ---------------------------- | --------- |
 | `react` / `react-dom`        | `>=19`    |
-| `lexical` / `@lexical/react` | `^0.44.0` |
+| `lexical` / `@lexical/react` | `^0.45.0` |
 | `@haklex/rich-editor`        | workspace |
 
 Per-module upstream packages (`@haklex/rich-ext-*`, `@haklex/rich-renderer-*`) are optional peers — install only those you compose.

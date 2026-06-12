@@ -10,12 +10,12 @@ pnpm add @haklex/rich-ext-gallery
 
 ## Peer Dependencies
 
-| Package        | Version    |
-| -------------- | ---------- |
-| `lexical`      | `^0.41.0`  |
-| `lucide-react` | `^0.574.0` |
-| `react`        | `>= 19`    |
-| `react-dom`    | `>= 19`    |
+| Package        | Version   |
+| -------------- | --------- |
+| `lexical`      | `^0.45.0` |
+| `lucide-react` | `^1.0.0`  |
+| `react`        | `>= 19`   |
+| `react-dom`    | `>= 19`   |
 
 ## Usage
 

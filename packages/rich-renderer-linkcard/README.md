@@ -12,24 +12,24 @@ pnpm add @haklex/rich-renderer-linkcard
 
 ## Peer Dependencies
 
-| Package | Version |
-| --- | --- |
-| `lexical` | `^0.41.0` |
-| `@lexical/react` | `^0.41.0` |
-| `@lexical/link` | `^0.41.0` |
-| `react` | `>=19` |
-| `react-dom` | `>=19` |
+| Package          | Version   |
+| ---------------- | --------- |
+| `lexical`        | `^0.45.0` |
+| `@lexical/react` | `^0.45.0` |
+| `@lexical/link`  | `^0.45.0` |
+| `react`          | `>=19`    |
+| `react-dom`      | `>=19`    |
 
 ## Usage
 
 ```tsx
-import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static'
+import { LinkCardRenderer } from '@haklex/rich-renderer-linkcard/static';
 
 // Register in a static RendererConfig
 const rendererConfig = {
   // ...other renderers
   LinkCard: LinkCardRenderer,
-}
+};
 ```
 
 For edit mode with link card conversion and paste support:
@@ -41,27 +41,22 @@ import {
   ConvertToLinkCardAction,
   PasteLinkCardPlugin,
   LinkCardFetchProvider,
-} from '@haklex/rich-renderer-linkcard'
+} from '@haklex/rich-renderer-linkcard';
 
 // Wrap editor with fetch provider for metadata resolution
 <LinkCardFetchProvider>
-  <Editor
-    nodes={linkCardEditNodes}
-    plugins={[
-      <PasteLinkCardPlugin />,
-    ]}
-  />
-</LinkCardFetchProvider>
+  <Editor nodes={linkCardEditNodes} plugins={[<PasteLinkCardPlugin />]} />
+</LinkCardFetchProvider>;
 ```
 
 ### Using URL-specific plugins
 
 ```tsx
-import { githubRepoPlugin, githubPrPlugin } from '@haklex/rich-renderer-linkcard'
+import { githubRepoPlugin, githubPrPlugin } from '@haklex/rich-renderer-linkcard';
 
 // Plugins are auto-registered; use matchUrl to detect supported URLs
-import { matchUrl } from '@haklex/rich-renderer-linkcard'
-const matched = matchUrl('https://github.com/user/repo')
+import { matchUrl } from '@haklex/rich-renderer-linkcard';
+const matched = matchUrl('https://github.com/user/repo');
 ```
 
 ## Exports
@@ -102,11 +97,11 @@ const matched = matchUrl('https://github.com/user/repo')
 
 ### Sub-path Exports
 
-| Path | Description |
-| --- | --- |
-| `@haklex/rich-renderer-linkcard` | Full exports (edit + static + plugins) |
-| `@haklex/rich-renderer-linkcard/static` | Static-only renderer |
-| `@haklex/rich-renderer-linkcard/style.css` | Stylesheet |
+| Path                                       | Description                            |
+| ------------------------------------------ | -------------------------------------- |
+| `@haklex/rich-renderer-linkcard`           | Full exports (edit + static + plugins) |
+| `@haklex/rich-renderer-linkcard/static`    | Static-only renderer                   |
+| `@haklex/rich-renderer-linkcard/style.css` | Stylesheet                             |
 
 ## Part of Haklex
 

@@ -10,45 +10,47 @@ pnpm add @haklex/rich-renderer-mention
 
 ## Peer Dependencies
 
-| Package | Version |
-| --- | --- |
-| `lexical` | `^0.41.0` |
-| `@lexical/react` | `^0.41.0` |
-| `react` | `>=19` |
-| `react-dom` | `>=19` |
+| Package          | Version   |
+| ---------------- | --------- |
+| `lexical`        | `^0.45.0` |
+| `@lexical/react` | `^0.45.0` |
+| `react`          | `>=19`    |
+| `react-dom`      | `>=19`    |
 
 ## Usage
 
 ```tsx
-import { MentionRenderer } from '@haklex/rich-renderer-mention/static'
+import { MentionRenderer } from '@haklex/rich-renderer-mention/static';
 
 // Register in a static RendererConfig
 const rendererConfig = {
   // ...other renderers
   Mention: MentionRenderer,
-}
+};
 ```
 
 For edit mode:
 
 ```tsx
-import { MentionEditRenderer } from '@haklex/rich-renderer-mention'
+import { MentionEditRenderer } from '@haklex/rich-renderer-mention';
 
 const editRendererConfig = {
   // ...other renderers
   Mention: MentionEditRenderer,
-}
+};
 ```
 
 ### Configuring platform metadata
 
 ```tsx
-import { MentionPlatformProvider, platformMetaMap, platformKeys } from '@haklex/rich-renderer-mention'
+import {
+  MentionPlatformProvider,
+  platformMetaMap,
+  platformKeys,
+} from '@haklex/rich-renderer-mention';
 
 // Wrap your app with the provider to customize platform rendering
-<MentionPlatformProvider>
-  {children}
-</MentionPlatformProvider>
+<MentionPlatformProvider>{children}</MentionPlatformProvider>;
 ```
 
 ## Exports
@@ -66,11 +68,11 @@ import { MentionPlatformProvider, platformMetaMap, platformKeys } from '@haklex/
 
 ### Sub-path Exports
 
-| Path | Description |
-| --- | --- |
-| `@haklex/rich-renderer-mention` | Full exports (edit + static) |
-| `@haklex/rich-renderer-mention/static` | Static-only renderer |
-| `@haklex/rich-renderer-mention/style.css` | Stylesheet |
+| Path                                      | Description                  |
+| ----------------------------------------- | ---------------------------- |
+| `@haklex/rich-renderer-mention`           | Full exports (edit + static) |
+| `@haklex/rich-renderer-mention/static`    | Static-only renderer         |
+| `@haklex/rich-renderer-mention/style.css` | Stylesheet                   |
 
 ## Part of Haklex
 

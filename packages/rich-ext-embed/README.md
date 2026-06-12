@@ -10,72 +10,72 @@ pnpm add @haklex/rich-ext-embed
 
 ## Peer Dependencies
 
-| Package | Version | Required |
-| --- | --- | --- |
-| `@lexical/react` | `^0.41.0` | Yes |
-| `lexical` | `^0.41.0` | Yes |
-| `react` | `>= 19` | Yes |
-| `react-dom` | `>= 19` | Yes |
-| `shiki` | `>= 3` | Optional |
+| Package          | Version   | Required |
+| ---------------- | --------- | -------- |
+| `@lexical/react` | `^0.45.0` | Yes      |
+| `lexical`        | `^0.45.0` | Yes      |
+| `react`          | `>= 19`   | Yes      |
+| `react-dom`      | `>= 19`   | Yes      |
+| `shiki`          | `>= 3`    | Optional |
 
 ## Usage
 
 ### Register nodes in your editor config
 
 ```ts
-import { embedEditNodes } from '@haklex/rich-ext-embed'
+import { embedEditNodes } from '@haklex/rich-ext-embed';
 
 const editorConfig = {
   nodes: [...embedEditNodes],
-}
+};
 ```
 
 For static/read-only rendering:
 
 ```ts
-import { embedNodes } from '@haklex/rich-ext-embed/static'
+import { embedNodes } from '@haklex/rich-ext-embed/static';
 
 const staticConfig = {
   nodes: [...embedNodes],
-}
+};
 ```
 
 ### Use the embed plugin
 
 ```tsx
-import { EmbedPlugin } from '@haklex/rich-ext-embed'
+import { EmbedPlugin } from '@haklex/rich-ext-embed';
 
 function EditorPlugins() {
-  return <EmbedPlugin />
+  return <EmbedPlugin />;
 }
 ```
 
 ### Insert embeds programmatically
 
 ```ts
-import { INSERT_EMBED_COMMAND } from '@haklex/rich-ext-embed'
+import { INSERT_EMBED_COMMAND } from '@haklex/rich-ext-embed';
 
-editor.dispatchCommand(INSERT_EMBED_COMMAND, { url: 'https://youtube.com/watch?v=...' })
+editor.dispatchCommand(INSERT_EMBED_COMMAND, { url: 'https://youtube.com/watch?v=...' });
 ```
 
 ### Use renderers
 
 ```tsx
-import { EmbedLinkRenderer } from '@haklex/rich-ext-embed'
-import { EmbedStaticRenderer } from '@haklex/rich-ext-embed/static'
+import { EmbedLinkRenderer } from '@haklex/rich-ext-embed';
+import { EmbedStaticRenderer } from '@haklex/rich-ext-embed/static';
 ```
 
 ### Provide custom embed renderers
 
 ```tsx
-import { EmbedRendererProvider, useEmbedRenderers } from '@haklex/rich-ext-embed'
+import { EmbedRendererProvider, useEmbedRenderers } from '@haklex/rich-ext-embed';
 
 function App() {
   return (
     <EmbedRendererProvider>
       <Editor />
     </EmbedRendererProvider>
-  )
+  );
 }
 ```
 
@@ -91,13 +91,13 @@ import {
   isGistUrl,
   isGithubFilePreviewUrl,
   createSelfThinkingMatcher,
-} from '@haklex/rich-ext-embed'
+} from '@haklex/rich-ext-embed';
 ```
 
 ### Import styles
 
 ```ts
-import '@haklex/rich-ext-embed/style.css'
+import '@haklex/rich-ext-embed/style.css';
 ```
 
 ## Exports
@@ -137,11 +137,11 @@ import '@haklex/rich-ext-embed/style.css'
 
 ### Sub-path Exports
 
-| Path | Description |
-| --- | --- |
-| `@haklex/rich-ext-embed` | Full exports (edit + static) |
-| `@haklex/rich-ext-embed/static` | Static-only (no heavy UI deps) |
-| `@haklex/rich-ext-embed/style.css` | Stylesheet |
+| Path                               | Description                    |
+| ---------------------------------- | ------------------------------ |
+| `@haklex/rich-ext-embed`           | Full exports (edit + static)   |
+| `@haklex/rich-ext-embed/static`    | Static-only (no heavy UI deps) |
+| `@haklex/rich-ext-embed/style.css` | Stylesheet                     |
 
 ## Part of Haklex
 
