@@ -1,6 +1,6 @@
 ---
 name: release-orchestrator
-description: Use when releasing @haklex/* packages and propagating to downstream consumers (Yohaku, admin-vue3, mx-core, mx-space). Owns end-to-end orchestration: change detection, per-package semver calc, peer-dep audit to prevent duplicate-instance bugs (e.g. lucide-react React Context mismatch), topologically-ordered publish with npm registry polling, parallel-worktree downstream smoke tests, auto-revert on failure, and direct push to downstream primary branches (no PRs). Fully autonomous — no user confirmation gates. Supersedes the old /release command.
+description: Use when releasing @haklex/* packages and propagating to downstream consumers (Yohaku, mx-core/apps/admin, mx-core/apps/core, mx-space). Owns end-to-end orchestration: change detection, per-package semver calc, peer-dep audit to prevent duplicate-instance bugs (e.g. lucide-react React Context mismatch), topologically-ordered publish with npm registry polling, parallel-worktree downstream smoke tests, auto-revert on failure, and direct push to downstream primary branches (no PRs). Fully autonomous — no user confirmation gates. Supersedes the old /release command.
 user_invocable: true
 ---
 
@@ -20,17 +20,16 @@ If no package has publishable `src/**` changes, stop and report that there is no
 
 ## Repo layout
 
-| Concern                | Path / Rule                                                                                                                                                                                                                                                                                                                                                                                        |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| haklex root            | Run the release from the **same worktree** where `git status` is clean. Use `git worktree list` to confirm. Never switch checkouts mid-release.                                                                                                                                                                                                                                                    |
-| Published namespace    | `@haklex/*`, via `pnpm run publish:packages` (excludes `@haklex/rich-editor-demo`).                                                                                                                                                                                                                                                                                                                |
-| CLI package            | `@haklex/rich-litexml-cli` ships the `litexml` binary. It depends on the published **dist assets** of `@haklex/rich-compose` (`dist/style.css`, `dist/litexml-html-preview-client.js`) at runtime via `require.resolve`, so the compose build must succeed before the CLI is published. Also one of the few packages whose installed binary should be sanity-checked post-publish — see Phase 4.5. |
-| Version strategy       | **Shared** — every `@haklex/*` lives on the same version (read from `packages/rich-editor/package.json`).                                                                                                                                                                                                                                                                                          |
-| Downstream: Yohaku     | `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json` — actual pin set varies; derive via `grep '"@haklex/' apps/web/package.json` at release time                                                                                                                                                                                                                                            |
-| Downstream: admin-vue3 | `/Users/innei/git/innei-repo/admin-vue3/packages/rich-react/package.json` — actual pin set varies; derive via `grep '"@haklex/' packages/rich-react/package.json` at release time                                                                                                                                                                                                                  |
-| Downstream: mx-core    | `/Users/innei/git/innei-repo/mx-core/apps/core/package.json` — `rich-headless` only                                                                                                                                                                                                                                                                                                                |
-| mx-space               | Same repo as `mx-core` (mx-core is mx-space/core).                                                                                                                                                                                                                                                                                                                                                 |
-| Deleted packages       | `@haklex/rich-static-renderer` was retired. If a downstream's tracked branch still lists it, drop it entirely instead of bumping (re-pinning a deleted package will 404 at install).                                                                                                                                                                                                               |
+| Concern             | Path / Rule                                                                                                                                                                                                                                                                                                                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| haklex root         | Run the release from the **same worktree** where `git status` is clean. Use `git worktree list` to confirm. Never switch checkouts mid-release.                                                                                                                                                                                                                                                    |
+| Published namespace | `@haklex/*`, via `pnpm run publish:packages` (excludes `@haklex/rich-editor-demo`).                                                                                                                                                                                                                                                                                                                |
+| CLI package         | `@haklex/rich-litexml-cli` ships the `litexml` binary. It depends on the published **dist assets** of `@haklex/rich-compose` (`dist/style.css`, `dist/litexml-html-preview-client.js`) at runtime via `require.resolve`, so the compose build must succeed before the CLI is published. Also one of the few packages whose installed binary should be sanity-checked post-publish — see Phase 4.5. |
+| Version strategy    | **Shared** — every `@haklex/*` lives on the same version (read from `packages/rich-editor/package.json`).                                                                                                                                                                                                                                                                                          |
+| Downstream: Yohaku  | `/Users/innei/git/innei-repo/Yohaku/apps/web/package.json` — actual pin set varies; derive via `grep '"@haklex/' apps/web/package.json` at release time                                                                                                                                                                                                                                            |
+| Downstream: mx-core | Two manifests in one repo: `/Users/innei/git/innei-repo/mx-core/apps/admin/package.json` (React dashboard — actual pin set varies; derive via `grep '"@haklex/' apps/admin/package.json` at release time) and `/Users/innei/git/innei-repo/mx-core/apps/core/package.json` (`rich-headless` only). admin-vue3 is retired — do not touch it.                                                        |
+| mx-space            | Same repo as `mx-core` (mx-core is mx-space/core).                                                                                                                                                                                                                                                                                                                                                 |
+| Deleted packages    | `@haklex/rich-static-renderer` was retired. If a downstream's tracked branch still lists it, drop it entirely instead of bumping (re-pinning a deleted package will 404 at install).                                                                                                                                                                                                               |
 
 ## Phase 0.5 — Mode detection
 
@@ -337,7 +336,7 @@ Derive the default branch per repo — do not guess:
 
 ```bash
 declare -A DEFAULT
-for repo in Yohaku admin-vue3 mx-core; do
+for repo in Yohaku mx-core; do
   git -C "/Users/innei/git/innei-repo/$repo" remote set-head origin --auto > /dev/null 2>&1
   DEFAULT[$repo]=$(git -C "/Users/innei/git/innei-repo/$repo" symbolic-ref refs/remotes/origin/HEAD --short | sed 's#^origin/##')
 done
@@ -348,7 +347,7 @@ If `symbolic-ref` fails (no `origin/HEAD`), stop and ask the user which branch i
 Create a disposable worktree per downstream, branched off `origin/${DEFAULT[$repo]}`:
 
 ```bash
-for repo in Yohaku admin-vue3 mx-core; do
+for repo in Yohaku mx-core; do
   D="${DEFAULT[$repo]}"
   git -C "/Users/innei/git/innei-repo/$repo" fetch origin "$D"
   git -C "/Users/innei/git/innei-repo/$repo" worktree add \
@@ -374,11 +373,10 @@ Use `Edit` (not `sed -i`) so the diff is reviewable. Then `pnpm install`. In inc
 
 Commit-ready files per repo:
 
-| Repo       | Stage these                                     |
-| ---------- | ----------------------------------------------- |
-| Yohaku     | `apps/web/package.json`, root `pnpm-lock.yaml`  |
-| admin-vue3 | `package.json`, `pnpm-lock.yaml`                |
-| mx-core    | `apps/core/package.json`, root `pnpm-lock.yaml` |
+| Repo    | Stage these                                                                |
+| ------- | -------------------------------------------------------------------------- |
+| Yohaku  | `apps/web/package.json`, root `pnpm-lock.yaml`                             |
+| mx-core | `apps/admin/package.json`, `apps/core/package.json`, root `pnpm-lock.yaml` |
 
 If the worktree is dirty beyond those files, stop and ask the user — do NOT `git add -A`.
 
@@ -390,7 +388,7 @@ In each downstream worktree, dispatch an independent subagent to run:
 2. `pnpm build`
 3. One E2E — use the repo's existing smoke journey. If none exists, skip with a warning; do not invent one.
 
-Run the three repos in parallel (one subagent per worktree). Collect pass/fail per repo. Proceed only when all green.
+Run the repos in parallel (one subagent per worktree). Collect pass/fail per repo. Proceed only when all green.
 
 ## Phase 8a — Failure recovery (on smoke or publish failure)
 
@@ -405,7 +403,7 @@ Run the three repos in parallel (one subagent per worktree). Collect pass/fail p
    
    git -C haklex reset --hard HEAD~1     # undo "release: v$NEW_VERSION"
    git -C haklex push --force-with-lease # ONLY if already pushed — ASK user first
-   for repo in Yohaku admin-vue3 mx-core; do
+   for repo in Yohaku mx-core; do
      git -C "/Users/innei/git/innei-repo/$repo" worktree remove "/tmp/release-$repo-$NEW_VERSION" --force
      git -C "/Users/innei/git/innei-repo/$repo" branch -D "chore/haklex-$NEW_VERSION"
    done
@@ -467,12 +465,11 @@ git -C "/Users/innei/git/innei-repo/$repo" branch -D "chore/haklex-$NEW_VERSION"
 
 Print:
 
-| Repo       | Branch | Commit SHA | Bump | Published (n / total)                             | Tests (typecheck / build / e2e) |
-| ---------- | ------ | ---------- | ---- | ------------------------------------------------- | ------------------------------- |
-| haklex     | main   | …          | …    | 3 / 15 (rich-editor, rich-compose, rich-ext-chat) | —                               |
-| Yohaku     | main   | …          | —    | 3 pins bumped                                     | ✅ / ✅ / ✅                    |
-| admin-vue3 | main   | …          | —    | 3 pins bumped                                     | ✅ / ✅ / ✅                    |
-| mx-core    | main   | …          | —    | 1 pin bumped (rich-headless)                      | ✅ / ✅ / (skipped)             |
+| Repo    | Branch | Commit SHA | Bump | Published (n / total)                             | Tests (typecheck / build / e2e) |
+| ------- | ------ | ---------- | ---- | ------------------------------------------------- | ------------------------------- |
+| haklex  | main   | …          | …    | 3 / 15 (rich-editor, rich-compose, rich-ext-chat) | —                               |
+| Yohaku  | main   | …          | —    | 3 pins bumped                                     | ✅ / ✅ / ✅                    |
+| mx-core | master | …          | —    | admin: 3 pins, core: 1 pin (rich-headless)        | ✅ / ✅ / (skipped)             |
 
 For `MODE=full`, the haklex row reads `15 / 15 (full)` and each downstream row reads `N pins bumped (full)`. For `MODE=incremental`, list the actually-published package names inline so the user can verify the scope matched intent.
 
