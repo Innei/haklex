@@ -226,6 +226,32 @@ describe('custom readers', () => {
     expect(nodes[0].snapshot).toBe('');
   });
 
+  it('reads <dynamic> with props CDATA', () => {
+    const nodes = parse(
+      '<dynamic id="dyn1" url="https://cdn.example.com/widget.mjs" initial-height="480"><![CDATA[{"level":1}]]></dynamic>',
+    );
+    expect(nodes[0].type).toBe('dynamic');
+    expect(nodes[0].url).toBe('https://cdn.example.com/widget.mjs');
+    expect(nodes[0].initialHeight).toBe(480);
+    expect(nodes[0].props).toEqual({ level: 1 });
+    expect(nodes[0].$?.blockId).toBe('dyn1');
+  });
+
+  it('reads self-closing <dynamic /> with defaults', () => {
+    const nodes = parse('<dynamic id="dyn2" url="https://cdn.example.com/widget.mjs" />');
+    expect(nodes[0].type).toBe('dynamic');
+    expect(nodes[0].props).toEqual({});
+    expect(nodes[0].initialHeight).toBe(320);
+  });
+
+  it('reads <dynamic> with malformed props as empty object', () => {
+    const nodes = parse(
+      '<dynamic id="dyn3" url="https://cdn.example.com/widget.mjs"><![CDATA[{broken]]></dynamic>',
+    );
+    expect(nodes[0].type).toBe('dynamic');
+    expect(nodes[0].props).toEqual({});
+  });
+
   it('reads <grid>', () => {
     const nodes = parse(
       '<grid id="g1" cols="3" gap="8px"><cell><p>A</p></cell><cell><p>B</p></cell><cell><p>C</p></cell></grid>',

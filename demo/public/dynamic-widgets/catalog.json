@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "components": [
+    {
+      "name": "counter",
+      "url": "/dynamic-widgets/counter.mjs",
+      "description": "Incrementing counter with a configurable step. Good for progress tallies and simple numeric interactions.",
+      "initialHeight": 168,
+      "propsSchema": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string", "description": "Card title, defaults to \"Counter\"" },
+          "step": { "type": "number", "description": "Increment step, defaults to 1" }
+        }
+      }
+    },
+    {
+      "name": "quiz",
+      "url": "/dynamic-widgets/quiz.mjs",
+      "description": "Single-choice knowledge check with instant correct/wrong feedback and a retry link.",
+      "initialHeight": 272,
+      "propsSchema": {
+        "type": "object",
+        "required": ["question", "options", "answer"],
+        "properties": {
+          "question": { "type": "string" },
+          "options": { "type": "array", "items": { "type": "string" }, "minItems": 2 },
+          "answer": { "type": "integer", "description": "Zero-based index of the correct option" }
+        }
+      }
+    }
+  ]
+}

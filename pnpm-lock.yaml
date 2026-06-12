@@ -127,6 +127,9 @@ importers:
       '@haklex/rich-ext-code-snippet':
         specifier: workspace:*
         version: link:../packages/rich-ext-code-snippet
+      '@haklex/rich-ext-dynamic':
+        specifier: workspace:*
+        version: link:../packages/rich-ext-dynamic
       '@haklex/rich-ext-embed':
         specifier: workspace:*
         version: link:../packages/rich-ext-embed
@@ -410,6 +413,9 @@ importers:
       '@haklex/rich-ext-code-snippet':
         specifier: workspace:*
         version: link:../rich-ext-code-snippet
+      '@haklex/rich-ext-dynamic':
+        specifier: workspace:*
+        version: link:../rich-ext-dynamic
       '@haklex/rich-ext-embed':
         specifier: workspace:*
         version: link:../rich-ext-embed
@@ -559,6 +565,30 @@ importers:
       lexical:
         specifier: ^0.45.0
         version: 0.45.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      unplugin-dts:
+        specifier: ^1.0.1
+        version: 1.0.1(esbuild@0.28.0)(rolldown@1.0.2)(typescript@5.9.3)(vite@8.0.14(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+      vite:
+        specifier: ^8.0.14
+        version: 8.0.14(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  packages/rich-dynamic-protocol:
+    devDependencies:
+      '@types/react':
+        specifier: ^19.2.15
+        version: 19.2.15
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.15)
+      react:
+        specifier: 19.2.6
+        version: 19.2.6
+      react-dom:
+        specifier: 19.2.6
+        version: 19.2.6(react@19.2.6)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3
@@ -897,6 +927,58 @@ importers:
       shiki:
         specifier: ^4.1.0
         version: 4.1.0
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      unplugin-dts:
+        specifier: ^1.0.1
+        version: 1.0.1(esbuild@0.28.0)(rolldown@1.0.2)(typescript@5.9.3)(vite@8.0.14(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
+      vite:
+        specifier: ^8.0.14
+        version: 8.0.14(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0)
+
+  packages/rich-ext-dynamic:
+    dependencies:
+      '@haklex/rich-dynamic-protocol':
+        specifier: workspace:*
+        version: link:../rich-dynamic-protocol
+      '@haklex/rich-editor':
+        specifier: workspace:*
+        version: link:../rich-editor
+      '@haklex/rich-editor-ui':
+        specifier: workspace:*
+        version: link:../rich-editor-ui
+      '@haklex/rich-style-token':
+        specifier: workspace:*
+        version: link:../rich-style-token
+    devDependencies:
+      '@lexical/react':
+        specifier: ^0.45.0
+        version: 0.45.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(yjs@13.6.29)
+      '@types/react':
+        specifier: ^19.2.15
+        version: 19.2.15
+      '@types/react-dom':
+        specifier: ^19.2.3
+        version: 19.2.3(@types/react@19.2.15)
+      '@vanilla-extract/css':
+        specifier: ^1.20.1
+        version: 1.20.1
+      '@vanilla-extract/vite-plugin':
+        specifier: ^5.2.2
+        version: 5.2.2(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(vite@8.0.14(@types/node@25.6.0)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))(yaml@2.9.0)
+      lexical:
+        specifier: ^0.45.0
+        version: 0.45.0
+      lucide-react:
+        specifier: ^1.17.0
+        version: 1.17.0(react@19.2.6)
+      react:
+        specifier: 19.2.6
+        version: 19.2.6
+      react-dom:
+        specifier: 19.2.6
+        version: 19.2.6(react@19.2.6)
       typescript:
         specifier: ^5.9.3
         version: 5.9.3

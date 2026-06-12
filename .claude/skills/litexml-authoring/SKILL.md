@@ -63,6 +63,7 @@ Detailed `When` / `Avoid when` / params / body rules for each tag live in [`node
 | Inline annotation                                      | `<spoiler>` / `<ruby>` / `<mention>` / `<tag>` / `<comment>`                | extensions |
 | Footnote                                               | `<footnote>` + `<footnote-section>`                                         | extensions |
 | Chat / poll                                            | `<chat>` / `<poll>`                                                         | extensions |
+| Remote interactive component (host catalog only)       | `<dynamic>`                                                                 | extensions |
 | Internal review marker                                 | `<agent-diff>`                                                              | extensions |
 
 ## Cross-cutting rules
@@ -72,6 +73,7 @@ Detailed `When` / `Avoid when` / params / body rules for each tag live in [`node
 - Escape XML-sensitive text (`&amp;`, `&lt;`, `&gt;`, `&quot;`). Use CDATA for opaque JSON, drawing snapshots, and multi-line code bodies.
 - `<alert>`, `<banner>`, `<nested-doc>`, `<grid><cell>` hold a **fresh nested editor state** — wrap their body in block tags (`<p>`, `<h*>`, …), not bare text.
 - A fragment that mixes any extension tag with prose must be wholly LiteXML; Markdown syntax is not parsed inside.
+- `<dynamic>` URLs must come from the host project's component catalog — never invent one. See the extensions reference for the full catalog rule.
 
 Details, gotchas, and the full disambiguation matrix: [`references/authoring-recipes.md`](./references/authoring-recipes.md).
 

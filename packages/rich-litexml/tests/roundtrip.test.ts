@@ -94,6 +94,18 @@ describe('roundtrip', () => {
     expect(result).toContain('<excalidraw');
   });
 
+  it('dynamic roundtrip', () => {
+    const input =
+      '<dynamic id="dyn1" url="https://cdn.example.com/widget.mjs" initial-height="480"><![CDATA[{"level":1}]]></dynamic>';
+    expect(roundtrip(input)).toBe(input);
+  });
+
+  it('dynamic without props roundtrip', () => {
+    const input =
+      '<dynamic id="dyn2" url="https://cdn.example.com/widget.mjs" initial-height="320" />';
+    expect(roundtrip(input)).toBe(input);
+  });
+
   it('grid-container roundtrip', () => {
     const result = roundtrip(
       '<grid id="g1" cols="2" gap="16px"><cell><p>A</p></cell><cell><p>B</p></cell></grid>',

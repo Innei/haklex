@@ -3,6 +3,7 @@ import { bannerModule } from './modules/banner/module';
 import { chatModule } from './modules/chat/module';
 import { codeBlockModule } from './modules/code-block/module';
 import { codeSnippetModule } from './modules/code-snippet/module';
+import { dynamicModule } from './modules/dynamic/module';
 import { embedModule } from './modules/embed/module';
 import { excalidrawModule } from './modules/excalidraw/module';
 import { galleryModule } from './modules/gallery/module';
@@ -21,6 +22,7 @@ export {
   chatModule,
   codeBlockModule,
   codeSnippetModule,
+  dynamicModule,
   embedModule,
   excalidrawModule,
   galleryModule,
@@ -40,6 +42,7 @@ export const allRendererModules = [
   chatModule,
   codeBlockModule,
   codeSnippetModule,
+  dynamicModule,
   embedModule,
   excalidrawModule,
   galleryModule,

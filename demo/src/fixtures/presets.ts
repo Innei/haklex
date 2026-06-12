@@ -3,6 +3,7 @@ import type { SerializedEditorState } from 'lexical';
 import {
   alertQuote,
   doc,
+  dynamic,
   excalidraw,
   footnote,
   footnoteSection,
@@ -1570,6 +1571,24 @@ export default async function PostsPage() {
         version: 1,
       } as any,
 
+      paragraph(
+        text(
+          'Before moving on, test yourself with this embedded interaction — a remote ESM component loaded at runtime via a ',
+        ),
+        text('dynamic', FORMAT_CODE),
+        text(' node:'),
+      ),
+
+      dynamic({
+        url: '/dynamic-widgets/quiz.mjs',
+        props: {
+          question: 'Which of these is NOT a Lexical core concept?',
+          options: ['Editor State', 'Nodes', 'Virtual DOM Diffing'],
+          answer: 2,
+        },
+        initialHeight: 272,
+      }) as any,
+
       heading('h2', text('Creating Custom Nodes')),
 
       paragraph(text("Here's how to create a custom node:")),
@@ -1602,6 +1621,16 @@ export default async function PostsPage() {
         ),
       ) as any,
 
+      dynamic({
+        url: '/dynamic-widgets/quiz.mjs',
+        props: {
+          question: 'What must a DecoratorNode implement to render React content?',
+          options: ['createDOM() only', 'decorate()', 'exportJSON()'],
+          answer: 1,
+        },
+        initialHeight: 272,
+      }) as any,
+
       heading('h2', text('Mathematical Expressions')),
 
       paragraph(
@@ -1621,6 +1650,24 @@ export default async function PostsPage() {
         equation: '\\sum_{i=1}^{n} i = \\frac{n(n+1)}{2}',
         version: 1,
       } as any,
+
+      heading('h2', text('Dynamic External Components')),
+
+      paragraph(
+        text(
+          'The widgets in this article are not bundled with the app — each one is a plain ESM file fetched with ',
+        ),
+        text('import(url)', FORMAT_CODE),
+        text(
+          ' and mounted inside a shadow root. They follow the host theme through CSS variables and a push-based update protocol. Count your progress:',
+        ),
+      ),
+
+      dynamic({
+        url: '/dynamic-widgets/counter.mjs',
+        props: { title: 'Sections Completed', step: 1 },
+        initialHeight: 168,
+      }) as any,
 
       heading('h2', text('Advanced Features')),
 

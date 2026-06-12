@@ -10,6 +10,7 @@ import type { ChatMessage, ChatParticipant, ChatVariant } from '@haklex/rich-ext
 import { ChatRenderer } from '@haklex/rich-ext-chat/static';
 import type { CodeFile } from '@haklex/rich-ext-code-snippet';
 import { CodeSnippetRenderer } from '@haklex/rich-ext-code-snippet/static';
+import { DynamicSSRRenderer } from '@haklex/rich-ext-dynamic/static';
 import type { ExcalidrawEditRendererProps, ExcalidrawSnapshot } from '@haklex/rich-ext-excalidraw';
 import { ExcalidrawConfigProvider } from '@haklex/rich-ext-excalidraw/static';
 import type { GalleryImage, GalleryRendererProps } from '@haklex/rich-ext-gallery';
@@ -58,6 +59,14 @@ const extensions: Extension[] = [
     description: 'Embedded whiteboard with remote and delta storage modes.',
     packageName: 'rich-ext-excalidraw',
     preview: 'Whiteboard',
+  },
+  {
+    id: 'dynamic',
+    name: 'Dynamic Component',
+    description:
+      'Remote ESM components mounted in shadow DOM with theme awareness and per-instance props.',
+    packageName: 'rich-ext-dynamic',
+    preview: 'Remote ESM',
   },
   {
     id: 'diff',
@@ -388,6 +397,68 @@ function ExcalidrawDetail() {
             </Panel>
           </div>
         </ExcalidrawConfigProvider>
+      </ColorSchemeProvider>
+    </PortalThemeProvider>
+  );
+}
+
+// ── Dynamic Component Section ─────────────────────────────────
+
+const DYNAMIC_WIDGET_URL = '/dynamic-widgets/counter.mjs';
+
+function DynamicDetail() {
+  const theme = useTheme();
+
+  return (
+    <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
+      <ColorSchemeProvider colorScheme={theme}>
+        <p
+          style={{
+            margin: '0 0 16px',
+            color: 'var(--demo-text-muted)',
+            fontSize: 14,
+          }}
+        >
+          The widget below is a plain ESM file served from <code>{DYNAMIC_WIDGET_URL}</code>, loaded
+          at runtime via <code>import(url)</code> and mounted inside a shadow root. Toggle the site
+          theme — it reaches the widget through <code>handle.update</code> and the{' '}
+          <code>--rc-*</code> CSS variables.
+        </p>
+        <div className="biz-grid">
+          <Panel badge="dynamic" title="Default Props">
+            <p className="node-description">
+              Mounted with <code>{'{}'}</code> — the widget falls back to its own defaults.
+            </p>
+            <div
+              className={getVariantClass('article')}
+              data-color-scheme={theme}
+              data-theme={theme}
+            >
+              <DynamicSSRRenderer
+                componentProps={{}}
+                initialHeight={140}
+                url={DYNAMIC_WIDGET_URL}
+              />
+            </div>
+          </Panel>
+
+          <Panel badge="dynamic" title="Per-Instance Props">
+            <p className="node-description">
+              Same module, different payload: <code>{'{"title":"Score","step":10}'}</code>.
+            </p>
+            <div
+              className={getVariantClass('article')}
+              data-color-scheme={theme}
+              data-theme={theme}
+            >
+              <DynamicSSRRenderer
+                componentProps={{ title: 'Score', step: 10 }}
+                initialHeight={140}
+                url={DYNAMIC_WIDGET_URL}
+              />
+            </div>
+          </Panel>
+        </div>
       </ColorSchemeProvider>
     </PortalThemeProvider>
   );
@@ -1277,6 +1348,9 @@ function ExtensionDetail({ id }: { id: string }) {
     }
     case 'excalidraw': {
       return <ExcalidrawDetail />;
+    }
+    case 'dynamic': {
+      return <DynamicDetail />;
     }
     case 'diff': {
       return <DiffDetail />;

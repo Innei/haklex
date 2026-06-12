@@ -379,6 +379,31 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       }) as any,
   );
 
+  // -- Dynamic external component: props JSON in CDATA --
+
+  registry.registerReader('dynamic', (el) => {
+    let props: Record<string, unknown> = {};
+    const raw = (extractCdataText(el) ?? el.textContent ?? '').trim();
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+          props = parsed;
+        }
+      } catch {
+        // malformed props payload degrades to empty props
+      }
+    }
+    return {
+      type: 'dynamic',
+      ...extractBlockId(el),
+      url: el.getAttribute('url') ?? '',
+      props,
+      initialHeight: numAttr(el, 'initial-height') ?? 320,
+      version: 1,
+    } as any;
+  });
+
   // -- Grid container: cols + gap + nested cell states --
 
   registry.registerReader('grid', (el, ctx) => {

@@ -172,6 +172,26 @@ flowchart LR
 <excalidraw>https://cdn.example.com/uploads/diagram.excalidraw</excalidraw>
 ```
 
+## Embedded interactive components
+
+### `<dynamic>` — remote ESM interactive component
+
+- **When**: Embedding an interactive widget (quiz, parameter explorer, step-through demo, …) that ships as an externally hosted ESM module implementing the `@haklex/rich-dynamic-protocol` mount contract.
+- **Avoid when**: A vote — use `<poll>`. A provider embed — use `<embed>`. Static media — use `<img>` / `<video>`. Anything achievable with a non-dynamic node.
+- **Required**: `url` — the component module URL.
+- **Optional**: `id`, `initial-height` (numeric px, defaults to 320) — the box's permanent minimum height; set it to the component's expected rendered height to avoid layout shift and dead space.
+- **Body**: props as a JSON object inside `<![CDATA[...]]>`; omit (self-closing) when the component needs no props.
+
+```xml
+<dynamic url="https://widgets.example.com/quiz@1.0.0.mjs" initial-height="272"><![CDATA[{
+  "question": "Which of these is NOT a Lexical core concept?",
+  "options": ["Editor State", "Nodes", "Virtual DOM Diffing"],
+  "answer": 2
+}]]></dynamic>
+```
+
+**Catalog rule (hard constraint)**: `url` executes code in readers' browsers, so it must come from the host project's dynamic-component catalog — a manifest listing each component's `url`, props JSON Schema, and recommended `initial-height` (e.g. `catalog.json` next to the widget files, or a host-provided endpoint). Never invent, guess, or adapt a URL. Validate props against the catalog's schema before emitting. If the catalog has no fitting component, fall back to a static node (`<poll>` for votes, `<video>` for demonstrations) and tell the user a new widget would be needed.
+
 ## Callouts and admonitions
 
 ### `<alert>` — semantic admonition

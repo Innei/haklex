@@ -275,6 +275,20 @@ export function video(payload: { src: string; poster?: string; width?: number; h
   };
 }
 
+export function dynamic(payload: {
+  url: string;
+  props?: Record<string, unknown>;
+  initialHeight?: number;
+}) {
+  return {
+    type: 'dynamic',
+    url: payload.url,
+    props: payload.props ?? {},
+    initialHeight: payload.initialHeight ?? 320,
+    version: 1,
+  };
+}
+
 export function mermaid(diagram: string) {
   return {
     type: 'mermaid',

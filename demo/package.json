@@ -26,6 +26,7 @@
     "@haklex/rich-ext-ai-agent": "workspace:*",
     "@haklex/rich-ext-chat": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
+    "@haklex/rich-ext-dynamic": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-gallery": "workspace:*",

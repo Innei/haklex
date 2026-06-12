@@ -119,6 +119,32 @@ function watchWorkspacePlugin(): Plugin {
   };
 }
 
+// Vite dev refuses to serve /public files through the module pipeline, but the
+// dynamic-component demo must import() them as real ESM. Serve them verbatim
+// before vite's transform middleware runs.
+function dynamicWidgetsPlugin(): Plugin {
+  return {
+    name: 'serve-dynamic-widgets',
+    apply: 'serve',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const url = req.url?.split('?')[0] ?? '';
+        if (!url.startsWith('/dynamic-widgets/') || !url.endsWith('.mjs')) {
+          next();
+          return;
+        }
+        const file = path.resolve(__dirname, 'public', url.slice(1));
+        if (!existsSync(file)) {
+          next();
+          return;
+        }
+        res.setHeader('Content-Type', 'text/javascript');
+        res.end(readFileSync(file));
+      });
+    },
+  };
+}
+
 function workspaceCssPlugin(): Plugin {
   const scopes = new Set(['@haklex', '@shiro']);
   const EMPTY_PREFIX = '\0empty-css:';
@@ -218,6 +244,7 @@ function workspaceBuildStyleAliases(): Alias[] {
 export default defineConfig(({ command }) => ({
   plugins: [
     apiProxyPlugin(),
+    dynamicWidgetsPlugin(),
     watchWorkspacePlugin(),
     workspaceCssPlugin(),
     vanillaExtractPlugin(),

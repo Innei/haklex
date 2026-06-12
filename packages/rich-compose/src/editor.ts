@@ -3,6 +3,7 @@ import { bannerEditModule } from './modules/banner/edit';
 import { chatEditModule } from './modules/chat/edit';
 import { codeBlockEditModule } from './modules/code-block/edit';
 import { codeSnippetEditModule } from './modules/code-snippet/edit';
+import { dynamicEditModule } from './modules/dynamic/edit';
 import { embedEditModule } from './modules/embed/edit';
 import { excalidrawEditModule } from './modules/excalidraw/edit';
 import { galleryEditModule } from './modules/gallery/edit';
@@ -22,6 +23,7 @@ export {
   chatEditModule,
   codeBlockEditModule,
   codeSnippetEditModule,
+  dynamicEditModule,
   embedEditModule,
   excalidrawEditModule,
   galleryEditModule,
@@ -42,6 +44,7 @@ export const allEditorModules = [
   chatEditModule,
   codeBlockEditModule,
   codeSnippetEditModule,
+  dynamicEditModule,
   embedEditModule,
   excalidrawEditModule,
   galleryEditModule,

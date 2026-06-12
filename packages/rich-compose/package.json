@@ -62,6 +62,9 @@
     "./modules/excalidraw": "./src/modules/excalidraw/index.ts",
     "./modules/excalidraw/edit": "./src/modules/excalidraw/edit.tsx",
     "./modules/excalidraw/node": "./src/modules/excalidraw/node.ts",
+    "./modules/dynamic": "./src/modules/dynamic/index.ts",
+    "./modules/dynamic/edit": "./src/modules/dynamic/edit.tsx",
+    "./modules/dynamic/node": "./src/modules/dynamic/node.ts",
     "./modules/nested-doc": "./src/modules/nested-doc/index.ts",
     "./modules/nested-doc/edit": "./src/modules/nested-doc/edit.ts",
     "./modules/nested-doc/node": "./src/modules/nested-doc/node.ts",
@@ -90,6 +93,7 @@
   "dependencies": {
     "@haklex/rich-ext-chat": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
+    "@haklex/rich-ext-dynamic": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-gallery": "workspace:*",
@@ -276,6 +280,14 @@
         "import": "./dist/modules/excalidraw/node.mjs",
         "types": "./dist/modules/excalidraw/node.d.ts"
       },
+      "./modules/dynamic": {
+        "import": "./dist/modules/dynamic/index.mjs",
+        "types": "./dist/modules/dynamic/index.d.ts"
+      },
+      "./modules/dynamic/node": {
+        "import": "./dist/modules/dynamic/node.mjs",
+        "types": "./dist/modules/dynamic/node.d.ts"
+      },
       "./modules/nested-doc": {
         "import": "./dist/modules/nested-doc/index.mjs",
         "types": "./dist/modules/nested-doc/index.d.ts"
@@ -323,6 +335,10 @@
       "./modules/excalidraw/edit": {
         "import": "./dist/modules/excalidraw/edit.mjs",
         "types": "./dist/modules/excalidraw/edit.d.ts"
+      },
+      "./modules/dynamic/edit": {
+        "import": "./dist/modules/dynamic/edit.mjs",
+        "types": "./dist/modules/dynamic/edit.d.ts"
       },
       "./modules/gallery/edit": {
         "import": "./dist/modules/gallery/edit.mjs",

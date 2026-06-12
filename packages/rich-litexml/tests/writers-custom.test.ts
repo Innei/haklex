@@ -501,6 +501,38 @@ describe('custom writers', () => {
     expect(xml).toContain('<excalidraw id="ex2" />');
   });
 
+  it('dynamic with props', () => {
+    const xml = serialize([
+      {
+        type: 'dynamic',
+        $: { blockId: 'dyn1' },
+        url: 'https://cdn.example.com/widget.mjs',
+        props: { level: 1 },
+        initialHeight: 480,
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain(
+      '<dynamic id="dyn1" url="https://cdn.example.com/widget.mjs" initial-height="480"><![CDATA[{"level":1}]]></dynamic>',
+    );
+  });
+
+  it('dynamic without props is self-closing', () => {
+    const xml = serialize([
+      {
+        type: 'dynamic',
+        $: { blockId: 'dyn2' },
+        url: 'https://cdn.example.com/widget.mjs',
+        props: {},
+        initialHeight: 320,
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain(
+      '<dynamic id="dyn2" url="https://cdn.example.com/widget.mjs" initial-height="320" />',
+    );
+  });
+
   it('grid-container', () => {
     const xml = serialize([
       {

@@ -351,6 +351,12 @@ export const ExcalidrawNode = headlessDecorator('excalidraw', ['snapshot'], {
   snapshot: '',
 });
 
+export const DynamicNode = headlessDecorator('dynamic', ['url', 'props', 'initialHeight'], {
+  url: '',
+  props: {},
+  initialHeight: 320,
+});
+
 export const TagNode = headlessDecorator('tag', ['text'], { text: '' }, true);
 
 export const CommentNode = headlessDecorator('comment', ['text'], { text: '' }, true);
@@ -590,6 +596,7 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   CodeSnippetNode,
   GalleryNode,
   ExcalidrawNode,
+  DynamicNode,
   TagNode,
   CommentNode,
   BannerNode,

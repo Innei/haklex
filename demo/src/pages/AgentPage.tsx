@@ -20,6 +20,7 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 
 import { useFullWidth } from '../context/FullWidthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useDynamicCatalogSystemMessages } from '../fixtures/dynamic-catalog';
 import { LexicalEditor } from '../lexical';
 
 interface DemoProviderConfig {
@@ -432,7 +433,8 @@ function AgentLoopCaptureInner({
   provider: LLMProvider;
   store: ReturnType<typeof createAgentStore>;
 }) {
-  const loop = useAgentLoop({ provider, store });
+  const systemMessages = useDynamicCatalogSystemMessages();
+  const loop = useAgentLoop({ provider, store, systemMessages });
   loopRef.current = loop;
 
   const [editor] = useLexicalComposerContext();

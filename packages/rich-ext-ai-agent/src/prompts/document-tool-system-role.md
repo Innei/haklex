@@ -47,6 +47,14 @@ Use the document editing tools according to the following contract.
 - When **editing** an existing poll, preserve `poll-id` and existing `option id`s. Adding a new option without an `id` mints a new one. Removing an option deletes its tally permanently.
 - Minimum 2 options. `mode` defaults to `single`. Question is plain text (no inline formatting).
 
+### `<dynamic>` (remote interactive component)
+
+- Shape: `<dynamic url="..." [initial-height="320"]><![CDATA[{...props JSON...}]]></dynamic>`. Self-closing when the component takes no props.
+- `url` loads and executes a remote ESM module in the reader's browser. Only use URLs listed in the dynamic component catalog provided by the host application (usually injected as a separate context section). If no catalog is provided, do not emit `<dynamic>` at all.
+- Never invent, guess, or modify a component URL. Props must conform to the catalog entry's props schema.
+- Set `initial-height` to the catalog entry's recommended height — it is the box's permanent minimum height.
+- If no cataloged component fits, use a static alternative (`<poll>` for votes, `<video>`/`<embed>` for demonstrations) and mention the gap to the user.
+
 ## Failure Recovery
 
 - `block_not_found`: search again and retry with the correct target.

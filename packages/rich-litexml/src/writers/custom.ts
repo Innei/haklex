@@ -167,6 +167,25 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
     };
   });
 
+  // -- Dynamic external component: url + initial height, props JSON as CDATA --
+
+  registry.registerWriter('dynamic', (node) => {
+    const n = node as any;
+    const attrs = optAttr({
+      ...blockId(n),
+      'url': n.url,
+      'initial-height': n.initialHeight != null ? String(n.initialHeight) : undefined,
+    });
+    if (!n.props || Object.keys(n.props).length === 0) {
+      return { tag: 'dynamic', attrs, selfClosing: true };
+    }
+    return {
+      tag: 'dynamic',
+      attrs,
+      children: [{ cdata: JSON.stringify(n.props) }],
+    };
+  });
+
   // -- Grid container: cols + gap + cells as nested editor states --
 
   registry.registerWriter('grid-container', (node, ctx) => {
