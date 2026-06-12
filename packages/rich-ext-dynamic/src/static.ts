@@ -1,3 +1,4 @@
+export * from './augment';
 export type { DynamicHostRendererProps } from './DynamicHostRenderer';
 export { DynamicHostRenderer } from './DynamicHostRenderer';
 export type { DynamicNodePayload, SerializedDynamicNode } from './DynamicNode';

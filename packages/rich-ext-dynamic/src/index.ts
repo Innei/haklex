@@ -1,3 +1,4 @@
+export * from './augment';
 export { $createDynamicEditNode, $isDynamicEditNode, DynamicEditNode } from './DynamicEditNode';
 export type { DynamicEditRendererProps } from './DynamicEditRenderer';
 export { DynamicEditRenderer } from './DynamicEditRenderer';
