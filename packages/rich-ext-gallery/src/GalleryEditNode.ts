@@ -5,8 +5,8 @@ import { Images } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
+import { GalleryEditRenderer } from './GalleryEditRenderer';
 import { GalleryNode, type GalleryNodePayload, type SerializedGalleryNode } from './GalleryNode';
-import { GalleryRenderer } from './GalleryRenderer';
 import type { GalleryImage, GalleryRendererProps } from './types';
 
 export class GalleryEditNode extends GalleryNode {
@@ -66,7 +66,7 @@ export class GalleryEditNode extends GalleryNode {
         });
       },
     };
-    return createElement(GalleryRenderer, props);
+    return createElement(GalleryEditRenderer, props);
   }
 }
 

@@ -735,6 +735,15 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
       if (event.button !== 0) return;
       const target = event.target as HTMLElement;
       if (rootElement.contains(target)) return;
+      // Gutter selection must not hijack clicks on interactive chrome inside
+      // `.rich-editor` (header toolbar, popovers) or above/below the content
+      // area — those used to NodeSelect the nearest block, so a toolbar
+      // insert replaced that block instead of inserting at the caret.
+      if (target.closest('button, input, textarea, select, [role="toolbar"], [role="menu"]')) {
+        return;
+      }
+      const rootRect = rootElement.getBoundingClientRect();
+      if (event.clientY < rootRect.top || event.clientY > rootRect.bottom) return;
 
       const nodeKey = getBlockKeyAtY(event.clientY);
       if (!nodeKey) return;
