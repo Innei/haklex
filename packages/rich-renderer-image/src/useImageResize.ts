@@ -83,10 +83,15 @@ export function useImageResize() {
         document.body.style.userSelect = prevUserSelect;
         store.set(resizingAtom, false);
         if (!commit || !moved) return;
-        editor.update(() => {
-          const node = $getNearestNodeFromDOMNode(trigger);
-          if ($isImageNode(node)) node.setDisplayWidth(percent);
-        });
+        editor.update(
+          () => {
+            const node = $getNearestNodeFromDOMNode(trigger);
+            if ($isImageNode(node)) node.setDisplayWidth(percent);
+          },
+          // Without this tag Lexical scrolls the (possibly offscreen) caret
+          // back into view on commit, yanking the scroll position.
+          { tag: 'skip-scroll-into-view' },
+        );
       };
       const handleEnd = () => finish(true);
 

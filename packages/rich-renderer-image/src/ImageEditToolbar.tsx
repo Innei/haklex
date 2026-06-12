@@ -2,7 +2,7 @@ import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useAtomValue, useSetAtom } from 'jotai';
 import { REDO_COMMAND, UNDO_COMMAND } from 'lexical';
-import { Copy, Download, ExternalLink, Replace, Trash2, Type } from 'lucide-react';
+import { CopyPlus, Download, ExternalLink, Replace, Trash2, Type } from 'lucide-react';
 
 import {
   altTextAtom,
@@ -71,6 +71,9 @@ export function ImageEditToolbar() {
     <div
       className={`${styles.editToolbar} ${styles.semanticClassNames.editToolbar} ${toolbarVisible ? `${styles.editToolbarVisible} ${styles.semanticClassNames.editToolbarVisible}` : ''}`}
     >
+      <ImageSizeControl />
+      <ImageLayoutControl />
+
       <Popover
         open={metaOpen}
         onOpenChange={(nextOpen) => {
@@ -125,8 +128,18 @@ export function ImageEditToolbar() {
         </PopoverPanel>
       </Popover>
 
-      <ImageSizeControl />
-      <ImageLayoutControl />
+      <button
+        className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}
+        title="Duplicate"
+        type="button"
+        onClick={handleDuplicate}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <CopyPlus size={14} />
+      </button>
 
       <button
         className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}
@@ -139,19 +152,6 @@ export function ImageEditToolbar() {
         }}
       >
         <ExternalLink size={14} />
-      </button>
-
-      <button
-        className={`${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`}
-        title="Duplicate"
-        type="button"
-        onClick={handleDuplicate}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      >
-        <Copy size={14} />
       </button>
 
       <button

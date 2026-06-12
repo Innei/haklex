@@ -60,10 +60,15 @@ export function useImageActions() {
     (updater: (node: ReturnType<typeof $createImageNode>) => void) => {
       const wrapperRef = store.get(wrapperRefAtom);
       if (!wrapperRef.current) return;
-      editor.update(() => {
-        const node = $getNearestNodeFromDOMNode(wrapperRef.current!);
-        if ($isImageNode(node)) updater(node);
-      });
+      editor.update(
+        () => {
+          const node = $getNearestNodeFromDOMNode(wrapperRef.current!);
+          if ($isImageNode(node)) updater(node);
+        },
+        // Toolbar actions target the image in view; don't let Lexical scroll
+        // the (possibly offscreen) caret back into view on commit.
+        { tag: 'skip-scroll-into-view' },
+      );
     },
     [editor, store],
   );

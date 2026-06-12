@@ -459,6 +459,76 @@ export const controlPanel = style({
   zIndex: 30,
 });
 
+// The popover base popup fixes width at 288px; doubled selector outranks it
+// without depending on cross-package CSS order.
+globalStyle(`${controlPanel}${controlPanel}`, {
+  width: 'fit-content',
+});
+
+export const sizeSliderWrap = style({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  width: 132,
+  height: 24,
+});
+
+const sliderThumb = {
+  appearance: 'none',
+  width: 12,
+  height: 12,
+  borderRadius: '50%',
+  backgroundColor: vars.color.bg,
+  border: `1px solid ${vars.color.border}`,
+  boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
+  cursor: 'ew-resize',
+} as const;
+
+export const sizeSlider = style({
+  appearance: 'none',
+  width: '100%',
+  height: 24,
+  margin: 0,
+  background: 'transparent',
+  cursor: 'pointer',
+  selectors: {
+    '&::-webkit-slider-runnable-track': {
+      height: 3,
+      borderRadius: 9999,
+      background: `linear-gradient(to right, ${vars.color.textSecondary} var(--fill), ${vars.color.fill} var(--fill))`,
+    },
+    '&::-webkit-slider-thumb': {
+      ...sliderThumb,
+      marginTop: -4.5,
+    },
+    '&::-moz-range-track': {
+      height: 3,
+      borderRadius: 9999,
+      background: `linear-gradient(to right, ${vars.color.textSecondary} var(--fill), ${vars.color.fill} var(--fill))`,
+    },
+    '&::-moz-range-thumb': sliderThumb,
+  },
+});
+
+export const sizeSliderTick = style({
+  position: 'absolute',
+  top: '50%',
+  width: 3,
+  height: 3,
+  borderRadius: '50%',
+  backgroundColor: vars.color.bg,
+  transform: 'translate(-50%, -50%)',
+  pointerEvents: 'none',
+});
+
+export const sizeValue = style({
+  minWidth: 34,
+  textAlign: 'right',
+  fontSize: vars.typography.fontSizeXs,
+  fontVariantNumeric: 'tabular-nums',
+  color: vars.color.textSecondary,
+});
+
 export const sizeOption = style({
   display: 'inline-flex',
   alignItems: 'center',
