@@ -40,7 +40,7 @@
     "@vanilla-extract/vite-plugin": "^5.2.2",
     "react": "19.2.6",
     "react-dom": "19.2.6",
-    "shiki": "^4.1.0",
+    "shiki": "^4.2.0",
     "typescript": "^5.9.3",
     "unplugin-dts": "^1.0.1",
     "vite": "^8.0.14"
