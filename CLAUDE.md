@@ -107,3 +107,5 @@ When creating a new Lexical node type:
 - **XML reader in `packages/rich-litexml/src/readers/`** (required for AI agent)
 - **Register in `packages/rich-litexml/src/default-registry.ts`**
 - Update `packages/rich-ext-ai-agent` system prompt if the node is agent-creatable
+- For a new `rich-ext-*`/`rich-renderer-*` package with styles: add it to `MODULE_TO_PACKAGE` in `packages/rich-compose/scripts/build-css.ts` (otherwise `rich-compose/style/<module>.css` does not exist for downstream)
+- Downstream wiring needs four parts: node registration, renderer config entry, plugin mount, **and the package's `style.css` import**

@@ -37,6 +37,7 @@ const MODULE_TO_PACKAGE: Record<string, string> = {
   'chat': 'rich-ext-chat',
   'code-block': 'rich-renderer-codeblock',
   'code-snippet': 'rich-ext-code-snippet',
+  'dynamic': 'rich-ext-dynamic',
   'embed': 'rich-ext-embed',
   'excalidraw': 'rich-ext-excalidraw',
   'gallery': 'rich-ext-gallery',
