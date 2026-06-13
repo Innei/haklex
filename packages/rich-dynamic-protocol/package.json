@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-dynamic-protocol",
-  "version": "0.26.4",
+  "version": "0.26.5",
   "description": "Mount protocol and authoring helpers for haklex dynamic external components",
   "repository": {
     "type": "git",
