@@ -328,10 +328,10 @@ importers:
         specifier: workspace:*
         version: link:../rich-diff-core
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       '@streamdown/code':
         specifier: ^1.1.1
@@ -517,16 +517,16 @@ importers:
   packages/rich-diff:
     dependencies:
       '@haklex/rich-compose':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-compose
       '@haklex/rich-diff-core':
         specifier: workspace:*
         version: link:../rich-diff-core
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@types/react':
@@ -742,22 +742,22 @@ importers:
         specifier: workspace:*
         version: link:../rich-agent-core
       '@haklex/rich-compose':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-compose
       '@haklex/rich-diff-core':
         specifier: workspace:*
         version: link:../rich-diff-core
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-litexml':
         specifier: workspace:*
         version: link:../rich-litexml
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       lucide-react:
         specifier: ^1.0.0
@@ -800,10 +800,10 @@ importers:
   packages/rich-ext-chat:
     dependencies:
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       '@streamdown/code':
         specifier: ^1.1.1
@@ -879,10 +879,10 @@ importers:
         specifier: workspace:*
         version: link:../cm-editor
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-headless':
         specifier: workspace:*
@@ -891,7 +891,7 @@ importers:
         specifier: workspace:*
         version: link:../rich-renderer-codeblock
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       lucide-react:
         specifier: ^1.0.0
@@ -943,13 +943,13 @@ importers:
         specifier: workspace:*
         version: link:../rich-dynamic-protocol
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@lexical/react':
@@ -992,13 +992,13 @@ importers:
   packages/rich-ext-embed:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       '@icons-pack/react-simple-icons':
         specifier: ^13.13.0
@@ -1050,16 +1050,16 @@ importers:
   packages/rich-ext-excalidraw:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-headless':
         specifier: workspace:*
         version: link:../rich-headless
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       jsondiffpatch:
         specifier: ^0.7.6
@@ -1117,13 +1117,13 @@ importers:
         specifier: ^3.2.2
         version: 3.2.2(react@19.2.6)
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       react-intersection-observer:
         specifier: ^10.0.3
@@ -1166,13 +1166,13 @@ importers:
   packages/rich-ext-nested-doc:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@lexical/markdown':
@@ -1218,7 +1218,7 @@ importers:
   packages/rich-ext-poll:
     dependencies:
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
         specifier: workspace:*
@@ -1363,10 +1363,10 @@ importers:
   packages/rich-plugin-block-handle:
     dependencies:
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       '@lexical/code-core':
         specifier: ^0.45.0
@@ -1424,13 +1424,13 @@ importers:
   packages/rich-plugin-floating-toolbar:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@lexical/link':
@@ -1479,13 +1479,13 @@ importers:
   packages/rich-plugin-image-editor:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       '@markerjs/markerjs3':
         specifier: ^3.10.0
@@ -1528,10 +1528,10 @@ importers:
   packages/rich-plugin-link-edit:
     dependencies:
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@lexical/link':
@@ -1611,13 +1611,13 @@ importers:
   packages/rich-plugin-mention:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-renderer-mention':
         specifier: workspace:*
         version: link:../rich-renderer-mention
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@lexical/react':
@@ -1660,10 +1660,10 @@ importers:
         specifier: ^2.1.8
         version: 2.1.8(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@lexical/list':
@@ -1718,10 +1718,10 @@ importers:
   packages/rich-plugin-table:
     dependencies:
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@lexical/react':
@@ -1767,13 +1767,13 @@ importers:
   packages/rich-plugin-toolbar:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@lexical/list':
@@ -1828,13 +1828,13 @@ importers:
   packages/rich-renderer-alert:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       lucide-react:
         specifier: ^1.0.0
@@ -1874,13 +1874,13 @@ importers:
   packages/rich-renderer-banner:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       lucide-react:
         specifier: ^1.0.0
@@ -1932,13 +1932,13 @@ importers:
         specifier: workspace:*
         version: link:../cm-editor
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       '@iconify-json/material-icon-theme':
         specifier: ^1.2.66
@@ -1984,13 +1984,13 @@ importers:
   packages/rich-renderer-image:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       jotai:
         specifier: 2.19.1
@@ -2036,13 +2036,13 @@ importers:
   packages/rich-renderer-katex:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       lucide-react:
         specifier: ^1.0.0
@@ -2091,13 +2091,13 @@ importers:
   packages/rich-renderer-linkcard:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       lucide-react:
         specifier: ^1.0.0
@@ -2146,13 +2146,13 @@ importers:
   packages/rich-renderer-mention:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       '@icons-pack/react-simple-icons':
         specifier: ^13.13.0
@@ -2198,13 +2198,13 @@ importers:
   packages/rich-renderer-mermaid:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       beautiful-mermaid:
         specifier: ^1.1.3
@@ -2247,10 +2247,10 @@ importers:
   packages/rich-renderer-ruby:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
     devDependencies:
       '@types/react':
@@ -2284,13 +2284,13 @@ importers:
   packages/rich-renderer-video:
     dependencies:
       '@haklex/rich-editor':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor
       '@haklex/rich-editor-ui':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-editor-ui
       '@haklex/rich-style-token':
-        specifier: workspace:*
+        specifier: workspace:^
         version: link:../rich-style-token
       lucide-react:
         specifier: ^1.0.0
