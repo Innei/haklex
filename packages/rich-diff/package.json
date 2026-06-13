@@ -25,7 +25,7 @@
     "@haklex/rich-diff-core": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vanilla-extract/css": "^1.20.1",
     "@vanilla-extract/vite-plugin": "^5.2.2",
@@ -33,8 +33,8 @@
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "typescript": "^5.9.3",
-    "unplugin-dts": "^1.0.1",
-    "vite": "^8.0.14"
+    "unplugin-dts": "^1.0.2",
+    "vite": "^8.0.16"
   },
   "peerDependencies": {
     "@haklex/rich-compose": "workspace:^",

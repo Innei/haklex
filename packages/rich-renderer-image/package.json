@@ -22,27 +22,26 @@
     "build": "vite build",
     "dev:build": "vite build --watch"
   },
-  "dependencies": {
-    "jotai": "2.19.1"
-  },
   "devDependencies": {
     "@lexical/react": "^0.45.0",
-    "@types/react": "^19.2.15",
+    "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "@vanilla-extract/css": "^1.20.1",
     "@vanilla-extract/vite-plugin": "^5.2.2",
+    "jotai": "^2.20.1",
     "lexical": "^0.45.0",
     "react": "19.2.6",
     "react-dom": "19.2.6",
     "typescript": "^5.9.3",
-    "unplugin-dts": "^1.0.1",
-    "vite": "^8.0.14"
+    "unplugin-dts": "^1.0.2",
+    "vite": "^8.0.16"
   },
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",
     "@haklex/rich-editor-ui": "workspace:^",
     "@haklex/rich-style-token": "workspace:^",
     "@lexical/react": "^0.45.0",
+    "jotai": ">=2",
     "lexical": "^0.45.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",

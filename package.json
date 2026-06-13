@@ -46,8 +46,8 @@
     "bumpp": "^11.1.0",
     "commitlint": "^21.0.2",
     "eslint": "^10.4.1",
-    "knip": "^6.15.0",
-    "lint-staged": "16.4.0",
+    "knip": "^6.16.1",
+    "lint-staged": "17.0.7",
     "mdast-util-to-string": "^4.0.0",
     "prettier": "3.8.3",
     "prettier-plugin-packagejson": "^3.0.2",
@@ -59,17 +59,17 @@
     "remark-parse": "^11.0.0",
     "sharp": "^0.34.5",
     "simple-git-hooks": "2.13.1",
-    "stylelint": "^17.12.0",
+    "stylelint": "^17.13.0",
     "taze": "^19.14.1",
     "thumbhash": "^0.1.1",
     "tsx": "^4.22.4",
-    "turbo": "^2.9.16",
+    "turbo": "^2.9.18",
     "unified": "^11.0.5",
-    "vitest": "^4.1.7"
+    "vitest": "^4.1.8"
   },
   "packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
