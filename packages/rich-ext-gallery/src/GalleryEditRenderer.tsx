@@ -14,11 +14,12 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { type ImageUploadFn, useImageUpload } from '@haklex/rich-editor/plugins';
 import { useColorScheme } from '@haklex/rich-editor/static';
 import { presentDialog, SegmentedControl } from '@haklex/rich-editor-ui';
 import { usePortalTheme, vars } from '@haklex/rich-style-token';
 import { GripVertical, ImageIcon, Images, Pencil, Plus, Trash2, X } from 'lucide-react';
-import type { CSSProperties, FC } from 'react';
+import type { CSSProperties, DragEvent as ReactDragEvent, FC } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -46,6 +47,36 @@ interface ImageEntry {
   image: GalleryImage;
 }
 
+function readAsDataUrl(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error('File read failed'));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function fileToGalleryImage(
+  file: File,
+  uploader: ImageUploadFn | null,
+): Promise<GalleryImage> {
+  if (uploader) {
+    const result = await uploader(file);
+    return { src: result.src, alt: result.altText ?? file.name };
+  }
+  return { src: await readAsDataUrl(file), alt: file.name };
+}
+
+function extractImageFiles(list: FileList | null | undefined): File[] {
+  if (!list) return [];
+  const files: File[] = [];
+  for (let i = 0; i < list.length; i++) {
+    const f = list[i];
+    if (f && f.type.startsWith('image/')) files.push(f);
+  }
+  return files;
+}
+
 // ── SortableImageCard ────────────────────────────────────────
 
 const SortableImageCard: FC<{
@@ -56,24 +87,54 @@ const SortableImageCard: FC<{
   lastInputRef: React.RefObject<HTMLInputElement | null>;
   onUpdate: (index: number, field: keyof GalleryImage, value: string) => void;
   onRemove: (index: number) => void;
-}> = ({ id, image, index, isLast, lastInputRef, onUpdate, onRemove }) => {
+  onDropFile: (index: number, file: File) => void;
+}> = ({ id, image, index, isLast, lastInputRef, onUpdate, onRemove, onDropFile }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id,
   });
+  const [dropActive, setDropActive] = useState(false);
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
     transition: isDragging ? undefined : transition,
     opacity: isDragging ? 0.4 : 1,
+    outline: dropActive ? `2px dashed ${vars.color.accent}` : undefined,
+    outlineOffset: dropActive ? 2 : undefined,
+  };
+
+  const handleDragOver = (e: ReactDragEvent<HTMLDivElement>) => {
+    if (!e.dataTransfer?.types.includes('Files')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+    if (!dropActive) setDropActive(true);
+  };
+  const handleDragLeave = (e: ReactDragEvent<HTMLDivElement>) => {
+    if (e.currentTarget.contains(e.relatedTarget as Node)) return;
+    setDropActive(false);
+  };
+  const handleDrop = (e: ReactDragEvent<HTMLDivElement>) => {
+    const files = extractImageFiles(e.dataTransfer?.files);
+    setDropActive(false);
+    if (!files.length) return;
+    e.preventDefault();
+    e.stopPropagation();
+    onDropFile(index, files[0]);
   };
 
   return (
-    <div className={css.galleryImageCard} ref={setNodeRef} style={style}>
+    <div
+      className={css.galleryImageCard}
+      ref={setNodeRef}
+      style={style}
+      onDragLeave={handleDragLeave}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
       <div className={css.galleryImageDragHandle} {...attributes} {...listeners}>
         <GripVertical size={14} />
       </div>
 
-      <div className={css.galleryImageThumb}>
+      <div className={css.galleryImageThumb} title="Drop an image here to replace">
         {image.src ? (
           <img alt={image.alt || ''} src={image.src} />
         ) : (
@@ -152,9 +213,10 @@ const GalleryEditorDialogContent: FC<{
   dismiss: () => void;
   initialImages: GalleryImage[];
   initialLayout: LayoutType;
+  uploader: ImageUploadFn | null;
   onImagesChange: (images: GalleryImage[]) => void;
   onLayoutChange: (layout: LayoutType) => void;
-}> = ({ dismiss, initialImages, initialLayout, onImagesChange, onLayoutChange }) => {
+}> = ({ dismiss, initialImages, initialLayout, uploader, onImagesChange, onLayoutChange }) => {
   const { className: portalClassName } = usePortalTheme();
   const [entries, setEntries] = useState<ImageEntry[]>(() =>
     initialImages.map((img) => ({ id: genId(), image: { ...img } })),
@@ -162,6 +224,8 @@ const GalleryEditorDialogContent: FC<{
   const [layout, setLayout] = useState<LayoutType>(initialLayout);
   const newInputRef = useRef<HTMLInputElement>(null);
   const [dragActiveId, setDragActiveId] = useState<string | null>(null);
+  const [bodyDropActive, setBodyDropActive] = useState(false);
+  const dragDepthRef = useRef(0);
 
   const itemIds = entries.map((e) => e.id);
 
@@ -177,6 +241,44 @@ const GalleryEditorDialogContent: FC<{
   const handleRemoveImage = useCallback((index: number) => {
     setEntries((prev) => prev.filter((_, i) => i !== index));
   }, []);
+
+  const appendFiles = useCallback(
+    async (files: File[]) => {
+      if (!files.length) return;
+      const results = await Promise.all(
+        files.map(async (file) => {
+          try {
+            return await fileToGalleryImage(file, uploader);
+          } catch {
+            return null;
+          }
+        }),
+      );
+      const fresh = results
+        .filter((r): r is GalleryImage => !!r && !!r.src)
+        .map((image) => ({ id: genId(), image }));
+      if (fresh.length) setEntries((prev) => [...prev, ...fresh]);
+    },
+    [uploader],
+  );
+
+  const replaceEntryFile = useCallback(
+    async (index: number, file: File) => {
+      try {
+        const next = await fileToGalleryImage(file, uploader);
+        setEntries((prev) =>
+          prev.map((entry, i) =>
+            i === index
+              ? { ...entry, image: { src: next.src, alt: next.alt || entry.image.alt || '' } }
+              : entry,
+          ),
+        );
+      } catch {
+        // swallow upload errors
+      }
+    },
+    [uploader],
+  );
 
   const handleUpdateImage = useCallback(
     (index: number, field: keyof GalleryImage, value: string) => {
@@ -210,6 +312,30 @@ const GalleryEditorDialogContent: FC<{
 
   const dragActiveEntry = dragActiveId ? entries.find((e) => e.id === dragActiveId) : null;
 
+  const handleBodyDragEnter = (e: ReactDragEvent<HTMLDivElement>) => {
+    if (!e.dataTransfer?.types.includes('Files')) return;
+    dragDepthRef.current += 1;
+    setBodyDropActive(true);
+  };
+  const handleBodyDragOver = (e: ReactDragEvent<HTMLDivElement>) => {
+    if (!e.dataTransfer?.types.includes('Files')) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'copy';
+  };
+  const handleBodyDragLeave = (e: ReactDragEvent<HTMLDivElement>) => {
+    if (!e.dataTransfer?.types.includes('Files')) return;
+    dragDepthRef.current = Math.max(0, dragDepthRef.current - 1);
+    if (dragDepthRef.current === 0) setBodyDropActive(false);
+  };
+  const handleBodyDrop = (e: ReactDragEvent<HTMLDivElement>) => {
+    const files = extractImageFiles(e.dataTransfer?.files);
+    dragDepthRef.current = 0;
+    setBodyDropActive(false);
+    if (!files.length) return;
+    e.preventDefault();
+    void appendFiles(files);
+  };
+
   return (
     <>
       {/* Header */}
@@ -229,11 +355,26 @@ const GalleryEditorDialogContent: FC<{
       </div>
 
       {/* Body */}
-      <div className={css.galleryDialogBody}>
+      <div
+        className={css.galleryDialogBody}
+        style={
+          bodyDropActive
+            ? {
+                outline: `2px dashed ${vars.color.accent}`,
+                outlineOffset: -8,
+                borderRadius: 8,
+              }
+            : undefined
+        }
+        onDragEnter={handleBodyDragEnter}
+        onDragLeave={handleBodyDragLeave}
+        onDragOver={handleBodyDragOver}
+        onDrop={handleBodyDrop}
+      >
         {entries.length === 0 ? (
           <div className={css.galleryDialogEmpty}>
             <ImageIcon size={32} />
-            <span>Add your first image</span>
+            <span>Add your first image or drop files here</span>
             <button
               className={css.galleryAddBtn}
               style={{ maxWidth: 200 }}
@@ -264,6 +405,7 @@ const GalleryEditorDialogContent: FC<{
                     isLast={index === entries.length - 1}
                     key={entry.id}
                     lastInputRef={newInputRef}
+                    onDropFile={replaceEntryFile}
                     onRemove={handleRemoveImage}
                     onUpdate={handleUpdateImage}
                   />
@@ -317,6 +459,7 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
 }) => {
   const { className: portalClassName } = usePortalTheme();
   const theme = useColorScheme();
+  const uploader = useImageUpload();
 
   const handleOpenEditor = useCallback(() => {
     if (!onImagesChange || !onLayoutChange) return;
@@ -326,6 +469,7 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
           dismiss={dismiss}
           initialImages={images}
           initialLayout={layout}
+          uploader={uploader}
           onImagesChange={onImagesChange}
           onLayoutChange={onLayoutChange}
         />
@@ -336,7 +480,7 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
       showCloseButton: false,
       clickOutsideToDismiss: false,
     });
-  }, [images, layout, onImagesChange, onLayoutChange, portalClassName, theme]);
+  }, [images, layout, onImagesChange, onLayoutChange, portalClassName, theme, uploader]);
 
   if (!onImagesChange) {
     return <GalleryRenderer images={images} layout={layout} />;
