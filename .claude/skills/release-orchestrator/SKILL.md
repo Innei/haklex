@@ -313,11 +313,11 @@ Only stage the bumped manifests and lockfile. If the worktree has unrelated edit
 
 Phase 4 invoked `bumpp -r --no-tag` to defer tagging until after manifests land on `main` — keep that flag so a single annotated tag points at the release commit, not at the pre-publish state.
 
-## Phase 5.5 — Draft GitHub release (note authored by user)
+## Phase 5.5 — Publish GitHub release (note auto-authored, published directly)
 
-Release notes (incl. breaking changes, new features, migration steps) live on GitHub Releases. The skill drafts the note from the changeset and creates a **draft** release — the user reviews and publishes from the GitHub UI.
+Release notes (incl. breaking changes, new features, migration steps) live on GitHub Releases. The skill authors the note from the changeset and **publishes the release directly** — no draft, no review gate. The orchestrator is fully autonomous; downstream propagation in Phase 6+ proceeds in parallel with the release going live.
 
-1. Build the draft note from `git log` and Phase 2's classification. Group commits by type, surface breaking changes first:
+1. Build the note from `git log` and Phase 2's classification. Group commits by type, surface breaking changes first:
 
    ```bash
    COMMITS=$(git log --pretty=format:'- %s (%h)' "$LAST"..HEAD)
@@ -328,9 +328,9 @@ Release notes (incl. breaking changes, new features, migration steps) live on Gi
    #   refactor: / perf: / docs: / chore:       → ## Other
    ```
 
-   Header the note with the Phase 2 bump classification table so reviewers see _why_ the level was chosen.
+   Header the note with the Phase 2 bump classification table so readers see _why_ the level was chosen.
 
-2. Write the draft to a temp file (`mktemp`) so the user can edit before publishing:
+2. Write the note to a temp file:
 
    ```bash
    NOTE=$(mktemp)
@@ -352,26 +352,16 @@ Release notes (incl. breaking changes, new features, migration steps) live on Gi
    EOF
    ```
 
-3. Create the release as a **draft** bound to the pushed tag:
+3. Publish the release bound to the pushed tag (no `--draft`):
 
    ```bash
    gh release create "v$NEW_VERSION" \
      --title "v$NEW_VERSION" \
      --notes-file "$NOTE" \
-     --draft \
      --verify-tag
    ```
 
-   `--draft` means the release is invisible to the public until the user publishes it. `--verify-tag` fails fast if Phase 5's `git push origin "v$NEW_VERSION"` didn't land — do not silently fall back to `--target HEAD`.
-
-4. Print the **edit** URL so the user lands directly in the editor with the "Publish release" button. `gh release view ... --json url` returns the `/releases/tag/<slug>` URL, which for an unpublished draft uses an `untagged-<hex>` slug and renders the read-only view page (no edit affordance). Swap `/tag/` → `/edit/` to surface the editor:
-
-   ```bash
-   EDIT_URL=$(gh release view "v$NEW_VERSION" --json url -q .url | sed 's#/releases/tag/#/releases/edit/#')
-   echo "$EDIT_URL"
-   ```
-
-   Do **not** wait for publication — downstream propagation proceeds in parallel.
+   `--verify-tag` fails fast if Phase 5's `git push origin "v$NEW_VERSION"` didn't land — do not silently fall back to `--target HEAD`. Print the published release URL in the Phase 9 summary; no edit URL is needed since the release is already live.
 
 If `gh` is missing or unauthenticated (`gh auth status` fails), stop and ask the user — do not skip the release step and push downstream anyway. The release is a required artefact, not an optional convenience.
 
@@ -462,9 +452,13 @@ Run the repos in parallel (one subagent per worktree). Collect pass/fail per rep
 1. **Local revert (safe, automatic):**
 
    ```bash
-   # Delete draft release first (safe — never published, never indexed)
-   gh release delete "v$NEW_VERSION" --yes 2> /dev/null || true
-   # Delete the tag locally and on the remote
+   # If the GitHub release already published in Phase 5.5, delete it. The
+   # release page is technically visible to the public for the brief window
+   # between Phase 5.5 and a Phase 7 failure, but no human is expected to
+   # have consumed it yet — deletion is still the right call.
+   gh release delete "v$NEW_VERSION" --yes --cleanup-tag 2> /dev/null || true
+   # --cleanup-tag also drops the tag on the remote; fall through to the
+   # local tag cleanup below in case the release was never created.
    git -C haklex tag -d "v$NEW_VERSION" 2> /dev/null || true
    git -C haklex push origin ":refs/tags/v$NEW_VERSION" 2> /dev/null || true
    
@@ -476,7 +470,7 @@ Run the repos in parallel (one subagent per worktree). Collect pass/fail per rep
    done
    ```
 
-   If the user has **already published** the draft release on GitHub, treat the version as in-the-wild — fall through to step 2 (publish a fix as a new patch) instead of deleting the release.
+   The release was published live in Phase 5.5, so during the brief window between Phase 5.5 and a downstream failure it is technically public. If any downstream commit already merged or any external party has consumed the published note, treat the version as in-the-wild — fall through to step 2 (publish a fix as a new patch) instead of deleting the release.
 
 2. **npm unpublish (risky — always ask user first):** within 72 h of publish, if no other package has installed it:
 
@@ -540,39 +534,36 @@ Print:
 
 For `MODE=full`, the haklex row reads `15 / 15 (full)` and each downstream row reads `N pins bumped (full)`. For `MODE=incremental`, list the actually-published package names inline so the user can verify the scope matched intent.
 
-Then surface the **draft GitHub release URL** as a separate, prominent line — this is the user's next action:
+Then surface the **published GitHub release URL** as a separate, prominent line:
 
 ```
-👉 Draft release pending review: <EDIT_URL from Phase 5.5 step 4>
-   Edit the auto-drafted notes (breaking changes, features, migration steps) and click "Publish release".
+✅ Release published: https://github.com/Innei/haklex/releases/tag/v$NEW_VERSION
 ```
 
-The URL must point at `/releases/edit/<slug>`, not `/releases/tag/<slug>`. The latter is the read-only view page; for an unpublished draft it has no edit affordance and the user has to manually click into the editor. Always surface the edit form so the next click is "Publish release".
-
-Do not mark the release as "complete" in the summary until the user publishes it.
+The release is live — no further user action required. Mark the release as complete in the summary.
 
 ## Quick reference
 
-| Step             | Command                                                                                                                                                                                                                                                                                                                                                    |
-| ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last release SHA | `git log --grep='^release: v' -n1 --format=%H`                                                                                                                                                                                                                                                                                                             |
-| Mode detect      | `grep -iqE '(^\|[^a-z])(full\|全量\|all)([^a-z]\|$)' <<<"$INVOCATION_TEXT" && echo full \|\| echo incremental`                                                                                                                                                                                                                                             |
-| Changed pkgs     | `git diff --name-only $LAST..HEAD -- 'packages/*/src/**'`                                                                                                                                                                                                                                                                                                  |
-| Publish set      | `full` → all `@haklex/*` sans demo. `incremental` → **bidirectional** closure of `CHANGED_PKGS`: forward over `dependencies + peerDependencies + optionalDependencies` (any `workspace:` prefix), backward over sibling `peerDependencies` exact-pins (`workspace:*` only — `workspace:^` is skipped). Iterate to fixed point. See Phase 4 for the script. |
-| Export diff      | `diff <(git show $LAST:…/index.ts \| grep ^export) <(git show HEAD:…/index.ts \| grep ^export)`                                                                                                                                                                                                                                                            |
-| Peer audit       | `jq '.dependencies, .peerDependencies' packages/<pkg>/package.json`                                                                                                                                                                                                                                                                                        |
-| Bump             | `pnpm bumpp -r <level> --no-git --no-tag`                                                                                                                                                                                                                                                                                                                  |
-| Build            | `pnpm run build:packages`                                                                                                                                                                                                                                                                                                                                  |
-| Publish one      | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                                                                                                                                                                                                                                                                                      |
-| Registry poll    | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                                                                                                                                                                                                                                                                                |
-| CLI smoke        | `npx --yes -p @haklex/rich-litexml-cli@$CLI_VER litexml '<p>x</p>' --format json --compact` (`$CLI_VER` = `$V` if in PUBLISH_SET, else `npm view @haklex/rich-litexml-cli version`)                                                                                                                                                                        |
-| Default branch   | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master)                                                                                                                                                                                                                                                          |
-| Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                                                                                                                                                                                                                                                                                     |
-| Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                                                                                                                                                                                                                                                                            |
-| Tag haklex       | `git tag v$V && git push origin v$V` (after commit, before downstream)                                                                                                                                                                                                                                                                                     |
-| Draft release    | `gh release create v$V --title v$V --notes-file $NOTE --draft --verify-tag`                                                                                                                                                                                                                                                                                |
-| Draft edit URL   | `gh release view v$V --json url -q .url \| sed 's#/releases/tag/#/releases/edit/#'`                                                                                                                                                                                                                                                                        |
-| Delete draft     | `gh release delete v$V --yes && git push origin :refs/tags/v$V` (rollback only)                                                                                                                                                                                                                                                                            |
+| Step             | Command                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Last release SHA | `git log --grep='^release: v' -n1 --format=%H`                                                                                                                                                                                                                                                                                                                    |
+| Mode detect      | `grep -iqE '(^\|[^a-z])(full\|全量\|all)([^a-z]\|$)' <<<"$INVOCATION_TEXT" && echo full \|\| echo incremental`                                                                                                                                                                                                                                                    |
+| Changed pkgs     | `git diff --name-only $LAST..HEAD -- 'packages/*/src/**'`                                                                                                                                                                                                                                                                                                         |
+| Publish set      | `full` → all `@haklex/*` sans demo. `incremental` → **bidirectional** closure of `CHANGED_PKGS`: forward over `dependencies + peerDependencies + optionalDependencies` (any `workspace:` prefix), backward over sibling exact-pins (`workspace:*` only — `workspace:^` is skipped) in **all three** sections. Iterate to fixed point. See Phase 4 for the script. |
+| Export diff      | `diff <(git show $LAST:…/index.ts \| grep ^export) <(git show HEAD:…/index.ts \| grep ^export)`                                                                                                                                                                                                                                                                   |
+| Peer audit       | `jq '.dependencies, .peerDependencies' packages/<pkg>/package.json`                                                                                                                                                                                                                                                                                               |
+| Bump             | `pnpm bumpp -r <level> --no-git --no-tag`                                                                                                                                                                                                                                                                                                                         |
+| Build            | `pnpm run build:packages`                                                                                                                                                                                                                                                                                                                                         |
+| Publish one      | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                                                                                                                                                                                                                                                                                             |
+| Registry poll    | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                                                                                                                                                                                                                                                                                       |
+| CLI smoke        | `npx --yes -p @haklex/rich-litexml-cli@$CLI_VER litexml '<p>x</p>' --format json --compact` (`$CLI_VER` = `$V` if in PUBLISH_SET, else `npm view @haklex/rich-litexml-cli version`)                                                                                                                                                                               |
+| Default branch   | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master)                                                                                                                                                                                                                                                                 |
+| Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                                                                                                                                                                                                                                                                                            |
+| Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                                                                                                                                                                                                                                                                                   |
+| Tag haklex       | `git tag v$V && git push origin v$V` (after commit, before downstream)                                                                                                                                                                                                                                                                                            |
+| Publish release  | `gh release create v$V --title v$V --notes-file $NOTE --verify-tag` (no `--draft` — publish directly)                                                                                                                                                                                                                                                             |
+| Release URL      | `https://github.com/Innei/haklex/releases/tag/v$V` (live immediately after publish)                                                                                                                                                                                                                                                                               |
+| Rollback release | `gh release delete v$V --yes --cleanup-tag` (only on Phase 8a failure path)                                                                                                                                                                                                                                                                                       |
 
 ## Common mistakes
 
@@ -599,11 +590,10 @@ Do not mark the release as "complete" in the summary until the user publishes it
 | Skipping `git fetch` + rebase before push                                  | Default branch may have advanced during the release; rebase on `origin/$D` first                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Targeting a feature branch or guessing `main`                              | Always derive `$D` from `origin/HEAD`; some repos use `master`, not `main`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | Writing release notes into README                                          | Notes live on GitHub Releases — README only links there; never paste a "What's new" block back into any in-repo doc                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| Publishing the GitHub release as non-draft                                 | Always `--draft` from the skill; the user reviews and publishes from the GitHub UI                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Adding `--draft` to `gh release create`                                    | The orchestrator is autonomous — publish directly. Drafts re-introduce a manual gate that defeats the point                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | Skipping the `rich-litexml-cli` binary smoke                               | Bin packages can publish "successfully" yet fail to boot — always run Phase 4.5                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | Skipping `--verify-tag` on `gh release create`                             | Without it, gh silently creates a tag at HEAD, decoupling the release from the bump commit                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| Forgetting to delete the draft on rollback                                 | A lingering draft + tag confuses the next release attempt — always clean up in Phase 8a                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| Surfacing the `/releases/tag/` URL for a draft                             | That's the read-only view page; for unpublished drafts it has no "Publish release" button. Swap to `/releases/edit/` so the user lands in the editor with the publish action one click away                                                                                                                                                                                                                                                                                                                                                                   |
+| Forgetting `--cleanup-tag` on rollback                                     | A lingering tag confuses the next release attempt. `gh release delete --cleanup-tag` drops both the release and the remote tag in one call                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
 ## Red flags — STOP and ask
 
@@ -618,7 +608,7 @@ Do not mark the release as "complete" in the summary until the user publishes it
 - Rebase against `origin/main` surfaces conflicts (something else landed during the release)
 - `main` is protected in a way that rejects direct push (fall back to opening a PR, but ask first)
 - `gh auth status` fails or `gh` is not installed — release artefact is required, do not skip
-- A draft release for `v$NEW_VERSION` already exists (stale from a previous failed attempt) — delete it before re-creating, or the user will edit the wrong one
+- A release for `v$NEW_VERSION` already exists on GitHub (stale from a previous failed attempt) — delete it via `gh release delete v$NEW_VERSION --yes --cleanup-tag` before re-publishing, or `gh release create` will reject as duplicate
 - Phase 3 audit finds any `@haklex/*` peerDep on `workspace:*` (must be `workspace:^`) — fix the manifest before Phase 4 runs `bumpp`, otherwise the exact pin gets baked into the published tarball and re-triggers the v0.26.3 duplicate-instance failure
 
 ## Real-world anchors
