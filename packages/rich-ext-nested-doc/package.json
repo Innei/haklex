@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-nested-doc",
-  "version": "0.26.2",
+  "version": "0.26.3",
   "description": "Nested document extension for haklex rich editor",
   "repository": {
     "type": "git",
