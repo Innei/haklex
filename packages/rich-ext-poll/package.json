@@ -46,6 +46,7 @@
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",
     "@haklex/rich-editor-ui": "workspace:^",
+    "@lexical/react": "^0.45.0",
     "lexical": "^0.45.0",
     "lucide-react": "^1.0.0",
     "react": ">=19"
