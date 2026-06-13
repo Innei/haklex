@@ -38,9 +38,9 @@
   },
   "peerDependencies": {
     "@base-ui/react": ">=1.5.0",
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
+    "@haklex/rich-editor": "workspace:^",
+    "@haklex/rich-editor-ui": "workspace:^",
+    "@haklex/rich-style-token": "workspace:^",
     "@lexical/react": "^0.45.0",
     "lexical": "^0.45.0",
     "lucide-react": "^1.0.0",

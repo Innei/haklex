@@ -43,9 +43,9 @@
   },
   "peerDependencies": {
     "@excalidraw/excalidraw": ">=0.18.0",
-    "@haklex/rich-editor": "workspace:*",
-    "@haklex/rich-editor-ui": "workspace:*",
-    "@haklex/rich-style-token": "workspace:*",
+    "@haklex/rich-editor": "workspace:^",
+    "@haklex/rich-editor-ui": "workspace:^",
+    "@haklex/rich-style-token": "workspace:^",
     "@lexical/react": "^0.45.0",
     "lexical": "^0.45.0",
     "lucide-react": "^1.0.0",

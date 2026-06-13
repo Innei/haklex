@@ -35,7 +35,7 @@
     "vitest": "^4.1.7"
   },
   "peerDependencies": {
-    "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-editor": "workspace:^",
     "lexical": "^0.45.0"
   },
   "publishConfig": {
