@@ -44,8 +44,8 @@ const LAYOUT_OPTIONS: { value: ImageLayout | undefined; label: string; Icon: Luc
   { value: undefined, label: 'Center', Icon: AlignCenterVertical },
   { value: 'align-left', label: 'Align left', Icon: AlignStartVertical },
   { value: 'align-right', label: 'Align right', Icon: AlignEndVertical },
-  { value: 'float-left', label: 'Float left, text wraps right', Icon: ArrowLeftToLine },
-  { value: 'float-right', label: 'Float right, text wraps left', Icon: ArrowRightToLine },
+  { value: 'float-left', label: 'Wrap left', Icon: ArrowLeftToLine },
+  { value: 'float-right', label: 'Wrap right', Icon: ArrowRightToLine },
 ];
 
 const toolbarButtonClass = `${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`;

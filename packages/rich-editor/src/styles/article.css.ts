@@ -210,6 +210,16 @@ globalStyle(`${articleBase} .rich-image`, {
   marginBottom: em(32, 16),
 });
 
+globalStyle(`${articleBase} .rich-image[data-layout^="float"]`, {
+  marginTop: '0.125rem',
+  marginBottom: '0.875rem',
+});
+
+globalStyle(`${articleBase} .rich-image-wrapper[data-layout^="float"] .rich-image`, {
+  marginTop: 0,
+  marginBottom: 0,
+});
+
 globalStyle(`${articleBase} .rich-image > *`, {
   marginTop: '0',
   marginBottom: '0',

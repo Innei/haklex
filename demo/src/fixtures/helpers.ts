@@ -251,6 +251,7 @@ export function image(payload: {
   thumbhash?: string;
   accent?: string;
   displayWidth?: number;
+  layout?: 'align-left' | 'align-right' | 'float-left' | 'float-right';
 }) {
   return {
     type: 'image',
@@ -262,6 +263,7 @@ export function image(payload: {
     thumbhash: payload.thumbhash,
     accent: payload.accent,
     displayWidth: payload.displayWidth,
+    layout: payload.layout,
     version: 1,
   };
 }

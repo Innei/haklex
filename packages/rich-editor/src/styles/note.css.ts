@@ -271,6 +271,16 @@ globalStyle(`${noteBase} .rich-image`, {
   marginBottom: '2em',
 });
 
+globalStyle(`${noteBase} .rich-image[data-layout^="float"]`, {
+  marginTop: '0.125rem',
+  marginBottom: '0.875rem',
+});
+
+globalStyle(`${noteBase} .rich-image-wrapper[data-layout^="float"] .rich-image`, {
+  marginTop: 0,
+  marginBottom: 0,
+});
+
 globalStyle(`${noteBase} .rich-image img`, {
   borderRadius: vars.borderRadius.md,
 });

@@ -27,6 +27,8 @@ export const semanticClassNames = {
   resizeHandle: 'rr-image-resize-handle',
 } as const;
 
+const floatWidthFallback = '42%';
+
 export const root = style({
   'margin': '1.25rem auto',
   'textAlign': 'center',
@@ -45,13 +47,13 @@ export const root = style({
     },
     '&[data-layout="float-left"]': {
       float: 'left',
-      width: 'var(--rich-image-display-width, 50%)',
-      margin: '0.25rem 1.5rem 1rem 0',
+      width: `var(--rich-image-display-width, ${floatWidthFallback})`,
+      margin: '0.125rem 1.25rem 0.875rem 0',
     },
     '&[data-layout="float-right"]': {
       float: 'right',
-      width: 'var(--rich-image-display-width, 50%)',
-      margin: '0.25rem 0 1rem 1.5rem',
+      width: `var(--rich-image-display-width, ${floatWidthFallback})`,
+      margin: '0.125rem 0 0.875rem 1.25rem',
     },
   },
   '@media': {
@@ -74,6 +76,22 @@ globalStyle(`.rich-image-wrapper[data-layout^="float"] ${root}`, {
   float: 'none',
   width: 'auto',
   margin: 0,
+});
+
+export const imageDragging = style({
+  opacity: 0.4,
+});
+
+globalStyle('.rich-editor__content[data-rich-image-drop-side]', {
+  cursor: 'move',
+});
+
+globalStyle('.rich-editor__content[data-rich-image-drop-side="left"]', {
+  boxShadow: `inset 3px 0 0 color-mix(in srgb, ${vars.color.accent} 70%, transparent)`,
+});
+
+globalStyle('.rich-editor__content[data-rich-image-drop-side="right"]', {
+  boxShadow: `inset -3px 0 0 color-mix(in srgb, ${vars.color.accent} 70%, transparent)`,
 });
 
 const imageLoad = keyframes({

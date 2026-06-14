@@ -27,6 +27,7 @@ import { ImageRenderer } from './ImageRenderer';
 import { ReplacePopover } from './ReplacePopover';
 import { ResizeHandles } from './ResizeHandles';
 import * as styles from './styles.css';
+import { useImageDragLayout } from './useImageDragLayout';
 
 const frameStateSemanticClass = {
   loading: styles.semanticClassNames.frameLoading,
@@ -75,6 +76,7 @@ function ImageEditContent() {
   const setFocusCaptionOnOpen = useSetAtom(focusCaptionOnOpenAtom);
   const displayWidth = useAtomValue(displayWidthAtom);
   const layout = useAtomValue(layoutAtom);
+  const dragLayoutProps = useImageDragLayout();
 
   const handleCaptionClick = useCallback(
     (e: React.MouseEvent) => {
@@ -107,6 +109,7 @@ function ImageEditContent() {
           className={`${styles.root} ${styles.semanticClassNames.root}`}
           data-layout={layout}
           style={figureStyle}
+          {...dragLayoutProps}
         >
           <div
             className={`${styles.frame} ${styles.semanticClassNames.frame} ${styles.frameEditMode} ${styles.imageState[loadState]} ${frameStateSemanticClass[loadState]}`.trim()}

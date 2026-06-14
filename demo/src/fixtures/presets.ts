@@ -12,6 +12,7 @@ import {
   FORMAT_ITALIC,
   heading,
   horizontalRule,
+  image,
   link,
   list,
   listItem,
@@ -535,6 +536,114 @@ export const presets: Preset[] = [
   notePreset,
   inneiAboutPreset,
   markdownTestPreset,
+  {
+    key: 'image-wrap-layout',
+    label: 'Image Wrap Layout',
+    description: 'Focused case for left and right image wrapping with drag-to-side layout',
+    data: doc(
+      heading('h1', text('Image Wrap Layout')),
+
+      paragraph(
+        text(
+          'This case isolates the square image wrap behavior. Use the editor mode, drag an image toward the left or right half of the editor, and observe the serialized layout value change between ',
+        ),
+        text('float-left', FORMAT_CODE),
+        text(' and '),
+        text('float-right', FORMAT_CODE),
+        text('.'),
+      ),
+
+      alertQuote(
+        'note',
+        paragraph(
+          text(
+            'The model intentionally remains simple: images are still document-flow blocks, and only the left or right side is selected by drag position.',
+          ),
+        ),
+      ) as any,
+
+      heading('h2', text('Left Wrap')),
+
+      image({
+        src: 'https://picsum.photos/seed/haklex-wrap-left/900/620',
+        altText: 'Left wrapped image',
+        caption: 'Left wrap: text flows on the right side',
+        width: 900,
+        height: 620,
+        thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        accent: '#a3a3a3',
+        displayWidth: 38,
+        layout: 'float-left',
+      }) as any,
+
+      paragraph(
+        text(
+          'A left wrapped image should keep the visual mass pinned to the left edge while normal paragraph text fills the remaining column. This paragraph is deliberately long enough to create several text lines beside the image, making the spacing, default width, and vertical margin easy to inspect. The image should not create a large empty gap above or below the paragraph text.',
+        ),
+      ),
+
+      paragraph(
+        text(
+          'Continue editing this section by dragging the image toward the right side of the editor. The image should move to the nearest document position and switch to right wrapping without requiring a separate toolbar action.',
+        ),
+      ),
+
+      horizontalRule(),
+
+      heading('h2', text('Right Wrap')),
+
+      image({
+        src: 'https://picsum.photos/seed/haklex-wrap-right/900/620',
+        altText: 'Right wrapped image',
+        caption: 'Right wrap: text flows on the left side',
+        width: 900,
+        height: 620,
+        thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        accent: '#737373',
+        displayWidth: 38,
+        layout: 'float-right',
+      }) as any,
+
+      paragraph(
+        text(
+          'A right wrapped image should sit against the right edge and leave a readable text column on the left. This paragraph checks the mirror case: the gutter should be consistent with the left-wrap section, and the paragraph should continue under the image once the available vertical space is exhausted.',
+        ),
+      ),
+
+      paragraph(
+        text(
+          'Resize handles remain independent from layout dragging. Horizontal resizing should update the display width, while drag-and-drop should update the side and document position.',
+        ),
+      ),
+
+      horizontalRule(),
+
+      heading('h2', text('Drag Target')),
+
+      paragraph(
+        text(
+          'The image below starts as a normal centered block. Drag it into either half of the editor to convert it into a wrapped image, then inspect the JSON panel to confirm the resulting layout field.',
+        ),
+      ),
+
+      image({
+        src: 'https://picsum.photos/seed/haklex-wrap-drag/900/620',
+        altText: 'Drag target image',
+        caption: 'Drag this image to the left or right side',
+        width: 900,
+        height: 620,
+        thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+        accent: '#d4d4d4',
+        displayWidth: 42,
+      }) as any,
+
+      paragraph(
+        text(
+          'After dropping the image, this paragraph should become part of the wrap test surface. If the image lands on the left, text should flow to its right. If it lands on the right, text should flow to its left. The behavior should remain stable after switching between edit and readonly modes.',
+        ),
+      ),
+    ),
+  },
   {
     key: 'excalidraw-showcase',
     label: 'Excalidraw Whiteboard',

@@ -113,6 +113,16 @@ globalStyle(`${commentBase} .rich-image`, {
   margin: `${vars.spacing.sm} 0`,
 });
 
+globalStyle(`${commentBase} .rich-image[data-layout^="float"]`, {
+  marginTop: '0.125rem',
+  marginBottom: '0.875rem',
+});
+
+globalStyle(`${commentBase} .rich-image-wrapper[data-layout^="float"] .rich-image`, {
+  marginTop: 0,
+  marginBottom: 0,
+});
+
 globalStyle(`${commentBase} .rich-image figcaption`, {
   fontSize: vars.typography.fontSizeSmall,
 });

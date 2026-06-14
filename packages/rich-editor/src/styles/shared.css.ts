@@ -948,6 +948,7 @@ globalStyle(`${tableCellHeader} > :last-child`, {
 });
 
 const mobileMedia = '(max-width: 640px)';
+const imageFloatWidthFallback = '42%';
 
 // ─── Image display width & layout ───────────────────────
 // `--rich-image-display-width` is set inline by ImageRenderer when
@@ -974,30 +975,30 @@ globalStyle('figure.rich-image[data-layout="align-right"]', {
 
 globalStyle('figure.rich-image[data-layout="float-left"]', {
   float: 'left',
-  width: 'var(--rich-image-display-width, 50%)',
-  margin: '0.25rem 1.5rem 1rem 0',
+  width: `var(--rich-image-display-width, ${imageFloatWidthFallback})`,
+  margin: '0.125rem 1.25rem 0.875rem 0',
 });
 
 globalStyle('figure.rich-image[data-layout="float-right"]', {
   float: 'right',
-  width: 'var(--rich-image-display-width, 50%)',
-  margin: '0.25rem 0 1rem 1.5rem',
+  width: `var(--rich-image-display-width, ${imageFloatWidthFallback})`,
+  margin: '0.125rem 0 0.875rem 1.25rem',
 });
 
-// width: 50% matches the static renderer's var() fallback for floats without
+// width matches the static renderer's var() fallback for floats without
 // an explicit displayWidth; the wrapper's inline width overrides it when set.
 globalStyle('.rich-image-wrapper[data-layout="float-left"]', {
   float: 'left',
-  width: '50%',
+  width: imageFloatWidthFallback,
   maxWidth: '100%',
-  margin: '0.25rem 1.5rem 1rem 0',
+  margin: '0.125rem 1.25rem 0.875rem 0',
 });
 
 globalStyle('.rich-image-wrapper[data-layout="float-right"]', {
   float: 'right',
-  width: '50%',
+  width: imageFloatWidthFallback,
   maxWidth: '100%',
-  margin: '0.25rem 0 1rem 1.5rem',
+  margin: '0.125rem 0 0.875rem 1.25rem',
 });
 
 // Inside a floated wrapper the wrapper already carries float + width;
