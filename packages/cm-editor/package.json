@@ -1,6 +1,6 @@
 {
   "name": "@haklex/cm-editor",
-  "version": "0.26.6",
+  "version": "0.27.0",
   "description": "Shared CodeMirror 6 editor utilities",
   "repository": {
     "type": "git",

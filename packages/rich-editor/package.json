@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-editor",
-  "version": "0.26.6",
+  "version": "0.27.0",
   "description": "Core rich text editor based on Lexical",
   "repository": {
     "type": "git",
