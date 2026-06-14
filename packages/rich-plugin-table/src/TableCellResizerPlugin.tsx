@@ -22,6 +22,7 @@ function TableCellResizerInner({ editor }: { editor: LexicalEditor }): ReactElem
   const startYRef = useRef(0);
   const startWidthRef = useRef(0);
   const startHeightRef = useRef(0);
+  const startTableWidthRef = useRef(0);
   const cleanupRef = useRef<(() => void) | null>(null);
   const activeCellRef = useRef<HTMLTableCellElement | null>(null);
 
@@ -120,6 +121,7 @@ function TableCellResizerInner({ editor }: { editor: LexicalEditor }): ReactElem
       startYRef.current = e.clientY;
       startWidthRef.current = activeCell.offsetWidth;
       startHeightRef.current = activeCell.offsetHeight;
+      startTableWidthRef.current = activeCell.closest('table')?.offsetWidth ?? 0;
 
       const capturedCell = activeCell;
 
@@ -130,6 +132,8 @@ function TableCellResizerInner({ editor }: { editor: LexicalEditor }): ReactElem
           const colIndex = capturedCell.cellIndex;
           const table = capturedCell.closest('table');
           if (table) {
+            const minTableWidth = table.parentElement?.clientWidth ?? startTableWidthRef.current;
+            table.style.width = `${Math.max(minTableWidth, startTableWidthRef.current + diff)}px`;
             const allRows = table.querySelectorAll('tr');
             allRows.forEach((row) => {
               const cells = row.querySelectorAll('td, th');
@@ -164,6 +168,11 @@ function TableCellResizerInner({ editor }: { editor: LexicalEditor }): ReactElem
         if (dir === 'right') {
           const diff = ev.clientX - startXRef.current;
           const newWidth = Math.max(50, startWidthRef.current + diff);
+          const table = capturedCell.closest('table');
+          if (table) {
+            const minTableWidth = table.parentElement?.clientWidth ?? startTableWidthRef.current;
+            table.style.width = `${Math.max(minTableWidth, startTableWidthRef.current + diff)}px`;
+          }
           editor.update(() => {
             const node = $getNearestNodeFromDOMNode(capturedCell);
             if (node && $isTableCellNode(node)) {

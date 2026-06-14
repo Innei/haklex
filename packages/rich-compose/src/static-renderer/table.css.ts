@@ -2,7 +2,12 @@ import { vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const tableWrapper = style({
+  display: 'block',
+  width: '100%',
+  maxWidth: '100%',
+  minWidth: 0,
   overflowX: 'auto',
+  overscrollBehaviorX: 'contain',
 });
 
 export const table = style({

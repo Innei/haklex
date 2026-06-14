@@ -250,6 +250,7 @@ export function image(payload: {
   caption?: string;
   thumbhash?: string;
   accent?: string;
+  displayWidth?: number;
 }) {
   return {
     type: 'image',
@@ -260,6 +261,7 @@ export function image(payload: {
     caption: payload.caption,
     thumbhash: payload.thumbhash,
     accent: payload.accent,
+    displayWidth: payload.displayWidth,
     version: 1,
   };
 }

@@ -17,6 +17,7 @@ export const content = style({
   outline: 'none',
   minHeight: '100px',
   width: '100%',
+  maxWidth: '100%',
   padding: `var(--ce-padding-top, 12px) ${vars.spacing.md} 12px ${vars.spacing.md}`,
 });
 

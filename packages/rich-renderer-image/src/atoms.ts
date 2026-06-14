@@ -84,13 +84,14 @@ export const frameStyleAtom = atom<CSSProperties>((get) => {
   const loadState = get(loadStateAtom);
   const width = get(widthAtom);
   const height = get(heightAtom);
+  const displayWidth = get(displayWidthAtom);
   return {
     backgroundColor:
       loadState !== 'loaded' && !placeholderUrl ? accent || '#f5f5f5' : 'transparent',
     backgroundImage:
       placeholderUrl && loadState !== 'loaded' ? `url(${placeholderUrl})` : undefined,
     backgroundSize: 'cover',
-    width: width ? Math.min(width, 1200) : undefined,
+    width: displayWidth !== undefined ? '100%' : width ? Math.min(width, 1200) : undefined,
     maxWidth: '100%',
     ...(width && height ? { aspectRatio: `${width} / ${height}` } : {}),
   };

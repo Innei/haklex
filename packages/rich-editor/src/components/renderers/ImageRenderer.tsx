@@ -71,10 +71,11 @@ export function ImageRenderer({
     [thumbhash],
   );
 
-  const aspectStyle: React.CSSProperties =
-    width && height
-      ? { aspectRatio: `${width} / ${height}`, maxWidth: '100%', width }
-      : { maxWidth: '100%' };
+  const aspectStyle: React.CSSProperties = {
+    ...(width && height ? { aspectRatio: `${width} / ${height}` } : {}),
+    maxWidth: '100%',
+    width: displayWidth !== undefined ? '100%' : width && height ? width : undefined,
+  };
 
   const figureStyle = displayWidth
     ? ({ '--rich-image-display-width': `${displayWidth}%` } as React.CSSProperties)

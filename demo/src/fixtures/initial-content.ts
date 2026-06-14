@@ -8,6 +8,7 @@ import {
   FORMAT_ITALIC,
   heading,
   horizontalRule,
+  image,
   list,
   listItem,
   nestedDoc,
@@ -234,6 +235,47 @@ console.log(greet('World'))`,
     accent: '#7ba8c4',
     version: 1,
   } as any,
+
+  heading('h2', text('Table Image Resize Repro')),
+
+  paragraph(
+    text('Reproduction fixture: resize the image in the first cell, then drag the same column.'),
+  ),
+
+  table(
+    tableRow(
+      tableCell(1, paragraph(text('Image cell'))),
+      tableCell(1, paragraph(text('Adjacent cell'))),
+      tableCell(1, paragraph(text('Expected behavior'))),
+    ),
+    tableRow(
+      tableCell(
+        0,
+        image({
+          src: 'https://picsum.photos/1200/720?random=612',
+          altText: 'Table cell resize repro image',
+          caption: 'Resize this image inside the table cell',
+          width: 1200,
+          height: 720,
+          thumbhash: 'LEHV6nWB2yk8pyo0adR*.7kCMdnj',
+          accent: '#a3a3a3',
+          displayWidth: 100,
+        }) as any,
+      ),
+      tableCell(
+        0,
+        paragraph(
+          text('This column should reclaim width after the image display width is reduced.'),
+        ),
+      ),
+      tableCell(
+        0,
+        paragraph(
+          text('The image display width should not keep the original column width locked.'),
+        ),
+      ),
+    ),
+  ),
 
   heading('h2', text('Video')),
 

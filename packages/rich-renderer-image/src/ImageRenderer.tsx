@@ -59,7 +59,7 @@ export function ImageRenderer({
       state !== 'loaded' && !placeholderUrl ? accent || vars.color.bgTertiary : 'transparent',
     backgroundImage: placeholderUrl && state !== 'loaded' ? `url(${placeholderUrl})` : undefined,
     backgroundSize: 'cover',
-    width: width ? Math.min(width, 1200) : undefined,
+    width: displayWidth !== undefined ? '100%' : width ? Math.min(width, 1200) : undefined,
     maxWidth: '100%',
     ...(width && height ? { aspectRatio: `${width} / ${height}` } : {}),
   };

@@ -16,6 +16,7 @@ import { createRendererDecoration } from '../components/RendererWrapper';
 import { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from '../plugins/image-upload-command';
 import { IMAGE_NODE_KEY } from '../types/renderer-keys';
 import type { CommandItemConfig } from '../types/slash-menu';
+import { $withAdaptiveImageDisplayWidth } from '../utils/image-insertion';
 
 export type ImageLayout = 'align-left' | 'align-right' | 'float-left' | 'float-right';
 
@@ -118,7 +119,9 @@ export class ImageNode extends DecoratorNode<ReactElement> {
         if (opened) return;
 
         editor.update(() => {
-          $insertNodes([$createImageNode({ src: '', altText: '' })]);
+          $insertNodes([
+            $createImageNode($withAdaptiveImageDisplayWidth({ src: '', altText: '' })),
+          ]);
         });
       },
     },

@@ -1,30 +1,29 @@
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext'
-import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical'
-import { useEffect } from 'react'
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { $insertNodes, COMMAND_PRIORITY_EDITOR, createCommand } from 'lexical';
+import { useEffect } from 'react';
 
-import type { ImageNodePayload } from '../nodes/ImageNode'
-import { $createImageNode } from '../nodes/ImageNode'
+import type { ImageNodePayload } from '../nodes/ImageNode';
+import { $createImageNode } from '../nodes/ImageNode';
+import { $withAdaptiveImageDisplayWidth } from '../utils/image-insertion';
 
-export type InsertImagePayload = ImageNodePayload
+export type InsertImagePayload = ImageNodePayload;
 
-export const INSERT_IMAGE_COMMAND = createCommand<InsertImagePayload>(
-  'INSERT_IMAGE_COMMAND',
-)
+export const INSERT_IMAGE_COMMAND = createCommand<InsertImagePayload>('INSERT_IMAGE_COMMAND');
 
 export function ImagePlugin() {
-  const [editor] = useLexicalComposerContext()
+  const [editor] = useLexicalComposerContext();
 
   useEffect(() => {
     return editor.registerCommand(
       INSERT_IMAGE_COMMAND,
       (payload) => {
-        const imageNode = $createImageNode(payload)
-        $insertNodes([imageNode])
-        return true
+        const imageNode = $createImageNode($withAdaptiveImageDisplayWidth(payload));
+        $insertNodes([imageNode]);
+        return true;
       },
       COMMAND_PRIORITY_EDITOR,
-    )
-  }, [editor])
+    );
+  }, [editor]);
 
-  return null
+  return null;
 }

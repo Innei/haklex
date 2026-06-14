@@ -19,6 +19,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useImagePreprocess } from '../context/ImagePreprocessContext';
 import { $createImageNode } from '../nodes/ImageNode';
+import { $withAdaptiveImageDisplayWidth } from '../utils/image-insertion';
 import { resolvePreprocessTargets } from '../utils/image-preprocess';
 import { computeImageMeta } from '../utils/thumbhash';
 import * as css from './image-upload.css';
@@ -144,13 +145,15 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
         const [result, meta] = await Promise.all([uploadRef.current(file), computeImageMeta(file)]);
 
         editor.update(() => {
-          const node = $createImageNode({
-            src: result.src,
-            altText: result.altText ?? file.name,
-            width: result.width ?? meta.width,
-            height: result.height ?? meta.height,
-            thumbhash: result.thumbhash ?? meta.thumbhash,
-          });
+          const node = $createImageNode(
+            $withAdaptiveImageDisplayWidth({
+              src: result.src,
+              altText: result.altText ?? file.name,
+              width: result.width ?? meta.width,
+              height: result.height ?? meta.height,
+              thumbhash: result.thumbhash ?? meta.thumbhash,
+            }),
+          );
           $insertNodes([node]);
         });
 
@@ -332,12 +335,14 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
     if (!urlPreview || !isSafeImageUrl(urlPreview)) return;
 
     editor.update(() => {
-      const node = $createImageNode({
-        src: urlPreview,
-        altText: '',
-        width: urlMeta?.width,
-        height: urlMeta?.height,
-      });
+      const node = $createImageNode(
+        $withAdaptiveImageDisplayWidth({
+          src: urlPreview,
+          altText: '',
+          width: urlMeta?.width,
+          height: urlMeta?.height,
+        }),
+      );
       $insertNodes([node]);
     });
     pushToast('success', 'Image inserted');

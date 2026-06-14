@@ -17,7 +17,7 @@ export function CorePlugins() {
       <ListPlugin />
       <LinkPlugin />
       <TabIndentationPlugin />
-      <TablePlugin />
+      <TablePlugin hasHorizontalScroll />
       <CheckListPlugin />
       <MarkdownShortcutsPlugin />
       <MarkdownPastePlugin />
