@@ -21,6 +21,11 @@ export {
   useNestedContentRenderer,
   useOptionalNestedContentRenderer,
 } from './context/NestedContentRendererContext';
+export type { NestedEditorPluginsProviderProps } from './context/NestedEditorPluginsContext';
+export {
+  NestedEditorPluginsProvider,
+  useNestedEditorPlugins,
+} from './context/NestedEditorPluginsContext';
 export type { RendererMode } from './context/RendererConfigContext';
 export {
   RendererConfigProvider,

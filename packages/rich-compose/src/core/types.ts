@@ -22,6 +22,7 @@ export interface RichEditorModule extends RichRendererModule {
   editNodes?: Klass<LexicalNode>[];
   EditorProvider?: ComponentType<{ children: ReactNode }>;
   editRenderers?: Partial<RendererConfig>;
+  nestedEditorPlugins?: ReactNode;
   plugins?: ReactNode;
 }
 

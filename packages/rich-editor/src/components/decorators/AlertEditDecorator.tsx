@@ -1,8 +1,6 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
-import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type { LexicalEditor } from 'lexical';
@@ -25,6 +23,7 @@ import { $isAlertQuoteNode } from '../../nodes/AlertQuoteNode';
 import { ALERT_NODE_KEY } from '../../types/renderer-keys';
 import { AlertRenderer } from '../renderers/AlertRenderer';
 import { RendererWrapper } from '../RendererWrapper';
+import { NestedEditorCorePlugins } from './NestedEditorCorePlugins';
 
 function ExitBlockPlugin({
   parentEditor,
@@ -189,8 +188,7 @@ export function AlertEditDecorator({ nodeKey, alertType, contentEditor }: AlertE
               />
             }
           />
-          <ListPlugin />
-          <LinkPlugin />
+          <NestedEditorCorePlugins />
           <ExitBlockPlugin nodeKey={nodeKey} parentEditor={editor} />
         </LexicalNestedComposer>
       </div>

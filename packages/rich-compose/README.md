@@ -140,6 +140,7 @@ interface RichEditorModule extends RichRendererModule {
   editRenderers?: Partial<RendererConfig>; // override renderers in editor mode
   EditorProvider?: ComponentType<{ children: ReactNode }>; // editor-only provider
   plugins?: ReactNode; // module-owned editor plugins
+  nestedEditorPlugins?: ReactNode; // plugins mounted inside LexicalNestedComposer surfaces
   actions?: ReactNode; // module-owned action UI
 }
 ```

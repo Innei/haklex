@@ -1,8 +1,6 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
-import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type { LexicalEditor } from 'lexical';
@@ -14,6 +12,7 @@ import { $isBannerNode } from '../../nodes/BannerNode';
 import { BANNER_NODE_KEY } from '../../types/renderer-keys';
 import { BannerRenderer } from '../renderers/BannerRenderer';
 import { RendererWrapper } from '../RendererWrapper';
+import { NestedEditorCorePlugins } from './NestedEditorCorePlugins';
 
 interface BannerEditDecoratorProps {
   bannerType: BannerType;
@@ -65,8 +64,7 @@ export function BannerEditDecorator({
               />
             }
           />
-          <ListPlugin />
-          <LinkPlugin />
+          <NestedEditorCorePlugins />
         </LexicalNestedComposer>
       </div>
     </div>

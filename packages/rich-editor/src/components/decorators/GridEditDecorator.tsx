@@ -1,8 +1,6 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
-import { LinkPlugin } from '@lexical/react/LexicalLinkPlugin';
-import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type { LexicalEditor } from 'lexical';
@@ -14,8 +12,11 @@ import { $isGridContainerNode } from '../../nodes/GridContainerNode';
 import { $isGridEditNode } from '../../nodes/GridEditNode';
 import { gridClassNames, gridStyles } from '../../styles/grid.css';
 import { clsx } from '../utils';
+import { scheduleGridCellAutoFocus } from './gridAutoFocus';
+import { NestedEditorCorePlugins } from './NestedEditorCorePlugins';
 
 interface GridEditDecoratorProps {
+  autoFocusOnMount?: boolean;
   cellEditors: LexicalEditor[];
   cols: number;
   gap: string;
@@ -26,6 +27,7 @@ const COL_OPTIONS = [1, 2, 3, 4] as const;
 
 export function GridEditDecorator({
   nodeKey,
+  autoFocusOnMount,
   cols: initialCols,
   gap,
   cellEditors,
@@ -43,6 +45,22 @@ export function GridEditDecorator({
       });
     });
   }, [editor, nodeKey]);
+
+  useEffect(() => {
+    if (!autoFocusOnMount) return;
+
+    return scheduleGridCellAutoFocus({
+      cellEditors,
+      clearAutoFocusIntent: () => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey);
+          if ($isGridEditNode(node)) {
+            node.setShouldAutoFocusOnMount(false);
+          }
+        }, { discrete: true });
+      },
+    });
+  }, [autoFocusOnMount, cellEditors, editor, nodeKey]);
 
   const handleSetCols = useCallback(
     (cols: number) => {
@@ -145,8 +163,7 @@ export function GridEditDecorator({
                   />
                 }
               />
-              <ListPlugin />
-              <LinkPlugin />
+              <NestedEditorCorePlugins />
             </LexicalNestedComposer>
           </div>
         ))}

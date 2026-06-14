@@ -1,5 +1,6 @@
 import {
   NestedContentRendererProvider,
+  NestedEditorPluginsProvider,
   type RendererConfig,
   RichEditor,
   type RichEditorProps,
@@ -72,9 +73,13 @@ export function composeEditor(opts: ComposeEditorOptions): ComponentType<RichEdi
 
   const modulePlugins: ReactNode[] = [];
   const moduleActions: ReactNode[] = [];
+  const nestedEditorPlugins: ReactNode[] = [];
   for (const m of merged) {
     if (m.plugins) modulePlugins.push(<Fragment key={`p:${m.name}`}>{m.plugins}</Fragment>);
     if (m.actions) moduleActions.push(<Fragment key={`a:${m.name}`}>{m.actions}</Fragment>);
+    if (m.nestedEditorPlugins) {
+      nestedEditorPlugins.push(<Fragment key={`nep:${m.name}`}>{m.nestedEditorPlugins}</Fragment>);
+    }
   }
 
   const NestedRenderer = composeRenderer({
@@ -100,26 +105,28 @@ export function composeEditor(opts: ComposeEditorOptions): ComponentType<RichEdi
 
     return (
       <NestedContentRendererProvider value={renderNested}>
-        <ComposedProviders>
-          <ComposedEditorProviders>
-            <RichEditor
-              {...rest}
-              extraNodes={mergedExtraNodes}
-              rendererConfig={finalConfig}
-              theme={theme}
-              variant={variant}
-              actions={
-                <>
-                  {moduleActions}
-                  {actions}
-                </>
-              }
-            >
-              {modulePlugins}
-              {children}
-            </RichEditor>
-          </ComposedEditorProviders>
-        </ComposedProviders>
+        <NestedEditorPluginsProvider plugins={nestedEditorPlugins}>
+          <ComposedProviders>
+            <ComposedEditorProviders>
+              <RichEditor
+                {...rest}
+                extraNodes={mergedExtraNodes}
+                rendererConfig={finalConfig}
+                theme={theme}
+                variant={variant}
+                actions={
+                  <>
+                    {moduleActions}
+                    {actions}
+                  </>
+                }
+              >
+                {modulePlugins}
+                {children}
+              </RichEditor>
+            </ComposedEditorProviders>
+          </ComposedProviders>
+        </NestedEditorPluginsProvider>
       </NestedContentRendererProvider>
     );
   }

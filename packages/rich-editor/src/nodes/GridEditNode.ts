@@ -25,6 +25,10 @@ interface LegacySerializedGridEditNode {
   version?: number;
 }
 
+interface GridEditNodeOptions {
+  autoFocusOnMount?: boolean;
+}
+
 function createCellEditor(): LexicalEditor {
   return createEditor({
     namespace: 'GridCell',
@@ -38,6 +42,7 @@ function createCellEditor(): LexicalEditor {
 
 export class GridEditNode extends GridContainerNode {
   __cellEditors: LexicalEditor[];
+  __autoFocusOnMount: boolean;
 
   static slashMenuItems: SlashMenuItemConfig[] = [
     {
@@ -48,20 +53,29 @@ export class GridEditNode extends GridContainerNode {
       section: 'LAYOUT',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createGridEditNode(2)]);
+          $insertNodes([$createGridEditNode(2, undefined, { autoFocusOnMount: true })]);
         });
       },
     },
   ];
 
   static clone(node: GridEditNode): GridEditNode {
-    const cloned = new GridEditNode(node.__cols, node.__gap, node.__cellStates, node.__key);
+    const cloned = new GridEditNode(node.__cols, node.__gap, node.__cellStates, node.__key, {
+      autoFocusOnMount: node.__autoFocusOnMount,
+    });
     cloned.__cellEditors = [...node.__cellEditors];
     return cloned;
   }
 
-  constructor(cols = 2, gap?: string, cellStates?: SerializedEditorState[], key?: string) {
+  constructor(
+    cols = 2,
+    gap?: string,
+    cellStates?: SerializedEditorState[],
+    key?: string,
+    options?: GridEditNodeOptions,
+  ) {
     super(cols, gap, cellStates, key);
+    this.__autoFocusOnMount = options?.autoFocusOnMount ?? false;
     this.__cellEditors = this.__cellStates.map((state) => {
       const editor = createCellEditor();
       const editorState = editor.parseEditorState(state);
@@ -72,6 +86,15 @@ export class GridEditNode extends GridContainerNode {
 
   getCellEditors(): LexicalEditor[] {
     return this.getLatest().__cellEditors;
+  }
+
+  getShouldAutoFocusOnMount(): boolean {
+    return this.getLatest().__autoFocusOnMount;
+  }
+
+  setShouldAutoFocusOnMount(autoFocusOnMount: boolean): void {
+    const writable = this.getWritable() as GridEditNode;
+    writable.__autoFocusOnMount = autoFocusOnMount;
   }
 
   setCols(cols: number): void {
@@ -201,12 +224,17 @@ export class GridEditNode extends GridContainerNode {
       cols: this.__cols,
       gap: this.__gap,
       cellEditors: this.__cellEditors,
+      autoFocusOnMount: this.__autoFocusOnMount,
     });
   }
 }
 
-export function $createGridEditNode(cols = 2, gap?: string): GridEditNode {
-  return new GridEditNode(cols, gap);
+export function $createGridEditNode(
+  cols = 2,
+  gap?: string,
+  options?: GridEditNodeOptions,
+): GridEditNode {
+  return new GridEditNode(cols, gap, undefined, undefined, options);
 }
 
 export function $isGridEditNode(node: LexicalNode | null | undefined): node is GridEditNode {
