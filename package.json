@@ -42,11 +42,11 @@
     "@types/mdast": "^4.0.4",
     "@types/node": "25.6.0",
     "@types/unist": "^3.0.3",
-    "@vanilla-extract/css": "^1.20.1",
+    "@vanilla-extract/css": "^1.21.0",
     "bumpp": "^11.1.0",
-    "commitlint": "^21.0.2",
-    "eslint": "^10.4.1",
-    "knip": "^6.16.1",
+    "commitlint": "^21.1.0",
+    "eslint": "^10.5.0",
+    "knip": "^6.18.0",
     "lint-staged": "17.0.7",
     "mdast-util-to-string": "^4.0.0",
     "prettier": "3.8.3",
@@ -57,7 +57,7 @@
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
     "remark-parse": "^11.0.0",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.2",
     "simple-git-hooks": "2.13.1",
     "stylelint": "^17.13.0",
     "taze": "^19.14.1",
@@ -65,9 +65,9 @@
     "tsx": "^4.22.4",
     "turbo": "^2.9.18",
     "unified": "^11.0.5",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.9"
   },
-  "packageManager": "pnpm@11.5.0+sha512.dbfcc4f81cf48597afd4bc391ffdf12c11f1a9fb83a395bfa6b0a2d9cc2fd8ffebafdb1ccbd529632153f793904c2615b7f09fe1a345473fd1c35845172a8eb1",
+  "packageManager": "pnpm@11.9.0+sha512.bd682d5d03fe525ef7c9fd6780c6884d1e756ac4c9c9fe00c538782824310dcf90e3ddc4f53835f06dfaebd5085e41855e0bcbb3b60de2ac5bbab89e5036f03b",
   "engines": {
     "node": ">=22"
   },

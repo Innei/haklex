@@ -24,7 +24,7 @@
     "lexical": "^0.45.0",
     "typescript": "^5.9.3",
     "unplugin-dts": "^1.0.2",
-    "vite": "^8.0.16"
+    "vite": "^8.1.0"
   },
   "peerDependencies": {
     "lexical": "^0.45.0"
