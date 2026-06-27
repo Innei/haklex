@@ -179,7 +179,8 @@ export class ImageNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedImageNode): ImageNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): ImageNode {
+    const serializedNode = _serializedNode as unknown as SerializedImageNode;
     return $createImageNode({
       src: serializedNode.src,
       altText: serializedNode.altText,

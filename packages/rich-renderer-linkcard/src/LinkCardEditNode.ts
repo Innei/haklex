@@ -5,7 +5,13 @@ import {
   type SerializedLinkCardNode,
 } from '@haklex/rich-editor/nodes';
 import { createRendererDecoration, LinkCardRenderer } from '@haklex/rich-editor/renderers';
-import type { EditorConfig, Klass, LexicalEditor, LexicalNode } from 'lexical';
+import type {
+  EditorConfig,
+  Klass,
+  LexicalEditor,
+  LexicalNode,
+  SerializedLexicalNode,
+} from 'lexical';
 import { $insertNodes } from 'lexical';
 import { Link } from 'lucide-react';
 import type { ReactElement } from 'react';
@@ -42,7 +48,10 @@ export class LinkCardEditNode extends LinkCardNode {
     );
   }
 
-  static importJSON(serializedNode: SerializedLinkCardNode): LinkCardEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): LinkCardEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedLinkCardNode;
     return new LinkCardEditNode({
       url: serializedNode.url,
       title: serializedNode.title,

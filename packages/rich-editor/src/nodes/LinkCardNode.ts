@@ -109,7 +109,10 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedLinkCardNode): LinkCardNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): LinkCardNode {
+    const serializedNode = _serializedNode as unknown as SerializedLinkCardNode;
     return $createLinkCardNode({
       url: serializedNode.url,
       source: serializedNode.source,

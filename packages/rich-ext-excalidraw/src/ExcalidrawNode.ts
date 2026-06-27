@@ -45,7 +45,10 @@ export class ExcalidrawNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedExcalidrawNode): ExcalidrawNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): ExcalidrawNode {
+    const serializedNode = _serializedNode as unknown as SerializedExcalidrawNode;
     return $createExcalidrawNode(serializedNode.snapshot);
   }
 

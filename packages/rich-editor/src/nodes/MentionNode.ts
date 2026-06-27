@@ -90,7 +90,8 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     return this.getLatest().__displayName;
   }
 
-  static importJSON(serializedNode: SerializedMentionNode): MentionNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): MentionNode {
+    const serializedNode = _serializedNode as unknown as SerializedMentionNode;
     return $createMentionNode(
       serializedNode.platform,
       serializedNode.handle,

@@ -1,5 +1,5 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
-import type { EditorConfig, LexicalEditor, NodeKey } from 'lexical';
+import type { EditorConfig, LexicalEditor, NodeKey, SerializedLexicalNode } from 'lexical';
 import { $insertNodes } from 'lexical';
 import { Vote } from 'lucide-react';
 import type { ReactElement } from 'react';
@@ -48,7 +48,10 @@ export class PollEditNode extends PollNode {
     super(payload, key);
   }
 
-  static importJSON(serializedNode: SerializedPollNode): PollEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): PollEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedPollNode;
     return new PollEditNode({
       pollId: serializedNode.pollId,
       question: serializedNode.question,

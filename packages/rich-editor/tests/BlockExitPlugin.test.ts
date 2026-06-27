@@ -52,6 +52,10 @@ class TestDecoratorNode extends DecoratorNode<null> {
   decorate() {
     return null;
   }
+
+  isInline() {
+    return false;
+  }
 }
 
 function createTestEditor() {

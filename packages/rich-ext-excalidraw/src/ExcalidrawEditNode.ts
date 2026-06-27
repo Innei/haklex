@@ -1,6 +1,12 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
 import { ViewportGate } from '@haklex/rich-editor-ui';
-import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical';
+import type {
+  EditorConfig,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+} from 'lexical';
 import { $getNodeByKey, $insertNodes } from 'lexical';
 import { PenTool } from 'lucide-react';
 import type { ReactElement } from 'react';
@@ -42,7 +48,10 @@ export class ExcalidrawEditNode extends ExcalidrawNode {
     super(snapshot, key);
   }
 
-  static importJSON(serializedNode: SerializedExcalidrawNode): ExcalidrawEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): ExcalidrawEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedExcalidrawNode;
     return new ExcalidrawEditNode(serializedNode.snapshot);
   }
 

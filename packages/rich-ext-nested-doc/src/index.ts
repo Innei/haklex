@@ -1,4 +1,4 @@
-import './styles.css.ts';
+import './styles.css';
 
 import type { Klass, LexicalNode } from 'lexical';
 

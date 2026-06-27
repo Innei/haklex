@@ -52,7 +52,10 @@ export class CodeSnippetNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedCodeSnippetNode): CodeSnippetNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): CodeSnippetNode {
+    const serializedNode = _serializedNode as unknown as SerializedCodeSnippetNode;
     return $createCodeSnippetNode(serializedNode.files);
   }
 

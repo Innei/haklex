@@ -94,7 +94,8 @@ export class VideoNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedVideoNode): VideoNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): VideoNode {
+    const serializedNode = _serializedNode as unknown as SerializedVideoNode;
     return $createVideoNode({
       src: serializedNode.src,
       poster: serializedNode.poster,

@@ -1,5 +1,5 @@
 import { QuoteNode, type SerializedQuoteNode } from '@lexical/rich-text';
-import type { LexicalNode, NodeKey, Spread } from 'lexical';
+import type { LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
 
 export type SerializedRichQuoteNode = Spread<{ attribution: string | null }, SerializedQuoteNode>;
 
@@ -25,7 +25,10 @@ export class RichQuoteNode extends QuoteNode {
     return new RichQuoteNode(node.__attribution, node.__key);
   }
 
-  static importJSON(serializedNode: SerializedRichQuoteNode): RichQuoteNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): RichQuoteNode {
+    const serializedNode = _serializedNode as unknown as SerializedRichQuoteNode;
     const node = $createRichQuoteNode(serializedNode.attribution ?? null);
     return node.updateFromJSON(serializedNode);
   }

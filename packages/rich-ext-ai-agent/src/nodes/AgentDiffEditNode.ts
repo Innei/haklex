@@ -1,4 +1,4 @@
-import type { EditorConfig, LexicalEditor } from 'lexical';
+import type { EditorConfig, LexicalEditor, SerializedLexicalNode } from 'lexical';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
@@ -15,7 +15,8 @@ export class AgentDiffEditNode extends AgentDiffNode {
     return new AgentDiffEditNode(node.getPayload(), node.__key);
   }
 
-  static importJSON(json: SerializedAgentDiffNode): AgentDiffEditNode {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): AgentDiffEditNode {
+    const json = _json as unknown as SerializedAgentDiffNode;
     return new AgentDiffEditNode({
       batchId: json.batchId ?? '',
       diffEntryId: json.diffEntryId,

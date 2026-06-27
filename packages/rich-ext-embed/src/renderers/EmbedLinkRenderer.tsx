@@ -1,4 +1,4 @@
-import '../styles.css.ts';
+import '../styles.css';
 
 import { ActionBar, ActionButton } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';

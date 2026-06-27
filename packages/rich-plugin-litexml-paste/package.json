@@ -24,19 +24,19 @@
     "@haklex/rich-litexml": "workspace:*"
   },
   "devDependencies": {
-    "@lexical/react": "^0.45.0",
+    "@lexical/react": "^0.46.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
-    "lexical": "^0.45.0",
-    "react": "19.2.6",
-    "react-dom": "19.2.6",
-    "typescript": "^5.9.3",
-    "unplugin-dts": "^1.0.2",
+    "lexical": "^0.46.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "typescript": "^6.0.3",
+    "unplugin-dts": "^1.0.3",
     "vite": "^8.1.0"
   },
   "peerDependencies": {
-    "@lexical/react": "^0.45.0",
-    "lexical": "^0.45.0",
+    "@lexical/react": "^0.46.0",
+    "lexical": "^0.46.0",
     "react": ">=19",
     "react-dom": ">=19"
   },

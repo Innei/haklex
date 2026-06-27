@@ -1,7 +1,12 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
 import { getResolvedEditNodes } from '@haklex/rich-editor/nodes';
 import { editorTheme } from '@haklex/rich-editor/static';
-import type { EditorConfig, LexicalEditor, SerializedEditorState } from 'lexical';
+import type {
+  EditorConfig,
+  LexicalEditor,
+  SerializedEditorState,
+  SerializedLexicalNode,
+} from 'lexical';
 import { $insertNodes, createEditor } from 'lexical';
 import { FileText } from 'lucide-react';
 import type { ReactElement } from 'react';
@@ -60,7 +65,10 @@ export class NestedDocEditNode extends NestedDocNode {
     return this.__contentEditor;
   }
 
-  static importJSON(serializedNode: SerializedNestedDocNode): NestedDocEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): NestedDocEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedNestedDocNode;
     return new NestedDocEditNode(serializedNode.content);
   }
 

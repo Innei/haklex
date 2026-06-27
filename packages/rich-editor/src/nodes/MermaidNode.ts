@@ -70,7 +70,8 @@ export class MermaidNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedMermaidNode): MermaidNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): MermaidNode {
+    const serializedNode = _serializedNode as unknown as SerializedMermaidNode;
     return $createMermaidNode(serializedNode.diagram);
   }
 

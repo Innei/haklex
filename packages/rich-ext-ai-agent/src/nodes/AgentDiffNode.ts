@@ -46,7 +46,8 @@ export class AgentDiffNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(json: SerializedAgentDiffNode): AgentDiffNode {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): AgentDiffNode {
+    const json = _json as unknown as SerializedAgentDiffNode;
     return new AgentDiffNode({
       batchId: json.batchId ?? '',
       diffEntryId: json.diffEntryId,

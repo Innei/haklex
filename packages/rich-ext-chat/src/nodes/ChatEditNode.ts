@@ -1,5 +1,5 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
-import type { EditorConfig, LexicalEditor, LexicalNode } from 'lexical';
+import type { EditorConfig, LexicalEditor, LexicalNode, SerializedLexicalNode } from 'lexical';
 import { $insertNodes } from 'lexical';
 import { MessageSquare } from 'lucide-react';
 import type { ReactElement } from 'react';
@@ -44,7 +44,10 @@ export class ChatEditNode extends ChatNode {
     );
   }
 
-  static importJSON(serializedNode: SerializedChatNode): ChatEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): ChatEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedChatNode;
     return new ChatEditNode({
       variant: serializedNode.variant,
       participants: serializedNode.participants,

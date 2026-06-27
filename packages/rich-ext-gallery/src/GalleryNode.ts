@@ -66,7 +66,8 @@ export class GalleryNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedGalleryNode): GalleryNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): GalleryNode {
+    const serializedNode = _serializedNode as unknown as SerializedGalleryNode;
     return $createGalleryNode({
       images: serializedNode.images,
       layout: serializedNode.layout,

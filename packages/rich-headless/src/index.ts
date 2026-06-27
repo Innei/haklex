@@ -76,7 +76,8 @@ export class SpoilerNode extends ElementNode {
   constructor(key?: NodeKey) {
     super(key);
   }
-  static importJSON(_json: SerializedElementNode): SpoilerNode {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): SpoilerNode {
+    void _json;
     return new SpoilerNode();
   }
   exportJSON(): SerializedElementNode {
@@ -109,7 +110,8 @@ export class RubyNode extends ElementNode {
   constructor(key?: NodeKey) {
     super(key);
   }
-  static importJSON(json: SerializedElementNode & { reading?: string }): RubyNode {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): RubyNode {
+    const json = _json as unknown as SerializedElementNode & { reading?: string };
     const node = new RubyNode();
     node.__reading = json.reading ?? '';
     return node;
@@ -151,9 +153,8 @@ export class DetailsNode extends ElementNode {
   constructor(key?: NodeKey) {
     super(key);
   }
-  static importJSON(
-    json: SerializedElementNode & { summary?: string; open?: boolean },
-  ): DetailsNode {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): DetailsNode {
+    const json = _json as unknown as SerializedElementNode & { summary?: string; open?: boolean };
     const node = new DetailsNode();
     node.__summary = json.summary ?? '';
     node.__open = json.open ?? false;
@@ -191,7 +192,8 @@ export class RichQuoteNode extends QuoteNode {
   constructor(key?: NodeKey) {
     super(key);
   }
-  static importJSON(json: SerializedElementNode & { attribution?: string | null }): RichQuoteNode {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): RichQuoteNode {
+    const json = _json as unknown as SerializedElementNode & { attribution?: string | null };
     const node = new RichQuoteNode();
     node.__attribution = json.attribution ?? null;
     return node;
@@ -233,7 +235,8 @@ function headlessDecorator(type: string, propKeys: string[], defaults: Props, in
       }
       return n;
     }
-    static importJSON(json: SerializedLexicalNode & Props): Node {
+    static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): Node {
+      const json = _json as unknown as SerializedLexicalNode & Props;
       const node = new Node();
       for (const k of propKeys) {
         (node as any)[`__${k}`] = json[k] ?? defaults[k];
@@ -398,12 +401,11 @@ export class BannerNode extends DecoratorNode<null> {
     n.__contentState = node.__contentState;
     return n;
   }
-  static importJSON(
-    json: SerializedLexicalNode & {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): BannerNode {
+    const json = _json as unknown as SerializedLexicalNode & {
       bannerType?: string;
       content?: unknown;
-    },
-  ): BannerNode {
+    };
     const node = new BannerNode();
     node.__bannerType = json.bannerType ?? 'note';
     node.__contentState = json.content ?? null;
@@ -447,12 +449,11 @@ export class AlertQuoteNode extends DecoratorNode<null> {
     n.__contentState = node.__contentState;
     return n;
   }
-  static importJSON(
-    json: SerializedLexicalNode & {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): AlertQuoteNode {
+    const json = _json as unknown as SerializedLexicalNode & {
       alertType?: string;
       content?: unknown;
-    },
-  ): AlertQuoteNode {
+    };
     const node = new AlertQuoteNode();
     node.__alertType = json.alertType ?? 'note';
     node.__contentState = json.content ?? null;
@@ -494,7 +495,8 @@ export class NestedDocNode extends DecoratorNode<null> {
     n.__contentState = node.__contentState;
     return n;
   }
-  static importJSON(json: SerializedLexicalNode & { content?: unknown }): NestedDocNode {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): NestedDocNode {
+    const json = _json as unknown as SerializedLexicalNode & { content?: unknown };
     const node = new NestedDocNode();
     node.__contentState = json.content ?? null;
     return node;
@@ -538,13 +540,12 @@ export class GridContainerNode extends DecoratorNode<null> {
     n.__cells = node.__cells;
     return n;
   }
-  static importJSON(
-    json: SerializedLexicalNode & {
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): GridContainerNode {
+    const json = _json as unknown as SerializedLexicalNode & {
       cols?: number;
       gap?: string | number;
       cells?: unknown[];
-    },
-  ): GridContainerNode {
+    };
     const node = new GridContainerNode();
     node.__cols = json.cols ?? 2;
     const rawGap = json.gap;

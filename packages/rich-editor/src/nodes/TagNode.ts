@@ -6,6 +6,7 @@ import type {
   LexicalEditor,
   LexicalNode,
   NodeKey,
+  SerializedLexicalNode,
   SerializedTextNode,
 } from 'lexical';
 import { $insertNodes, TextNode } from 'lexical';
@@ -112,7 +113,8 @@ export class TagNode extends TextNode {
     return true;
   }
 
-  static importJSON(serializedNode: SerializedTagNode): TagNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): TagNode {
+    const serializedNode = _serializedNode as unknown as SerializedTagNode;
     const node = $createTagNode(serializedNode.text ?? '');
     node.setFormat(serializedNode.format ?? 0);
     node.setDetail(serializedNode.detail ?? 0);

@@ -2,25 +2,18 @@ import type {
   EditorConfig,
   LexicalEditor,
   SerializedEditorState,
-} from 'lexical'
-import { $insertNodes, createEditor } from 'lexical'
-import {
-  Info,
-  Lightbulb,
-  TriangleAlert as TriangleAlertIcon,
-} from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+  SerializedLexicalNode,
+} from 'lexical';
+import { $insertNodes, createEditor } from 'lexical';
+import { Info, Lightbulb, TriangleAlert as TriangleAlertIcon } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { AlertEditDecorator } from '../components/decorators/AlertEditDecorator'
-import { editorTheme } from '../styles/theme'
-import type { CommandItemConfig } from '../types/slash-menu'
-import {
-  AlertQuoteNode,
-  type AlertType,
-  type SerializedAlertQuoteNode,
-} from './AlertQuoteNode'
-import { NESTED_EDITOR_NODES } from './shared'
+import { AlertEditDecorator } from '../components/decorators/AlertEditDecorator';
+import { editorTheme } from '../styles/theme';
+import type { CommandItemConfig } from '../types/slash-menu';
+import { AlertQuoteNode, type AlertType, type SerializedAlertQuoteNode } from './AlertQuoteNode';
+import { NESTED_EDITOR_NODES } from './shared';
 
 function createContentEditor(): LexicalEditor {
   return createEditor({
@@ -28,13 +21,13 @@ function createContentEditor(): LexicalEditor {
     nodes: NESTED_EDITOR_NODES,
     theme: editorTheme,
     onError: (error: Error) => {
-      console.error('[AlertContent]', error)
+      console.error('[AlertContent]', error);
     },
-  })
+  });
 }
 
 export class AlertQuoteEditNode extends AlertQuoteNode {
-  __contentEditor: LexicalEditor
+  __contentEditor: LexicalEditor;
 
   static commandItems: CommandItemConfig[] = [
     {
@@ -47,8 +40,8 @@ export class AlertQuoteEditNode extends AlertQuoteNode {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createAlertQuoteEditNode('note')])
-        })
+          $insertNodes([$createAlertQuoteEditNode('note')]);
+        });
       },
     },
     {
@@ -61,8 +54,8 @@ export class AlertQuoteEditNode extends AlertQuoteNode {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createAlertQuoteEditNode('tip')])
-        })
+          $insertNodes([$createAlertQuoteEditNode('tip')]);
+        });
       },
     },
     {
@@ -75,47 +68,37 @@ export class AlertQuoteEditNode extends AlertQuoteNode {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createAlertQuoteEditNode('warning')])
-        })
+          $insertNodes([$createAlertQuoteEditNode('warning')]);
+        });
       },
     },
-  ]
+  ];
 
   static clone(node: AlertQuoteEditNode): AlertQuoteEditNode {
-    const cloned = new AlertQuoteEditNode(
-      node.__alertType,
-      node.__contentState,
-      node.__key,
-    )
-    cloned.__contentEditor = node.__contentEditor
-    return cloned
+    const cloned = new AlertQuoteEditNode(node.__alertType, node.__contentState, node.__key);
+    cloned.__contentEditor = node.__contentEditor;
+    return cloned;
   }
 
-  constructor(
-    alertType: AlertType,
-    contentState?: SerializedEditorState,
-    key?: string,
-  ) {
-    super(alertType, contentState, key)
-    this.__contentEditor = createContentEditor()
+  constructor(alertType: AlertType, contentState?: SerializedEditorState, key?: string) {
+    super(alertType, contentState, key);
+    this.__contentEditor = createContentEditor();
     if (contentState) {
-      const editorState = this.__contentEditor.parseEditorState(contentState)
-      this.__contentEditor.setEditorState(editorState)
+      const editorState = this.__contentEditor.parseEditorState(contentState);
+      this.__contentEditor.setEditorState(editorState);
     }
   }
 
   getContentEditor(): LexicalEditor {
-    return this.__contentEditor
+    return this.__contentEditor;
   }
 
   static importJSON(
-    serializedNode: SerializedAlertQuoteNode,
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): AlertQuoteEditNode {
-    const node = new AlertQuoteEditNode(
-      serializedNode.alertType,
-      serializedNode.content,
-    )
-    return node
+    const serializedNode = _serializedNode as unknown as SerializedAlertQuoteNode;
+    const node = new AlertQuoteEditNode(serializedNode.alertType, serializedNode.content);
+    return node;
   }
 
   exportJSON(): SerializedAlertQuoteNode {
@@ -125,7 +108,7 @@ export class AlertQuoteEditNode extends AlertQuoteNode {
       alertType: this.__alertType,
       content: this.__contentEditor.getEditorState().toJSON(),
       version: 1,
-    }
+    };
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -133,7 +116,7 @@ export class AlertQuoteEditNode extends AlertQuoteNode {
       nodeKey: this.__key,
       alertType: this.__alertType,
       contentEditor: this.__contentEditor,
-    })
+    });
   }
 }
 
@@ -141,5 +124,5 @@ export function $createAlertQuoteEditNode(
   alertType: AlertType,
   contentState?: SerializedEditorState,
 ): AlertQuoteEditNode {
-  return new AlertQuoteEditNode(alertType, contentState)
+  return new AlertQuoteEditNode(alertType, contentState);
 }

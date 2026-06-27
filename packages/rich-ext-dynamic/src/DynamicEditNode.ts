@@ -1,5 +1,11 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
-import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical';
+import type {
+  EditorConfig,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+} from 'lexical';
 import { $insertNodes } from 'lexical';
 import { Boxes } from 'lucide-react';
 import type { ReactElement } from 'react';
@@ -45,7 +51,10 @@ export class DynamicEditNode extends DynamicNode {
     super(url, props, initialHeight, key);
   }
 
-  static importJSON(serializedNode: SerializedDynamicNode): DynamicEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): DynamicEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedDynamicNode;
     return new DynamicEditNode(
       serializedNode.url,
       serializedNode.props,

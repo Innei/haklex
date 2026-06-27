@@ -6,6 +6,7 @@ import type {
   LexicalNode,
   NodeKey,
   SerializedElementNode,
+  SerializedLexicalNode,
   Spread,
 } from 'lexical';
 import { $createTextNode, ElementNode } from 'lexical';
@@ -57,7 +58,8 @@ export class RubyNode extends ElementNode {
     this.__reading = reading;
   }
 
-  static importJSON(serializedNode: SerializedRubyNode): RubyNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): RubyNode {
+    const serializedNode = _serializedNode as unknown as SerializedRubyNode;
     return $createRubyNode(serializedNode.reading ?? '');
   }
 

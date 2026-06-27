@@ -3,25 +3,25 @@ import type {
   LexicalEditor,
   SerializedEditorState,
   SerializedLexicalNode,
-} from 'lexical'
-import { $insertNodes, createEditor } from 'lexical'
-import { Flag } from 'lucide-react'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { $insertNodes, createEditor } from 'lexical';
+import { Flag } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { BannerEditDecorator } from '../components/decorators/BannerEditDecorator'
-import { editorTheme } from '../styles/theme'
-import type { CommandItemConfig } from '../types/slash-menu'
+import { BannerEditDecorator } from '../components/decorators/BannerEditDecorator';
+import { editorTheme } from '../styles/theme';
+import type { CommandItemConfig } from '../types/slash-menu';
 import {
   BannerNode,
   type BannerType,
   normalizeBannerType,
   type SerializedBannerNode,
-} from './BannerNode'
-import { NESTED_EDITOR_NODES } from './shared'
+} from './BannerNode';
+import { NESTED_EDITOR_NODES } from './shared';
 
 interface LegacySerializedBannerEditNode extends SerializedBannerNode {
-  children?: SerializedLexicalNode[]
+  children?: SerializedLexicalNode[];
 }
 
 function createContentEditor(): LexicalEditor {
@@ -30,13 +30,13 @@ function createContentEditor(): LexicalEditor {
     nodes: NESTED_EDITOR_NODES,
     theme: editorTheme,
     onError: (error: Error) => {
-      console.error('[BannerContent]', error)
+      console.error('[BannerContent]', error);
     },
-  })
+  });
 }
 
 export class BannerEditNode extends BannerNode {
-  __contentEditor: LexicalEditor
+  __contentEditor: LexicalEditor;
 
   static commandItems: CommandItemConfig[] = [
     {
@@ -49,45 +49,40 @@ export class BannerEditNode extends BannerNode {
       group: 'insert',
       onSelect: (editor) => {
         editor.update(() => {
-          $insertNodes([$createBannerEditNode('note')])
-        })
+          $insertNodes([$createBannerEditNode('note')]);
+        });
       },
     },
-  ]
+  ];
 
   static clone(node: BannerEditNode): BannerEditNode {
-    const cloned = new BannerEditNode(
-      node.__bannerType,
-      node.__contentState,
-      node.__key,
-    )
-    cloned.__contentEditor = node.__contentEditor
-    return cloned
+    const cloned = new BannerEditNode(node.__bannerType, node.__contentState, node.__key);
+    cloned.__contentEditor = node.__contentEditor;
+    return cloned;
   }
 
-  constructor(
-    bannerType: BannerType,
-    contentState?: SerializedEditorState,
-    key?: string,
-  ) {
-    super(bannerType, contentState, key)
-    this.__contentEditor = createContentEditor()
+  constructor(bannerType: BannerType, contentState?: SerializedEditorState, key?: string) {
+    super(bannerType, contentState, key);
+    this.__contentEditor = createContentEditor();
     if (contentState) {
-      const editorState = this.__contentEditor.parseEditorState(contentState)
-      this.__contentEditor.setEditorState(editorState)
+      const editorState = this.__contentEditor.parseEditorState(contentState);
+      this.__contentEditor.setEditorState(editorState);
     }
   }
 
   getContentEditor(): LexicalEditor {
-    return this.__contentEditor
+    return this.__contentEditor;
   }
 
-  static importJSON(serializedNode: SerializedBannerNode): BannerEditNode {
-    const legacy = serializedNode as LegacySerializedBannerEditNode
-    const bannerType = normalizeBannerType(serializedNode.bannerType)
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): BannerEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedBannerNode;
+    const legacy = serializedNode as LegacySerializedBannerEditNode;
+    const bannerType = normalizeBannerType(serializedNode.bannerType);
 
     if (serializedNode.content) {
-      return new BannerEditNode(bannerType, serializedNode.content)
+      return new BannerEditNode(bannerType, serializedNode.content);
     }
 
     if (legacy.children) {
@@ -100,11 +95,11 @@ export class BannerEditNode extends BannerNode {
           type: 'root',
           version: 1,
         },
-      } as unknown as SerializedEditorState
-      return new BannerEditNode(bannerType, content)
+      } as unknown as SerializedEditorState;
+      return new BannerEditNode(bannerType, content);
     }
 
-    return new BannerEditNode(bannerType)
+    return new BannerEditNode(bannerType);
   }
 
   exportJSON(): SerializedBannerNode {
@@ -114,7 +109,7 @@ export class BannerEditNode extends BannerNode {
       bannerType: this.__bannerType,
       content: this.__contentEditor.getEditorState().toJSON(),
       version: 1,
-    }
+    };
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
@@ -122,7 +117,7 @@ export class BannerEditNode extends BannerNode {
       nodeKey: this.__key,
       bannerType: this.__bannerType,
       contentEditor: this.__contentEditor,
-    })
+    });
   }
 }
 
@@ -130,5 +125,5 @@ export function $createBannerEditNode(
   bannerType: BannerType,
   contentState?: SerializedEditorState,
 ): BannerEditNode {
-  return new BannerEditNode(bannerType, contentState)
+  return new BannerEditNode(bannerType, contentState);
 }

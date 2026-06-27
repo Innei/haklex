@@ -72,7 +72,10 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedKaTeXBlockNode): KaTeXBlockNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): KaTeXBlockNode {
+    const serializedNode = _serializedNode as unknown as SerializedKaTeXBlockNode;
     return $createKaTeXBlockNode(serializedNode.equation);
   }
 

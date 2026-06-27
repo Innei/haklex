@@ -154,7 +154,8 @@ export class PollNode extends DecoratorNode<ReactElement> {
     writable.__showResults = showResults;
   }
 
-  static importJSON(serializedNode: SerializedPollNode): PollNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): PollNode {
+    const serializedNode = _serializedNode as unknown as SerializedPollNode;
     return new PollNode({
       pollId: serializedNode.pollId,
       question: serializedNode.question,

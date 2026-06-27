@@ -51,7 +51,10 @@ export class FootnoteSectionNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedFootnoteSectionNode): FootnoteSectionNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): FootnoteSectionNode {
+    const serializedNode = _serializedNode as unknown as SerializedFootnoteSectionNode;
     return $createFootnoteSectionNode(serializedNode.definitions);
   }
 

@@ -62,7 +62,8 @@ export class DynamicNode extends DecoratorNode<ReactElement> {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedDynamicNode): DynamicNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): DynamicNode {
+    const serializedNode = _serializedNode as unknown as SerializedDynamicNode;
     return $createDynamicNode(serializedNode);
   }
 

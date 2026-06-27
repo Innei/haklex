@@ -1,4 +1,10 @@
-import type { EditorConfig, LexicalNode, NodeKey, SerializedElementNode } from 'lexical';
+import type {
+  EditorConfig,
+  LexicalNode,
+  NodeKey,
+  SerializedElementNode,
+  SerializedLexicalNode,
+} from 'lexical';
 import { ElementNode } from 'lexical';
 
 import { semanticClassNames, sharedStyles } from '../styles/shared.css';
@@ -48,7 +54,8 @@ export class SpoilerNode extends ElementNode {
     return false;
   }
 
-  static importJSON(_serializedNode: SerializedElementNode): SpoilerNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): SpoilerNode {
+    void _serializedNode;
     return $createSpoilerNode();
   }
 

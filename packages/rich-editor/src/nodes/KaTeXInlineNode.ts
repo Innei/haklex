@@ -61,7 +61,10 @@ export class KaTeXInlineNode extends DecoratorNode<ReactElement> {
     return true;
   }
 
-  static importJSON(serializedNode: SerializedKaTeXInlineNode): KaTeXInlineNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): KaTeXInlineNode {
+    const serializedNode = _serializedNode as unknown as SerializedKaTeXInlineNode;
     const node = $createKaTeXInlineNode(serializedNode.equation);
     if (serializedNode.color) node.setColor(serializedNode.color);
     return node;

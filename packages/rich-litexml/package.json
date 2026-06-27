@@ -25,13 +25,13 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "lexical": "^0.45.0",
+    "lexical": "^0.46.0",
     "linkedom": "^0.18.12",
-    "nanoid": "^5.1.11"
+    "nanoid": "^5.1.16"
   },
   "devDependencies": {
-    "typescript": "^5.9.3",
-    "unplugin-dts": "^1.0.2",
+    "typescript": "^6.0.3",
+    "unplugin-dts": "^1.0.3",
     "vite": "^8.1.0"
   },
   "publishConfig": {

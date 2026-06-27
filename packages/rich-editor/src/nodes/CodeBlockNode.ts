@@ -77,7 +77,10 @@ export class CodeBlockNode extends DecoratorNode<ReactElement> {
     return true;
   }
 
-  static importJSON(serializedNode: SerializedCodeBlockNode): CodeBlockNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): CodeBlockNode {
+    const serializedNode = _serializedNode as unknown as SerializedCodeBlockNode;
     return $createCodeBlockNode(serializedNode.code, serializedNode.language);
   }
 

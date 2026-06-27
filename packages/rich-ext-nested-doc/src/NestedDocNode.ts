@@ -1,4 +1,4 @@
-import { extractTextContent } from '@haklex/rich-editor/static'
+import { extractTextContent } from '@haklex/rich-editor/static';
 import type {
   EditorConfig,
   LexicalEditor,
@@ -7,33 +7,33 @@ import type {
   SerializedEditorState,
   SerializedLexicalNode,
   Spread,
-} from 'lexical'
-import { DecoratorNode } from 'lexical'
-import type { ReactElement } from 'react'
-import { createElement } from 'react'
+} from 'lexical';
+import { DecoratorNode } from 'lexical';
+import type { ReactElement } from 'react';
+import { createElement } from 'react';
 
-import { NestedDocStaticDecorator } from './NestedDocStaticDecorator'
+import { NestedDocStaticDecorator } from './NestedDocStaticDecorator';
 
 export type SerializedNestedDocNode = Spread<
   {
-    content: SerializedEditorState
+    content: SerializedEditorState;
   },
   SerializedLexicalNode
->
+>;
 
 export class NestedDocNode extends DecoratorNode<ReactElement> {
-  __contentState: SerializedEditorState
+  __contentState: SerializedEditorState;
 
   static getType(): string {
-    return 'nested-doc'
+    return 'nested-doc';
   }
 
   static clone(node: NestedDocNode): NestedDocNode {
-    return new NestedDocNode(node.__contentState, node.__key)
+    return new NestedDocNode(node.__contentState, node.__key);
   }
 
   constructor(contentState?: SerializedEditorState, key?: NodeKey) {
-    super(key)
+    super(key);
     this.__contentState =
       contentState ||
       ({
@@ -56,38 +56,41 @@ export class NestedDocNode extends DecoratorNode<ReactElement> {
           type: 'root',
           version: 1,
         },
-      } as unknown as SerializedEditorState)
+      } as unknown as SerializedEditorState);
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    const div = document.createElement('div')
-    div.className = 'rich-nested-doc'
-    return div
+    const div = document.createElement('div');
+    div.className = 'rich-nested-doc';
+    return div;
   }
 
   updateDOM(): boolean {
-    return false
+    return false;
   }
 
   isInline(): boolean {
-    return false
+    return false;
   }
 
   getContentState(): SerializedEditorState {
-    return this.getLatest().__contentState
+    return this.getLatest().__contentState;
   }
 
   setContentState(state: SerializedEditorState): void {
-    const writable = this.getWritable()
-    writable.__contentState = state
+    const writable = this.getWritable();
+    writable.__contentState = state;
   }
 
   getTextContent(): string {
-    return extractTextContent(this.__contentState)
+    return extractTextContent(this.__contentState);
   }
 
-  static importJSON(serializedNode: SerializedNestedDocNode): NestedDocNode {
-    return new NestedDocNode(serializedNode.content)
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): NestedDocNode {
+    const serializedNode = _serializedNode as unknown as SerializedNestedDocNode;
+    return new NestedDocNode(serializedNode.content);
   }
 
   exportJSON(): SerializedNestedDocNode {
@@ -96,24 +99,20 @@ export class NestedDocNode extends DecoratorNode<ReactElement> {
       type: 'nested-doc',
       content: this.__contentState,
       version: 1,
-    }
+    };
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createElement(NestedDocStaticDecorator, {
       contentState: this.__contentState,
-    })
+    });
   }
 }
 
-export function $createNestedDocNode(
-  contentState?: SerializedEditorState,
-): NestedDocNode {
-  return new NestedDocNode(contentState)
+export function $createNestedDocNode(contentState?: SerializedEditorState): NestedDocNode {
+  return new NestedDocNode(contentState);
 }
 
-export function $isNestedDocNode(
-  node: LexicalNode | null | undefined,
-): node is NestedDocNode {
-  return node instanceof NestedDocNode
+export function $isNestedDocNode(node: LexicalNode | null | undefined): node is NestedDocNode {
+  return node instanceof NestedDocNode;
 }

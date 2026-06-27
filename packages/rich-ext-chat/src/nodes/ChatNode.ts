@@ -1,7 +1,13 @@
 import '../augment';
 
 import { createRendererDecoration } from '@haklex/rich-editor/renderers';
-import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical';
+import type {
+  EditorConfig,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+} from 'lexical';
 import { DecoratorNode } from 'lexical';
 import type { ReactElement } from 'react';
 
@@ -88,7 +94,8 @@ export class ChatNode extends DecoratorNode<ReactElement> {
     writable.__messages = messages;
   }
 
-  static importJSON(serializedNode: SerializedChatNode): ChatNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): ChatNode {
+    const serializedNode = _serializedNode as unknown as SerializedChatNode;
     return new ChatNode({
       variant: serializedNode.variant,
       participants: serializedNode.participants,

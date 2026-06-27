@@ -1,5 +1,11 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
-import type { EditorConfig, LexicalEditor, LexicalNode, NodeKey } from 'lexical';
+import type {
+  EditorConfig,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+} from 'lexical';
 import { $getNodeByKey, $insertNodes } from 'lexical';
 import { Images } from 'lucide-react';
 import type { ReactElement } from 'react';
@@ -41,7 +47,10 @@ export class GalleryEditNode extends GalleryNode {
     super(payload, key);
   }
 
-  static importJSON(serializedNode: SerializedGalleryNode): GalleryEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): GalleryEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedGalleryNode;
     return new GalleryEditNode({
       images: serializedNode.images,
       layout: serializedNode.layout,

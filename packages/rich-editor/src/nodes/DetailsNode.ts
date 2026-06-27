@@ -1,4 +1,11 @@
-import type { EditorConfig, LexicalNode, NodeKey, SerializedElementNode, Spread } from 'lexical';
+import type {
+  EditorConfig,
+  LexicalNode,
+  NodeKey,
+  SerializedElementNode,
+  SerializedLexicalNode,
+  Spread,
+} from 'lexical';
 import { $createParagraphNode, $insertNodes, ElementNode } from 'lexical';
 import { ChevronRight } from 'lucide-react';
 import { createElement } from 'react';
@@ -105,7 +112,8 @@ export class DetailsNode extends ElementNode {
     return false;
   }
 
-  static importJSON(serializedNode: SerializedDetailsNode): DetailsNode {
+  static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): DetailsNode {
+    const serializedNode = _serializedNode as unknown as SerializedDetailsNode;
     return $createDetailsNode(serializedNode.summary, serializedNode.open);
   }
 

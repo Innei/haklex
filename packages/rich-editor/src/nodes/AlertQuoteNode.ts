@@ -114,7 +114,10 @@ export class AlertQuoteNode extends DecoratorNode<ReactElement> {
     return extractTextContent(this.__contentState);
   }
 
-  static importJSON(serializedNode: SerializedAlertQuoteNode): AlertQuoteNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): AlertQuoteNode {
+    const serializedNode = _serializedNode as unknown as SerializedAlertQuoteNode;
     return new AlertQuoteNode(serializedNode.alertType, serializedNode.content);
   }
 

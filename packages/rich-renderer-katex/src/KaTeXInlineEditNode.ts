@@ -1,6 +1,6 @@
 import { KaTeXInlineNode, type SerializedKaTeXInlineNode } from '@haklex/rich-editor/nodes';
 import { createRendererDecoration, KaTeXRenderer } from '@haklex/rich-editor/renderers';
-import type { EditorConfig, LexicalEditor } from 'lexical';
+import type { EditorConfig, LexicalEditor, SerializedLexicalNode } from 'lexical';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
@@ -16,7 +16,10 @@ export class KaTeXInlineEditNode extends KaTeXInlineNode {
     );
   }
 
-  static importJSON(serializedNode: SerializedKaTeXInlineNode): KaTeXInlineEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): KaTeXInlineEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedKaTeXInlineNode;
     const node = new KaTeXInlineEditNode(serializedNode.equation);
     if (serializedNode.color) node.setColor(serializedNode.color);
     return node;

@@ -1,6 +1,6 @@
 import { KaTeXBlockNode, type SerializedKaTeXBlockNode } from '@haklex/rich-editor/nodes';
 import { createRendererDecoration, KaTeXRenderer } from '@haklex/rich-editor/renderers';
-import type { EditorConfig, LexicalEditor } from 'lexical';
+import type { EditorConfig, LexicalEditor, SerializedLexicalNode } from 'lexical';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
@@ -8,14 +8,13 @@ import { KaTeXEditDecorator } from './KaTeXEditDecorator';
 
 export class KaTeXBlockEditNode extends KaTeXBlockNode {
   static clone(node: KaTeXBlockEditNode): KaTeXBlockEditNode {
-    return new KaTeXBlockEditNode(
-      node.__equation,
-      node.__key,
-      node.getShouldAutoOpenOnMount(),
-    );
+    return new KaTeXBlockEditNode(node.__equation, node.__key, node.getShouldAutoOpenOnMount());
   }
 
-  static importJSON(serializedNode: SerializedKaTeXBlockNode): KaTeXBlockEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): KaTeXBlockEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedKaTeXBlockNode;
     return new KaTeXBlockEditNode(serializedNode.equation);
   }
 

@@ -12,8 +12,7 @@
     "isolatedModules": true,
     "declaration": true,
     "declarationMap": true,
-    "outDir": "./dist",
-    "baseUrl": "./src"
+    "outDir": "./dist"
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src/**/*.ts"]

@@ -186,7 +186,10 @@ export class GridContainerNode extends DecoratorNode<ReactElement> {
     return this.__cellStates.map((s) => extractTextContent(s)).join('\n');
   }
 
-  static importJSON(serializedNode: SerializedGridContainerNode): GridContainerNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): GridContainerNode {
+    const serializedNode = _serializedNode as unknown as SerializedGridContainerNode;
     const legacy = serializedNode as LegacySerializedGridNode;
     const cols = legacy.cols || 2;
     const rawGap = legacy.gap;

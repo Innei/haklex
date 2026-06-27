@@ -1,4 +1,4 @@
-import '../styles.css.ts';
+import '../styles.css';
 
 import { useColorScheme } from '@haklex/rich-editor/static';
 import { SiGithub } from '@icons-pack/react-simple-icons';

@@ -178,7 +178,10 @@ export class GridEditNode extends GridContainerNode {
     }
   }
 
-  static importJSON(serializedNode: SerializedGridContainerNode): GridEditNode {
+  static importJSON(
+    _serializedNode: SerializedLexicalNode & Record<string, unknown>,
+  ): GridEditNode {
+    const serializedNode = _serializedNode as unknown as SerializedGridContainerNode;
     const legacy = serializedNode as LegacySerializedGridEditNode;
     const cols = legacy.cols || 2;
     const rawGap = legacy.gap;
