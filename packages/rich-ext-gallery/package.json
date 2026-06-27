@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-gallery",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "description": "Image gallery extension with drag-and-drop",
   "repository": {
     "type": "git",
