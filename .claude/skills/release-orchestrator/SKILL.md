@@ -1,6 +1,6 @@
 ---
 name: release-orchestrator
-description: Use when releasing @haklex/* packages and propagating to downstream consumers (Yohaku, mx-core/apps/admin, mx-core/apps/core, mx-space). Owns end-to-end orchestration: change detection, per-package semver calc, peer-dep audit to prevent duplicate-instance bugs (e.g. lucide-react React Context mismatch), topologically-ordered publish with npm registry polling, parallel-worktree downstream smoke tests, auto-revert on failure, and direct push to downstream primary branches (no PRs). Fully autonomous — no user confirmation gates. Supersedes the old /release command.
+description: Use when releasing @haklex/* packages and propagating to downstream consumers (Yohaku, mx-core/apps/admin, mx-core/apps/core, mx-space). Owns end-to-end orchestration: change detection, per-package semver calc, peer-dep audit (cross-package consistency for shared third-party peers like lexical, plus the always-peer Context-creating list) to prevent duplicate-instance bugs, tri-directional publish-set closure (forward workspace deps, backward exact-pin siblings, third-party peer-floor drift carriers), topologically-ordered publish with npm registry polling, downstream third-party pin reconciliation, parallel-worktree smoke tests with a duplicate-runtime invariant assertion, auto-revert on failure, and direct push to downstream primary branches (no PRs). Fully autonomous — no user confirmation gates. Supersedes the old /release command.
 user_invocable: true
 ---
 
@@ -16,7 +16,7 @@ Do not require caller-supplied release metadata. Infer the release context from 
 2. **Affected packages** — derive mechanically from `git diff --name-only "$LAST"..HEAD`; do not ask the caller for a package list.
 3. **Release mode** — see Phase 0.5; defaults to `incremental` (publish the workspace closure of changed packages — Phase 4 expands `CHANGED_PKGS` to `PUBLISH_SET` via forward closure over workspace cross-deps), upgradeable to `full` either by user opt-in keyword or by Phase 2 auto-fallback on a `major` bump.
 
-If no package has publishable `src/**` changes, stop and report that there is no releasable package diff.
+If no package has publishable `src/**` changes, no non-`@haklex/*` `peerDependencies` range advanced since `$LAST`, AND no `@haklex/*` package is behind its shared source version on the registry, stop and report that there is no releasable package diff. Any one of the three Phase 1 triggers — src diff, peer-range advance, or registry-version catch-up — is enough to require a release.
 
 ## Repo layout
 
@@ -69,15 +69,64 @@ Print the chosen mode as a banner before Phase 1. If Phase 2 later flips the mod
    git diff --name-only "$LAST"..HEAD -- 'packages/*/src/**' 'packages/*/package.json'
    ```
 
-   A package is **changed** only if `src/**` has diffs. `package.json`-only or lockfile-only changes do **not** trigger a publish on their own. Use the full diff and commit log to infer a terse changeset summary for downstream commit messages and final reporting.
+   A package is **changed** if any of:
+   - **(a) `src/**`has diffs since`$LAST`\*\* — the conventional trigger; or
+   - **(b) its `peerDependencies` range advanced for any non-`@haklex/*` library since `$LAST`** — a peer-range advance (range widened, floor raised) changes the published tarball's resolution behaviour for consumers, so it MUST trigger republish even when no source code changed; or
+   - **(c) its currently-published registry version is behind the local source's shared version (catch-up trigger)** — if a previous cycle bumped shared version but did not publish this package, the on-registry tarball drifted from what current source would produce. The next release MUST catch up the stragglers, otherwise downstream consumers split across two `@haklex/*` cohorts (the bumped majority vs the stranded stragglers), and any third-party peer floor advance in the bumped majority triggers a duplicate-runtime install via the registry-version mismatch (v0.29.0 → v0.29.1 case — see anchor).
 
-4. Define `CHANGED_PKGS` as the set of unique package names (e.g. `rich-editor`, `rich-compose`) from step 3 that have `src/**` diffs. Print a one-line tally before Phase 2 so the user can confirm scope:
+   Plain `package.json` cosmetic edits (description, keywords, scripts) and `@haklex/*` peer-range changes do **not** count under (a)/(b) — `@haklex/*` peer ranges are handled by Phase 4's bidirectional closure. Lockfile-only changes never trigger.
+
+4. Define `CHANGED_PKGS` as the union of (a), (b), and (c):
+
+   ```bash
+   LOCAL_VERSION=$(jq -r .version packages/rich-editor/package.json)
+   
+   SRC_CHANGED=$(
+     git diff --name-only "$LAST"..HEAD -- 'packages/*/src/**' \
+       | awk -F/ '{print $2}' | sort -u
+   )
+   PEER_DRIFT=$(
+     for manifest in $(git diff --name-only "$LAST"..HEAD -- 'packages/*/package.json'); do
+       pkg=$(basename "$(dirname "$manifest")")
+       old=$(git show "$LAST:$manifest" 2> /dev/null | jq -r '
+         (.peerDependencies // {}) | to_entries[]
+         | select(.key | startswith("@haklex/") | not)
+         | "\(.key) \(.value)"' | sort)
+       new=$(jq -r '
+         (.peerDependencies // {}) | to_entries[]
+         | select(.key | startswith("@haklex/") | not)
+         | "\(.key) \(.value)"' "$manifest" | sort)
+       [ "$old" != "$new" ] && echo "$pkg"
+     done | sort -u
+   )
+   # Catch-up: any @haklex/* whose registry version != shared local version.
+   # Skip rich-editor-demo (not published).
+   CATCHUP=$(
+     for manifest in packages/*/package.json; do
+       pkg_name=$(jq -r .name "$manifest")
+       [ "$pkg_name" = "@haklex/rich-editor-demo" ] && continue
+       reg=$(npm view "$pkg_name" version 2> /dev/null || echo "404")
+       [ "$reg" = "404" ] && continue # never-published, leave for Phase 4 closure
+       if [ "$reg" != "$LOCAL_VERSION" ]; then
+         basename "$(dirname "$manifest")"
+       fi
+     done | sort -u
+   )
+   CHANGED_PKGS=$(printf '%s\n%s\n%s\n' "$SRC_CHANGED" "$PEER_DRIFT" "$CATCHUP" \
+     | sort -u | grep -v '^$')
+   ```
+
+   Print a one-line tally before Phase 2 so the user can confirm scope, distinguishing the three trigger sources:
 
    ```
-   Changed packages: rich-editor, rich-compose, rich-ext-chat (3 of 15)
+   Changed packages: rich-editor, rich-compose, rich-ext-chat (src)
+                   + rich-plugin-block-handle, rich-plugin-floating-toolbar (peer-drift: lexical 0.45→0.46)
+                   + rich-plugin-link-edit, rich-plugin-slash-menu, rich-plugin-table,
+                     rich-plugin-toolbar (catch-up: registry 0.28.0 < source 0.29.0)
+                   = 9 of 33
    ```
 
-   `CHANGED_PKGS` drives both Phase 2 (semver classification) and Phase 4 (publish set when `MODE=incremental`).
+   `CHANGED_PKGS` drives both Phase 2 (semver classification) and Phase 4 (publish set when `MODE=incremental`). For semver: peer-drift-only changes classify as `minor` (new floor is additive to consumers willing to upgrade) unless the range introduces a breaking semver crossing (e.g. `^0.45.0` → `^1.0.0`), in which case `major` and Phase 2's full-mode auto-fallback fires. Catch-up-only changes inherit the highest classification produced by (a) or (b); if (a) and (b) are empty (pure catch-up cycle), classify as `patch` — the catch-up release ships the same source the missed-cycle should have shipped, just at a fresh version number.
 
 ## Phase 2 — Semver calc (highest-wins across shared version)
 
@@ -156,6 +205,32 @@ jq -e '
 
 If any offender exists, fix it in-place before Phase 4's bump runs (otherwise `bumpp` writes the new exact peer pin straight into the tarball and the cycle is poisoned). `dependencies` and `optionalDependencies` keep `workspace:*` — those must publish as exact for the install graph to resolve.
 
+**Shared third-party peer-floor consistency (critical)** — for every library that appears under `peerDependencies` of more than one `@haklex/*` package (always-peer candidates above, plus `lexical` and every `@lexical/*` subpackage), all carriers MUST declare the **same range floor**. Drift across siblings is the same failure mode as a stale `workspace:*` peer pin via a third-party route: an unchanged sibling whose published tarball still pins the old floor forces downstream `pnpm install` to allocate a second copy of the bumped runtime alongside the new one. Lexical (and its `@lexical/*` subpackages) is the most fragile case — two `lexical` copies on disk re-trigger the v0.26.3 duplicate-runtime bug (Lexical error #8 from cross-heap node-class lookup), and this is exactly what landed in the v0.29.0 cycle.
+
+Scan the full workspace before `bumpp` runs and fail loudly on any divergence:
+
+```bash
+jq -s '
+  [ .[]
+    | .name as $p
+    | (.peerDependencies // {})
+    | to_entries[]
+    | select(.key | startswith("@haklex/") | not)
+    | {lib: .key, range: .value, pkg: $p}
+  ]
+  | group_by(.lib)
+  | map({lib: .[0].lib, ranges: ([.[].range] | unique), pkgs: ([.[].pkg] | unique)})
+  | map(select(.ranges | length > 1))
+' packages/*/package.json
+```
+
+If the output is non-empty, two things MUST happen before Phase 4 proceeds:
+
+1. **Realign every offending peer range to the highest floor.** Rewrite each carrier's `peerDependencies.<lib>` to the same range (typically the new floor's `^X.Y.Z`).
+2. **Force every carrier into `PUBLISH_SET`.** Even siblings whose `src/**` did not change must be republished so their on-registry tarball carries the new peer floor. See Phase 4's third closure direction (third-party peer-floor advancement).
+
+There is no safe way to publish an editor whose third-party peer floor advanced while siblings keep the old floor — pnpm resolves each carrier's peer locally, producing a duplicate runtime install. This is not a downstream concern that can be deferred to Phase 6; it is a release-blocking inconsistency.
+
 ## Phase 4 — Build, publish in topological order, poll registry
 
 Bump and build always run **full** — shared version means every `package.json` must advance in lockstep, and the workspace dep graph requires every package's dist to be fresh in case it is consumed transitively at runtime:
@@ -167,12 +242,13 @@ pnpm run build:packages
 
 Do **not** use `pnpm run release:rich` here — that path runs bumpp + build + publish in one step and bypasses the ordered/polled publish this skill needs. Replace it with explicit phases.
 
-**Publish set is mode-dependent. In `incremental` mode it is computed as the workspace-closure of `CHANGED_PKGS`, not `CHANGED_PKGS` itself** (see Phase 2 — workspace-pinning reality). The closure walks **both directions**:
+**Publish set is mode-dependent. In `incremental` mode it is computed as the workspace-closure of `CHANGED_PKGS`, not `CHANGED_PKGS` itself** (see Phase 2 — workspace-pinning reality). The closure walks **three directions**:
 
 - **Forward** — for each package P in the set, include every `@haklex/*` that P's `dependencies` / `peerDependencies` / `optionalDependencies` reference under a `workspace:` specifier. Prevents `ERR_PNPM_NO_MATCHING_VERSION` when a published tarball points at an unpublished workspace dep (v0.21.0 anchor).
 - **Backward (exact-pin only)** — for each package P in the set, scan every other workspace package S. If S exact-pins P via `workspace:*` in **any** of `dependencies` / `optionalDependencies` / `peerDependencies` (all of which pnpm publishes as exact `X.Y.Z`), include S too. Prevents the dual failure mode where S's last published tarball still carries the **old** exact pin → downstream installs both new P and a duplicate **old** P to satisfy S's stale dep (v0.26.3 anchor — `peerDependencies` direction, Lexical error #8 from two `@haklex/rich-editor` copies on disk → two `lexical` runtimes → node-class mismatch; v0.26.6 anchor — `dependencies` direction, `rich-compose@old/dependencies` carried exact pins to bumped `rich-renderer-image` / `rich-style-token`, forcing a duplicate-version install across the whole renderer subtree).
+- **Third-party peer-floor drift** — for every non-`@haklex/*` library L whose peerDependencies range advanced in **any** changed package since `$LAST`, scan every workspace sibling S. If S declares L under `peerDependencies` at the **old** range (or any range stricter than the new floor), include S too. Prevents the third-route variant of the duplicate-runtime bug: an unchanged sibling whose published tarball still floors L at the old version forces downstream to install L at both the old (to satisfy the stale sibling) and the new (to satisfy the bumped package) floor (v0.29.0 anchor — `lexical` and `@lexical/*` peer floor bumped from `^0.45.0` to `^0.46.0` in `rich-headless` + `rich-editor` + their immediate cluster, but every `rich-plugin-*` kept the old `^0.45.0` peer. The 6 stranded plugins were not in `CHANGED_PKGS` and the existing forward/backward walks did not pick them up, because their workspace cross-deps were already `workspace:^` (post-v0.26.3 migration). Downstream `mx-core` ended up with both lexical 0.45 and 0.46 in `node_modules` — same Lexical error #8 path, different trigger).
 
-Note the asymmetry: forward walk follows any `workspace:` prefix (`*`, `^`, `~`, explicit), because pnpm publishes them all as **some** concrete version and the consumer must be able to resolve them. Backward walk fires **only** on `workspace:*` pins (any of deps / optional / peer), because `workspace:^` publishes as `^X.Y.Z` and tolerates sibling minor/patch bumps without republish. Bumps that cross the caret floor (i.e. `major`) still force `MODE=full` via Phase 2's auto-fallback, so backward walk does not need to handle them.
+Note the asymmetry: forward walk follows any `workspace:` prefix (`*`, `^`, `~`, explicit), because pnpm publishes them all as **some** concrete version and the consumer must be able to resolve them. Backward walk fires **only** on `workspace:*` pins (any of deps / optional / peer), because `workspace:^` publishes as `^X.Y.Z` and tolerates sibling minor/patch bumps without republish. Bumps that cross the caret floor (i.e. `major`) still force `MODE=full` via Phase 2's auto-fallback, so backward walk does not need to handle them. Third-party peer-floor walk fires on **any** carrier of the drifted lib whose declared peer is stricter than the new floor — the trigger is the floor advance in the changed package, not the workspace-pin shape.
 
 **Reality check on incremental savings.** Because the repo still has many `workspace:*` cross-deps under `dependencies` (notably `rich-compose` depending on every `rich-ext-*` / `rich-renderer-*` / `rich-litexml` / `rich-style-token` via `workspace:*`), the backward walk over `dependencies` can rapidly snowball: republishing any one of those forces `rich-compose` in, which forces all its other workspace deps in, which forces everything depending on them in, … In practice incremental closures touching the renderer / extension subtree converge on `full` anyway. That is expected behaviour, not a bug — the alternative is shipping a broken install graph. If you want incremental to stay genuinely small over time, the fix is migrating the offending `dependencies: workspace:*` to `workspace:^` (a tarball-format change requiring a one-time republish of every consumer), the same migration the v0.26.3 cycle did for `peerDependencies`.
 
@@ -184,10 +260,30 @@ case "$MODE" in
       | jq -r '.[].name' | grep '^@haklex/' | grep -v '@haklex/rich-editor-demo')
     ;;
   incremental)
-    # Bidirectional closure: forward (deps/peers/optional) + backward (exact-pin peerDeps).
-    # Iterate to fixed point.
+    # Tri-directional closure: forward (deps/peers/optional) + backward (exact-pin
+    # cross-pkgs) + third-party peer-floor drift carriers. Iterate to fixed point.
     declare -A IN_SET
     for p in $CHANGED_PKGS; do IN_SET["@haklex/$p"]=1; done
+
+    # Pre-compute the set of non-@haklex/* peer libs whose floor advanced in any
+    # changed package between $LAST and HEAD. Format per line: "<lib> <new-range>".
+    DRIFTED_PEERS=$(
+      for p in $CHANGED_PKGS; do
+        manifest="packages/$p/package.json"
+        [ -f "$manifest" ] || continue
+        diff \
+          <(git show "$LAST:$manifest" 2> /dev/null | jq -r '
+            (.peerDependencies // {}) | to_entries[]
+            | select(.key | startswith("@haklex/") | not)
+            | "\(.key) \(.value)"' | sort) \
+          <(jq -r '
+            (.peerDependencies // {}) | to_entries[]
+            | select(.key | startswith("@haklex/") | not)
+            | "\(.key) \(.value)"' "$manifest" | sort) \
+          | awk '/^> /{print $2" "$3}'
+      done | sort -u
+    )
+
     changed=1
     while [ "$changed" -eq 1 ]; do
       changed=0
@@ -230,6 +326,27 @@ case "$MODE" in
           | .key
         ' "$sib")
       done
+      # Third-party peer-floor drift: any sibling that peers a drifted lib at the
+      # old (stricter-than-new-floor) range must be republished so its tarball
+      # carries the new floor. Skip siblings whose own range already matches the
+      # new floor — they don't need a republish for this lib.
+      if [ -n "$DRIFTED_PEERS" ]; then
+        for sib in packages/*/package.json; do
+          sib_name=$(jq -r '.name' "$sib")
+          [ "$sib_name" = "@haklex/rich-editor-demo" ] && continue
+          [ -n "${IN_SET[$sib_name]:-}" ] && continue
+          while read -r lib new_range; do
+            [ -z "$lib" ] && continue
+            sib_range=$(jq -r --arg lib "$lib" '(.peerDependencies // {})[$lib] // empty' "$sib")
+            [ -z "$sib_range" ] && continue
+            if [ "$sib_range" != "$new_range" ]; then
+              IN_SET[$sib_name]=1
+              changed=1
+              break
+            fi
+          done <<< "$DRIFTED_PEERS"
+        done
+      fi
     done
     PUBLISH_SET=$(printf '%s\n' "${!IN_SET[@]}" | sort)
     ;;
@@ -239,15 +356,18 @@ echo "Publish set ($MODE): $(wc -l <<< "$PUBLISH_SET") packages"
 
 Devdeps are excluded from both directions (consumers never see them).
 
-Print which packages were absorbed by closure expansion, separating forward from backward so the user can see why `PUBLISH_SET` is larger than `CHANGED_PKGS`:
+Print which packages were absorbed by closure expansion, separating forward / backward / third-party-peer-drift so the user can see why `PUBLISH_SET` is larger than `CHANGED_PKGS`:
 
 ```
 Closure expansion: rich-editor, rich-editor-ui, rich-ext-gallery, rich-headless (changed)
                  + rich-style-token (forward: workspace dep of rich-editor)
                  + rich-ext-chat, rich-ext-code-snippet, rich-ext-dynamic, rich-ext-embed,
-                   rich-ext-excalidraw, rich-ext-nested-doc, rich-plugin-*, rich-renderer-*
+                   rich-ext-excalidraw, rich-ext-nested-doc, rich-renderer-*
                    (backward: exact peer-pin workspace:* on rich-editor / rich-editor-ui / rich-style-token)
-                 = 27 packages
+                 + rich-plugin-block-handle, rich-plugin-floating-toolbar, rich-plugin-link-edit,
+                   rich-plugin-slash-menu, rich-plugin-table, rich-plugin-toolbar
+                   (third-party peer drift: lexical floor ^0.45.0 → ^0.46.0 in rich-headless / rich-editor)
+                 = 33 packages
 ```
 
 Compute topological order from the workspace graph and **intersect** with `PUBLISH_SET`:
@@ -420,6 +540,41 @@ done
 
 Use `Edit` (not `sed -i`) so the diff is reviewable. Then `pnpm install`. In incremental mode some downstream `@haklex/*` pins will remain at their prior version — that is correct.
 
+**Third-party peer reconciliation (critical when Phase 3 flagged drift)** — if any published `@haklex/*` advanced a non-`@haklex/*` peer floor this cycle (i.e. `DRIFTED_PEERS` from Phase 4 is non-empty, or Phase 3's consistency audit fired), downstream consumers' **own** direct pins for the same library must also lift. Otherwise pnpm satisfies the downstream's pin and haklex's peer independently, allocating two physical copies of the library and reproducing the duplicate-runtime bug via a third-party route (v0.29.0 anchor — mx-core kept `lexical: ^0.45.0` while haklex peers required `^0.46.0`; pnpm installed both, breaking the editor at runtime).
+
+Collect the new peer ranges from registry-published manifests (not local source — local may have drifted past what was actually published this cycle), then rewrite any downstream direct pin that doesn't satisfy:
+
+```bash
+# Aggregate peer ranges from every freshly-published @haklex/*. Each row: "<lib>\t<range>"
+PEER_FLOORS=$(
+  for pkg in $PUBLISH_SET; do
+    npm view "$pkg@$NEW_VERSION" peerDependencies --json 2> /dev/null
+  done | jq -s '
+    add // {}
+    | to_entries
+    | map(select(.key | startswith("@haklex/") | not))
+    | map("\(.key)\t\(.value)")
+    | .[]
+  '
+)
+
+# For each (lib, range), rewrite the downstream manifest sections that pin lib at
+# a range strictly older than the new floor. Skip libs the downstream does not list.
+while IFS=$'\t' read -r lib new_range; do
+  [ -z "$lib" ] && continue
+  for section in dependencies devDependencies peerDependencies; do
+    cur=$(jq -r --arg s "$section" --arg l "$lib" '(.[$s] // {})[$l] // empty' "$MANIFEST")
+    [ -z "$cur" ] && continue
+    [ "$cur" = "$new_range" ] && continue
+    # Use Edit to rewrite "$lib": "$cur" → "$lib": "$new_range" in $MANIFEST.
+  done
+done <<< "$PEER_FLOORS"
+```
+
+`devDependencies` is included because downstream test/build tooling often pins the same lib (e.g. mx-core's `apps/core` lists `@lexical/headless` under `dependencies` but `@lexical/code-core` etc. need to track the same floor). Rewrite in-place; if the downstream's existing range is already `>=` the new floor (e.g. an explicit `^0.46.1` when the new floor is `^0.46.0`), leave it alone.
+
+Stage these third-party pin changes alongside the `@haklex/*` pin rewrites — Phase 8b commits them together under the same `chore(deps): bump @haklex/*` message.
+
 Commit-ready files per repo (re-derive at release time — these are the historically observed sets, not a guarantee):
 
 | Repo    | Stage these                                                                                                                                                                                                                                         |
@@ -443,7 +598,25 @@ In each downstream worktree, dispatch an independent subagent to run:
 
 1. `pnpm typecheck` (or `pnpm -r exec tsc --noEmit` if no script)
 2. `pnpm build`
-3. One E2E — use the repo's existing smoke journey. If none exists, skip with a warning; do not invent one.
+3. **Duplicate-runtime invariant** — for every lib in `DRIFTED_PEERS` (Phase 4, the lib column only) plus the always-peer list (`lexical`, `react`, `react-dom`, `@lexical/react`, `lucide-react`, `shiki`), assert exactly one resolved version in the install graph. This catches the v0.26.3 / v0.29.0 family of duplicate-runtime bugs that typecheck and build silently tolerate:
+
+   ```bash
+   DRIFTED_LIBS=$(awk '{print $1}' <<< "$DRIFTED_PEERS" | sort -u)
+   for lib in lexical react react-dom @lexical/react lucide-react shiki $DRIFTED_LIBS; do
+     # extract distinct resolved versions across the workspace
+     versions=$(pnpm ls "$lib" -r --depth Infinity --json 2> /dev/null \
+       | jq -r '.. | objects | select(.name? == "'$lib'") | .version' | sort -u)
+     count=$(wc -l <<< "$versions" | tr -d ' ')
+     if [ "$count" -gt 1 ]; then
+       echo "FAIL: $lib has $count distinct copies: $versions"
+       exit 1
+     fi
+   done
+   ```
+
+   A single resolved version is mandatory for any Context-creating or runtime-anchored lib. If the assertion fails, fall through to Phase 8a — the bug is that a stranded sibling's published peer range is still pinning the old floor; the fix is republishing that sibling at the new floor (Phase 4's third-direction closure should have caught it, but didn't because either Phase 3's audit was skipped or the carrier doesn't list the lib as peer locally despite needing it).
+
+4. One E2E — use the repo's existing smoke journey. If none exists, skip with a warning; do not invent one.
 
 Run the repos in parallel (one subagent per worktree). Collect pass/fail per repo. Proceed only when all green.
 
@@ -544,26 +717,28 @@ The release is live — no further user action required. Mark the release as com
 
 ## Quick reference
 
-| Step             | Command                                                                                                                                                                                                                                                                                                                                                           |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Last release SHA | `git log --grep='^release: v' -n1 --format=%H`                                                                                                                                                                                                                                                                                                                    |
-| Mode detect      | `grep -iqE '(^\|[^a-z])(full\|全量\|all)([^a-z]\|$)' <<<"$INVOCATION_TEXT" && echo full \|\| echo incremental`                                                                                                                                                                                                                                                    |
-| Changed pkgs     | `git diff --name-only $LAST..HEAD -- 'packages/*/src/**'`                                                                                                                                                                                                                                                                                                         |
-| Publish set      | `full` → all `@haklex/*` sans demo. `incremental` → **bidirectional** closure of `CHANGED_PKGS`: forward over `dependencies + peerDependencies + optionalDependencies` (any `workspace:` prefix), backward over sibling exact-pins (`workspace:*` only — `workspace:^` is skipped) in **all three** sections. Iterate to fixed point. See Phase 4 for the script. |
-| Export diff      | `diff <(git show $LAST:…/index.ts \| grep ^export) <(git show HEAD:…/index.ts \| grep ^export)`                                                                                                                                                                                                                                                                   |
-| Peer audit       | `jq '.dependencies, .peerDependencies' packages/<pkg>/package.json`                                                                                                                                                                                                                                                                                               |
-| Bump             | `pnpm bumpp -r <level> --no-git --no-tag`                                                                                                                                                                                                                                                                                                                         |
-| Build            | `pnpm run build:packages`                                                                                                                                                                                                                                                                                                                                         |
-| Publish one      | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                                                                                                                                                                                                                                                                                             |
-| Registry poll    | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                                                                                                                                                                                                                                                                                       |
-| CLI smoke        | `npx --yes -p @haklex/rich-litexml-cli@$CLI_VER litexml '<p>x</p>' --format json --compact` (`$CLI_VER` = `$V` if in PUBLISH_SET, else `npm view @haklex/rich-litexml-cli version`)                                                                                                                                                                               |
-| Default branch   | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master)                                                                                                                                                                                                                                                                 |
-| Worktree         | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                                                                                                                                                                                                                                                                                            |
-| Push downstream  | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                                                                                                                                                                                                                                                                                   |
-| Tag haklex       | `git tag v$V && git push origin v$V` (after commit, before downstream)                                                                                                                                                                                                                                                                                            |
-| Publish release  | `gh release create v$V --title v$V --notes-file $NOTE --verify-tag` (no `--draft` — publish directly)                                                                                                                                                                                                                                                             |
-| Release URL      | `https://github.com/Innei/haklex/releases/tag/v$V` (live immediately after publish)                                                                                                                                                                                                                                                                               |
-| Rollback release | `gh release delete v$V --yes --cleanup-tag` (only on Phase 8a failure path)                                                                                                                                                                                                                                                                                       |
+| Step              | Command                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Last release SHA  | `git log --grep='^release: v' -n1 --format=%H`                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Mode detect       | `grep -iqE '(^\|[^a-z])(full\|全量\|all)([^a-z]\|$)' <<<"$INVOCATION_TEXT" && echo full \|\| echo incremental`                                                                                                                                                                                                                                                                                                                                                                                            |
+| Changed pkgs      | `git diff --name-only $LAST..HEAD -- 'packages/*/src/**'`                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Publish set       | `full` → all `@haklex/*` sans demo. `incremental` → **tri-directional** closure of `CHANGED_PKGS`: forward over `dependencies + peerDependencies + optionalDependencies` (any `workspace:` prefix), backward over sibling exact-pins (`workspace:*` only — `workspace:^` is skipped) in **all three** sections, plus third-party peer-floor drift carriers (any sibling that peers a drifted non-`@haklex/*` lib at a stricter-than-new-floor range). Iterate to fixed point. See Phase 4 for the script. |
+| Export diff       | `diff <(git show $LAST:…/index.ts \| grep ^export) <(git show HEAD:…/index.ts \| grep ^export)`                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Peer audit        | `jq '.dependencies, .peerDependencies' packages/<pkg>/package.json`; plus cross-package consistency: `jq -s 'map(...) \| group_by(.lib) \| map(select(.ranges \| length > 1))' packages/*/package.json` (see Phase 3 — must be `[]`)                                                                                                                                                                                                                                                                      |
+| Drifted peers     | `for p in $CHANGED_PKGS; do diff <(git show $LAST:packages/$p/package.json \| jq -r '.peerDependencies\|to_entries[]\|select(.key\|startswith("@haklex/")\|not)\|"\(.key) \(.value)"') <(jq -r 'same' packages/$p/package.json) \| awk '/^> /{print $2,$3}'; done` (non-empty → Phase 6 must reconcile downstream pins)                                                                                                                                                                                   |
+| Dup-runtime smoke | `pnpm ls <lib> -r --depth Infinity --json \| jq -r '.. \| objects \| select(.name? == "<lib>") \| .version' \| sort -u \| wc -l` must equal 1 for `lexical` / `react` / `react-dom` / `@lexical/react` / `lucide-react` / `shiki`                                                                                                                                                                                                                                                                         |
+| Bump              | `pnpm bumpp -r <level> --no-git --no-tag`                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Build             | `pnpm run build:packages`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Publish one       | `pnpm --filter @haklex/<pkg> publish --no-git-checks`                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Registry poll     | `until npm view @haklex/<pkg>@$V version; do sleep 5; done`                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| CLI smoke         | `npx --yes -p @haklex/rich-litexml-cli@$CLI_VER litexml '<p>x</p>' --format json --compact` (`$CLI_VER` = `$V` if in PUBLISH_SET, else `npm view @haklex/rich-litexml-cli version`)                                                                                                                                                                                                                                                                                                                       |
+| Default branch    | `git -C <repo> symbolic-ref refs/remotes/origin/HEAD --short \| sed 's#^origin/##'` (main/master)                                                                                                                                                                                                                                                                                                                                                                                                         |
+| Worktree          | `git worktree add /tmp/release-<repo>-$V -b chore/haklex-$V origin/$D`                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Push downstream   | `git push origin HEAD:$D` (after `git fetch origin $D && git rebase origin/$D`)                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Tag haklex        | `git tag v$V && git push origin v$V` (after commit, before downstream)                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Publish release   | `gh release create v$V --title v$V --notes-file $NOTE --verify-tag` (no `--draft` — publish directly)                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Release URL       | `https://github.com/Innei/haklex/releases/tag/v$V` (live immediately after publish)                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Rollback release  | `gh release delete v$V --yes --cleanup-tag` (only on Phase 8a failure path)                                                                                                                                                                                                                                                                                                                                                                                                                               |
 
 ## Common mistakes
 
@@ -574,6 +749,9 @@ The release is live — no further user action required. Mark the release as com
 | Treating a `major` bump as safely incremental                              | A major breaks every cross-dep pin in unpublished packages. Phase 2 must flip `MODE=full` and republish everything                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | Equating `PUBLISH_SET` with `CHANGED_PKGS` in `incremental` mode           | This repo uses `workspace:*` — pnpm publishes those as exact versions. `PUBLISH_SET` must be the **bidirectional** closure of `CHANGED_PKGS`: forward over `dependencies + peerDependencies + optionalDependencies`, backward over **all three** sections' `workspace:*` exact-pins (not just peers). Forward-only misses the reverse failure mode — sibling tarballs with stale exact pins force downstream to install a duplicate old copy of the bumped package. Real-world hits: v0.21.0 (forward), v0.26.3 (backward — peers), v0.26.6 (backward — deps) |
 | Restricting backward walk to `peerDependencies`                            | The v0.26.3 fix only migrated peers to `workspace:^`. `dependencies` / `optionalDependencies` workspace:\* still publish as exact and still trigger the duplicate-version failure when stale. Backward walk MUST scan all three manifest sections. Real-world hit: v0.26.6                                                                                                                                                                                                                                                                                    |
+| Ignoring third-party peer-floor drift across `@haklex/*` siblings          | A third-party peer floor (e.g. `lexical`) that advances in some carriers while siblings keep the old floor reproduces the v0.26.3 duplicate-runtime bug via a third-party route. Phase 3 must audit cross-package consistency and fail; Phase 4's closure must walk a third direction (carriers of drifted peers); Phase 6 must reconcile downstream's direct pin to the new floor. Real-world hit: v0.29.0 (lexical 0.45→0.46 in editor + headless, but plugins stayed at 0.45)                                                                              |
+| Trusting typecheck + build to catch duplicate-runtime bugs                 | Both pass with two physical copies of `lexical` / `react` / etc. in `node_modules` — the failure is runtime (Lexical error #8, React Context mismatch). Phase 7 must explicitly assert exactly one resolved version per Context-creating lib via `pnpm ls <lib> -r`                                                                                                                                                                                                                                                                                           |
+| Rewriting only `@haklex/*` pins in downstream manifests                    | When a haklex peer floor for a third-party lib advances, downstream's own direct pin for the same lib must also lift. Otherwise pnpm satisfies each independently and installs both versions. Phase 6's third-party reconciliation step rewrites `dependencies` / `devDependencies` / `peerDependencies` entries for any lib in the new peer-floor set                                                                                                                                                                                                        |
 | Treating `workspace:^` peerDeps as identical to `workspace:*`              | `workspace:*` publishes as **exact** `X.Y.Z` — a stale sibling will pin the old version and force downstream duplicates. `workspace:^` publishes as `^X.Y.Z` and tolerates sibling minor/patch bumps without republish. Backward walk in Phase 4 fires **only** on `workspace:*` peers; `workspace:^` peers are intentionally skipped. Phase 2's major auto-fallback covers the case where a bump exits the caret floor                                                                                                                                       |
 | Re-pinning a downstream `@haklex/*` not in `PUBLISH_SET` to `$NEW_VERSION` | That version was never published for unchanged packages — `pnpm install` 404s. Only rewrite pins for packages in `PUBLISH_SET`                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | Running the CLI smoke against `$NEW_VERSION` when CLI wasn't republished   | The version doesn't exist on the registry. Read the prior version via `npm view @haklex/rich-litexml-cli version` and smoke against that with the new `rich-compose` resolved at install                                                                                                                                                                                                                                                                                                                                                                      |
@@ -610,6 +788,8 @@ The release is live — no further user action required. Mark the release as com
 - `gh auth status` fails or `gh` is not installed — release artefact is required, do not skip
 - A release for `v$NEW_VERSION` already exists on GitHub (stale from a previous failed attempt) — delete it via `gh release delete v$NEW_VERSION --yes --cleanup-tag` before re-publishing, or `gh release create` will reject as duplicate
 - Phase 3 audit finds any `@haklex/*` peerDep on `workspace:*` (must be `workspace:^`) — fix the manifest before Phase 4 runs `bumpp`, otherwise the exact pin gets baked into the published tarball and re-triggers the v0.26.3 duplicate-instance failure
+- Phase 3 cross-package third-party peer audit finds any lib at >1 distinct range across `@haklex/*` siblings (e.g. `lexical: ^0.45.0` in `rich-plugin-*` but `^0.46.0` in `rich-headless`) — realign every offender to the highest floor and force them into `PUBLISH_SET` (Phase 4's third closure direction) before publishing. Releasing under this state guarantees a downstream duplicate-runtime install (v0.29.0 anchor)
+- Phase 7 duplicate-runtime invariant fires (`pnpm ls <lib> -r` shows >1 resolved version for `lexical` / `react` / any Context-creating lib) — fall through to Phase 8a; the stranded carrier needs republishing at the new peer floor, not a Phase 6 retry
 
 ## Real-world anchors
 
@@ -618,4 +798,5 @@ The release is live — no further user action required. Mark the release as com
 - `v0.21.0` — incremental closure bug, **forward** direction. Initial run published only `CHANGED_PKGS = {rich-agent-core, rich-ext-ai-agent}`. Downstreams hit `ERR_PNPM_NO_MATCHING_VERSION: No matching version found for @haklex/rich-diff-core@0.21.0` because `workspace:*` had published as exact `0.21.0` but the dep wasn't republished. Recovered by publishing `rich-litexml@0.21.0` + `rich-diff-core@0.21.0` after the fact. Motivated the Phase 4 forward closure-expansion algorithm.
 - `v0.26.3` — incremental closure bug, **backward** direction, `peerDependencies` half. Initial run published only `CHANGED_PKGS = {rich-editor, rich-editor-ui, rich-ext-gallery, rich-headless}`. The forward closure stopped there because none of those reach the rest via deps. However, every unchanged `rich-ext-*` / `rich-plugin-*` / `rich-renderer-*` package's last published tarball (`0.26.2`) carried exact peer pins `"@haklex/rich-editor": "0.26.2"` (from `workspace:*`). When downstream bumped `rich-editor` to `0.26.3`, pnpm satisfied each unchanged ext's stale peer by installing a **second** copy of `rich-editor@0.26.2`, producing two physical `@haklex/rich-editor` directories under `node_modules`. Two `rich-editor` dirs → two bundled `lexical` runtimes → inserting `rich-ext-chat`'s `ChatNode` into the 0.26.3 editor triggered Lexical error #8 (`Cannot find node by key`) because the class registered against the 0.26.2 lexical heap was not the class the 0.26.3 editor reconciled against. Two-part fix: (1) migrated every `@haklex/*` peerDep in this repo from `workspace:*` to `workspace:^` so publish writes `^X.Y.Z` instead of exact, letting siblings tolerate minor/patch bumps without republish; (2) added the backward closure walk to Phase 4 so existing `workspace:*` peer pins (and any future ones) force the peer-pinner into `PUBLISH_SET`. The migration in (1) prevents recurrence going forward; the walk in (2) protects the transitional period during which already-published tarballs still carry exact peer pins.
 - `v0.26.6` — incremental closure bug, **backward** direction, `dependencies` half (the other shoe dropping from v0.26.3). Initial run started incremental with `CHANGED_PKGS = {rich-renderer-image}` (manifest-only — `jotai` migrated from `dependencies` to `peerDependencies`). Forward closure expanded to 5 packages (rich-editor + ui + style-token + headless via `peerDependencies: workspace:^`). After publishing those 5, audit revealed `rich-compose@0.26.5/dependencies` still pinned `"@haklex/rich-renderer-image": "0.26.5"` and `"@haklex/rich-style-token": "0.26.5"` exactly — both bumped to 0.26.6 on the registry. The v0.26.3 fix only migrated `peerDependencies` to `workspace:^`; `dependencies` and `optionalDependencies` are still `workspace:*` and still publish as exact. Same backward failure mode, different manifest section. Re-publishing `rich-compose@0.26.6` would have cascaded into its own forward closure (every `rich-ext-*` / `rich-renderer-*` / `rich-litexml` it depends on at `workspace:*`), which in turn would force their backward-pinners in, … converging on the full set anyway. Resolution: switch to `MODE=full` and republish all 41. Fix in this skill: (1) backward walk now scans `dependencies + optionalDependencies + peerDependencies` (not just peers); (2) documented that incremental closures touching the renderer / extension subtree will snowball into full for as long as `dependencies: workspace:*` remains in use, and the lasting fix is migrating those to `workspace:^` too. Also caught: mx-core has additional `@haklex/*` consumers under `packages/cli` and `packages/editor` not listed in the original Repo layout table — added the "always grep" rule to Phase 6. Also caught: `Yohaku/packages/design-system` is a sibling-directory symlink that `git worktree` does not materialize — added the `cp -R design-oss/ + rm .git` workaround to Phase 6.
+- `v0.29.0` — incremental closure bug, **third direction**: third-party peer-floor drift. The cycle bumped `lexical` and every `@lexical/*` subpackage peer floor from `^0.45.0` to `^0.46.0` in `rich-headless` and `rich-editor` (plus their immediate cluster). `CHANGED_PKGS` covered those; forward+backward closure expanded to most of the family. But the six `rich-plugin-*` packages (block-handle, floating-toolbar, link-edit, slash-menu, table, toolbar) had no `src/**` diff and no workspace-pin-shape trigger pulling them in (their `@haklex/*` cross-deps were already `workspace:^` post-v0.26.3), so they stayed at `0.28.0` on the registry. Their published 0.28.0 tarballs floor `lexical` at `^0.45.0`. Downstream `mx-core` consumed both the new `rich-editor@0.29.0` (peers `lexical^0.46.0`) and the stranded `rich-plugin-*@0.28.0` (peers `lexical^0.45.0`) — pnpm installed both `lexical@0.45.0` AND `lexical@0.46.0` in `node_modules`. Same Lexical error #8 path as v0.26.3, different trigger: the carrier was a third-party peer, not a workspace peer pin. Compounding bug: mx-core's own direct pins `lexical: ^0.45.0` / `@lexical/react: ^0.45.0` / etc. in `apps/admin`, `apps/core`, `packages/cli`, `packages/editor` were never rewritten by the orchestrator (Phase 6 only touched `@haklex/*` pins). Three fixes in this skill: (1) Phase 3 now audits cross-package consistency of shared third-party peer ranges and fails the release if siblings disagree; (2) Phase 4's closure walks a third direction — third-party peer-floor drift in any changed package forces every workspace carrier of that peer into `PUBLISH_SET`; (3) Phase 6 now reconciles downstream's direct third-party pins against the newly-published `@haklex/*` peer floors; (4) Phase 7 adds a duplicate-runtime invariant smoke (`pnpm ls <lib> -r` must show exactly one resolved version for any Context-creating lib).
 - Previous per-repo playbook: `.claude/commands/release.md` (now superseded by this skill)
