@@ -428,6 +428,9 @@ export class BannerNode extends DecoratorNode<null> {
   decorate(): null {
     return null;
   }
+  isInline(): boolean {
+    return false;
+  }
   getTextContent(): string {
     return extractText(this.__contentState);
   }
@@ -476,6 +479,9 @@ export class AlertQuoteNode extends DecoratorNode<null> {
   decorate(): null {
     return null;
   }
+  isInline(): boolean {
+    return false;
+  }
   getTextContent(): string {
     return extractText(this.__contentState);
   }
@@ -516,6 +522,9 @@ export class NestedDocNode extends DecoratorNode<null> {
   }
   decorate(): null {
     return null;
+  }
+  isInline(): boolean {
+    return false;
   }
   getTextContent(): string {
     return extractText(this.__contentState);
@@ -570,6 +579,9 @@ export class GridContainerNode extends DecoratorNode<null> {
   }
   decorate(): null {
     return null;
+  }
+  isInline(): boolean {
+    return false;
   }
   getTextContent(): string {
     return this.__cells.map((cell) => extractText(cell)).join('\n');
