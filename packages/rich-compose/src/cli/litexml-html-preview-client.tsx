@@ -4,12 +4,27 @@ import { createRoot } from 'react-dom/client';
 
 import { composeRenderer } from '../core/compose';
 import type { RichRendererModule } from '../core/types';
+import { alertModule } from '../modules/alert/module';
+import { bannerModule } from '../modules/banner/module';
+import { chatModule } from '../modules/chat/module';
 import { ChatRenderer } from '../modules/chat/renderer';
+import { codeBlockModule } from '../modules/code-block/module';
 import { CodeBlockRenderer } from '../modules/code-block/renderer';
+import { codeSnippetModule } from '../modules/code-snippet/module';
 import { CodeSnippetRenderer } from '../modules/code-snippet/renderer';
-import { MermaidRenderer } from '../modules/mermaid/renderer';
+import { dynamicModule } from '../modules/dynamic/module';
+import { embedModule } from '../modules/embed/module';
+import { excalidrawModule } from '../modules/excalidraw/module';
+import { galleryModule } from '../modules/gallery/module';
+import { imageModule } from '../modules/image/module';
+import { linkCardModule } from '../modules/link-card/module';
+import { mentionModule } from '../modules/mention/module';
+import { nestedDocModule } from '../modules/nested-doc/module';
+import { pollModule } from '../modules/poll/module';
 import { PollRenderer } from '../modules/poll/renderer';
-import { allRendererModules } from '../renderer';
+import { rubyModule } from '../modules/ruby/module';
+import { videoModule } from '../modules/video/module';
+import { MermaidRenderer } from './mermaid-cdn-renderer';
 
 type Theme = 'light' | 'dark';
 type Variant = 'article' | 'note' | 'comment';
@@ -36,7 +51,30 @@ const syncRendererMap: Record<string, NonNullable<RichRendererModule['renderers'
   'poll': { Poll: PollRenderer },
 };
 
-const htmlRendererModules: RichRendererModule[] = allRendererModules.map((module) => {
+const previewRendererModules: RichRendererModule[] = [
+  alertModule,
+  bannerModule,
+  chatModule,
+  codeBlockModule,
+  codeSnippetModule,
+  dynamicModule,
+  embedModule,
+  excalidrawModule,
+  galleryModule,
+  imageModule,
+  linkCardModule,
+  mentionModule,
+  {
+    name: 'mermaid',
+    renderers: { Mermaid: MermaidRenderer },
+  },
+  nestedDocModule,
+  pollModule,
+  rubyModule,
+  videoModule,
+];
+
+const htmlRendererModules: RichRendererModule[] = previewRendererModules.map((module) => {
   const renderers = syncRendererMap[module.name];
   if (!renderers) return module;
 

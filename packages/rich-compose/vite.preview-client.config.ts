@@ -8,6 +8,30 @@ export default defineConfig({
     'process.env.NODE_ENV': JSON.stringify('production'),
   },
   plugins: [vanillaExtractPlugin()],
+  resolve: {
+    alias: [
+      {
+        find: /^shiki$/,
+        replacement: path.resolve(process.cwd(), 'src/cli/shiki-cdn.ts'),
+      },
+      {
+        find: /^mermaid$/,
+        replacement: path.resolve(process.cwd(), 'src/cli/mermaid-cdn.ts'),
+      },
+      {
+        find: /^shiki\/bundle\/web$/,
+        replacement: path.resolve(process.cwd(), 'src/cli/shiki-cdn.ts'),
+      },
+      {
+        find: /^shiki\/engine\/javascript$/,
+        replacement: path.resolve(process.cwd(), 'src/cli/shiki-engine-cdn.ts'),
+      },
+      {
+        find: /^\.{1,2}\/components\/renderers\/KaTeXRenderer$/,
+        replacement: path.resolve(process.cwd(), 'src/cli/katex-cdn-renderer.tsx'),
+      },
+    ],
+  },
   build: {
     emptyOutDir: false,
     lib: {
