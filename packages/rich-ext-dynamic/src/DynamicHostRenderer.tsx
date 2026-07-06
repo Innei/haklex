@@ -12,6 +12,13 @@ export interface DynamicHostRendererProps extends DynamicSlotProps {
 
 type Status = 'loading' | 'mounted' | 'error';
 
+// new Function keeps the import() opaque to bundlers (vite/webpack/turbopack)
+// so the remote URL is loaded natively at runtime instead of being rewritten
+// into a "too dynamic" stub
+const importRemoteModule = new Function('url', 'return import(url)') as (
+  url: string,
+) => Promise<unknown>;
+
 function parseProps(json: string): Record<string, unknown> {
   try {
     const value = JSON.parse(json);
@@ -67,7 +74,7 @@ export function DynamicHostRenderer({
     container.style.minHeight = `${initialHeight}px`;
     shadow.append(container);
 
-    import(/* @vite-ignore */ url)
+    importRemoteModule(url)
       .then((mod) => {
         if (cancelled) return;
         const component = (mod as { default?: unknown })?.default;
