@@ -42,7 +42,7 @@
   "peerDependencies": {
     "@haklex/rich-editor-ui": "workspace:^",
     "@haklex/rich-style-token": "workspace:^",
-    "lucide-react": ">=1.0.0",
+    "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
   },
