@@ -11,19 +11,19 @@ export const MermaidRenderer: FC<MermaidRendererProps & { colorScheme?: ColorSch
   colorScheme,
 }) => {
   const { error, imgSrc, width, height } = useMermaidRender(content, colorScheme);
-  const minHeight = estimateMermaidHeight(content);
-  const wrapperStyle = { minHeight };
 
   if (!imgSrc) {
+    // Estimated height only stabilizes the placeholder; the rendered image
+    // carries its intrinsic dimensions and must not be padded by the estimate.
     return (
-      <div className={css.mermaidError} style={wrapperStyle}>
+      <div className={css.mermaidError} style={{ minHeight: estimateMermaidHeight(content) }}>
         {error || 'Render failed'}
       </div>
     );
   }
 
   return (
-    <div className={css.mermaidContainer} style={{ ...wrapperStyle, cursor: 'default' }}>
+    <div className={css.mermaidContainer} style={{ cursor: 'default' }}>
       <img alt="Mermaid diagram" height={height} src={imgSrc} width={width} />
     </div>
   );
