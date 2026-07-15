@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@haklex/rich-litexml": "workspace:*",
-    "nanoid": "^5.1.16",
+    "nanoid": "^6.0.0",
     "zustand": "^5.0.14"
   },
   "devDependencies": {
@@ -31,8 +31,8 @@
     "lexical": "^0.47.0",
     "typescript": "^6.0.3",
     "unplugin-dts": "^1.0.3",
-    "vite": "^8.1.0",
-    "vitest": "^4.1.9"
+    "vite": "^8.1.4",
+    "vitest": "^4.1.10"
   },
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",

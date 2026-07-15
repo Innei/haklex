@@ -26,13 +26,13 @@
   },
   "dependencies": {
     "lexical": "^0.47.0",
-    "linkedom": "^0.18.12",
-    "nanoid": "^5.1.16"
+    "linkedom": "^0.18.13",
+    "nanoid": "^6.0.0"
   },
   "devDependencies": {
     "typescript": "^6.0.3",
     "unplugin-dts": "^1.0.3",
-    "vite": "^8.1.0"
+    "vite": "^8.1.4"
   },
   "publishConfig": {
     "access": "public",
