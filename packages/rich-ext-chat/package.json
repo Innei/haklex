@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-chat",
-  "version": "0.30.0",
+  "version": "0.31.0",
   "description": "Static chat-snapshot node for the haklex rich editor",
   "repository": {
     "type": "git",
