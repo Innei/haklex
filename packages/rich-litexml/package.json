@@ -25,7 +25,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "lexical": "^0.46.0",
+    "lexical": "^0.47.0",
     "linkedom": "^0.18.12",
     "nanoid": "^5.1.16"
   },

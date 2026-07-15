@@ -25,7 +25,7 @@
 | Category              | Technology                    |
 | --------------------- | ----------------------------- |
 | **Language**          | TypeScript 5.9                |
-| **Editor Core**       | Lexical 0.45                  |
+| **Editor Core**       | Lexical 0.47                  |
 | **UI Framework**      | React 19                      |
 | **UI Primitives**     | Base UI 1 (`@base-ui/react`)  |
 | **Build**             | Vite 8, Turbo 2               |
@@ -34,7 +34,7 @@
 | **Package Manager**   | pnpm 10                       |
 | **Module Format**     | ESM only (`.mjs`)             |
 
-Lexical stays on **0.x** releases: the **minor** (e.g. **0.45**) is what must align across `lexical` and `@lexical/*`, not the patch number.
+Lexical stays on **0.x** releases: the **minor** (e.g. **0.47**) is what must align across `lexical` and `@lexical/*`, not the patch number.
 
 ## Prerequisites
 

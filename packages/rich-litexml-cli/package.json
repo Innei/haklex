@@ -24,8 +24,8 @@
     "@haklex/rich-compose": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-litexml": "workspace:*",
-    "@lexical/headless": "^0.46.0",
-    "lexical": "^0.46.0"
+    "@lexical/headless": "^0.47.0",
+    "lexical": "^0.47.0"
   },
   "devDependencies": {
     "@types/node": "26.1.0",
