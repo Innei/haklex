@@ -7,7 +7,7 @@ import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react';
 
 import { useEmbedRenderers } from '../context/EmbedRendererContext';
 import * as styles from '../styles-static.css';
-import type { EmbedType } from '../url-matchers';
+import { type EmbedType, getSpotifyEmbedPath } from '../url-matchers';
 
 const extToLang: Record<string, string> = {
   '.js': 'javascript',
@@ -70,6 +70,8 @@ export interface EmbedStaticRendererProps {
 const typeLabels: Record<EmbedType, string> = {
   'tweet': 'X / Twitter',
   'youtube': 'YouTube',
+  'apple-music': 'Apple Music',
+  'spotify': 'Spotify',
   'codesandbox': 'CodeSandbox',
   'bilibili': 'Bilibili',
   'github-file': 'GitHub File',
@@ -361,6 +363,41 @@ export function EmbedStaticRenderer({ type, url }: EmbedStaticRendererProps) {
             className={`${styles.iframe} ${styles.semanticClassNames.iframe}`}
             src={`https://www.youtube.com/embed/${id}`}
             title="YouTube video player"
+          />
+        </FixedRatioContainer>
+      );
+    }
+
+    case 'apple-music': {
+      parsedUrl.hostname = 'embed.music.apple.com';
+      parsedUrl.protocol = 'https:';
+      return (
+        <FixedRatioContainer ratio={68}>
+          <iframe
+            allowFullScreen
+            allow="autoplay *; encrypted-media *; fullscreen *; clipboard-write"
+            className={`${styles.iframe} ${styles.semanticClassNames.iframe}`}
+            sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-top-navigation-by-user-activation"
+            src={parsedUrl.toString()}
+            title="Apple Music player"
+          />
+        </FixedRatioContainer>
+      );
+    }
+
+    case 'spotify': {
+      const embedPath = getSpotifyEmbedPath(parsedUrl);
+      if (!embedPath) return <FallbackLink type={type} url={url} />;
+      parsedUrl.pathname = embedPath;
+      return (
+        <FixedRatioContainer ratio={54}>
+          <iframe
+            allowFullScreen
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            className={`${styles.iframe} ${styles.semanticClassNames.iframe}`}
+            loading="lazy"
+            src={parsedUrl.toString()}
+            title="Spotify player"
           />
         </FixedRatioContainer>
       );

@@ -25,6 +25,8 @@ export interface EmbedLinkRendererProps {
 const typeLabels: Record<EmbedType, string> = {
   'tweet': 'X / Twitter',
   'youtube': 'YouTube',
+  'apple-music': 'Apple Music',
+  'spotify': 'Spotify',
   'codesandbox': 'CodeSandbox',
   'bilibili': 'Bilibili',
   'github-file': 'GitHub File',

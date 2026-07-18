@@ -22,10 +22,12 @@ export { EmbedStaticRenderer } from './renderers/EmbedStaticRenderer'
 export type { EmbedType } from './url-matchers'
 export {
   createSelfThinkingMatcher,
+  isAppleMusicUrl,
   isBilibiliVideoUrl,
   isCodesandboxUrl,
   isGistUrl,
   isGithubFilePreviewUrl,
+  isSpotifyUrl,
   isTweetUrl,
   isYoutubeUrl,
   matchEmbedUrl,

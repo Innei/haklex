@@ -1,6 +1,6 @@
 # @haklex/rich-ext-embed
 
-URL embed extension supporting Twitter, YouTube, Bilibili, CodeSandbox, and GitHub Gist.
+URL embed extension supporting Twitter, YouTube, Apple Music, Spotify, Bilibili, CodeSandbox, and GitHub Gist.
 
 ## Installation
 
@@ -86,6 +86,8 @@ import {
   matchEmbedUrl,
   isTweetUrl,
   isYoutubeUrl,
+  isAppleMusicUrl,
+  isSpotifyUrl,
   isBilibiliVideoUrl,
   isCodesandboxUrl,
   isGistUrl,
@@ -128,7 +130,7 @@ import '@haklex/rich-ext-embed/style.css';
 ### URL Matchers
 
 - `matchEmbedUrl` -- match a URL against all supported embed types
-- `isTweetUrl`, `isYoutubeUrl`, `isBilibiliVideoUrl`, `isCodesandboxUrl`, `isGistUrl`, `isGithubFilePreviewUrl` -- individual URL matchers
+- `isTweetUrl`, `isYoutubeUrl`, `isAppleMusicUrl`, `isSpotifyUrl`, `isBilibiliVideoUrl`, `isCodesandboxUrl`, `isGistUrl`, `isGithubFilePreviewUrl` -- individual URL matchers
 - `createSelfThinkingMatcher` -- factory for custom URL matchers
 
 ### Types
