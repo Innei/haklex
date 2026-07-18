@@ -1,9 +1,9 @@
-import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language'
-import type { Extension } from '@codemirror/state'
-import { oneDark } from '@codemirror/theme-one-dark'
-import { EditorView } from '@codemirror/view'
+import { defaultHighlightStyle, syntaxHighlighting } from '@codemirror/language';
+import type { Extension } from '@codemirror/state';
+import { oneDark } from '@codemirror/theme-one-dark';
+import { EditorView } from '@codemirror/view';
 
-export const baseTheme = EditorView.theme({
+export const baseTheme: Extension = EditorView.theme({
   '&': {
     backgroundColor: 'transparent',
   },
@@ -23,10 +23,10 @@ export const baseTheme = EditorView.theme({
   '.cm-selectionBackground': {
     backgroundColor: 'rgba(125, 125, 125, 0.26) !important',
   },
-})
+});
 
 export function getThemeExtensions(colorScheme: 'light' | 'dark'): Extension {
   return colorScheme === 'dark'
     ? [oneDark, baseTheme]
-    : [baseTheme, syntaxHighlighting(defaultHighlightStyle, { fallback: true })]
+    : [baseTheme, syntaxHighlighting(defaultHighlightStyle, { fallback: true })];
 }
