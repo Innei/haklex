@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-floating-toolbar",
-  "version": "0.31.0",
+  "version": "0.31.1",
   "description": "Floating toolbar plugin",
   "repository": {
     "type": "git",

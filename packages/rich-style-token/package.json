@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-style-token",
-  "version": "0.31.0",
+  "version": "0.31.1",
   "description": "Style tokens and CSS variables for haklex rich editor",
   "repository": {
     "type": "git",
