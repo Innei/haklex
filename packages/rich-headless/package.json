@@ -33,7 +33,7 @@
   "devDependencies": {
     "@lexical/headless": "^0.48.0",
     "lexical": "^0.48.0",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "unplugin-dts": "^1.0.3",
     "vite": "^8.1.5"
   },

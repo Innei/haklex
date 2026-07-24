@@ -30,9 +30,9 @@
     "@vanilla-extract/css": "^1.21.1",
     "@vanilla-extract/vite-plugin": "^5.2.5",
     "lexical": "^0.48.0",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "typescript": "^6.0.3",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "typescript": "^7.0.2",
     "unplugin-dts": "^1.0.3",
     "vite": "^8.1.5"
   },
