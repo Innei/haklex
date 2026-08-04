@@ -28,22 +28,22 @@
   "dependencies": {
     "@codemirror/commands": "^6.10.4",
     "@codemirror/state": "^6.7.1",
-    "@codemirror/view": "^6.43.6",
+    "@codemirror/view": "^6.43.7",
     "@haklex/cm-editor": "workspace:*",
-    "@iconify-json/material-icon-theme": "^1.2.69",
+    "@iconify-json/material-icon-theme": "^1.2.70",
     "@iconify/utils": "^3.1.4"
   },
   "devDependencies": {
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vanilla-extract/css": "^1.21.1",
-    "@vanilla-extract/vite-plugin": "^5.2.5",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vanilla-extract/css": "^1.21.2",
+    "@vanilla-extract/vite-plugin": "^5.2.6",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "shiki": "^4.3.1",
+    "shiki": "^4.4.1",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.0.3",
-    "vite": "^8.1.5"
+    "vite": "^8.2.0"
   },
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",

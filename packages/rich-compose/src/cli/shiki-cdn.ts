@@ -1,4 +1,4 @@
-const SHIKI_CDN_URL = 'https://esm.sh/shiki@4.3.0/bundle/full?bundle';
+const SHIKI_CDN_URL = 'https://esm.sh/shiki@4.4.1/bundle/full?bundle';
 
 interface HighlighterLike {
   codeToHtml: (code: string, options?: unknown) => string;
