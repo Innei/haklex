@@ -5,16 +5,15 @@ import type {
   SerializedEditorState,
   SerializedLexicalNode,
 } from 'lexical';
-import { $getRoot, $insertNodes, createEditor } from 'lexical';
+import { $getRoot, $insertNodes } from 'lexical';
 import { LayoutGrid } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
 import { GridEditDecorator } from '../components/decorators/GridEditDecorator';
-import { editorTheme } from '../styles/theme';
 import type { SlashMenuItemConfig } from '../types/slash-menu';
 import { GridContainerNode, type SerializedGridContainerNode } from './GridContainerNode';
-import { NESTED_EDITOR_NODES } from './shared';
+import { createNestedEditor } from './shared';
 
 interface LegacySerializedGridEditNode {
   cells?: SerializedEditorState[];
@@ -30,14 +29,7 @@ interface GridEditNodeOptions {
 }
 
 function createCellEditor(): LexicalEditor {
-  return createEditor({
-    namespace: 'GridCell',
-    nodes: NESTED_EDITOR_NODES,
-    theme: editorTheme,
-    onError: (error: Error) => {
-      console.error('[GridCell]', error);
-    },
-  });
+  return createNestedEditor('GridCell');
 }
 
 export class GridEditNode extends GridContainerNode {

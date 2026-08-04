@@ -4,13 +4,12 @@ import type {
   SerializedEditorState,
   SerializedLexicalNode,
 } from 'lexical';
-import { $insertNodes, createEditor } from 'lexical';
+import { $insertNodes } from 'lexical';
 import { Flag } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
 import { BannerEditDecorator } from '../components/decorators/BannerEditDecorator';
-import { editorTheme } from '../styles/theme';
 import type { CommandItemConfig } from '../types/slash-menu';
 import {
   BannerNode,
@@ -18,21 +17,14 @@ import {
   normalizeBannerType,
   type SerializedBannerNode,
 } from './BannerNode';
-import { NESTED_EDITOR_NODES } from './shared';
+import { createNestedEditor } from './shared';
 
 interface LegacySerializedBannerEditNode extends SerializedBannerNode {
   children?: SerializedLexicalNode[];
 }
 
 function createContentEditor(): LexicalEditor {
-  return createEditor({
-    namespace: 'BannerContent',
-    nodes: NESTED_EDITOR_NODES,
-    theme: editorTheme,
-    onError: (error: Error) => {
-      console.error('[BannerContent]', error);
-    },
-  });
+  return createNestedEditor('BannerContent');
 }
 
 export class BannerEditNode extends BannerNode {

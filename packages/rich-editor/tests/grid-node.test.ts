@@ -3,12 +3,16 @@ import {
   $getRoot,
   $nodesOfType,
   createEditor,
+  DecoratorNode,
+  type EditorConfig,
   type LexicalEditor,
 } from 'lexical';
+import type { ReactElement } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 import { scheduleGridCellAutoFocus } from '../src/components/decorators/gridAutoFocus';
 import { $createGridEditNode, GridEditNode } from '../src/nodes/GridEditNode';
+import { createNestedEditor } from '../src/nodes/shared';
 
 vi.mock('../src/components/decorators/GridEditDecorator', () => ({
   GridEditDecorator: vi.fn(),
@@ -18,13 +22,38 @@ vi.mock('../src/components/renderers/GridStaticDecorator', () => ({
   GridStaticDecorator: vi.fn(),
 }));
 
-vi.mock('../src/nodes/shared', () => ({
-  NESTED_EDITOR_NODES: [],
-}));
+vi.mock('../src/nodes/shared', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../src/nodes/shared')>();
+  return {
+    ...actual,
+    NESTED_EDITOR_NODES: [],
+  };
+});
 
 vi.mock('../src/styles/grid.css', () => ({
   gridClassNames: { container: 'grid-container' },
   gridStyles: { container: 'grid-container-style' },
+}));
+
+vi.mock('../src/styles/shared.css', () => {
+  const identityProxy = new Proxy({}, { get: (_target, prop: string) => prop });
+  return {
+    semanticClassNames: identityProxy,
+    sharedStyles: identityProxy,
+  };
+});
+
+vi.mock('../src/styles/katex.css', () => {
+  const identityProxy = new Proxy({}, { get: (_target, prop: string) => prop });
+  return {
+    katexClassNames: identityProxy,
+    katexStyles: identityProxy,
+  };
+});
+
+vi.mock('../src/components/utils', () => ({
+  clsx: (...args: Array<string | undefined | null | false>) => args.filter(Boolean).join(' '),
+  getVariantClass: () => '',
 }));
 
 vi.mock('../src/styles/theme', () => ({
@@ -58,6 +87,58 @@ function createFrameScheduler() {
     },
   };
 }
+
+class ExtraTestNode extends DecoratorNode<ReactElement | null> {
+  static getType(): string {
+    return 'extra-test-node';
+  }
+
+  static clone(node: ExtraTestNode): ExtraTestNode {
+    return new ExtraTestNode(node.__key);
+  }
+
+  static importJSON(): ExtraTestNode {
+    return new ExtraTestNode();
+  }
+
+  createDOM(_config: EditorConfig): HTMLElement {
+    return {} as HTMLElement;
+  }
+
+  updateDOM(): boolean {
+    return false;
+  }
+
+  decorate(): ReactElement | null {
+    return null;
+  }
+}
+
+describe('createNestedEditor node registry inheritance', () => {
+  it('inherits the active editor node registry inside an update context', () => {
+    const editor = createEditor({
+      namespace: 'CreateNestedEditorInheritTest',
+      nodes: [GridEditNode, ExtraTestNode],
+      onError: (error) => {
+        throw error;
+      },
+    });
+
+    editor.update(() => {
+      const gridNode = $createGridEditNode(1);
+      const [cellEditor] = gridNode.getCellEditors();
+
+      expect(cellEditor._nodes.has(ExtraTestNode.getType())).toBe(true);
+    });
+  });
+
+  it('falls back to NESTED_EDITOR_NODES outside an update context', () => {
+    const fallbackEditor = createNestedEditor('CreateNestedEditorFallbackTest');
+
+    expect(fallbackEditor._parentEditor).toBeNull();
+    expect(fallbackEditor._nodes.has(ExtraTestNode.getType())).toBe(false);
+  });
+});
 
 describe('GridEditNode insertion focus intent', () => {
   it('marks slash-menu inserted grids for first-cell focus on mount', async () => {
