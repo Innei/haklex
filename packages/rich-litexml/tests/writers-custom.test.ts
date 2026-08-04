@@ -480,7 +480,7 @@ describe('custom writers', () => {
     );
   });
 
-  it('gallery writes aspect and fit at their defaults, omits unset maxItemHeight', () => {
+  it('gallery omits aspect and fit at their defaults, and unset maxItemHeight', () => {
     const xml = serialize([
       {
         type: 'gallery',
@@ -491,7 +491,9 @@ describe('custom writers', () => {
         version: 1,
       },
     ]);
-    expect(xml).toContain('<gallery layout="grid" aspect="auto" fit="cover">');
+    expect(xml).toContain('<gallery layout="grid">');
+    expect(xml).not.toContain('aspect');
+    expect(xml).not.toContain('fit');
     expect(xml).not.toContain('max-item-height');
   });
 

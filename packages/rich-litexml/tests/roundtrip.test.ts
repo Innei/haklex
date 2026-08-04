@@ -128,9 +128,12 @@ describe('roundtrip', () => {
     expect(result).toContain('<img src="/b.jpg" alt="B" />');
   });
 
-  it('gallery roundtrip with no new attributes applies defaults, no maxItemHeight surprise', () => {
-    const result = roundtrip('<gallery layout="grid"><img src="/a.jpg" alt="A" /></gallery>');
-    expect(result).toContain('<gallery layout="grid" aspect="auto" fit="cover">');
+  it('legacy gallery with no new attributes survives unchanged', () => {
+    const input = '<gallery layout="grid"><img src="/a.jpg" alt="A" /></gallery>';
+    const result = roundtrip(input);
+    expect(result).toContain('<gallery layout="grid">');
+    expect(result).not.toContain('aspect');
+    expect(result).not.toContain('fit');
     expect(result).not.toContain('max-item-height');
   });
 
