@@ -29,6 +29,7 @@ export class ExcalidrawEditNode extends ExcalidrawNode {
       icon: createElement(PenTool, { size: 20 }),
       description: 'Excalidraw whiteboard canvas',
       keywords: ['excalidraw', 'whiteboard', 'draw', 'canvas'],
+      nested: false,
       section: 'MEDIA',
       placement: ['slash', 'toolbar'],
       group: 'insert',

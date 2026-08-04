@@ -18,6 +18,7 @@ import { SlashMenuList } from './SlashMenuList';
 export interface SlashMenuPluginProps {
   extraItems?: SlashMenuItem[];
   items?: SlashMenuItem[];
+  nested?: boolean;
   triggerChar?: string;
 }
 
@@ -31,6 +32,7 @@ export function collectNodeSlashItems(editor: LexicalEditor): SlashMenuItem[] {
           description: c.description,
           icon: isValidElement(c.icon) ? c.icon : undefined,
           keywords: c.keywords,
+          nested: c.nested,
           section: c.section,
           onSelect: c.onSelect,
         }),
@@ -46,17 +48,28 @@ function filterItems(query: string, items: SlashMenuItem[]): SlashMenuItem[] {
   });
 }
 
-export function SlashMenuPlugin({ items, extraItems, triggerChar = '/' }: SlashMenuPluginProps) {
+export function SlashMenuPlugin({
+  items,
+  extraItems,
+  nested,
+  triggerChar = '/',
+}: SlashMenuPluginProps) {
   const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>(null);
 
   const allItems = useMemo(() => {
-    if (items) return items;
-    const builtins = getBuiltinItems();
-    const nodeItems = collectNodeSlashItems(editor);
-    const combined = [...builtins, ...nodeItems];
-    return extraItems ? [...combined, ...extraItems] : combined;
-  }, [items, extraItems, editor]);
+    let combined: SlashMenuItem[];
+    if (items) {
+      combined = items;
+    } else {
+      const builtins = getBuiltinItems();
+      const nodeItems = collectNodeSlashItems(editor);
+      combined = extraItems
+        ? [...builtins, ...nodeItems, ...extraItems]
+        : [...builtins, ...nodeItems];
+    }
+    return nested ? combined.filter((item) => item.nested !== false) : combined;
+  }, [items, extraItems, nested, editor]);
 
   const filteredItems = useMemo(
     () => filterItems(queryString ?? '', allItems),

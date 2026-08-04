@@ -183,3 +183,9 @@ describe('ImageNode layout DOM', () => {
     });
   });
 });
+
+describe('ImageNode nested-editor slash menu availability', () => {
+  it('allows Image in nested editors', () => {
+    expect(ImageNode.commandItems[0].nested).toBeUndefined();
+  });
+});

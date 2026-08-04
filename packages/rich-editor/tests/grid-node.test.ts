@@ -187,6 +187,10 @@ describe('GridEditNode insertion focus intent', () => {
       expect(restored.getShouldAutoFocusOnMount()).toBe(false);
     });
   });
+
+  it('excludes Grid from nested-editor slash menus', () => {
+    expect(GridEditNode.slashMenuItems[0].nested).toBe(false);
+  });
 });
 
 describe('scheduleGridCellAutoFocus', () => {

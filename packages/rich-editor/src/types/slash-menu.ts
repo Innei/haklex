@@ -12,6 +12,7 @@ export interface CommandItemConfig {
   isActive?: (editor: LexicalEditor) => boolean;
   isDisabled?: (editor: LexicalEditor) => boolean;
   keywords?: string[];
+  nested?: boolean;
 
   onSelect: (editor: LexicalEditor, queryString: string) => void;
   placement?: CommandPlacement[];

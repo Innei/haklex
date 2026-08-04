@@ -22,6 +22,7 @@ export class ChatEditNode extends ChatNode {
       icon: createElement(MessageSquare, { size: 20 }),
       description: 'Embed a conversation snapshot',
       keywords: ['chat', 'conversation', 'dialog', 'agent'],
+      nested: false,
       section: 'MEDIA',
       placement: ['slash', 'toolbar'],
       group: 'insert',

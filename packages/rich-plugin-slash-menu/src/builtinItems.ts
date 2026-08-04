@@ -2,13 +2,13 @@ import {
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
-} from '@lexical/list'
-import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode'
-import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text'
-import { $setBlocksType } from '@lexical/selection'
-import { INSERT_TABLE_COMMAND } from '@lexical/table'
-import type { LexicalEditor } from 'lexical'
-import { $createParagraphNode, $getSelection, $isRangeSelection } from 'lexical'
+} from '@lexical/list';
+import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
+import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
+import { $setBlocksType } from '@lexical/selection';
+import { INSERT_TABLE_COMMAND } from '@lexical/table';
+import type { LexicalEditor } from 'lexical';
+import { $createParagraphNode, $getSelection, $isRangeSelection } from 'lexical';
 import {
   Heading1,
   Heading2,
@@ -20,14 +20,14 @@ import {
   Table,
   TextQuote,
   Type,
-} from 'lucide-react'
-import { createElement } from 'react'
+} from 'lucide-react';
+import { createElement } from 'react';
 
-import { SlashMenuItem } from './SlashMenuItem'
+import { SlashMenuItem } from './SlashMenuItem';
 
-const SECTION_BASIC = 'BASIC BLOCKS'
-const SECTION_LIST = 'LISTS'
-const ICON_SIZE = 20
+const SECTION_BASIC = 'BASIC BLOCKS';
+const SECTION_LIST = 'LISTS';
+const ICON_SIZE = 20;
 
 export function getBuiltinItems(): SlashMenuItem[] {
   return [
@@ -38,11 +38,11 @@ export function getBuiltinItems(): SlashMenuItem[] {
       section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
-          const selection = $getSelection()
+          const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createParagraphNode())
+            $setBlocksType(selection, () => $createParagraphNode());
           }
-        })
+        });
       },
     }),
     new SlashMenuItem('Heading 1', {
@@ -52,11 +52,11 @@ export function getBuiltinItems(): SlashMenuItem[] {
       section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
-          const selection = $getSelection()
+          const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createHeadingNode('h1'))
+            $setBlocksType(selection, () => $createHeadingNode('h1'));
           }
-        })
+        });
       },
     }),
     new SlashMenuItem('Heading 2', {
@@ -66,11 +66,11 @@ export function getBuiltinItems(): SlashMenuItem[] {
       section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
-          const selection = $getSelection()
+          const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createHeadingNode('h2'))
+            $setBlocksType(selection, () => $createHeadingNode('h2'));
           }
-        })
+        });
       },
     }),
     new SlashMenuItem('Heading 3', {
@@ -80,11 +80,11 @@ export function getBuiltinItems(): SlashMenuItem[] {
       section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
-          const selection = $getSelection()
+          const selection = $getSelection();
           if ($isRangeSelection(selection)) {
-            $setBlocksType(selection, () => $createHeadingNode('h3'))
+            $setBlocksType(selection, () => $createHeadingNode('h3'));
           }
-        })
+        });
       },
     }),
     new SlashMenuItem('Quote', {
@@ -94,17 +94,17 @@ export function getBuiltinItems(): SlashMenuItem[] {
       section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
-          const selection = $getSelection()
-          if (!$isRangeSelection(selection)) return
-          const anchorNode = selection.anchor.getNode()
-          const element = anchorNode.getTopLevelElementOrThrow()
-          const quoteNode = $createQuoteNode()
-          const paragraph = $createParagraphNode()
-          paragraph.append(...element.getChildren())
-          quoteNode.append(paragraph)
-          element.replace(quoteNode)
-          paragraph.selectEnd()
-        })
+          const selection = $getSelection();
+          if (!$isRangeSelection(selection)) return;
+          const anchorNode = selection.anchor.getNode();
+          const element = anchorNode.getTopLevelElementOrThrow();
+          const quoteNode = $createQuoteNode();
+          const paragraph = $createParagraphNode();
+          paragraph.append(...element.getChildren());
+          quoteNode.append(paragraph);
+          element.replace(quoteNode);
+          paragraph.selectEnd();
+        });
       },
     }),
     new SlashMenuItem('Divider', {
@@ -113,20 +113,21 @@ export function getBuiltinItems(): SlashMenuItem[] {
       keywords: ['divider', 'hr', 'rule', 'separator'],
       section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
-        editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, void 0)
+        editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, void 0);
       },
     }),
     new SlashMenuItem('Table', {
       icon: createElement(Table, { size: ICON_SIZE }),
       description: 'Add a table',
       keywords: ['table', 'grid'],
+      nested: false,
       section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.dispatchCommand(INSERT_TABLE_COMMAND, {
           columns: '3',
           rows: '3',
           includeHeaders: true,
-        })
+        });
       },
     }),
 
@@ -136,7 +137,7 @@ export function getBuiltinItems(): SlashMenuItem[] {
       keywords: ['list', 'bullet', 'unordered'],
       section: SECTION_LIST,
       onSelect: (editor: LexicalEditor) => {
-        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0)
+        editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0);
       },
     }),
     new SlashMenuItem('Numbered List', {
@@ -145,7 +146,7 @@ export function getBuiltinItems(): SlashMenuItem[] {
       keywords: ['list', 'ordered', 'number'],
       section: SECTION_LIST,
       onSelect: (editor: LexicalEditor) => {
-        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0)
+        editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0);
       },
     }),
     new SlashMenuItem('To-do List', {
@@ -154,8 +155,8 @@ export function getBuiltinItems(): SlashMenuItem[] {
       keywords: ['task', 'todo', 'checkbox', 'checklist'],
       section: SECTION_LIST,
       onSelect: (editor: LexicalEditor) => {
-        editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0)
+        editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0);
       },
     }),
-  ]
+  ];
 }

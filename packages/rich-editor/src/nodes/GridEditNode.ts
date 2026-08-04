@@ -42,6 +42,7 @@ export class GridEditNode extends GridContainerNode {
       icon: createElement(LayoutGrid, { size: 20 }),
       description: 'Grid layout container',
       keywords: ['grid', 'columns', 'layout'],
+      nested: false,
       section: 'LAYOUT',
       onSelect: (editor) => {
         editor.update(() => {
