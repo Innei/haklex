@@ -230,6 +230,27 @@ export const galleryHeaderActions = style({
   gap: 2,
 });
 
+export const galleryDialogSubHeader = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 16,
+  padding: '8px 16px',
+  borderBottom: `1px solid ${vars.color.border}`,
+  flexShrink: 0,
+});
+
+export const galleryDialogSubHeaderGroup = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+});
+
+export const galleryDialogSubHeaderLabel = style({
+  fontSize: vars.typography.fontSizeXs,
+  color: vars.color.textSecondary,
+  flexShrink: 0,
+});
+
 export const galleryHeaderClose = style({
   'marginLeft': 8,
   'flexShrink': 0,
@@ -343,6 +364,13 @@ export const galleryImageInput = style({
     color: `color-mix(in srgb, ${vars.color.textSecondary} 50%, transparent)`,
   },
 });
+
+export const galleryMaxHeightInput = style([
+  galleryImageInput,
+  {
+    width: 96,
+  },
+]);
 
 export const galleryImageActions = style({
   display: 'flex',

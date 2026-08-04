@@ -13,7 +13,13 @@ import { createElement } from 'react';
 
 import { GalleryEditRenderer } from './GalleryEditRenderer';
 import { GalleryNode, type GalleryNodePayload, type SerializedGalleryNode } from './GalleryNode';
-import type { GalleryImage, GalleryLayout, GalleryRendererProps } from './types';
+import type {
+  GalleryAspect,
+  GalleryFit,
+  GalleryImage,
+  GalleryLayout,
+  GalleryRendererProps,
+} from './types';
 
 export class GalleryEditNode extends GalleryNode {
   static commandItems: CommandItemConfig[] = [
@@ -81,6 +87,24 @@ export class GalleryEditNode extends GalleryNode {
         editor.update(() => {
           const node = $getNodeByKey(nodeKey) as GalleryNode | null;
           if (node) node.setLayout(layout);
+        });
+      },
+      onAspectChange: (aspect: GalleryAspect) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey) as GalleryNode | null;
+          if (node) node.setAspect(aspect);
+        });
+      },
+      onFitChange: (fit: GalleryFit) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey) as GalleryNode | null;
+          if (node) node.setFit(fit);
+        });
+      },
+      onMaxItemHeightChange: (maxItemHeight: number | undefined) => {
+        editor.update(() => {
+          const node = $getNodeByKey(nodeKey) as GalleryNode | null;
+          if (node) node.setMaxItemHeight(maxItemHeight);
         });
       },
     };

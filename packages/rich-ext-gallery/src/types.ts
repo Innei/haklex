@@ -27,7 +27,10 @@ export interface GalleryRendererProps {
   images: GalleryImage[];
   layout: GalleryLayout;
   maxItemHeight?: number;
+  onAspectChange?: (aspect: GalleryAspect) => void;
+  onFitChange?: (fit: GalleryFit) => void;
   onImageClick?: GalleryOnImageClick;
   onImagesChange?: (images: GalleryImage[]) => void;
   onLayoutChange?: (layout: GalleryLayout) => void;
+  onMaxItemHeightChange?: (maxItemHeight: number | undefined) => void;
 }
