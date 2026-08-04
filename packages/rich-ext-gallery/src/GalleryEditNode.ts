@@ -13,7 +13,7 @@ import { createElement } from 'react';
 
 import { GalleryEditRenderer } from './GalleryEditRenderer';
 import { GalleryNode, type GalleryNodePayload, type SerializedGalleryNode } from './GalleryNode';
-import type { GalleryImage, GalleryRendererProps } from './types';
+import type { GalleryImage, GalleryLayout, GalleryRendererProps } from './types';
 
 export class GalleryEditNode extends GalleryNode {
   static commandItems: CommandItemConfig[] = [
@@ -38,6 +38,9 @@ export class GalleryEditNode extends GalleryNode {
       {
         images: node.__images.map((img) => ({ ...img })),
         layout: node.__layout,
+        aspect: node.__aspect,
+        fit: node.__fit,
+        maxItemHeight: node.__maxItemHeight,
       },
       node.__key,
     );
@@ -54,6 +57,9 @@ export class GalleryEditNode extends GalleryNode {
     return new GalleryEditNode({
       images: serializedNode.images,
       layout: serializedNode.layout,
+      aspect: serializedNode.aspect,
+      fit: serializedNode.fit,
+      maxItemHeight: serializedNode.maxItemHeight,
     });
   }
 
@@ -62,13 +68,16 @@ export class GalleryEditNode extends GalleryNode {
     const props: GalleryRendererProps = {
       images: this.__images,
       layout: this.__layout,
+      aspect: this.__aspect,
+      fit: this.__fit,
+      maxItemHeight: this.__maxItemHeight,
       onImagesChange: (images: GalleryImage[]) => {
         editor.update(() => {
           const node = $getNodeByKey(nodeKey) as GalleryNode | null;
           if (node) node.setImages(images);
         });
       },
-      onLayoutChange: (layout: 'grid' | 'masonry' | 'carousel') => {
+      onLayoutChange: (layout: GalleryLayout) => {
         editor.update(() => {
           const node = $getNodeByKey(nodeKey) as GalleryNode | null;
           if (node) node.setLayout(layout);

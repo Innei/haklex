@@ -1,3 +1,9 @@
+export type GalleryAspect = 'auto' | '1:1' | '4:3' | '16:9' | '3:4';
+
+export type GalleryFit = 'cover' | 'contain';
+
+export type GalleryLayout = 'grid' | 'masonry' | 'carousel';
+
 export interface GalleryImage {
   alt?: string;
   height?: number;
@@ -16,9 +22,12 @@ export interface GalleryImageClickPayload {
 export type GalleryOnImageClick = (payload: GalleryImageClickPayload) => void;
 
 export interface GalleryRendererProps {
+  aspect?: GalleryAspect;
+  fit?: GalleryFit;
   images: GalleryImage[];
-  layout: 'grid' | 'masonry' | 'carousel';
+  layout: GalleryLayout;
+  maxItemHeight?: number;
   onImageClick?: GalleryOnImageClick;
   onImagesChange?: (images: GalleryImage[]) => void;
-  onLayoutChange?: (layout: 'grid' | 'masonry' | 'carousel') => void;
+  onLayoutChange?: (layout: GalleryLayout) => void;
 }

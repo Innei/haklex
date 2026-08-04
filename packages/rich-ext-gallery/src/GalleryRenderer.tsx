@@ -5,11 +5,26 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 
 import * as css from './styles.css';
-import type { GalleryImage, GalleryOnImageClick, GalleryRendererProps } from './types';
+import type {
+  GalleryAspect,
+  GalleryFit,
+  GalleryImage,
+  GalleryLayout,
+  GalleryOnImageClick,
+  GalleryRendererProps,
+} from './types';
 
 const IMAGE_CONTAINER_MARGIN_INSET = 60;
 const CHILD_GAP = 15;
 const AUTOPLAY_DURATION = 5000;
+
+const GALLERY_ASPECT_RATIO_CSS: Record<GalleryAspect, string | undefined> = {
+  'auto': undefined,
+  '1:1': '1 / 1',
+  '4:3': '4 / 3',
+  '16:9': '16 / 9',
+  '3:4': '3 / 4',
+};
 
 function throttle<T extends (...args: any[]) => void>(func: T, wait: number): T {
   let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -37,8 +52,11 @@ function useThumbhashStyle(image: GalleryImage): React.CSSProperties | undefined
 }
 
 export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
+  aspect = 'auto',
+  fit = 'cover',
   images,
   layout,
+  maxItemHeight,
   onImageClick,
 }) => {
   const [containerRef, setContainerRef] = useState<HTMLDivElement | null>(null);
@@ -158,10 +176,14 @@ export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
       <div className={clsx(css.gallery, layoutClass)}>
         {images.map((image, index) => (
           <GalleryFigure
+            aspect={aspect}
+            fit={fit}
             image={image}
             images={images}
             index={index}
             key={index}
+            layout={layout}
+            maxItemHeight={maxItemHeight}
             onImageClick={onImageClick}
           />
         ))}
@@ -184,10 +206,14 @@ export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
       >
         {images.map((image, index) => (
           <GalleryFigure
+            aspect={aspect}
+            fit={fit}
             image={image}
             images={images}
             index={index}
             key={index}
+            layout={layout}
+            maxItemHeight={maxItemHeight}
             style={{
               width: `calc(100% - ${IMAGE_CONTAINER_MARGIN_INSET}px)`,
               marginRight: `${CHILD_GAP}px`,
@@ -228,51 +254,80 @@ export const GalleryRenderer: ComponentType<GalleryRendererProps> = ({
 };
 
 interface GalleryFigureProps {
+  aspect: GalleryAspect;
+  fit: GalleryFit;
   image: GalleryImage;
   images: GalleryImage[];
   index: number;
+  layout: GalleryLayout;
+  maxItemHeight?: number;
   onImageClick?: GalleryOnImageClick;
   style?: React.CSSProperties;
 }
 
-const GalleryFigure = memo(({ image, images, index, onImageClick, style }: GalleryFigureProps) => {
-  const thumbStyle = useThumbhashStyle(image);
-  const imgRef = useRef<HTMLImageElement>(null);
-  const interactive = Boolean(onImageClick);
+const GalleryFigure = memo(
+  ({
+    aspect,
+    fit,
+    image,
+    images,
+    index,
+    layout,
+    maxItemHeight,
+    onImageClick,
+    style,
+  }: GalleryFigureProps) => {
+    const thumbStyle = useThumbhashStyle(image);
+    const imgRef = useRef<HTMLImageElement>(null);
+    const interactive = Boolean(onImageClick);
 
-  const activate = () => {
-    if (imgRef.current) {
-      onImageClick?.({ current: image, images, index, target: imgRef.current });
-    }
-  };
+    const activate = () => {
+      if (imgRef.current) {
+        onImageClick?.({ current: image, images, index, target: imgRef.current });
+      }
+    };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault();
-    activate();
-  };
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      activate();
+    };
 
-  return (
-    <figure
-      aria-label={interactive ? `Open image: ${image.alt || 'image'}` : undefined}
-      className={css.galleryItem}
-      role={interactive ? 'button' : undefined}
-      style={{ ...thumbStyle, ...style, ...(interactive ? null : { cursor: 'default' }) }}
-      tabIndex={interactive ? 0 : undefined}
-      onClick={interactive ? activate : undefined}
-      onKeyDown={interactive ? handleKeyDown : undefined}
-    >
-      <img
-        alt={image.alt || ''}
-        height={image.height}
-        loading="lazy"
-        ref={imgRef}
-        src={image.src}
-        style={{ maxWidth: '100%', height: 'auto' }}
-        width={image.width}
-      />
-    </figure>
-  );
-});
+    const aspectRatio = layout === 'masonry' ? undefined : GALLERY_ASPECT_RATIO_CSS[aspect];
+    const imageStyle: React.CSSProperties = aspectRatio
+      ? { width: '100%', height: '100%', objectFit: fit }
+      : layout === 'masonry' && maxItemHeight !== undefined
+        ? { maxHeight: `${maxItemHeight}px`, maxWidth: '100%', width: 'auto' }
+        : { maxWidth: '100%', height: 'auto' };
+    const figureStyle: React.CSSProperties = {
+      ...thumbStyle,
+      ...style,
+      ...(aspectRatio ? { aspectRatio } : null),
+      ...(interactive ? null : { cursor: 'default' }),
+    };
+
+    return (
+      <figure
+        aria-label={interactive ? `Open image: ${image.alt || 'image'}` : undefined}
+        className={css.galleryItem}
+        role={interactive ? 'button' : undefined}
+        style={figureStyle}
+        tabIndex={interactive ? 0 : undefined}
+        onClick={interactive ? activate : undefined}
+        onKeyDown={interactive ? handleKeyDown : undefined}
+      >
+        <img
+          alt={image.alt || ''}
+          height={image.height}
+          loading="lazy"
+          ref={imgRef}
+          src={image.src}
+          style={imageStyle}
+          width={image.width}
+        />
+      </figure>
+    );
+  },
+);
 
 export default memo(GalleryRenderer);
