@@ -1,4 +1,4 @@
-import { composeEditor, type RichEditorModule } from '@haklex/rich-compose';
+import { composeEditor } from '@haklex/rich-compose';
 import { allEditorModules } from '@haklex/rich-compose/editor';
 import type { RichEditorProps } from '@haklex/rich-editor';
 import { EmbedPlugin } from '@haklex/rich-ext-embed';
@@ -9,32 +9,13 @@ import { FloatingLinkEditorPlugin } from '@haklex/rich-plugin-link-edit';
 import { LiteXmlPastePlugin } from '@haklex/rich-plugin-litexml-paste';
 import type { MentionPlatformDef } from '@haklex/rich-plugin-mention';
 import { MentionMenuPlugin } from '@haklex/rich-plugin-mention';
-import { getBuiltinItems, SlashMenuPlugin } from '@haklex/rich-plugin-slash-menu';
+import { SlashMenuPlugin } from '@haklex/rich-plugin-slash-menu';
 import { TableCellResizerPlugin, TableRowColumnHandlesPlugin } from '@haklex/rich-plugin-table';
 import { ConvertToLinkCardAction } from '@haklex/rich-renderer-linkcard';
 import type { ReactNode } from 'react';
 import { useCallback } from 'react';
 
-const nestedEditorSlashItemTitles = new Set([
-  'Text',
-  'Heading 1',
-  'Heading 2',
-  'Heading 3',
-  'Quote',
-  'Bulleted List',
-  'Numbered List',
-]);
-
-const nestedEditorSlashMenuModule: RichEditorModule = {
-  name: 'nested-editor-slash-menu',
-  nestedEditorPlugins: (
-    <SlashMenuPlugin
-      items={getBuiltinItems().filter((item) => nestedEditorSlashItemTitles.has(item.title))}
-    />
-  ),
-};
-
-const ComposedEditor = composeEditor({ modules: [...allEditorModules, nestedEditorSlashMenuModule] });
+const ComposedEditor = composeEditor({ modules: allEditorModules });
 
 export interface LexicalEditorProps extends Omit<RichEditorProps, 'actions'> {
   actions?: ReactNode;

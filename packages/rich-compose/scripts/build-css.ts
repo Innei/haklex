@@ -49,6 +49,7 @@ const MODULE_TO_PACKAGE: Record<string, string> = {
   'nested-doc': 'rich-ext-nested-doc',
   'poll': 'rich-ext-poll',
   'ruby': 'rich-renderer-ruby',
+  'slash-menu': 'rich-plugin-slash-menu',
   'video': 'rich-renderer-video',
 };
 

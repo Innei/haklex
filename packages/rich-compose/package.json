@@ -73,6 +73,8 @@
     "./modules/poll/node": "./src/modules/poll/node.ts",
     "./modules/poll/renderer": "./src/modules/poll/renderer.tsx",
     "./modules/katex/edit": "./src/modules/katex/edit.ts",
+    "./modules/slash-menu": "./src/modules/slash-menu/index.ts",
+    "./modules/slash-menu/edit": "./src/modules/slash-menu/edit.tsx",
     "./style-token": "./src/style-token/index.ts",
     "./style-token/styles": "./src/style-token/styles.ts",
     "./style.css": "./dist/style.css",
@@ -100,6 +102,7 @@
     "@haklex/rich-ext-nested-doc": "workspace:*",
     "@haklex/rich-ext-poll": "workspace:*",
     "@haklex/rich-litexml": "workspace:*",
+    "@haklex/rich-plugin-slash-menu": "workspace:*",
     "@haklex/rich-renderer-alert": "workspace:*",
     "@haklex/rich-renderer-banner": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
@@ -308,6 +311,10 @@
         "import": "./dist/modules/poll/renderer.mjs",
         "types": "./dist/modules/poll/renderer.d.ts"
       },
+      "./modules/slash-menu": {
+        "import": "./dist/modules/slash-menu/index.mjs",
+        "types": "./dist/modules/slash-menu/index.d.ts"
+      },
       "./modules/alert/edit": {
         "import": "./dist/modules/alert/edit.mjs",
         "types": "./dist/modules/alert/edit.d.ts"
@@ -375,6 +382,10 @@
       "./modules/ruby/edit": {
         "import": "./dist/modules/ruby/edit.mjs",
         "types": "./dist/modules/ruby/edit.d.ts"
+      },
+      "./modules/slash-menu/edit": {
+        "import": "./dist/modules/slash-menu/edit.mjs",
+        "types": "./dist/modules/slash-menu/edit.d.ts"
       },
       "./modules/video/edit": {
         "import": "./dist/modules/video/edit.mjs",

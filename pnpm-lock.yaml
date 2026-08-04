@@ -437,6 +437,9 @@ importers:
       '@haklex/rich-litexml':
         specifier: workspace:*
         version: link:../rich-litexml
+      '@haklex/rich-plugin-slash-menu':
+        specifier: workspace:*
+        version: link:../rich-plugin-slash-menu
       '@haklex/rich-renderer-alert':
         specifier: workspace:*
         version: link:../rich-renderer-alert

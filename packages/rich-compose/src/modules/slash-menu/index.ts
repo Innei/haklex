@@ -1,0 +1,1 @@
+export { slashMenuEditModule } from './edit';
