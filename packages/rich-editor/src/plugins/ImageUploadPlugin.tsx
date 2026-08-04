@@ -12,6 +12,7 @@ import {
   $insertNodes,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
+  type LexicalEditor,
   PASTE_COMMAND,
 } from 'lexical';
 import { Check, Info, Link2, Upload } from 'lucide-react';
@@ -90,6 +91,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   const [editor] = useLexicalComposerContext();
   const uploadRef = useRef(onUpload);
   uploadRef.current = onUpload;
+  const targetEditorRef = useRef<LexicalEditor>(editor);
   const preprocessContext = useImagePreprocess();
   const preprocessRef = preprocessContext?.ref ?? null;
   const getPreprocess = useCallback(() => preprocessRef?.current ?? null, [preprocessRef]);
@@ -133,7 +135,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   }, []);
 
   const insertByUpload = useCallback(
-    async (file: File, options?: { closeDialog?: boolean }) => {
+    async (file: File, target: LexicalEditor, options?: { closeDialog?: boolean }) => {
       if (!isImageFile(file)) return false;
 
       const closeDialog = Boolean(options?.closeDialog);
@@ -144,7 +146,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
       try {
         const [result, meta] = await Promise.all([uploadRef.current(file), computeImageMeta(file)]);
 
-        editor.update(() => {
+        target.update(() => {
           const node = $createImageNode(
             $withAdaptiveImageDisplayWidth({
               src: result.src,
@@ -175,18 +177,18 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
         setDialogUploading(false);
       }
     },
-    [editor, pushToast],
+    [pushToast],
   );
 
   const handleFiles = useCallback(
-    (files: File[], source: 'drop' | 'paste'): boolean => {
+    (files: File[], source: 'drop' | 'paste', target: LexicalEditor): boolean => {
       const images = files.filter(isImageFile);
       if (images.length === 0) return false;
 
       void (async () => {
         const targets = await resolvePreprocessTargets(images, source, getPreprocess());
         for (const file of targets) {
-          void insertByUpload(file);
+          void insertByUpload(file, target);
         }
       })();
       return true;
@@ -197,20 +199,20 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   useEffect(() => {
     const unregisterDragDrop = editor.registerCommand(
       DRAG_DROP_PASTE,
-      (files: File[]) => handleFiles(files, 'drop'),
+      (files: File[], fromEditor) => handleFiles(files, 'drop', fromEditor),
       COMMAND_PRIORITY_HIGH,
     );
 
     const unregisterPaste = editor.registerCommand(
       PASTE_COMMAND,
-      (event: ClipboardEvent | InputEvent | KeyboardEvent) => {
+      (event: ClipboardEvent | InputEvent | KeyboardEvent, fromEditor) => {
         const clipboardData =
           'clipboardData' in event ? (event as ClipboardEvent).clipboardData : null;
         if (!clipboardData) return false;
 
         const files = [...clipboardData.files];
         if (files.some(isImageFile)) {
-          return handleFiles(files, 'paste');
+          return handleFiles(files, 'paste', fromEditor);
         }
         return false;
       },
@@ -219,7 +221,8 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
 
     const unregisterOpenDialog = editor.registerCommand(
       OPEN_IMAGE_UPLOAD_DIALOG_COMMAND,
-      () => {
+      (_payload, fromEditor) => {
+        targetEditorRef.current = fromEditor;
         setDialogOpen(true);
         return true;
       },
@@ -298,12 +301,12 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
     async (file: File | null) => {
       if (!file) return;
 
-      let target: File | undefined = file;
+      let uploadFile: File | undefined = file;
       if (isImageFile(file)) {
-        [target] = await resolvePreprocessTargets([file], 'dialog', getPreprocess());
+        [uploadFile] = await resolvePreprocessTargets([file], 'dialog', getPreprocess());
       }
-      if (!target) return;
-      await insertByUpload(target, { closeDialog: true });
+      if (!uploadFile) return;
+      await insertByUpload(uploadFile, targetEditorRef.current, { closeDialog: true });
     },
     [insertByUpload, getPreprocess],
   );
@@ -334,7 +337,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   const handleInsertByUrl = useCallback(() => {
     if (!urlPreview || !isSafeImageUrl(urlPreview)) return;
 
-    editor.update(() => {
+    targetEditorRef.current.update(() => {
       const node = $createImageNode(
         $withAdaptiveImageDisplayWidth({
           src: urlPreview,
@@ -348,7 +351,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
     pushToast('success', 'Image inserted');
     setDialogOpen(false);
     resetUrlState();
-  }, [editor, pushToast, resetUrlState, urlMeta, urlPreview]);
+  }, [pushToast, resetUrlState, urlMeta, urlPreview]);
 
   const helperMessage =
     pendingUploads > 0
@@ -385,6 +388,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
             resetUrlState();
             setDialogUploading(false);
             setDialogDragActive(false);
+            targetEditorRef.current = editor;
           }
         }}
       >
