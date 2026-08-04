@@ -294,7 +294,13 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
     }));
     return {
       tag: 'gallery',
-      attrs: optAttr({ ...blockId(n), layout: n.layout }),
+      attrs: optAttr({
+        ...blockId(n),
+        'layout': n.layout,
+        'aspect': n.aspect,
+        'fit': n.fit,
+        'max-item-height': n.maxItemHeight != null ? String(n.maxItemHeight) : undefined,
+      }),
       children: images,
     };
   });
