@@ -42,6 +42,7 @@
     "@types/mdast": "^4.0.4",
     "@types/node": "26.0.1",
     "@types/unist": "^3.0.3",
+    "@typescript/typescript6": "^6.0.2",
     "@vanilla-extract/css": "^1.21.1",
     "bumpp": "^12.0.0",
     "commitlint": "^21.2.1",
