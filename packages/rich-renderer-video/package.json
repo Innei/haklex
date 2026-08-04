@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-video",
-  "version": "0.32.0",
+  "version": "0.33.0",
   "description": "Video player renderer",
   "repository": {
     "type": "git",

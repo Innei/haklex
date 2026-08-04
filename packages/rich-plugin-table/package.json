@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-table",
-  "version": "0.32.0",
+  "version": "0.33.0",
   "description": "Table editing plugin",
   "repository": {
     "type": "git",
