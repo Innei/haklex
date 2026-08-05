@@ -8,6 +8,7 @@ export class SlashMenuItem extends MenuOption {
   description: string;
   keywords: string[];
   section: string;
+  nested: boolean;
   onSelect: (editor: LexicalEditor, queryString: string) => void;
 
   constructor(
@@ -17,6 +18,7 @@ export class SlashMenuItem extends MenuOption {
       description?: string;
       keywords?: string[];
       section?: string;
+      nested?: boolean;
       onSelect: (editor: LexicalEditor, queryString: string) => void;
     },
   ) {
@@ -26,6 +28,7 @@ export class SlashMenuItem extends MenuOption {
     this.description = options.description ?? '';
     this.keywords = options.keywords ?? [];
     this.section = options.section ?? 'BASIC BLOCKS';
+    this.nested = options.nested ?? true;
     this.onSelect = options.onSelect;
   }
 }

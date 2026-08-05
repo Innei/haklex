@@ -462,6 +462,41 @@ describe('custom writers', () => {
     expect(xml).toContain('<img src="/b.jpg" alt="B" />');
   });
 
+  it('gallery with non-default aspect, fit, and maxItemHeight', () => {
+    const xml = serialize([
+      {
+        type: 'gallery',
+        $: { blockId: 'g1' },
+        images: [{ src: '/a.jpg', alt: 'A' }],
+        layout: 'masonry',
+        aspect: '16:9',
+        fit: 'contain',
+        maxItemHeight: 480,
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain(
+      '<gallery id="g1" layout="masonry" aspect="16:9" fit="contain" max-item-height="480">',
+    );
+  });
+
+  it('gallery omits aspect and fit at their defaults, and unset maxItemHeight', () => {
+    const xml = serialize([
+      {
+        type: 'gallery',
+        images: [{ src: '/a.jpg', alt: 'A' }],
+        layout: 'grid',
+        aspect: 'auto',
+        fit: 'cover',
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain('<gallery layout="grid">');
+    expect(xml).not.toContain('aspect');
+    expect(xml).not.toContain('fit');
+    expect(xml).not.toContain('max-item-height');
+  });
+
   it('excalidraw', () => {
     const xml = serialize([
       {

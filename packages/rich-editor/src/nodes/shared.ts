@@ -4,8 +4,10 @@ import { AutoLinkNode, LinkNode } from '@lexical/link';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { TableCellNode, TableNode, TableRowNode } from '@lexical/table';
-import type { Klass, LexicalNode, LexicalNodeReplacement } from 'lexical';
+import type { Klass, LexicalEditor, LexicalNode, LexicalNodeReplacement } from 'lexical';
+import { $getEditor, createEditor } from 'lexical';
 
+import { editorTheme } from '../styles/theme';
 import { FootnoteNode } from './FootnoteNode';
 import { KaTeXInlineNode } from './KaTeXInlineNode';
 import { MentionNode } from './MentionNode';
@@ -33,3 +35,22 @@ export const NESTED_EDITOR_NODES: Array<Klass<LexicalNode> | LexicalNodeReplacem
   KaTeXInlineNode,
   TagNode,
 ];
+
+function $tryGetEditor(): LexicalEditor | null {
+  try {
+    return $getEditor();
+  } catch {
+    return null;
+  }
+}
+
+export function createNestedEditor(fallbackNamespace: string): LexicalEditor {
+  // no-arg createEditor() inherits the active editor's node registry and parent link
+  if ($tryGetEditor()) return createEditor();
+  return createEditor({
+    namespace: fallbackNamespace,
+    nodes: NESTED_EDITOR_NODES,
+    theme: editorTheme,
+    onError: (error: Error) => console.error(`[${fallbackNamespace}]`, error),
+  });
+}

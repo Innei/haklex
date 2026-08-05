@@ -32,6 +32,25 @@ function imageLayoutAttr(el: Element): string | undefined {
   return v !== null && IMAGE_LAYOUTS.has(v) ? v : undefined;
 }
 
+// Duplicated from @haklex/rich-ext-gallery types (not a dependency of this package)
+const GALLERY_ASPECTS = new Set(['auto', '1:1', '4:3', '16:9', '3:4']);
+const GALLERY_FITS = new Set(['cover', 'contain']);
+
+function galleryAspectAttr(el: Element): string {
+  const v = el.getAttribute('aspect');
+  return v !== null && GALLERY_ASPECTS.has(v) ? v : 'auto';
+}
+
+function galleryFitAttr(el: Element): string {
+  const v = el.getAttribute('fit');
+  return v !== null && GALLERY_FITS.has(v) ? v : 'cover';
+}
+
+function galleryMaxItemHeightAttr(el: Element): number | undefined {
+  const v = numAttr(el, 'max-item-height');
+  return v !== undefined && Number.isFinite(v) && v > 0 ? v : undefined;
+}
+
 /**
  * Extract CDATA text content from an element.
  * linkedom (HTML parser) converts <![CDATA[...]]> to a comment node
@@ -358,6 +377,9 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       ...extractBlockId(el),
       images,
       layout: el.getAttribute('layout') ?? 'grid',
+      aspect: galleryAspectAttr(el),
+      fit: galleryFitAttr(el),
+      maxItemHeight: galleryMaxItemHeightAttr(el),
       version: 1,
     } as any;
   });

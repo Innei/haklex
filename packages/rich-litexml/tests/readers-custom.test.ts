@@ -183,6 +183,34 @@ describe('custom readers', () => {
     expect(nodes[0].images[0].src).toBe('/a.jpg');
   });
 
+  it('reads <gallery> with no new attributes and applies defaults', () => {
+    const nodes = parse('<gallery layout="grid"><img src="/a.jpg" alt="A" /></gallery>');
+    expect(nodes[0].aspect).toBe('auto');
+    expect(nodes[0].fit).toBe('cover');
+    expect(nodes[0].maxItemHeight).toBeUndefined();
+  });
+
+  it('reads <gallery> aspect, fit, and max-item-height', () => {
+    const nodes = parse(
+      '<gallery layout="masonry" aspect="16:9" fit="contain" max-item-height="480"><img src="/a.jpg" alt="A" /></gallery>',
+    );
+    expect(nodes[0].aspect).toBe('16:9');
+    expect(nodes[0].fit).toBe('contain');
+    expect(nodes[0].maxItemHeight).toBe(480);
+  });
+
+  it('rejects invalid <gallery> aspect, fit, and max-item-height values', () => {
+    const nodes = parse(
+      '<gallery aspect="banana" fit="squish" max-item-height="-3"><img src="/a.jpg" alt="A" /></gallery>',
+    );
+    expect(nodes[0].aspect).toBe('auto');
+    expect(nodes[0].fit).toBe('cover');
+    expect(nodes[0].maxItemHeight).toBeUndefined();
+
+    const nodes2 = parse('<gallery max-item-height="abc"><img src="/a.jpg" alt="A" /></gallery>');
+    expect(nodes2[0].maxItemHeight).toBeUndefined();
+  });
+
   it('reads <code-snippet>', () => {
     const nodes = parse(
       '<code-snippet id="cs1"><file name="index.ts" lang="ts">export {}</file></code-snippet>',

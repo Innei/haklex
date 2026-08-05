@@ -117,6 +117,26 @@ describe('roundtrip', () => {
     expect(result).toContain('</grid>');
   });
 
+  it('gallery roundtrip with aspect, fit, and max-item-height', () => {
+    const input =
+      '<gallery id="g1" layout="masonry" aspect="16:9" fit="contain" max-item-height="480"><img src="/a.jpg" alt="A" /><img src="/b.jpg" alt="B" /></gallery>';
+    const result = roundtrip(input);
+    expect(result).toContain(
+      '<gallery id="g1" layout="masonry" aspect="16:9" fit="contain" max-item-height="480">',
+    );
+    expect(result).toContain('<img src="/a.jpg" alt="A" />');
+    expect(result).toContain('<img src="/b.jpg" alt="B" />');
+  });
+
+  it('legacy gallery with no new attributes survives unchanged', () => {
+    const input = '<gallery layout="grid"><img src="/a.jpg" alt="A" /></gallery>';
+    const result = roundtrip(input);
+    expect(result).toContain('<gallery layout="grid">');
+    expect(result).not.toContain('aspect');
+    expect(result).not.toContain('fit');
+    expect(result).not.toContain('max-item-height');
+  });
+
   it('agent-diff roundtrip', () => {
     const result = roundtrip('<agent-diff id="ad1" op="insert" entry="d1" />');
     expect(result).toContain('<agent-diff');

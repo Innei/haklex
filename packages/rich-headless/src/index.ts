@@ -345,10 +345,17 @@ export const CodeSnippetNode = headlessDecorator('code-snippet', ['files'], {
   files: [],
 });
 
-export const GalleryNode = headlessDecorator('gallery', ['images', 'layout'], {
-  images: [],
-  layout: 'grid',
-});
+export const GalleryNode = headlessDecorator(
+  'gallery',
+  ['images', 'layout', 'aspect', 'fit', 'maxItemHeight'],
+  {
+    images: [],
+    layout: 'grid',
+    aspect: 'auto',
+    fit: 'cover',
+    maxItemHeight: undefined,
+  },
+);
 
 export const ExcalidrawNode = headlessDecorator('excalidraw', ['snapshot'], {
   snapshot: '',

@@ -2,4 +2,10 @@ import './styles.css';
 
 export * from './augment';
 export { default, GalleryRenderer } from './GalleryRenderer';
-export type { GalleryImage, GalleryRendererProps } from './types';
+export type {
+  GalleryAspect,
+  GalleryFit,
+  GalleryImage,
+  GalleryLayout,
+  GalleryRendererProps,
+} from './types';

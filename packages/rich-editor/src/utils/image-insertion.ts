@@ -1,5 +1,11 @@
 import { $getTableCellNodeFromLexicalNode } from '@lexical/table';
-import { $getSelection, $isNodeSelection, $isRangeSelection, type LexicalNode } from 'lexical';
+import {
+  $getEditor,
+  $getSelection,
+  $isNodeSelection,
+  $isRangeSelection,
+  type LexicalNode,
+} from 'lexical';
 
 import type { ImageNodePayload } from '../nodes/ImageNode';
 
@@ -22,8 +28,12 @@ export function $isSelectionInTableCell(): boolean {
   return anchorNode ? $getTableCellNodeFromLexicalNode(anchorNode) !== null : false;
 }
 
+export function $isInNestedEditor(): boolean {
+  return $getEditor()._parentEditor !== null;
+}
+
 export function $withAdaptiveImageDisplayWidth(payload: ImageNodePayload): ImageNodePayload {
-  if (payload.displayWidth !== undefined || !$isSelectionInTableCell()) {
+  if (payload.displayWidth !== undefined || (!$isSelectionInTableCell() && !$isInNestedEditor())) {
     return payload;
   }
 

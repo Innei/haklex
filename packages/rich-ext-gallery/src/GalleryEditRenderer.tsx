@@ -23,9 +23,11 @@ import type { CSSProperties, DragEvent as ReactDragEvent, FC } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { GalleryDialogSubHeader } from './GalleryDialogSubHeader';
 import { GalleryRenderer } from './GalleryRenderer';
+import { parseMaxItemHeightInput } from './maxItemHeight';
 import * as css from './styles.css';
-import type { GalleryImage, GalleryRendererProps } from './types';
+import type { GalleryAspect, GalleryFit, GalleryImage, GalleryRendererProps } from './types';
 
 type LayoutType = 'grid' | 'masonry' | 'carousel';
 
@@ -211,17 +213,41 @@ const DragOverlayCard: FC<{ image: GalleryImage }> = ({ image }) => (
 
 const GalleryEditorDialogContent: FC<{
   dismiss: () => void;
+  initialAspect: GalleryAspect;
+  initialFit: GalleryFit;
   initialImages: GalleryImage[];
   initialLayout: LayoutType;
+  initialMaxItemHeight: number | undefined;
   uploader: ImageUploadFn | null;
+  onAspectChange?: (aspect: GalleryAspect) => void;
+  onFitChange?: (fit: GalleryFit) => void;
   onImagesChange: (images: GalleryImage[]) => void;
   onLayoutChange: (layout: LayoutType) => void;
-}> = ({ dismiss, initialImages, initialLayout, uploader, onImagesChange, onLayoutChange }) => {
+  onMaxItemHeightChange?: (maxItemHeight: number | undefined) => void;
+}> = ({
+  dismiss,
+  initialAspect,
+  initialFit,
+  initialImages,
+  initialLayout,
+  initialMaxItemHeight,
+  uploader,
+  onAspectChange,
+  onFitChange,
+  onImagesChange,
+  onLayoutChange,
+  onMaxItemHeightChange,
+}) => {
   const { className: portalClassName } = usePortalTheme();
   const [entries, setEntries] = useState<ImageEntry[]>(() =>
     initialImages.map((img) => ({ id: genId(), image: { ...img } })),
   );
   const [layout, setLayout] = useState<LayoutType>(initialLayout);
+  const [aspect, setAspect] = useState<GalleryAspect>(initialAspect);
+  const [fit, setFit] = useState<GalleryFit>(initialFit);
+  const [maxItemHeightInput, setMaxItemHeightInput] = useState(
+    initialMaxItemHeight === undefined ? '' : String(initialMaxItemHeight),
+  );
   const newInputRef = useRef<HTMLInputElement>(null);
   const [dragActiveId, setDragActiveId] = useState<string | null>(null);
   const [bodyDropActive, setBodyDropActive] = useState(false);
@@ -307,8 +333,23 @@ const GalleryEditorDialogContent: FC<{
     const filtered = entries.map((e) => e.image).filter((img) => img.src.trim());
     onImagesChange(filtered);
     onLayoutChange(layout);
+    onAspectChange?.(aspect);
+    onFitChange?.(fit);
+    onMaxItemHeightChange?.(parseMaxItemHeightInput(maxItemHeightInput));
     dismiss();
-  }, [entries, layout, onImagesChange, onLayoutChange, dismiss]);
+  }, [
+    entries,
+    layout,
+    aspect,
+    fit,
+    maxItemHeightInput,
+    onImagesChange,
+    onLayoutChange,
+    onAspectChange,
+    onFitChange,
+    onMaxItemHeightChange,
+    dismiss,
+  ]);
 
   const dragActiveEntry = dragActiveId ? entries.find((e) => e.id === dragActiveId) : null;
 
@@ -353,6 +394,16 @@ const GalleryEditorDialogContent: FC<{
           <X size={18} />
         </button>
       </div>
+
+      <GalleryDialogSubHeader
+        aspect={aspect}
+        fit={fit}
+        layout={layout}
+        maxItemHeightInput={maxItemHeightInput}
+        onAspectChange={setAspect}
+        onFitChange={setFit}
+        onMaxItemHeightInputChange={setMaxItemHeightInput}
+      />
 
       {/* Body */}
       <div
@@ -452,10 +503,16 @@ const GalleryEditorDialogContent: FC<{
 // ── Main component ───────────────────────────────────────────
 
 export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
+  aspect,
+  fit,
   images,
   layout,
+  maxItemHeight,
+  onAspectChange,
+  onFitChange,
   onImagesChange,
   onLayoutChange,
+  onMaxItemHeightChange,
 }) => {
   const { className: portalClassName } = usePortalTheme();
   const theme = useColorScheme();
@@ -467,11 +524,17 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
       content: ({ dismiss }) => (
         <GalleryEditorDialogContent
           dismiss={dismiss}
+          initialAspect={aspect ?? 'auto'}
+          initialFit={fit ?? 'cover'}
           initialImages={images}
           initialLayout={layout}
+          initialMaxItemHeight={maxItemHeight}
           uploader={uploader}
+          onAspectChange={onAspectChange}
+          onFitChange={onFitChange}
           onImagesChange={onImagesChange}
           onLayoutChange={onLayoutChange}
+          onMaxItemHeightChange={onMaxItemHeightChange}
         />
       ),
       className: css.galleryDialogPopup,
@@ -480,10 +543,32 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
       showCloseButton: false,
       clickOutsideToDismiss: false,
     });
-  }, [images, layout, onImagesChange, onLayoutChange, portalClassName, theme, uploader]);
+  }, [
+    aspect,
+    fit,
+    images,
+    layout,
+    maxItemHeight,
+    onAspectChange,
+    onFitChange,
+    onImagesChange,
+    onLayoutChange,
+    onMaxItemHeightChange,
+    portalClassName,
+    theme,
+    uploader,
+  ]);
 
   if (!onImagesChange) {
-    return <GalleryRenderer images={images} layout={layout} />;
+    return (
+      <GalleryRenderer
+        aspect={aspect}
+        fit={fit}
+        images={images}
+        layout={layout}
+        maxItemHeight={maxItemHeight}
+      />
+    );
   }
 
   if (images.length === 0) {
@@ -505,7 +590,13 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
 
   return (
     <div className={css.galleryEditContainer}>
-      <GalleryRenderer images={images} layout={layout} />
+      <GalleryRenderer
+        aspect={aspect}
+        fit={fit}
+        images={images}
+        layout={layout}
+        maxItemHeight={maxItemHeight}
+      />
       <button className={css.galleryEditOverlay} type="button" onClick={handleOpenEditor}>
         <span className={css.galleryEditLabel}>
           <Pencil size={16} />

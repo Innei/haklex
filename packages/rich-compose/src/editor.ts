@@ -15,6 +15,7 @@ import { mermaidEditModule } from './modules/mermaid/edit';
 import { nestedDocEditModule } from './modules/nested-doc/edit';
 import { pollEditModule } from './modules/poll/edit';
 import { rubyEditModule } from './modules/ruby/edit';
+import { slashMenuEditModule } from './modules/slash-menu/edit';
 import { videoEditModule } from './modules/video/edit';
 
 export {
@@ -35,6 +36,7 @@ export {
   nestedDocEditModule,
   pollEditModule,
   rubyEditModule,
+  slashMenuEditModule,
   videoEditModule,
 };
 
@@ -56,5 +58,6 @@ export const allEditorModules = [
   nestedDocEditModule,
   pollEditModule,
   rubyEditModule,
+  slashMenuEditModule,
   videoEditModule,
 ];

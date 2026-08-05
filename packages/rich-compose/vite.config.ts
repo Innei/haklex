@@ -62,6 +62,8 @@ export default createViteConfig({
     'modules/poll/edit': 'src/modules/poll/edit.ts',
     'modules/ruby/edit': 'src/modules/ruby/edit.ts',
     'modules/video/edit': 'src/modules/video/edit.ts',
+    'modules/slash-menu/index': 'src/modules/slash-menu/index.ts',
+    'modules/slash-menu/edit': 'src/modules/slash-menu/edit.tsx',
     'style-token/index': 'src/style-token/index.ts',
     'style-token/styles': 'src/style-token/styles.ts',
   },

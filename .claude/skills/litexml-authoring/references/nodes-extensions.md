@@ -66,11 +66,12 @@ Every block-level extension may carry `id="..."` → `$.blockId`. Omit for fresh
 - **When**: A related image set displayed together.
 - **Avoid when**: A single figure — use `<img>`.
 - **Required**: one or more `<img>` children.
-- **Optional**: `id`, `layout` (defaults to `grid`).
+- **Optional**: `id`, `layout` (defaults to `grid`; also `masonry`, `carousel`), `aspect` (`auto` default | `1:1` | `4:3` | `16:9` | `3:4`), `fit` (`cover` default | `contain`), `max-item-height` (numeric px).
 - **Body**: only `<img src="..." alt="..." />` children. Other tags are ignored.
+- `aspect` and `fit` apply to `grid` and `carousel` layouts only; `max-item-height` applies to `masonry` only. Invalid `aspect`/`fit` values fall back to their defaults.
 
 ```xml
-<gallery layout="grid">
+<gallery layout="grid" aspect="1:1" fit="cover">
   <img src="/a.jpg" alt="A" />
   <img src="/b.jpg" alt="B" />
   <img src="/c.jpg" alt="C" />

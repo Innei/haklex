@@ -35,6 +35,7 @@ export class NestedDocEditNode extends NestedDocNode {
       icon: createElement(FileText, { size: 20 }),
       description: 'Embed a collapsible nested document',
       keywords: ['nested', 'document', 'nested-doc', 'embed'],
+      nested: false,
       section: 'ADVANCED',
       placement: ['slash', 'toolbar'],
       group: 'insert',

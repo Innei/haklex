@@ -1,44 +1,44 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { globalStyle, style } from '@vanilla-extract/css'
+import { vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
 // ─── Root ────────────────────────────────────────────────
 export const gallery = style({
   position: 'relative',
   width: '100%',
   margin: '16px 0',
-})
+});
 
 // ─── Grid ────────────────────────────────────────────────
 export const galleryGrid = style({
-  display: 'grid',
-  gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
-  gap: 12,
+  'display': 'grid',
+  'gridTemplateColumns': 'repeat(auto-fill, minmax(200px, 1fr))',
+  'gap': 12,
   '@media': {
     '(max-width: 480px)': {
       gridTemplateColumns: '1fr',
     },
   },
-})
+});
 
 // ─── Masonry ─────────────────────────────────────────────
 export const galleryMasonry = style({
-  columnCount: 3,
-  columnGap: 12,
+  'columnCount': 3,
+  'columnGap': 12,
   '@media': {
     '(max-width: 768px)': { columnCount: 2 },
     '(max-width: 480px)': { columnCount: 1 },
   },
-})
+});
 
 globalStyle(`${galleryMasonry} figure`, {
   breakInside: 'avoid',
   marginBottom: 12,
-})
+});
 
 // ─── Carousel ────────────────────────────────────────────
 export const galleryCarousel = style({
   position: 'relative',
-})
+});
 
 export const galleryContainer = style({
   width: '100%',
@@ -50,7 +50,7 @@ export const galleryContainer = style({
   selectors: {
     '&::-webkit-scrollbar': { display: 'none' },
   },
-})
+});
 
 export const galleryItem = style({
   display: 'inline-block',
@@ -60,12 +60,12 @@ export const galleryItem = style({
   selectors: {
     '&:hover': { transform: 'scale(1.02)' },
   },
-})
+});
 
 globalStyle(`${galleryItem} img`, {
   display: 'block',
   borderRadius: 4,
-})
+});
 
 // ─── Nav ─────────────────────────────────────────────────
 export const galleryNav = style({
@@ -84,10 +84,10 @@ export const galleryNav = style({
   cursor: 'pointer',
   backdropFilter: 'blur(20px) saturate(180%)',
   zIndex: 10,
-})
+});
 
-export const galleryNavPrev = style({ left: 8 })
-export const galleryNavNext = style({ right: 8 })
+export const galleryNavPrev = style({ left: 8 });
+export const galleryNavNext = style({ right: 8 });
 
 // ─── Indicators ──────────────────────────────────────────
 export const galleryIndicators = style({
@@ -98,7 +98,7 @@ export const galleryIndicators = style({
   display: 'flex',
   gap: 8,
   zIndex: 10,
-})
+});
 
 export const galleryIndicator = style({
   width: 6,
@@ -112,11 +112,11 @@ export const galleryIndicator = style({
   selectors: {
     '&:hover': { opacity: 1 },
   },
-})
+});
 
 export const galleryIndicatorActive = style({
   opacity: 1,
-})
+});
 
 // ─── Edit Container ─────────────────────────────────────
 export const galleryEditContainer = style({
@@ -127,23 +127,23 @@ export const galleryEditContainer = style({
   overflow: 'hidden',
   border: `1px solid ${vars.color.border}`,
   minHeight: 120,
-})
+});
 
 export const galleryEditOverlay = style({
-  position: 'absolute',
-  inset: 0,
-  zIndex: 5,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-  background: 'transparent',
-  border: 'none',
-  transition: 'background 0.2s',
+  'position': 'absolute',
+  'inset': 0,
+  'zIndex': 5,
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'cursor': 'pointer',
+  'background': 'transparent',
+  'border': 'none',
+  'transition': 'background 0.2s',
   ':hover': {
     background: 'color-mix(in srgb, currentColor 6%, transparent)',
   },
-})
+});
 
 export const galleryEditLabel = style({
   display: 'flex',
@@ -163,7 +163,7 @@ export const galleryEditLabel = style({
       opacity: 1,
     },
   },
-})
+});
 
 export const galleryEmptyState = style({
   display: 'flex',
@@ -175,32 +175,32 @@ export const galleryEmptyState = style({
   color: vars.color.textSecondary,
   fontSize: vars.typography.fontSizeMd,
   minHeight: 120,
-})
+});
 
 // ─── Dialog (fullscreen popup) ──────────────────────────
-const _galleryDialogPopup = style({})
+const _galleryDialogPopup = style({});
 globalStyle(`${_galleryDialogPopup}${_galleryDialogPopup}`, {
-  padding: 0,
-  gap: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-  width: 'calc(100vw - 2rem)',
-  height: 'min(720px, 85vh)',
-  borderRadius: '0.5rem',
+  'padding': 0,
+  'gap': 0,
+  'display': 'flex',
+  'flexDirection': 'column',
+  'overflow': 'hidden',
+  'width': 'calc(100vw - 2rem)',
+  'height': 'min(720px, 85vh)',
+  'borderRadius': '0.5rem',
   '@media': {
     '(min-width: 640px)': {
       maxWidth: '56rem',
     },
   },
-})
+});
 globalStyle(`${_galleryDialogPopup}${_galleryDialogPopup}[data-open]`, {
   animation: 'none',
-})
+});
 globalStyle(`${_galleryDialogPopup}${_galleryDialogPopup}[data-closed]`, {
   animation: 'none',
-})
-export { _galleryDialogPopup as galleryDialogPopup }
+});
+export { _galleryDialogPopup as galleryDialogPopup };
 
 // ─── Dialog header ──────────────────────────────────────
 export const galleryDialogHeader = style({
@@ -211,7 +211,7 @@ export const galleryDialogHeader = style({
   padding: '0 12px 0 16px',
   borderBottom: `1px solid ${vars.color.border}`,
   gap: 10,
-})
+});
 
 export const galleryDialogTitle = style({
   display: 'flex',
@@ -221,34 +221,55 @@ export const galleryDialogTitle = style({
   fontWeight: 600,
   color: vars.color.text,
   lineHeight: 1,
-})
+});
 
 export const galleryHeaderActions = style({
   marginLeft: 'auto',
   display: 'flex',
   alignItems: 'center',
   gap: 2,
-})
+});
 
-export const galleryHeaderClose = style({
-  marginLeft: 8,
-  flexShrink: 0,
+export const galleryDialogSubHeader = style({
   display: 'flex',
   alignItems: 'center',
-  justifyContent: 'center',
-  width: 32,
-  height: 32,
-  borderRadius: 6,
-  border: 'none',
-  background: 'transparent',
+  gap: 16,
+  padding: '8px 16px',
+  borderBottom: `1px solid ${vars.color.border}`,
+  flexShrink: 0,
+});
+
+export const galleryDialogSubHeaderGroup = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+});
+
+export const galleryDialogSubHeaderLabel = style({
+  fontSize: vars.typography.fontSizeXs,
   color: vars.color.textSecondary,
-  cursor: 'pointer',
-  transition: 'background 0.15s, color 0.15s',
+  flexShrink: 0,
+});
+
+export const galleryHeaderClose = style({
+  'marginLeft': 8,
+  'flexShrink': 0,
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 32,
+  'height': 32,
+  'borderRadius': 6,
+  'border': 'none',
+  'background': 'transparent',
+  'color': vars.color.textSecondary,
+  'cursor': 'pointer',
+  'transition': 'background 0.15s, color 0.15s',
   ':hover': {
     background: 'color-mix(in srgb, currentColor 8%, transparent)',
     color: vars.color.text,
   },
-})
+});
 
 // ─── Dialog body ────────────────────────────────────────
 export const galleryDialogBody = style({
@@ -256,13 +277,13 @@ export const galleryDialogBody = style({
   minHeight: 0,
   overflowY: 'auto',
   padding: '1rem',
-})
+});
 
 export const galleryImageList = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '0.75rem',
-})
+});
 
 // ─── Image card ─────────────────────────────────────────
 export const galleryImageCard = style({
@@ -273,20 +294,20 @@ export const galleryImageCard = style({
   borderRadius: '0.5rem',
   border: `1px solid ${vars.color.border}`,
   background: `color-mix(in srgb, ${vars.color.text} 2%, transparent)`,
-})
+});
 
 export const galleryImageDragHandle = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 24,
-  height: 24,
-  flexShrink: 0,
-  color: vars.color.textSecondary,
-  cursor: 'grab',
-  marginTop: 4,
-  borderRadius: 4,
-  transition: 'background 0.15s, color 0.15s',
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 24,
+  'height': 24,
+  'flexShrink': 0,
+  'color': vars.color.textSecondary,
+  'cursor': 'grab',
+  'marginTop': 4,
+  'borderRadius': 4,
+  'transition': 'background 0.15s, color 0.15s',
   ':hover': {
     background: 'color-mix(in srgb, currentColor 8%, transparent)',
     color: vars.color.text,
@@ -294,7 +315,7 @@ export const galleryImageDragHandle = style({
   ':active': {
     cursor: 'grabbing',
   },
-})
+});
 
 export const galleryImageThumb = style({
   width: 64,
@@ -306,17 +327,17 @@ export const galleryImageThumb = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-})
+});
 
 globalStyle(`${galleryImageThumb} img`, {
   width: '100%',
   height: '100%',
   objectFit: 'cover',
-})
+});
 
 export const galleryImageThumbPlaceholder = style({
   color: `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent)`,
-})
+});
 
 export const galleryImageFields = style({
   flex: 1,
@@ -324,72 +345,79 @@ export const galleryImageFields = style({
   flexDirection: 'column',
   gap: 6,
   minWidth: 0,
-})
+});
 
 export const galleryImageInput = style({
-  width: '100%',
-  padding: '4px 8px',
-  borderRadius: 4,
-  border: `1px solid ${vars.color.border}`,
-  background: vars.color.bg,
-  color: vars.color.text,
-  fontSize: vars.typography.fontSizeSm,
-  outline: 'none',
-  transition: 'border-color 0.15s',
+  'width': '100%',
+  'padding': '4px 8px',
+  'borderRadius': 4,
+  'border': `1px solid ${vars.color.border}`,
+  'background': vars.color.bg,
+  'color': vars.color.text,
+  'fontSize': vars.typography.fontSizeSm,
+  'outline': 'none',
+  'transition': 'border-color 0.15s',
   ':focus': {
     borderColor: `color-mix(in srgb, ${vars.color.text} 30%, transparent)`,
   },
   '::placeholder': {
     color: `color-mix(in srgb, ${vars.color.textSecondary} 50%, transparent)`,
   },
-})
+});
+
+export const galleryMaxHeightInput = style([
+  galleryImageInput,
+  {
+    width: 96,
+  },
+]);
 
 export const galleryImageActions = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 2,
   flexShrink: 0,
-})
+});
 
 export const galleryImageDeleteBtn = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 28,
-  height: 28,
-  borderRadius: 4,
-  border: 'none',
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  transition: 'background 0.15s, color 0.15s',
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 28,
+  'height': 28,
+  'borderRadius': 4,
+  'border': 'none',
+  'background': 'transparent',
+  'color': vars.color.textSecondary,
+  'cursor': 'pointer',
+  'transition': 'background 0.15s, color 0.15s',
   ':hover': {
     background: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
     color: vars.color.alertCaution,
   },
-})
+});
 
 // ─── Add image button ───────────────────────────────────
 export const galleryAddBtn = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 6,
-  width: '100%',
-  padding: '0.625rem',
-  borderRadius: '0.5rem',
-  border: `1px dashed ${vars.color.border}`,
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  fontSize: vars.typography.fontSizeSm,
-  cursor: 'pointer',
-  transition: 'border-color 0.15s, color 0.15s, background 0.15s',
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'gap': 6,
+  'width': '100%',
+  'padding': '0.625rem',
+  'borderRadius': '0.5rem',
+  'border': `1px dashed ${vars.color.border}`,
+  'background': 'transparent',
+  'color': vars.color.textSecondary,
+  'fontSize': vars.typography.fontSizeSm,
+  'cursor': 'pointer',
+  'transition': 'border-color 0.15s, color 0.15s, background 0.15s',
   ':hover': {
     borderColor: `color-mix(in srgb, ${vars.color.text} 20%, transparent)`,
     color: vars.color.text,
     background: `color-mix(in srgb, ${vars.color.text} 2%, transparent)`,
   },
-})
+});
 
 // ─── Dialog footer ──────────────────────────────────────
 export const galleryDialogFooter = style({
@@ -401,18 +429,18 @@ export const galleryDialogFooter = style({
   borderTop: `1px solid ${vars.color.border}`,
   flexShrink: 0,
   backgroundColor: `color-mix(in srgb, ${vars.color.text} 1.5%, transparent)`,
-})
+});
 
 export const galleryFooterInfo = style({
   fontSize: vars.typography.fontSizeXs,
   color: vars.color.textSecondary,
-})
+});
 
 export const galleryFooterActions = style({
   display: 'flex',
   alignItems: 'center',
   gap: '0.5rem',
-})
+});
 
 const galleryFooterBtnBase = style({
   padding: '0.25rem 0.75rem',
@@ -422,31 +450,31 @@ const galleryFooterBtnBase = style({
   cursor: 'pointer',
   height: 28,
   transition: 'background-color 0.15s, border-color 0.15s',
-})
+});
 
 export const galleryFooterBtnCancel = style([
   galleryFooterBtnBase,
   {
-    backgroundColor: 'transparent',
-    color: vars.color.textSecondary,
-    border: `1px solid ${vars.color.border}`,
+    'backgroundColor': 'transparent',
+    'color': vars.color.textSecondary,
+    'border': `1px solid ${vars.color.border}`,
     ':hover': {
       backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
     },
   },
-])
+]);
 
 export const galleryFooterBtnSave = style([
   galleryFooterBtnBase,
   {
-    backgroundColor: vars.color.text,
-    color: vars.color.bg,
-    border: '1px solid transparent',
+    'backgroundColor': vars.color.text,
+    'color': vars.color.bg,
+    'border': '1px solid transparent',
     ':hover': {
       backgroundColor: `color-mix(in srgb, ${vars.color.text} 85%, transparent)`,
     },
   },
-])
+]);
 
 // ─── Dialog empty state ─────────────────────────────────
 export const galleryDialogEmpty = style({
@@ -459,4 +487,4 @@ export const galleryDialogEmpty = style({
   color: vars.color.textSecondary,
   fontSize: vars.typography.fontSizeMd,
   padding: '2rem',
-})
+});

@@ -4,26 +4,18 @@ import type {
   SerializedEditorState,
   SerializedLexicalNode,
 } from 'lexical';
-import { $insertNodes, createEditor } from 'lexical';
+import { $insertNodes } from 'lexical';
 import { Info, Lightbulb, TriangleAlert as TriangleAlertIcon } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
 import { AlertEditDecorator } from '../components/decorators/AlertEditDecorator';
-import { editorTheme } from '../styles/theme';
 import type { CommandItemConfig } from '../types/slash-menu';
 import { AlertQuoteNode, type AlertType, type SerializedAlertQuoteNode } from './AlertQuoteNode';
-import { NESTED_EDITOR_NODES } from './shared';
+import { createNestedEditor } from './shared';
 
 function createContentEditor(): LexicalEditor {
-  return createEditor({
-    namespace: 'AlertContent',
-    nodes: NESTED_EDITOR_NODES,
-    theme: editorTheme,
-    onError: (error: Error) => {
-      console.error('[AlertContent]', error);
-    },
-  });
+  return createNestedEditor('AlertContent');
 }
 
 export class AlertQuoteEditNode extends AlertQuoteNode {
