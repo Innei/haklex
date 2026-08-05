@@ -2,7 +2,7 @@ let highlighterPromise: Promise<any> | null = null;
 
 function getHighlighter() {
   if (!highlighterPromise) {
-    highlighterPromise = import('shiki/bundle/web').then((mod) =>
+    highlighterPromise = import('shiki/bundle/full').then((mod) =>
       mod.createHighlighter({
         langs: [],
         themes: ['github-light', 'github-dark'],
@@ -21,7 +21,7 @@ export async function getHighlighterWithLang(language: string) {
       try {
         await highlighter.loadLanguage(language);
       } catch {
-        // Language not available in the web bundle.
+        // Language not available in the bundle.
       }
     }
   }

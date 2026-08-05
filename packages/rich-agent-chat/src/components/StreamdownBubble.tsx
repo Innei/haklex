@@ -1,6 +1,6 @@
 import { CodeBlock } from '@haklex/rich-editor-ui';
 import { code } from '@streamdown/code';
-import type { ReactElement } from 'react';
+import type { ComponentProps, ReactElement } from 'react';
 import { Streamdown } from 'streamdown';
 
 import { proseAssistant } from '../styles.css';
@@ -10,7 +10,8 @@ interface StreamdownBubbleProps {
   isStreaming: boolean;
 }
 
-const plugins = { code };
+// @streamdown/code types against its own shiki 3 while streamdown resolves the hoisted shiki 4
+const plugins = { code } as unknown as ComponentProps<typeof Streamdown>['plugins'];
 
 const components = {
   pre: ({ children, ...props }: any) => {

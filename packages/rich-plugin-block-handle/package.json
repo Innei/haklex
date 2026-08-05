@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-block-handle",
-  "version": "0.31.1",
+  "version": "0.33.0",
   "description": "Block handle plugin with add button and context menu",
   "repository": {
     "type": "git",
@@ -22,35 +22,35 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@lexical/code-core": "^0.48.0"
+    "@lexical/code-core": "^0.49.0"
   },
   "devDependencies": {
-    "@lexical/html": "^0.48.0",
-    "@lexical/list": "^0.48.0",
-    "@lexical/react": "^0.48.0",
-    "@lexical/rich-text": "^0.48.0",
-    "@lexical/selection": "^0.48.0",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vanilla-extract/css": "^1.21.1",
-    "@vanilla-extract/vite-plugin": "^5.2.5",
-    "lexical": "^0.48.0",
-    "lucide-react": "^1.26.0",
+    "@lexical/html": "^0.49.0",
+    "@lexical/list": "^0.49.0",
+    "@lexical/react": "^0.49.0",
+    "@lexical/rich-text": "^0.49.0",
+    "@lexical/selection": "^0.49.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vanilla-extract/css": "^1.21.2",
+    "@vanilla-extract/vite-plugin": "^5.2.6",
+    "lexical": "^0.49.0",
+    "lucide-react": "^1.28.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.0.3",
-    "vite": "^8.1.5"
+    "vite": "^8.2.0"
   },
   "peerDependencies": {
     "@haklex/rich-editor-ui": "workspace:^",
     "@haklex/rich-style-token": "workspace:^",
-    "@lexical/html": "^0.47.0",
-    "@lexical/list": "^0.47.0",
-    "@lexical/react": "^0.47.0",
-    "@lexical/rich-text": "^0.47.0",
-    "@lexical/selection": "^0.47.0",
-    "lexical": "^0.47.0",
+    "@lexical/html": "^0.49.0",
+    "@lexical/list": "^0.49.0",
+    "@lexical/react": "^0.49.0",
+    "@lexical/rich-text": "^0.49.0",
+    "@lexical/selection": "^0.49.0",
+    "lexical": "^0.49.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"

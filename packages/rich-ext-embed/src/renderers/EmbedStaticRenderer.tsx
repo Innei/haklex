@@ -60,7 +60,7 @@ function getLangFromPath(path: string): string {
 }
 
 // Pre-warm Shiki import (runs once, resolved from cache on subsequent calls)
-const shikiPromise = import('shiki/bundle/web').catch(() => null);
+const shikiPromise = import('shiki/bundle/full').catch(() => null);
 
 export interface EmbedStaticRendererProps {
   type: EmbedType | null;
