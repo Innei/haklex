@@ -31,6 +31,7 @@ export { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';
 export { MarkdownShortcutsPlugin } from './plugins/MarkdownShortcutsPlugin';
 export { MermaidPlugin } from './plugins/MermaidPlugin';
 export { OnChangePlugin } from './plugins/OnChangePlugin';
+export { PasteLinkPlugin } from './plugins/PasteLinkPlugin';
 export { SubmitShortcutPlugin } from './plugins/SubmitShortcutPlugin';
 export { TextSelectionPlugin } from './plugins/TextSelectionPlugin';
 export {

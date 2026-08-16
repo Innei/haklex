@@ -10,12 +10,14 @@ import { ClickBelowPlugin } from '../plugins/ClickBelowPlugin';
 import { HorizontalRulePlugin } from '../plugins/HorizontalRulePlugin';
 import { MarkdownPastePlugin } from '../plugins/MarkdownPastePlugin';
 import { MarkdownShortcutsPlugin } from '../plugins/MarkdownShortcutsPlugin';
+import { PasteLinkPlugin } from '../plugins/PasteLinkPlugin';
 
 export function CorePlugins() {
   return (
     <>
       <ListPlugin />
       <LinkPlugin />
+      <PasteLinkPlugin />
       <TabIndentationPlugin />
       <TablePlugin hasHorizontalScroll />
       <CheckListPlugin />
