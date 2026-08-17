@@ -958,7 +958,12 @@ const imageFloatWidthFallback = '42%';
 globalStyle('figure.rich-image', {
   width: 'var(--rich-image-display-width, auto)',
   maxWidth: '100%',
+  maxHeight: 'var(--rich-image-display-height, none)',
   marginInline: 'auto',
+});
+
+globalStyle('figure.rich-image[data-display="fixed-height"]', {
+  width: 'auto',
 });
 
 globalStyle('figure.rich-image[data-layout="align-left"]', {
@@ -983,6 +988,20 @@ globalStyle('figure.rich-image[data-layout="float-right"]', {
   float: 'right',
   width: `var(--rich-image-display-width, ${imageFloatWidthFallback})`,
   margin: '0.125rem 0 0.875rem 1.25rem',
+});
+
+globalStyle(
+  'figure.rich-image[data-display="fixed-height"][data-layout="float-left"], figure.rich-image[data-display="fixed-height"][data-layout="float-right"]',
+  {
+    width: 'auto',
+  },
+);
+
+globalStyle('figure.rich-image[data-display="fixed-height"] img', {
+  width: 'auto',
+  height: 'auto',
+  maxWidth: '100%',
+  maxHeight: 'var(--rich-image-display-height)',
 });
 
 // width matches the static renderer's var() fallback for floats without

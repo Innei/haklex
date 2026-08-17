@@ -1,3 +1,8 @@
+import {
+  imageDisplayCssVars,
+  imageDisplayDataAttr,
+  resolveImageDisplaySize,
+} from '@haklex/rich-editor/nodes';
 import type { ImageRendererProps } from '@haklex/rich-editor/renderers';
 import { useRendererMode } from '@haklex/rich-editor/static';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -9,6 +14,8 @@ import {
   altTextAtom,
   captionTextAtom,
   displayWidthAtom,
+  fixedHeightAtom,
+  fixedWidthAtom,
   focusCaptionOnOpenAtom,
   frameStyleAtom,
   heightAtom,
@@ -75,7 +82,10 @@ function ImageEditContent() {
   const setReplaceOpen = useSetAtom(replaceOpenAtom);
   const setFocusCaptionOnOpen = useSetAtom(focusCaptionOnOpenAtom);
   const displayWidth = useAtomValue(displayWidthAtom);
+  const fixedWidth = useAtomValue(fixedWidthAtom);
+  const fixedHeight = useAtomValue(fixedHeightAtom);
   const layout = useAtomValue(layoutAtom);
+  const displaySize = resolveImageDisplaySize({ displayWidth, fixedWidth, fixedHeight });
   const dragLayoutProps = useImageDragLayout();
 
   const handleCaptionClick = useCallback(
@@ -93,9 +103,7 @@ function ImageEditContent() {
     [setMetaOpen, setReplaceOpen, setFocusCaptionOnOpen],
   );
 
-  const figureStyle = displayWidth
-    ? ({ '--rich-image-display-width': `${displayWidth}%` } as CSSProperties)
-    : undefined;
+  const figureStyle = imageDisplayCssVars(displaySize) as CSSProperties | undefined;
 
   return (
     <div
@@ -107,6 +115,7 @@ function ImageEditContent() {
       {src ? (
         <figure
           className={`${styles.root} ${styles.semanticClassNames.root}`}
+          data-display={imageDisplayDataAttr(displaySize)}
           data-layout={layout}
           style={figureStyle}
           {...dragLayoutProps}
@@ -122,6 +131,11 @@ function ImageEditContent() {
               loading="lazy"
               src={src}
               width={width}
+              style={
+                displaySize.mode === 'fixed-height'
+                  ? { width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }
+                  : undefined
+              }
               onError={() => setLoadState('error')}
               onLoad={() => setLoadState('loaded')}
             />

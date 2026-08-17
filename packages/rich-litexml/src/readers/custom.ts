@@ -27,6 +27,25 @@ function imageDisplayWidthAttr(el: Element): number | undefined {
   return v !== undefined && Number.isFinite(v) && v >= 10 && v <= 100 ? v : undefined;
 }
 
+function imageFixedPxAttr(el: Element, name: string): number | undefined {
+  const v = numAttr(el, name);
+  return v !== undefined && Number.isFinite(v) && v > 0 ? Math.round(v) : undefined;
+}
+
+function exclusiveImageDisplayAttrs(el: Element): {
+  displayWidth?: number;
+  fixedHeight?: number;
+  fixedWidth?: number;
+} {
+  const displayWidth = imageDisplayWidthAttr(el);
+  if (displayWidth !== undefined) return { displayWidth };
+  const fixedWidth = imageFixedPxAttr(el, 'fixed-width');
+  if (fixedWidth !== undefined) return { fixedWidth };
+  const fixedHeight = imageFixedPxAttr(el, 'fixed-height');
+  if (fixedHeight !== undefined) return { fixedHeight };
+  return {};
+}
+
 function imageLayoutAttr(el: Element): string | undefined {
   const v = el.getAttribute('layout');
   return v !== null && IMAGE_LAYOUTS.has(v) ? v : undefined;
@@ -88,7 +107,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       caption: el.getAttribute('caption') ?? undefined,
       thumbhash: el.getAttribute('thumbhash') ?? undefined,
       accent: el.getAttribute('accent') ?? undefined,
-      displayWidth: imageDisplayWidthAttr(el),
+      ...exclusiveImageDisplayAttrs(el),
       layout: imageLayoutAttr(el),
       version: 1,
     } as any;

@@ -12,6 +12,8 @@ import {
   editCaptionAtom,
   editSrcAtom,
   fileInputRefAtom,
+  fixedHeightAtom,
+  fixedWidthAtom,
   heightAtom,
   layoutAtom,
   loadStateAtom,
@@ -42,6 +44,8 @@ export function ImageEditProvider({
     s.set(thumbhashAtom, props.thumbhash);
     s.set(accentAtom, props.accent);
     s.set(displayWidthAtom, props.displayWidth);
+    s.set(fixedWidthAtom, props.fixedWidth);
+    s.set(fixedHeightAtom, props.fixedHeight);
     s.set(layoutAtom, props.layout);
     s.set(editSrcAtom, props.src);
     s.set(editAltTextAtom, props.altText);
@@ -62,6 +66,8 @@ export function ImageEditProvider({
     store.set(thumbhashAtom, props.thumbhash);
     store.set(accentAtom, props.accent);
     store.set(displayWidthAtom, props.displayWidth);
+    store.set(fixedWidthAtom, props.fixedWidth);
+    store.set(fixedHeightAtom, props.fixedHeight);
     store.set(layoutAtom, props.layout);
   }, [
     store,
@@ -73,6 +79,8 @@ export function ImageEditProvider({
     props.thumbhash,
     props.accent,
     props.displayWidth,
+    props.fixedWidth,
+    props.fixedHeight,
     props.layout,
   ]);
 

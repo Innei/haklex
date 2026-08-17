@@ -67,6 +67,18 @@ describe('roundtrip', () => {
     expect(result).toContain('layout="float-right"');
   });
 
+  it('image with fixed-width', () => {
+    const result = roundtrip('<img id="i1" src="/a.jpg" alt="Photo" fixed-width="360" />');
+    expect(result).toContain('fixed-width="360"');
+    expect(result).not.toContain('fixed-height');
+  });
+
+  it('image with fixed-height', () => {
+    const result = roundtrip('<img id="i1" src="/a.jpg" alt="Photo" fixed-height="240" />');
+    expect(result).toContain('fixed-height="240"');
+    expect(result).not.toContain('fixed-width');
+  });
+
   it('link inside paragraph', () => {
     const result = roundtrip('<p id="p1">See <a href="https://x.com">link</a></p>');
     expect(result).toContain('<a href="https://x.com">link</a>');

@@ -1,3 +1,8 @@
+import {
+  imageDisplayCssVars,
+  imageDisplayDataAttr,
+  resolveImageDisplaySize,
+} from '@haklex/rich-editor/nodes';
 import { decodeThumbHash, type ImageRendererProps } from '@haklex/rich-editor/renderers';
 import { vars } from '@haklex/rich-editor/static';
 import type { CSSProperties, KeyboardEvent, Ref } from 'react';
@@ -36,6 +41,8 @@ export function ImageRenderer({
   thumbhash,
   accent,
   displayWidth,
+  fixedWidth,
+  fixedHeight,
   layout,
   onActivate,
   ref,
@@ -53,14 +60,17 @@ export function ImageRenderer({
   if (!src) return null;
 
   const interactive = Boolean(onActivate);
+  const displaySize = resolveImageDisplaySize({ displayWidth, fixedWidth, fixedHeight });
+  const fillsFigure = displaySize.mode === 'percent' || displaySize.mode === 'fixed-width';
 
   const frameStyle: CSSProperties = {
     backgroundColor:
       state !== 'loaded' && !placeholderUrl ? accent || vars.color.bgTertiary : 'transparent',
     backgroundImage: placeholderUrl && state !== 'loaded' ? `url(${placeholderUrl})` : undefined,
     backgroundSize: 'cover',
-    width: displayWidth !== undefined ? '100%' : width ? Math.min(width, 1200) : undefined,
+    width: fillsFigure ? '100%' : width ? Math.min(width, 1200) : undefined,
     maxWidth: '100%',
+    maxHeight: displaySize.mode === 'fixed-height' ? `${displaySize.px}px` : undefined,
     ...(width && height ? { aspectRatio: `${width} / ${height}` } : {}),
   };
 
@@ -74,13 +84,12 @@ export function ImageRenderer({
     activate();
   };
 
-  const figureStyle = displayWidth
-    ? ({ '--rich-image-display-width': `${displayWidth}%` } as CSSProperties)
-    : undefined;
+  const figureStyle = imageDisplayCssVars(displaySize) as CSSProperties | undefined;
 
   return (
     <figure
       className={`${styles.root} ${styles.semanticClassNames.root}`}
+      data-display={imageDisplayDataAttr(displaySize)}
       data-layout={layout}
       ref={ref}
       style={figureStyle}
@@ -102,8 +111,14 @@ export function ImageRenderer({
           loading="lazy"
           ref={imgRef}
           src={src}
-          style={width && height ? { height: '100%', objectFit: 'cover' } : undefined}
           width={width}
+          style={
+            displaySize.mode === 'fixed-height'
+              ? { width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }
+              : width && height
+                ? { height: '100%', objectFit: 'cover' }
+                : undefined
+          }
           onError={() => setState('error')}
           onLoad={() => setState('loaded')}
         />

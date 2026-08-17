@@ -58,6 +58,37 @@ describe('custom writers', () => {
     const xml = serialize([{ type: 'image', src: '/photo.jpg', altText: 'A photo', version: 1 }]);
     expect(xml).not.toContain('display-width');
     expect(xml).not.toContain('layout');
+    expect(xml).not.toContain('fixed-width');
+    expect(xml).not.toContain('fixed-height');
+  });
+
+  it('image with fixedWidth', () => {
+    const xml = serialize([
+      {
+        type: 'image',
+        src: '/photo.jpg',
+        altText: 'A photo',
+        fixedWidth: 360,
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain('fixed-width="360"');
+    expect(xml).not.toContain('display-width');
+    expect(xml).not.toContain('fixed-height');
+  });
+
+  it('image with fixedHeight', () => {
+    const xml = serialize([
+      {
+        type: 'image',
+        src: '/photo.jpg',
+        altText: 'A photo',
+        fixedHeight: 240,
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain('fixed-height="240"');
+    expect(xml).not.toContain('fixed-width');
   });
 
   it('video', () => {

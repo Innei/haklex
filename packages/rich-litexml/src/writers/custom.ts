@@ -30,6 +30,8 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
         'thumbhash': n.thumbhash,
         'accent': n.accent,
         'display-width': n.displayWidth != null ? String(n.displayWidth) : undefined,
+        'fixed-width': n.fixedWidth != null ? String(n.fixedWidth) : undefined,
+        'fixed-height': n.fixedHeight != null ? String(n.fixedHeight) : undefined,
         'layout': n.layout,
       }),
       selfClosing: true,

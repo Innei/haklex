@@ -13,6 +13,22 @@ export {
   sanitizeImageDisplayWidth,
   sanitizeImageLayout,
 } from './nodes/ImageNode';
+export type {
+  ImageDisplayConvertContext,
+  ImageDisplayFields,
+  ImageDisplayMode,
+  ImageDisplaySize,
+} from './utils/image-display-size';
+export {
+  computeImageDisplayPixels,
+  convertImageDisplaySize,
+  imageDisplayCssVars,
+  imageDisplayDataAttr,
+  imageDisplayFieldsFromSize,
+  imageDisplaySizeAfterResize,
+  resolveImageDisplaySize,
+  sanitizeImageFixedPx,
+} from './utils/image-display-size';
 
 // KaTeX nodes
 export type { SerializedKaTeXBlockNode } from './nodes/KaTeXBlockNode';

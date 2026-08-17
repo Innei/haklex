@@ -34,6 +34,7 @@ export const root = style({
   'textAlign': 'center',
   'width': 'var(--rich-image-display-width, auto)',
   'maxWidth': '100%',
+  'maxHeight': 'var(--rich-image-display-height, none)',
   'selectors': {
     '&[data-layout="align-left"]': {
       marginLeft: 0,
@@ -55,6 +56,13 @@ export const root = style({
       width: `var(--rich-image-display-width, ${floatWidthFallback})`,
       margin: '0.125rem 0 0.875rem 1.25rem',
     },
+    '&[data-display="fixed-height"]': {
+      width: 'auto',
+    },
+    '&[data-layout="float-left"][data-display="fixed-height"], &[data-layout="float-right"][data-display="fixed-height"]':
+      {
+        width: 'auto',
+      },
   },
   '@media': {
     '(max-width: 640px)': {
@@ -158,6 +166,19 @@ export const frameStatic = style({
       transform: 'none',
     },
   },
+});
+
+globalStyle(`${root}[data-display="fixed-height"] ${image}`, {
+  width: 'auto',
+  height: 'auto',
+  maxWidth: '100%',
+  maxHeight: 'var(--rich-image-display-height)',
+});
+
+globalStyle(`${root}[data-display="fixed-height"] ${frame}`, {
+  width: 'auto',
+  maxWidth: '100%',
+  maxHeight: 'var(--rich-image-display-height)',
 });
 
 const spin = keyframes({ to: { transform: 'rotate(360deg)' } });
@@ -483,11 +504,41 @@ globalStyle(`${controlPanel}${controlPanel}`, {
   width: 'fit-content',
 });
 
+export const sizePanel = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+  gap: 2,
+  padding: 4,
+  fontFamily: vars.typography.fontFamily,
+  zIndex: 30,
+});
+
+globalStyle(`${sizePanel}${sizePanel}`, {
+  width: 272,
+});
+
+export const sizePanelRow = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 4,
+  minHeight: 26,
+});
+
+export const sizeReadout = style({
+  display: 'flex',
+  alignItems: 'center',
+  flexShrink: 0,
+  gap: 6,
+  marginLeft: 'auto',
+  paddingLeft: 8,
+});
+
 export const sizeSliderWrap = style({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
-  width: 132,
+  flex: 1,
   height: 24,
 });
 
@@ -539,12 +590,44 @@ export const sizeSliderTick = style({
   pointerEvents: 'none',
 });
 
-export const sizeValue = style({
-  minWidth: 34,
+export const sizeValueField = style({
+  boxSizing: 'border-box',
+  width: 52,
+  height: 26,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: '6px',
+  backgroundColor: vars.color.bgSecondary,
+  color: vars.color.text,
+  fontSize: vars.typography.fontSizeXs,
+  fontVariantNumeric: 'tabular-nums',
+  textAlign: 'center',
+  lineHeight: '24px',
+  overflow: 'hidden',
+});
+
+export const sizePxInput = style({
+  appearance: 'none',
+  MozAppearance: 'textfield',
+  padding: 0,
+  outline: 'none',
+  minWidth: 0,
+  selectors: {
+    '&:focus': {
+      borderColor: vars.color.textSecondary,
+    },
+  },
+});
+
+export const sizeEquiv = style({
+  boxSizing: 'border-box',
+  width: 48,
   textAlign: 'right',
   fontSize: vars.typography.fontSizeXs,
   fontVariantNumeric: 'tabular-nums',
-  color: vars.color.textSecondary,
+  color: vars.color.textTertiary,
 });
 
 export const sizeOption = style({

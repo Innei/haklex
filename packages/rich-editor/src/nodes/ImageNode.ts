@@ -16,7 +16,16 @@ import { createRendererDecoration } from '../components/RendererWrapper';
 import { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from '../plugins/image-upload-command';
 import { IMAGE_NODE_KEY } from '../types/renderer-keys';
 import type { CommandItemConfig } from '../types/slash-menu';
+import {
+  imageDisplayFieldsFromSize,
+  type ImageDisplaySize,
+  resolveImageDisplaySize,
+  sanitizeImageDisplayWidth,
+  sanitizeImageFixedPx,
+} from '../utils/image-display-size';
 import { $withAdaptiveImageDisplayWidth } from '../utils/image-insertion';
+
+export { sanitizeImageDisplayWidth } from '../utils/image-display-size';
 
 export type ImageLayout = 'align-left' | 'align-right' | 'float-left' | 'float-right';
 
@@ -30,6 +39,8 @@ export type SerializedImageNode = Spread<
     thumbhash?: string;
     accent?: string;
     displayWidth?: number;
+    fixedHeight?: number;
+    fixedWidth?: number;
     layout?: ImageLayout;
   },
   SerializedLexicalNode
@@ -52,11 +63,6 @@ function sanitizeColor(value: string | undefined): string | undefined {
   return undefined;
 }
 
-export function sanitizeImageDisplayWidth(value: number | undefined): number | undefined {
-  if (typeof value !== 'number' || !Number.isFinite(value)) return undefined;
-  return Math.round(Math.min(100, Math.max(10, value)));
-}
-
 const IMAGE_LAYOUTS: readonly ImageLayout[] = [
   'align-left',
   'align-right',
@@ -71,15 +77,36 @@ export function sanitizeImageLayout(value: string | undefined): ImageLayout | un
 function applyLayoutToDOM(
   dom: HTMLElement,
   layout: ImageLayout | undefined,
-  displayWidth: number | undefined,
+  size: ImageDisplaySize,
 ): void {
   if (layout) {
     dom.dataset.layout = layout;
   } else {
     delete dom.dataset.layout;
   }
+  if (size.mode === 'auto') {
+    delete dom.dataset.display;
+  } else {
+    dom.dataset.display = size.mode;
+  }
   const isFloat = layout === 'float-left' || layout === 'float-right';
-  dom.style.width = isFloat && displayWidth !== undefined ? `${displayWidth}%` : '';
+  if (isFloat && size.mode === 'percent') {
+    dom.style.width = `${size.value}%`;
+    dom.style.maxWidth = '';
+    return;
+  }
+  if (isFloat && size.mode === 'fixed-width') {
+    dom.style.width = `${size.px}px`;
+    dom.style.maxWidth = '100%';
+    return;
+  }
+  if (isFloat && size.mode === 'fixed-height') {
+    dom.style.width = 'auto';
+    dom.style.maxWidth = '100%';
+    return;
+  }
+  dom.style.width = '';
+  dom.style.maxWidth = '';
 }
 
 export interface ImageNodePayload {
@@ -87,6 +114,8 @@ export interface ImageNodePayload {
   altText: string;
   caption?: string;
   displayWidth?: number;
+  fixedHeight?: number;
+  fixedWidth?: number;
   height?: number;
   layout?: ImageLayout;
   src: string;
@@ -103,6 +132,8 @@ export class ImageNode extends DecoratorNode<ReactElement> {
   __thumbhash?: string;
   __accent?: string;
   __displayWidth?: number;
+  __fixedHeight?: number;
+  __fixedWidth?: number;
   __layout?: ImageLayout;
 
   static commandItems: CommandItemConfig[] = [
@@ -142,6 +173,8 @@ export class ImageNode extends DecoratorNode<ReactElement> {
         thumbhash: node.__thumbhash,
         accent: node.__accent,
         displayWidth: node.__displayWidth,
+        fixedWidth: node.__fixedWidth,
+        fixedHeight: node.__fixedHeight,
         layout: node.__layout,
       },
       node.__key,
@@ -157,20 +190,28 @@ export class ImageNode extends DecoratorNode<ReactElement> {
     this.__caption = payload.caption;
     this.__thumbhash = payload.thumbhash;
     this.__accent = sanitizeColor(payload.accent);
-    this.__displayWidth = sanitizeImageDisplayWidth(payload.displayWidth);
+    const display = imageDisplayFieldsFromSize(resolveImageDisplaySize(payload));
+    this.__displayWidth = display.displayWidth;
+    this.__fixedWidth = display.fixedWidth;
+    this.__fixedHeight = display.fixedHeight;
     this.__layout = sanitizeImageLayout(payload.layout);
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
     const div = document.createElement('div');
     div.className = 'rich-image-wrapper';
-    applyLayoutToDOM(div, this.__layout, this.__displayWidth);
+    applyLayoutToDOM(div, this.__layout, this.getDisplaySize());
     return div;
   }
 
   updateDOM(prevNode: this, dom: HTMLElement): boolean {
-    if (prevNode.__layout !== this.__layout || prevNode.__displayWidth !== this.__displayWidth) {
-      applyLayoutToDOM(dom, this.__layout, this.__displayWidth);
+    if (
+      prevNode.__layout !== this.__layout ||
+      prevNode.__displayWidth !== this.__displayWidth ||
+      prevNode.__fixedWidth !== this.__fixedWidth ||
+      prevNode.__fixedHeight !== this.__fixedHeight
+    ) {
+      applyLayoutToDOM(dom, this.__layout, this.getDisplaySize());
     }
     return false;
   }
@@ -190,6 +231,8 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       thumbhash: serializedNode.thumbhash,
       accent: serializedNode.accent,
       displayWidth: serializedNode.displayWidth,
+      fixedWidth: serializedNode.fixedWidth,
+      fixedHeight: serializedNode.fixedHeight,
       layout: serializedNode.layout,
     });
   }
@@ -206,6 +249,8 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       thumbhash: this.__thumbhash,
       accent: this.__accent,
       displayWidth: this.__displayWidth,
+      fixedWidth: this.__fixedWidth,
+      fixedHeight: this.__fixedHeight,
       layout: this.__layout,
       version: 1,
     };
@@ -242,9 +287,27 @@ export class ImageNode extends DecoratorNode<ReactElement> {
     writable.__accent = sanitizeColor(accent);
   }
 
-  setDisplayWidth(width?: number): void {
+  applyDisplaySize(size: ImageDisplaySize): void {
     const writable = this.getWritable();
-    writable.__displayWidth = sanitizeImageDisplayWidth(width);
+    const fields = imageDisplayFieldsFromSize(size);
+    writable.__displayWidth = fields.displayWidth;
+    writable.__fixedWidth = fields.fixedWidth;
+    writable.__fixedHeight = fields.fixedHeight;
+  }
+
+  setDisplayWidth(width?: number): void {
+    const value = sanitizeImageDisplayWidth(width);
+    this.applyDisplaySize(value === undefined ? { mode: 'auto' } : { mode: 'percent', value });
+  }
+
+  setFixedWidth(width?: number): void {
+    const px = sanitizeImageFixedPx(width);
+    this.applyDisplaySize(px === undefined ? { mode: 'auto' } : { mode: 'fixed-width', px });
+  }
+
+  setFixedHeight(height?: number): void {
+    const px = sanitizeImageFixedPx(height);
+    this.applyDisplaySize(px === undefined ? { mode: 'auto' } : { mode: 'fixed-height', px });
   }
 
   setLayout(layout?: ImageLayout): void {
@@ -284,6 +347,22 @@ export class ImageNode extends DecoratorNode<ReactElement> {
     return this.__displayWidth;
   }
 
+  getFixedWidth(): number | undefined {
+    return this.__fixedWidth;
+  }
+
+  getFixedHeight(): number | undefined {
+    return this.__fixedHeight;
+  }
+
+  getDisplaySize(): ImageDisplaySize {
+    return resolveImageDisplaySize({
+      displayWidth: this.__displayWidth,
+      fixedWidth: this.__fixedWidth,
+      fixedHeight: this.__fixedHeight,
+    });
+  }
+
   getLayout(): ImageLayout | undefined {
     return this.__layout;
   }
@@ -298,6 +377,8 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       thumbhash: this.__thumbhash,
       accent: this.__accent,
       displayWidth: this.__displayWidth,
+      fixedWidth: this.__fixedWidth,
+      fixedHeight: this.__fixedHeight,
       layout: this.__layout,
     });
   }

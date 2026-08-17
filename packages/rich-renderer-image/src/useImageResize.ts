@@ -1,10 +1,23 @@
-import { $isImageNode, sanitizeImageDisplayWidth } from '@haklex/rich-editor/nodes';
+import {
+  $isImageNode,
+  imageDisplayCssVars,
+  imageDisplaySizeAfterResize,
+  resolveImageDisplaySize,
+} from '@haklex/rich-editor/nodes';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useStore } from 'jotai';
 import { $getNearestNodeFromDOMNode } from 'lexical';
 import { useCallback, useEffect, useRef } from 'react';
 
-import { layoutAtom, resizingAtom, wrapperRefAtom } from './atoms';
+import {
+  displayWidthAtom,
+  fixedHeightAtom,
+  fixedWidthAtom,
+  layoutAtom,
+  resizingAtom,
+  wrapperRefAtom,
+} from './atoms';
+import { measureImageContainerWidth } from './image-metrics';
 import { semanticClassNames } from './styles.css';
 
 export type ResizeSide = 'left' | 'right';
@@ -25,15 +38,9 @@ export function useImageResize() {
       const frame = trigger.querySelector<HTMLElement>(`.${semanticClassNames.frame}`);
       const figure = trigger.querySelector<HTMLElement>('figure');
       const blockWrapper = trigger.closest<HTMLElement>('.rich-image-wrapper');
-      const container = blockWrapper?.parentElement ?? trigger.parentElement;
-      if (!frame || !figure || !container) return;
+      if (!frame || !figure) return;
 
-      // width: N% resolves against the content box, so exclude padding.
-      const containerStyle = getComputedStyle(container);
-      const containerWidth =
-        container.clientWidth -
-        Number.parseFloat(containerStyle.paddingLeft) -
-        Number.parseFloat(containerStyle.paddingRight);
+      const containerWidth = measureImageContainerWidth(trigger);
       const startWidth = frame.getBoundingClientRect().width;
       if (!containerWidth || containerWidth <= 0 || !startWidth) return;
 
@@ -57,8 +64,43 @@ export function useImageResize() {
       const prevUserSelect = document.body.style.userSelect;
       document.body.style.userSelect = 'none';
 
-      let percent = sanitizeImageDisplayWidth((startWidth / containerWidth) * 100) ?? 100;
+      const startHeight = frame.getBoundingClientRect().height;
+      const aspect = startWidth > 0 && startHeight > 0 ? startHeight / startWidth : undefined;
+      const currentMode = resolveImageDisplaySize({
+        displayWidth: store.get(displayWidthAtom),
+        fixedWidth: store.get(fixedWidthAtom),
+        fixedHeight: store.get(fixedHeightAtom),
+      }).mode;
+      let nextSize = imageDisplaySizeAfterResize(
+        currentMode,
+        startWidth,
+        startHeight,
+        containerWidth,
+      );
       let moved = false;
+
+      const applyPreview = (size: typeof nextSize) => {
+        const vars = imageDisplayCssVars(size);
+        figure.style.removeProperty('--rich-image-display-width');
+        figure.style.removeProperty('--rich-image-display-height');
+        if (vars) {
+          for (const [key, value] of Object.entries(vars)) {
+            figure.style.setProperty(key, value);
+          }
+        }
+        if (isFloat && blockWrapper) {
+          if (size.mode === 'percent') {
+            blockWrapper.style.width = `${size.value}%`;
+            blockWrapper.style.maxWidth = '';
+          } else if (size.mode === 'fixed-width') {
+            blockWrapper.style.width = `${size.px}px`;
+            blockWrapper.style.maxWidth = '100%';
+          } else if (size.mode === 'fixed-height') {
+            blockWrapper.style.width = 'auto';
+            blockWrapper.style.maxWidth = '100%';
+          }
+        }
+      };
 
       const handleMove = (moveEvent: PointerEvent) => {
         const rawDelta = moveEvent.clientX - startX;
@@ -66,12 +108,9 @@ export function useImageResize() {
         moved = true;
         const outward = side === 'left' ? -rawDelta : rawDelta;
         const nextWidth = startWidth + outward * factor;
-        percent = sanitizeImageDisplayWidth((nextWidth / containerWidth) * 100) ?? percent;
-        if (isFloat && blockWrapper) {
-          blockWrapper.style.width = `${percent}%`;
-        } else {
-          figure.style.setProperty('--rich-image-display-width', `${percent}%`);
-        }
+        const nextHeight = aspect ? nextWidth * aspect : startHeight;
+        nextSize = imageDisplaySizeAfterResize(currentMode, nextWidth, nextHeight, containerWidth);
+        applyPreview(nextSize);
       };
 
       const finish = (commit: boolean) => {
@@ -86,7 +125,7 @@ export function useImageResize() {
         editor.update(
           () => {
             const node = $getNearestNodeFromDOMNode(trigger);
-            if ($isImageNode(node)) node.setDisplayWidth(percent);
+            if ($isImageNode(node)) node.applyDisplaySize(nextSize);
           },
           // Without this tag Lexical scrolls the (possibly offscreen) caret
           // back into view on commit, yanking the scroll position.

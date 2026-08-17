@@ -44,6 +44,26 @@ describe('custom readers', () => {
     ).toBeUndefined();
   });
 
+  it('reads <img /> fixed-width and fixed-height', () => {
+    expect(parse('<img src="/a.jpg" alt="A" fixed-width="360" />')[0].fixedWidth).toBe(360);
+    expect(parse('<img src="/a.jpg" alt="A" fixed-height="240" />')[0].fixedHeight).toBe(240);
+  });
+
+  it('rejects invalid <img /> fixed-width and fixed-height', () => {
+    expect(parse('<img src="/a.jpg" alt="A" fixed-width="0" />')[0].fixedWidth).toBeUndefined();
+    expect(parse('<img src="/a.jpg" alt="A" fixed-width="-8" />')[0].fixedWidth).toBeUndefined();
+    expect(parse('<img src="/a.jpg" alt="A" fixed-height="abc" />')[0].fixedHeight).toBeUndefined();
+  });
+
+  it('keeps only display-width when multiple image size attributes are present', () => {
+    const node = parse(
+      '<img src="/a.jpg" alt="A" display-width="50" fixed-width="360" fixed-height="240" />',
+    )[0];
+    expect(node.displayWidth).toBe(50);
+    expect(node.fixedWidth).toBeUndefined();
+    expect(node.fixedHeight).toBeUndefined();
+  });
+
   it('reads <video />', () => {
     const nodes = parse('<video id="v1" src="/clip.mp4" poster="/thumb.jpg" />');
     expect(nodes[0].type).toBe('video');

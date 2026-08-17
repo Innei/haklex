@@ -24,6 +24,8 @@ export const captionAtom = atom<string | undefined>();
 export const thumbhashAtom = atom<string | undefined>();
 export const accentAtom = atom<string | undefined>();
 export const displayWidthAtom = atom<number | undefined>();
+export const fixedWidthAtom = atom<number | undefined>();
+export const fixedHeightAtom = atom<number | undefined>();
 export const layoutAtom = atom<ImageLayout | undefined>();
 
 // --- UI state ---
@@ -85,14 +87,18 @@ export const frameStyleAtom = atom<CSSProperties>((get) => {
   const width = get(widthAtom);
   const height = get(heightAtom);
   const displayWidth = get(displayWidthAtom);
+  const fixedWidth = get(fixedWidthAtom);
+  const fixedHeight = get(fixedHeightAtom);
+  const fillsFigure = displayWidth !== undefined || fixedWidth !== undefined;
   return {
     backgroundColor:
       loadState !== 'loaded' && !placeholderUrl ? accent || '#f5f5f5' : 'transparent',
     backgroundImage:
       placeholderUrl && loadState !== 'loaded' ? `url(${placeholderUrl})` : undefined,
     backgroundSize: 'cover',
-    width: displayWidth !== undefined ? '100%' : width ? Math.min(width, 1200) : undefined,
+    width: fillsFigure ? '100%' : width ? Math.min(width, 1200) : undefined,
     maxWidth: '100%',
+    maxHeight: fixedHeight !== undefined ? `${fixedHeight}px` : undefined,
     ...(width && height ? { aspectRatio: `${width} / ${height}` } : {}),
   };
 });

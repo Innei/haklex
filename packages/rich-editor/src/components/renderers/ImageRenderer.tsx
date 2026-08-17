@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import type { ImageLayout } from '../../nodes/ImageNode';
+import {
+  imageDisplayCssVars,
+  imageDisplayDataAttr,
+  resolveImageDisplaySize,
+} from '../../utils/image-display-size';
 import { decodeThumbHash } from '../../utils/thumbhash';
 
 export interface ImageRendererProps {
@@ -8,6 +13,8 @@ export interface ImageRendererProps {
   altText: string;
   caption?: string;
   displayWidth?: number;
+  fixedHeight?: number;
+  fixedWidth?: number;
   height?: number;
   layout?: ImageLayout;
   src: string;
@@ -24,6 +31,8 @@ export function ImageRenderer({
   thumbhash,
   accent,
   displayWidth,
+  fixedWidth,
+  fixedHeight,
   layout,
 }: ImageRendererProps) {
   const [loaded, setLoaded] = useState(false);
@@ -71,18 +80,25 @@ export function ImageRenderer({
     [thumbhash],
   );
 
+  const displaySize = resolveImageDisplaySize({ displayWidth, fixedWidth, fixedHeight });
+  const fillsFigure = displaySize.mode === 'percent' || displaySize.mode === 'fixed-width';
+
   const aspectStyle: React.CSSProperties = {
     ...(width && height ? { aspectRatio: `${width} / ${height}` } : {}),
     maxWidth: '100%',
-    width: displayWidth !== undefined ? '100%' : width && height ? width : undefined,
+    maxHeight: displaySize.mode === 'fixed-height' ? `${displaySize.px}px` : undefined,
+    width: fillsFigure ? '100%' : width && height ? width : undefined,
   };
 
-  const figureStyle = displayWidth
-    ? ({ '--rich-image-display-width': `${displayWidth}%` } as React.CSSProperties)
-    : undefined;
+  const figureStyle = imageDisplayCssVars(displaySize) as React.CSSProperties | undefined;
 
   return (
-    <figure className="rich-image" data-layout={layout} style={figureStyle}>
+    <figure
+      className="rich-image"
+      data-display={imageDisplayDataAttr(displaySize)}
+      data-layout={layout}
+      style={figureStyle}
+    >
       <div
         aria-label={loaded ? `Zoom image: ${altText}` : undefined}
         className={`rich-image-container${loaded ? ' rich-image-loaded' : ''}`}
@@ -104,8 +120,12 @@ export function ImageRenderer({
           height={height}
           loading="lazy"
           src={src}
-          style={{ maxWidth: '100%', height: 'auto' }}
           width={width}
+          style={
+            displaySize.mode === 'fixed-height'
+              ? { width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }
+              : { maxWidth: '100%', height: 'auto' }
+          }
           onLoad={handleLoad}
         />
       </div>
