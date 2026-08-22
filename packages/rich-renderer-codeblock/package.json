@@ -26,9 +26,9 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@codemirror/commands": "^6.10.4",
+    "@codemirror/commands": "^6.11.0",
     "@codemirror/state": "^6.7.1",
-    "@codemirror/view": "^6.43.8",
+    "@codemirror/view": "^6.43.9",
     "@haklex/cm-editor": "workspace:*",
     "@iconify-json/material-icon-theme": "^1.2.70",
     "@iconify/utils": "^3.1.4"
@@ -43,7 +43,7 @@
     "shiki": "^4.4.3",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.0.3",
-    "vite": "^8.2.1"
+    "vite": "^8.2.2"
   },
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",
