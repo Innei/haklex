@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-litexml",
-  "version": "0.36.0",
+  "version": "0.36.1",
   "description": "Bidirectional Lexical SerializedNode <-> XML conversion with plugin registry",
   "repository": {
     "type": "git",
@@ -18,10 +18,11 @@
   },
   "main": "./src/index-node.ts",
   "files": [
+    ".claude/skills/litexml-authoring",
     "dist"
   ],
   "scripts": {
-    "build": "vite build",
+    "build": "vite build && node -e \"const fs=require('node:fs');fs.rmSync('.claude',{recursive:true,force:true});fs.cpSync('../../.claude/skills/litexml-authoring','.claude/skills/litexml-authoring',{recursive:true})\"",
     "dev:build": "vite build --watch"
   },
   "dependencies": {

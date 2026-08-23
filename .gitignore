@@ -12,6 +12,7 @@ node_modules
 dist
 build
 .turbo
+/packages/rich-litexml/.claude/
 
 # misc
 .DS_Store
