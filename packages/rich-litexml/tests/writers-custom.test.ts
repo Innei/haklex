@@ -119,7 +119,7 @@ describe('custom writers', () => {
       },
     ]);
     expect(xml).toContain(
-      '<file id="f1" src="/spec.pdf" name="design-spec.pdf" size="2457600" mime-type="application/pdf" ext="pdf" />',
+      '<attachment id="f1" src="/spec.pdf" name="design-spec.pdf" size="2457600" mime-type="application/pdf" ext="pdf" />',
     );
     expect(xml).not.toContain('display=');
     const inlineXml = serialize([

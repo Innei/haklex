@@ -71,9 +71,9 @@ describe('custom readers', () => {
     expect(nodes[0].poster).toBe('/thumb.jpg');
   });
 
-  it('reads <file />', () => {
+  it('reads <attachment />', () => {
     const nodes = parse(
-      '<file src="/spec.pdf" name="design-spec.pdf" size="2457600" mime-type="application/pdf" ext="pdf" />',
+      '<attachment src="/spec.pdf" name="design-spec.pdf" size="2457600" mime-type="application/pdf" ext="pdf" />',
     );
     expect(nodes[0].type).toBe('file');
     expect(nodes[0].src).toBe('/spec.pdf');
@@ -82,7 +82,9 @@ describe('custom readers', () => {
     expect(nodes[0].mimeType).toBe('application/pdf');
     expect(nodes[0].ext).toBe('pdf');
     expect(nodes[0].display).toBe('block');
-    expect(parse('<file src="/a.md" name="a.md" display="inline" />')[0].display).toBe('inline');
+    expect(parse('<attachment src="/a.md" name="a.md" display="inline" />')[0].display).toBe(
+      'inline',
+    );
   });
 
   it('reads <codeblock>', () => {

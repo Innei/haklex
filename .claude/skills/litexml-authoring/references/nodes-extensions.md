@@ -37,6 +37,18 @@ Every block-level extension may carry `id="..."` → `$.blockId`. Omit for fresh
 <video src="/clip.mp4" poster="/thumb.jpg" />
 ```
 
+### `<attachment>` — file attachment
+
+- **When**: A downloadable file attachment (PDF, archive, document).
+- **Avoid when**: Image — use `<img>`. Playable video — use `<video>`. A code file inside `<code-snippet>` — that is the unrelated `<file>` child tag.
+- **Required**: `src`, `name` (display file name).
+- **Optional**: `id`, `size` (bytes), `mime-type`, `ext` (lowercase extension shown on the card), `display` (`inline` for an in-text chip; omit for a block card).
+- **Body**: self-closing.
+
+```xml
+<attachment src="/spec.pdf" name="design-spec.pdf" size="2457600" mime-type="application/pdf" ext="pdf" />
+```
+
 ### `<link-card>` — rich link preview
 
 - **When**: A standalone reference URL that deserves a visible card (title, description, favicon, hero image).

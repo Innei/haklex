@@ -55,6 +55,7 @@ Detailed `When` / `Avoid when` / params / body rules for each tag live in [`node
 | Paragraph, heading, list, table, link, inline format   | `<p>` / `<h*>` / `<ul>` / `<ol>` / `<table>` / `<a>` / `<b>` / `<code>` / … | structural |
 | Quote (with optional `attribution`)                    | `<blockquote>`                                                              | structural |
 | Single image / multi-image / video / embed / link card | `<img>` / `<gallery>` / `<video>` / `<embed>` / `<link-card>`               | extensions |
+| Downloadable file attachment                           | `<attachment>`                                                              | extensions |
 | Code (single / multi-file)                             | `<codeblock>` / `<code-snippet>`                                            | extensions |
 | Diagram (Mermaid / opaque)                             | `<mermaid>` / `<excalidraw>`                                                | extensions |
 | Math (inline / block)                                  | `<math>` / `<math display="block">`                                         | extensions |

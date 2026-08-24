@@ -50,7 +50,7 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
   registry.registerWriter('file', (node) => {
     const n = node as any;
     return {
-      tag: 'file',
+      tag: 'attachment',
       attrs: optAttr({
         ...blockId(n),
         'src': n.src,

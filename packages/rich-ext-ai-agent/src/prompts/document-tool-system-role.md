@@ -41,9 +41,9 @@ Use the document editing tools according to the following contract.
 - `fixed-width` / `fixed-height` are CSS pixels on one axis (the other follows aspect ratio). Use only one of `display-width`, `fixed-width`, `fixed-height`. Fixed width larger than the article column shrinks via `max-width: 100%`.
 - `layout`: `align-left` / `align-right` keep a standalone block aligned to a side; `float-left` / `float-right` float the image so following text wraps around. Omit for the default centered block.
 
-### `<file>` (file attachment)
+### `<attachment>` (file attachment)
 
-- Shape: `<file src="..." name="..." [size="bytes"] [mime-type="..."] [ext="pdf"] [display="inline"] />`
+- Shape: `<attachment src="..." name="..." [size="bytes"] [mime-type="..."] [ext="pdf"] [display="inline"] />`
 - `name` is the display file name. Omit `display` for a block card; `display="inline"` renders an in-text chip.
 - Only reference file URLs provided by the user or existing document context — never invent a `src`.
 

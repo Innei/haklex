@@ -128,7 +128,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
   );
 
   registry.registerReader(
-    'file',
+    'attachment',
     (el) =>
       ({
         type: 'file',
