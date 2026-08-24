@@ -17,6 +17,24 @@ import { useCallback } from 'react';
 
 const ComposedEditor = composeEditor({ modules: allEditorModules });
 
+async function demoFileUpload(
+  file: File,
+  opts?: { onProgress?: (percent: number) => void },
+): Promise<{ src: string }> {
+  for (let percent = 20; percent <= 80; percent += 30) {
+    opts?.onProgress?.(percent);
+    await new Promise((resolve) => setTimeout(resolve, 150));
+  }
+  const src = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error('File read failed'));
+    reader.readAsDataURL(file);
+  });
+  opts?.onProgress?.(100);
+  return { src };
+}
+
 export interface LexicalEditorProps extends Omit<RichEditorProps, 'actions'> {
   actions?: ReactNode;
   extraMentionPlatforms?: MentionPlatformDef[];
@@ -33,6 +51,7 @@ export function LexicalEditor({
   selfHostnames,
   variant = 'article',
   theme = 'light',
+  fileUpload = demoFileUpload,
   ...props
 }: LexicalEditorProps) {
   const renderLinkExtraActions = useCallback(
@@ -51,6 +70,7 @@ export function LexicalEditor({
   return (
     <ComposedEditor
       {...props}
+      fileUpload={fileUpload}
       theme={theme}
       variant={variant}
       actions={

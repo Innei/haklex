@@ -12,6 +12,7 @@ import { createElement } from 'react';
 
 import { MentionRenderer } from '../components/renderers/MentionRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
+import { markInlineDraggable } from '../plugins/inline-dnd-shared';
 import { MENTION_NODE_KEY } from '../types/renderer-keys';
 import type { SlashMenuItemConfig } from '../types/slash-menu';
 
@@ -67,6 +68,7 @@ export class MentionNode extends DecoratorNode<ReactElement> {
     el.style.display = 'inline-flex';
     el.style.alignItems = 'center';
     el.style.height = '1lh';
+    markInlineDraggable(el, this.getKey());
     return el;
   }
 

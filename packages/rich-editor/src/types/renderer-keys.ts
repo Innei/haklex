@@ -13,6 +13,7 @@
 export const ALERT_NODE_KEY = 'Alert' as const;
 export const BANNER_NODE_KEY = 'Banner' as const;
 export const CODE_BLOCK_NODE_KEY = 'CodeBlock' as const;
+export const FILE_NODE_KEY = 'File' as const;
 export const FOOTNOTE_NODE_KEY = 'Footnote' as const;
 export const FOOTNOTE_SECTION_NODE_KEY = 'FootnoteSection' as const;
 export const IMAGE_NODE_KEY = 'Image' as const;

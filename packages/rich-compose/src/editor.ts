@@ -6,6 +6,7 @@ import { codeSnippetEditModule } from './modules/code-snippet/edit';
 import { dynamicEditModule } from './modules/dynamic/edit';
 import { embedEditModule } from './modules/embed/edit';
 import { excalidrawEditModule } from './modules/excalidraw/edit';
+import { fileEditModule } from './modules/file/edit';
 import { galleryEditModule } from './modules/gallery/edit';
 import { imageEditModule } from './modules/image/edit';
 import { katexEditModule } from './modules/katex/edit';
@@ -27,6 +28,7 @@ export {
   dynamicEditModule,
   embedEditModule,
   excalidrawEditModule,
+  fileEditModule,
   galleryEditModule,
   imageEditModule,
   katexEditModule,
@@ -49,6 +51,7 @@ export const allEditorModules = [
   dynamicEditModule,
   embedEditModule,
   excalidrawEditModule,
+  fileEditModule,
   galleryEditModule,
   imageEditModule,
   katexEditModule,

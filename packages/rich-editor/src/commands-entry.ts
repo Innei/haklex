@@ -1,4 +1,5 @@
 export { INSERT_ALERT_COMMAND } from './plugins/AlertPlugin';
+export { OPEN_FILE_PICKER_COMMAND } from './plugins/file-upload-command';
 export { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from './plugins/image-upload-command';
 export { INSERT_IMAGE_COMMAND } from './plugins/ImagePlugin';
 export { INSERT_KATEX_BLOCK_COMMAND, INSERT_KATEX_INLINE_COMMAND } from './plugins/KaTeXPlugin';

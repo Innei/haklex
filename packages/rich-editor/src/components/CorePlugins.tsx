@@ -8,6 +8,7 @@ import { AutoLinkPlugin } from '../plugins/AutoLinkPlugin';
 import { BlockExitPlugin } from '../plugins/BlockExitPlugin';
 import { ClickBelowPlugin } from '../plugins/ClickBelowPlugin';
 import { HorizontalRulePlugin } from '../plugins/HorizontalRulePlugin';
+import { InlineDndPlugin } from '../plugins/InlineDndPlugin';
 import { MarkdownPastePlugin } from '../plugins/MarkdownPastePlugin';
 import { MarkdownShortcutsPlugin } from '../plugins/MarkdownShortcutsPlugin';
 import { PasteLinkPlugin } from '../plugins/PasteLinkPlugin';
@@ -22,6 +23,7 @@ export function CorePlugins() {
       <TablePlugin hasHorizontalScroll />
       <CheckListPlugin />
       <MarkdownShortcutsPlugin />
+      <InlineDndPlugin />
       <MarkdownPastePlugin />
       <BlockExitPlugin />
       <ClickBelowPlugin />

@@ -4,6 +4,10 @@ export { allEditNodes, customEditNodes } from './config-edit';
 export { getResolvedEditNodes, setResolvedEditNodes } from './node-registry';
 export { NESTED_EDITOR_NODES } from './nodes/shared';
 
+// FileNode
+export type { FileDisplay, FileNodePayload, SerializedFileNode } from './nodes/FileNode';
+export { $createFileNode, $isFileNode, fileExtFromName, FileNode } from './nodes/FileNode';
+
 // ImageNode
 export type { ImageLayout, ImageNodePayload, SerializedImageNode } from './nodes/ImageNode';
 export {

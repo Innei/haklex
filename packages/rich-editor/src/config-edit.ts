@@ -6,6 +6,7 @@ import { BannerEditNode } from './nodes/BannerEditNode';
 import { CodeBlockEditNode } from './nodes/CodeBlockEditNode';
 import { CommentNode } from './nodes/CommentNode';
 import { DetailsNode } from './nodes/DetailsNode';
+import { FileNode } from './nodes/FileNode';
 import { FootnoteNode } from './nodes/FootnoteNode';
 import { FootnoteSectionEditNode } from './nodes/FootnoteSectionEditNode';
 import { GridEditNode } from './nodes/GridEditNode';
@@ -31,6 +32,7 @@ export const customEditNodes: Array<Klass<LexicalNode> | LexicalNodeReplacement>
   FootnoteNode,
   FootnoteSectionEditNode,
   VideoNode,
+  FileNode,
   LinkCardNode,
   CommentNode,
   DetailsNode,

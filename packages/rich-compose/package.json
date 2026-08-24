@@ -23,6 +23,9 @@
     "./modules/code-block": "./src/modules/code-block/index.ts",
     "./modules/code-block/edit": "./src/modules/code-block/edit.ts",
     "./modules/code-block/renderer": "./src/modules/code-block/renderer.tsx",
+    "./modules/file": "./src/modules/file/index.ts",
+    "./modules/file/edit": "./src/modules/file/edit.ts",
+    "./modules/file/renderer": "./src/modules/file/renderer.tsx",
     "./modules/link-card": "./src/modules/link-card/index.ts",
     "./modules/link-card/edit": "./src/modules/link-card/edit.tsx",
     "./modules/link-card/renderer": "./src/modules/link-card/renderer.tsx",
@@ -106,6 +109,7 @@
     "@haklex/rich-renderer-alert": "workspace:*",
     "@haklex/rich-renderer-banner": "workspace:*",
     "@haklex/rich-renderer-codeblock": "workspace:*",
+    "@haklex/rich-renderer-file": "workspace:*",
     "@haklex/rich-renderer-image": "workspace:*",
     "@haklex/rich-renderer-katex": "workspace:*",
     "@haklex/rich-renderer-linkcard": "workspace:*",
@@ -174,6 +178,14 @@
       "./modules/code-block/renderer": {
         "import": "./dist/modules/code-block/renderer.mjs",
         "types": "./dist/modules/code-block/renderer.d.ts"
+      },
+      "./modules/file": {
+        "import": "./dist/modules/file/index.mjs",
+        "types": "./dist/modules/file/index.d.ts"
+      },
+      "./modules/file/renderer": {
+        "import": "./dist/modules/file/renderer.mjs",
+        "types": "./dist/modules/file/renderer.d.ts"
       },
       "./modules/link-card": {
         "import": "./dist/modules/link-card/index.mjs",
@@ -390,6 +402,10 @@
       "./modules/video/edit": {
         "import": "./dist/modules/video/edit.mjs",
         "types": "./dist/modules/video/edit.d.ts"
+      },
+      "./modules/file/edit": {
+        "import": "./dist/modules/file/edit.mjs",
+        "types": "./dist/modules/file/edit.d.ts"
       },
       "./style-token": {
         "import": "./dist/style-token/index.mjs",

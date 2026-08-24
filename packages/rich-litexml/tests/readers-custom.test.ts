@@ -71,6 +71,20 @@ describe('custom readers', () => {
     expect(nodes[0].poster).toBe('/thumb.jpg');
   });
 
+  it('reads <file />', () => {
+    const nodes = parse(
+      '<file src="/spec.pdf" name="design-spec.pdf" size="2457600" mime-type="application/pdf" ext="pdf" />',
+    );
+    expect(nodes[0].type).toBe('file');
+    expect(nodes[0].src).toBe('/spec.pdf');
+    expect(nodes[0].name).toBe('design-spec.pdf');
+    expect(nodes[0].size).toBe(2_457_600);
+    expect(nodes[0].mimeType).toBe('application/pdf');
+    expect(nodes[0].ext).toBe('pdf');
+    expect(nodes[0].display).toBe('block');
+    expect(parse('<file src="/a.md" name="a.md" display="inline" />')[0].display).toBe('inline');
+  });
+
   it('reads <codeblock>', () => {
     const nodes = parse('<codeblock id="cb1" lang="ts">const x = 1</codeblock>');
     expect(nodes[0].type).toBe('code-block');

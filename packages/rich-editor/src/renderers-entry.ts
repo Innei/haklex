@@ -1,6 +1,13 @@
 export type { AlertRendererProps } from './components/renderers/AlertRenderer';
 export type { BannerRendererProps } from './components/renderers/BannerRenderer';
 export type { CodeBlockRendererProps } from './components/renderers/CodeBlockRenderer';
+export type { FileRendererProps } from './components/renderers/FileRenderer';
+export {
+  fileExtension,
+  fileMetaText,
+  FileRenderer,
+  formatFileSize,
+} from './components/renderers/FileRenderer';
 export type { FootnoteRendererProps } from './components/renderers/FootnoteRenderer';
 export { FootnoteRenderer } from './components/renderers/FootnoteRenderer';
 export type { FootnoteSectionRendererProps } from './components/renderers/FootnoteSectionRenderer';
@@ -22,6 +29,7 @@ export {
   ALERT_NODE_KEY,
   BANNER_NODE_KEY,
   CODE_BLOCK_NODE_KEY,
+  FILE_NODE_KEY,
   FOOTNOTE_NODE_KEY,
   FOOTNOTE_SECTION_NODE_KEY,
   IMAGE_NODE_KEY,

@@ -1,4 +1,5 @@
 export { CorePlugins } from './components/CorePlugins';
+export { FileUploadProvider, useFileUpload } from './context/FileUploadContext';
 export {
   type ImagePreprocessContextValue,
   type ImagePreprocessFn,
@@ -16,6 +17,16 @@ export { BlockIdPlugin } from './plugins/BlockIdPlugin';
 export { blockIdState } from './plugins/BlockIdPlugin';
 export { ClickBelowPlugin, registerClickBelowCommand } from './plugins/ClickBelowPlugin';
 export { EditorRefPlugin } from './plugins/EditorRefPlugin';
+export {
+  type FileUploadEntry,
+  setFileUploadEntry,
+  useFileUploadEntry,
+} from './plugins/file-upload-store';
+export {
+  type FileUploadFn,
+  FileUploadPlugin,
+  type FileUploadResult,
+} from './plugins/FileUploadPlugin';
 export { FootnotePlugin } from './plugins/FootnotePlugin';
 export { HorizontalRulePlugin } from './plugins/HorizontalRulePlugin';
 export { ImagePlugin } from './plugins/ImagePlugin';
@@ -25,6 +36,8 @@ export {
   ImageUploadPlugin,
   type ImageUploadResult,
 } from './plugins/ImageUploadPlugin';
+export { INLINE_DRAG_ATTR, markInlineDraggable } from './plugins/inline-dnd-shared';
+export { InlineDndPlugin } from './plugins/InlineDndPlugin';
 export { KaTeXPlugin } from './plugins/KaTeXPlugin';
 export { LinkFaviconPlugin } from './plugins/LinkFaviconPlugin';
 export { MarkdownPastePlugin } from './plugins/MarkdownPastePlugin';

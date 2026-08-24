@@ -104,6 +104,30 @@ describe('custom writers', () => {
     expect(xml).toContain('<video id="v1" src="/clip.mp4" poster="/thumb.jpg" />');
   });
 
+  it('file', () => {
+    const xml = serialize([
+      {
+        type: 'file',
+        $: { blockId: 'f1' },
+        src: '/spec.pdf',
+        name: 'design-spec.pdf',
+        size: 2_457_600,
+        mimeType: 'application/pdf',
+        ext: 'pdf',
+        display: 'block',
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain(
+      '<file id="f1" src="/spec.pdf" name="design-spec.pdf" size="2457600" mime-type="application/pdf" ext="pdf" />',
+    );
+    expect(xml).not.toContain('display=');
+    const inlineXml = serialize([
+      { type: 'file', src: '/a.md', name: 'a.md', display: 'inline', version: 1 },
+    ]);
+    expect(inlineXml).toContain('display="inline"');
+  });
+
   it('link-card', () => {
     const xml = serialize([
       {

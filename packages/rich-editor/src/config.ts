@@ -11,6 +11,7 @@ import { BannerNode } from './nodes/BannerNode';
 import { CodeBlockNode } from './nodes/CodeBlockNode';
 import { CommentNode } from './nodes/CommentNode';
 import { DetailsNode } from './nodes/DetailsNode';
+import { FileNode } from './nodes/FileNode';
 import { FootnoteNode } from './nodes/FootnoteNode';
 import { FootnoteSectionNode } from './nodes/FootnoteSectionNode';
 import { GridContainerNode } from './nodes/GridContainerNode';
@@ -53,6 +54,7 @@ export const customNodes: Array<Klass<LexicalNode> | LexicalNodeReplacement> = [
   FootnoteNode,
   FootnoteSectionNode,
   VideoNode,
+  FileNode,
   LinkCardNode,
   CommentNode,
   DetailsNode,

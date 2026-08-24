@@ -6,6 +6,7 @@ import { codeSnippetModule } from './modules/code-snippet/module';
 import { dynamicModule } from './modules/dynamic/module';
 import { embedModule } from './modules/embed/module';
 import { excalidrawModule } from './modules/excalidraw/module';
+import { fileModule } from './modules/file/module';
 import { galleryModule } from './modules/gallery/module';
 import { imageModule } from './modules/image/module';
 import { linkCardModule } from './modules/link-card/module';
@@ -25,6 +26,7 @@ export {
   dynamicModule,
   embedModule,
   excalidrawModule,
+  fileModule,
   galleryModule,
   imageModule,
   linkCardModule,
@@ -45,6 +47,7 @@ export const allRendererModules = [
   dynamicModule,
   embedModule,
   excalidrawModule,
+  fileModule,
   galleryModule,
   imageModule,
   linkCardModule,

@@ -12,6 +12,7 @@ import { createElement } from 'react';
 
 import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
+import { markInlineDraggable } from '../plugins/inline-dnd-shared';
 import { KATEX_NODE_KEY } from '../types/renderer-keys';
 import { getRegisteredNodeKlass } from '../utils/getRegisteredNodeKlass';
 import { resolveKaTeXEquation } from '../utils/katex-defaults';
@@ -50,7 +51,9 @@ export class KaTeXInlineNode extends DecoratorNode<ReactElement> {
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
-    return document.createElement('span');
+    const el = document.createElement('span');
+    markInlineDraggable(el, this.getKey());
+    return el;
   }
 
   updateDOM(): boolean {

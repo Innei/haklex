@@ -3,6 +3,7 @@ import type { ComponentType } from 'react';
 import type { AlertRendererProps } from '../components/renderers/AlertRenderer';
 import type { BannerRendererProps } from '../components/renderers/BannerRenderer';
 import type { CodeBlockRendererProps } from '../components/renderers/CodeBlockRenderer';
+import type { FileRendererProps } from '../components/renderers/FileRenderer';
 import type { FootnoteRendererProps } from '../components/renderers/FootnoteRenderer';
 import type { FootnoteSectionRendererProps } from '../components/renderers/FootnoteSectionRenderer';
 import type { ImageRendererProps } from '../components/renderers/ImageRenderer';
@@ -52,6 +53,8 @@ export interface RendererConfig {
   Banner?: ComponentType<BannerRendererProps>;
   /** Custom renderer for code blocks with syntax highlighting */
   CodeBlock?: ComponentType<CodeBlockRendererProps>;
+  /** Custom renderer for file attachments */
+  File?: ComponentType<FileRendererProps>;
   /** Custom renderer for footnote references */
   Footnote?: ComponentType<FootnoteRendererProps>;
   /** Custom renderer for footnote definition section */

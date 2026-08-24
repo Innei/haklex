@@ -15,6 +15,7 @@ import { CodeSnippetRenderer } from '../modules/code-snippet/renderer';
 import { dynamicModule } from '../modules/dynamic/module';
 import { embedModule } from '../modules/embed/module';
 import { excalidrawModule } from '../modules/excalidraw/module';
+import { fileModule } from '../modules/file/module';
 import { galleryModule } from '../modules/gallery/module';
 import { imageModule } from '../modules/image/module';
 import { linkCardModule } from '../modules/link-card/module';
@@ -62,6 +63,7 @@ const previewRendererModules: RichRendererModule[] = [
   excalidrawModule,
   galleryModule,
   imageModule,
+  fileModule,
   linkCardModule,
   mentionModule,
   {

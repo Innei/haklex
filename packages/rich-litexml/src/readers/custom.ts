@@ -128,6 +128,22 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
   );
 
   registry.registerReader(
+    'file',
+    (el) =>
+      ({
+        type: 'file',
+        ...extractBlockId(el),
+        src: el.getAttribute('src') ?? '',
+        name: el.getAttribute('name') ?? '',
+        size: numAttr(el, 'size'),
+        mimeType: el.getAttribute('mime-type') ?? undefined,
+        ext: el.getAttribute('ext') ?? undefined,
+        display: el.getAttribute('display') === 'inline' ? 'inline' : 'block',
+        version: 1,
+      }) as any,
+  );
+
+  registry.registerReader(
     'link-card',
     (el) =>
       ({

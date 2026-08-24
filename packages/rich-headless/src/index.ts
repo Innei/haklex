@@ -289,6 +289,19 @@ export const VideoNode = headlessDecorator('video', ['src', 'poster', 'width', '
   height: undefined,
 });
 
+export const FileNode = headlessDecorator(
+  'file',
+  ['src', 'name', 'size', 'mimeType', 'ext', 'display'],
+  {
+    src: '',
+    name: '',
+    size: undefined,
+    mimeType: undefined,
+    ext: undefined,
+    display: 'block',
+  },
+);
+
 export const LinkCardNode = headlessDecorator(
   'link-card',
   ['url', 'source', 'id', 'title', 'description', 'favicon', 'image'],
@@ -604,6 +617,7 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   RichQuoteNode,
   ImageNode,
   VideoNode,
+  FileNode,
   LinkCardNode,
   KaTeXInlineNode,
   KaTeXBlockNode,

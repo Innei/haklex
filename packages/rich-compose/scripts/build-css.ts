@@ -42,6 +42,7 @@ const MODULE_TO_PACKAGE: Record<string, string> = {
   'excalidraw': 'rich-ext-excalidraw',
   'gallery': 'rich-ext-gallery',
   'image': 'rich-renderer-image',
+  'file': 'rich-renderer-file',
   'katex': 'rich-renderer-katex',
   'link-card': 'rich-renderer-linkcard',
   'mention': 'rich-renderer-mention',

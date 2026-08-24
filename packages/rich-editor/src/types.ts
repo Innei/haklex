@@ -14,6 +14,10 @@ export interface RichEditorProps {
   contentClassName?: string;
   debounceMs?: number;
   extraNodes?: Array<Klass<LexicalNode>>;
+  fileUpload?: (
+    file: File,
+    opts?: { onProgress?: (percent: number) => void },
+  ) => Promise<{ src: string }>;
   header?: ReactNode;
   imageUpload?: (file: File) => Promise<{
     src: string;

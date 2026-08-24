@@ -47,6 +47,23 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
     };
   });
 
+  registry.registerWriter('file', (node) => {
+    const n = node as any;
+    return {
+      tag: 'file',
+      attrs: optAttr({
+        ...blockId(n),
+        'src': n.src,
+        'name': n.name,
+        'size': n.size != null ? String(n.size) : undefined,
+        'mime-type': n.mimeType,
+        'ext': n.ext,
+        'display': n.display === 'inline' ? 'inline' : undefined,
+      }),
+      selfClosing: true,
+    };
+  });
+
   registry.registerWriter('link-card', (node) => {
     const n = node as any;
     return {
