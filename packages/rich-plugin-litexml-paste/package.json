@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-litexml-paste",
-  "version": "0.36.0",
+  "version": "0.37.0",
   "description": "LiteXML paste plugin for rich-editor — detects pasted Haklex node XML and converts to Lexical nodes",
   "repository": {
     "type": "git",
