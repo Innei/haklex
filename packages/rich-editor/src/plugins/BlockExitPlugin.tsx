@@ -1,8 +1,10 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $isQuoteNode } from '@lexical/rich-text';
 import {
+  $addUpdateTag,
   $createNodeSelection,
   $createParagraphNode,
+  $createTextNode,
   $getNodeByKey,
   $getRoot,
   $getSelection,
@@ -14,8 +16,10 @@ import {
   $isRootNode,
   $isTextNode,
   $setSelection,
+  BLUR_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
   COMMAND_PRIORITY_HIGH,
+  HISTORY_MERGE_TAG,
   IS_CODE,
   KEY_ARROW_DOWN_COMMAND,
   KEY_ARROW_RIGHT_COMMAND,
@@ -23,13 +27,20 @@ import {
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
   KEY_ENTER_COMMAND,
+  KEY_SPACE_COMMAND,
   type LexicalEditor,
   type LexicalNode,
   type RangeSelection,
+  SELECTION_CHANGE_COMMAND,
+  SKIP_COLLAB_TAG,
+  TextNode,
 } from 'lexical';
 import { useEffect } from 'react';
 
 import { setCodeBlockCursorIntent } from '../utils/codeBlockSelectionIntent';
+
+// Chrome needs a real text character here or the caret can snap back into the preceding <code>.
+const INLINE_CODE_EXIT_CARET = '\u200B';
 
 function selectDecoratorNode(node: LexicalNode, cursorPlacement: 'start' | 'end' = 'start') {
   if (node.getType() === 'code-block') {
@@ -69,18 +80,6 @@ function isSingleLineParagraph(node: LexicalNode): boolean {
   return $isParagraphNode(node) && !node.getTextContent().includes('\n');
 }
 
-function getOutermostNodeWithinTopLevel(node: LexicalNode, topLevel: LexicalNode): LexicalNode {
-  let current = node;
-
-  while (current.getParent() !== topLevel) {
-    const parent = current.getParent();
-    if (!parent) break;
-    current = parent;
-  }
-
-  return current;
-}
-
 function isDeeplyEmptyElement(node: LexicalNode): boolean {
   if (!$isElementNode(node)) {
     return false;
@@ -113,34 +112,28 @@ function isSelectionInsideTopLevel(selection: RangeSelection, topLevelKey: strin
   );
 }
 
-function exitInlineCodeAtLineEnd(selection: RangeSelection): boolean {
+function exitInlineCodeAtLineEnd(selection: RangeSelection) {
   if (!selection.isCollapsed() || selection.anchor.type !== 'text') {
-    return false;
+    return null;
   }
 
   const anchorNode = selection.anchor.getNode();
   if (!$isTextNode(anchorNode) || !anchorNode.hasFormat('code')) {
-    return false;
+    return null;
   }
 
   if (selection.anchor.offset !== anchorNode.getTextContentSize()) {
-    return false;
+    return null;
   }
 
   if (!isAtTopLevelBoundary(selection, 'end')) {
-    return false;
+    return null;
   }
 
-  const topLevel = anchorNode.getTopLevelElementOrThrow();
-  const boundaryNode = getOutermostNodeWithinTopLevel(anchorNode, topLevel);
-  const exitOffset = boundaryNode.getIndexWithinParent() + 1;
-
-  selection.anchor.set(topLevel.getKey(), exitOffset, 'element');
-  selection.focus.set(topLevel.getKey(), exitOffset, 'element');
   selection.setFormat(anchorNode.getFormat() & ~IS_CODE);
   selection.setStyle(anchorNode.getStyle());
 
-  return true;
+  return anchorNode;
 }
 
 export function BlockExitPlugin() {
@@ -155,6 +148,8 @@ export function BlockExitPlugin() {
 
 export function registerBlockExitCommands(editor: LexicalEditor) {
   let virtualParagraphKey: null | string = null;
+  let inlineCodeExitCaretKey: null | string = null;
+  let inlineCodeExitCaretStyle = '';
 
   const clearVirtualParagraph = () => {
     virtualParagraphKey = null;
@@ -167,6 +162,29 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
 
     const node = $getNodeByKey(virtualParagraphKey);
     return $isParagraphNode(node) ? node : null;
+  };
+
+  const $releaseInlineCodeExitCaret = () => {
+    const caretKey = inlineCodeExitCaretKey;
+    if (!caretKey) return;
+
+    inlineCodeExitCaretKey = null;
+    const originalStyle = inlineCodeExitCaretStyle;
+    inlineCodeExitCaretStyle = '';
+    $addUpdateTag(HISTORY_MERGE_TAG);
+    $addUpdateTag(SKIP_COLLAB_TAG);
+
+    const caretNode = $getNodeByKey(caretKey);
+    if (!$isTextNode(caretNode)) return;
+
+    const text = caretNode.getTextContent().replaceAll(INLINE_CODE_EXIT_CARET, '');
+    if (text === '') {
+      caretNode.remove();
+      return;
+    }
+
+    caretNode.setTextContent(text).setStyle(originalStyle);
+    if (caretNode.isUnmergeable()) caretNode.toggleUnmergeable();
   };
 
   const insertVirtualParagraph = (
@@ -232,15 +250,85 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
     });
   });
 
+  const unregisterInlineCodeExitCaretCleanup = editor.registerCommand(
+    SELECTION_CHANGE_COMMAND,
+    () => {
+      const caretKey = inlineCodeExitCaretKey;
+      if (!caretKey) return false;
+
+      const caretNode = $getNodeByKey(caretKey);
+      const selection = $getSelection();
+      const isActive =
+        $isTextNode(caretNode) &&
+        (caretNode.isComposing() ||
+          ($isRangeSelection(selection) &&
+            selection.isCollapsed() &&
+            selection.anchor.key === caretKey));
+
+      if (!isActive) $releaseInlineCodeExitCaret();
+      return false;
+    },
+    COMMAND_PRIORITY_HIGH,
+  );
+
+  const unregisterInlineCodeExitCaretTransform = editor.registerNodeTransform(TextNode, () => {
+    const caretKey = inlineCodeExitCaretKey;
+    if (!caretKey) return;
+
+    const caretNode = $getNodeByKey(caretKey);
+    const selection = $getSelection();
+    if ($isTextNode(caretNode) && caretNode.isComposing()) return;
+
+    if (
+      !$isTextNode(caretNode) ||
+      caretNode.getTextContent() !== INLINE_CODE_EXIT_CARET ||
+      !$isRangeSelection(selection) ||
+      selection.anchor.key !== caretKey
+    ) {
+      $releaseInlineCodeExitCaret();
+    }
+  });
+
+  const unregisterInlineCodeExitCaretBlur = editor.registerCommand(
+    BLUR_COMMAND,
+    () => {
+      $releaseInlineCodeExitCaret();
+      return false;
+    },
+    COMMAND_PRIORITY_HIGH,
+  );
+
   const unregisterArrowRight = editor.registerCommand(
     KEY_ARROW_RIGHT_COMMAND,
     (event) => {
       const selection = $getSelection();
       if (!$isRangeSelection(selection)) return false;
-      if (!exitInlineCodeAtLineEnd(selection)) return false;
+      const codeNode = exitInlineCodeAtLineEnd(selection);
+      if (!codeNode) return false;
+
+      inlineCodeExitCaretStyle = codeNode.getStyle();
+      const caretNode = $createTextNode(INLINE_CODE_EXIT_CARET)
+        .setFormat(codeNode.getFormat() & ~IS_CODE)
+        .setStyle([inlineCodeExitCaretStyle, 'margin-left: 4px'].filter(Boolean).join('; '))
+        .toggleUnmergeable();
+      codeNode.insertAfter(caretNode);
+      caretNode.selectEnd();
+      inlineCodeExitCaretKey = caretNode.getKey();
+      $addUpdateTag(HISTORY_MERGE_TAG);
+      $addUpdateTag(SKIP_COLLAB_TAG);
 
       event?.preventDefault();
       return true;
+    },
+    COMMAND_PRIORITY_CRITICAL,
+  );
+
+  const unregisterInlineCodeSpace = editor.registerCommand(
+    KEY_SPACE_COMMAND,
+    () => {
+      const selection = $getSelection();
+      if ($isRangeSelection(selection)) exitInlineCodeAtLineEnd(selection);
+      return false;
     },
     COMMAND_PRIORITY_CRITICAL,
   );
@@ -523,7 +611,12 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
 
   return () => {
     unregisterVirtualParagraphCleanup();
+    unregisterInlineCodeExitCaretCleanup();
+    unregisterInlineCodeExitCaretTransform();
+    unregisterInlineCodeExitCaretBlur();
+    editor.update($releaseInlineCodeExitCaret);
     unregisterArrowRight();
+    unregisterInlineCodeSpace();
     unregisterArrowDown();
     unregisterEnter();
     unregisterBackspace();

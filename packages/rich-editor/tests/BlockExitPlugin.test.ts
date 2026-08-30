@@ -10,8 +10,10 @@ import {
   createEditor,
   DecoratorNode,
   KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_RIGHT_COMMAND,
   KEY_ARROW_UP_COMMAND,
   KEY_ENTER_COMMAND,
+  KEY_SPACE_COMMAND,
 } from 'lexical';
 import { describe, expect, it } from 'vitest';
 
@@ -77,6 +79,61 @@ async function flushEditor() {
 }
 
 describe('registerBlockExitCommands', () => {
+  it.each([
+    ['ArrowRight', KEY_ARROW_RIGHT_COMMAND, true, 'X'],
+    ['Space', KEY_SPACE_COMMAND, false, ' X'],
+  ])(
+    'inserts plain text after trailing inline code on %s',
+    async (_name, command, handled, text) => {
+      const { editor, unregister } = createTestEditor();
+
+      try {
+        editor.update(() => {
+          const paragraph = $createParagraphNode();
+          const code = $createTextNode('code');
+          code.setFormat('code');
+          paragraph.append($createTextNode('prefix '), code);
+          $getRoot().append(paragraph);
+          code.selectEnd().setFormat(code.getFormat());
+        });
+
+        await flushEditor();
+
+        expect(editor.dispatchCommand(command, createKeyboardEventStub())).toBe(handled);
+
+        await flushEditor();
+
+        editor.getEditorState().read(() => {
+          const selection = $getSelection();
+
+          expect($isRangeSelection(selection)).toBe(true);
+          if ($isRangeSelection(selection)) {
+            expect(selection.anchor.type).toBe('text');
+            expect(selection.hasFormat('code')).toBe(false);
+          }
+        });
+
+        editor.update(() => {
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) selection.insertText(text);
+        });
+
+        await flushEditor();
+
+        editor.getEditorState().read(() => {
+          const children = $getRoot().getFirstChildOrThrow().getChildren();
+
+          expect(children.map((node) => node.getTextContent())).toEqual(['prefix ', 'code', text]);
+          expect(children[1]?.hasFormat('code')).toBe(true);
+          expect(children[2]?.hasFormat('code')).toBe(false);
+          expect(children[2]?.isUnmergeable()).toBe(false);
+        });
+      } finally {
+        unregister();
+      }
+    },
+  );
+
   it('inserts a virtual paragraph before the first top-level block on ArrowUp', async () => {
     const { editor, unregister } = createTestEditor();
 
