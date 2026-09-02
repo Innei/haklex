@@ -16,4 +16,4 @@ allowBuilds:
   simple-git-hooks: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
-  - '@innei/react-tweet@3.4.3'
+  - '@innei/react-tweet@4.0.0'

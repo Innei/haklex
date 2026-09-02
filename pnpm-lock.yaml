@@ -1019,8 +1019,8 @@ importers:
         specifier: ^1.0.0
         version: 1.33.0(react@19.2.8)
       react-tweet:
-        specifier: npm:@innei/react-tweet@3.4.3
-        version: '@innei/react-tweet@3.4.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)'
+        specifier: npm:@innei/react-tweet@4.0.0
+        version: '@innei/react-tweet@4.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)'
     devDependencies:
       '@lexical/react':
         specifier: ^0.49.0
@@ -4011,10 +4011,10 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@innei/react-tweet@3.4.3':
+  '@innei/react-tweet@4.0.0':
     resolution:
       {
-        integrity: sha512-qX+dg+x6KyCBl358LxJPdCKpJtYpBiNFreMDLnyqajSgOA26hmBm7UqdTM7bnaOXeEPTD/rzmQvVikg7rVS3hw==,
+        integrity: sha512-s9C80t/O6YSI4FrBDUfOlsPXe4t29IpNz+OBujbT96tlZJcBIl2+m/LALKjknwqtoFyPUvDO6IgEE7TLWJCyBw==,
       }
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
@@ -5667,10 +5667,10 @@ packages:
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
-  '@swc/helpers@0.5.23':
+  '@stylexjs/stylex@0.19.0':
     resolution:
       {
-        integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==,
+        integrity: sha512-CnUFp7YMaDLDeemsWOfJgoC/gKM5P/yBNMcpJaE6ChJmXr7s0DJwSeGTTlHJcqqwN9OW1qGtmARWLFhGZN1pTA==,
       }
 
   '@turbo/darwin-64@2.10.11':
@@ -7353,6 +7353,12 @@ packages:
         integrity: sha512-8HFEBPKhOpJPEPu70wJJetjKta86Gw9+CCyCnB3sui2qQfOvRyqBy4IKLKKAwdMpWb2lHXWk9Wb4Z6AmaUT1Pg==,
       }
     engines: { node: '>=12' }
+
+  css-mediaquery@0.1.2:
+    resolution:
+      {
+        integrity: sha512-COtn4EROW5dBGlE/4PiKnh6rZpAPxDeFLaEEwt4i10jpDMFt2EhQGS79QmmrO+iKCHv0PU/HrOWEhijFd1x99Q==,
+      }
 
   css-select@7.0.0:
     resolution:
@@ -9085,6 +9091,12 @@ packages:
         integrity: sha512-5Hh7Y1wQbvY5ooGgPbDaL5iYLAPzMTUrjMulskHLH6wnv/A+1q5rgEaiuqEjB+oxGXIVZs1FF+R/KPN3ZSQYYg==,
       }
     engines: { node: '>=12' }
+
+  invariant@2.2.4:
+    resolution:
+      {
+        integrity: sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==,
+      }
 
   is-alphabetical@2.0.1:
     resolution:
@@ -11643,6 +11655,12 @@ packages:
     engines: { node: '>=20.19.0' }
     hasBin: true
 
+  styleq@0.2.1:
+    resolution:
+      {
+        integrity: sha512-L0TR0NQb+X4/ktDEKmjWyp27gla+LUYi/by5k5SjKXf6/pvZP7wbwEB5J+tqxdFVPgzbsuz+d4RTScO/QZquBw==,
+      }
+
   stylis@4.4.0:
     resolution:
       {
@@ -13681,10 +13699,9 @@ snapshots:
   '@img/sharp-win32-x64@0.35.3':
     optional: true
 
-  '@innei/react-tweet@3.4.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+  '@innei/react-tweet@4.0.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
-      '@swc/helpers': 0.5.23
-      clsx: 2.1.1
+      '@stylexjs/stylex': 0.19.0
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
       swr: 2.4.1(react@19.2.8)
@@ -14737,9 +14754,11 @@ snapshots:
       react: 19.2.8
       shiki: 3.23.0
 
-  '@swc/helpers@0.5.23':
+  '@stylexjs/stylex@0.19.0':
     dependencies:
-      tslib: 2.8.1
+      css-mediaquery: 0.1.2
+      invariant: 2.2.4
+      styleq: 0.2.1
 
   '@turbo/darwin-64@2.10.11':
     optional: true
@@ -15741,6 +15760,8 @@ snapshots:
       which: 2.0.2
 
   css-functions-list@3.3.3: {}
+
+  css-mediaquery@0.1.2: {}
 
   css-select@7.0.0:
     dependencies:
@@ -17008,6 +17029,10 @@ snapshots:
   internmap@1.0.1: {}
 
   internmap@2.0.3: {}
+
+  invariant@2.2.4:
+    dependencies:
+      loose-envify: 1.4.0
 
   is-alphabetical@2.0.1: {}
 
@@ -18898,6 +18923,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
       - typescript
+
+  styleq@0.2.1: {}
 
   stylis@4.4.0: {}
 
