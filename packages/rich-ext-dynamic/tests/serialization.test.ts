@@ -1,6 +1,7 @@
-import { createEditor } from 'lexical';
+import { $getRoot, $getState, $setState, createEditor, createState } from 'lexical';
 import { describe, expect, it, vi } from 'vitest';
 
+import { DynamicEditNode } from '../src/DynamicEditNode';
 import {
   $createDynamicNode,
   $isDynamicNode,
@@ -109,3 +110,44 @@ describe('DynamicNode', () => {
     });
   });
 });
+
+it.each([DynamicNode, DynamicEditNode])(
+  '%s preserves block identity when reloading a saved component',
+  (NodeClass) => {
+    const blockId = createState('blockId', {
+      parse: (value) => (typeof value === 'string' ? value : ''),
+    });
+    const editor = createEditor({
+      nodes: [NodeClass],
+      onError: (error) => {
+        throw error;
+      },
+    });
+    editor.update(
+      () => {
+        const node = new NodeClass('https://cdn.example.com/v1.js', { count: 3 }, 320);
+        $setState(node, blockId, 'counter');
+        $getRoot().append(node);
+      },
+      { discrete: true },
+    );
+    const saved = editor.getEditorState().toJSON();
+    editor.setEditorState(editor.parseEditorState(saved));
+    editor.update(
+      () => {
+        const target = $getRoot()
+          .getChildren()
+          .find((node) => $getState(node, blockId) === 'counter');
+        expect(target).toBeInstanceOf(NodeClass);
+        (target as DynamicNode).setUrl('https://cdn.example.com/v2.js');
+      },
+      { discrete: true },
+    );
+    expect((editor.getEditorState().toJSON().root.children[0] as SerializedDynamicNode).url).toBe(
+      'https://cdn.example.com/v2.js',
+    );
+    expect((saved.root.children[0] as SerializedDynamicNode).url).toBe(
+      'https://cdn.example.com/v1.js',
+    );
+  },
+);

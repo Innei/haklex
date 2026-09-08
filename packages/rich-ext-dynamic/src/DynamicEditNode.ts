@@ -59,7 +59,7 @@ export class DynamicEditNode extends DynamicNode {
       serializedNode.url,
       serializedNode.props,
       serializedNode.initialHeight,
-    );
+    ).updateFromJSON(serializedNode);
   }
 
   decorate(editor: LexicalEditor, config: EditorConfig): ReactElement {
