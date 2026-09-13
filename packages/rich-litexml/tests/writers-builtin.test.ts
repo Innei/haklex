@@ -116,6 +116,26 @@ describe('builtin writers', () => {
   });
 
   it('quote without attribution emits no attribute', () => {
+    const xml = serialize([
+      {
+        type: 'quote',
+        $: { blockId: 'q1' },
+        children: [TEXT('quoted')],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        textFormat: 0,
+        textStyle: '',
+        version: 1,
+      },
+    ]);
+    expect(xml).toContain('<blockquote id="q1">quoted</blockquote>');
+  });
+
+  // A rich quote and a plain quote share the `<blockquote>` tag, and the writer
+  // drops empty attribute values, so a rich quote with no attribution needs an
+  // explicit flag. Without it the reader cannot recover the node type.
+  it('rich quote without attribution emits the rich flag', () => {
     const base = {
       $: { blockId: 'q1' },
       children: [TEXT('quoted')],
@@ -126,16 +146,10 @@ describe('builtin writers', () => {
       textStyle: '',
       version: 1,
     };
-    for (const variant of [
-      { type: 'quote', ...base },
-      { type: 'rich-quote', attribution: null, ...base },
-      { type: 'rich-quote', attribution: undefined, ...base },
-      { type: 'rich-quote', attribution: '', ...base },
-      { type: 'rich-quote', attribution: '   ', ...base },
-    ]) {
-      const xml = serialize([variant]);
+    for (const attribution of [null, undefined, '', '   ']) {
+      const xml = serialize([{ type: 'rich-quote', attribution, ...base }]);
       expect(xml).not.toContain('attribution=');
-      expect(xml).toContain('<blockquote id="q1">quoted</blockquote>');
+      expect(xml).toContain('<blockquote id="q1" rich="true">quoted</blockquote>');
     }
   });
 

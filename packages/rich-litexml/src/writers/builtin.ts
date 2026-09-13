@@ -1,3 +1,5 @@
+import type { SerializedLexicalNode } from 'lexical';
+
 import type { LitexmlRegistry } from '../registry';
 import type { XmlWriterFn } from '../types';
 
@@ -27,12 +29,30 @@ export function registerBuiltinWriters(registry: LitexmlRegistry): void {
     };
   });
 
-  // quote / rich-quote (same XML output; rich-quote adds optional attribution)
+  // quote / rich-quote
+  //
+  // The two node types share the `<blockquote>` tag, so the reader needs a
+  // marker to tell them apart: without one, a rich quote whose `attribution`
+  // is null round-trips into a plain quote. `attribution` alone cannot carry
+  // that signal because `buildAttrs` drops empty values, so an explicit
+  // `rich` flag accompanies it.
   const writeQuote: XmlWriterFn = (node, ctx) => {
-    const n = node as any;
+    const n = node as SerializedLexicalNode & {
+      attribution?: unknown;
+      children?: SerializedLexicalNode[];
+      type?: string;
+    };
     const attrs: Record<string, string> = { ...blockId(n) };
-    if (typeof n.attribution === 'string' && n.attribution.trim() !== '') {
-      attrs.attribution = n.attribution;
+    if (n.type === 'rich-quote') {
+      const attribution = typeof n.attribution === 'string' ? n.attribution.trim() : '';
+      if (attribution !== '') {
+        attrs.attribution = n.attribution as string;
+      } else {
+        // A rich quote with no attribution has no other trace of its type, so
+        // it needs the explicit flag; an attributed one is already
+        // distinguishable and keeps the historical shape.
+        attrs.rich = 'true';
+      }
     }
     return {
       tag: 'blockquote',
@@ -76,10 +96,19 @@ export function registerBuiltinWriters(registry: LitexmlRegistry): void {
 
   // link
   registry.registerWriter('link', (node, ctx) => {
-    const n = node as any;
-    const attrs: Record<string, string> = { href: n.url ?? '' };
-    if (n.target) attrs.target = n.target;
-    if (n.title) attrs.title = n.title;
+    const n = node as SerializedLexicalNode & {
+      children?: SerializedLexicalNode[];
+      rel?: unknown;
+      target?: unknown;
+      title?: unknown;
+      url?: unknown;
+    };
+    const attrs: Record<string, string> = {
+      href: typeof n.url === 'string' ? n.url : '',
+    };
+    if (typeof n.target === 'string' && n.target !== '') attrs.target = n.target;
+    if (typeof n.title === 'string' && n.title !== '') attrs.title = n.title;
+    if (typeof n.rel === 'string' && n.rel !== '') attrs.rel = n.rel;
     return {
       tag: 'a',
       attrs,

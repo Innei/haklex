@@ -194,3 +194,63 @@ describe('roundtrip', () => {
     expect(result).toContain('<participant id="p_b" kind="user" name="Bob"');
   });
 });
+
+/**
+ * A `<blockquote>` is shared by two node types, so the codec must preserve
+ * which one it round-tripped through. These cases pin that contract: a rich
+ * quote with no attribution is otherwise indistinguishable from a plain quote,
+ * and the XML writer drops empty attribute values, so the type cannot ride on
+ * `attribution` alone.
+ */
+describe('roundtrip node identity', () => {
+  const roundtripState = (xml: string) =>
+    serializeToXml(deserializeFromXml(`<doc>${xml}</doc>`, registry), registry);
+
+  it('keeps a rich quote that has no attribution', () => {
+    const state = deserializeFromXml(
+      '<doc><blockquote id="q1" rich="true"><p>hi</p></blockquote></doc>',
+      registry,
+    );
+    expect((state.root as any).children[0].type).toBe('rich-quote');
+    expect((state.root as any).children[0].attribution).toBeNull();
+
+    const xml = roundtripState('<blockquote id="q1" rich="true"><p>hi</p></blockquote>');
+    const back = deserializeFromXml(xml, registry);
+    expect((back.root as any).children[0].type).toBe('rich-quote');
+  });
+
+  it('keeps a rich quote that has an attribution, without needing the flag', () => {
+    const xml = roundtripState(
+      '<blockquote id="q1" rich="true" attribution="Ada"><p>hi</p></blockquote>',
+    );
+    const back = deserializeFromXml(xml, registry);
+    expect((back.root as any).children[0].type).toBe('rich-quote');
+    expect((back.root as any).children[0].attribution).toBe('Ada');
+  });
+
+  it('keeps a plain quote plain', () => {
+    const xml = roundtripState('<blockquote id="q1"><p>hi</p></blockquote>');
+    const back = deserializeFromXml(xml, registry);
+    expect((back.root as any).children[0].type).toBe('quote');
+  });
+
+  it('treats a whitespace-only attribution as absent', () => {
+    const state = deserializeFromXml(
+      '<doc><blockquote id="q1" attribution="   "><p>hi</p></blockquote></doc>',
+      registry,
+    );
+    expect((state.root as any).children[0].type).toBe('rich-quote');
+    expect((state.root as any).children[0].attribution).toBeNull();
+  });
+
+  it('keeps a link rel attribute', () => {
+    const xml = roundtripState('<a href="https://x.test" rel="noreferrer">link</a>');
+    const back = deserializeFromXml(xml, registry);
+    expect((back.root as any).children[0].rel).toBe('noreferrer');
+  });
+
+  it('leaves rel null when the element has none', () => {
+    const state = deserializeFromXml('<doc><a href="https://x.test">link</a></doc>', registry);
+    expect((state.root as any).children[0].rel).toBeNull();
+  });
+});

@@ -4,6 +4,7 @@ import { parseHTML } from './parse-html';
 import type { LitexmlRegistry } from './registry';
 import { getFormatBit, isFormatTag } from './text-format';
 import type { ReaderContext } from './types';
+import { isInlineTag } from './xml-utils';
 
 /**
  * HTML5 void elements — tags the HTML parser already treats as self-closing
@@ -133,7 +134,13 @@ function isBlockContainer(element: Element): boolean {
 function createReaderContext(registry: LitexmlRegistry): ReaderContext {
   const ctx: ReaderContext = {
     parseChildren(element: Element): SerializedLexicalNode[] {
-      const blockLevel = isBlockContainer(element);
+      // A pretty-printed document puts each block child on its own indented
+      // line, so the indentation reaches the reader as whitespace-only text.
+      // Treat any element holding a non-inline child as a block container so
+      // that layout whitespace is dropped; a purely inline run keeps whatever
+      // spacing it was written with.
+      const holdsBlockChild = [...element.children].some((child) => !isInlineTag(child.tagName));
+      const blockLevel = isBlockContainer(element) || holdsBlockChild;
       const nodes: SerializedLexicalNode[] = [];
       let pendingText = '';
       const flushText = () => {

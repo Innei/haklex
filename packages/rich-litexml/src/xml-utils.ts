@@ -117,29 +117,45 @@ function renderInline(el: XmlElement): string {
   return `<${el.tag}${attrs}>${inner}</${el.tag}>`;
 }
 
+/**
+ * Elements that sit inside a text run without forcing a line break, so the
+ * serializer keeps them on the same line as their siblings and the reader does
+ * not mistake the surrounding indentation for content.
+ *
+ * The void elements (`br`, `img`) belong here: a paragraph holding a line break
+ * or an inline image is still a single line of prose.
+ */
+const INLINE_TAGS = new Set([
+  'b',
+  'i',
+  'u',
+  's',
+  'code',
+  'sub',
+  'sup',
+  'mark',
+  'strong',
+  'em',
+  'del',
+  'a',
+  'mention',
+  'tag',
+  'spoiler',
+  'ruby',
+  'math',
+  'footnote',
+  'comment',
+  'br',
+  'img',
+]);
+
+/** Tags rendered inline (no line break between siblings). */
+export function isInlineTag(tag: string): boolean {
+  return INLINE_TAGS.has(tag.toLowerCase());
+}
+
 function isInlineElement(el: XmlElement): boolean {
-  const inlineTags = new Set([
-    'b',
-    'i',
-    'u',
-    's',
-    'code',
-    'sub',
-    'sup',
-    'mark',
-    'strong',
-    'em',
-    'del',
-    'a',
-    'mention',
-    'tag',
-    'spoiler',
-    'ruby',
-    'math',
-    'footnote',
-    'comment',
-  ]);
-  return inlineTags.has(el.tag);
+  return isInlineTag(el.tag);
 }
 
 function pad(indent: number): string {

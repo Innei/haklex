@@ -1,8 +1,10 @@
+import type { SerializedEditorState } from 'lexical';
 import { describe, expect, it } from 'vitest';
 
 import { createDefaultRegistry } from '../src/default-registry';
 import { deserializeFromXml, deserializeNodesFromXml } from '../src/deserializer';
 import { LitexmlRegistry } from '../src/registry';
+import { serializeToXml } from '../src/serializer';
 
 describe('deserializeFromXml', () => {
   it('deserializes empty doc', () => {
@@ -211,5 +213,91 @@ describe('deserializeNodesFromXml', () => {
     expect(nodes).toHaveLength(2);
     expect(nodes[0].type).toBe('paragraph');
     expect(nodes[1].type).toBe('paragraph');
+  });
+});
+
+/**
+ * The pretty printer puts each block child on its own indented line, so the
+ * indentation comes back as text. It must not survive as content: inside an
+ * element that holds a block child it is layout, while a purely inline run has
+ * to keep the spacing it was written with.
+ */
+describe('formatting whitespace', () => {
+  const registry = createDefaultRegistry();
+
+  const childrenOf = (xml: string) => {
+    const state = deserializeFromXml(xml, registry);
+    return (state.root as any).children[0].children;
+  };
+
+  it('drops indentation around a block child inside a paragraph', () => {
+    const xml = `<doc>
+  <p id="p1">
+    <excalidraw id="e1"></excalidraw>
+  </p>
+</doc>`;
+    const children = childrenOf(xml);
+    expect(children.map((c: any) => c.type)).toEqual(['excalidraw']);
+  });
+
+  it('keeps text spacing when a paragraph is inline only', () => {
+    const children = childrenOf('<doc><p id="p1">  padded text  </p></doc>');
+    expect(children.map((c: any) => c.type)).toEqual(['text']);
+    expect(children[0].text).toBe('  padded text  ');
+  });
+
+  // The real failure mode is a full cycle: the pretty printer decides whether
+  // to indent by asking if every child is inline, so a line break must count as
+  // inline or the indentation ends up fused onto the surrounding text.
+  it('does not fold indentation into text beside a line break', () => {
+    const state = {
+      root: {
+        type: 'root',
+        children: [
+          {
+            type: 'paragraph',
+            $: { blockId: 'p1' },
+            children: [
+              {
+                type: 'text',
+                text: 'hello',
+                format: 0,
+                detail: 0,
+                mode: 'normal',
+                style: '',
+                version: 1,
+              },
+              { type: 'linebreak', version: 1 },
+              {
+                type: 'text',
+                text: 'world',
+                format: 0,
+                detail: 0,
+                mode: 'normal',
+                style: '',
+                version: 1,
+              },
+            ],
+            direction: 'ltr',
+            format: '',
+            indent: 0,
+            version: 1,
+          },
+        ],
+        direction: 'ltr',
+        format: '',
+        indent: 0,
+        version: 1,
+      },
+    } as unknown as SerializedEditorState;
+
+    const xml = serializeToXml(state, registry, { compact: false });
+    const back = deserializeFromXml(xml, registry);
+    const children = (back.root as any).children[0].children;
+    expect(children.map((c: any) => (c.type === 'text' ? c.text : `<${c.type}>`))).toEqual([
+      'hello',
+      '<linebreak>',
+      'world',
+    ]);
   });
 });

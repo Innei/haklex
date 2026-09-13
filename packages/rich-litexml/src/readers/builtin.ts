@@ -43,15 +43,24 @@ export function registerBuiltinReaders(registry: LitexmlRegistry): void {
   }
 
   // blockquote
+  //
+  // A rich quote is marked by the `rich` flag or, for documents written before
+  // that flag existed, by a non-empty `attribution`. An empty or whitespace-only
+  // attribution normalizes to null, matching what the editor stores.
   registry.registerReader('blockquote', (el, ctx) => {
     const attribution = el.getAttribute('attribution');
+    const isRichQuote = el.getAttribute('rich') !== null || attribution !== null;
     const base = {
       ...extractBlockId(el),
       children: ctx.parseChildren(el),
       ...ELEMENT_DEFAULTS,
     };
-    if (attribution !== null) {
-      return { type: 'rich-quote', attribution, ...base } as any;
+    if (isRichQuote) {
+      return {
+        type: 'rich-quote',
+        attribution: attribution?.trim() ? attribution : null,
+        ...base,
+      } as any;
     }
     return { type: 'quote', ...base } as any;
   });
@@ -124,7 +133,7 @@ export function registerBuiltinReaders(registry: LitexmlRegistry): void {
         url: el.getAttribute('href') ?? '',
         target: el.getAttribute('target') ?? null,
         title: el.getAttribute('title') ?? null,
-        rel: null,
+        rel: el.getAttribute('rel'),
         children: ctx.parseChildren(el),
         direction: 'ltr',
         format: '',
