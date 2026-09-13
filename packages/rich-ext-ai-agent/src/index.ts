@@ -10,7 +10,10 @@ export { projectAgentDiffNodesToFactualState } from './nodes/diff-node-state';
 export { AgentPanelPlugin } from './plugins/AgentPanelPlugin';
 export { AgentSelectionPinPlugin } from './plugins/AgentSelectionPinPlugin';
 export type { AgentDiffReviewActions } from './plugins/diff-node-controller';
-export { getAgentDiffReviewController } from './plugins/diff-node-controller';
+export {
+  getAgentDiffReviewController,
+  setAgentDiffReviewController,
+} from './plugins/diff-node-controller';
 export { DiffApplyPlugin } from './plugins/DiffApplyPlugin';
 export { DiffReviewOverlayPlugin } from './plugins/DiffReviewOverlayPlugin';
 export type { AgentActionConfig } from './registry';
