@@ -32,6 +32,15 @@ The skill is split into a thin index (this file) plus per-topic references. Load
 
 Once a fragment contains any LiteXML tag, **all** surrounding prose in that fragment must also be LiteXML. Markdown is not parsed inside a LiteXML fragment.
 
+**Hard rule — no Markdown tokens inside LiteXML.** `**bold**`, `*italic*`, `` `code` ``, `# heading`, `- item`, `[text](url)` inside any `<p>`/`<li>`/`<h*>` are emitted as literal characters. Use `<b>`, `<i>`, `<code>`, `<h2>`, `<ul><li><p>`, `<a href>` instead. Before returning a LiteXML fragment, scan it for `**`, `` ` ``, and line-leading `#`/`-`/`1.` and convert them.
+
+```xml
+<!-- wrong -->
+<p>Run **npm install** then see `README.md`</p>
+<!-- right -->
+<p>Run <b>npm install</b> then see <code>README.md</code></p>
+```
+
 ## CLI quick start
 
 ```bash

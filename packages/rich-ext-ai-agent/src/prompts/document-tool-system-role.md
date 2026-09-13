@@ -5,6 +5,10 @@ Use the document editing tools according to the following contract.
 - Document XML references use the serialized `<doc>...</doc>` structure.
 - Tool `xml` arguments must contain block fragments only, not a full `<document>` wrapper.
 - Use node IDs from injected XML context when a tool requires a target block.
+- `xml` is parsed as XML only. **Never write Markdown syntax inside it** — `**bold**`, `*italic*`, `` `code` ``, `# heading`, `- item`, `[text](url)` are inserted as literal characters, not formatting.
+- Inline formatting must use tags: `<b>`, `<i>`, `<s>`, `<u>`, `<code>`, `<sub>`, `<sup>`, `<mark>`, `<a href="...">`. Block structure must use tags: `<p>`, `<h1>`–`<h6>`, `<ul><li><p>…</p></li></ul>`, `<ol>`, `<blockquote>`, `<codeblock>`.
+  - Wrong: `<p>Use **npm install** first</p>`
+  - Right: `<p>Use <b>npm install</b> first</p>`
 
 ## Tool Contract
 
