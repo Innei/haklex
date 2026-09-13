@@ -10,6 +10,13 @@ Use the document editing tools according to the following contract.
   - Wrong: `<p>Use **npm install** first</p>`
   - Right: `<p>Use <b>npm install</b> first</p>`
 
+## Edit Semantics
+
+- `insert_node`, `replace_node`, and `delete_node` do not modify the live document. They stage a proposed edit that the user reviews and accepts or rejects after your turn ends.
+- A successful result means the edit is staged. It is final from your side — do not search to verify it, and never re-issue the same edit because a later result still looks unchanged.
+- `search_document` returns the staged view (snapshot plus your pending edits). Injected document XML is the pre-edit snapshot.
+- Stage each edit once, then finish with a brief summary.
+
 ## Tool Contract
 
 ### `insert_node`
@@ -35,6 +42,7 @@ Use the document editing tools according to the following contract.
 
 - Use to locate candidate blocks by text or block type.
 - Prefer search when the target block is unknown or a prior edit attempt failed.
+- Not for verifying your own staged edits.
 
 ## Node-Specific Guidance
 

@@ -13,6 +13,39 @@ function extractText(node: SerializedLexicalNode): string {
   return '';
 }
 
+const STAGED_NOTE =
+  'Staged for user review; the live document changes only after the user accepts. search_document already reflects staged edits — do not re-run the same edit to "make it stick".';
+
+type StagedBlock = { blockId: string; node: SerializedLexicalNode };
+
+// Ops are queued, not applied, so a search after an edit must overlay the
+// queue on the snapshot or the model sees its own edit as "not taken".
+function stagedBlocks(snapshot: EditorSnapshot, operations: AgentOperation[]): StagedBlock[] {
+  let blocks: StagedBlock[] = snapshot.blockIds.map((blockId) => ({
+    blockId,
+    node: snapshot.getBlock(blockId)!,
+  }));
+  let inserted = 0;
+  for (const op of operations) {
+    if (op.op === 'replace') {
+      blocks = blocks.map((b) => (b.blockId === op.blockId ? { ...b, node: op.node } : b));
+    } else if (op.op === 'delete') {
+      blocks = blocks.filter((b) => b.blockId !== op.blockId);
+    } else {
+      const staged = { blockId: `staged-${++inserted}`, node: op.node };
+      if (op.position.type === 'root') {
+        blocks.splice(op.position.index ?? blocks.length, 0, staged);
+      } else {
+        const anchor = op.position.blockId;
+        const idx = blocks.findIndex((b) => b.blockId === anchor);
+        if (idx === -1) blocks.push(staged);
+        else blocks.splice(op.position.type === 'after' ? idx + 1 : idx, 0, staged);
+      }
+    }
+  }
+  return blocks;
+}
+
 export function createDocumentTools(
   snapshot: EditorSnapshot,
   operations: AgentOperation[],
@@ -88,7 +121,7 @@ export function createDocumentTools(
 
       return {
         ok: true,
-        content: `Inserted ${nodes.length} node(s) ${position.type} block "${position.blockId ?? 'root'}"`,
+        content: `Staged insert of ${nodes.length} node(s) ${position.type} block "${position.blockId ?? 'root'}". ${STAGED_NOTE}`,
       };
     },
   };
@@ -146,7 +179,10 @@ export function createDocumentTools(
         operations.push({ op: 'insert', position: { type: 'after', blockId }, node: nodes[i] });
       }
 
-      return { ok: true, content: `Replaced block "${blockId}" (${nodes.length} node(s))` };
+      return {
+        ok: true,
+        content: `Staged replacement of block "${blockId}" (${nodes.length} node(s)). ${STAGED_NOTE}`,
+      };
     },
   };
 
@@ -171,13 +207,14 @@ export function createDocumentTools(
         };
       }
       operations.push({ op: 'delete', blockId });
-      return { ok: true, content: `Deleted block "${blockId}"` };
+      return { ok: true, content: `Staged deletion of block "${blockId}". ${STAGED_NOTE}` };
     },
   };
 
   const searchDocumentTool: AgentToolConfig = {
     name: 'search_document',
-    description: 'Search for blocks in the document by text content or block type',
+    description:
+      'Search for blocks in the document by text content or block type. Results include edits staged in this session that the user has not accepted yet.',
     parameters: {
       type: 'object',
       properties: {
@@ -196,8 +233,7 @@ export function createDocumentTools(
     execute: async (params: unknown): Promise<AgentToolResult> => {
       const { query, blockType } = params as { query: string; blockType?: string };
       const matches: Array<{ blockId: string; nodeType: string; textContent: string }> = [];
-      for (const blockId of snapshot.blockIds) {
-        const block = snapshot.getBlock(blockId)!;
+      for (const { blockId, node: block } of stagedBlocks(snapshot, operations)) {
         const nodeType = (block as any).type ?? 'unknown';
         if (blockType && nodeType !== blockType) continue;
         const text = extractText(block);

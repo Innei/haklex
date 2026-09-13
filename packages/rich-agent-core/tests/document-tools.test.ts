@@ -225,4 +225,24 @@ describe('createDocumentTools', () => {
       expect(result.content).not.toContain('p1');
     }
   });
+
+  it('search_document overlays staged edits on the snapshot', async () => {
+    const { snapshot, operations } = makeSnapshot();
+    const tools = createDocumentTools(snapshot, operations);
+    const replaceTool = tools.find((t) => t.name === 'replace_node')!;
+    const deleteTool = tools.find((t) => t.name === 'delete_node')!;
+    const insertTool = tools.find((t) => t.name === 'insert_node')!;
+    const searchTool = tools.find((t) => t.name === 'search_document')!;
+
+    await replaceTool.execute({ blockId: 'p1', xml: '<p>Bye <b>world</b></p>' });
+    await deleteTool.execute({ blockId: 'h1' });
+    await insertTool.execute({ position: { type: 'after', blockId: 'p1' }, xml: '<p>Fresh</p>' });
+
+    const result = await searchTool.execute({ query: '' });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const matches = JSON.parse(result.content) as Array<{ blockId: string; textContent: string }>;
+    expect(matches.map((m) => m.textContent)).toEqual(['Bye world', 'Fresh']);
+    expect(matches[0].blockId).toBe('p1');
+  });
 });
