@@ -1,4 +1,5 @@
 import type {
+  AgentExecutorPlugin,
   AgentStore,
   AgentToolConfig,
   ChatMessage,
@@ -14,21 +15,27 @@ import { useAgentLoop } from '../hooks/useAgentLoop';
 import type { AgentMessagesEngine } from '../messageEngine';
 
 export interface AgentPanelPluginProps {
+  injectDocumentXml?: boolean;
   litexmlRegistry?: LitexmlRegistryProvider;
   messageEngine?: AgentMessagesEngine;
+  plugins?: AgentExecutorPlugin[];
   provider: LLMProvider;
   store: AgentStore;
   systemMessages?: ChatMessage[];
   tools?: AgentToolConfig[];
+  toolSystemRole?: string | false;
 }
 
 export function AgentPanelPlugin({
+  injectDocumentXml,
   messageEngine,
+  plugins,
   provider,
   store,
   litexmlRegistry,
   tools,
   systemMessages,
+  toolSystemRole,
 }: AgentPanelPluginProps): ReactElement | null {
   const [editor] = useLexicalComposerContext();
   const textSelectionSnapshot = useTextSelectionSnapshot();
@@ -56,6 +63,16 @@ export function AgentPanelPlugin({
     };
   }, [store]);
 
-  useAgentLoop({ provider, store, tools, litexmlRegistry, systemMessages, messageEngine });
+  useAgentLoop({
+    injectDocumentXml,
+    litexmlRegistry,
+    messageEngine,
+    plugins,
+    provider,
+    store,
+    systemMessages,
+    tools,
+    toolSystemRole,
+  });
   return null;
 }

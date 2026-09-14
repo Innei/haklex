@@ -136,4 +136,30 @@ describe('AgentMessagesEngine history', () => {
       content: expect.not.stringContaining('block_selection'),
     });
   });
+
+  it('skips document xml injection when injectDocumentXml is false', () => {
+    const prepared = new AgentMessagesEngine({
+      injectDocumentXml: false,
+      systemMessages: [{ role: 'system', content: 'System prompt' }],
+    }).processWithEditor({
+      editorState: emptyEditorState,
+      userInput: 'Current request',
+    });
+
+    expect(prepared.preambleMessages).toHaveLength(1);
+    expect(prepared.preambleMessages[0].content).toBe('Current request');
+    expect(prepared.preambleMessages[0].content).not.toContain('<current_page');
+  });
+
+  it('skips the document tool system role when toolSystemRole is false', () => {
+    const prepared = new AgentMessagesEngine({
+      systemMessages: [{ role: 'system', content: 'System prompt' }],
+      toolSystemRole: false,
+    }).processWithEditor({
+      editorState: emptyEditorState,
+      userInput: 'Current request',
+    });
+
+    expect(prepared.systemMessages).toEqual([{ role: 'system', content: 'System prompt' }]);
+  });
 });

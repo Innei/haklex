@@ -2,8 +2,15 @@ export { $captureSelection } from './captureSelection';
 export { AGENT_PIN_SELECTION_COMMAND } from './commands';
 export { AgentActionBar } from './components/AgentActionBar';
 export { AgentAskAIAction } from './components/AgentAskAIAction';
+export type { UseAgentLoopOptions } from './hooks/useAgentLoop';
 export { useAgentLoop } from './hooks/useAgentLoop';
-export { defaultAgentSystemMessage, defaultAgentSystemRole } from './messageEngine';
+export type { AgentMessagesEngineOptions } from './messageEngine';
+export {
+  AgentMessagesEngine,
+  defaultAgentSystemMessage,
+  defaultAgentSystemRole,
+  defaultDocumentToolSystemRole,
+} from './messageEngine';
 export { AgentDiffEditNode } from './nodes/AgentDiffEditNode';
 export type { AgentDiffNodePayload, AgentDiffOpType } from './nodes/diff-node-state';
 export { projectAgentDiffNodesToFactualState } from './nodes/diff-node-state';

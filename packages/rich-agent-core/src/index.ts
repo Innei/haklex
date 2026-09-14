@@ -1,5 +1,7 @@
 export type { AgentExecutorConfig, AgentExecutorResult } from './agent-executor';
 export { createAgentExecutor } from './agent-executor';
+export type { AgentExecutorPlugin, AgentExecutorPluginContext } from './agent-plugins';
+export { documentToolsPlugin } from './agent-plugins';
 export {
   acceptAllDiffs,
   acceptDiff,

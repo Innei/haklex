@@ -1,4 +1,5 @@
 import {
+  type AgentExecutorPlugin,
   type AgentStore,
   type AgentToolConfig,
   type ChatMessage,
@@ -21,9 +22,12 @@ export type UseAgentLoopOptions = {
   provider: LLMProvider;
   store: AgentStore;
   tools?: AgentToolConfig[];
+  plugins?: AgentExecutorPlugin[];
+  injectDocumentXml?: boolean;
   litexmlRegistry?: LitexmlRegistryProvider;
   messageEngine?: AgentMessagesEngine;
   systemMessages?: ChatMessage[];
+  toolSystemRole?: string | false;
 };
 
 export function useAgentLoop(options: UseAgentLoopOptions) {
@@ -50,8 +54,10 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
         const messageEngine =
           options.messageEngine ??
           new AgentMessagesEngine({
+            injectDocumentXml: options.injectDocumentXml,
             litexmlRegistry: options.litexmlRegistry,
             systemMessages: options.systemMessages,
+            toolSystemRole: options.toolSystemRole,
           });
         const preparedMessages = messageEngine.processWithEditor({
           editorState: serialized,
@@ -67,6 +73,7 @@ export function useAgentLoop(options: UseAgentLoopOptions) {
           snapshot,
           store: options.store,
           tools: options.tools ?? [],
+          plugins: options.plugins,
           litexmlRegistry: options.litexmlRegistry,
           signal: controller.signal,
           onOperationsChanged: (ops) => {

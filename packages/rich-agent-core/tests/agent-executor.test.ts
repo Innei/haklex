@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
 import { createAgentExecutor } from '../src/agent-executor';
-import type { LLMChunk, LLMProvider, PreparedMessages } from '../src/protocol';
+import type { AgentToolConfig, LLMChunk, LLMProvider, PreparedMessages } from '../src/protocol';
 import { createSnapshot } from '../src/snapshot';
 import { createAgentStore } from '../src/store';
+import type { AgentOperation } from '../src/types';
 
 function makeEditorState() {
   return {
@@ -270,4 +271,183 @@ describe('createAgentExecutor', () => {
 
     await expect(promise).rejects.toThrow();
   });
+
+  it('omits built-in document tools when plugins is empty', async () => {
+    const store = createAgentStore();
+    const snapshot = createSnapshot(makeEditorState() as any);
+
+    let callCount = 0;
+    const provider: LLMProvider = {
+      async *chat() {
+        callCount++;
+        if (callCount === 1) {
+          yield {
+            type: 'tool_call' as const,
+            id: 'tc1',
+            name: 'delete_node',
+            arguments: JSON.stringify({ blockId: 'p1' }),
+          };
+          yield { type: 'done' as const };
+        } else {
+          yield { type: 'text' as const, text: 'No builtin tools.' };
+          yield { type: 'done' as const };
+        }
+      },
+    };
+
+    const executor = createAgentExecutor({
+      plugins: [],
+      provider,
+      snapshot,
+      store,
+      tools: [],
+    });
+
+    const result = await executor.run({
+      systemMessages: [{ role: 'system', content: 'Agent' }],
+      preambleMessages: [{ role: 'user', content: 'Delete it' }],
+    });
+
+    expect(result.operations).toHaveLength(0);
+
+    const group = store.getState().bubbles.find((b) => b.type === 'tool_call_group');
+    expect(group?.type).toBe('tool_call_group');
+    if (group?.type === 'tool_call_group') {
+      expect(group.items[0].status).toBe('error');
+      expect(group.items[0].error).toContain('unknown_tool');
+    }
+  });
+
+  it('appends operations returned by a host tool', async () => {
+    const store = createAgentStore();
+    const snapshot = createSnapshot(makeEditorState() as any);
+    const op: AgentOperation = { op: 'delete', blockId: 'p1' };
+    const hostTool = makeHostTool('host_edit', {
+      ok: true,
+      content: 'deleted',
+      operations: [op],
+    });
+
+    let callCount = 0;
+    const provider: LLMProvider = {
+      async *chat() {
+        callCount++;
+        if (callCount === 1) {
+          yield {
+            type: 'tool_call' as const,
+            id: 'tc1',
+            name: 'host_edit',
+            arguments: '{}',
+          };
+          yield { type: 'done' as const };
+        } else {
+          yield { type: 'text' as const, text: 'Done.' };
+          yield { type: 'done' as const };
+        }
+      },
+    };
+
+    const executor = createAgentExecutor({
+      plugins: [],
+      provider,
+      snapshot,
+      store,
+      tools: [hostTool],
+    });
+
+    const result = await executor.run({
+      systemMessages: [{ role: 'system', content: 'Agent' }],
+      preambleMessages: [{ role: 'user', content: 'Edit' }],
+    });
+
+    expect(result.operations).toEqual([op]);
+  });
+
+  it('replaces accumulated operations when a host tool uses replace mode', async () => {
+    const store = createAgentStore();
+    const snapshot = createSnapshot(makeEditorState() as any);
+    const first: AgentOperation = { op: 'delete', blockId: 'p1' };
+    const second: AgentOperation = {
+      op: 'insert',
+      position: { type: 'root', index: 0 },
+      node: { type: 'paragraph', version: 1 },
+    };
+    let execCount = 0;
+    const hostTool: AgentToolConfig = {
+      name: 'host_edit',
+      description: 'host',
+      parameters: { type: 'object', properties: {} },
+      execute: async () => {
+        execCount++;
+        if (execCount === 1) {
+          return { ok: true, content: 'first', operations: [first] };
+        }
+        return {
+          ok: true,
+          content: 'second',
+          operations: [second],
+          operationsMode: 'replace',
+        };
+      },
+    };
+
+    let callCount = 0;
+    const provider: LLMProvider = {
+      async *chat() {
+        callCount++;
+        if (callCount === 1) {
+          yield {
+            type: 'tool_call' as const,
+            id: 'tc1',
+            name: 'host_edit',
+            arguments: '{}',
+          };
+          yield { type: 'done' as const };
+        } else if (callCount === 2) {
+          yield {
+            type: 'tool_call' as const,
+            id: 'tc2',
+            name: 'host_edit',
+            arguments: '{}',
+          };
+          yield { type: 'done' as const };
+        } else {
+          yield { type: 'text' as const, text: 'Done.' };
+          yield { type: 'done' as const };
+        }
+      },
+    };
+
+    const notified: AgentOperation[][] = [];
+    const executor = createAgentExecutor({
+      onOperationsChanged: (operations) => {
+        notified.push([...operations]);
+      },
+      plugins: [],
+      provider,
+      snapshot,
+      store,
+      tools: [hostTool],
+    });
+
+    const result = await executor.run({
+      systemMessages: [{ role: 'system', content: 'Agent' }],
+      preambleMessages: [{ role: 'user', content: 'Edit' }],
+    });
+
+    expect(result.operations).toEqual([second]);
+    expect(notified).toEqual([[first], [second]]);
+  });
 });
+
+function makeHostTool(
+  name: string,
+  result: Extract<Awaited<ReturnType<AgentToolConfig['execute']>>, { ok: true }>,
+): AgentToolConfig {
+  return {
+    name,
+    description: name,
+    parameters: { type: 'object', properties: {} },
+    execute: async () => result,
+  };
+}

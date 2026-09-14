@@ -30,9 +30,10 @@ export const defaultAgentSystemMessage: Extract<ChatMessage, { role: 'system' }>
 };
 
 export type AgentMessagesEngineOptions = {
+  injectDocumentXml?: boolean;
   litexmlRegistry?: LitexmlRegistryProvider;
   systemMessages?: ChatMessage[];
-  toolSystemRole?: string;
+  toolSystemRole?: string | false;
 };
 
 function resolveLitexmlRegistry(provider?: LitexmlRegistryProvider) {
@@ -254,17 +255,24 @@ function buildTextSelectionContext(
 }
 
 export class AgentMessagesEngine extends MessagesEngine {
+  private readonly injectDocumentXml: boolean;
   private readonly litexmlRegistry?: LitexmlRegistryProvider;
 
   constructor(options: AgentMessagesEngineOptions = {}) {
-    super([
+    const processors = [
       new DefaultSystemRoleInjector(normalizeSystemMessages(options.systemMessages)),
-      new DocumentToolSystemInjector(options.toolSystemRole ?? defaultDocumentToolSystemRole),
+      ...(options.toolSystemRole === false
+        ? []
+        : [
+            new DocumentToolSystemInjector(options.toolSystemRole ?? defaultDocumentToolSystemRole),
+          ]),
       new PageSelectionsInjector(),
       new CapturedSelectionInjector(),
       new TextSelectionInjector(),
-      new PageEditorContextInjector(),
-    ]);
+      ...(options.injectDocumentXml === false ? [] : [new PageEditorContextInjector()]),
+    ];
+    super(processors);
+    this.injectDocumentXml = options.injectDocumentXml !== false;
     this.litexmlRegistry = options.litexmlRegistry;
   }
 
@@ -291,15 +299,17 @@ export class AgentMessagesEngine extends MessagesEngine {
 
     return this.process({
       messages: [...(params.messages ?? []), userMessage],
-      pageContentContext: {
-        metadata: { title: params.title ?? 'Current Document' },
-        xml: buildDocumentContext(params.editorState, {
-          litexmlRegistry: this.litexmlRegistry,
-          mode: 'full',
-          compact: true,
-          selectedBlockIds,
-        }),
-      },
+      pageContentContext: this.injectDocumentXml
+        ? {
+            metadata: { title: params.title ?? 'Current Document' },
+            xml: buildDocumentContext(params.editorState, {
+              litexmlRegistry: this.litexmlRegistry,
+              mode: 'full',
+              compact: true,
+              selectedBlockIds,
+            }),
+          }
+        : undefined,
       textSelection,
     });
   }

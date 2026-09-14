@@ -1,4 +1,4 @@
-import { createDocumentTools } from './document-tools';
+import { type AgentExecutorPlugin, documentToolsPlugin } from './agent-plugins';
 import type { ChatBubble } from './initialState';
 import type { LitexmlRegistryProvider } from './litexml';
 import { buildMessages } from './messages-engine';
@@ -19,6 +19,7 @@ export type AgentExecutorConfig = {
   snapshot: EditorSnapshot;
   store: AgentStore;
   tools: AgentToolConfig[];
+  plugins?: AgentExecutorPlugin[];
   litexmlRegistry?: LitexmlRegistryProvider;
   signal?: AbortSignal;
   onOperationsChanged?: (operations: AgentOperation[]) => void;
@@ -68,14 +69,32 @@ function toolConfigToSchema(tool: AgentToolConfig): ToolSchema {
   };
 }
 
+function applyReturnedOperations(
+  operations: AgentOperation[],
+  result: AgentToolResult,
+): 'append' | 'replace' | null {
+  if (!result.ok || !result.operations) return null;
+  if (result.operationsMode === 'replace') {
+    operations.splice(0, operations.length, ...result.operations);
+    return 'replace';
+  }
+  operations.push(...result.operations);
+  return 'append';
+}
+
 export function createAgentExecutor(config: AgentExecutorConfig) {
   const { provider, snapshot, store, signal, onOperationsChanged } = config;
   const operations: AgentOperation[] = [];
   let lastOpsLength = 0;
-  const documentTools = createDocumentTools(snapshot, operations, {
-    litexmlRegistry: config.litexmlRegistry,
-  });
-  const allTools = [...documentTools, ...config.tools];
+  const plugins = config.plugins ?? [documentToolsPlugin()];
+  const pluginTools = plugins.flatMap((plugin) =>
+    plugin.tools({
+      litexmlRegistry: config.litexmlRegistry,
+      operations,
+      snapshot,
+    }),
+  );
+  const allTools = [...pluginTools, ...config.tools];
   const toolMap = new Map(allTools.map((t) => [t.name, t]));
   const toolSchemas = allTools.map(toolConfigToSchema);
 
@@ -226,6 +245,7 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
 
         const result = await executeTool(tc.name, tc.arguments);
         const content = result.ok ? result.content : JSON.stringify(result.error);
+        const returnedMode = applyReturnedOperations(operations, result);
 
         updateToolCallItem(groupId, tc.id, {
           status: result.ok ? 'completed' : 'error',
@@ -242,7 +262,7 @@ export function createAgentExecutor(config: AgentExecutorConfig) {
           isError: !result.ok,
         });
 
-        if (operations.length > lastOpsLength) {
+        if (returnedMode === 'replace' || operations.length !== lastOpsLength) {
           lastOpsLength = operations.length;
           onOperationsChanged?.(operations);
         }

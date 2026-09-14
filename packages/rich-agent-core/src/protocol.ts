@@ -1,4 +1,5 @@
 import type { LitexmlRegistryProvider } from './litexml';
+import type { AgentOperation } from './types';
 
 export type ChatMessage =
   | { role: 'system'; content: string; cacheBreakpoint?: boolean }
@@ -55,7 +56,14 @@ export type LLMProvider = {
   chat: (messages: ChatMessage[], tools?: ToolSchema[]) => AsyncIterable<LLMChunk>;
 };
 
-export type AgentToolResult = { ok: true; content: string } | { ok: false; error: ToolError };
+export type AgentToolResult =
+  | {
+      ok: true;
+      content: string;
+      operations?: AgentOperation[];
+      operationsMode?: 'append' | 'replace';
+    }
+  | { ok: false; error: ToolError };
 
 export type ToolError = {
   error: 'block_modified' | 'block_not_found' | string;
