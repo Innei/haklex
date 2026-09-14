@@ -22,5 +22,9 @@ export type {
   OnImageClick,
   RichImageInfo,
 } from './modules/image/types';
-export type { BuiltinNodeRenderer, RichRendererProps } from './static-renderer';
+export type {
+  BlockAnchorRenderer,
+  BuiltinNodeRenderer,
+  RichRendererProps,
+} from './static-renderer';
 export { RichRenderer } from './static-renderer';

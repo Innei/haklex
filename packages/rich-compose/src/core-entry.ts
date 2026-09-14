@@ -7,5 +7,9 @@ export type {
   RichRendererBaseProps,
   RichRendererModule,
 } from './core/types';
-export type { BuiltinNodeRenderer, RichRendererProps } from './static-renderer';
+export type {
+  BlockAnchorRenderer,
+  BuiltinNodeRenderer,
+  RichRendererProps,
+} from './static-renderer';
 export { RichRenderer } from './static-renderer';

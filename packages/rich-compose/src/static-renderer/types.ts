@@ -1,6 +1,6 @@
 import type { ColorScheme, RendererConfig, RichEditorVariant } from '@haklex/rich-editor/static';
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, ElementType, ReactNode } from 'react';
 
 export type BuiltinNodeRenderer = (
   node: any,
@@ -9,8 +9,15 @@ export type BuiltinNodeRenderer = (
   defaultRenderer: () => ReactNode,
 ) => ReactNode;
 
+export type BlockAnchorRenderer = (
+  element: ReactNode,
+  blockId: string,
+  nodeKey: string,
+) => ReactNode;
+
 export interface RichRendererProps {
-  as?: keyof React.JSX.IntrinsicElements;
+  as?: ElementType;
+  blockAnchor?: BlockAnchorRenderer;
   builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>;
   className?: string;
   extraNodes?: Array<Klass<LexicalNode>>;

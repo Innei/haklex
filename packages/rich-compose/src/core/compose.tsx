@@ -58,6 +58,7 @@ export function composeRenderer(
   };
   const ComposedProviders = composeProviders(merged);
   const builtinNodeOverrides = opts.builtinNodeOverrides;
+  const blockAnchor = opts.blockAnchor;
 
   function ComposedRenderer(props: RichRendererBaseProps) {
     const { theme, variant } = props;
@@ -73,6 +74,7 @@ export function composeRenderer(
         <ComposedProviders>
           <RichRenderer
             as={props.as}
+            blockAnchor={blockAnchor}
             builtinNodeOverrides={builtinNodeOverrides}
             className={props.className}
             extraNodes={allNodes}

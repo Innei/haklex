@@ -1,8 +1,8 @@
 import type { RendererConfig, RichEditorVariant } from '@haklex/rich-editor/static';
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
-import type { ComponentType, CSSProperties, ReactNode } from 'react';
+import type { ComponentType, CSSProperties, ElementType, ReactNode } from 'react';
 
-import type { BuiltinNodeRenderer } from '../static-renderer/types';
+import type { BlockAnchorRenderer, BuiltinNodeRenderer } from '../static-renderer/types';
 
 export type RendererKey = keyof RendererConfig;
 
@@ -27,6 +27,7 @@ export interface RichEditorModule extends RichRendererModule {
 }
 
 export interface ComposeRendererOptions {
+  blockAnchor?: BlockAnchorRenderer;
   builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>;
   modules?: RichRendererModule[];
   overrides?: Partial<RendererConfig>;
@@ -40,7 +41,7 @@ export interface ComposeEditorOptions {
 }
 
 export interface RichRendererBaseProps {
-  as?: keyof React.JSX.IntrinsicElements;
+  as?: ElementType;
   className?: string;
   nested?: boolean;
   style?: CSSProperties;

@@ -7,6 +7,9 @@ export default defineConfig({
   test: {
     include: ['packages/**/*.test.{ts,tsx}'],
     exclude: ['**/node_modules/**', '**/dist/**'],
-    setupFiles: ['./packages/rich-litexml/tests/setup.ts'],
+    setupFiles: [
+      './packages/rich-litexml/tests/setup.ts',
+      './packages/rich-compose/tests/setup-vanilla-extract.ts',
+    ],
   },
 });

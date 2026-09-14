@@ -177,6 +177,42 @@ composeRenderer({
 
 The lazy chunk is still emitted but never fetched at runtime.
 
+## Platform-agnostic rendering
+
+`RichRenderer` (and `composeRenderer`) emit DOM by default, but every DOM touchpoint is injectable so the same tree walk can target another React renderer (React Native, ink, a test harness):
+
+| Hook                            | Covers                                                                                        |
+| ------------------------------- | --------------------------------------------------------------------------------------------- |
+| `builtinNodeOverrides[type]`    | Element nodes (`paragraph`, `heading`, `list`, …) and decorator nodes (`image`, `mermaid`, …) |
+| `builtinNodeOverrides.text`     | Text leaves — receives the serialized text node (`text`, `format`, `style`)                   |
+| `blockAnchor(el, blockId, key)` | Root-level block wrapper carrying `$.blockId`; defaults to a `data-block-id` div              |
+| `as`                            | Host container — any `ElementType`; non-string hosts receive only `style` and `children`      |
+
+A decorator override receives the default decoration as its single child and may drop it:
+
+```tsx
+<RichRenderer
+  as={View}
+  blockAnchor={(el, blockId, key) => (
+    <View key={key} nativeID={blockId}>
+      {el}
+    </View>
+  )}
+  builtinNodeOverrides={{
+    text: (node, key) => (
+      <Text key={key} style={textStyle(node.format)}>
+        {node.text}
+      </Text>
+    ),
+    paragraph: (_node, key, children) => <Text key={key}>{children}</Text>,
+    mermaid: (node, key) => <NativeMermaid key={key} diagram={node.diagram} />,
+  }}
+  value={state}
+/>
+```
+
+Decorator slots (`rendererConfig` / module `renderers`) accept any React component, so `Image`, `CodeBlock`, `LinkCard` etc. can be replaced the same way.
+
 ## Module catalog
 
 | Module         | Base Klass        | Edit Klass            | Mode                            | Source                    |
