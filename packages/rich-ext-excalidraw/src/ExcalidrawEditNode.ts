@@ -53,7 +53,7 @@ export class ExcalidrawEditNode extends ExcalidrawNode {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): ExcalidrawEditNode {
     const serializedNode = _serializedNode as unknown as SerializedExcalidrawNode;
-    return new ExcalidrawEditNode(serializedNode.snapshot);
+    return new ExcalidrawEditNode(serializedNode.snapshot).updateFromJSON(_serializedNode);
   }
 
   decorate(editor: LexicalEditor, config: EditorConfig): ReactElement {

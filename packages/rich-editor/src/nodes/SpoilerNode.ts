@@ -55,8 +55,7 @@ export class SpoilerNode extends ElementNode {
   }
 
   static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): SpoilerNode {
-    void _serializedNode;
-    return $createSpoilerNode();
+    return $createSpoilerNode().updateFromJSON(_serializedNode as unknown as SerializedElementNode);
   }
 
   exportJSON(): SerializedElementNode {

@@ -22,7 +22,7 @@ export class KaTeXInlineEditNode extends KaTeXInlineNode {
     const serializedNode = _serializedNode as unknown as SerializedKaTeXInlineNode;
     const node = new KaTeXInlineEditNode(serializedNode.equation);
     if (serializedNode.color) node.setColor(serializedNode.color);
-    return node;
+    return node.updateFromJSON(_serializedNode);
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

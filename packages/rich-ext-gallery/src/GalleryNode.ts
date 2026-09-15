@@ -95,7 +95,7 @@ export class GalleryNode extends DecoratorNode<ReactElement> {
       aspect: serializedNode.aspect,
       fit: serializedNode.fit,
       maxItemHeight: serializedNode.maxItemHeight,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedGalleryNode {

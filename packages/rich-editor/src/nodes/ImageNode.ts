@@ -234,7 +234,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       fixedWidth: serializedNode.fixedWidth,
       fixedHeight: serializedNode.fixedHeight,
       layout: serializedNode.layout,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedImageNode {

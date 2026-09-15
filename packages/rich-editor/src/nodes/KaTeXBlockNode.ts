@@ -76,7 +76,7 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): KaTeXBlockNode {
     const serializedNode = _serializedNode as unknown as SerializedKaTeXBlockNode;
-    return $createKaTeXBlockNode(serializedNode.equation);
+    return $createKaTeXBlockNode(serializedNode.equation).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedKaTeXBlockNode {

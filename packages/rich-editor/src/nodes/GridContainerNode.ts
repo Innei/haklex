@@ -196,7 +196,7 @@ export class GridContainerNode extends DecoratorNode<ReactElement> {
     const gap = typeof rawGap === 'number' ? `${rawGap}px` : rawGap;
 
     if (legacy.cells && legacy.cells.length > 0) {
-      return new GridContainerNode(cols, gap, legacy.cells);
+      return new GridContainerNode(cols, gap, legacy.cells).updateFromJSON(_serializedNode);
     }
 
     if (legacy.children) {
@@ -212,10 +212,10 @@ export class GridContainerNode extends DecoratorNode<ReactElement> {
           },
         } as unknown as SerializedEditorState;
       });
-      return new GridContainerNode(cols, gap, cellStates);
+      return new GridContainerNode(cols, gap, cellStates).updateFromJSON(_serializedNode);
     }
 
-    return new GridContainerNode(cols, gap);
+    return new GridContainerNode(cols, gap).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedGridContainerNode {

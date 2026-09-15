@@ -53,7 +53,9 @@ export class EmbedNode extends DecoratorNode<ReactElement> {
 
   static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): EmbedNode {
     const serializedNode = _serializedNode as unknown as SerializedEmbedNode;
-    return $createEmbedNode(serializedNode.url, serializedNode.source);
+    return $createEmbedNode(serializedNode.url, serializedNode.source).updateFromJSON(
+      _serializedNode,
+    );
   }
 
   exportJSON(): SerializedEmbedNode {

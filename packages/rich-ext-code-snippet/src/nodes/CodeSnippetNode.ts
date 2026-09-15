@@ -56,7 +56,7 @@ export class CodeSnippetNode extends DecoratorNode<ReactElement> {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): CodeSnippetNode {
     const serializedNode = _serializedNode as unknown as SerializedCodeSnippetNode;
-    return $createCodeSnippetNode(serializedNode.files);
+    return $createCodeSnippetNode(serializedNode.files).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedCodeSnippetNode {

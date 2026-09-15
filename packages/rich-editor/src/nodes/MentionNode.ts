@@ -98,7 +98,7 @@ export class MentionNode extends DecoratorNode<ReactElement> {
       serializedNode.platform,
       serializedNode.handle,
       serializedNode.displayName,
-    );
+    ).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedMentionNode {

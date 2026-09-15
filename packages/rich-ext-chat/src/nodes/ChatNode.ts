@@ -100,7 +100,7 @@ export class ChatNode extends DecoratorNode<ReactElement> {
       variant: serializedNode.variant,
       participants: serializedNode.participants,
       messages: serializedNode.messages,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedChatNode {

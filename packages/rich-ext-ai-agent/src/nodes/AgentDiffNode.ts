@@ -54,7 +54,7 @@ export class AgentDiffNode extends DecoratorNode<ReactElement> {
       opType: json.opType,
       originalNode: json.originalNode ?? null,
       proposedNode: json.proposedNode ?? null,
-    });
+    }).updateFromJSON(_json);
   }
 
   getPayload(): AgentDiffNodePayload {

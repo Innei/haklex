@@ -60,7 +60,7 @@ export class RubyNode extends ElementNode {
 
   static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): RubyNode {
     const serializedNode = _serializedNode as unknown as SerializedRubyNode;
-    return $createRubyNode(serializedNode.reading ?? '');
+    return $createRubyNode(serializedNode.reading ?? '').updateFromJSON(serializedNode);
   }
 
   exportJSON(): SerializedRubyNode {

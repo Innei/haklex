@@ -59,7 +59,7 @@ export class PollEditNode extends PollNode {
       mode: serializedNode.mode,
       closeAt: serializedNode.closeAt,
       showResults: serializedNode.showResults,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

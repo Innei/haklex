@@ -23,7 +23,7 @@ export class AgentDiffEditNode extends AgentDiffNode {
       opType: json.opType,
       originalNode: json.originalNode ?? null,
       proposedNode: json.proposedNode ?? null,
-    });
+    }).updateFromJSON(_json);
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

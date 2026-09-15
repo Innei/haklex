@@ -74,7 +74,7 @@ export class BannerEditNode extends BannerNode {
     const bannerType = normalizeBannerType(serializedNode.bannerType);
 
     if (serializedNode.content) {
-      return new BannerEditNode(bannerType, serializedNode.content);
+      return new BannerEditNode(bannerType, serializedNode.content).updateFromJSON(_serializedNode);
     }
 
     if (legacy.children) {
@@ -88,10 +88,10 @@ export class BannerEditNode extends BannerNode {
           version: 1,
         },
       } as unknown as SerializedEditorState;
-      return new BannerEditNode(bannerType, content);
+      return new BannerEditNode(bannerType, content).updateFromJSON(_serializedNode);
     }
 
-    return new BannerEditNode(bannerType);
+    return new BannerEditNode(bannerType).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedBannerNode {

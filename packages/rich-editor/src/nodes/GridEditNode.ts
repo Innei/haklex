@@ -181,7 +181,7 @@ export class GridEditNode extends GridContainerNode {
     const gap = typeof rawGap === 'number' ? `${rawGap}px` : rawGap;
 
     if (legacy.cells && legacy.cells.length > 0) {
-      return new GridEditNode(cols, gap, legacy.cells);
+      return new GridEditNode(cols, gap, legacy.cells).updateFromJSON(_serializedNode);
     }
 
     if (legacy.children) {
@@ -197,10 +197,10 @@ export class GridEditNode extends GridContainerNode {
           },
         } as unknown as SerializedEditorState;
       });
-      return new GridEditNode(cols, gap, cellStates);
+      return new GridEditNode(cols, gap, cellStates).updateFromJSON(_serializedNode);
     }
 
-    return new GridEditNode(cols, gap);
+    return new GridEditNode(cols, gap).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedGridContainerNode {

@@ -49,7 +49,7 @@ export class ExcalidrawNode extends DecoratorNode<ReactElement> {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): ExcalidrawNode {
     const serializedNode = _serializedNode as unknown as SerializedExcalidrawNode;
-    return $createExcalidrawNode(serializedNode.snapshot);
+    return $createExcalidrawNode(serializedNode.snapshot).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedExcalidrawNode {

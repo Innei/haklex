@@ -18,7 +18,7 @@ export class FootnoteSectionEditNode extends FootnoteSectionNode {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): FootnoteSectionEditNode {
     const serializedNode = _serializedNode as unknown as SerializedFootnoteSectionNode;
-    return new FootnoteSectionEditNode(serializedNode.definitions);
+    return new FootnoteSectionEditNode(serializedNode.definitions).updateFromJSON(_serializedNode);
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

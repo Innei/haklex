@@ -58,7 +58,7 @@ export class LinkCardEditNode extends LinkCardNode {
       description: serializedNode.description,
       favicon: serializedNode.favicon,
       image: serializedNode.image,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

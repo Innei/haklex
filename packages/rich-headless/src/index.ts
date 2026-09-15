@@ -78,7 +78,7 @@ export class SpoilerNode extends ElementNode {
   }
   static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): SpoilerNode {
     void _json;
-    return new SpoilerNode();
+    return new SpoilerNode().updateFromJSON(_json as unknown as SerializedElementNode);
   }
   exportJSON(): SerializedElementNode {
     return { ...super.exportJSON(), type: 'spoiler', version: 1 };

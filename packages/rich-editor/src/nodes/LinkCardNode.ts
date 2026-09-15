@@ -121,7 +121,7 @@ export class LinkCardNode extends DecoratorNode<ReactElement> {
       description: serializedNode.description,
       favicon: serializedNode.favicon,
       image: serializedNode.image,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedLinkCardNode {

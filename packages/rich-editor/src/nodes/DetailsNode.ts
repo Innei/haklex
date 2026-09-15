@@ -114,7 +114,9 @@ export class DetailsNode extends ElementNode {
 
   static importJSON(_serializedNode: SerializedLexicalNode & Record<string, unknown>): DetailsNode {
     const serializedNode = _serializedNode as unknown as SerializedDetailsNode;
-    return $createDetailsNode(serializedNode.summary, serializedNode.open);
+    return $createDetailsNode(serializedNode.summary, serializedNode.open).updateFromJSON(
+      serializedNode,
+    );
   }
 
   exportJSON(): SerializedDetailsNode {

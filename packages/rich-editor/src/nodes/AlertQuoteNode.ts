@@ -118,7 +118,9 @@ export class AlertQuoteNode extends DecoratorNode<ReactElement> {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): AlertQuoteNode {
     const serializedNode = _serializedNode as unknown as SerializedAlertQuoteNode;
-    return new AlertQuoteNode(serializedNode.alertType, serializedNode.content);
+    return new AlertQuoteNode(serializedNode.alertType, serializedNode.content).updateFromJSON(
+      _serializedNode,
+    );
   }
 
   exportJSON(): SerializedAlertQuoteNode {

@@ -134,7 +134,7 @@ export class BannerNode extends DecoratorNode<ReactElement> {
     const bannerType = normalizeBannerType(serializedNode.bannerType);
 
     if (serializedNode.content) {
-      return new BannerNode(bannerType, serializedNode.content);
+      return new BannerNode(bannerType, serializedNode.content).updateFromJSON(_serializedNode);
     }
 
     if (legacy.children) {
@@ -148,10 +148,10 @@ export class BannerNode extends DecoratorNode<ReactElement> {
           version: 1,
         },
       } as unknown as SerializedEditorState;
-      return new BannerNode(bannerType, content);
+      return new BannerNode(bannerType, content).updateFromJSON(_serializedNode);
     }
 
-    return new BannerNode(bannerType);
+    return new BannerNode(bannerType).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedBannerNode {

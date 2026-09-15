@@ -55,7 +55,7 @@ export class FootnoteNode extends DecoratorNode<ReactElement> {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): FootnoteNode {
     const serializedNode = _serializedNode as unknown as SerializedFootnoteNode;
-    return $createFootnoteNode(serializedNode.identifier);
+    return $createFootnoteNode(serializedNode.identifier).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedFootnoteNode {

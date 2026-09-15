@@ -5,7 +5,10 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import {
   $getNodeByKey,
   $getRoot,
+  $getSelection,
+  $isRangeSelection,
   $parseSerializedNode,
+  $setSelection,
   $setState,
   type LexicalNode,
   type SerializedLexicalNode,
@@ -96,6 +99,18 @@ function $parseMaterializedNode(
 
   if (payload.opType === 'insert') return null;
   return payload.originalNode ? $parseSerializedNode(payload.originalNode) : null;
+}
+
+// Replacing a block that holds the caret leaves a RangeSelection pointing at
+// detached text nodes; Lexical then throws in dev and discards the whole
+// update, so no diff node ever renders.
+function $clearDetachedSelection() {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection)) return;
+  const anchor = $getNodeByKey(selection.anchor.key);
+  const focus = $getNodeByKey(selection.focus.key);
+  if (anchor?.isAttached() && focus?.isAttached()) return;
+  $setSelection(null);
 }
 
 function $resolveDiffNode(node: LexicalNode, side: 'accepted' | 'rejected') {
@@ -327,6 +342,8 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           );
         }
       }
+
+      $clearDetachedSelection();
     });
   }, [editor, store]);
 

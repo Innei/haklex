@@ -15,7 +15,7 @@ export class KaTeXBlockEditNode extends KaTeXBlockNode {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): KaTeXBlockEditNode {
     const serializedNode = _serializedNode as unknown as SerializedKaTeXBlockNode;
-    return new KaTeXBlockEditNode(serializedNode.equation);
+    return new KaTeXBlockEditNode(serializedNode.equation).updateFromJSON(_serializedNode);
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

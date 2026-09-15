@@ -70,7 +70,7 @@ export class NestedDocEditNode extends NestedDocNode {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): NestedDocEditNode {
     const serializedNode = _serializedNode as unknown as SerializedNestedDocNode;
-    return new NestedDocEditNode(serializedNode.content);
+    return new NestedDocEditNode(serializedNode.content).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedNestedDocNode {

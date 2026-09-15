@@ -53,7 +53,7 @@ export class ChatEditNode extends ChatNode {
       variant: serializedNode.variant,
       participants: serializedNode.participants,
       messages: serializedNode.messages,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

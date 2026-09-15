@@ -39,7 +39,7 @@ export class CodeSnippetEditNode extends CodeSnippetNode {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): CodeSnippetEditNode {
     const serializedNode = _serializedNode as unknown as SerializedCodeSnippetNode;
-    return new CodeSnippetEditNode(serializedNode.files);
+    return new CodeSnippetEditNode(serializedNode.files).updateFromJSON(_serializedNode);
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

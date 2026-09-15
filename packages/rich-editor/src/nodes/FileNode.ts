@@ -123,7 +123,7 @@ export class FileNode extends DecoratorNode<ReactElement> {
       mimeType: serializedNode.mimeType,
       ext: serializedNode.ext,
       display: serializedNode.display,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedFileNode {

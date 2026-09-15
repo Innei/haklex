@@ -163,7 +163,7 @@ export class PollNode extends DecoratorNode<ReactElement> {
       mode: serializedNode.mode,
       closeAt: serializedNode.closeAt,
       showResults: serializedNode.showResults,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedPollNode {

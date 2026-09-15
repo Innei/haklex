@@ -90,7 +90,7 @@ export class AlertQuoteEditNode extends AlertQuoteNode {
   ): AlertQuoteEditNode {
     const serializedNode = _serializedNode as unknown as SerializedAlertQuoteNode;
     const node = new AlertQuoteEditNode(serializedNode.alertType, serializedNode.content);
-    return node;
+    return node.updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedAlertQuoteNode {

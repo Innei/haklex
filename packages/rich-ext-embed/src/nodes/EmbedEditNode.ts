@@ -35,7 +35,9 @@ export class EmbedEditNode extends EmbedNode {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): EmbedEditNode {
     const serializedNode = _serializedNode as unknown as SerializedEmbedNode;
-    return new EmbedEditNode(serializedNode.url, serializedNode.source);
+    return new EmbedEditNode(serializedNode.url, serializedNode.source).updateFromJSON(
+      _serializedNode,
+    );
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

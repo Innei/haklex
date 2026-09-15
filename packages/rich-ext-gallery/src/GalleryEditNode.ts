@@ -66,7 +66,7 @@ export class GalleryEditNode extends GalleryNode {
       aspect: serializedNode.aspect,
       fit: serializedNode.fit,
       maxItemHeight: serializedNode.maxItemHeight,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   decorate(editor: LexicalEditor, _config: EditorConfig): ReactElement {

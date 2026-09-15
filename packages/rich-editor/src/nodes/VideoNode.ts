@@ -101,7 +101,7 @@ export class VideoNode extends DecoratorNode<ReactElement> {
       poster: serializedNode.poster,
       width: serializedNode.width,
       height: serializedNode.height,
-    });
+    }).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedVideoNode {

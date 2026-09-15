@@ -24,7 +24,9 @@ export class CodeBlockEditNode extends CodeBlockNode {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): CodeBlockEditNode {
     const serializedNode = _serializedNode as unknown as SerializedCodeBlockNode;
-    return new CodeBlockEditNode(serializedNode.code, serializedNode.language);
+    return new CodeBlockEditNode(serializedNode.code, serializedNode.language).updateFromJSON(
+      _serializedNode,
+    );
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {

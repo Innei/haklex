@@ -90,7 +90,7 @@ export class NestedDocNode extends DecoratorNode<ReactElement> {
     _serializedNode: SerializedLexicalNode & Record<string, unknown>,
   ): NestedDocNode {
     const serializedNode = _serializedNode as unknown as SerializedNestedDocNode;
-    return new NestedDocNode(serializedNode.content);
+    return new NestedDocNode(serializedNode.content).updateFromJSON(_serializedNode);
   }
 
   exportJSON(): SerializedNestedDocNode {
