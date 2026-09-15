@@ -25,6 +25,35 @@ describe('serializeToXml', () => {
     expect(xml).toBe('<doc>\n</doc>\n');
   });
 
+  it('merges adjacent text runs that share formats', () => {
+    const registry = new LitexmlRegistry();
+    registry.registerWriter('paragraph', (node, ctx) => ({
+      tag: 'p',
+      children: ctx.serializeChildren((node as any).children ?? []),
+    }));
+    const text = (text: string, format: number) => ({ type: 'text', text, format, version: 1 });
+    const state = makeState([
+      {
+        type: 'paragraph',
+        version: 1,
+        children: [
+          text('plain ', 0),
+          text('bold ', 1),
+          text('code', 17),
+          text(' tail', 1),
+          text(' after', 0),
+          text('a', 1),
+          text('b', 3),
+          text('c', 2),
+        ],
+      },
+    ]);
+    const xml = serializeToXml(state, registry, { compact: true });
+    expect(xml).toContain(
+      '<p>plain <b>bold <code>code</code> tail</b> after<b>a</b><b><i>b</i></b><i>c</i></p>',
+    );
+  });
+
   it('uses fallback for unregistered nodes', () => {
     const registry = new LitexmlRegistry();
     const state = makeState([

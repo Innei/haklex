@@ -42,9 +42,12 @@ export const FORMAT_TAG_TO_BIT: Record<string, number> = {
 
 /** Wrap text content with nested format tags based on bitmask. */
 export function wrapWithFormatTags(text: string, format: number): XmlContent[] {
-  if (format === 0) return [text];
+  return wrapContentWithFormatTags([text], format);
+}
 
-  let content: XmlContent[] = [text];
+/** Wrap already-serialized inline content with nested format tags based on bitmask. */
+export function wrapContentWithFormatTags(content: XmlContent[], format: number): XmlContent[] {
+  if (format === 0) return content;
 
   // Wrap inside-out: last matching bit wraps first (innermost), first bit wraps last (outermost)
   for (let idx = FORMAT_BIT_TO_TAG.length - 1; idx >= 0; idx--) {
