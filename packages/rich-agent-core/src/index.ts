@@ -49,6 +49,7 @@ export { createDirectTransport, createProvider, createProxyTransport } from './p
 export {
   acceptAndRebaseBatch,
   acceptBatch,
+  appendReviewBatch,
   applyOpsToSnapshot,
   createReviewBatch,
   detectConflicts,

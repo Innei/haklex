@@ -140,7 +140,9 @@ function updateResolvedBatch(
         ? {
             ...batch,
             status,
-            entries: batch.entries.map((entry) => ({ ...entry, status })),
+            entries: batch.entries.map((entry) =>
+              entry.status === 'pending' ? { ...entry, status } : entry,
+            ),
           }
         : batch,
     ),
@@ -153,7 +155,9 @@ function batchEntriesMatch(
   predicate: (left: ReviewEntry, right: ReviewEntry) => boolean,
 ): boolean {
   for (const leftEntry of left.entries) {
+    if (leftEntry.status !== 'pending') continue;
     for (const rightEntry of right.entries) {
+      if (rightEntry.status !== 'pending') continue;
       if (predicate(leftEntry, rightEntry)) {
         return true;
       }
@@ -219,6 +223,26 @@ export function createReviewBatch(
     entries,
     touchedBlockIds: extractTouchedBlockIds(entries),
   };
+}
+
+function withEntries(batch: ReviewBatch, entries: ReviewEntry[]): ReviewBatch {
+  const allResolved = entries.every((e) => e.status === 'accepted' || e.status === 'rejected');
+  if (!allResolved) return { ...batch, entries };
+  const allRejected = entries.every((e) => e.status === 'rejected');
+  return { ...batch, entries, status: allRejected ? 'rejected' : 'accepted' };
+}
+
+export function appendReviewBatch(state: ReviewState, incoming: ReviewBatch): ReviewState {
+  const batches = state.batches.map((batch) => {
+    if (isFinalBatchStatus(batch.status)) return batch;
+    const entries = batch.entries.map((entry) =>
+      entry.status === 'pending' && incoming.entries.some((next) => entriesConflict(entry, next))
+        ? { ...entry, status: 'rejected' as const }
+        : entry,
+    );
+    return withEntries(batch, entries);
+  });
+  return reconcileReviewBatches({ ...state, batches: [...batches, incoming] });
 }
 
 export function acceptBatch(state: ReviewState, batchId: string): ReviewState {
@@ -310,15 +334,28 @@ function rebaseBatch(
   baseSnapshot: SerializedEditorState,
   baseRevision: number,
 ): ReviewBatch {
-  const ops = batch.entries.map((entry) => entry.op);
+  // Only pending entries move to the new base. Entries the user already
+  // accepted or rejected must keep their status and id, or a rebase
+  // triggered by accepting a sibling batch resurrects them as pending.
+  const pendingEntries = batch.entries.filter((entry) => entry.status === 'pending');
+  const ops = pendingEntries.map((entry) => entry.op);
   if (!ops.every((op) => canApplyOpToSnapshot(baseSnapshot, op))) {
     return batch;
   }
 
   const rebased = createReviewBatch(ops, baseSnapshot, baseRevision);
+  let nextPendingIndex = 0;
+  const entries = batch.entries.map((entry) => {
+    if (entry.status !== 'pending') return entry;
+    const next = rebased.entries[nextPendingIndex++];
+    return { ...next, id: entry.id };
+  });
+
   return {
     ...rebased,
     id: batch.id,
+    entries,
+    touchedBlockIds: extractTouchedBlockIds(entries),
   };
 }
 
@@ -395,19 +432,12 @@ export function resolveReviewEntry(
     batches: state.batches.map((batch) => {
       if (batch.id !== batchId) return batch;
 
-      const entries = batch.entries.map((entry) =>
-        entry.id === entryId ? { ...entry, status: resolution } : entry,
+      return withEntries(
+        batch,
+        batch.entries.map((entry) =>
+          entry.id === entryId ? { ...entry, status: resolution } : entry,
+        ),
       );
-
-      const allResolved = entries.every((e) => e.status === 'accepted' || e.status === 'rejected');
-
-      let batchStatus = batch.status;
-      if (allResolved) {
-        const allRejected = entries.every((e) => e.status === 'rejected');
-        batchStatus = allRejected ? 'rejected' : 'accepted';
-      }
-
-      return { ...batch, entries, status: batchStatus };
     }),
   };
 }

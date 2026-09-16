@@ -52,14 +52,24 @@ function $findBlockByBlockId(blockId: string): LexicalNode | null {
   return root.getChildren().find((child) => getNodeBlockId(child) === blockId) ?? null;
 }
 
+// An insert whose blockId the same batch deletes is a move; keeping the id
+// lets the moved block stay addressable after accept. Any other inserted id
+// is untrusted and stripped so BlockIdPlugin mints a unique one.
+function isMovedBlock(batch: ReviewBatch, node: SerializedLexicalNode): boolean {
+  const blockId = getBlockId(node);
+  if (!blockId) return false;
+  return batch.entries.some((entry) => entry.op.op === 'delete' && entry.op.blockId === blockId);
+}
+
 function getPayload(batch: ReviewBatch, entry: ReviewEntry): AgentDiffNodePayload {
   if (entry.op.op === 'insert') {
+    const node = entry.op.node as SerializedLexicalNode;
     return {
       batchId: batch.id,
       diffEntryId: entry.id,
       opType: 'insert',
       originalNode: null,
-      proposedNode: stripBlockIdFromSerializedNode(entry.op.node),
+      proposedNode: isMovedBlock(batch, node) ? node : stripBlockIdFromSerializedNode(node),
     };
   }
 
@@ -90,11 +100,7 @@ function $parseMaterializedNode(
     if (payload.opType === 'delete') return null;
     if (!payload.proposedNode) return null;
 
-    const nextNode =
-      payload.opType === 'insert'
-        ? stripBlockIdFromSerializedNode(payload.proposedNode)
-        : payload.proposedNode;
-    return $parseSerializedNode(nextNode);
+    return $parseSerializedNode(payload.proposedNode);
   }
 
   if (payload.opType === 'insert') return null;

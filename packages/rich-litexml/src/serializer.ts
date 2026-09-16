@@ -70,10 +70,16 @@ function serializeTextRun(run: TextRun[]): XmlContent[] {
   }
 
   const groups: TextRun[][] = [];
+  let current: TextRun[] | undefined;
+  let previous: TextRun | undefined;
   for (const node of run) {
-    const last = groups.at(-1);
-    if (last && (last.at(-1).format & node.format) !== 0) last.push(node);
-    else groups.push([node]);
+    if (current && previous && (previous.format & node.format) !== 0) {
+      current.push(node);
+    } else {
+      current = [node];
+      groups.push(current);
+    }
+    previous = node;
   }
   if (groups.length === 1) return run.flatMap((node) => wrapWithFormatTags(node.text, node.format));
   return groups.flatMap((group) => serializeTextRun(group));

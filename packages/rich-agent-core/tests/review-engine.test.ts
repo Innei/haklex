@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   acceptAndRebaseBatch,
+  appendReviewBatch,
   applyOpsToSnapshot,
   createReviewBatch,
   detectConflicts,
@@ -309,6 +310,54 @@ describe('acceptAndRebaseBatch', () => {
     expect((rebased.baseSnapshot.root as any).children ?? []).toHaveLength(3);
   });
 
+  it('keeps already resolved entries resolved when a sibling batch is accepted', () => {
+    const first = createReviewBatch(
+      [{ op: 'replace', blockId: 'b1', node: makeParagraph('Hello!', 'b1') as any }],
+      base,
+      0,
+    );
+    const second = createReviewBatch(
+      [
+        { op: 'replace', blockId: 'b2', node: makeParagraph('World!', 'b2') as any },
+        {
+          op: 'insert',
+          position: { type: 'after', blockId: 'b2' },
+          node: makeParagraph('Tail', 'n1') as any,
+        },
+      ],
+      base,
+      0,
+    );
+    const rejectedEntry = second.entries[0]!;
+    const pendingEntry = second.entries[1]!;
+    const state = {
+      documentRevision: 0,
+      batches: [
+        first,
+        { ...second, entries: [{ ...rejectedEntry, status: 'rejected' as const }, pendingEntry] },
+      ],
+    };
+
+    const result = acceptAndRebaseBatch(detectConflicts(state), first.id);
+    const rebased = result.batches.find((batch) => batch.id === second.id)!;
+
+    expect(rebased.baseRevision).toBe(1);
+    expect(rebased.entries.map((entry) => [entry.id, entry.status])).toEqual([
+      [rejectedEntry.id, 'rejected'],
+      [pendingEntry.id, 'pending'],
+    ]);
+
+    const accepted = acceptAndRebaseBatch(result, second.id);
+    expect(
+      accepted.batches.find((batch) => batch.id === second.id)!.entries.map((e) => e.status),
+    ).toEqual(['rejected', 'accepted']);
+    expect((rebased.previewSnapshot.root as any).children.map((c: any) => c.$.blockId)).toEqual([
+      'b1',
+      'b2',
+      'n1',
+    ]);
+  });
+
   it('marks a batch as conflicted when rebase target no longer exists', () => {
     const deleting = createReviewBatch([{ op: 'delete', blockId: 'b1' }], base, 0);
     const inserting = createReviewBatch(
@@ -336,5 +385,69 @@ describe('acceptAndRebaseBatch', () => {
     expect(result.documentRevision).toBe(1);
     expect(rebased.status).toBe('conflicted');
     expect(rebased.baseRevision).toBe(0);
+  });
+});
+
+describe('appendReviewBatch', () => {
+  const base = makeDoc([makeParagraph('Hello', 'b1'), makeParagraph('World', 'b2')]);
+
+  it('supersedes a pending entry on the same block instead of marking both conflicted', () => {
+    const first = createReviewBatch(
+      [
+        { op: 'replace', blockId: 'b1', node: makeParagraph('First', 'b1') as any },
+        { op: 'replace', blockId: 'b2', node: makeParagraph('Keep me', 'b2') as any },
+      ],
+      base,
+      0,
+    );
+    const second = createReviewBatch(
+      [{ op: 'replace', blockId: 'b1', node: makeParagraph('Second', 'b1') as any }],
+      base,
+      0,
+    );
+
+    const result = appendReviewBatch({ documentRevision: 0, batches: [first] }, second);
+    const [older, newer] = result.batches;
+
+    expect(older.status).toBe('pending');
+    expect(older.entries.map((e) => e.status)).toEqual(['rejected', 'pending']);
+    expect(newer.status).toBe('pending');
+  });
+
+  it('rejects the whole older batch when every entry is superseded', () => {
+    const first = createReviewBatch(
+      [{ op: 'replace', blockId: 'b1', node: makeParagraph('First', 'b1') as any }],
+      base,
+      0,
+    );
+    const second = createReviewBatch([{ op: 'delete', blockId: 'b1' }], base, 0);
+
+    const result = appendReviewBatch({ documentRevision: 0, batches: [first] }, second);
+
+    expect(result.batches[0].status).toBe('rejected');
+    expect(result.batches[1].status).toBe('pending');
+  });
+
+  it('leaves already resolved entries alone', () => {
+    const first = createReviewBatch(
+      [{ op: 'replace', blockId: 'b1', node: makeParagraph('First', 'b1') as any }],
+      base,
+      0,
+    );
+    const accepted = {
+      ...first,
+      status: 'accepted' as const,
+      entries: first.entries.map((e) => ({ ...e, status: 'accepted' as const })),
+    };
+    const second = createReviewBatch(
+      [{ op: 'replace', blockId: 'b1', node: makeParagraph('Second', 'b1') as any }],
+      base,
+      0,
+    );
+
+    const result = appendReviewBatch({ documentRevision: 0, batches: [accepted] }, second);
+
+    expect(result.batches[0].entries[0].status).toBe('accepted');
+    expect(result.batches[1].status).toBe('pending');
   });
 });

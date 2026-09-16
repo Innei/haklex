@@ -8,6 +8,7 @@ import {
 import type { CapturedSelection } from './protocol';
 import {
   acceptAndRebaseBatch,
+  appendReviewBatch,
   reconcileReviewBatches,
   rejectBatch as rejectBatchFn,
   resolveReviewEntry,
@@ -103,12 +104,8 @@ export class AgentStoreActionImpl {
 
   addReviewBatch = (batch: ReviewBatch) => {
     this.#set((state) => {
-      const current = state.reviewState ?? { documentRevision: 0, batches: [] };
-      const next: ReviewState = {
-        ...current,
-        batches: [...current.batches, batch],
-      };
-      return { reviewState: reconcileReviewBatches(next) };
+      const current: ReviewState = state.reviewState ?? { documentRevision: 0, batches: [] };
+      return { reviewState: appendReviewBatch(current, batch) };
     });
   };
 
