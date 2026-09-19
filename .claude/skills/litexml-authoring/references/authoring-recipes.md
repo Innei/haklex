@@ -132,7 +132,7 @@ When `litexml` succeeds but a downstream editor cannot materialize a node, the c
 
 ## Adding a new node
 
-If you find yourself wanting a tag that this skill does not document, the underlying machinery is in `packages/rich-litexml/`. Following its `CLAUDE.md`:
+If you find yourself wanting a tag that this skill does not document, the underlying machinery is in `packages/rich-litexml/`. Following its `AGENTS.md`:
 
 1. Add a writer in `packages/rich-litexml/src/writers/` (SerializedNode JSON → XML).
 2. Add a reader in `packages/rich-litexml/src/readers/` (XML → SerializedNode JSON).
