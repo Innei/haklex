@@ -2,7 +2,7 @@ import { createDefaultRegistry, deserializeFromXml } from '@haklex/rich-litexml'
 import { $getNodeByKey, $getRoot } from 'lexical';
 import { describe, expect, it } from 'vitest';
 
-import { $reconcileRoot, planFrames, streamAtVersion } from '../src';
+import { $reconcileRoot, createLoroBinding, planFrames, streamAtVersion } from '../src';
 import { createEditor, createPeer, rootJSON, sync } from './helpers';
 
 const registry = createDefaultRegistry();
@@ -66,7 +66,14 @@ describe('streamAtVersion', () => {
     sync(server, human);
     const target = parse('<p>alpha</p><p>beta rewritten by the agent, streamed</p>');
 
-    const steps = streamAtVersion(server.doc, base, createEditor, baseState, target, 'agent');
+    const { frontiers, steps } = streamAtVersion(
+      server.doc,
+      base,
+      createEditor,
+      baseState,
+      target,
+      'agent',
+    );
     expect(steps.length).toBeGreaterThan(3);
     for (const step of steps) {
       server.binding.import(step.update);
@@ -88,5 +95,12 @@ describe('streamAtVersion', () => {
     ]);
     expect(rootJSON(human)).toEqual(rootJSON(server));
     expect(rootJSON(oneShot)).toEqual(rootJSON(server));
+
+    const atAgentVersion = createEditor();
+    createLoroBinding(atAgentVersion, server.doc.forkAt(frontiers));
+    expect(texts(atAgentVersion.getEditorState().toJSON().root as never)).toEqual([
+      'alpha',
+      'beta rewritten by the agent, streamed',
+    ]);
   });
 });

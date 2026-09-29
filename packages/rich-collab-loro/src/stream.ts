@@ -189,7 +189,7 @@ export function streamAtVersion(
   base: SerializedEditorState,
   target: SerializedEditorState,
   commitMessage?: string,
-): StreamStep[] {
+): { frontiers: Frontiers; steps: StreamStep[] } {
   const fork = doc.forkAt(frontiers);
   const editor = createEditor();
   const binding = createLoroBinding(editor, fork, { commitMessage });
@@ -204,5 +204,5 @@ export function streamAtVersion(
     steps.push({ cursor: id && at ? { id, offset: at.offset } : null, update });
   }
   binding.dispose();
-  return steps;
+  return { frontiers: fork.frontiers(), steps };
 }
