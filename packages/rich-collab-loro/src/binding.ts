@@ -16,6 +16,8 @@ import {
 import { type LoroDoc, LoroText, type LoroTreeNode, type TreeID } from 'loro-crdt';
 
 import { transformOffset } from './offset';
+import { $updateInPlace } from './reconcile';
+import { stable } from './stable';
 
 export const COLLAB_TAG = 'collab';
 export const TREE_NAME = 'lexical';
@@ -35,7 +37,7 @@ export interface LoroBindingOptions {
 type Props = Record<string, unknown>;
 
 function sameValue(a: unknown, b: unknown): boolean {
-  return a === b || JSON.stringify(a) === JSON.stringify(b);
+  return a === b || stable(a) === stable(b);
 }
 
 function nodeProps(node: LexicalNode): Props {
@@ -75,23 +77,30 @@ export function createLoroBinding(
   // exportJSON disagree; writing only this peer's own prop changes stops them from
   // endlessly overwriting each other's fields.
   const synced = new Map<NodeKey, Props>();
+  const readBaseline = new Map<TreeID, string>();
 
   const writeNode = (node: LexicalNode, treeNode: LoroTreeNode) => {
     const data = treeNode.data;
     const props = nodeProps(node);
     const previous = synced.get(node.getKey()) ?? {};
+    let wrote = false;
     for (const key of new Set([...Object.keys(previous), ...Object.keys(props)])) {
       const value = props[key];
       if (sameValue(previous[key], value) && (value === undefined || data.get(key) !== undefined)) {
         continue;
       }
       if (value === undefined) {
-        if (data.get(key) !== undefined) data.delete(key);
+        if (data.get(key) !== undefined) {
+          data.delete(key);
+          wrote = true;
+        }
       } else if (!sameValue(data.get(key), value)) {
         data.set(key, value as never);
+        wrote = true;
       }
     }
     synced.set(node.getKey(), props);
+    if (wrote) readBaseline.set(treeNode.id, stable(storedProps(treeNode)));
     if ($isTextNode(node)) {
       const text = data.getOrCreateContainer(TEXT_KEY, new LoroText());
       const next = node.getTextContent();
@@ -173,7 +182,16 @@ export function createLoroBinding(
         applyText(existing, text ?? '');
         return existing;
       }
-      if (sameValue(nodeProps(existing), props)) return existing;
+      const storedKey = stable(props);
+      if (readBaseline.get(treeNode.id) === storedKey || sameValue(nodeProps(existing), props)) {
+        readBaseline.set(treeNode.id, storedKey);
+        return existing;
+      }
+      if ($updateInPlace(existing, props as never)) {
+        readBaseline.set(treeNode.id, storedKey);
+        return existing;
+      }
+      readBaseline.set(treeNode.id, storedKey);
       const replacement = $parseSerializedNode({
         ...props,
         children: [],
@@ -187,6 +205,7 @@ export function createLoroBinding(
       ...(text === undefined ? {} : { text }),
       children: [],
     } as unknown as SerializedLexicalNode);
+    readBaseline.set(treeNode.id, stable(props));
     link(created.getKey(), treeNode.id);
     return created;
   };

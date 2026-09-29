@@ -75,6 +75,21 @@ function randomOp(peer: Peer, random: () => number): void {
   );
 }
 
+// A pull can make Lexical derive fields (e.g. an emptied paragraph's textFormat)
+// that become new local ops, so peers converge once exchanges go quiet.
+function settle(a: Peer, b: Peer): void {
+  for (let round = 0; round < 3; round++) {
+    const before = [a.doc.oplogVersion().toJSON(), b.doc.oplogVersion().toJSON()];
+    sync(a, b);
+    const after = [a.doc.oplogVersion().toJSON(), b.doc.oplogVersion().toJSON()];
+    if (
+      JSON.stringify([...before[0]]) === JSON.stringify([...after[0]]) &&
+      JSON.stringify([...before[1]]) === JSON.stringify([...after[1]])
+    )
+      return;
+  }
+}
+
 describe('concurrent convergence', () => {
   for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
     it(`converges after random concurrent edits (seed ${seed})`, () => {
@@ -96,11 +111,11 @@ describe('concurrent convergence', () => {
         for (let i = 0; i < opsB; i++) randomOp(b, random);
         expect(rootJSON(createPeer(9, a))).toEqual(rootJSON(a));
         if (random() < 0.6) {
-          sync(a, b);
+          settle(a, b);
           expect(rootJSON(b)).toEqual(rootJSON(a));
         }
       }
-      sync(a, b);
+      settle(a, b);
       expect(rootJSON(b)).toEqual(rootJSON(a));
     });
   }

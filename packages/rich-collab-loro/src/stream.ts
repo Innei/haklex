@@ -9,7 +9,8 @@ import {
 import type { LoroDoc, TreeID } from 'loro-crdt';
 
 import { createLoroBinding } from './binding';
-import { $reconcileRoot, type Frontiers, type Json, lcs, pairable, stable } from './reconcile';
+import { $reconcileRoot, type Frontiers, type Json, lcs, pairable } from './reconcile';
+import { stable } from './stable';
 
 export interface FrameFocus {
   offset: number;

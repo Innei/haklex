@@ -12,6 +12,7 @@ import {
 import type { LoroDoc } from 'loro-crdt';
 
 import { createLoroBinding } from './binding';
+import { stable } from './stable';
 
 export type Json = SerializedLexicalNode & {
   $?: { blockId?: string };
@@ -21,20 +22,16 @@ export type Json = SerializedLexicalNode & {
 
 export type Frontiers = ReturnType<LoroDoc['frontiers']>;
 
-export function stable(value: unknown): string {
-  if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
-  if (value && typeof value === 'object') {
-    return `{${Object.keys(value)
-      .filter((key) => (value as Record<string, unknown>)[key] !== undefined)
-      .sort()
-      .map((key) => `${JSON.stringify(key)}:${stable((value as Record<string, unknown>)[key])}`)
-      .join(',')}}`;
-  }
-  return JSON.stringify(value);
+const DERIVED_KEYS: Record<string, string[]> = { listitem: ['value'] };
+
+function withoutDerived(json: Json): Record<string, unknown> {
+  const { children: _children, text: _text, ...rest } = json;
+  for (const key of DERIVED_KEYS[json.type] ?? []) delete (rest as Record<string, unknown>)[key];
+  return rest;
 }
 
-function shallow({ children: _children, text: _text, ...rest }: Json): string {
-  return stable(rest);
+function shallow(json: Json): string {
+  return stable(withoutDerived(json));
 }
 
 function $serialize(node: LexicalNode): Json {
@@ -63,6 +60,14 @@ export function lcs(a: string[], b: string[]): Array<[number, number]> {
   return pairs;
 }
 
+// Replacing a node deletes its Loro tree node, and with it any child a peer
+// inserted concurrently; update in place whenever the node class can absorb the change.
+export function $updateInPlace(node: LexicalNode, target: Json): boolean {
+  const props = withoutDerived(target);
+  node.updateFromJSON(props as never);
+  return shallow(node.exportJSON() as Json) === shallow(target);
+}
+
 function $update(node: LexicalNode, current: Json, target: Json): LexicalNode {
   if ($isTextNode(node)) {
     if (shallow(current) !== shallow(target)) {
@@ -73,7 +78,7 @@ function $update(node: LexicalNode, current: Json, target: Json): LexicalNode {
   }
   if ($isElementNode(node)) {
     let element: ElementNode = node;
-    if (shallow(current) !== shallow(target)) {
+    if (shallow(current) !== shallow(target) && !$updateInPlace(node, target)) {
       const replacement = $parseSerializedNode({ ...target, children: [] } as Json);
       if (!$isElementNode(replacement)) return node;
       node.replace(replacement, true);
@@ -82,7 +87,7 @@ function $update(node: LexicalNode, current: Json, target: Json): LexicalNode {
     $reconcileChildren(element, target.children ?? []);
     return element;
   }
-  if (stable(current) === stable(target)) return node;
+  if (stable(current) === stable(target) || $updateInPlace(node, target)) return node;
   const replacement = $parseSerializedNode(target);
   node.replace(replacement);
   return replacement;
