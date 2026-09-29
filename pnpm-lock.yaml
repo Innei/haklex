@@ -411,6 +411,33 @@ importers:
         specifier: ^4.1.11
         version: 4.1.11(@types/node@26.0.1)(happy-dom@20.10.6)(vite@8.2.2(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
 
+  packages/rich-collab-loro:
+    devDependencies:
+      '@haklex/rich-headless':
+        specifier: workspace:*
+        version: link:../rich-headless
+      '@haklex/rich-litexml':
+        specifier: workspace:*
+        version: link:../rich-litexml
+      '@lexical/headless':
+        specifier: ^0.49.0
+        version: 0.49.0(typescript@7.0.2)
+      lexical:
+        specifier: ^0.49.0
+        version: 0.49.0(typescript@7.0.2)
+      loro-crdt:
+        specifier: ^1.16.3
+        version: 1.16.3
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      unplugin-dts:
+        specifier: ^1.0.3
+        version: 1.0.3(esbuild@0.28.1)(rolldown@1.2.5)(supports-color@10.2.2)(typescript@7.0.2)(vite@8.2.2(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0))
+      vite:
+        specifier: ^8.2.2
+        version: 8.2.2(@types/node@26.0.1)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.12)(yaml@2.9.0)
+
   packages/rich-compose:
     dependencies:
       '@haklex/rich-ext-chat':
@@ -9868,6 +9895,12 @@ packages:
       }
     hasBin: true
 
+  loro-crdt@1.16.3:
+    resolution:
+      {
+        integrity: sha512-0FP3TsPTCIVLg7fbjh7cJTt3evpbFD/KRfnd4k9R3ZuDTzl83nuiYK/8LRxQ35xKzcHAcvMowoL9pecNDw1bkw==,
+      }
+
   lru-cache@10.4.3:
     resolution:
       {
@@ -17449,6 +17482,8 @@ snapshots:
   loose-envify@1.4.0:
     dependencies:
       js-tokens: 4.0.0
+
+  loro-crdt@1.16.3: {}
 
   lru-cache@10.4.3: {}
 
