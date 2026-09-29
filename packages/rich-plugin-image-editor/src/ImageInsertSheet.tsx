@@ -1,10 +1,11 @@
+import type { ImagePreprocessSource } from '@haklex/rich-editor/plugins';
 import { MapPin } from 'lucide-react';
 import type { FC } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
 import type { ImageEditResult } from './ImageEditModal';
 import type { GpsInfo, ImageEditPrivacy, SheetRow } from './insert-sheet-model';
-import { finalizeRows } from './insert-sheet-model';
+import { finalizeRows, sheetCopy } from './insert-sheet-model';
 import * as css from './sheet.css';
 import { SheetRowItem } from './SheetRowItem';
 import * as editorCss from './styles.css';
@@ -16,6 +17,7 @@ export interface ImageInsertSheetProps {
   onEdit: (file: File) => Promise<ImageEditResult | null>;
   onInsert: (files: File[]) => void;
   privacy?: ImageEditPrivacy;
+  source?: ImagePreprocessSource;
 }
 
 function mapUrl({ latitude, longitude }: { latitude: number; longitude: number }) {
@@ -35,6 +37,7 @@ export const ImageInsertSheet: FC<ImageInsertSheetProps> = ({
   onEdit,
   onInsert,
   privacy,
+  source = 'paste',
 }) => {
   const [rows, setRows] = useState<SheetRow[]>(() =>
     files.map((file, index) => ({
@@ -167,7 +170,7 @@ export const ImageInsertSheet: FC<ImageInsertSheetProps> = ({
           type="button"
           onClick={() => void handleInsert()}
         >
-          {rows.length > 1 ? `Insert ${rows.length} images` : 'Insert'}
+          {sheetCopy(source, rows.length).action}
         </button>
       </div>
     </div>

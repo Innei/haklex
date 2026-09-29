@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import type { SheetRow } from '../src/insert-sheet-model';
-import { finalizeRows, formatBytes, isEditableImage } from '../src/insert-sheet-model';
+import { finalizeRows, formatBytes, isEditableImage, sheetCopy } from '../src/insert-sheet-model';
 
 const gps = { latitude: 31.23, longitude: 121.47 };
 
@@ -85,5 +85,16 @@ describe('formatBytes', () => {
     expect(formatBytes(512)).toBe('512 B');
     expect(formatBytes(820 * 1024)).toBe('820 KB');
     expect(formatBytes(3.1 * 1024 * 1024)).toBe('3.1 MB');
+  });
+});
+
+describe('sheetCopy', () => {
+  it('uses replace wording for the replace source', () => {
+    expect(sheetCopy('replace', 1)).toEqual({ action: 'Replace', title: 'Replace image' });
+  });
+
+  it('uses insert wording and counts images otherwise', () => {
+    expect(sheetCopy('paste', 1)).toEqual({ action: 'Insert', title: 'Insert image' });
+    expect(sheetCopy('drop', 3)).toEqual({ action: 'Insert 3 images', title: 'Insert images' });
   });
 });

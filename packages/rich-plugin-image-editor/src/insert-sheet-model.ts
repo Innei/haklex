@@ -1,3 +1,5 @@
+import type { ImagePreprocessSource } from '@haklex/rich-editor/plugins';
+
 export interface GpsInfo {
   latitude: number;
   longitude: number;
@@ -48,4 +50,15 @@ export async function finalizeRows(
     }),
   );
   return { failedIds, files: results.filter((file): file is File => file !== null) };
+}
+
+export function sheetCopy(
+  source: ImagePreprocessSource,
+  count: number,
+): { action: string; title: string } {
+  if (source === 'replace') return { action: 'Replace', title: 'Replace image' };
+  return {
+    action: count > 1 ? `Insert ${count} images` : 'Insert',
+    title: count > 1 ? 'Insert images' : 'Insert image',
+  };
 }

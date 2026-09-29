@@ -9,6 +9,7 @@ import type { ImageEditResult } from './ImageEditModal';
 import { ImageEditModal } from './ImageEditModal';
 import { ImageInsertSheet } from './ImageInsertSheet';
 import type { ImageEditPrivacy } from './insert-sheet-model';
+import { sheetCopy } from './insert-sheet-model';
 import * as sheetCss from './sheet.css';
 import * as css from './styles.css';
 
@@ -57,7 +58,7 @@ export const ImageEditModalPlugin: FC<ImageEditModalPluginProps> = ({ privacy })
         });
       });
 
-    const fn: ImagePreprocessFn = (files) =>
+    const fn: ImagePreprocessFn = (files, { source }) =>
       new Promise<File[] | null>((resolve) => {
         let settled = false;
         const settle = (result: File[] | null) => {
@@ -73,6 +74,7 @@ export const ImageEditModalPlugin: FC<ImageEditModalPluginProps> = ({ privacy })
             <ImageInsertSheet
               files={files}
               privacy={privacyRef.current}
+              source={source}
               onEdit={openEditor}
               onCancel={() => {
                 settle(null);
@@ -91,7 +93,7 @@ export const ImageEditModalPlugin: FC<ImageEditModalPluginProps> = ({ privacy })
           portalClassName: portalThemeRef.current.className,
           showCloseButton: false,
           theme: portalThemeRef.current.theme,
-          title: files.length > 1 ? 'Insert images' : 'Insert image',
+          title: sheetCopy(source, files.length).title,
         });
       });
 

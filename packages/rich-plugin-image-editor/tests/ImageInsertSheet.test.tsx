@@ -156,4 +156,13 @@ describe('ImageInsertSheet', () => {
     expect(privacy.stripGps).toHaveBeenCalledWith(a);
     expect(onInsert).toHaveBeenCalledWith([clean]);
   });
+
+  it('labels the action Replace when replacing an existing image', async () => {
+    const a = file('a.jpg');
+    const { onInsert } = await render({ files: [a], source: 'replace' });
+
+    await click(button('Replace'));
+
+    expect(onInsert).toHaveBeenCalledWith([a]);
+  });
 });
