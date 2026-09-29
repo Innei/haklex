@@ -137,4 +137,12 @@ describe('createLoroBinding', () => {
     });
     expect(offset).toBe(8);
   });
+
+  it('keeps a pending commit message when no commitMessage option is set', () => {
+    const a = createPeer(1);
+    a.doc.setNextCommitMessage('marker');
+    seed(a, ['x']);
+    const messages = [...a.doc.getAllChanges().values()].flat().map((change) => change.message);
+    expect(messages).toContain('marker');
+  });
 });
