@@ -166,4 +166,62 @@ describe('ImageUploadPlugin insertByUpload target routing', () => {
     expect(editorHasImageNode(nestedEditor)).toBe(true);
     expect(editorHasImageNode(rootEditor)).toBe(false);
   });
+
+  it('inserts a multi-file batch in the given order even when uploads finish out of order', async () => {
+    let rootEditor: LexicalEditor | undefined;
+    const release: Record<string, () => void> = {};
+
+    container = document.createElement('div');
+    document.body.append(container);
+    root = createRoot(container);
+
+    await act(async () => {
+      root?.render(
+        <LexicalComposer
+          initialConfig={{
+            namespace: 'ImageUploadOrderTest',
+            nodes: [ImageNode],
+            onError: (error) => {
+              throw error;
+            },
+          }}
+        >
+          <EditorCapture
+            onReady={(editor) => {
+              rootEditor = editor;
+            }}
+          />
+          <ImageUploadPlugin
+            onUpload={(file) =>
+              new Promise((resolve) => {
+                release[file.name] = () => resolve({ src: `https://example.com/${file.name}` });
+              })
+            }
+          />
+        </LexicalComposer>,
+      );
+    });
+
+    if (!rootEditor) throw new Error('root editor was not captured');
+    const files = ['a.png', 'b.png'].map((name) => new File(['x'], name, { type: 'image/png' }));
+
+    await act(async () => {
+      rootEditor?.dispatchCommand(DRAG_DROP_PASTE, files);
+      await flushMicrotasks();
+    });
+    await act(async () => {
+      release['b.png']();
+      await flushMicrotasks();
+      release['a.png']();
+      await flushMicrotasks();
+    });
+
+    const srcs: string[] = [];
+    rootEditor.getEditorState().read(() => {
+      for (const node of $getRoot().getChildren()) {
+        if ($isImageNode(node)) srcs.push(node.exportJSON().src);
+      }
+    });
+    expect(srcs).toEqual(['https://example.com/a.png', 'https://example.com/b.png']);
+  });
 });

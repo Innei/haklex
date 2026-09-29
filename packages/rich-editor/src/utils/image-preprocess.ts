@@ -1,21 +1,17 @@
-import type { ImagePreprocessFn } from '../context/ImagePreprocessContext';
+import type { ImagePreprocessFn, ImagePreprocessSource } from '../context/ImagePreprocessContext';
 
 export async function resolvePreprocessTargets(
   files: File[],
-  source: 'drop' | 'paste' | 'dialog',
+  source: ImagePreprocessSource,
   preprocess: ImagePreprocessFn | null,
 ): Promise<File[]> {
-  // Multi-file gestures intentionally bypass preprocessing — the edit modal is single-image UX.
-  if (!preprocess || files.length !== 1) return files;
+  if (!preprocess || files.length === 0) return files;
 
   try {
-    const result = await preprocess(files[0], { source });
-    if (result === null) return [];
-    if (result === 'skip') return files;
-    return [result];
+    return (await preprocess(files, { source })) ?? [];
   } catch (err: unknown) {
-    // A failing preprocessor must not lose the user's file; fall back to the original.
-    console.error('[ImageUploadPlugin] preprocess failed, uploading original', err);
+    // A failing preprocessor must not lose the user's files; fall back to the originals.
+    console.error('[ImageUploadPlugin] preprocess failed, uploading originals', err);
     return files;
   }
 }

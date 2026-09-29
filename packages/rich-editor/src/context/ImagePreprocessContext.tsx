@@ -1,11 +1,11 @@
 import type { ReactNode, RefObject } from 'react';
 import { createContext, use, useMemo, useRef } from 'react';
 
-export type ImagePreprocessResult = File | 'skip' | null;
+export type ImagePreprocessSource = 'drop' | 'paste' | 'dialog' | 'replace' | 'gallery';
 export type ImagePreprocessFn = (
-  file: File,
-  meta: { source: 'drop' | 'paste' | 'dialog' },
-) => Promise<ImagePreprocessResult>;
+  files: File[],
+  meta: { source: ImagePreprocessSource },
+) => Promise<File[] | null>;
 
 export interface ImagePreprocessContextValue {
   ref: RefObject<ImagePreprocessFn | null>;

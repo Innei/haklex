@@ -2,7 +2,7 @@ import type { AnnotationState, IPoint, MarkerBaseState } from '@markerjs/markerj
 
 import type { EditorTool } from './useImageEditorState';
 
-export type AnnotationTool = Exclude<EditorTool, 'crop'>;
+export type AnnotationTool = Exclude<EditorTool, 'crop' | 'mosaic'>;
 
 // markerjs3 has no numbered-badge marker, so Counter is a TextMarker preset
 // prefilled with an auto-incrementing number.
@@ -17,7 +17,7 @@ export const MARKER_TYPE_BY_TOOL: Record<AnnotationTool, string> = {
 };
 
 export function isAnnotationTool(tool: EditorTool): tool is AnnotationTool {
-  return tool !== 'crop';
+  return tool !== 'crop' && tool !== 'mosaic';
 }
 
 export const SWATCH_COLORS = [

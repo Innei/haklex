@@ -135,7 +135,11 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   }, []);
 
   const insertByUpload = useCallback(
-    async (file: File, target: LexicalEditor, options?: { closeDialog?: boolean }) => {
+    async (
+      file: File,
+      target: LexicalEditor,
+      options?: { after?: Promise<unknown>; closeDialog?: boolean },
+    ) => {
       if (!isImageFile(file)) return false;
 
       const closeDialog = Boolean(options?.closeDialog);
@@ -145,6 +149,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
 
       try {
         const [result, meta] = await Promise.all([uploadRef.current(file), computeImageMeta(file)]);
+        await options?.after;
 
         target.update(() => {
           const node = $createImageNode(
@@ -187,8 +192,9 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
 
       void (async () => {
         const targets = await resolvePreprocessTargets(images, source, getPreprocess());
+        let previous: Promise<unknown> = Promise.resolve();
         for (const file of targets) {
-          void insertByUpload(file, target);
+          previous = insertByUpload(file, target, { after: previous });
         }
       })();
       return true;

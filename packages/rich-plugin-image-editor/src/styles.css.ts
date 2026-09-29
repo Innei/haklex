@@ -280,6 +280,12 @@ export const footer = style({
 
 export const footerSpacer = style({
   flex: 1,
+  textAlign: 'right',
+});
+
+export const footerError = style({
+  color: '#dc2626',
+  fontSize: 12,
 });
 
 const buttonBase = style({
@@ -352,3 +358,67 @@ export const primaryButton = style([
     },
   },
 ]);
+
+export const segmentButton = style([
+  optionButton,
+  {
+    width: 'auto',
+    padding: '0 10px',
+    fontSize: 12,
+    fontWeight: 500,
+  },
+]);
+
+export const rangeField = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  fontSize: 12,
+  color: '#737373',
+});
+
+export const rangeInput = style({
+  width: 110,
+  accentColor: vars.color.text,
+});
+
+export const rangeValue = style({
+  minWidth: 36,
+  color: vars.color.text,
+  fontVariantNumeric: 'tabular-nums',
+});
+
+export const sizeControl = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+});
+
+export const sizeSelect = style({
+  height: 30,
+  padding: '0 8px',
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: vars.borderRadius.sm,
+  backgroundColor: vars.color.bg,
+  color: vars.color.text,
+  fontSize: 12,
+});
+
+export const sizeInput = style({
+  width: 72,
+  height: 30,
+  boxSizing: 'border-box',
+  padding: '0 8px',
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: vars.borderRadius.sm,
+  backgroundColor: vars.color.bg,
+  color: vars.color.text,
+  fontSize: 12,
+  fontVariantNumeric: 'tabular-nums',
+});
+
+export const sizeOutput = style({
+  fontSize: 12,
+  color: '#737373',
+  fontVariantNumeric: 'tabular-nums',
+});

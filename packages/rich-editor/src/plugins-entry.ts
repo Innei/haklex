@@ -4,7 +4,7 @@ export {
   type ImagePreprocessContextValue,
   type ImagePreprocessFn,
   ImagePreprocessProvider,
-  type ImagePreprocessResult,
+  type ImagePreprocessSource,
   useImagePreprocess,
 } from './context/ImagePreprocessContext';
 export { ImageUploadProvider, useImageUpload } from './context/ImageUploadContext';
@@ -53,3 +53,4 @@ export {
   type VideoUploadResult,
 } from './plugins/VideoUploadPlugin';
 export { ALL_TRANSFORMERS } from './transformers';
+export { resolvePreprocessTargets } from './utils/image-preprocess';

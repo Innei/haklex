@@ -14,7 +14,13 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { type ImageUploadFn, useImageUpload } from '@haklex/rich-editor/plugins';
+import {
+  type ImagePreprocessContextValue,
+  type ImageUploadFn,
+  resolvePreprocessTargets,
+  useImagePreprocess,
+  useImageUpload,
+} from '@haklex/rich-editor/plugins';
 import { useColorScheme } from '@haklex/rich-editor/static';
 import { presentDialog, SegmentedControl } from '@haklex/rich-editor-ui';
 import { usePortalTheme, vars } from '@haklex/rich-style-token';
@@ -218,6 +224,7 @@ const GalleryEditorDialogContent: FC<{
   initialImages: GalleryImage[];
   initialLayout: LayoutType;
   initialMaxItemHeight: number | undefined;
+  preprocess: ImagePreprocessContextValue | null;
   uploader: ImageUploadFn | null;
   onAspectChange?: (aspect: GalleryAspect) => void;
   onFitChange?: (fit: GalleryFit) => void;
@@ -231,6 +238,7 @@ const GalleryEditorDialogContent: FC<{
   initialImages,
   initialLayout,
   initialMaxItemHeight,
+  preprocess,
   uploader,
   onAspectChange,
   onFitChange,
@@ -269,7 +277,12 @@ const GalleryEditorDialogContent: FC<{
   }, []);
 
   const appendFiles = useCallback(
-    async (files: File[]) => {
+    async (picked: File[]) => {
+      const files = await resolvePreprocessTargets(
+        picked,
+        'gallery',
+        preprocess?.ref.current ?? null,
+      );
       if (!files.length) return;
       const results = await Promise.all(
         files.map(async (file) => {
@@ -285,11 +298,17 @@ const GalleryEditorDialogContent: FC<{
         .map((image) => ({ id: genId(), image }));
       if (fresh.length) setEntries((prev) => [...prev, ...fresh]);
     },
-    [uploader],
+    [preprocess, uploader],
   );
 
   const replaceEntryFile = useCallback(
-    async (index: number, file: File) => {
+    async (index: number, picked: File) => {
+      const [file] = await resolvePreprocessTargets(
+        [picked],
+        'gallery',
+        preprocess?.ref.current ?? null,
+      );
+      if (!file) return;
       try {
         const next = await fileToGalleryImage(file, uploader);
         setEntries((prev) =>
@@ -303,7 +322,7 @@ const GalleryEditorDialogContent: FC<{
         // swallow upload errors
       }
     },
-    [uploader],
+    [preprocess, uploader],
   );
 
   const handleUpdateImage = useCallback(
@@ -517,6 +536,7 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
   const { className: portalClassName } = usePortalTheme();
   const theme = useColorScheme();
   const uploader = useImageUpload();
+  const preprocess = useImagePreprocess();
 
   const handleOpenEditor = useCallback(() => {
     if (!onImagesChange || !onLayoutChange) return;
@@ -529,6 +549,7 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
           initialImages={images}
           initialLayout={layout}
           initialMaxItemHeight={maxItemHeight}
+          preprocess={preprocess}
           uploader={uploader}
           onAspectChange={onAspectChange}
           onFitChange={onFitChange}
@@ -555,6 +576,7 @@ export const GalleryEditRenderer: FC<GalleryRendererProps> = ({
     onLayoutChange,
     onMaxItemHeightChange,
     portalClassName,
+    preprocess,
     theme,
     uploader,
   ]);

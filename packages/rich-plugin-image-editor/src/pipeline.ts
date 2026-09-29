@@ -5,6 +5,7 @@ import { buildResult } from './build-result';
 import type { CropRect } from './crop';
 import { canvasToObjectUrl, cropCanvas, extractCrop, sourceToCanvas } from './crop';
 import { rasterizeAnnotations } from './rasterize';
+import { scaleCanvasToLongEdge } from './resize';
 
 export interface CropRebase {
   bitmapUrl: string;
@@ -33,6 +34,7 @@ export async function applyCropRebase(
 export interface ExportInput {
   hasRebasedBitmap: boolean;
   markerState: AnnotationState | null;
+  maxLongEdge: number | null;
   original: File;
   pendingCropRect: CropRect | null;
   sourceUrl: string;
@@ -41,6 +43,7 @@ export interface ExportInput {
 export async function exportResult({
   hasRebasedBitmap,
   markerState,
+  maxLongEdge,
   original,
   pendingCropRect,
   sourceUrl,
@@ -53,8 +56,9 @@ export async function exportResult({
     if (pendingCropRect) canvas = cropCanvas(canvas, pendingCropRect);
   } else if (pendingCropRect) {
     canvas = await extractCrop(sourceUrl, pendingCropRect);
-  } else if (hasRebasedBitmap) {
+  } else if (hasRebasedBitmap || maxLongEdge !== null) {
     canvas = await sourceToCanvas(sourceUrl);
   }
+  if (canvas && maxLongEdge !== null) canvas = scaleCanvasToLongEdge(canvas, maxLongEdge);
   return buildResult(original, canvas);
 }

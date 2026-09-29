@@ -14,46 +14,48 @@ describe('resolvePreprocessTargets', () => {
     await expect(resolvePreprocessTargets([file], 'drop', null)).resolves.toEqual([file]);
   });
 
-  it('replaces the file when the preprocessor resolves a File', async () => {
-    const original = createImageFile('a.png');
+  it('passes the whole batch and returns what the preprocessor resolves', async () => {
+    const files = [createImageFile('a.png'), createImageFile('b.png')];
     const edited = createImageFile('a-edited.png');
-    const preprocess = vi.fn<ImagePreprocessFn>().mockResolvedValue(edited);
+    const preprocess = vi.fn<ImagePreprocessFn>().mockResolvedValue([edited, files[1]]);
 
-    await expect(resolvePreprocessTargets([original], 'paste', preprocess)).resolves.toEqual([
+    await expect(resolvePreprocessTargets(files, 'paste', preprocess)).resolves.toEqual([
       edited,
+      files[1],
     ]);
-    expect(preprocess).toHaveBeenCalledWith(original, { source: 'paste' });
+    expect(preprocess).toHaveBeenCalledWith(files, { source: 'paste' });
   });
 
-  it("keeps the original file when the preprocessor resolves 'skip'", async () => {
-    const file = createImageFile('a.png');
-    const preprocess = vi.fn<ImagePreprocessFn>().mockResolvedValue('skip');
+  it('keeps the order and subset the preprocessor returns', async () => {
+    const files = [createImageFile('a.png'), createImageFile('b.png'), createImageFile('c.png')];
+    const preprocess = vi.fn<ImagePreprocessFn>().mockResolvedValue([files[2], files[0]]);
 
-    await expect(resolvePreprocessTargets([file], 'dialog', preprocess)).resolves.toEqual([file]);
-    expect(preprocess).toHaveBeenCalledWith(file, { source: 'dialog' });
+    await expect(resolvePreprocessTargets(files, 'drop', preprocess)).resolves.toEqual([
+      files[2],
+      files[0],
+    ]);
   });
 
   it('returns no files when the preprocessor resolves null', async () => {
     const file = createImageFile('a.png');
     const preprocess = vi.fn<ImagePreprocessFn>().mockResolvedValue(null);
 
-    await expect(resolvePreprocessTargets([file], 'drop', preprocess)).resolves.toEqual([]);
+    await expect(resolvePreprocessTargets([file], 'dialog', preprocess)).resolves.toEqual([]);
   });
 
-  it('falls back to the original file when the preprocessor rejects', async () => {
-    const file = createImageFile('a.png');
+  it('falls back to the original files when the preprocessor rejects', async () => {
+    const files = [createImageFile('a.png'), createImageFile('b.png')];
     const preprocess = vi.fn<ImagePreprocessFn>().mockRejectedValue(new Error('boom'));
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-    await expect(resolvePreprocessTargets([file], 'drop', preprocess)).resolves.toEqual([file]);
+    await expect(resolvePreprocessTargets(files, 'drop', preprocess)).resolves.toEqual(files);
     errorSpy.mockRestore();
   });
 
-  it('bypasses the preprocessor for multi-file batches', async () => {
-    const files = [createImageFile('a.png'), createImageFile('b.png')];
-    const preprocess = vi.fn<ImagePreprocessFn>().mockResolvedValue(null);
+  it('skips the preprocessor for an empty batch', async () => {
+    const preprocess = vi.fn<ImagePreprocessFn>().mockResolvedValue([]);
 
-    await expect(resolvePreprocessTargets(files, 'drop', preprocess)).resolves.toEqual(files);
+    await expect(resolvePreprocessTargets([], 'drop', preprocess)).resolves.toEqual([]);
     expect(preprocess).not.toHaveBeenCalled();
   });
 });

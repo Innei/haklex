@@ -1,6 +1,11 @@
 import type { ImageDisplaySize, ImageLayout } from '@haklex/rich-editor/nodes';
 import { $createImageNode, $isImageNode } from '@haklex/rich-editor/nodes';
-import { type ImageUploadFn, useImageUpload } from '@haklex/rich-editor/plugins';
+import {
+  type ImageUploadFn,
+  resolvePreprocessTargets,
+  useImagePreprocess,
+  useImageUpload,
+} from '@haklex/rich-editor/plugins';
 import { computeImageMeta } from '@haklex/rich-editor/renderers';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useStore } from 'jotai';
@@ -55,6 +60,7 @@ export function useImageActions() {
   const store = useStore();
   const [editor] = useLexicalComposerContext();
   const uploadImage = useImageUpload();
+  const preprocess = useImagePreprocess();
 
   const withImageNode = useCallback(
     (updater: (node: ReturnType<typeof $createImageNode>) => void) => {
@@ -157,8 +163,14 @@ export function useImageActions() {
   );
 
   const handleReplaceFile = useCallback(
-    async (file: File | null) => {
-      if (!file || !file.type.startsWith('image/')) return;
+    async (picked: File | null) => {
+      if (!picked || !picked.type.startsWith('image/')) return;
+      const [file] = await resolvePreprocessTargets(
+        [picked],
+        'replace',
+        preprocess?.ref.current ?? null,
+      );
+      if (!file) return;
       store.set(replaceLoadingAtom, true);
       store.set(replaceErrorAtom, null);
       try {
@@ -181,7 +193,7 @@ export function useImageActions() {
         store.set(replaceLoadingAtom, false);
       }
     },
-    [closeReplacePanel, store, uploadImage, withImageNode],
+    [closeReplacePanel, preprocess, store, uploadImage, withImageNode],
   );
 
   const handlePreviewUrl = useCallback(async () => {

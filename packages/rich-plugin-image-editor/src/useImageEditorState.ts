@@ -5,6 +5,8 @@ import type { Crop } from 'react-image-crop';
 
 import type { CropRect } from './crop';
 import { clampCropRect, isFullImageCrop } from './crop';
+import type { MosaicMode } from './mosaic';
+import { applyMosaic } from './mosaic';
 import { applyCropRebase } from './pipeline';
 
 export type EditorTool =
@@ -15,7 +17,8 @@ export type EditorTool =
   | 'ellipse'
   | 'text'
   | 'counter'
-  | 'cover';
+  | 'cover'
+  | 'mosaic';
 
 export interface ImageNaturalSize {
   height: number;
@@ -27,6 +30,7 @@ export const FULL_IMAGE_CROP: Crop = { height: 100, unit: '%', width: 100, x: 0,
 
 export interface ImageEditorState {
   activeTool: EditorTool;
+  applyMosaicArea: (area: CropRect, mode: MosaicMode, block: number) => Promise<void>;
   // Applies the pending crop (re-basing bitmap + marker state), then switches tool.
   confirmCropAndSwitch: (tool: EditorTool) => Promise<void>;
   crop: Crop;
@@ -35,6 +39,8 @@ export interface ImageEditorState {
   hasPendingCrop: boolean;
   // Survives AnnotationSurface remounts (tool/bitmap switches).
   markerStateRef: RefObject<AnnotationState | null>;
+  mosaicBusy: boolean;
+  mosaicCount: number;
   naturalSize: ImageNaturalSize | null;
   // Non-null after a crop has been applied (re-based bitmap).
   rebasedBitmapUrl: string | null;
@@ -44,6 +50,7 @@ export interface ImageEditorState {
   setCroppedAreaPixels: (area: CropRect | null) => void;
   setNaturalSize: (size: ImageNaturalSize | null) => void;
   sourceUrl: string;
+  undoMosaic: () => void;
 }
 
 export function useImageEditorState(objectUrl: string): ImageEditorState {
@@ -54,16 +61,29 @@ export function useImageEditorState(objectUrl: string): ImageEditorState {
   const [naturalSize, setNaturalSize] = useState<ImageNaturalSize | null>(null);
   const markerStateRef = useRef<AnnotationState | null>(null);
 
+  // Bitmaps to restore on mosaic undo; null stands for the original object URL.
+  const [mosaicHistory, setMosaicHistory] = useState<(string | null)[]>([]);
+
   const rebasedUrlRef = useRef<string | null>(null);
   rebasedUrlRef.current = rebasedBitmapUrl;
-  useEffect(
-    () => () => {
+  const mosaicHistoryRef = useRef(mosaicHistory);
+  mosaicHistoryRef.current = mosaicHistory;
+  const mountedRef = useRef(false);
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
       if (rebasedUrlRef.current) URL.revokeObjectURL(rebasedUrlRef.current);
-    },
-    [],
-  );
+      for (const url of mosaicHistoryRef.current) if (url) URL.revokeObjectURL(url);
+    };
+  }, []);
 
   const sourceUrl = rebasedBitmapUrl ?? objectUrl;
+  const sourceUrlRef = useRef(sourceUrl);
+  sourceUrlRef.current = sourceUrl;
+  // Mosaics must apply one at a time on the latest bitmap, or a later result overwrites an earlier redaction.
+  const [mosaicBusy, setMosaicBusy] = useState(false);
+  const mosaicBusyRef = useRef(false);
 
   // Full-image or empty selections upload the original image untouched.
   const hasPendingCrop =
@@ -84,6 +104,9 @@ export function useImageEditorState(objectUrl: string): ImageEditorState {
     try {
       const rebase = await applyCropRebase(sourceUrl, rect, markerStateRef.current);
       if (rebasedBitmapUrl) URL.revokeObjectURL(rebasedBitmapUrl);
+      // Pre-crop bitmaps no longer match the rebased geometry, so mosaic undo stops here.
+      for (const url of mosaicHistory) if (url) URL.revokeObjectURL(url);
+      setMosaicHistory([]);
       setRebasedBitmapUrl(rebase.bitmapUrl);
       markerStateRef.current = rebase.markerState;
       resetCrop();
@@ -94,13 +117,46 @@ export function useImageEditorState(objectUrl: string): ImageEditorState {
     }
   };
 
+  const applyMosaicArea = async (area: CropRect, mode: MosaicMode, block: number) => {
+    if (!naturalSize || mosaicBusyRef.current) return;
+    const rect = clampCropRect(area, naturalSize.width, naturalSize.height);
+    if (rect.width < 1 || rect.height < 1) return;
+    mosaicBusyRef.current = true;
+    setMosaicBusy(true);
+    try {
+      const bitmapUrl = await applyMosaic(sourceUrlRef.current, rect, mode, block);
+      if (!mountedRef.current) {
+        URL.revokeObjectURL(bitmapUrl);
+        return;
+      }
+      const previous = rebasedUrlRef.current;
+      rebasedUrlRef.current = bitmapUrl;
+      setMosaicHistory((history) => [...history, previous]);
+      setRebasedBitmapUrl(bitmapUrl);
+    } finally {
+      mosaicBusyRef.current = false;
+      if (mountedRef.current) setMosaicBusy(false);
+    }
+  };
+
+  const undoMosaic = () => {
+    if (mosaicHistory.length === 0 || mosaicBusyRef.current) return;
+    const previous = mosaicHistory.at(-1) ?? null;
+    if (rebasedBitmapUrl) URL.revokeObjectURL(rebasedBitmapUrl);
+    setMosaicHistory(mosaicHistory.slice(0, -1));
+    setRebasedBitmapUrl(previous);
+  };
+
   return {
     activeTool,
+    applyMosaicArea,
     confirmCropAndSwitch,
     crop,
     croppedAreaPixels,
     hasPendingCrop,
     markerStateRef,
+    mosaicBusy,
+    mosaicCount: mosaicHistory.length,
     naturalSize,
     rebasedBitmapUrl,
     resetCrop,
@@ -109,5 +165,6 @@ export function useImageEditorState(objectUrl: string): ImageEditorState {
     setCroppedAreaPixels,
     setNaturalSize,
     sourceUrl,
+    undoMosaic,
   };
 }
