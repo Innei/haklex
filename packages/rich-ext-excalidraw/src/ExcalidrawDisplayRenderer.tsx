@@ -12,7 +12,7 @@ import {
   useState,
 } from 'react';
 
-import { readonlyUIOptions } from './constants';
+import { fitSceneOnReady, fitSceneToViewport, readonlyUIOptions } from './constants';
 import * as css from './styles.css';
 import { useExcalidrawData } from './useExcalidrawData';
 
@@ -73,7 +73,7 @@ const ExcalidrawStaticCanvas: FC<{
           initialData={data}
           theme={theme}
           excalidrawAPI={(api: ExcalidrawImperativeAPI) => {
-            setTimeout(() => api.scrollToContent(), 100);
+            fitSceneOnReady(api);
           }}
         />
       );
@@ -128,7 +128,7 @@ const ExcalidrawStaticCanvas: FC<{
           theme={theme}
           excalidrawAPI={(api: ExcalidrawImperativeAPI) => {
             apiRef.current = api;
-            setTimeout(() => api.scrollToContent(), 100);
+            fitSceneOnReady(api);
           }}
         />
       </ExcalidrawErrorBoundary>
@@ -164,7 +164,7 @@ const ExcalidrawStaticCanvas: FC<{
           className={css.excalidrawActionButton}
           title="Fit to Content"
           type="button"
-          onClick={() => apiRef.current?.scrollToContent()}
+          onClick={() => apiRef.current && fitSceneToViewport(apiRef.current)}
         >
           <ScanSearch size={20} />
         </button>

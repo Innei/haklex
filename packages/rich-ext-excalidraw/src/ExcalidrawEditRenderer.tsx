@@ -6,7 +6,7 @@ import { Clipboard, Download, Pencil, Save, X } from 'lucide-react';
 import type { ComponentType, FC } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-import { readonlyUIOptions } from './constants';
+import { fitSceneOnReady, readonlyUIOptions } from './constants';
 import { useExcalidrawConfig } from './ExcalidrawConfigContext';
 import * as css from './styles.css';
 import type { ExcalidrawSnapshot } from './types';
@@ -537,7 +537,7 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
         theme={theme}
         excalidrawAPI={(api: ExcalidrawImperativeAPI) => {
           previewApiRef.current = api;
-          setTimeout(() => api.scrollToContent(), 100);
+          fitSceneOnReady(api);
         }}
       />
 
