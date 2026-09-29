@@ -24,6 +24,10 @@ import { useEscapeDismissesTopDialog } from './useEscapeDismissesTopDialog';
 import type { EditorTool } from './useImageEditorState';
 import { useImageEditorState } from './useImageEditorState';
 
+// ReactCrop fires onComplete when `crop` turns from undefined to defined, which
+// would end a mosaic drag on pointerdown; an empty rect keeps it always defined.
+const EMPTY_MOSAIC_CROP: Crop = { height: 0, unit: 'px', width: 0, x: 0, y: 0 };
+
 export interface ImageEditResult {
   file: File;
   summary: string;
@@ -45,7 +49,7 @@ export const ImageEditModal: FC<ImageEditModalProps> = ({ file, onCancel, onConf
   const [history, setHistory] = useState({ canRedo: false, canUndo: false });
   const [mosaicMode, setMosaicMode] = useState<MosaicMode>('pixelate');
   const [mosaicStrength, setMosaicStrength] = useState(MOSAIC_DEFAULT_STRENGTH.pixelate);
-  const [mosaicCrop, setMosaicCrop] = useState<Crop>();
+  const [mosaicCrop, setMosaicCrop] = useState<Crop>(EMPTY_MOSAIC_CROP);
   const [originalSize, setOriginalSize] = useState<{ height: number; width: number } | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const counterRef = useRef(1);
@@ -93,7 +97,7 @@ export const ImageEditModal: FC<ImageEditModalProps> = ({ file, onCancel, onConf
 
   const handleMosaicComplete = (pixelCrop: PixelCrop) => {
     const natural = toNatural(pixelCrop);
-    setMosaicCrop(undefined);
+    setMosaicCrop(EMPTY_MOSAIC_CROP);
     if (!natural || pixelCrop.width < 2 || pixelCrop.height < 2) return;
     void editor
       .applyMosaicArea(natural.rect, mosaicMode, mosaicStrength * natural.scale)

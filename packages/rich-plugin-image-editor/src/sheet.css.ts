@@ -11,6 +11,7 @@ export const sheet = style({
   display: 'flex',
   flexDirection: 'column',
   gap: 12,
+  padding: '0.25rem 1.5rem 1.25rem',
   color: vars.color.text,
   fontFamily: vars.typography.fontFamilySans,
 });

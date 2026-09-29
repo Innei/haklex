@@ -129,7 +129,7 @@ export const ImageInsertSheet: FC<ImageInsertSheetProps> = ({
             <MapPin aria-hidden color="#d97706" size={16} />
             {single
               ? 'This photo records where it was taken'
-              : `${gpsRows.length} of ${rows.length} record where they were taken`}
+              : `${gpsRows.length} of ${rows.length} images record where they were taken`}
           </div>
           {single?.gps && (
             <div className={css.gpsCoords}>
