@@ -69,19 +69,27 @@ export function createLoroBinding(
   const alive = (id: TreeID | undefined): id is TreeID =>
     id !== undefined && tree.has(id) && !tree.isNodeDeleted(id);
 
+  // Peers may register different classes for one type (headless vs edit nodes) whose
+  // exportJSON disagree; writing only this peer's own prop changes stops them from
+  // endlessly overwriting each other's fields.
+  const synced = new Map<NodeKey, Props>();
+
   const writeNode = (node: LexicalNode, treeNode: LoroTreeNode) => {
     const data = treeNode.data;
     const props = nodeProps(node);
-    for (const [key, value] of Object.entries(props)) {
+    const previous = synced.get(node.getKey()) ?? {};
+    for (const key of new Set([...Object.keys(previous), ...Object.keys(props)])) {
+      const value = props[key];
+      if (sameValue(previous[key], value) && (value === undefined || data.get(key) !== undefined)) {
+        continue;
+      }
       if (value === undefined) {
         if (data.get(key) !== undefined) data.delete(key);
       } else if (!sameValue(data.get(key), value)) {
         data.set(key, value as never);
       }
     }
-    for (const key of data.keys()) {
-      if (key !== TEXT_KEY && props[key] === undefined) data.delete(key);
-    }
+    synced.set(node.getKey(), props);
     if ($isTextNode(node)) {
       const text = data.getOrCreateContainer(TEXT_KEY, new LoroText());
       const next = node.getTextContent();
@@ -145,6 +153,12 @@ export function createLoroBinding(
   };
 
   const readNode = (treeNode: LoroTreeNode): LexicalNode => {
+    const node = readNodeUnsynced(treeNode);
+    synced.set(node.getKey(), nodeProps(node));
+    return node;
+  };
+
+  const readNodeUnsynced = (treeNode: LoroTreeNode): LexicalNode => {
     const props = storedProps(treeNode);
     const text = $isTextLike(props) ? String(treeNode.data.get(TEXT_KEY) ?? '') : undefined;
     const key = idToKey.get(treeNode.id);
@@ -210,6 +224,7 @@ export function createLoroBinding(
         if (rootProps.type === 'root' && !sameValue(nodeProps($getRoot()), rootProps)) {
           $getRoot().updateFromJSON(rootProps as never);
         }
+        synced.set('root', nodeProps($getRoot()));
         const visited = new Set<NodeKey>(['root']);
         readChildren($getRoot(), rootTreeNode, visited);
         const all: LexicalNode[] = [];

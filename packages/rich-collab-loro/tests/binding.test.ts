@@ -145,4 +145,22 @@ describe('createLoroBinding', () => {
     const messages = [...a.doc.getAllChanges().values()].flat().map((change) => change.message);
     expect(messages).toContain('marker');
   });
+
+  it('preserves node state written by a peer and settles without further ops', () => {
+    const a = createPeer(1);
+    seed(a, ['x']);
+    const b = createPeer(2, a);
+    write(b, () => {
+      $getRoot()
+        .getFirstChild()!
+        .updateFromJSON({ $: { blockId: 'blk1' } } as never);
+    });
+    sync(a, b);
+    expect(rootJSON(a)).toEqual(rootJSON(b));
+    expect(JSON.stringify(rootJSON(a))).toContain('blk1');
+    const before = a.doc.oplogVersion();
+    sync(a, b);
+    expect(a.doc.export({ mode: 'update', from: before }).length).toBeLessThan(40);
+    expect(a.doc.oplogVersion().toJSON()).toEqual(before.toJSON());
+  });
 });
