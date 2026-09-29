@@ -23,7 +23,9 @@ const TEXT_KEY = '#text';
 
 export interface LoroBinding {
   dispose: () => void;
+  idOf: (key: NodeKey) => TreeID | undefined;
   import: (bytes: Uint8Array) => void;
+  keyOf: (id: TreeID) => NodeKey | undefined;
 }
 
 export interface LoroBindingOptions {
@@ -247,6 +249,8 @@ export function createLoroBinding(
 
   return {
     dispose: unregister,
+    idOf: (key) => keyToId.get(key),
+    keyOf: (id) => idToKey.get(id),
     import: (bytes) => {
       doc.import(bytes);
       pullFromDoc();

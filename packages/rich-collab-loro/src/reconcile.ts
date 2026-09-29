@@ -13,15 +13,15 @@ import type { LoroDoc } from 'loro-crdt';
 
 import { createLoroBinding } from './binding';
 
-type Json = SerializedLexicalNode & {
+export type Json = SerializedLexicalNode & {
   $?: { blockId?: string };
   children?: Json[];
   text?: string;
 };
 
-type Frontiers = ReturnType<LoroDoc['frontiers']>;
+export type Frontiers = ReturnType<LoroDoc['frontiers']>;
 
-function stable(value: unknown): string {
+export function stable(value: unknown): string {
   if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
   if (value && typeof value === 'object') {
     return `{${Object.keys(value)
@@ -44,7 +44,7 @@ function $serialize(node: LexicalNode): Json {
 }
 
 // ponytail: O(n·m) LCS per element; fine for article-sized blocks, switch to Myers if docs grow huge
-function lcs(a: string[], b: string[]): Array<[number, number]> {
+export function lcs(a: string[], b: string[]): Array<[number, number]> {
   const table = Array.from({ length: a.length + 1 }, () => new Uint32Array(b.length + 1));
   for (let i = a.length - 1; i >= 0; i--) {
     for (let j = b.length - 1; j >= 0; j--) {
@@ -88,7 +88,7 @@ function $update(node: LexicalNode, current: Json, target: Json): LexicalNode {
   return replacement;
 }
 
-function pairable(current: Json, target: Json): boolean {
+export function pairable(current: Json, target: Json): boolean {
   if (current.type !== target.type) return false;
   const a = current.$?.blockId;
   const b = target.$?.blockId;
