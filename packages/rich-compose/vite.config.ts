@@ -30,6 +30,8 @@ export default createViteConfig({
     'modules/mention/index': 'src/modules/mention/index.ts',
     'modules/mention/renderer': 'src/modules/mention/renderer.tsx',
     'modules/ruby/index': 'src/modules/ruby/index.ts',
+    'modules/katex/index': 'src/modules/katex/index.ts',
+    'modules/katex/renderer': 'src/modules/katex/renderer.tsx',
     'modules/ruby/renderer': 'src/modules/ruby/renderer.tsx',
     'modules/file/index': 'src/modules/file/index.ts',
     'modules/file/renderer': 'src/modules/file/renderer.tsx',

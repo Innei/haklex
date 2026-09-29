@@ -10,7 +10,6 @@ import { DecoratorNode } from 'lexical';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
-import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
 import { markInlineDraggable } from '../plugins/inline-dnd-shared';
 import { KATEX_NODE_KEY } from '../types/renderer-keys';
@@ -111,7 +110,7 @@ export class KaTeXInlineNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    const decoration = createRendererDecoration(KATEX_NODE_KEY, KaTeXRenderer, {
+    const decoration = createRendererDecoration(KATEX_NODE_KEY, undefined, {
       equation: this.__equation,
       displayMode: false,
     });

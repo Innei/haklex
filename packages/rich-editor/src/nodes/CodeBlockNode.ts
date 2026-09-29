@@ -11,7 +11,6 @@ import { Code } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
-import { CodeBlockRenderer } from '../components/renderers/CodeBlockRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
 import { CODE_BLOCK_NODE_KEY } from '../types/renderer-keys';
 import type { CommandItemConfig } from '../types/slash-menu';
@@ -115,7 +114,7 @@ export class CodeBlockNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration(CODE_BLOCK_NODE_KEY, CodeBlockRenderer, {
+    return createRendererDecoration(CODE_BLOCK_NODE_KEY, undefined, {
       code: this.__code,
       language: this.__language,
     });

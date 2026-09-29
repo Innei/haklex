@@ -75,7 +75,9 @@
     "./modules/poll/edit": "./src/modules/poll/edit.ts",
     "./modules/poll/node": "./src/modules/poll/node.ts",
     "./modules/poll/renderer": "./src/modules/poll/renderer.tsx",
+    "./modules/katex": "./src/modules/katex/index.ts",
     "./modules/katex/edit": "./src/modules/katex/edit.ts",
+    "./modules/katex/renderer": "./src/modules/katex/renderer.tsx",
     "./modules/slash-menu": "./src/modules/slash-menu/index.ts",
     "./modules/slash-menu/edit": "./src/modules/slash-menu/edit.tsx",
     "./style-token": "./src/style-token/index.ts",
@@ -366,6 +368,14 @@
       "./modules/image/edit": {
         "import": "./dist/modules/image/edit.mjs",
         "types": "./dist/modules/image/edit.d.ts"
+      },
+      "./modules/katex": {
+        "import": "./dist/modules/katex/index.mjs",
+        "types": "./dist/modules/katex/index.d.ts"
+      },
+      "./modules/katex/renderer": {
+        "import": "./dist/modules/katex/renderer.mjs",
+        "types": "./dist/modules/katex/renderer.d.ts"
       },
       "./modules/katex/edit": {
         "import": "./dist/modules/katex/edit.mjs",

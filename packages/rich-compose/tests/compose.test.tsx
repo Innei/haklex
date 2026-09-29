@@ -26,3 +26,17 @@ describe('codeBlockModule shape', () => {
     expect(invoked).toBe(false);
   });
 });
+
+describe('katexModule shape', () => {
+  it('supplies the KaTeX renderer the static nodes no longer default to', async () => {
+    const { katexModule } = await import('../src/modules/katex/module');
+    const { KaTeXRenderer } = await import('@haklex/rich-editor/renderers');
+    expect(katexModule.name).toBe('katex');
+    expect(katexModule.renderers?.KaTeX).toBe(KaTeXRenderer);
+  });
+
+  it('ships in allRendererModules', async () => {
+    const { allRendererModules, katexModule } = await import('../src/renderer');
+    expect(allRendererModules).toContain(katexModule);
+  });
+});

@@ -9,6 +9,7 @@ import { excalidrawModule } from './modules/excalidraw/module';
 import { fileModule } from './modules/file/module';
 import { galleryModule } from './modules/gallery/module';
 import { imageModule } from './modules/image/module';
+import { katexModule } from './modules/katex/module';
 import { linkCardModule } from './modules/link-card/module';
 import { mentionModule } from './modules/mention/module';
 import { mermaidModule } from './modules/mermaid/module';
@@ -29,6 +30,7 @@ export {
   fileModule,
   galleryModule,
   imageModule,
+  katexModule,
   linkCardModule,
   mentionModule,
   mermaidModule,
@@ -50,6 +52,7 @@ export const allRendererModules = [
   fileModule,
   galleryModule,
   imageModule,
+  katexModule,
   linkCardModule,
   mentionModule,
   mermaidModule,

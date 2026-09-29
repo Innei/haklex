@@ -11,7 +11,6 @@ import { Sigma } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { createElement } from 'react';
 
-import { KaTeXRenderer } from '../components/renderers/KaTeXRenderer';
 import { createRendererDecoration } from '../components/RendererWrapper';
 import { KATEX_NODE_KEY } from '../types/renderer-keys';
 import type { SlashMenuItemConfig } from '../types/slash-menu';
@@ -107,7 +106,7 @@ export class KaTeXBlockNode extends DecoratorNode<ReactElement> {
   }
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
-    return createRendererDecoration(KATEX_NODE_KEY, KaTeXRenderer, {
+    return createRendererDecoration(KATEX_NODE_KEY, undefined, {
       equation: this.__equation,
       displayMode: true,
     });

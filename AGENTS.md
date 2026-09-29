@@ -43,6 +43,8 @@ The ecosystem splits **nodes** and **renderers** into static (read-only) and edi
 
 **Split criteria**: Only split when the edit path introduces heavy imports absent from the static path.
 
+**No heavy defaults in static nodes**: A static node whose renderer reaches a heavy library (shiki, katex) passes `undefined` as `defaultRenderer`; the renderer comes from `RendererConfig` via its compose module (`codeBlockModule`, `katexModule`). Metro cannot split dynamic imports, so a default renderer referenced from a node class ships its whole library in React Native bundles that never render it.
+
 Registration:
 
 - `@haklex/rich-editor` `src/config.ts` → static nodes → `RichRenderer`
