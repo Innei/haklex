@@ -35,7 +35,7 @@ function shallow(json: Json): string {
 }
 
 function $serialize(node: LexicalNode): Json {
-  const json = node.exportJSON() as Json;
+  const json = node.getLatest().exportJSON() as Json;
   if ($isElementNode(node)) json.children = node.getChildren().map($serialize);
   return json;
 }
@@ -64,8 +64,8 @@ export function lcs(a: string[], b: string[]): Array<[number, number]> {
 // inserted concurrently; update in place whenever the node class can absorb the change.
 export function $updateInPlace(node: LexicalNode, target: Json): boolean {
   const props = withoutDerived(target);
-  node.updateFromJSON(props as never);
-  return shallow(node.exportJSON() as Json) === shallow(target);
+  const updated = node.updateFromJSON(props as never);
+  return shallow(updated.exportJSON() as Json) === shallow(target);
 }
 
 function $update(node: LexicalNode, current: Json, target: Json): LexicalNode {

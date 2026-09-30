@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "@haklex/rich-editor": "workspace:*",
-    "lexical": "^0.49.0",
+    "lexical": "^0.52.0",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.0.3",
     "vite": "^8.2.2",
@@ -36,7 +36,7 @@
   },
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",
-    "lexical": "^0.49.0"
+    "lexical": "^0.52.0"
   },
   "publishConfig": {
     "access": "public",

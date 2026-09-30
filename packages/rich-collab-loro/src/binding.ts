@@ -41,7 +41,7 @@ function sameValue(a: unknown, b: unknown): boolean {
 }
 
 function nodeProps(node: LexicalNode): Props {
-  const { children: _children, ...props } = node.exportJSON() as Props;
+  const { children: _children, ...props } = node.getLatest().exportJSON() as Props;
   if ($isTextNode(node)) delete props.text;
   return props;
 }
