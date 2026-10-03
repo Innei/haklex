@@ -270,7 +270,19 @@ function headlessDecorator(type: string, propKeys: string[], defaults: Props, in
 
 export const ImageNode = headlessDecorator(
   'image',
-  ['src', 'altText', 'width', 'height', 'caption', 'thumbhash', 'accent'],
+  [
+    'src',
+    'altText',
+    'width',
+    'height',
+    'caption',
+    'thumbhash',
+    'accent',
+    'displayWidth',
+    'fixedWidth',
+    'fixedHeight',
+    'layout',
+  ],
   {
     src: '',
     altText: '',
@@ -279,6 +291,10 @@ export const ImageNode = headlessDecorator(
     caption: undefined,
     thumbhash: undefined,
     accent: undefined,
+    displayWidth: undefined,
+    fixedWidth: undefined,
+    fixedHeight: undefined,
+    layout: undefined,
   },
 );
 
