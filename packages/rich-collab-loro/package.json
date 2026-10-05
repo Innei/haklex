@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-collab-loro",
-  "version": "0.46.1",
+  "version": "0.46.2",
   "description": "Loro CRDT binding for Lexical — bidirectional LoroTree sync for real-time collaboration and history",
   "repository": {
     "type": "git",
