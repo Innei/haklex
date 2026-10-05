@@ -1008,6 +1008,7 @@ globalStyle('figure.rich-image[data-display="fixed-height"] img', {
 // an explicit displayWidth; the wrapper's inline width overrides it when set.
 globalStyle('.rich-image-wrapper[data-layout="float-left"]', {
   float: 'left',
+  clear: 'both',
   width: imageFloatWidthFallback,
   maxWidth: '100%',
   margin: '0.125rem 1.25rem 0.875rem 0',
@@ -1015,6 +1016,7 @@ globalStyle('.rich-image-wrapper[data-layout="float-left"]', {
 
 globalStyle('.rich-image-wrapper[data-layout="float-right"]', {
   float: 'right',
+  clear: 'both',
   width: imageFloatWidthFallback,
   maxWidth: '100%',
   margin: '0.125rem 0 0.875rem 1.25rem',
@@ -1048,6 +1050,15 @@ globalStyle('.rich-image-wrapper[data-layout^="float"]', {
     },
   },
 });
+
+// Float layouts are tuned at one column width; only flowing text may wrap a
+// float that overran its paragraphs at another width, every other block starts below it.
+globalStyle(
+  `${richContent} > :not(p, ul, ol, blockquote), ${richContent} .rich-editor__content > :not(p, ul, ol, blockquote)`,
+  {
+    clear: 'both',
+  },
+);
 
 export const sharedStyles = {
   paragraph,

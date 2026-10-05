@@ -48,11 +48,13 @@ export const root = style({
     },
     '&[data-layout="float-left"]': {
       float: 'left',
+      clear: 'both',
       width: `var(--rich-image-display-width, ${floatWidthFallback})`,
       margin: '0.125rem 1.25rem 0.875rem 0',
     },
     '&[data-layout="float-right"]': {
       float: 'right',
+      clear: 'both',
       width: `var(--rich-image-display-width, ${floatWidthFallback})`,
       margin: '0.125rem 0 0.875rem 1.25rem',
     },
