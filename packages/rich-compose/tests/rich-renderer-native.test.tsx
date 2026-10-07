@@ -89,4 +89,14 @@ describe('RichRenderer platform injection', () => {
     expect(html).toContain('class="rich-block-anchor" data-block-id="b2"');
     expect(html).toContain('rich-text-bold');
   });
+
+  it('keeps an empty paragraph one line tall like the editor does', () => {
+    const root = (value as any).root;
+    const empty = {
+      root: { ...root, children: [{ ...root.children[0], children: [] }] },
+    } as unknown as SerializedEditorState;
+    const html = renderToStaticMarkup(<RichRenderer value={empty} />);
+
+    expect(html).toMatch(/<p class="rich-paragraph[^>]*><br\/><\/p>/);
+  });
 });

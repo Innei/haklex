@@ -62,7 +62,7 @@ export function renderBuiltinNode(
       const align = node.format ? ({ textAlign: node.format } as const) : undefined;
       return (
         <p className={shared('paragraph')} key={key} style={align}>
-          {children}
+          {children ?? <br />}
         </p>
       );
     }
