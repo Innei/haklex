@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-file",
-  "version": "0.46.2",
+  "version": "0.46.3",
   "description": "File attachment renderer",
   "repository": {
     "type": "git",
