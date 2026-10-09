@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useExcalidrawConfig } from './ExcalidrawConfigContext';
 import type { ExcalidrawSnapshot } from './types';
-import { parseSnapshot } from './types';
+import { isLocalScenePath, parseSnapshot } from './types';
 
 export interface ExcalidrawDataState {
   /** The raw base data before delta patch (for computing new diffs in edit mode) */
@@ -26,7 +26,7 @@ function resolveUrl(
   apiUrl: string | undefined,
 ): { fetchUrl: string; refLine: string } | { error: string } {
   const refLine = url;
-  if (url.startsWith('http') || url.startsWith('blob:')) {
+  if (url.startsWith('http') || url.startsWith('blob:') || isLocalScenePath(url)) {
     return { fetchUrl: url, refLine };
   }
   if (url.startsWith('ref:') && apiUrl) {

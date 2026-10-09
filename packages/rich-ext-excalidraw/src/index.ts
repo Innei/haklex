@@ -25,7 +25,7 @@ export { EXCALIDRAW_NODE_KEY } from './slot';
 export { excalidrawFullscreenPopup } from './styles.css';
 export { EXCALIDRAW_BLOCK_TRANSFORMER } from './transformer';
 export type { ExcalidrawSnapshot } from './types';
-export { parseSnapshot, serializeSnapshot } from './types';
+export { isLocalScenePath, parseSnapshot, serializeSnapshot } from './types';
 
 // Backward compat
 export type { ExcalidrawStaticRendererProps } from './ExcalidrawDisplayRenderer';

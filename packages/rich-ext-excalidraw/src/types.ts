@@ -3,6 +3,12 @@ export type ExcalidrawSnapshot =
   | { type: 'remote'; url: string }
   | { type: 'delta'; baseUrl: string; delta: object };
 
+const LOCAL_SCENE_PATH = /^(?:\.{1,2}\/)?[\w-][\w./-]*\.excalidraw$/;
+
+export function isLocalScenePath(ref: string): boolean {
+  return LOCAL_SCENE_PATH.test(ref);
+}
+
 export function parseSnapshot(raw: string): ExcalidrawSnapshot | null {
   if (!raw || !raw.trim()) return null;
 
@@ -19,7 +25,8 @@ export function parseSnapshot(raw: string): ExcalidrawSnapshot | null {
   if (
     !firstLine.startsWith('http') &&
     !firstLine.startsWith('blob:') &&
-    !firstLine.startsWith('ref:')
+    !firstLine.startsWith('ref:') &&
+    !isLocalScenePath(firstLine)
   )
     return null;
 
