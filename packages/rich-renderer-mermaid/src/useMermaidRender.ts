@@ -1,25 +1,14 @@
 import type { ColorScheme } from '@haklex/rich-editor/static';
 import { useColorScheme } from '@haklex/rich-editor/static';
-import { renderMermaidSVG } from 'beautiful-mermaid';
 import { useMemo } from 'react';
 
-const LIGHT_PALETTE = { bg: '#ffffff', fg: '#262626' } as const;
-const DARK_PALETTE = { bg: '#171717', fg: '#fafafa' } as const;
+import { renderMermaid } from './utils';
 
 function svgToDataUrl(svg: string): string {
   const bytes = new TextEncoder().encode(svg);
   let binary = '';
   for (const byte of bytes) binary += String.fromCodePoint(byte);
   return `data:image/svg+xml;base64,${btoa(binary)}`;
-}
-
-function readDimensions(svg: string): { width?: number; height?: number } {
-  const match = svg.match(/viewBox="\s*(?:[\d.-]+\s+){2}([\d.]+)\s+([\d.]+)/);
-  if (!match) return {};
-  return {
-    width: Number.parseFloat(match[1]),
-    height: Number.parseFloat(match[2]),
-  };
 }
 
 export function useMermaidRender(content: string, preferredColorScheme?: ColorScheme) {
@@ -39,12 +28,7 @@ export function useMermaidRender(content: string, preferredColorScheme?: ColorSc
     }
 
     try {
-      const palette = effectiveColorScheme === 'dark' ? DARK_PALETTE : LIGHT_PALETTE;
-      const svg = renderMermaidSVG(content, {
-        bg: palette.bg,
-        fg: palette.fg,
-      });
-      const { width, height } = readDimensions(svg);
+      const { svg, width, height } = renderMermaid(content, effectiveColorScheme);
       return {
         loading: false,
         error: '',

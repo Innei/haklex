@@ -1,5 +1,5 @@
 import { code } from '@streamdown/code';
-import type { ComponentProps, FC, ReactElement } from 'react';
+import type { FC, ReactElement } from 'react';
 import { Streamdown } from 'streamdown';
 
 import * as styles from './styles.css';
@@ -11,8 +11,7 @@ import type {
   ChatVariant,
 } from './types';
 
-// @streamdown/code types against its own shiki 3 while streamdown resolves the hoisted shiki 4
-const streamdownPlugins = { code } as unknown as ComponentProps<typeof Streamdown>['plugins'];
+const streamdownPlugins = { code };
 
 const UNKNOWN: ChatParticipant = {
   id: '__unknown__',

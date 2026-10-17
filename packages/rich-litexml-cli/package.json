@@ -28,10 +28,10 @@
     "lexical": "^0.52.0"
   },
   "devDependencies": {
-    "@types/node": "26.1.0",
+    "@types/node": "26.6.5",
     "typescript": "^7.0.2",
-    "vite": "^8.2.2",
-    "vitest": "^4.1.11"
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
   },
   "publishConfig": {
     "access": "public",

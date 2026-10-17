@@ -1,6 +1,8 @@
 # @haklex/rich-renderer-mermaid
 
-Mermaid diagram renderer with interactive zoom and pan controls.
+Mermaid diagram renderer powered by Pele, with interactive zoom and pan controls.
+Rendering is synchronous and uses the same text metrics in the browser and on the
+server. Exported SVG images include their light or dark palette.
 
 ## Installation
 
@@ -10,32 +12,32 @@ pnpm add @haklex/rich-renderer-mermaid
 
 ## Peer Dependencies
 
-| Package | Version |
-| --- | --- |
-| `react` | `>=19` |
-| `react-dom` | `>=19` |
+| Package     | Version |
+| ----------- | ------- |
+| `react`     | `>=19`  |
+| `react-dom` | `>=19`  |
 
 ## Usage
 
 ```tsx
-import { MermaidRenderer } from '@haklex/rich-renderer-mermaid/static'
+import { MermaidRenderer } from '@haklex/rich-renderer-mermaid/static';
 
 // Register in a static RendererConfig
 const rendererConfig = {
   // ...other renderers
   Mermaid: MermaidRenderer,
-}
+};
 ```
 
 For edit mode:
 
 ```tsx
-import { MermaidEditRenderer } from '@haklex/rich-renderer-mermaid'
+import { MermaidEditRenderer } from '@haklex/rich-renderer-mermaid';
 
 const editRendererConfig = {
   // ...other renderers
   Mermaid: MermaidEditRenderer,
-}
+};
 ```
 
 ## Exports
@@ -47,12 +49,12 @@ const editRendererConfig = {
 
 ### Sub-path Exports
 
-| Path | Description |
-| --- | --- |
-| `@haklex/rich-renderer-mermaid` | Full exports (edit + static) |
-| `@haklex/rich-renderer-mermaid/static` | Static-only renderer |
-| `@haklex/rich-renderer-mermaid/utils` | Mermaid utility functions |
-| `@haklex/rich-renderer-mermaid/style.css` | Stylesheet |
+| Path                                      | Description                  |
+| ----------------------------------------- | ---------------------------- |
+| `@haklex/rich-renderer-mermaid`           | Full exports (edit + static) |
+| `@haklex/rich-renderer-mermaid/static`    | Static-only renderer         |
+| `@haklex/rich-renderer-mermaid/utils`     | Mermaid utility functions    |
+| `@haklex/rich-renderer-mermaid/style.css` | Stylesheet                   |
 
 ## Part of Haklex
 

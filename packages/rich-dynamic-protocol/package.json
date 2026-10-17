@@ -22,13 +22,13 @@
     "dev:build": "vite build --watch"
   },
   "devDependencies": {
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "typescript": "^7.0.2",
-    "unplugin-dts": "^1.0.3",
-    "vite": "^8.2.2"
+    "unplugin-dts": "^1.1.2",
+    "vite": "^8.3.4"
   },
   "peerDependencies": {
     "react": ">=19",

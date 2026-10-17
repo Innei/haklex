@@ -1,4 +1,5 @@
 import { GalleryRenderer } from '@haklex/rich-ext-gallery/renderer';
+import { MermaidRenderer } from '@haklex/rich-renderer-mermaid/static';
 import type { SerializedEditorState } from 'lexical';
 import { createRoot } from 'react-dom/client';
 
@@ -25,7 +26,6 @@ import { pollModule } from '../modules/poll/module';
 import { PollRenderer } from '../modules/poll/renderer';
 import { rubyModule } from '../modules/ruby/module';
 import { videoModule } from '../modules/video/module';
-import { MermaidRenderer } from './mermaid-cdn-renderer';
 
 type Theme = 'light' | 'dark';
 type Variant = 'article' | 'note' | 'comment';

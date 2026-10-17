@@ -28,12 +28,12 @@
   "dependencies": {
     "lexical": "^0.52.0",
     "linkedom": "^0.18.13",
-    "nanoid": "^6.0.1"
+    "nanoid": "^6.0.2"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
-    "unplugin-dts": "^1.0.3",
-    "vite": "^8.2.2"
+    "unplugin-dts": "^1.1.2",
+    "vite": "^8.3.4"
   },
   "publishConfig": {
     "access": "public",

@@ -24,22 +24,22 @@
 
 | Category              | Technology                    |
 | --------------------- | ----------------------------- |
-| **Language**          | TypeScript 5.9                |
-| **Editor Core**       | Lexical 0.47                  |
+| **Language**          | TypeScript 7                  |
+| **Editor Core**       | Lexical 0.52                  |
 | **UI Framework**      | React 19                      |
 | **UI Primitives**     | Base UI 1 (`@base-ui/react`)  |
 | **Build**             | Vite 8, Turbo 2               |
 | **Styling**           | Vanilla Extract 1 (CSS-in-TS) |
 | **Code Highlighting** | Shiki 4, CodeMirror 6         |
-| **Package Manager**   | pnpm 10                       |
+| **Package Manager**   | pnpm 12                       |
 | **Module Format**     | ESM only (`.mjs`)             |
 
-Lexical stays on **0.x** releases: the **minor** (e.g. **0.47**) is what must align across `lexical` and `@lexical/*`, not the patch number.
+Lexical stays on **0.x** releases: the **minor** (e.g. **0.52**) is what must align across `lexical` and `@lexical/*`, not the patch number.
 
 ## Prerequisites
 
-- **Node.js** 20 or higher
-- **pnpm** 10 (`corepack enable && corepack prepare pnpm@latest --activate`, or match `packageManager` in the repo root)
+- **Node.js** 22.12 or higher
+- **pnpm** 12 (match `packageManager` in the repo root)
 
 ## Getting Started
 

@@ -34,8 +34,8 @@
     "@lexical/headless": "^0.52.0",
     "lexical": "^0.52.0",
     "typescript": "^7.0.2",
-    "unplugin-dts": "^1.0.3",
-    "vite": "^8.2.2"
+    "unplugin-dts": "^1.1.2",
+    "vite": "^8.3.4"
   },
   "peerDependencies": {
     "lexical": "^0.52.0"

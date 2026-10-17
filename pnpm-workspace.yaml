@@ -12,8 +12,10 @@ publicHoistPattern:
   - 'react-dom'
 allowBuilds:
   esbuild: true
+  node-pty: true
   sharp: true
   simple-git-hooks: true
   unrs-resolver: true
 minimumReleaseAgeExclude:
   - '@innei/react-tweet@4.0.0'
+  - pele@1.6.0

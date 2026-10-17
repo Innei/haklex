@@ -24,20 +24,20 @@
   "dependencies": {
     "@haklex/rich-agent-core": "workspace:*",
     "@haklex/rich-diff-core": "workspace:*",
-    "@streamdown/code": "^1.1.1",
-    "streamdown": "^2.5.0",
+    "@streamdown/code": "^2.0.0",
+    "streamdown": "^2.7.0",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
-    "@vanilla-extract/css": "^1.21.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vanilla-extract/css": "^1.21.3",
     "@vanilla-extract/vite-plugin": "^5.2.6",
-    "react": "^19.2.8",
-    "react-dom": "^19.2.8",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "typescript": "^7.0.2",
-    "unplugin-dts": "^1.0.3",
-    "vite": "^8.2.2"
+    "unplugin-dts": "^1.1.2",
+    "vite": "^8.3.4"
   },
   "peerDependencies": {
     "@haklex/rich-editor-ui": "workspace:^",

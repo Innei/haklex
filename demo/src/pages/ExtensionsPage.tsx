@@ -113,7 +113,7 @@ const extensions: Extension[] = [
   {
     id: 'mermaid',
     name: 'Mermaid',
-    description: 'Sync SVG diagram rendering powered by beautiful-mermaid.',
+    description: 'Sync SVG diagram rendering powered by Pele.',
     packageName: 'rich-renderer-mermaid',
     preview: 'Mermaid',
   },
@@ -1295,9 +1295,8 @@ function MermaidDetail() {
             fontSize: 14,
           }}
         >
-          Sync SVG rendering via <code>beautiful-mermaid</code>. Supported types: flowchart, state,
-          sequence, class, ER, XY chart. Unsupported in this engine: gantt, pie, gitGraph, journey,
-          mindmap, timeline.
+          Sync SVG rendering via <code>Pele</code>, including flowcharts, sequence and class
+          diagrams, ER, XY charts, Gantt charts, pie charts, mindmaps, and timelines.
         </p>
 
         <div className="biz-masonry">

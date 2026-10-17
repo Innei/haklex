@@ -46,10 +46,6 @@ export default defineConfig({
         replacement: path.resolve(process.cwd(), 'src/cli/shiki-cdn.ts'),
       },
       {
-        find: /^mermaid$/,
-        replacement: path.resolve(process.cwd(), 'src/cli/mermaid-cdn.ts'),
-      },
-      {
         find: /^shiki\/bundle\/(web|full)$/,
         replacement: path.resolve(process.cwd(), 'src/cli/shiki-cdn.ts'),
       },

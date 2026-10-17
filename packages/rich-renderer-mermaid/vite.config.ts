@@ -1,8 +1,9 @@
-import { createViteConfig } from '../vite.shared'
+import { createViteConfig } from '../vite.shared';
 
 export default createViteConfig({
   entry: {
     index: 'src/index.ts',
     static: 'src/static.ts',
+    utils: 'src/utils.ts',
   },
-})
+});
