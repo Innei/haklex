@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-agent-chat",
-  "version": "0.46.5",
+  "version": "0.47.0",
   "description": "Chat panel UI for AI agent interaction",
   "repository": {
     "type": "git",
