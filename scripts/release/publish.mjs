@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { execFileSync, spawnSync } from 'node:child_process';
+import { spawn } from 'node:child_process';
 import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -56,10 +56,27 @@ function sharedVersion(packages) {
   return expected;
 }
 
-function isPublished(name, version) {
-  const result = spawnSync('npm', ['view', `${name}@${version}`, 'version'], {
-    encoding: 'utf8',
+function run(command, args, options = {}) {
+  return new Promise((resolve) => {
+    const child = spawn(command, args, { ...options, stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    child.stdout.on('data', (chunk) => (stdout += chunk));
+    child.stderr.on('data', (chunk) => (stderr += chunk));
+    child.on('close', (status) => resolve({ status, stdout, stderr }));
   });
+}
+
+async function pool(items, concurrency, worker) {
+  const queue = [...items];
+  const runners = Array.from({ length: Math.min(concurrency, queue.length) }, async () => {
+    while (queue.length > 0) await worker(queue.shift());
+  });
+  await Promise.all(runners);
+}
+
+async function isPublished(name, version) {
+  const result = await run('npm', ['view', `${name}@${version}`, 'version']);
   return result.status === 0 && result.stdout.trim() === version;
 }
 
@@ -71,41 +88,43 @@ function check(tag) {
   console.log(`Shared version ${version}`);
 }
 
-function publish() {
+async function publishOne(name, dir, version, packDir) {
+  if (await isPublished(name, version)) return `skip ${name}@${version} (already on npm)`;
+  const dest = mkdtempSync(path.join(packDir, 'pkg-'));
+  // pnpm pack rewrites workspace: specifiers and applies publishConfig;
+  // npm publish then handles the trusted-publishing OIDC exchange.
+  const pack = await run('pnpm', ['pack', '--pack-destination', dest], { cwd: dir });
+  const tarball = readdirSync(dest).find((file) => file.endsWith('.tgz'));
+  if (pack.status !== 0 || !tarball) {
+    throw new Error(`pnpm pack failed for ${name}\n${pack.stderr}`);
+  }
+  const result = await run('npm', ['publish', path.join(dest, tarball), '--access', 'public']);
+  if (result.status === 0) return `published ${name}@${version}`;
+  if (/cannot publish over|previously published/i.test(result.stderr)) {
+    return `skip ${name}@${version} (registry already has it)`;
+  }
+  throw new Error(`npm publish failed for ${name}@${version}\n${result.stderr}`);
+}
+
+async function publish(concurrency = 8) {
   const packages = loadPackages();
   const version = sharedVersion(packages);
   const packDir = mkdtempSync(path.join(tmpdir(), 'haklex-pack-'));
+  const failures = [];
   try {
-    for (const name of topoOrder(packages)) {
-      if (isPublished(name, version)) {
-        console.log(`skip ${name}@${version} (already on npm)`);
-        continue;
+    await pool(topoOrder(packages), concurrency, async (name) => {
+      try {
+        console.log(await publishOne(name, packages.get(name).dir, version, packDir));
+      } catch (error) {
+        failures.push(name);
+        console.error(error.message);
       }
-      const dest = mkdtempSync(path.join(packDir, 'pkg-'));
-      // pnpm pack rewrites workspace: specifiers and applies publishConfig;
-      // npm publish then handles the trusted-publishing OIDC exchange.
-      execFileSync('pnpm', ['pack', '--pack-destination', dest], {
-        cwd: packages.get(name).dir,
-        stdio: ['ignore', 'ignore', 'inherit'],
-      });
-      const tarball = readdirSync(dest).find((file) => file.endsWith('.tgz'));
-      if (!tarball) throw new Error(`pnpm pack produced no tarball for ${name}`);
-      const result = spawnSync('npm', ['publish', path.join(dest, tarball), '--access', 'public'], {
-        encoding: 'utf8',
-      });
-      process.stdout.write(result.stdout);
-      process.stderr.write(result.stderr);
-      if (result.status !== 0) {
-        if (/cannot publish over|previously published/i.test(result.stderr)) {
-          console.log(`skip ${name}@${version} (registry already has it)`);
-          continue;
-        }
-        throw new Error(`npm publish failed for ${name}@${version}`);
-      }
-      console.log(`published ${name}@${version}`);
-    }
+    });
   } finally {
     rmSync(packDir, { recursive: true, force: true });
+  }
+  if (failures.length > 0) {
+    throw new Error(`Failed to publish ${failures.length}: ${failures.join(', ')}`);
   }
 }
 
@@ -115,7 +134,11 @@ async function waitResolvable(timeoutMinutes = 60) {
   const deadline = Date.now() + timeoutMinutes * 60_000;
   let missing = [...packages.keys()];
   while (missing.length > 0) {
-    missing = missing.filter((name) => !isPublished(name, version));
+    const resolved = new Set();
+    await pool(missing, 16, async (name) => {
+      if (await isPublished(name, version)) resolved.add(name);
+    });
+    missing = missing.filter((name) => !resolved.has(name));
     if (missing.length === 0) break;
     if (Date.now() > deadline) {
       throw new Error(`Still unresolvable after ${timeoutMinutes} min: ${missing.join(', ')}`);
@@ -137,7 +160,7 @@ switch (command) {
     break;
   }
   case 'publish': {
-    publish();
+    await publish(arg ? Number(arg) : undefined);
     break;
   }
   case 'wait': {
@@ -145,7 +168,9 @@ switch (command) {
     break;
   }
   default: {
-    console.error('usage: publish.mjs <check [tag] | list | publish | wait [minutes]>');
+    console.error(
+      'usage: publish.mjs <check [tag] | list | publish [concurrency] | wait [minutes]>',
+    );
     process.exit(1);
   }
 }

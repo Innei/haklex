@@ -45,20 +45,20 @@ git push --atomic origin main "v$NEW_VERSION"
 2. Streams it with `gh run watch --exit-status`.
 3. On success, re-checks that every package in `publish.mjs list` resolves at `$NEW_VERSION` and that the GitHub release exists.
 
-Expect 10–30 minutes: npm's post-publish review can hold each version for a few minutes, and the workflow's `wait` step absorbs that.
+Expect about 10–15 minutes: build and tests take most of it; npm's post-publish review holds each version for a few minutes, and because publishes run concurrently those waits overlap inside the `wait` step.
 
 Do not start downstream work until the script exits 0.
 
 ## What the Workflow Guarantees
 
-| Step                     | Guarantee                                                                                        |
-| ------------------------ | ------------------------------------------------------------------------------------------------ |
-| `publish.mjs check`      | All public packages share the version; the tag equals it.                                        |
-| typecheck / test / build | Same gates as `ci.yml`, on the tagged commit.                                                    |
-| `publish.mjs publish`    | Leaf-first `pnpm pack` + `npm publish` via OIDC trusted publishing, with provenance. Idempotent. |
-| `publish.mjs wait 90`    | Every package resolvable from npm before the job continues.                                      |
-| CLI smoke                | `@haklex/rich-litexml-cli@$NEW_VERSION` runs and emits a paragraph.                              |
-| GitHub release           | Created from the tag body, `--verify-tag`; skipped if it already exists.                         |
+| Step                     | Guarantee                                                                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `publish.mjs check`      | All public packages share the version; the tag equals it.                                                                                        |
+| typecheck / test / build | Same gates as `ci.yml`, on the tagged commit.                                                                                                    |
+| `publish.mjs publish`    | `pnpm pack` + `npm publish` via OIDC trusted publishing, with provenance, 8 packages concurrently. Idempotent; reports every failure at the end. |
+| `publish.mjs wait 90`    | Every package resolvable from npm before the job continues.                                                                                      |
+| CLI smoke                | `@haklex/rich-litexml-cli@$NEW_VERSION` runs and emits a paragraph.                                                                              |
+| GitHub release           | Created from the tag body, `--verify-tag`; skipped if it already exists.                                                                         |
 
 `pnpm pack` rewrites `workspace:*` / `workspace:^` specifiers and applies `publishConfig`; `npm publish <tarball>` performs the trusted-publishing token exchange. Publishing the tarball with npm instead of `pnpm publish` keeps the OIDC path on npm's own implementation.
 

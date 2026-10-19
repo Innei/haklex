@@ -59,7 +59,7 @@ Triggered by any `v*` tag push:
 
 1. `scripts/release/publish.mjs check $TAG`: every public package is on the shared version and the tag equals it.
 2. `pnpm install --frozen-lockfile`, `pnpm typecheck`, `pnpm test`, `pnpm run build:packages`.
-3. `scripts/release/publish.mjs publish`: leaf-first, `pnpm pack` each package, `npm publish <tarball>` via OIDC. Already-published versions are skipped, so a re-run resumes a partial publish.
+3. `scripts/release/publish.mjs publish`: `pnpm pack` each package, `npm publish <tarball>` via OIDC, 8 at a time (`publish 16` raises it). Already-published versions are skipped, so a re-run resumes a partial publish; failures are collected and reported together.
 4. `scripts/release/publish.mjs wait 90`: polls until every package resolves on npm.
 5. `@haklex/rich-litexml-cli` binary smoke.
 6. `gh release create` with the annotated tag's body as notes (falls back to `--generate-notes`).
