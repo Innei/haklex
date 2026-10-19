@@ -114,7 +114,7 @@ export class RubyNode extends ElementNode {
     const json = _json as unknown as SerializedElementNode & { reading?: string };
     const node = new RubyNode();
     node.__reading = json.reading ?? '';
-    return node;
+    return node.updateFromJSON(json);
   }
   exportJSON(): SerializedElementNode & { reading: string } {
     return {
@@ -158,7 +158,7 @@ export class DetailsNode extends ElementNode {
     const node = new DetailsNode();
     node.__summary = json.summary ?? '';
     node.__open = json.open ?? false;
-    return node;
+    return node.updateFromJSON(json);
   }
   exportJSON(): SerializedElementNode & { summary: string; open: boolean } {
     return {
@@ -196,7 +196,7 @@ export class RichQuoteNode extends QuoteNode {
     const json = _json as unknown as SerializedElementNode & { attribution?: string | null };
     const node = new RichQuoteNode();
     node.__attribution = json.attribution ?? null;
-    return node;
+    return node.updateFromJSON(json);
   }
   exportJSON(): SerializedElementNode & { attribution: string | null } {
     return {
@@ -241,10 +241,10 @@ function headlessDecorator(type: string, propKeys: string[], defaults: Props, in
       for (const k of propKeys) {
         (node as any)[`__${k}`] = json[k] ?? defaults[k];
       }
-      return node;
+      return node.updateFromJSON(json);
     }
     exportJSON(): SerializedLexicalNode & Props {
-      const out: Props = { type, version: 1 };
+      const out: Props = { ...super.exportJSON(), type, version: 1 };
       for (const k of propKeys) {
         out[k] = (this as any)[`__${k}`];
       }
@@ -449,10 +449,11 @@ export class BannerNode extends DecoratorNode<null> {
     const node = new BannerNode();
     node.__bannerType = json.bannerType ?? 'note';
     node.__contentState = json.content ?? null;
-    return node;
+    return node.updateFromJSON(json);
   }
   exportJSON(): SerializedLexicalNode {
     return {
+      ...super.exportJSON(),
       type: 'banner',
       version: 1,
       bannerType: this.__bannerType,
@@ -500,10 +501,11 @@ export class AlertQuoteNode extends DecoratorNode<null> {
     const node = new AlertQuoteNode();
     node.__alertType = json.alertType ?? 'note';
     node.__contentState = json.content ?? null;
-    return node;
+    return node.updateFromJSON(json);
   }
   exportJSON(): SerializedLexicalNode {
     return {
+      ...super.exportJSON(),
       type: 'alert-quote',
       version: 1,
       alertType: this.__alertType,
@@ -545,10 +547,11 @@ export class NestedDocNode extends DecoratorNode<null> {
     const json = _json as unknown as SerializedLexicalNode & { content?: unknown };
     const node = new NestedDocNode();
     node.__contentState = json.content ?? null;
-    return node;
+    return node.updateFromJSON(json);
   }
   exportJSON(): SerializedLexicalNode {
     return {
+      ...super.exportJSON(),
       type: 'nested-doc',
       version: 1,
       content: this.__contentState,
@@ -600,10 +603,11 @@ export class GridContainerNode extends DecoratorNode<null> {
     const rawGap = json.gap;
     node.__gap = typeof rawGap === 'number' ? `${rawGap}px` : (rawGap ?? '16px');
     node.__cells = json.cells ?? [];
-    return node;
+    return node.updateFromJSON(json);
   }
   exportJSON(): SerializedLexicalNode {
     return {
+      ...super.exportJSON(),
       type: 'grid-container',
       version: 1,
       cols: this.__cols,

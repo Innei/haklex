@@ -47,6 +47,18 @@ describe('chart through the headless editor', () => {
     expect(roundtrip(input)).toBe(input);
   });
 
+  it('keeps block ids on chart and its neighbours', () => {
+    const input = [
+      '<p id="p1">Intro</p>',
+      `<chart id="c1"><![CDATA[${SPEC}]]></chart>`,
+      '<excalidraw id="e1">ref:abc</excalidraw>',
+    ].join('\n');
+    const lines = roundtrip(input)
+      .split('\n')
+      .map((l) => l.trim());
+    expect(lines.join('\n')).toBe(input);
+  });
+
   it('round-trips an empty chart', () => {
     expect(roundtrip('<chart />')).toBe('<chart />');
   });
