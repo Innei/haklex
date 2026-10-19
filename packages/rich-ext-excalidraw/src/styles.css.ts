@@ -106,14 +106,6 @@ export const excalidrawRetry = style({
   },
 });
 
-globalStyle(`${excalidrawEditorContainer} .Island`, {
-  display: 'none !important',
-});
-
-globalStyle(`.excalidraw--view-mode .dropdown-menu-button`, {
-  display: 'none !important',
-});
-
 const _excalidrawFullscreenPopup = style({});
 globalStyle(`${_excalidrawFullscreenPopup}${_excalidrawFullscreenPopup}`, {
   position: 'fixed',

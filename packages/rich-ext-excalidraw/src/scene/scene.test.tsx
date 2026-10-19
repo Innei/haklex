@@ -60,7 +60,21 @@ describe('Scene dark mode', () => {
     const html = renderToStaticMarkup(<Scene scene={imageScene} theme="dark" />);
     expect(html).toContain('invert(93%) hue-rotate(180deg)');
     expect(html).toContain('<filter');
-    expect(html).toMatch(/<image[^>]*filter="url\(#rich-excalidraw-counter-invert\)"/);
+    expect(html).toMatch(/<image[^>]*filter="url\(#rich-excalidraw-counter-invert-[\w-]+\)"/);
+  });
+
+  it('gives each dark scene its own counter-invert filter id', () => {
+    const html = renderToStaticMarkup(
+      <>
+        <Scene scene={imageScene} theme="dark" />
+        <Scene scene={imageScene} theme="dark" />
+      </>,
+    );
+    const ids = [...html.matchAll(/<filter[^>]* id="([^"]+)"/g)].map((m) => m[1]);
+    const refs = [...html.matchAll(/<image[^>]*filter="url\(#([^)]+)\)"/g)].map((m) => m[1]);
+    expect(ids).toHaveLength(2);
+    expect(new Set(ids).size).toBe(2);
+    expect(refs).toEqual(ids);
   });
 
   it('leaves images untouched in light mode', () => {

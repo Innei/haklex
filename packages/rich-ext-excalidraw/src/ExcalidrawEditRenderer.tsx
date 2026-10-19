@@ -442,6 +442,7 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
     loading: dataLoading,
     error: dataError,
     retry,
+    retryable,
     baseRef,
     baseData,
   } = useExcalidrawData(snapshot);
@@ -530,7 +531,7 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
   if (dataError) {
     return (
       <div className={css.excalidrawEditorContainer}>
-        <ExcalidrawErrorState message={dataError} onRetry={retry} />
+        <ExcalidrawErrorState message={dataError} onRetry={retryable ? retry : undefined} />
       </div>
     );
   }

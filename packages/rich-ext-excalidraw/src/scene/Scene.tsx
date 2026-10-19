@@ -1,5 +1,5 @@
 import type { CSSProperties, FC } from 'react';
-import { createContext, memo, use } from 'react';
+import { createContext, memo, use, useId } from 'react';
 
 import { fontFamilyToCss } from './fonts';
 import {
@@ -65,16 +65,14 @@ export function computeSceneBounds(elements: ExcalidrawElement[]): SceneBounds {
 
 export const DARK_SCENE_FILTER = 'invert(93%) hue-rotate(180deg)';
 
-const COUNTER_INVERT_FILTER_ID = 'rich-excalidraw-counter-invert';
-
-const SceneDarkContext = createContext(false);
+const SceneDarkContext = createContext<{ filterId: string } | null>(null);
 
 // Exact inverse of DARK_SCENE_FILTER, applied to embedded images so photos keep
 // their colours while the drawing around them is inverted. CSS filters run in
 // sRGB, so the SVG filter must too.
-const CounterInvertFilter: FC = () => (
+const CounterInvertFilter: FC<{ id: string }> = ({ id }) => (
   <defs>
-    <filter colorInterpolationFilters="sRGB" id={COUNTER_INVERT_FILTER_ID}>
+    <filter colorInterpolationFilters="sRGB" id={id}>
       <feColorMatrix type="hueRotate" values="180" />
       <feColorMatrix
         type="matrix"
@@ -92,9 +90,12 @@ interface SceneContentProps {
 
 export const SceneContent: FC<SceneContentProps> = memo(({ dark = false, files, scene }) => {
   const elements = scene.elements.filter((el) => !el.isDeleted);
+  // One filter per scene: `url(#id)` resolves to the first match in the page, and
+  // a match inside a hidden subtree may not render in every engine.
+  const filterId = `rich-excalidraw-counter-invert-${useId().replaceAll(/[^\w-]/g, '')}`;
   return (
-    <SceneDarkContext value={dark}>
-      {dark && <CounterInvertFilter />}
+    <SceneDarkContext value={dark ? { filterId } : null}>
+      {dark && <CounterInvertFilter id={filterId} />}
       {elements.map((el) => (
         <ElementGroup el={el} files={files} key={el.id} />
       ))}
@@ -473,7 +474,7 @@ const TextRender: FC<{ el: TextElement }> = ({ el }) => {
 };
 
 const ImageRender: FC<{ el: ImageElement; files?: BinaryFiles }> = ({ el, files }) => {
-  const dark = use(SceneDarkContext);
+  const darkFilter = use(SceneDarkContext);
   const file = el.fileId && files ? files[el.fileId] : undefined;
   if (!file?.dataURL) {
     return <ImagePlaceholder el={el} label="Image" />;
@@ -482,7 +483,7 @@ const ImageRender: FC<{ el: ImageElement; files?: BinaryFiles }> = ({ el, files 
   const scaleY = el.scale?.[1] ?? 1;
   return (
     <image
-      filter={dark ? `url(#${COUNTER_INVERT_FILTER_ID})` : undefined}
+      filter={darkFilter ? `url(#${darkFilter.filterId})` : undefined}
       height={el.height}
       href={file.dataURL}
       preserveAspectRatio="none"

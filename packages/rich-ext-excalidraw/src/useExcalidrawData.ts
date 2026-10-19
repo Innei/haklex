@@ -13,6 +13,8 @@ export interface ExcalidrawDataState {
   loading: boolean;
   /** Re-fetches a remote or incremental snapshot; a no-op for inline data. */
   retry: () => void;
+  /** True only when `error` came from a fetch, so `retry` can change the outcome. */
+  retryable: boolean;
   snapshot: Record<string, any> | undefined;
 }
 
@@ -69,8 +71,9 @@ function typedToParsed(typed: ExcalidrawSnapshot, apiUrl: string | undefined): P
 }
 
 function stringToParsed(data: string, apiUrl: string | undefined): ParsedData {
+  if (!data.trim()) return { type: 'empty' };
   const typed = parseSnapshot(data);
-  if (!typed) return { type: 'empty' };
+  if (!typed) return { type: 'error', error: 'Unrecognized snapshot format' };
   return typedToParsed(typed, apiUrl);
 }
 
@@ -133,7 +136,7 @@ export function useExcalidrawData(data: string | ExcalidrawSnapshot | null): Exc
   }, [parsed, attempt]);
 
   if (parsed.type === 'inline') {
-    return { snapshot: parsed.snapshot, loading: false, error: '', retry };
+    return { snapshot: parsed.snapshot, loading: false, error: '', retry, retryable: false };
   }
 
   if (parsed.type === 'remote' || parsed.type === 'incremental') {
@@ -142,14 +145,15 @@ export function useExcalidrawData(data: string | ExcalidrawSnapshot | null): Exc
       loading,
       error,
       retry,
+      retryable: Boolean(error),
       baseRef: parsed.refLine,
       baseData,
     };
   }
 
   if (parsed.type === 'error') {
-    return { snapshot: undefined, loading: false, error: parsed.error, retry };
+    return { snapshot: undefined, loading: false, error: parsed.error, retry, retryable: false };
   }
 
-  return { snapshot: undefined, loading: false, error: '', retry };
+  return { snapshot: undefined, loading: false, error: '', retry, retryable: false };
 }

@@ -31,7 +31,7 @@ export const ExcalidrawDisplayRenderer: FC<ExcalidrawStaticRendererProps> = ({
   snapshot,
 }) => {
   const theme = useColorScheme();
-  const { snapshot: data, loading, error, retry } = useExcalidrawData(snapshot);
+  const { snapshot: data, loading, error, retry, retryable } = useExcalidrawData(snapshot);
   const scene = useMemo(() => toScene(data), [data]);
   useExcalidrawFont();
 
@@ -50,7 +50,8 @@ export const ExcalidrawDisplayRenderer: FC<ExcalidrawStaticRendererProps> = ({
 
   let body: ReactNode;
   if (loading) body = <ExcalidrawLoadingState />;
-  else if (error) body = <ExcalidrawErrorState message={error} onRetry={retry} />;
+  else if (error)
+    body = <ExcalidrawErrorState message={error} onRetry={retryable ? retry : undefined} />;
   else if (!data) body = <ExcalidrawEmptyState />;
   else if (!scene) body = <ExcalidrawErrorState message="Invalid whiteboard data" />;
   else if (countElements(scene) === 0) body = <ExcalidrawEmptyState />;
