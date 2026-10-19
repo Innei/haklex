@@ -12,22 +12,32 @@
 
 ## Downstream Consumers
 
-| Repo               | Location                              | Rules                                                                                                                                                                  |
-| ------------------ | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Yohaku             | `/Users/innei/git/innei-repo/Yohaku`  | Grep package manifests at release time. Historical primary manifest: `apps/web/package.json`.                                                                          |
-| mx-core / mx-space | `/Users/innei/git/innei-repo/mx-core` | Grep all manifests. Historical consumers include `apps/admin/package.json`, `apps/core/package.json`, `packages/cli/package.json`, and `packages/editor/package.json`. |
+| Repo                | Location                                  | Rules                                                                                                                                                                                                                                                                                                                                                                                   |
+| ------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Yohaku              | `/Users/innei/git/innei-repo/Yohaku`      | Grep package manifests at release time, including the `yohaku-oss` submodule (`packages/rich-content`, `apps/mobile`). All of them move together; see the submodule section.                                                                                                                                                                                                            |
+| mx-core / mx-space  | `/Users/innei/git/innei-repo/mx-core`     | Grep all manifests. Historical consumers include `apps/admin/package.json`, `apps/core/package.json`, `packages/cli/package.json`, and `packages/editor/package.json`.                                                                                                                                                                                                                  |
+| ryugi (superpowers) | `/Users/innei/git/innei-repo/superpowers` | `artifacts/package.json` (own lockfile and `pnpm-workspace.yaml` under `artifacts/`). After pinning, ship a ryugi release: `scripts/bump-version.sh <patch>`, commit, rebase onto `origin/main`, **then** `git tag v<version>` and `git push --atomic origin main v<version>`; its `Release` workflow publishes `ryugi-artifacts`. Tagging before the rebase leaves the tag off `main`. |
 
-## Yohaku Worktree Quirk
+## Yohaku Worktree and Submodule
 
-`Yohaku/packages/design-system` is a symlink to `../design-oss/design-system`. A `git worktree add` operation does not materialize sibling-directory targets, so `pnpm install` may fail with `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND` for `@yohaku/design-system`.
-
-After creating `/tmp/release-Yohaku-$NEW_VERSION`, copy the sibling directory into the worktree:
+`Yohaku/packages/{design-system,rich-content,dom-webview}` and `apps/mobile` are symlinks into the `yohaku-oss` submodule. A fresh worktree has an empty `yohaku-oss/`, so initialise it before installing:
 
 ```bash
-cp -R "/Users/innei/git/innei-repo/Yohaku/design-oss/" \
-  "/tmp/release-Yohaku-$NEW_VERSION/design-oss/"
-rm -rf "/tmp/release-Yohaku-$NEW_VERSION/design-oss/.git"
+git -C "/tmp/release-Yohaku-$NEW_VERSION" submodule update --init yohaku-oss
+git -C "/tmp/release-Yohaku-$NEW_VERSION/yohaku-oss" switch -c "chore/haklex-$NEW_VERSION"
 ```
+
+Pin every `@haklex/*` entry in `apps/web`, `yohaku-oss/packages/rich-content` (dev + peer) and `yohaku-oss/apps/mobile` to the same version. A lagging `rich-content` pin installs a second `@haklex/rich-editor` and breaks web types (v0.50.0: `RichEditorVariant` mismatch).
+
+`yohaku-oss` keeps its own `pnpm-lock.yaml` and `pnpm-workspace.yaml`. After the root `pnpm install`, refresh it without touching `node_modules` (which is a symlink to the root store):
+
+```bash
+cd "/tmp/release-Yohaku-$NEW_VERSION/yohaku-oss" && pnpm install --lockfile-only
+```
+
+Commit and push `yohaku-oss` first (`chore(deps): bump @haklex/* to $NEW_VERSION`), then in Yohaku commit `apps/web/package.json` + `pnpm-lock.yaml`, then the pin bump `chore(mobile): bump public iOS source — <oss subject>` (Yohaku `AGENTS.md`).
+
+Known baselines that are not release regressions (verify against the main checkout before treating as new): web `tsc` errors in `textures.ts` and `Gallery.tsx`; mobile drizzle `BaseSQLiteDatabase` errors (two drizzle peer instances); mobile `native-dependency-policy` AVIF test. The web build skips type validation (`ignoreBuildErrors`), so run `pnpm --filter @yohaku/web exec tsc --noEmit` separately and diff against main.
 
 ## Manifest Enumeration
 

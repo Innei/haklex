@@ -3,15 +3,16 @@
  * @see https://github.com/antfu-collective/bumpp
  *
  * 脚本:
- * - pnpm run release        递归 bump 所有 workspace 包 → commit → tag → push
- * - pnpm run release:rich   同上，且在 commit 前执行 build:rich + publish:rich（发布 @haklex/*）
- * - pnpm run release:dry    bump 所有包，不 commit/tag/push（仅看版本变化）
+ * - pnpm run release        递归 bump 所有 workspace 包（不 commit/tag/push）
+ * - pnpm run release:dry    同上，仅看版本变化
+ *
+ * 发布不在本地进行：推送 vX.Y.Z tag 后由 .github/workflows/release.yml 全量发布。
  *
  * 基准版本以 packages/rich-editor 的 version 为准。
  */
-import { defineConfig } from 'bumpp'
+import { defineConfig } from 'bumpp';
 
-import richEditorPkg from './packages/rich-editor/package.json'
+import richEditorPkg from './packages/rich-editor/package.json';
 
 export default defineConfig({
   /** 基准版本：与 packages/rich-editor 保持一致 */
@@ -27,4 +28,4 @@ export default defineConfig({
   confirm: false,
   /** 只 bump 根与 packages/* */
   files: ['package.json', 'pnpm-lock.yaml', 'packages/**/package.json'],
-})
+});

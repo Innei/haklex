@@ -16,12 +16,8 @@
     "lint": "eslint . --fix",
     "litexml": "tsx scripts/litexml/index.ts",
     "prepare": "pnpm exec simple-git-hooks",
-    "publish:packages": "pnpm run build:packages && pnpm -r publish --no-git-checks --filter '@haklex/*' --filter '!@haklex/rich-editor-demo'",
-    "publish:rich": "pnpm run publish:packages",
-    "release": "bumpp -r",
+    "release": "bumpp -r --no-commit --no-tag --no-push",
     "release:dry": "bumpp -r --no-commit --no-tag --no-push",
-    "release:packages": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\"",
-    "release:rich": "bumpp -r -x \"sh -c 'pnpm run build:packages && pnpm run publish:packages'\"",
     "test": "vitest run",
     "typecheck": "pnpm --filter \"./packages/*\" -r exec tsc --noEmit"
   },

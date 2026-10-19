@@ -279,20 +279,20 @@ Cherry-pick individual modules from `@haklex/rich-compose/modules/<name>` and `@
 
 ## Available Scripts
 
-| Command                                              | Description                                             |
-| ---------------------------------------------------- | ------------------------------------------------------- |
-| `pnpm dev`                                           | Start development playground on port 5188               |
-| `pnpm build`                                         | Build all packages (Turbo, dependency-ordered)          |
-| `pnpm build:packages`                                | Build all workspace packages under `packages/`          |
-| `pnpm --filter @haklex/rich-editor build`            | Build a single package                                  |
-| `pnpm --filter @haklex/rich-editor dev:build`        | Watch mode for a single package                         |
-| `pnpm lint`                                          | ESLint on the repo root (`eslint . --fix`)              |
-| `pnpm test`                                          | Run all Vitest suites (`vitest run`)                    |
-| `pnpm typecheck`                                     | `tsc --noEmit` for every `packages/*` workspace         |
-| `npx eslint path/to/file.ts`                         | Lint a single file                                      |
-| `npx prettier --write path/to/file.ts`               | Format a single file                                    |
-| `npx vitest run packages/rich-renderer-katex/tests/` | Run tests for a specific package                        |
-| `pnpm release:rich`                                  | Bump version, build, and publish all `@haklex/*` to npm |
+| Command                                              | Description                                                    |
+| ---------------------------------------------------- | -------------------------------------------------------------- |
+| `pnpm dev`                                           | Start development playground on port 5188                      |
+| `pnpm build`                                         | Build all packages (Turbo, dependency-ordered)                 |
+| `pnpm build:packages`                                | Build all workspace packages under `packages/`                 |
+| `pnpm --filter @haklex/rich-editor build`            | Build a single package                                         |
+| `pnpm --filter @haklex/rich-editor dev:build`        | Watch mode for a single package                                |
+| `pnpm lint`                                          | ESLint on the repo root (`eslint . --fix`)                     |
+| `pnpm test`                                          | Run all Vitest suites (`vitest run`)                           |
+| `pnpm typecheck`                                     | `tsc --noEmit` for every `packages/*` workspace                |
+| `npx eslint path/to/file.ts`                         | Lint a single file                                             |
+| `npx prettier --write path/to/file.ts`               | Format a single file                                           |
+| `npx vitest run packages/rich-renderer-katex/tests/` | Run tests for a specific package                               |
+| `pnpm release`                                       | Bump every package version (publishing runs in CI on tag push) |
 
 ## Open Source, AI, and Dialogue
 

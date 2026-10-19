@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Fetch the annotated tag
+        run: git fetch --force origin "refs/tags/$GITHUB_REF_NAME:refs/tags/$GITHUB_REF_NAME"
+
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Tag matches the shared version
+        run: node scripts/release/publish.mjs check "$GITHUB_REF_NAME"
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck packages
+        run: pnpm typecheck
+
+      - name: Unit tests
+        run: pnpm test
+
+      - name: Build packages
+        run: pnpm run build:packages
+
+      - name: Upgrade npm for trusted publishing
+        run: |
+          npm install -g npm@^11.15.0
+          npm --version
+
+      - name: Publish every @haklex/* package
+        run: node scripts/release/publish.mjs publish
+
+      - name: Wait until every package resolves
+        run: node scripts/release/publish.mjs wait 90
+
+      - name: CLI smoke
+        run: |
+          npx --yes -p "@haklex/rich-litexml-cli@${GITHUB_REF_NAME#v}" \
+            litexml '<p>release smoke</p>' --format json --compact \
+            | jq -e '.root.children[0].type == "paragraph"'
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME already exists"
+            exit 0
+          fi
+          notes="$RUNNER_TEMP/notes.md"
+          git for-each-ref "refs/tags/$GITHUB_REF_NAME" --format='%(contents:body)' > "$notes"
+          if [ -s "$notes" ] && grep -q '[^[:space:]]' "$notes"; then
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file "$notes" --verify-tag
+          else
+            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
+          fi

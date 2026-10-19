@@ -1,104 +1,69 @@
 # Publish Pipeline
 
-## Phase 4: Build and Publish
+Publishing runs in GitHub Actions only. Locally, the skill bumps, gates, tags, pushes, and watches.
 
-Do not use `pnpm run release:rich`. That script combines bump, build, and publish, but this skill requires ordered publish with registry polling.
-
-Bump and build always run over the whole workspace:
+## Phase 4: Bump, Local Gate, Tag
 
 ```bash
-pnpm bumpp -r < patch | minor | major > --no-git --no-tag
+LEVEL=minor # patch | minor | major, from Phase 2
+pnpm bumpp -r "$LEVEL" --no-git --no-tag --yes
+NEW_VERSION=$(jq -r .version packages/rich-editor/package.json)
+node scripts/release/publish.mjs check "v$NEW_VERSION"
 pnpm run build:packages
 ```
 
-The publish step is mode-dependent:
+The local build is a cheap gate so a broken tag never reaches CI; CI rebuilds from scratch.
 
-| Mode          | `PUBLISH_SET`                                                |
-| ------------- | ------------------------------------------------------------ |
-| `full`        | Every `@haklex/*` package except `@haklex/rich-editor-demo`. |
-| `incremental` | Tri-directional closure of `CHANGED_PKGS`.                   |
-
-Use [../scripts/publish-set.sh](../scripts/publish-set.sh) to compute the set.
-
-## Tri-Directional Closure
-
-```mermaid
-flowchart LR
-  C[Changed package] --> F[Forward workspace deps]
-  C --> B[Backward exact-pin siblings]
-  C --> T[Third-party peer-floor carriers]
-  F --> P[Publish set]
-  B --> P
-  T --> P
-```
-
-| Direction              | Rule                                                                                                                                      | Failure prevented                                                           |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Forward                | Include any `@haklex/*` referenced under `dependencies`, `peerDependencies`, or `optionalDependencies` with any `workspace:` prefix.      | Published tarball points at an unpublished dependency version.              |
-| Backward               | Include any sibling that exact-pins an in-set package via `workspace:*` in `dependencies`, `optionalDependencies`, or `peerDependencies`. | Stale sibling tarball forces an old duplicate copy downstream.              |
-| Third-party peer drift | Include every sibling that peers a drifted non-`@haklex/*` library at a stricter or different old floor.                                  | Downstream installs two versions of runtime-anchored third-party libraries. |
-
-Forward follows any `workspace:` prefix. Backward fires only on `workspace:*`, because `workspace:^` publishes as a caret range and tolerates minor/patch sibling bumps.
-
-## Incremental Reality Check
-
-Many packages still use `dependencies: workspace:*`. A renderer or extension change can pull in `rich-compose`, which can then pull in most of the workspace. This convergence toward `full` is expected and is safer than publishing a broken install graph.
-
-## Topological Publish
-
-Compute workspace order with:
+Write the release notes (summary, breaking changes, features, bug fixes, bump rationale) into the tag message. CI turns the tag body into the GitHub release notes, so the first line is the subject and the notes start after a blank line:
 
 ```bash
-pnpm -r ls --depth -1 --json
-```
+TAG_MSG=$(mktemp)
+{
+  printf 'release: v%s\n\n' "$NEW_VERSION"
+  cat "$NOTE"
+} > "$TAG_MSG"
 
-Publish only packages in `PUBLISH_SET`, but keep leaf-first order:
-
-```bash
-for pkg in $PUBLISH_SET_TOPO; do
-  pnpm --filter "$pkg" publish --no-git-checks
-  until npm view "$pkg@$NEW_VERSION" version > /dev/null 2>&1; do
-    sleep 5
-  done
-done
-```
-
-Do not proceed to downstream updates until every published package is resolvable from npm.
-
-## Phase 4.5: CLI Binary Smoke
-
-Run only when `@haklex/rich-litexml-cli` or `@haklex/rich-compose` is in `PUBLISH_SET`.
-
-```bash
-if grep -qxF '@haklex/rich-litexml-cli' <<< "$PUBLISH_SET"; then
-  CLI_VER="$NEW_VERSION"
-else
-  CLI_VER=$(npm view @haklex/rich-litexml-cli version)
-fi
-
-npx --yes -p "@haklex/rich-litexml-cli@$CLI_VER" \
-  litexml '<p>release smoke</p>' --format json --compact \
-  | jq -e '.root.children[0].type == "paragraph"' > /dev/null
-```
-
-If neither package is published, print:
-
-```text
-CLI smoke skipped (neither rich-litexml-cli nor rich-compose in PUBLISH_SET)
-```
-
-## Phase 5: Commit, Tag, Push Haklex
-
-Stage only bumped package manifests and lockfile:
-
-```bash
 git add packages/*/package.json pnpm-lock.yaml
 git commit -m "release: v$NEW_VERSION"
-git tag "v$NEW_VERSION"
-git push
-git push origin "v$NEW_VERSION"
+git tag -a "v$NEW_VERSION" --cleanup=verbatim -F "$TAG_MSG"
 ```
 
-If unrelated edits exist, stop and ask. Do not stage broad changes.
+`--cleanup=verbatim` is required: the default cleanup strips every line starting with `#`, which deletes Markdown headings from the notes.
 
-`bumpp` must use `--no-tag` so the final tag points at the release commit, not at the pre-publish state.
+## Phase 5: Push and Watch CI
+
+Push the commit and the tag in one atomic operation, so `main` never carries a release commit without its tag (or the reverse):
+
+```bash
+git push --atomic origin main "v$NEW_VERSION"
+./.claude/skills/release-orchestrator/scripts/watch-release.sh "v$NEW_VERSION"
+```
+
+`watch-release.sh`:
+
+1. Waits for the `Release` workflow run whose `headBranch` is the tag (up to 2 minutes for it to appear).
+2. Streams it with `gh run watch --exit-status`.
+3. On success, re-checks that every package in `publish.mjs list` resolves at `$NEW_VERSION` and that the GitHub release exists.
+
+Expect 10–30 minutes: npm's post-publish review can hold each version for a few minutes, and the workflow's `wait` step absorbs that.
+
+Do not start downstream work until the script exits 0.
+
+## What the Workflow Guarantees
+
+| Step                     | Guarantee                                                                                        |
+| ------------------------ | ------------------------------------------------------------------------------------------------ |
+| `publish.mjs check`      | All public packages share the version; the tag equals it.                                        |
+| typecheck / test / build | Same gates as `ci.yml`, on the tagged commit.                                                    |
+| `publish.mjs publish`    | Leaf-first `pnpm pack` + `npm publish` via OIDC trusted publishing, with provenance. Idempotent. |
+| `publish.mjs wait 90`    | Every package resolvable from npm before the job continues.                                      |
+| CLI smoke                | `@haklex/rich-litexml-cli@$NEW_VERSION` runs and emits a paragraph.                              |
+| GitHub release           | Created from the tag body, `--verify-tag`; skipped if it already exists.                         |
+
+`pnpm pack` rewrites `workspace:*` / `workspace:^` specifiers and applies `publishConfig`; `npm publish <tarball>` performs the trusted-publishing token exchange. Publishing the tarball with npm instead of `pnpm publish` keeps the OIDC path on npm's own implementation.
+
+## Trusted Publishing Setup
+
+Each package must list `Innei/haklex` + `release.yml` as its trusted publisher on npmjs.com. `scripts/release/trust-setup.sh` registers every package in one interactive run (npm ≥ 11.15, account 2FA; choose "skip 2FA for 5 minutes" on the first prompt). It skips packages that are already configured.
+
+Trusted publishing cannot create a package. A new `@haklex/*` package needs its first version published by hand, then `trust-setup.sh`, before the next tag.

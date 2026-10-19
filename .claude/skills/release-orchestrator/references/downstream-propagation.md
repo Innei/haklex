@@ -1,25 +1,8 @@
 # Downstream Propagation
 
-## Phase 5.5: GitHub Release
+## Precondition
 
-Release notes live on GitHub Releases. Publish directly; do not create a draft.
-
-Required checks:
-
-| Check            | Requirement                                                                 |
-| ---------------- | --------------------------------------------------------------------------- |
-| `gh auth status` | Must pass before downstream propagation.                                    |
-| Tag              | `gh release create` must use `--verify-tag`.                                |
-| Notes            | Include summary, breaking changes, features, bug fixes, and bump rationale. |
-
-```bash
-gh release create "v$NEW_VERSION" \
-  --title "v$NEW_VERSION" \
-  --notes-file "$NOTE" \
-  --verify-tag
-```
-
-If `gh` is missing or unauthenticated, stop. The release artefact is required.
+Start only after `watch-release.sh "v$NEW_VERSION"` exits 0: the `Release` run succeeded, every package resolves on npm, and the GitHub release exists. The workflow creates the GitHub release; do not create it locally.
 
 ## Phase 6: Downstream Worktrees
 
@@ -54,7 +37,11 @@ DOWNSTREAM_MANIFESTS=$(
 )
 ```
 
-Only rewrite `@haklex/*` packages present in `PUBLISH_SET`. Packages outside `PUBLISH_SET` were not published at `$NEW_VERSION` and must keep their prior pin.
+Every public package is published at `$NEW_VERSION`, so every `@haklex/*` pin moves to it. Build the set from the workspace:
+
+```bash
+PUBLISH_SET=$(node /Users/innei/git/innei-repo/haklex/scripts/release/publish.mjs list)
+```
 
 Use [../scripts/downstream-dispatch.sh](../scripts/downstream-dispatch.sh) to emit rewrite rows. Apply each row with an explicit file edit; do not use blanket `sed -i`.
 
@@ -97,10 +84,11 @@ The check must cover:
 
 Re-derive at release time. Historical sets:
 
-| Repo    | Stage                                                                                                                                                                                                                          |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Yohaku  | `apps/web/package.json`, root `pnpm-lock.yaml`, and any reconciled direct `lexical` / `@lexical/*` pins in the same manifest.                                                                                                  |
-| mx-core | `apps/admin/package.json`, `apps/core/package.json`, `packages/cli/package.json`, `packages/editor/package.json`, root `pnpm-lock.yaml`, and `pnpm-workspace.yaml` if `pnpm install` adds a benign `minimumReleaseAgeExclude`. |
+| Repo    | Stage                                                                                                                                                                                                                                                               |
+| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Yohaku  | `apps/web/package.json`, root `pnpm-lock.yaml`, the `yohaku-oss` pin, and in `yohaku-oss`: `packages/rich-content/package.json`, `apps/mobile/package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`. Never stage `apps/web/next-env.d.ts` churn from `next build`. |
+| mx-core | `apps/admin/package.json`, `apps/core/package.json`, `packages/cli/package.json`, `packages/editor/package.json`, root `pnpm-lock.yaml`, and `pnpm-workspace.yaml` if `pnpm install` adds a benign `minimumReleaseAgeExclude`.                                      |
+| ryugi   | `artifacts/package.json`, `artifacts/pnpm-lock.yaml`, `artifacts/pnpm-workspace.yaml`, plus the files `scripts/bump-version.sh` touches.                                                                                                                            |
 
 Do not discard generated file churn with reset/restore commands. If generated files changed, inspect them and either include them deliberately or ask the user how to proceed.
 
@@ -112,7 +100,7 @@ pnpm why <lib> -r -> <version>
 
 ## Phase 7: Downstream Smoke Tests
 
-Run Yohaku and mx-core worktrees in parallel where practical.
+Run Yohaku, mx-core and ryugi worktrees in parallel where practical.
 
 | Test                        | Requirement                                                                                   |
 | --------------------------- | --------------------------------------------------------------------------------------------- |

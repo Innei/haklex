@@ -24,7 +24,7 @@ pnpm typecheck                                     # tsc --noEmit in packages/*
 npx eslint path/to/file.ts                         # lint single file
 npx prettier --write path/to/file.ts               # format single file
 npx vitest run packages/rich-renderer-katex/tests/ # run specific tests
-pnpm release:rich                                  # bump + build + publish @haklex/*
+pnpm release                                       # bump versions only; publishing is CI (see below)
 ```
 
 ## Toolchain
@@ -95,7 +95,7 @@ mx-core (NestJS backend, ../mx-core)
       Server-side: createHeadlessEditor() + allHeadlessNodes + $toMarkdown() for Lexical JSON → Markdown
 ```
 
-**Release flow**: `pnpm release:rich` → bump + build + publish to npm. Then update pinned versions in `mx-core/apps/admin/package.json` (dashboard) and `mx-core/apps/core/package.json` (server).
+**Release flow**: use the `release-orchestrator` skill. Every release publishes all public `@haklex/*` packages; nothing is published from a laptop. The skill bumps the shared version, commits `release: vX.Y.Z`, pushes an annotated tag, and `.github/workflows/release.yml` builds and publishes via npm trusted publishing, then creates the GitHub release. Downstream pins (Yohaku incl. `yohaku-oss`, mx-core, ryugi) are updated only after that workflow succeeds. A new package needs a manual first publish plus `scripts/release/trust-setup.sh` before CI can publish it.
 
 ## Adding New Nodes Checklist
 
