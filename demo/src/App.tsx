@@ -15,6 +15,7 @@ import { ThemeContext } from './context/ThemeContext';
 import { SetVariantContext, VariantContext } from './context/VariantContext';
 import { mockPollAdapter } from './fixtures/mock-poll-adapter';
 import { AgentPage } from './pages/AgentPage';
+import { ChartsPage } from './pages/ChartsPage';
 import { CommentsPage } from './pages/CommentsPage';
 import { EditorPage } from './pages/EditorPage';
 import { ExtensionsPage } from './pages/ExtensionsPage';
@@ -29,6 +30,7 @@ const navItems = [
   { path: '/comments', label: 'Comments' },
   { path: '/nodes', label: 'Nodes' },
   { path: '/extensions', label: 'Extensions' },
+  { path: '/charts', label: 'Charts' },
   { path: '/ai', label: 'AI' },
 ] as const;
 
@@ -216,6 +218,7 @@ export const router = createBrowserRouter([
       { path: '/comments', element: <CommentsPage /> },
       { path: '/nodes', element: <NodeShowcase /> },
       { path: '/extensions', element: <ExtensionsPage /> },
+      { path: '/charts', element: <ChartsPage /> },
       { path: '/ai', element: <AgentPage /> },
       { path: '*', element: <Navigate replace to="/editor" /> },
     ],
