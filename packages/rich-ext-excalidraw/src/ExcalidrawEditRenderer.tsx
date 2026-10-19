@@ -4,13 +4,20 @@ import { dismissTopDialog, presentDialog, SegmentedControl } from '@haklex/rich-
 import { usePortalTheme } from '@haklex/rich-style-token';
 import { Clipboard, Download, Pencil, Save, X } from 'lucide-react';
 import type { ComponentType, FC } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { fitSceneOnReady, readonlyUIOptions } from './constants';
 import { useExcalidrawConfig } from './ExcalidrawConfigContext';
+import {
+  ExcalidrawEmptyState,
+  ExcalidrawErrorState,
+  ExcalidrawLoadingState,
+} from './ExcalidrawFrameStates';
+import { countElements, toScene } from './scene/normalize';
+import { Scene } from './scene/Scene';
 import * as css from './styles.css';
 import type { ExcalidrawSnapshot } from './types';
 import { useExcalidrawData } from './useExcalidrawData';
+import { useExcalidrawFont } from './useExcalidrawFont';
 
 export interface ExcalidrawEditRendererProps {
   onSnapshotChange: (snapshot: ExcalidrawSnapshot) => void;
@@ -434,14 +441,13 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
     snapshot: initialData,
     loading: dataLoading,
     error: dataError,
+    retry,
     baseRef,
     baseData,
   } = useExcalidrawData(snapshot);
-  const [ExcalidrawComponent, setExcalidrawComponent] = useState<FC<any> | null>(null);
-  const [libLoading, setLibLoading] = useState(true);
-  const previewApiRef = useRef<any>(null);
-  const initialDataRef = useRef<Record<string, any> | undefined>(undefined);
-  const [previewKey, setPreviewKey] = useState(0);
+  const [editedData, setEditedData] = useState<Record<string, any> | undefined>();
+  const [editorLoading, setEditorLoading] = useState(false);
+  const excalidrawRef = useRef<ComponentType<ExcalidrawProps> | null>(null);
   const onSnapshotChangeRef = useRef(onSnapshotChange);
   onSnapshotChangeRef.current = onSnapshotChange;
   const saveSnapshotRef = useRef(saveSnapshot);
@@ -449,25 +455,12 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
   const snapshotRef = useRef(snapshot);
   snapshotRef.current = snapshot;
   const { className: portalClassName } = usePortalTheme();
+  useExcalidrawFont();
 
-  useEffect(() => {
-    if (initialData && !initialDataRef.current) {
-      initialDataRef.current = initialData;
-    }
-  }, [initialData]);
-
-  useEffect(() => {
-    Promise.all([import('@excalidraw/excalidraw'), import('@excalidraw/excalidraw/index.css')])
-      .then(([mod]: [any, unknown]) => {
-        const Comp = mod.Excalidraw || mod.default?.Excalidraw;
-        if (Comp) setExcalidrawComponent(() => Comp);
-        setLibLoading(false);
-      })
-      .catch((err) => {
-        console.error('[excalidraw] failed to load', err);
-        setLibLoading(false);
-      });
-  }, []);
+  const previewData = editedData ?? initialData;
+  const previewDataRef = useRef(previewData);
+  previewDataRef.current = previewData;
+  const previewScene = useMemo(() => toScene(previewData), [previewData]);
 
   const baseRefRef = useRef(baseRef);
   const baseDataRefOuter = useRef(baseData);
@@ -478,8 +471,29 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
     if (baseData) baseDataRefOuter.current = baseData;
   }, [baseData]);
 
-  const handleOpenEditor = useCallback(() => {
-    if (!ExcalidrawComponent || dataLoading) return;
+  const loadExcalidraw = useCallback(async () => {
+    if (excalidrawRef.current) return excalidrawRef.current;
+    const [mod] = await Promise.all([
+      import('@excalidraw/excalidraw'),
+      import('@excalidraw/excalidraw/index.css'),
+    ]);
+    const Comp = (mod as any).Excalidraw || (mod as any).default?.Excalidraw;
+    excalidrawRef.current = Comp ?? null;
+    return excalidrawRef.current;
+  }, []);
+
+  const handleOpenEditor = useCallback(async () => {
+    if (dataLoading || editorLoading) return;
+    setEditorLoading(true);
+    let ExcalidrawComponent: ComponentType<ExcalidrawProps> | null = null;
+    try {
+      ExcalidrawComponent = await loadExcalidraw();
+    } catch (err) {
+      console.error('[excalidraw] failed to load', err);
+    } finally {
+      setEditorLoading(false);
+    }
+    if (!ExcalidrawComponent) return;
     presentDialog({
       content: ({ dismiss }) => (
         <ExcalidrawEditorDialogContent
@@ -487,16 +501,13 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
           baseData={baseDataRefOuter.current}
           baseRef={baseRefRef.current}
           dismiss={dismiss}
-          initialData={initialDataRef.current}
+          initialData={previewDataRef.current}
           initialSnapshot={snapshotRef.current}
           saveSnapshot={saveSnapshotRef.current}
           theme={theme}
           onSave={(ref) => onSnapshotChangeRef.current(ref)}
           onClose={(doc) => {
-            if (doc) {
-              initialDataRef.current = doc;
-              setPreviewKey((k) => k + 1);
-            }
+            if (doc) setEditedData(doc);
           }}
         />
       ),
@@ -506,14 +517,12 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
       showCloseButton: false,
       clickOutsideToDismiss: false,
     });
-  }, [ExcalidrawComponent, dataLoading, theme, portalClassName]);
+  }, [dataLoading, editorLoading, loadExcalidraw, theme, portalClassName]);
 
-  const loading = dataLoading || libLoading;
-
-  if (loading || !ExcalidrawComponent) {
+  if (dataLoading) {
     return (
       <div className={css.excalidrawEditorContainer}>
-        <div className={css.excalidrawLoading}>Loading excalidraw editor...</div>
+        <ExcalidrawLoadingState />
       </div>
     );
   }
@@ -521,30 +530,28 @@ export const ExcalidrawEditRenderer: FC<ExcalidrawEditRendererProps> = ({
   if (dataError) {
     return (
       <div className={css.excalidrawEditorContainer}>
-        <div className={css.excalidrawError}>{dataError}</div>
+        <ExcalidrawErrorState message={dataError} onRetry={retry} />
       </div>
     );
   }
 
   return (
     <div className={css.excalidrawEditorContainer}>
-      <ExcalidrawComponent
-        viewModeEnabled
-        zenModeEnabled
-        UIOptions={readonlyUIOptions}
-        initialData={initialDataRef.current}
-        key={previewKey}
-        theme={theme}
-        excalidrawAPI={(api: ExcalidrawImperativeAPI) => {
-          previewApiRef.current = api;
-          fitSceneOnReady(api);
-        }}
-      />
+      {previewScene && countElements(previewScene) > 0 ? (
+        <Scene scene={previewScene} theme={theme} />
+      ) : (
+        <ExcalidrawEmptyState />
+      )}
 
-      <button className={css.excalidrawEditOverlay} type="button" onClick={handleOpenEditor}>
+      <button
+        aria-label="Edit whiteboard"
+        className={css.excalidrawEditOverlay}
+        type="button"
+        onClick={handleOpenEditor}
+      >
         <span className={css.excalidrawEditLabel}>
-          <Pencil size={16} />
-          Edit Whiteboard
+          <Pencil size={14} />
+          {editorLoading ? 'Loading editor…' : 'Edit'}
         </span>
       </button>
     </div>

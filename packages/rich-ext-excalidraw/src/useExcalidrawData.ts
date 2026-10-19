@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { useExcalidrawConfig } from './ExcalidrawConfigContext';
 import type { ExcalidrawSnapshot } from './types';
@@ -11,6 +11,8 @@ export interface ExcalidrawDataState {
   baseRef?: string;
   error: string;
   loading: boolean;
+  /** Re-fetches a remote or incremental snapshot; a no-op for inline data. */
+  retry: () => void;
   snapshot: Record<string, any> | undefined;
 }
 
@@ -85,6 +87,8 @@ export function useExcalidrawData(data: string | ExcalidrawSnapshot | null): Exc
   const [baseData, setBaseData] = useState<Record<string, any> | undefined>();
   const [loading, setLoading] = useState(parsed.type === 'remote' || parsed.type === 'incremental');
   const [error, setError] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
 
   useEffect(() => {
     if (parsed.type !== 'remote' && parsed.type !== 'incremental') return;
@@ -126,10 +130,10 @@ export function useExcalidrawData(data: string | ExcalidrawSnapshot | null): Exc
     return () => {
       cancelled = true;
     };
-  }, [parsed]);
+  }, [parsed, attempt]);
 
   if (parsed.type === 'inline') {
-    return { snapshot: parsed.snapshot, loading: false, error: '' };
+    return { snapshot: parsed.snapshot, loading: false, error: '', retry };
   }
 
   if (parsed.type === 'remote' || parsed.type === 'incremental') {
@@ -137,14 +141,15 @@ export function useExcalidrawData(data: string | ExcalidrawSnapshot | null): Exc
       snapshot: remoteSnapshot,
       loading,
       error,
+      retry,
       baseRef: parsed.refLine,
       baseData,
     };
   }
 
   if (parsed.type === 'error') {
-    return { snapshot: undefined, loading: false, error: parsed.error };
+    return { snapshot: undefined, loading: false, error: parsed.error, retry };
   }
 
-  return { snapshot: undefined, loading: false, error: '' };
+  return { snapshot: undefined, loading: false, error: '', retry };
 }

@@ -24,7 +24,8 @@
   },
   "dependencies": {
     "@haklex/rich-headless": "workspace:*",
-    "jsondiffpatch": "^0.7.6"
+    "jsondiffpatch": "^0.7.6",
+    "roughjs": "^4.6.6"
   },
   "devDependencies": {
     "@excalidraw/excalidraw": "^0.18.1",
@@ -51,6 +52,11 @@
     "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
+  },
+  "peerDependenciesMeta": {
+    "@excalidraw/excalidraw": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public",

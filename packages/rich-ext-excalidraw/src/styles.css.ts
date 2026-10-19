@@ -1,126 +1,118 @@
 import { vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
-const ASPECT_RATIO = '16 / 10';
+const ASPECT_RATIO = '16 / 9';
 
-export const excalidrawStaticContainer = style({
+const frameBase = {
   position: 'relative',
   width: '100%',
   aspectRatio: ASPECT_RATIO,
-  margin: '1rem 0',
-  borderRadius: '0.5rem',
+  margin: `${vars.flow.block} 0`,
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: vars.borderRadius.md,
   overflow: 'hidden',
   backgroundColor: vars.color.bg,
-});
+} as const;
+
+export const excalidrawStaticContainer = style(frameBase);
 
 export const excalidrawEditorContainer = style({
-  position: 'relative',
-  width: '100%',
-  aspectRatio: ASPECT_RATIO,
-  margin: '1rem 0',
-  borderRadius: '0.5rem',
-  overflow: 'hidden',
-  border: `1px solid ${vars.color.border}`,
-});
-
-export const excalidrawPlaceholder = style({
-  position: 'relative',
-  width: '100%',
-  aspectRatio: ASPECT_RATIO,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: vars.color.bg,
-  borderRadius: '0.5rem',
-  border: `1px solid ${vars.color.border}`,
-  color: vars.color.textSecondary,
-  fontSize: vars.typography.fontSizeMd,
-});
-
-export const excalidrawLoading = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'absolute',
-  inset: 0,
-  color: vars.color.textSecondary,
-  fontSize: vars.typography.fontSizeMd,
-});
-
-const spin = keyframes({
-  to: { transform: 'rotate(360deg)' },
-});
-
-globalStyle(`${excalidrawLoading}::after`, {
-  content: '""',
-  display: 'inline-block',
-  width: 16,
-  height: 16,
-  marginLeft: 8,
-  border: '2px solid currentColor',
-  borderRightColor: 'transparent',
-  borderRadius: '50%',
-  animation: `${spin} 0.6s linear infinite`,
-});
-
-export const excalidrawError = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  position: 'absolute',
-  inset: 0,
-  padding: '0.75rem 1rem',
-  backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
-  color: vars.color.alertCaution,
-  fontSize: vars.typography.fontSizeMd,
-});
-
-// Hide excalidraw's built-in bottom toolbar in readonly containers
-globalStyle(`${excalidrawStaticContainer} .App-toolbar`, { display: 'none' });
-globalStyle(`${excalidrawEditorContainer} .Island`, {
-  display: 'none !important',
-});
-globalStyle(`.excalidraw--view-mode .dropdown-menu-button`, {
-  display: 'none !important',
-});
-
-export const excalidrawActionGroup = style({
-  position: 'absolute',
-  bottom: 8,
-  right: 8,
-  zIndex: 10,
-  display: 'flex',
-  gap: 4,
-  borderRadius: 6,
-  padding: 2,
-  backgroundColor: 'color-mix(in srgb, currentColor 8%, transparent)',
-  backdropFilter: 'blur(8px)',
-});
-
-export const excalidrawActionButton = style({
-  'display': 'flex',
-  'alignItems': 'center',
-  'justifyContent': 'center',
-  'width': 28,
-  'height': 28,
-  'borderRadius': 4,
-  'border': 'none',
-  'background': 'transparent',
-  'color': vars.color.textSecondary,
-  'cursor': 'pointer',
-  'transition': 'background 0.15s, color 0.15s',
-  ':hover': {
-    background: 'color-mix(in srgb, currentColor 12%, transparent)',
-    color: vars.color.text,
+  ...frameBase,
+  selectors: {
+    '&:focus-within': {
+      borderColor: vars.color.accent,
+    },
   },
 });
 
-globalStyle(`${excalidrawActionButton} svg`, {
-  width: 16,
-  height: 16,
+const dottedPaper = {
+  backgroundImage: `radial-gradient(${vars.color.border} 1px, transparent 1px)`,
+  backgroundSize: '16px 16px',
+} as const;
+
+export const excalidrawPlaceholder = style({
+  ...frameBase,
+  ...dottedPaper,
 });
 
-// ── Fullscreen popup (overrides editor-ui dialog popup) ─────────
+const stateLayer = {
+  position: 'absolute',
+  inset: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '8px',
+  fontFamily: vars.typography.fontFamilySans,
+  fontSize: '13px',
+  color: vars.color.textTertiary,
+} as const;
+
+export const excalidrawStateLayer = style(stateLayer);
+
+export const excalidrawStateIcon = style({
+  width: '20px',
+  height: '20px',
+  color: vars.color.textQuaternary,
+});
+
+const sheen = keyframes({
+  from: { backgroundPosition: '200% 0, 0 0' },
+  to: { backgroundPosition: '-200% 0, 0 0' },
+});
+
+export const excalidrawLoading = style({
+  ...stateLayer,
+  ...dottedPaper,
+  'backgroundImage': `linear-gradient(90deg, transparent, color-mix(in oklab, ${vars.color.text} 4%, transparent), transparent), radial-gradient(${vars.color.border} 1px, transparent 1px)`,
+  'backgroundSize': '200% 100%, 16px 16px',
+  'animation': `${sheen} 1.6s linear infinite`,
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      animation: 'none',
+    },
+  },
+});
+
+export const excalidrawEmpty = style({
+  ...stateLayer,
+  ...dottedPaper,
+});
+
+export const excalidrawError = style({
+  ...stateLayer,
+  color: vars.color.textSecondary,
+});
+
+export const excalidrawErrorIcon = style({
+  width: '20px',
+  height: '20px',
+  color: vars.color.alertCaution,
+});
+
+export const excalidrawRetry = style({
+  'appearance': 'none',
+  'padding': '4px 12px',
+  'border': `1px solid ${vars.color.border}`,
+  'borderRadius': '6px',
+  'background': vars.color.bg,
+  'color': vars.color.textSecondary,
+  'font': 'inherit',
+  'fontSize': '12px',
+  'cursor': 'pointer',
+  ':hover': {
+    color: vars.color.text,
+    backgroundColor: vars.color.fillTertiary,
+  },
+});
+
+globalStyle(`${excalidrawEditorContainer} .Island`, {
+  display: 'none !important',
+});
+
+globalStyle(`.excalidraw--view-mode .dropdown-menu-button`, {
+  display: 'none !important',
+});
 
 const _excalidrawFullscreenPopup = style({});
 globalStyle(`${_excalidrawFullscreenPopup}${_excalidrawFullscreenPopup}`, {
@@ -354,34 +346,41 @@ export const excalidrawConfirmBtnDanger = style({
 export const excalidrawEditOverlay = style({
   'position': 'absolute',
   'inset': 0,
-  'zIndex': 5,
-  'display': 'flex',
-  'alignItems': 'center',
-  'justifyContent': 'center',
+  'zIndex': 1,
+  'padding': 0,
   'cursor': 'pointer',
   'background': 'transparent',
   'border': 'none',
-  'transition': 'background 0.2s',
-  ':hover': {
-    background: 'color-mix(in srgb, currentColor 6%, transparent)',
+  'outline': 'none',
+  ':focus-visible': {
+    boxShadow: `inset 0 0 0 2px ${vars.color.accent}`,
   },
 });
 
 export const excalidrawEditLabel = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 6,
-  padding: '6px 14px',
-  borderRadius: 6,
-  background: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
-  color: vars.color.text,
-  fontSize: vars.typography.fontSizeSm,
-  fontWeight: 500,
-  opacity: 0,
-  transition: 'opacity 0.2s',
-  selectors: {
-    [`${excalidrawEditOverlay}:hover &`]: {
+  'position': 'absolute',
+  'top': '8px',
+  'right': '8px',
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'gap': '6px',
+  'padding': '6px 10px',
+  'borderRadius': '8px',
+  'background': `color-mix(in oklab, ${vars.color.bg} 92%, transparent)`,
+  'border': `1px solid ${vars.color.border}`,
+  'color': vars.color.textSecondary,
+  'fontFamily': vars.typography.fontFamilySans,
+  'fontSize': '12px',
+  'fontWeight': 500,
+  'opacity': 0,
+  'transition': 'opacity 0.15s ease',
+  'selectors': {
+    [`${excalidrawEditOverlay}:hover &, ${excalidrawEditOverlay}:focus-visible &`]: {
+      opacity: 1,
+    },
+  },
+  '@media': {
+    '(pointer: coarse)': {
       opacity: 1,
     },
   },

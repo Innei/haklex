@@ -1,4 +1,4 @@
-import { noteVariant } from '@haklex/rich-editor/styles';
+import { chatVariant, commentVariant } from '@haklex/rich-editor/styles';
 import { vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
@@ -13,24 +13,19 @@ const bannerTypeColors = {
 
 const bannerTypeStyles = {
   note: {
-    backgroundColor: `color-mix(in srgb, ${vars.color.alertInfo} 8%, transparent)`,
-    borderColor: `color-mix(in srgb, ${vars.color.alertInfo} 30%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertInfo} 8%, transparent)`,
   },
   tip: {
-    backgroundColor: `color-mix(in srgb, ${vars.color.alertTip} 8%, transparent)`,
-    borderColor: `color-mix(in srgb, ${vars.color.alertTip} 30%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertTip} 8%, transparent)`,
   },
   important: {
-    backgroundColor: `color-mix(in srgb, ${vars.color.alertImportant} 8%, transparent)`,
-    borderColor: `color-mix(in srgb, ${vars.color.alertImportant} 30%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertImportant} 8%, transparent)`,
   },
   warning: {
-    backgroundColor: `color-mix(in srgb, ${vars.color.alertWarning} 8%, transparent)`,
-    borderColor: `color-mix(in srgb, ${vars.color.alertWarning} 30%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertWarning} 8%, transparent)`,
   },
   caution: {
-    backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 8%, transparent)`,
-    borderColor: `color-mix(in srgb, ${vars.color.alertCaution} 30%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertCaution} 8%, transparent)`,
   },
 } as const;
 
@@ -69,11 +64,11 @@ export const semanticTypeClassNames = {
 
 const bannerRootStyles = {
   borderRadius: vars.borderRadius.md,
-  border: '1px solid',
-  padding: vars.spacing.lg,
-  margin: `${vars.spacing.md} 0`,
+  border: 'none',
+  padding: '14px 18px',
+  margin: `${vars.flow.block} 0`,
   color: vars.color.text,
-  lineHeight: '1.8',
+  lineHeight: vars.typography.lineHeight,
 } as const;
 
 export const bannerRoot = style(bannerRootStyles);
@@ -82,19 +77,27 @@ const bannerInnerStyles = {
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: vars.spacing.md,
+  gap: '12px',
 } as const;
 
 export const bannerInner = style(bannerInnerStyles);
 
+// The box keeps the text's font size so `1lh` is one line of banner text; the
+// glyph inside is sized separately and centred on that line.
 const bannerIconStyles = {
   display: 'inline-flex',
+  alignItems: 'center',
   flexShrink: 0,
-  fontSize: '1.5em',
+  height: '1lh',
   alignSelf: 'flex-start',
 } as const;
 
 export const bannerIcon = style(bannerIconStyles);
+
+globalStyle(`${bannerIcon} svg, .rich-banner-icon svg`, {
+  width: '18px',
+  height: '18px',
+});
 
 const bannerContentStyles = {
   flex: 1,
@@ -126,12 +129,14 @@ export const bannerIconType = recipe({
 });
 
 export const bannerTrigger = style({
+  font: 'inherit',
+  lineHeight: 'inherit',
   cursor: 'pointer',
   borderRadius: '4px',
   border: 'none',
   background: 'none',
-  padding: '2px',
-  margin: '-2px',
+  padding: '0 2px',
+  margin: '0 -2px',
   transition: 'background-color 0.15s',
   selectors: {
     '&:hover': {
@@ -170,11 +175,20 @@ globalStyle(`.${semanticClassNames.content} .rich-paragraph:last-child`, {
   marginBottom: 0,
 });
 
-globalStyle(`.${noteVariant} .${semanticClassNames.content} > .rich-paragraph`, {
-  textIndent: '2em',
-});
-
 for (const type of Object.keys(bannerTypeColors) as Array<keyof typeof bannerTypeColors>) {
   globalStyle(`.${semanticTypeClassNames.icon[type]}`, bannerIconTypeStyles[type]);
   globalStyle(`.${semanticTypeClassNames.root[type]}`, bannerTypeStyles[type]);
 }
+
+const darkScopes = ["[data-theme='dark']", '.dark'];
+const compactScopes = [commentVariant, chatVariant].map((v) => `.${v}`);
+
+for (const type of Object.keys(bannerTypeColors) as Array<keyof typeof bannerTypeColors>) {
+  globalStyle(darkScopes.map((d) => `${d} .${semanticTypeClassNames.root[type]}`).join(', '), {
+    backgroundColor: `color-mix(in oklab, ${bannerTypeColors[type]} 14%, transparent)`,
+  });
+}
+
+globalStyle(compactScopes.map((v) => `${v} .${semanticClassNames.root}`).join(', '), {
+  padding: '10px 14px',
+});

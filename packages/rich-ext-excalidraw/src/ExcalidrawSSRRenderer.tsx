@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import { lazy, Suspense } from 'react';
 
 import type { OnExcalidrawExpand } from './ExcalidrawDisplayRenderer';
+import { ExcalidrawPlaceholderState } from './ExcalidrawFrameStates';
 import * as css from './styles.css';
 
 export interface ExcalidrawSSRRendererProps {
@@ -16,26 +17,23 @@ const LazyDisplayRenderer = lazy(() =>
   })),
 );
 
-const ExcalidrawPlaceholder: FC<{ snapshot: string }> = ({ snapshot }) => {
-  let label = 'Excalidraw Whiteboard';
+function countInlineElements(snapshot: string): number | undefined {
   try {
     const data = JSON.parse(snapshot);
-    if (data && typeof data === 'object') {
-      const elementCount = Array.isArray(data.elements) ? data.elements.length : 0;
-      if (elementCount > 0) {
-        label = `Excalidraw Whiteboard (${elementCount} elements)`;
-      }
+    if (data && typeof data === 'object' && Array.isArray(data.elements)) {
+      return data.elements.filter((el: { isDeleted?: boolean }) => !el?.isDeleted).length;
     }
   } catch {
     // snapshot may be a URL ref, delta format (URL\ndelta-json), or invalid JSON
   }
+  return undefined;
+}
 
-  return (
-    <div aria-label={label} className={css.excalidrawPlaceholder}>
-      <span>{label}</span>
-    </div>
-  );
-};
+const ExcalidrawPlaceholder: FC<{ snapshot: string }> = ({ snapshot }) => (
+  <div className={css.excalidrawPlaceholder}>
+    <ExcalidrawPlaceholderState elementCount={countInlineElements(snapshot)} />
+  </div>
+);
 
 export const ExcalidrawSSRRenderer: FC<ExcalidrawSSRRendererProps> = ({ onExpand, snapshot }) => {
   return (

@@ -1,23 +1,20 @@
-import type { ExcalidrawImperativeAPI, ExcalidrawProps } from '@excalidraw/excalidraw/types';
 import { useColorScheme } from '@haklex/rich-editor/static';
-import { Maximize2, ScanSearch, ZoomIn, ZoomOut } from 'lucide-react';
-import {
-  Component,
-  type ComponentType,
-  type FC,
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { Component, type FC, type ReactNode, useCallback, useMemo } from 'react';
 
-import { fitSceneOnReady, fitSceneToViewport, readonlyUIOptions } from './constants';
+import {
+  ExcalidrawEmptyState,
+  ExcalidrawErrorState,
+  ExcalidrawLoadingState,
+} from './ExcalidrawFrameStates';
+import { InteractiveScene } from './scene/InteractiveScene';
+import { countElements, toScene } from './scene/normalize';
 import * as css from './styles.css';
 import { useExcalidrawData } from './useExcalidrawData';
+import { useExcalidrawFont } from './useExcalidrawFont';
 
 export interface ExcalidrawExpandPayload {
   content: ReactNode;
+  elementCount?: number;
   target: HTMLElement;
   theme: 'light' | 'dark';
 }
@@ -34,151 +31,46 @@ export const ExcalidrawDisplayRenderer: FC<ExcalidrawStaticRendererProps> = ({
   snapshot,
 }) => {
   const theme = useColorScheme();
-  return <ExcalidrawStaticCanvas snapshot={snapshot} theme={theme} onExpand={onExpand} />;
-};
-
-const ExcalidrawStaticCanvas: FC<{
-  onExpand?: OnExcalidrawExpand;
-  snapshot: string;
-  theme: 'light' | 'dark';
-}> = ({ onExpand, snapshot, theme }) => {
-  const { snapshot: data, loading: dataLoading, error: dataError } = useExcalidrawData(snapshot);
-  const [ExcalidrawComponent, setExcalidrawComponent] =
-    useState<ComponentType<ExcalidrawProps> | null>(null);
-  const [libLoading, setLibLoading] = useState(true);
-  const apiRef = useRef<any>(null);
-
-  useEffect(() => {
-    Promise.all([import('@excalidraw/excalidraw'), import('@excalidraw/excalidraw/index.css')])
-      .then(([mod]) => {
-        const Comp = mod.Excalidraw;
-
-        if (Comp) setExcalidrawComponent(() => Comp as ComponentType<ExcalidrawProps>);
-        setLibLoading(false);
-      })
-      .catch((error) => {
-        console.error('Error loading excalidraw', error);
-        setLibLoading(false);
-      });
-  }, []);
+  const { snapshot: data, loading, error, retry } = useExcalidrawData(snapshot);
+  const scene = useMemo(() => toScene(data), [data]);
+  useExcalidrawFont();
 
   const handleExpand = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
-      if (!onExpand || !ExcalidrawComponent || !data) return;
-      const content = (
-        <ExcalidrawComponent
-          viewModeEnabled
-          zenModeEnabled
-          UIOptions={readonlyUIOptions}
-          initialData={data}
-          theme={theme}
-          excalidrawAPI={(api: ExcalidrawImperativeAPI) => {
-            fitSceneOnReady(api);
-          }}
-        />
-      );
-      onExpand({ content, target: e.currentTarget, theme });
+    (target: HTMLElement) => {
+      if (!onExpand || !scene) return;
+      onExpand({
+        content: <InteractiveScene mode="fullscreen" scene={scene} theme={theme} />,
+        elementCount: countElements(scene),
+        target,
+        theme,
+      });
     },
-    [onExpand, ExcalidrawComponent, data, theme],
+    [onExpand, scene, theme],
   );
 
-  const loading = dataLoading || libLoading;
-
-  if (loading) {
-    return (
-      <div className={css.excalidrawStaticContainer}>
-        <div className={css.excalidrawLoading}>Loading excalidraw...</div>
-      </div>
-    );
-  }
-
-  if (dataError || !data) {
-    return (
-      <div className={css.excalidrawStaticContainer}>
-        <div className={css.excalidrawError}>{dataError || 'No data'}</div>
-      </div>
-    );
-  }
-
-  if (!ExcalidrawComponent) {
-    return (
-      <div className={css.excalidrawStaticContainer}>
-        <div className={css.excalidrawError}>Failed to load excalidraw</div>
-      </div>
-    );
-  }
-
-  const canExpand = Boolean(onExpand);
-
-  return (
-    <div
-      suppressHydrationWarning
-      className={css.excalidrawStaticContainer}
-      data-color-scheme={theme}
-      data-theme={theme}
-    >
+  let body: ReactNode;
+  if (loading) body = <ExcalidrawLoadingState />;
+  else if (error) body = <ExcalidrawErrorState message={error} onRetry={retry} />;
+  else if (!data) body = <ExcalidrawEmptyState />;
+  else if (!scene) body = <ExcalidrawErrorState message="Invalid whiteboard data" />;
+  else if (countElements(scene) === 0) body = <ExcalidrawEmptyState />;
+  else {
+    body = (
       <ExcalidrawErrorBoundary
-        fallback={<div className={css.excalidrawError}>Failed to render excalidraw</div>}
+        fallback={<ExcalidrawErrorState message="Failed to render whiteboard" />}
       >
-        <ExcalidrawComponent
-          viewModeEnabled
-          zenModeEnabled
-          UIOptions={readonlyUIOptions}
-          initialData={data}
+        <InteractiveScene
+          scene={scene}
           theme={theme}
-          excalidrawAPI={(api: ExcalidrawImperativeAPI) => {
-            apiRef.current = api;
-            fitSceneOnReady(api);
-          }}
+          onExpand={onExpand ? handleExpand : undefined}
         />
       </ExcalidrawErrorBoundary>
+    );
+  }
 
-      <div className={css.excalidrawActionGroup}>
-        <button
-          className={css.excalidrawActionButton}
-          title="Zoom In"
-          type="button"
-          onClick={() => {
-            const api = apiRef.current;
-            if (!api) return;
-            const zoom = api.getAppState().zoom.value;
-            api.updateScene({ appState: { zoom: { value: zoom * 1.25 } } });
-          }}
-        >
-          <ZoomIn size={20} />
-        </button>
-        <button
-          className={css.excalidrawActionButton}
-          title="Zoom Out"
-          type="button"
-          onClick={() => {
-            const api = apiRef.current;
-            if (!api) return;
-            const zoom = api.getAppState().zoom.value;
-            api.updateScene({ appState: { zoom: { value: zoom / 1.25 } } });
-          }}
-        >
-          <ZoomOut size={20} />
-        </button>
-        <button
-          className={css.excalidrawActionButton}
-          title="Fit to Content"
-          type="button"
-          onClick={() => apiRef.current && fitSceneToViewport(apiRef.current)}
-        >
-          <ScanSearch size={20} />
-        </button>
-        {canExpand && (
-          <button
-            className={css.excalidrawActionButton}
-            title="Expand"
-            type="button"
-            onClick={handleExpand}
-          >
-            <Maximize2 size={20} />
-          </button>
-        )}
-      </div>
+  return (
+    <div className={css.excalidrawStaticContainer} data-theme={theme}>
+      {body}
     </div>
   );
 };

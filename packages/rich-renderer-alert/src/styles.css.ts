@@ -1,4 +1,4 @@
-import { noteVariant } from '@haklex/rich-editor/styles';
+import { chatVariant, commentVariant } from '@haklex/rich-editor/styles';
 import { vars } from '@haklex/rich-style-token/styles';
 import { createVar, globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
@@ -56,14 +56,12 @@ export const alertType = recipe({
 export const alertHeader = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
+  gap: '6px',
   fontFamily: vars.typography.fontFamilySans,
   fontWeight: 600,
-  textTransform: 'uppercase',
-  letterSpacing: '0.02em',
-  fontSize: vars.typography.fontSizeMd,
-  lineHeight: 1,
-  marginBottom: 6,
+  fontSize: '13px',
+  lineHeight: 1.4,
+  marginBottom: '4px',
 });
 
 export const alertTrigger = style({
@@ -78,10 +76,8 @@ export const alertTrigger = style({
   background: 'none',
   font: 'inherit',
   fontWeight: 600,
-  textTransform: 'uppercase',
-  letterSpacing: '0.02em',
-  fontSize: vars.typography.fontSizeMd,
-  lineHeight: 1,
+  fontSize: '13px',
+  lineHeight: 1.4,
   transition: 'background-color 0.15s',
   selectors: {
     '&:hover': {
@@ -107,8 +103,8 @@ export const alertChevron = style({
 });
 
 export const alertIcon = style({
-  width: '16px',
-  height: '16px',
+  width: '15px',
+  height: '15px',
   flexShrink: 0,
   color: alertColor,
 });
@@ -124,16 +120,12 @@ export const alertMenuIcon = style({
   color: alertColor,
 });
 
-// ─── Alert / Callout (from editor shared) ─────────────────
-const alertBarWidth = 4;
-
 const alertRootStyles = {
   position: 'relative',
-  padding: vars.spacing.md,
-  paddingLeft: `calc(${vars.spacing.md} + ${alertBarWidth}px)`,
-  borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
-  margin: `${vars.spacing.md} 0`,
-  backgroundColor: vars.color.bgSecondary,
+  padding: '2px 0 2px 18px',
+  margin: `${vars.flow.block} 0`,
+  backgroundColor: 'transparent',
+  borderRadius: 0,
 } as const;
 
 const alertRootBarStyles = {
@@ -142,22 +134,20 @@ const alertRootBarStyles = {
   left: 0,
   top: 0,
   bottom: 0,
-  width: `${alertBarWidth}px`,
-  borderRadius: vars.borderRadius.sm,
+  width: '2px',
+  borderRadius: '1px',
 } as const;
 
 const alertHeaderStyles = {
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
-  gap: vars.spacing.sm,
+  gap: '6px',
   fontFamily: vars.typography.fontFamilySans,
   fontWeight: 600,
-  marginBottom: vars.spacing.xs,
-  fontSize: vars.typography.fontSizeMd,
-  textTransform: 'uppercase',
-  letterSpacing: '0.02em',
-  lineHeight: 1,
+  marginBottom: '4px',
+  fontSize: '13px',
+  lineHeight: 1.4,
 } as const;
 
 const alertContentStyles = {
@@ -171,26 +161,15 @@ const alertContentEditableStyles = {
 
 globalStyle(`.${semanticClassNames.root}`, alertRootStyles);
 globalStyle(`.${semanticClassNames.root}::before`, alertRootBarStyles);
-
 globalStyle(`.${semanticClassNames.header}`, alertHeaderStyles);
-
 globalStyle(`.${semanticClassNames.icon}`, {
   display: 'inline-flex',
-  width: '16px',
-  height: '16px',
+  width: '15px',
+  height: '15px',
   flexShrink: 0,
 });
-
 globalStyle(`.${semanticClassNames.content}`, alertContentStyles);
 globalStyle(`.${semanticClassNames.contentEditable}`, alertContentEditableStyles);
-
-globalStyle(`.${semanticClassNames.content} > .rich-paragraph:first-child`, {
-  marginTop: 0,
-});
-
-globalStyle(`.${semanticClassNames.content} > .rich-paragraph:last-child`, {
-  marginBottom: 0,
-});
 
 globalStyle(`.${semanticClassNames.content} .rich-paragraph`, {
   margin: 0,
@@ -201,15 +180,42 @@ globalStyle(`.${semanticClassNames.content} .rich-paragraph:last-child`, {
   marginBottom: 0,
 });
 
-globalStyle(`.${noteVariant} .${semanticClassNames.content} > .rich-paragraph`, {
-  textIndent: '2em',
+// Comment and chat fold the label into the first line of text so a one-line
+// alert stays one line tall. No tint here: a filled block is Banner's shape.
+const compactRoot = [commentVariant, chatVariant]
+  .map((v) => `.${v} .${semanticClassNames.root}`)
+  .join(', ');
+
+globalStyle(compactRoot, {
+  paddingLeft: '12px',
 });
+
+globalStyle(
+  [commentVariant, chatVariant].map((v) => `.${v} .${semanticClassNames.header}`).join(', '),
+  {
+    float: 'left',
+    marginRight: '6px',
+    marginBottom: 0,
+    fontSize: 'inherit',
+    lineHeight: 'inherit',
+  },
+);
+
+// The static renderer nests a `.rich-content` (flow-root) in the body; a new
+// formatting context sits beside the float instead of wrapping under it.
+globalStyle(
+  [commentVariant, chatVariant]
+    .map((v) => `.${v} .${semanticClassNames.content} > .rich-content`)
+    .join(', '),
+  {
+    display: 'block',
+  },
+);
 
 for (const type of Object.keys(alertTypeColors) as Array<keyof typeof alertTypeColors>) {
   globalStyle(`.${semanticTypeClassNames.root[type]}::before`, {
     backgroundColor: alertTypeColors[type],
   });
-
   globalStyle(`.${semanticTypeClassNames.header[type]}`, {
     color: alertTypeColors[type],
   });

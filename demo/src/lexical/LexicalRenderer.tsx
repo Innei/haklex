@@ -39,10 +39,15 @@ const modules = allRendererModules.map((module) => {
   }
   if (module === excalidrawModule) {
     return excalidrawModule.setup({
-      onExpand: ({ content, theme }) => {
+      onExpand: ({ content, elementCount, theme }) => {
         presentDialog({
           content: ({ dismiss }) => (
-            <ExcalidrawExpandShell dismiss={dismiss}>{content}</ExcalidrawExpandShell>
+            <ExcalidrawExpandShell
+              dismiss={dismiss}
+              meta={elementCount === undefined ? undefined : `${elementCount} elements`}
+            >
+              {content}
+            </ExcalidrawExpandShell>
           ),
           className: excalidrawFullscreenPopup,
           theme,

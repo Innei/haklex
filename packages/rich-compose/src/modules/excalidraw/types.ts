@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 
 export interface ExcalidrawExpandPayload {
   content: ReactNode;
+  elementCount?: number;
   target: HTMLElement;
   theme: 'light' | 'dark';
 }
