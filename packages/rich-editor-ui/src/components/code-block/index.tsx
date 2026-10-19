@@ -1,12 +1,16 @@
 import type { ReactElement } from 'react';
 import { useEffect, useMemo, useState } from 'react';
 
+import type { CodeBlockChrome } from './CodeBlockCard';
 import { CodeBlockCard } from './CodeBlockCard';
 import { normalizeLanguage } from './constants';
 import { getHighlighterWithLang, SHIKI_DUAL_THEMES } from './shiki';
 import * as styles from './styles.css';
 
+export type { CodeBlockChrome } from './CodeBlockCard';
+
 export interface CodeBlockProps {
+  chrome?: CodeBlockChrome;
   className?: string;
   code: string;
   collapsible?: boolean;
@@ -16,6 +20,7 @@ export interface CodeBlockProps {
 }
 
 export function CodeBlock({
+  chrome,
   className,
   collapsible = true,
   code,
@@ -64,6 +69,7 @@ export function CodeBlock({
   return (
     <CodeBlockCard
       static
+      chrome={chrome}
       className={className}
       code={code}
       collapsible={collapsible}

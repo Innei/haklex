@@ -8,6 +8,7 @@ import {
 
 import {
   articleLayout,
+  chatLayout,
   commentLayout,
   darkBoxShadow,
   darkColors,
@@ -18,13 +19,13 @@ import {
 
 export const vars = createGlobalThemeContract({
   color: {
-    /** 默认值: '#000' */
+    /** 默认值: '#171717' */
     text: 'rc-text',
-    /** 默认值: '#262626' */
+    /** 默认值: '#404040' */
     textSecondary: 'rc-text-secondary',
     /** 默认值: '#737373' */
     textTertiary: 'rc-text-tertiary',
-    /** 默认值: '#a3a3a3' */
+    /** 默认值: '#a3a3a3' — 仅用于图标、占位、禁用态，不做可读文字 */
     textQuaternary: 'rc-text-quaternary',
     /** 默认值: '#ffffff' */
     bg: 'rc-bg',
@@ -40,11 +41,13 @@ export const vars = createGlobalThemeContract({
     fillTertiary: 'rc-fill-tertiary',
     /** 默认值: '#fafafa' — 交互态填充色 4 (most subtle) */
     fillQuaternary: 'rc-fill-quaternary',
-    /** 默认值: '#f5f5f5' */
+    /** 默认值: '#e8e8e8' */
     border: 'rc-border',
+    /** 默认值: '#f0f0f0' — 最弱的分隔线（表格行线等） */
+    borderSubtle: 'rc-border-subtle',
     /** 默认值: '#2563eb' */
     accent: 'rc-accent',
-    /** 默认值: '#2563eb20' */
+    /** 默认值: 'color-mix(in oklab, var(--rc-accent) 12%, transparent)' */
     accentLight: 'rc-accent-light',
     /** 默认值: '#2563eb' */
     link: 'rc-link',
@@ -52,21 +55,23 @@ export const vars = createGlobalThemeContract({
     codeText: 'rc-code-text',
     /** 默认值: '#f5f5f5' */
     codeBg: 'rc-code-bg',
-    /** 默认值: '#e5e5e5' */
+    /** 默认值: '#f0f0f0' */
+    codeHeaderBg: 'rc-code-header-bg',
+    /** 默认值: '#e8e8e8' */
     hrBorder: 'rc-hr-border',
-    /** 默认值: '#2563eb' */
+    /** 默认值: 'color-mix(in oklab, var(--rc-text) 18%, transparent)' */
     quoteBorder: 'rc-quote-border',
     /** 默认值: '#f5f5f5' */
     quoteBg: 'rc-quote-bg',
-    /** 默认值: '#006bb7' */
+    /** 默认值: '#2f6db5' */
     alertInfo: 'rc-alert-info',
-    /** 默认值: '#cc5500' */
+    /** 默认值: '#b7791f' */
     alertWarning: 'rc-alert-warning',
-    /** 默认值: '#11cc00' */
+    /** 默认值: '#2f855a' */
     alertTip: 'rc-alert-tip',
-    /** 默认值: '#cc0011' */
+    /** 默认值: '#c53030' */
     alertCaution: 'rc-alert-caution',
-    /** 默认值: '#5500cc' */
+    /** 默认值: '#6b46c1' */
     alertImportant: 'rc-alert-important',
   },
   spacing: {
@@ -81,16 +86,26 @@ export const vars = createGlobalThemeContract({
     /** 默认值: '32px' */
     xl: 'rc-space-xl',
   },
+  flow: {
+    /** 默认值: '1.25em' — 段落之间 */
+    paragraph: 'rc-flow-paragraph',
+    /** 默认值: '0.375em' — 列表项之间 */
+    list: 'rc-flow-list',
+    /** 默认值: '2em' — 代码、表格、图片等块级节点上下 */
+    block: 'rc-flow-block',
+    /** 默认值: '2em' — 标题上方（按正文字号计） */
+    heading: 'rc-flow-heading',
+  },
   typography: {
-    /** 默认值: '"PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, Helvetica, "noto sans sc", "hiragino sans gb", -apple-system, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Not Color Emoji' */
+    /** 默认值: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", Roboto, Helvetica, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"' */
     fontFamily: 'rc-font-family',
-    /** 默认值: '"PingFang SC", "Microsoft YaHei", "Segoe UI", Roboto, Helvetica, "noto sans sc", "hiragino sans gb", -apple-system, system-ui, sans-serif, Apple Color Emoji, Segoe UI Emoji, Not Color Emoji' */
+    /** 默认值: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", Roboto, Helvetica, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji"' */
     fontFamilySans: 'rc-font-family-sans',
     /** 默认值: '"Noto Serif CJK SC", "Source Han Serif SC", "Source Han Serif", "source-han-serif-sc", "Songti SC", STSong, "华文宋体", serif' */
     fontFamilySerif: 'rc-font-family-serif',
     /** 默认值: '"楷体", KaiTi, STKaiti, "Kaiti SC", "LXGW WenKai", "霞鹜文楷", "Noto Serif CJK SC", serif' */
     fontFamilyKai: 'rc-font-family-kai',
-    /** 默认值: '"SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, monospace' */
+    /** 默认值: '"SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, "PingFang SC", "Noto Sans SC", monospace' */
     fontMono: 'rc-font-mono',
     /** 默认值: '0.625em' */
     fontSize2xs: 'rc-font-size-2xs',
@@ -106,10 +121,18 @@ export const vars = createGlobalThemeContract({
     fontSizeBase: 'rc-font-size-base',
     /** 默认值: '14px' */
     fontSizeSmall: 'rc-font-size-small',
-    /** 默认值: '1.7' */
+    /** 默认值: '0.8125em' — 代码块正文 */
+    fontSizeCode: 'rc-font-size-code',
+    /** 默认值: '0.8125em' — 图注、表头等说明文字 */
+    fontSizeCaption: 'rc-font-size-caption',
+    /** 默认值: '1.75' */
     lineHeight: 'rc-line-height',
-    /** 默认值: '1.4' */
+    /** 默认值: '1.35' */
     lineHeightTight: 'rc-line-height-tight',
+    /** 默认值: '1.6' — 表格、评论、对话 */
+    lineHeightCompact: 'rc-line-height-compact',
+    /** 默认值: '1.7' */
+    lineHeightCode: 'rc-line-height-code',
   },
   borderRadius: {
     /** 默认值: '4px' */
@@ -165,8 +188,13 @@ export const commentTheme = createTheme(vars, {
   ...commentLayout,
 });
 
+export const chatTheme = createTheme(vars, {
+  color: lightCommentColors,
+  ...chatLayout,
+});
+
 // Per-variant dark override (higher specificity for variant-specific color tweaks)
-for (const themeClass of [articleTheme, noteTheme, commentTheme]) {
+for (const themeClass of [articleTheme, noteTheme, commentTheme, chatTheme]) {
   globalStyle(`.dark .${themeClass}, [data-theme="dark"] .${themeClass}`, {
     vars: { ...darkColorVars, ...darkShadowVars },
   });

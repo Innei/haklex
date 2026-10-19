@@ -5,12 +5,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getLanguageDisplayName, languageToColorMap, normalizeLanguage } from './constants';
 import * as styles from './styles.css';
 
-const CopyIcon = <Copy size={16} />;
-const CheckIcon = <Check size={16} />;
+const CopyIcon = <Copy size={14} />;
+const CheckIcon = <Check size={14} />;
 const ExpandIcon = <ChevronDown size={14} />;
+
+export type CodeBlockChrome = 'bar' | 'compact';
 
 interface CodeBlockCardProps {
   children: ReactNode;
+  chrome?: CodeBlockChrome;
   className?: string;
   code: string;
   collapsible?: boolean;
@@ -21,6 +24,7 @@ interface CodeBlockCardProps {
 
 export function CodeBlockCard({
   children,
+  chrome = 'bar',
   className,
   code,
   collapsible = true,
@@ -29,8 +33,15 @@ export function CodeBlockCard({
   static: staticMode = false,
 }: CodeBlockCardProps): ReactElement {
   const normalizedLanguage = normalizeLanguage(language);
-  const languageLabel = getLanguageDisplayName(normalizedLanguage);
-  const accent = languageToColorMap[normalizedLanguage] || '#737373';
+  const hasLanguage = !!language && normalizedLanguage !== 'text';
+  const languageLabel =
+    chrome === 'compact' ? normalizedLanguage : getLanguageDisplayName(normalizedLanguage);
+  const languageColor = languageToColorMap[normalizedLanguage] || '#737373';
+  const lineCount = useMemo(() => code.split('\n').length, [code]);
+  const gutterStyle = useMemo(
+    () => ({ '--rc-ln-digits': Math.max(2, String(lineCount).length) }) as CSSProperties,
+    [lineCount],
+  );
 
   const [copied, setCopied] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -70,55 +81,60 @@ export function CodeBlockCard({
       .catch(() => {});
   }, [code]);
 
-  const cardStyle = useMemo(() => ({ '--rr-code-accent': accent }) as CSSProperties, [accent]);
-
-  const scrollClassName = [
-    styles.scroll,
-    collapsible && isCollapsed && isOverflow && styles.scrollCollapsed,
-  ]
+  const isCollapsedOverflow = collapsible && isOverflow && isCollapsed;
+  const scrollClassName = [styles.scroll, isCollapsedOverflow && styles.scrollCollapsed]
     .filter(Boolean)
     .join(' ');
+
+  const showHeader = hasLanguage || showCopyButton;
 
   return (
     <div
       className={`${styles.card}${className ? ` ${className}` : ''}`}
-      style={cardStyle}
+      data-chrome={chrome}
+      style={gutterStyle}
     >
-      {language && normalizedLanguage !== 'text' && (
-        <div aria-hidden className={styles.lang}>
-          <span>{languageLabel}</span>
+      {showHeader && (
+        <div className={styles.header}>
+          <div className={styles.lang}>
+            {hasLanguage && (
+              <>
+                <span
+                  aria-hidden
+                  className={styles.langMark}
+                  style={{ backgroundColor: languageColor }}
+                />
+                <span>{languageLabel}</span>
+              </>
+            )}
+          </div>
+          {showCopyButton && (
+            <button
+              aria-label={copied ? 'Copied' : 'Copy code'}
+              className={styles.copyButton}
+              type="button"
+              onClick={handleCopy}
+            >
+              {copied ? CheckIcon : CopyIcon}
+              <span>{copied ? 'Copied' : 'Copy'}</span>
+            </button>
+          )}
         </div>
-      )}
-
-      {showCopyButton && (
-        <button
-          aria-label={copied ? 'Copied' : 'Copy code'}
-          className={styles.copyButton}
-          type="button"
-          onClick={handleCopy}
-        >
-          {copied ? CheckIcon : CopyIcon}
-        </button>
       )}
 
       <div className={staticMode ? styles.bodyBackgroundStatic : styles.bodyBackground}>
         <div className={scrollClassName} ref={scrollRef}>
           {children}
         </div>
-
-        {collapsible && isOverflow && isCollapsed && (
-          <div className={styles.expandWrap}>
-            <button
-              className={styles.expandButton}
-              type="button"
-              onClick={() => setIsCollapsed(false)}
-            >
-              {ExpandIcon}
-              <span>Expand</span>
-            </button>
-          </div>
-        )}
+        {isCollapsedOverflow && <div aria-hidden className={styles.expandFade} />}
       </div>
+
+      {isCollapsedOverflow && (
+        <button className={styles.expandButton} type="button" onClick={() => setIsCollapsed(false)}>
+          <span>{`Expand all · ${lineCount} lines`}</span>
+          {ExpandIcon}
+        </button>
+      )}
     </div>
   );
 }

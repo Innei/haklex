@@ -6,8 +6,8 @@ import { getLanguageDisplayName, languageToColorMap, normalizeLanguage } from '.
 import { hasLanguageIcon, LanguageIcon } from './icons';
 import * as styles from './styles.css';
 
-const CopyIcon = <Copy size={16} />;
-const CheckIcon = <Check size={16} />;
+const CopyIcon = <Copy size={14} />;
+const CheckIcon = <Check size={14} />;
 const ExpandIcon = <ChevronDown size={14} />;
 
 interface CodeBlockCardProps {
@@ -35,6 +35,11 @@ export function CodeBlockCard({
   const [isCollapsed, setIsCollapsed] = useState(true);
   const [isOverflow, setIsOverflow] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lineCount = useMemo(() => code.split('\n').length, [code]);
+  const gutterStyle = useMemo(
+    () => ({ '--rc-ln-digits': Math.max(2, String(lineCount).length) }) as CSSProperties,
+    [lineCount],
+  );
 
   useEffect(() => {
     if (!collapsible) {
@@ -68,40 +73,50 @@ export function CodeBlockCard({
   }, [code]);
 
   const languageLabel = getLanguageDisplayName(normalizedLanguage);
-  const accent = languageToColorMap[normalizedLanguage] || '#737373';
-
-  const cardStyle = useMemo(() => ({ '--rr-code-accent': accent }) as CSSProperties, [accent]);
+  const languageColor = languageToColorMap[normalizedLanguage] || '#737373';
+  const isCollapsedOverflow = collapsible && isCollapsed && isOverflow;
 
   const scrollClassName = [
     styles.scroll,
     styles.semanticClassNames.scroll,
-    collapsible && isCollapsed && isOverflow && styles.scrollCollapsed,
-    collapsible && isCollapsed && isOverflow && styles.semanticClassNames.scrollCollapsed,
+    isCollapsedOverflow && styles.scrollCollapsed,
+    isCollapsedOverflow && styles.semanticClassNames.scrollCollapsed,
   ]
     .filter(Boolean)
     .join(' ');
 
   return (
-    <div className={`${styles.card} ${styles.semanticClassNames.card}`} style={cardStyle}>
-      {langSlot ??
-        (normalizedLanguage !== 'text' && (
-          <div aria-hidden className={`${styles.lang} ${styles.semanticClassNames.lang}`}>
-            {hasLanguageIcon(normalizedLanguage) ? (
-              <LanguageIcon language={normalizedLanguage} size={14} />
-            ) : (
-              <span>{languageLabel}</span>
-            )}
+    <div
+      className={`${styles.card} ${styles.semanticClassNames.card}`}
+      data-chrome="bar"
+      style={gutterStyle}
+    >
+      <div className={`${styles.header} ${styles.semanticClassNames.header}`}>
+        {langSlot ?? (
+          <div className={`${styles.lang} ${styles.semanticClassNames.lang}`}>
+            {normalizedLanguage !== 'text' &&
+              (hasLanguageIcon(normalizedLanguage) ? (
+                <LanguageIcon language={normalizedLanguage} size={14} />
+              ) : (
+                <span
+                  aria-hidden
+                  className={styles.langMark}
+                  style={{ backgroundColor: languageColor }}
+                />
+              ))}
+            {normalizedLanguage !== 'text' && <span>{languageLabel}</span>}
           </div>
-        ))}
-
-      <button
-        aria-label={copied ? 'Copied' : 'Copy code'}
-        className={`${styles.copyButton} ${styles.semanticClassNames.copyButton}`}
-        type="button"
-        onClick={handleCopy}
-      >
-        {copied ? CheckIcon : CopyIcon}
-      </button>
+        )}
+        <button
+          aria-label={copied ? 'Copied' : 'Copy code'}
+          className={`${styles.copyButton} ${styles.semanticClassNames.copyButton}`}
+          type="button"
+          onClick={handleCopy}
+        >
+          {copied ? CheckIcon : CopyIcon}
+          <span>{copied ? 'Copied' : 'Copy'}</span>
+        </button>
+      </div>
 
       <div
         className={`${staticMode ? styles.bodyBackgroundStatic : styles.bodyBackground} ${styles.semanticClassNames.bodyBackground}`}
@@ -109,20 +124,24 @@ export function CodeBlockCard({
         <div className={scrollClassName} ref={scrollRef}>
           {children}
         </div>
-
-        {collapsible && isOverflow && isCollapsed && (
-          <div className={`${styles.expandWrap} ${styles.semanticClassNames.expandWrap}`}>
-            <button
-              className={`${styles.expandButton} ${styles.semanticClassNames.expandButton}`}
-              type="button"
-              onClick={() => setIsCollapsed(false)}
-            >
-              {ExpandIcon}
-              <span>展开</span>
-            </button>
-          </div>
+        {isCollapsedOverflow && (
+          <div
+            aria-hidden
+            className={`${styles.expandWrap} ${styles.semanticClassNames.expandWrap}`}
+          />
         )}
       </div>
+
+      {isCollapsedOverflow && (
+        <button
+          className={`${styles.expandButton} ${styles.semanticClassNames.expandButton}`}
+          type="button"
+          onClick={() => setIsCollapsed(false)}
+        >
+          <span>{`Expand all · ${lineCount} lines`}</span>
+          {ExpandIcon}
+        </button>
+      )}
     </div>
   );
 }

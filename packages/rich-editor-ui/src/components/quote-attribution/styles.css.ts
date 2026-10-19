@@ -19,10 +19,10 @@ export const overlay = style({
 export const panel = style({
   position: 'absolute',
   bottom: '4px',
-  right: '8px',
+  left: '18px',
   maxWidth: '60%',
   display: 'flex',
-  justifyContent: 'flex-end',
+  justifyContent: 'flex-start',
   pointerEvents: 'auto',
 });
 
@@ -36,17 +36,16 @@ export const input = style({
   margin: 0,
   width: '100%',
   minWidth: 0,
-  textAlign: 'right',
-  fontStyle: 'italic',
+  textAlign: 'start',
+  fontStyle: 'normal',
   fontFamily: vars.typography.fontFamily,
-  fontSize: '12px',
-  color: vars.color.textSecondary,
+  fontSize: '13px',
+  color: vars.color.textTertiary,
   outline: 'none',
   transition: 'border-color 120ms ease, background-color 120ms ease',
   selectors: {
     '&::placeholder': {
       color: vars.color.textQuaternary,
-      fontStyle: 'italic',
     },
     '&:hover': {
       borderBottomColor: vars.color.textQuaternary,

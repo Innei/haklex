@@ -80,7 +80,7 @@ const headingLevelBadge = {
   fontFamily: vars.typography.fontMono,
 } as const;
 
-const quoteBarWidth = 4;
+const quoteBarWidth = 2;
 
 export const richContent = style({
   // flow-root establishes a BFC so floated images (data-layout^="float")
@@ -96,7 +96,7 @@ export const richContent = style({
 
 export const paragraph = style({
   margin: 0,
-  marginBottom: '1em',
+  marginBottom: vars.flow.paragraph,
   lineHeight: vars.typography.lineHeight,
 });
 
@@ -114,27 +114,37 @@ export const textUnderline = style({
 
 export const textStrikethrough = style({
   textDecoration: 'line-through',
-  opacity: 0.65,
+  textDecorationColor: vars.color.textQuaternary,
+  color: vars.color.textTertiary,
 });
 
+// Shifted with relative positioning instead of vertical-align so the line box
+// keeps the paragraph's line height.
 export const textSuperscript = style({
-  verticalAlign: 'super',
-  fontSize: '0.8em',
+  position: 'relative',
+  top: '-0.5em',
+  verticalAlign: 'baseline',
+  fontSize: '0.75em',
+  lineHeight: 0,
 });
 
 export const textSubscript = style({
-  verticalAlign: 'sub',
-  fontSize: '0.8em',
+  position: 'relative',
+  top: '0.25em',
+  verticalAlign: 'baseline',
+  fontSize: '0.75em',
+  lineHeight: 0,
 });
 
 export const textCode = style({
   fontFamily: vars.typography.fontMono,
-  fontSize: '0.9em',
+  fontSize: '0.875em',
+  fontWeight: 'normal',
   backgroundColor: vars.color.codeBg,
   color: 'inherit',
-  padding: '2px 6px',
+  padding: '0.12em 0.36em',
   borderRadius: vars.borderRadius.sm,
-  border: `1px solid ${vars.color.border}`,
+  boxShadow: `inset 0 0 0 1px ${vars.color.border}`,
   selectors: {
     '[contenteditable="true"] &': {
       paddingRight: 0,
@@ -192,104 +202,132 @@ export const headingAnchor = style({
   fontSize: '0.8rem',
 });
 
+// Top margin is `flow.heading` measured in body ems, so it is divided by the
+// heading's own size ratio before being applied in the heading's em.
+const headingTop = (k: number, ratio: number) => `calc(${vars.flow.heading} * ${k / ratio})`;
+
+const hideBadgeWhenNarrow = {
+  '(max-width: 640px)': {
+    selectors: {
+      '[contenteditable="true"] &::before': { display: 'none' },
+    },
+  },
+};
+
 export const headingH1 = style({
-  position: 'relative',
-  fontSize: '2em',
-  fontWeight: 700,
-  lineHeight: vars.typography.lineHeightTight,
-  marginTop: '1.5em',
-  marginBottom: '0.5em',
-  selectors: {
+  'position': 'relative',
+  'fontSize': '2em',
+  'fontWeight': 700,
+  'lineHeight': vars.typography.lineHeightTight,
+  'marginTop': headingTop(1.25, 2),
+  'marginBottom': '0.6em',
+  'selectors': {
     '[contenteditable="true"] &::before': {
       ...headingLevelBadge,
       content: '"H1"',
     },
   },
+  '@media': hideBadgeWhenNarrow,
 });
 
 export const headingH2 = style({
-  position: 'relative',
-  fontSize: '1.5em',
-  fontWeight: 700,
-  lineHeight: vars.typography.lineHeightTight,
-  marginTop: '1.4em',
-  marginBottom: '0.45em',
-  selectors: {
+  'position': 'relative',
+  'fontSize': '1.5em',
+  'fontWeight': 700,
+  'lineHeight': vars.typography.lineHeightTight,
+  'marginTop': headingTop(1.1, 1.5),
+  'marginBottom': '0.5em',
+  'selectors': {
     '[contenteditable="true"] &::before': {
       ...headingLevelBadge,
       content: '"H2"',
     },
   },
+  '@media': hideBadgeWhenNarrow,
 });
 
 export const headingH3 = style({
-  position: 'relative',
-  fontSize: '1.25em',
-  fontWeight: 600,
-  lineHeight: vars.typography.lineHeightTight,
-  marginTop: '1.3em',
-  marginBottom: '0.4em',
-  selectors: {
+  'position': 'relative',
+  'fontSize': '1.25em',
+  'fontWeight': 600,
+  'lineHeight': vars.typography.lineHeightTight,
+  'marginTop': headingTop(1, 1.25),
+  'marginBottom': '0.4em',
+  'selectors': {
     '[contenteditable="true"] &::before': {
       ...headingLevelBadge,
       content: '"H3"',
     },
   },
+  '@media': hideBadgeWhenNarrow,
 });
 
 export const headingH4 = style({
-  position: 'relative',
-  fontSize: '1.125em',
-  fontWeight: 600,
-  lineHeight: vars.typography.lineHeightTight,
-  marginTop: '1.2em',
-  marginBottom: '0.35em',
-  selectors: {
+  'position': 'relative',
+  'fontSize': '1.125em',
+  'fontWeight': 600,
+  'lineHeight': vars.typography.lineHeightTight,
+  'marginTop': headingTop(0.9, 1.125),
+  'marginBottom': '0.35em',
+  'selectors': {
     '[contenteditable="true"] &::before': {
       ...headingLevelBadge,
       content: '"H4"',
     },
   },
+  '@media': hideBadgeWhenNarrow,
 });
 
 export const headingH5 = style({
-  position: 'relative',
-  fontSize: '1em',
-  fontWeight: 600,
-  lineHeight: vars.typography.lineHeightTight,
-  marginTop: '1.1em',
-  marginBottom: '0.3em',
-  selectors: {
+  'position': 'relative',
+  'fontSize': '1em',
+  'fontWeight': 600,
+  'lineHeight': vars.typography.lineHeightTight,
+  'marginTop': headingTop(0.9, 1),
+  'marginBottom': '0.3em',
+  'selectors': {
     '[contenteditable="true"] &::before': {
       ...headingLevelBadge,
       content: '"H5"',
     },
   },
+  '@media': hideBadgeWhenNarrow,
 });
 
 export const headingH6 = style({
-  position: 'relative',
-  fontSize: '0.875em',
-  fontWeight: 600,
-  lineHeight: vars.typography.lineHeightTight,
-  marginTop: '1em',
-  marginBottom: '0.25em',
-  color: vars.color.text,
-  selectors: {
+  'position': 'relative',
+  'fontSize': '0.875em',
+  'fontWeight': 600,
+  'lineHeight': vars.typography.lineHeightTight,
+  'marginTop': headingTop(0.9, 0.875),
+  'marginBottom': '0.25em',
+  'color': vars.color.textSecondary,
+  'selectors': {
     '[contenteditable="true"] &::before': {
       ...headingLevelBadge,
       content: '"H6"',
     },
   },
+  '@media': hideBadgeWhenNarrow,
 });
+
+globalStyle(
+  [headingH1, headingH2, headingH3, headingH4, headingH5, headingH6]
+    .map((h) => `${h} + *`)
+    .join(', '),
+  { marginTop: 0 },
+);
 
 export const link = style({
   color: vars.color.link,
-  textDecoration: 'none',
-  transition: 'color 0.2s ease',
+  textDecoration: 'underline',
+  textDecorationThickness: '1px',
+  textUnderlineOffset: '0.22em',
+  textDecorationColor: `color-mix(in oklab, ${vars.color.link} 35%, transparent)`,
+  transition: 'color 0.2s ease, text-decoration-color 0.2s ease',
   selectors: {
     '&:hover': {
-      textDecoration: 'underline',
+      textDecorationColor: vars.color.link,
     },
     '&[data-favicon="loaded"]::before': {
       content: '""',
@@ -316,18 +354,25 @@ export const linkFavicon = style({
 
 export const listOl = style({
   listStyleType: 'decimal',
-  paddingLeft: vars.spacing.lg,
-  marginBottom: '1em',
+  paddingLeft: '1.375em',
+  marginTop: 0,
+  marginBottom: vars.flow.paragraph,
 });
 
 export const listUl = style({
   listStyleType: 'disc',
-  paddingLeft: vars.spacing.lg,
-  marginBottom: '1em',
+  paddingLeft: '1.375em',
+  marginTop: 0,
+  marginBottom: vars.flow.paragraph,
 });
 
 export const listItem = style({
-  marginBottom: '0.25em',
+  marginBottom: vars.flow.list,
+  selectors: {
+    '&::marker': {
+      color: vars.color.textQuaternary,
+    },
+  },
 });
 
 export const listNestedItem = style({
@@ -367,19 +412,19 @@ const checklistItemBase = {
     '&::after': {
       content: '""',
       position: 'absolute',
-      left: 'calc(var(--rc-cb-size) * 0.32)',
+      left: 'calc(var(--rc-cb-size) * 0.36)',
       top: 'calc((1lh - var(--rc-cb-size)) / 2 + var(--rc-cb-size) * 0.14)',
       width: 'calc(var(--rc-cb-size) * 0.28)',
       height: 'calc(var(--rc-cb-size) * 0.55)',
-      borderRight: `2px solid ${vars.color.accent}`,
-      borderBottom: `2px solid ${vars.color.accent}`,
+      borderRight: `2px solid ${vars.color.bg}`,
+      borderBottom: `2px solid ${vars.color.bg}`,
       boxSizing: 'border-box',
       display: 'block',
       pointerEvents: 'none',
       transform: 'rotate(45deg) scale(0)',
       transformOrigin: 'center',
       opacity: 0,
-      transition: 'transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s, opacity 0.15s ease',
+      transition: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1) 0.05s, opacity 0.15s ease',
     },
     '[contenteditable="true"] &:active::before': {
       transform: 'scale(0.94)',
@@ -399,13 +444,15 @@ export const listItemUnchecked = style({
 
 export const listItemChecked = style({
   ...checklistItemBase,
-  color: vars.color.textSecondary,
+  color: vars.color.textTertiary,
+  textDecoration: 'line-through',
+  textDecorationColor: vars.color.textQuaternary,
   selectors: {
     ...checklistItemBase.selectors,
     '&::before': {
       ...checklistItemBase.selectors['&::before'],
-      borderColor: vars.color.accent,
-      backgroundColor: vars.color.accentLight,
+      borderColor: vars.color.text,
+      backgroundColor: vars.color.text,
     },
     '&::after': {
       ...checklistItemBase.selectors['&::after'],
@@ -413,20 +460,20 @@ export const listItemChecked = style({
       opacity: 1,
     },
     '[contenteditable="true"] &:hover::before': {
-      backgroundColor: `color-mix(in oklab, ${vars.color.accent} 12%, transparent)`,
+      backgroundColor: `color-mix(in oklab, ${vars.color.text} 80%, transparent)`,
     },
   },
 });
 
 export const quote = style({
   position: 'relative',
-  backgroundColor: vars.color.quoteBg,
-  margin: `${vars.spacing.md} 0`,
-  padding: `${vars.spacing.sm} ${vars.spacing.md}`,
-  paddingLeft: `calc(${vars.spacing.md} + ${quoteBarWidth}px)`,
+  backgroundColor: 'transparent',
+  margin: `${vars.flow.block} 0`,
+  padding: '0.125em 0',
+  paddingLeft: '1.125em',
   fontStyle: 'normal',
   color: vars.color.textSecondary,
-  borderRadius: `0 ${vars.borderRadius.sm} ${vars.borderRadius.sm} 0`,
+  borderRadius: 0,
   selectors: {
     '&::before': {
       content: '""',
@@ -435,22 +482,22 @@ export const quote = style({
       top: '0',
       bottom: '0',
       width: `${quoteBarWidth}px`,
-      borderRadius: vars.borderRadius.sm,
+      borderRadius: '1px',
       backgroundColor: vars.color.quoteBorder,
     },
     // When the floating attribution input is anchored to this quote, reserve
     // bottom space so the last line of quote text never collides with it.
     '&[data-attribution-panel]': {
-      paddingBottom: `calc(${vars.spacing.sm} + 24px)`,
+      paddingBottom: `calc(0.125em + 24px)`,
     },
   },
 });
 
 export const quoteAttribution = style({
   display: 'block',
-  textAlign: 'right',
-  fontSize: '12px',
-  color: vars.color.textSecondary,
+  textAlign: 'start',
+  fontSize: vars.typography.fontSizeCaption,
+  color: vars.color.textTertiary,
   marginTop: vars.spacing.sm,
   fontStyle: 'normal',
 });
@@ -462,63 +509,125 @@ export const hr = style({
   width: 60,
 });
 
+// Discrete keyframes: the fade stays until the scroll timeline reaches its end.
+// Without overflow the timeline is inactive, so no fade is drawn at all.
+const tableEdgeFade = keyframes({
+  '0%, 99%': {
+    maskImage: 'linear-gradient(to right, #000 calc(100% - 28px), transparent)',
+  },
+  '100%': {
+    maskImage: 'none',
+  },
+});
+
 export const tableScrollableWrapper = style({
-  display: 'block',
-  width: '100%',
-  maxWidth: '100%',
-  minWidth: 0,
-  overflowX: 'auto',
-  overscrollBehaviorX: 'contain',
+  'display': 'block',
+  'width': '100%',
+  'maxWidth': '100%',
+  'minWidth': 0,
+  'overflowX': 'auto',
+  'overscrollBehaviorX': 'contain',
+  'margin': `${vars.flow.block} 0`,
+  '@supports': {
+    '(animation-timeline: scroll())': {
+      animation: `${tableEdgeFade} linear both`,
+      animationTimeline: 'scroll(self inline)',
+    } as any,
+  },
 });
 
 export const tableCell = style({
   border: 'none',
-  borderBottom: `1px solid ${vars.color.border}`,
-  borderRight: `1px solid ${vars.color.border}`,
-  padding: `1.25em ${vars.spacing.lg}`,
-  textAlign: 'left',
-  verticalAlign: 'middle',
-  lineHeight: '1.5',
-  selectors: {
-    '&:last-child': {
-      borderRight: 'none',
-    },
-  },
+  borderBottom: `1px solid ${vars.color.borderSubtle}`,
+  padding: '10px 14px',
+  minWidth: '4em',
+  textAlign: 'start',
+  verticalAlign: 'top',
 });
 
 export const tableCellHeader = style({
   border: 'none',
-  borderBottom: `1px solid ${vars.color.border}`,
-  borderRight: `1px solid ${vars.color.border}`,
-  padding: `${vars.spacing.md} ${vars.spacing.lg}`,
-  textAlign: 'left',
+  borderBottom: `1px solid color-mix(in oklab, ${vars.color.text} 18%, transparent)`,
+  padding: '8px 14px',
+  textAlign: 'start',
+  verticalAlign: 'bottom',
   fontWeight: 600,
-  fontSize: '0.75em',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
+  fontSize: '0.9286em',
   color: vars.color.textSecondary,
-  backgroundColor: vars.color.bgSecondary,
-  verticalAlign: 'middle',
-  lineHeight: '1.5',
-  position: 'sticky',
-  top: 0,
-  zIndex: 1,
+  whiteSpace: 'nowrap',
+});
+
+export const table = style({
+  width: 'max-content',
+  minWidth: '100%',
+  borderCollapse: 'collapse',
+  margin: `${vars.flow.block} 0`,
+  fontSize: '0.875em',
+  lineHeight: vars.typography.lineHeightCompact,
+  fontVariantNumeric: 'tabular-nums',
   selectors: {
-    '&:last-child': {
-      borderRight: 'none',
+    [`${tableScrollableWrapper} > &`]: {
+      margin: 0,
+    },
+    '[contenteditable="true"] &': {
+      borderCollapse: 'separate',
+      borderSpacing: 0,
+      border: `1px solid ${vars.color.border}`,
+      borderRadius: vars.borderRadius.md,
+      overflow: 'hidden',
     },
   },
 });
 
-export const table = style({
-  width: '100%',
-  borderCollapse: 'separate',
-  borderSpacing: 0,
-  margin: `${vars.spacing.lg} 0`,
-  fontSize: vars.typography.fontSizeSmall,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: vars.borderRadius.md,
-  overflow: 'hidden',
+globalStyle(`${table} tr:last-child > ${tableCell}`, {
+  borderBottomColor: vars.color.border,
+});
+
+globalStyle(`${table} tr > :first-child`, {
+  paddingLeft: 0,
+});
+
+globalStyle(`${table} tr > :last-child`, {
+  paddingRight: 0,
+});
+
+globalStyle(`${table} :is(${tableCell}, ${tableCellHeader}) > ${paragraph}`, {
+  margin: 0,
+  lineHeight: 'inherit',
+});
+
+globalStyle(`${table} ${tableCell} > ${paragraph}`, {
+  maxWidth: '20em',
+});
+
+globalStyle(`[contenteditable="true"] ${tableCellHeader}`, {
+  backgroundColor: vars.color.bgSecondary,
+  borderBottomColor: vars.color.border,
+});
+
+globalStyle(`[contenteditable="true"] ${table} tr > :first-child`, {
+  paddingLeft: '16px',
+});
+
+globalStyle(`[contenteditable="true"] ${table} tr > :last-child`, {
+  paddingRight: '16px',
+});
+
+globalStyle(`[contenteditable="true"] ${table} tr:last-child > ${tableCell}`, {
+  borderBottom: 'none',
+});
+
+globalStyle(`${tableScrollableWrapper} ${table} tr > :first-child`, {
+  '@media': {
+    '(max-width: 767px)': {
+      position: 'sticky',
+      left: 0,
+      zIndex: 1,
+      paddingRight: '14px',
+      backgroundColor: vars.color.bg,
+      boxShadow: `1px 0 0 ${vars.color.border}`,
+    },
+  },
 });
 
 export const spoiler = style({
@@ -633,27 +742,26 @@ export const rubyRt = style({
 });
 
 export const footnote = style({
-  verticalAlign: 'super',
-  fontSize: '0.8em',
+  verticalAlign: 'baseline',
+  fontSize: 'inherit',
 });
 
+// Raised with relative positioning so the reference never grows its line box.
 export const footnoteRef = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  minWidth: '1.5em',
+  display: 'inline-block',
+  position: 'relative',
+  top: '-0.5em',
+  padding: '0 0.1em',
   textDecoration: 'none',
   color: vars.color.accent,
-  backgroundColor: vars.color.accentLight,
-  borderRadius: '999px',
-  padding: '0 0.35em',
-  lineHeight: 1.45,
+  lineHeight: 1.3,
   fontWeight: 600,
-  fontSize: '0.82em',
-  transition: 'filter 0.15s ease',
+  fontSize: '0.72em',
+  fontVariantNumeric: 'tabular-nums',
+  transition: 'opacity 0.15s ease',
   selectors: {
     '&:hover': {
-      filter: 'brightness(0.96)',
+      opacity: 0.7,
     },
   },
 });
@@ -794,8 +902,7 @@ export const dropIndicator = style({
 });
 
 export const alert = style({
-  margin: '2em 0',
-  padding: '0 1em',
+  margin: `${vars.flow.block} 0`,
   backgroundColor: 'transparent',
   border: 'none',
   borderRadius: 0,
@@ -894,29 +1001,12 @@ globalStyle(`${listNestedItem} ${listUl}`, {
   listStyleType: 'circle',
 });
 
-globalStyle(`${listItemChecked} > *, ${listItemUnchecked} > *`, {
-  backgroundImage: `linear-gradient(${vars.color.textSecondary}, ${vars.color.textSecondary})`,
-  backgroundSize: '0% 1.5px',
-  backgroundPosition: 'left center',
-  backgroundRepeat: 'no-repeat',
-  transition: 'background-size 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.15s, opacity 0.15s ease',
-});
-
-globalStyle(`${listItemChecked} > *`, {
-  backgroundSize: '100% 1.5px',
-  opacity: 0.5,
-});
-
 globalStyle(`${quote} > ${paragraph}:first-child`, {
   marginTop: 0,
 });
 
 globalStyle(`${quote} > ${paragraph}:last-child`, {
   marginBottom: 0,
-});
-
-globalStyle(`${table} tbody tr:last-child ${tableCell}`, {
-  borderBottom: 'none',
 });
 
 globalStyle(`${tableCell} ${paragraph}`, {

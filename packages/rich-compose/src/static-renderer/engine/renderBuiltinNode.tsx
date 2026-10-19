@@ -13,7 +13,6 @@ import { Link } from 'lucide-react';
 import { createElement, type ReactNode } from 'react';
 
 import { HtmlComment } from '../components/HtmlComment';
-import * as tableStyles from '../table.css';
 
 const shared = (key: SharedStyleKey): string => `${semanticClassNames[key]} ${sharedStyles[key]}`;
 const headingClassNames = {
@@ -170,8 +169,8 @@ export function renderBuiltinNode(
     }
     case 'table': {
       return (
-        <div className={tableStyles.tableWrapper} key={key}>
-          <table className={tableStyles.table}>{children}</table>
+        <div className={shared('tableScrollableWrapper')} key={key}>
+          <table className={shared('table')}>{children}</table>
         </div>
       );
     }
@@ -180,7 +179,7 @@ export function renderBuiltinNode(
     }
     case 'tablecell': {
       const CellTag = node.headerState ? 'th' : 'td';
-      const cls = node.headerState ? tableStyles.tableHead : tableStyles.tableCell;
+      const cls = node.headerState ? shared('tableCellHeader') : shared('tableCell');
       return (
         <CellTag className={cls} colSpan={node.colSpan > 1 ? node.colSpan : undefined} key={key}>
           {children}

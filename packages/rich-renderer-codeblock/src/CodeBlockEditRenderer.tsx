@@ -37,7 +37,7 @@ export const CodeBlockEditRenderer: ComponentType<CodeBlockRendererProps> = ({
 }) => {
   const variant = useVariant();
   const colorScheme = useColorScheme();
-  const showLineNumbers = showLineNumbersProp ?? variant !== 'comment';
+  const showLineNumbers = showLineNumbersProp ?? (variant !== 'comment' && variant !== 'chat');
   const normalizedLanguage = normalizeLanguage(language);
   const [mounted, setMounted] = useState(false);
 

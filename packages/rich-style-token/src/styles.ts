@@ -2,6 +2,7 @@ export { type ThemeTokens } from './create-theme-style';
 export { createThemeStyle } from './create-theme-style';
 export {
   articleLayout,
+  chatLayout,
   commentLayout,
   darkColors,
   fonts,
@@ -9,4 +10,4 @@ export {
   lightCommentColors,
   noteLayout,
 } from './themes';
-export { articleTheme, commentTheme, noteTheme, vars } from './vars.css';
+export { articleTheme, chatTheme, commentTheme, noteTheme, vars } from './vars.css';

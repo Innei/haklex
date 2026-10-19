@@ -1,11 +1,13 @@
 // Post-build CSS aggregator for @haklex/rich-compose.
 //
-// After `vite build` emits `dist/rich-compose.css` (rich-compose's own
-// vanilla-extract output: foundation tokens + variant classes + built-in
-// table renderer), this script:
+// After `vite build`, this script:
 //
-//   1. Splits `rich-compose.css` into `dist/style/foundation.css` and
-//      `dist/style/table.css`.
+//   1. Appends rich-compose's own vanilla-extract output
+//      (`dist/rich-compose.css`, absent when the package ships no styles of
+//      its own) to `dist/style/foundation.css`. `dist/style/table.css` stays
+//      as an empty stub: tables now use rich-editor's shared classes, which
+//      already live in foundation, and existing `style/table.css` imports
+//      must keep resolving.
 //   2. Inlines `@haklex/rich-editor`'s compiled CSS at the top of
 //      `style/foundation.css` so consumers of the static renderer never
 //      need to import from rich-editor directly.
@@ -62,48 +64,6 @@ function readCss(filePath: string): string {
   return readFileSync(filePath, 'utf8');
 }
 
-// Walk top-level rule blocks. Each rule block runs from the start of a
-// selector to its matching '}'. We classify by whether every selector
-// clause targets the table renderer (.icqzyn*).
-function splitTableRules(css: string): { foundation: string; table: string } {
-  const tableRules: string[] = [];
-  const foundationRules: string[] = [];
-
-  let i = 0;
-  while (i < css.length) {
-    while (i < css.length && /\s/.test(css[i]!)) i++;
-    if (i >= css.length) break;
-
-    const ruleStart = i;
-    while (i < css.length && css[i] !== '{') i++;
-    if (i >= css.length) break;
-
-    let depth = 1;
-    i++;
-    while (i < css.length && depth > 0) {
-      const ch = css[i];
-      if (ch === '{') depth++;
-      else if (ch === '}') depth--;
-      i++;
-    }
-
-    const rule = css.slice(ruleStart, i);
-    const braceIdx = rule.indexOf('{');
-    const selectors = rule.slice(0, braceIdx).trim();
-    const clauses = selectors
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-
-    const allTable = clauses.length > 0 && clauses.every((c) => /\.icqzyn\d/.test(c));
-    if (allTable) tableRules.push(rule);
-    else foundationRules.push(rule);
-  }
-
-  const joiner = (rules: string[]) => rules.join('\n');
-  return { foundation: joiner(foundationRules), table: joiner(tableRules) };
-}
-
 function modulePkgCssPath(pkgDir: string): string {
   // Each workspace renderer/ext package emits its CSS as
   // `dist/<package-name>.css`.
@@ -112,13 +72,8 @@ function modulePkgCssPath(pkgDir: string): string {
 
 mkdirSync(STYLE_DIR, { recursive: true });
 
-// 1. Split rich-compose's own CSS
-const composeCss = readCss(path.join(DIST, 'rich-compose.css'));
-if (!composeCss) {
-  console.error('[build-css] dist/rich-compose.css not found — run `vite build` first');
-  process.exit(1);
-}
-const { foundation: composeFoundation, table } = splitTableRules(composeCss);
+// 1. rich-compose's own CSS (may be empty)
+const composeFoundation = readCss(path.join(DIST, 'rich-compose.css')).trim();
 
 // 2. Inline rich-editor's prose body CSS into foundation
 const proseCss = readCss(modulePkgCssPath(PROSE_PACKAGE_DIR));
@@ -133,7 +88,7 @@ const foundationCss =
 writeFileSync(path.join(STYLE_DIR, 'foundation.css'), foundationCss);
 writeFileSync(
   path.join(STYLE_DIR, 'table.css'),
-  `/* @haklex/rich-compose — built-in table renderer. */\n${table}\n`,
+  `/* @haklex/rich-compose — tables are styled by foundation.css; kept for import compatibility. */\n`,
 );
 
 // 3. Copy each module's CSS
@@ -150,19 +105,17 @@ for (const [moduleName, pkgDir] of Object.entries(MODULE_TO_PACKAGE)) {
 }
 copied.sort();
 
-// 4. All-in-one bundle: foundation + alphabetical modules + table.
+// 4. All-in-one bundle: foundation + alphabetical modules.
 // Inline-concat rather than @import to stay portable across bundlers
 // that don't resolve @import paths inside node_modules.
 const moduleSegments = copied.map((name) => {
   const css = readCss(path.join(STYLE_DIR, `${name}.css`));
   return `/* --- module: ${name} --- */\n${css.trimEnd()}`;
 });
-const tableSegment = `/* --- built-in: table --- */\n${readCss(path.join(STYLE_DIR, 'table.css')).trimEnd()}`;
 const segments = [
-  `/* @haklex/rich-compose — all-in-one (foundation + modules + table). Do not edit. */`,
+  `/* @haklex/rich-compose — all-in-one (foundation + modules). Do not edit. */`,
   foundationCss.trimEnd(),
   ...moduleSegments,
-  tableSegment,
 ];
 writeFileSync(path.join(DIST, 'style.css'), `${segments.join('\n\n')}\n`);
 
@@ -173,4 +126,4 @@ rmSync(path.join(DIST, 'rich-compose.css'), { force: true });
 if (missing.length > 0) {
   console.warn(`[build-css] missing CSS for: ${missing.join(', ')}`);
 }
-console.log(`[build-css] wrote dist/style.css + ${copied.length} per-module + foundation + table`);
+console.log(`[build-css] wrote dist/style.css + ${copied.length} per-module + foundation`);

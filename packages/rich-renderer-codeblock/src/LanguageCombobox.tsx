@@ -74,7 +74,7 @@ export function LanguageCombobox({ language, onLanguageChange }: LanguageCombobo
             e.stopPropagation();
           }}
         />
-        <ComboboxContent align="end" side="top" sideOffset={8}>
+        <ComboboxContent align="start" side="bottom" sideOffset={8}>
           <ComboboxEmpty>No languages found.</ComboboxEmpty>
           <ComboboxList>
             {(item) => (

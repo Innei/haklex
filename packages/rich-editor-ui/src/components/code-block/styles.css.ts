@@ -2,59 +2,138 @@ import { vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const card = style({
-  vars: {
-    '--rr-code-accent': '#737373',
-  },
   position: 'relative',
-  margin: '1.5rem 0',
-  borderRadius: '0.5rem',
+  margin: `${vars.flow.block} 0`,
+  borderRadius: vars.borderRadius.md,
   overflow: 'hidden',
-  fontSize: vars.typography.fontSizeMd,
+  backgroundColor: vars.color.codeBg,
+  color: vars.color.text,
+  fontSize: vars.typography.fontSizeCode,
   fontFamily: vars.typography.fontMono,
-  lineHeight: 1.65,
-});
-
-export const lang = style({
-  position: 'absolute',
-  bottom: '0.75rem',
-  right: '0.75rem',
-  zIndex: 1,
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.375rem',
-  fontSize: vars.typography.fontSizeMd,
-  opacity: 0.6,
-  pointerEvents: 'none',
-});
-
-export const copyButton = style({
-  appearance: 'none',
-  position: 'absolute',
-  right: '0.5rem',
-  top: '0.5rem',
-  zIndex: 3,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '0.375rem',
-  borderRadius: '0.375rem',
-  border: '1px solid color-mix(in srgb, var(--rr-code-accent) 5%, transparent)',
-  background: 'color-mix(in srgb, var(--rr-code-accent) 80%, transparent)',
-  color: 'white',
-  cursor: 'pointer',
-  opacity: 0,
-  transition: 'opacity 0.2s ease',
-  backdropFilter: 'blur(8px)',
+  lineHeight: vars.typography.lineHeightCode,
   selectors: {
-    [`${card}:hover &`]: {
-      opacity: 1,
+    '&[data-chrome="bar"]': {
+      border: `1px solid ${vars.color.border}`,
     },
   },
 });
 
+export const header = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '0.75rem',
+  fontFamily: vars.typography.fontFamilySans,
+  fontSize: '12px',
+  lineHeight: 1,
+  color: vars.color.textTertiary,
+  userSelect: 'none',
+  selectors: {
+    [`${card}[data-chrome="bar"] &`]: {
+      height: '36px',
+      padding: '0 6px 0 14px',
+      backgroundColor: vars.color.codeHeaderBg,
+      borderBottom: `1px solid ${vars.color.border}`,
+    },
+    [`${card}[data-chrome="compact"] &`]: {
+      position: 'absolute',
+      top: '6px',
+      right: '6px',
+      zIndex: 2,
+    },
+  },
+});
+
+export const lang = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: '8px',
+  minWidth: 0,
+  whiteSpace: 'nowrap',
+  selectors: {
+    [`${card}[data-chrome="compact"] &`]: {
+      fontFamily: vars.typography.fontMono,
+      fontSize: '11px',
+      padding: '4px 4px',
+    },
+  },
+});
+
+export const langMark = style({
+  width: '10px',
+  height: '10px',
+  borderRadius: '3px',
+  flexShrink: 0,
+  selectors: {
+    [`${card}[data-chrome="compact"] &`]: {
+      display: 'none',
+    },
+  },
+});
+
+export const copyButton = style({
+  'appearance': 'none',
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'gap': '6px',
+  'padding': '6px 8px',
+  'border': 'none',
+  'borderRadius': '6px',
+  'background': 'transparent',
+  'color': vars.color.textTertiary,
+  'font': 'inherit',
+  'cursor': 'pointer',
+  'transition': 'color 0.15s ease, background-color 0.15s ease, opacity 0.15s ease',
+  ':hover': {
+    color: vars.color.text,
+    backgroundColor: vars.color.fill,
+  },
+  'selectors': {
+    [`${card}[data-chrome="compact"] &`]: {
+      backgroundColor: vars.color.fill,
+      color: vars.color.text,
+    },
+  },
+});
+
+// Compact chrome swaps the language label for the copy button on hover. The
+// button stays in the tab order (opacity, not display) so keyboard users can
+// still reach it.
+globalStyle(`${card}[data-chrome="compact"] ${copyButton}`, {
+  '@media': {
+    '(hover: hover)': {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      opacity: 0,
+    },
+  },
+});
+
+globalStyle(
+  `${card}[data-chrome="compact"]:hover ${copyButton}, ${card}[data-chrome="compact"] ${copyButton}:focus-visible`,
+  {
+    '@media': {
+      '(hover: hover)': {
+        opacity: 1,
+      },
+    },
+  },
+);
+
+globalStyle(
+  `${card}[data-chrome="compact"]:hover ${lang}, ${card}[data-chrome="compact"]:has(${copyButton}:focus-visible) ${lang}`,
+  {
+    '@media': {
+      '(hover: hover)': {
+        visibility: 'hidden',
+      },
+    },
+  },
+);
+
 export const bodyBackground = style({
   position: 'relative',
-  background: 'color-mix(in srgb, var(--rr-code-accent) 5%, transparent)',
   padding: 0,
 });
 
@@ -76,34 +155,33 @@ export const scrollCollapsed = style({
   overflow: 'hidden',
 });
 
-export const expandWrap = style({
+export const expandFade = style({
   position: 'absolute',
-  bottom: 0,
   left: 0,
   right: 0,
-  display: 'flex',
-  justifyContent: 'center',
-  padding: '0.5rem 0 0.75rem',
-  background: `linear-gradient(to bottom, transparent 0%, var(--bg, ${vars.color.bgSecondary}) 80%)`,
+  bottom: 0,
+  height: '56px',
+  background: `linear-gradient(to bottom, transparent, ${vars.color.codeBg})`,
   pointerEvents: 'none',
 });
 
 export const expandButton = style({
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  fontSize: vars.typography.fontSizeXs,
-  color: 'inherit',
-  opacity: 0.7,
-  pointerEvents: 'auto',
-  selectors: {
-    '&:hover': {
-      opacity: 1,
-    },
+  'appearance': 'none',
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'gap': '6px',
+  'width': '100%',
+  'height': '32px',
+  'border': 'none',
+  'borderTop': `1px solid ${vars.color.border}`,
+  'background': vars.color.codeBg,
+  'color': vars.color.textTertiary,
+  'fontFamily': vars.typography.fontFamilySans,
+  'fontSize': '12px',
+  'cursor': 'pointer',
+  ':hover': {
+    color: vars.color.text,
   },
 });
 
@@ -119,8 +197,8 @@ globalStyle(`${lined} .line::before`, {
   content: 'counter(shiki-line)',
   color: 'transparent',
   textAlign: 'right',
-  boxSizing: 'border-box',
-  width: '2em',
+  boxSizing: 'content-box',
+  minWidth: 'calc(var(--rc-ln-digits, 2) * 1ch)',
   display: 'inline-block',
   position: 'sticky',
   left: 0,
@@ -129,10 +207,8 @@ globalStyle(`${lined} .line::before`, {
 export const linedWithNumbers = style({});
 
 globalStyle(`${linedWithNumbers} .line::before`, {
-  color: 'inherit',
-  opacity: 0.4,
-  width: '5em',
-  paddingRight: '2em',
+  color: vars.color.textQuaternary,
+  paddingRight: '16px',
 });
 
 globalStyle(`${card} pre`, {
@@ -167,11 +243,15 @@ globalStyle(
 
 globalStyle(`${card} .line`, {
   display: 'block',
-  padding: '0 1.25rem',
+  padding: '0 16px',
+});
+
+globalStyle(`${card}[data-chrome="compact"] .line`, {
+  paddingRight: '3em',
 });
 
 globalStyle(`${card} .line > span:last-child`, {
-  marginRight: '1.25rem',
+  marginRight: '16px',
 });
 
 globalStyle(`${card} .line::after`, {

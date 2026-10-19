@@ -18,7 +18,7 @@ const components = {
     if (codeChild) {
       const lang = codeChild.className?.replace('language-', '') || '';
       const codeText = typeof codeChild.children === 'string' ? codeChild.children : '';
-      return <CodeBlock code={codeText} language={lang} />;
+      return <CodeBlock chrome="compact" code={codeText} language={lang} />;
     }
     return <pre {...props}>{children}</pre>;
   },

@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 import type { ColorScheme } from './context/ColorSchemeContext';
 import type { RendererConfig } from './types/renderer-config';
 
-export type RichEditorVariant = 'article' | 'comment' | 'note';
+export type RichEditorVariant = 'article' | 'chat' | 'comment' | 'note';
 
 export interface RichEditorProps {
   actions?: ReactNode;

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useColorScheme } from '../../context/ColorSchemeContext';
 import { useVariant } from '../../context/RendererConfigContext';
@@ -24,7 +25,7 @@ export function CodeBlockRenderer({
   showLineNumbers: showLineNumbersProp,
 }: CodeBlockRendererProps) {
   const variant = useVariant();
-  const showLineNumbers = showLineNumbersProp ?? variant !== 'comment';
+  const showLineNumbers = showLineNumbersProp ?? (variant !== 'comment' && variant !== 'chat');
   const colorScheme = useColorScheme();
   const shikiTheme = colorScheme === 'dark' ? 'github-dark' : 'github-light';
   const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
@@ -87,13 +88,19 @@ export function CodeBlockRenderer({
     </div>
   ) : null;
 
+  const gutterStyle = useMemo(
+    () =>
+      ({ '--rc-ln-digits': Math.max(2, String(code.split('\n').length).length) }) as CSSProperties,
+    [code],
+  );
+
   const wrapperClass = showLineNumbers
     ? 'rich-code-block rich-code-block-numbered'
     : 'rich-code-block';
 
   if (highlightedHtml) {
     return (
-      <div className={wrapperClass}>
+      <div className={wrapperClass} style={gutterStyle}>
         {header}
         <div dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
       </div>
@@ -102,7 +109,7 @@ export function CodeBlockRenderer({
 
   const lines = code.split('\n');
   return (
-    <div className={wrapperClass}>
+    <div className={wrapperClass} style={gutterStyle}>
       {header}
       <pre>
         <code>

@@ -7,7 +7,7 @@ import { richContent, sharedStyles } from './shared.css';
 const noteBase = style({
   maxWidth: vars.layout.maxWidth,
   fontSize: vars.typography.fontSizeBase,
-  lineHeight: '1.8',
+  lineHeight: vars.typography.lineHeight,
   color: vars.color.text,
 });
 
@@ -22,13 +22,18 @@ const editorTopParagraph = `${noteBase} .rich-editor__content > ${sharedStyles.p
 const rendererTopParagraph = `${noteBase}.rich-content:not([data-rich-nested='true']) > ${sharedStyles.paragraph}`;
 
 globalStyle(`${editorTopParagraph}, ${rendererTopParagraph}`, {
-  marginTop: '1.25em',
-  marginBottom: '1.25em',
-  lineHeight: '1.8',
+  marginTop: 0,
+  marginBottom: vars.flow.paragraph,
 });
 
 globalStyle(`${rendererTopParagraph}:not(:first-of-type)`, {
   textIndent: '2em',
+});
+
+// text-indent is inherited: inline-block children (footnote refs, mention
+// chips) would indent their own first line by 2em.
+globalStyle(`${rendererTopParagraph} *`, {
+  textIndent: 0,
 });
 
 globalStyle(`${editorTopParagraph}:first-of-type, ${rendererTopParagraph}:first-of-type`, {
@@ -65,85 +70,6 @@ globalStyle(note(sharedStyles.textBold), {
   fontFamily: vars.typography.fontFamily,
   fontWeight: 600,
   color: vars.color.text,
-});
-
-// ─── Headings (article-level hierarchy) ──────────────────
-globalStyle(note(sharedStyles.headingH1), {
-  fontSize: '2.25em',
-  fontWeight: 800,
-  lineHeight: '1.1111111',
-  marginTop: 0,
-  marginBottom: '0.8888889em',
-  letterSpacing: '-0.025em',
-  color: vars.color.text,
-});
-
-globalStyle(note(sharedStyles.headingH2), {
-  fontSize: '1.5em',
-  fontWeight: 700,
-  lineHeight: '1.3333333',
-  marginTop: '2em',
-  marginBottom: '1em',
-  letterSpacing: '-0.025em',
-  color: vars.color.text,
-});
-
-globalStyle(`${note(sharedStyles.headingH2)} + *`, {
-  marginTop: 0,
-});
-
-globalStyle(note(sharedStyles.headingH3), {
-  fontSize: '1.25em',
-  fontWeight: 600,
-  lineHeight: '1.6',
-  marginTop: '1.6em',
-  marginBottom: '0.6em',
-  letterSpacing: '-0.025em',
-  color: vars.color.text,
-});
-
-globalStyle(`${note(sharedStyles.headingH3)} + *`, {
-  marginTop: 0,
-});
-
-globalStyle(note(sharedStyles.headingH4), {
-  fontSize: '1.125em',
-  fontWeight: 600,
-  lineHeight: '1.5',
-  marginTop: '1.5em',
-  marginBottom: '0.5em',
-  color: vars.color.text,
-});
-
-globalStyle(`${note(sharedStyles.headingH4)} + *`, {
-  marginTop: 0,
-});
-
-globalStyle(note(sharedStyles.headingH5), {
-  fontSize: '1em',
-  fontWeight: 600,
-  lineHeight: '1.5',
-  marginTop: '1.5em',
-  marginBottom: '0.5em',
-  color: vars.color.text,
-});
-
-globalStyle(`${note(sharedStyles.headingH5)} + *`, {
-  marginTop: 0,
-});
-
-globalStyle(note(sharedStyles.headingH6), {
-  fontSize: '0.875em',
-  fontWeight: 600,
-  lineHeight: '1.5',
-  marginTop: '1.5em',
-  marginBottom: '0.5em',
-  color: vars.color.text,
-  textTransform: 'uppercase',
-});
-
-globalStyle(`${note(sharedStyles.headingH6)} + *`, {
-  marginTop: 0,
 });
 
 // ─── Blockquote (sticky-note style) ─────────────────────
@@ -188,76 +114,11 @@ globalStyle(note(`${sharedStyles.quote} ${sharedStyles.paragraph}:first-child::f
   marginRight: 0,
 });
 
-// ─── Inline elements ────────────────────────────────────
-globalStyle(note(sharedStyles.link), {
-  fontWeight: 500,
-  textDecoration: 'underline',
-  textDecorationThickness: '1px',
-  textUnderlineOffset: '2px',
-  transition: 'color 0.15s ease',
-});
-
-globalStyle(`${note(sharedStyles.link)}:hover`, {
-  textDecorationThickness: '2px',
-});
-
-globalStyle(note(sharedStyles.textCode), {
-  fontSize: '0.875em',
-  fontFamily: vars.typography.fontMono,
-  fontWeight: 500,
-  padding: '0.2em 0.4em',
-  borderRadius: vars.borderRadius.sm,
-  backgroundColor: vars.color.codeBg,
-});
-
-// ─── Lists ──────────────────────────────────────────────
-globalStyle(`${note(sharedStyles.listOl)}, ${note(sharedStyles.listUl)}`, {
-  marginTop: '1.25em',
-  marginBottom: '1.25em',
-  paddingLeft: '1.625em',
-});
-
-globalStyle(note(sharedStyles.listItem), {
-  marginTop: '0.5em',
-  marginBottom: '0.5em',
-});
-
 globalStyle(note(plainListItem), {
-  paddingLeft: '0.375em',
-});
-
-globalStyle(`${note(sharedStyles.listItem)}::marker`, {
-  color: vars.color.textSecondary,
-});
-
-// ─── Code blocks ────────────────────────────────────────
-globalStyle(`${noteBase} .rich-code-block`, {
-  fontSize: '0.875em',
-  lineHeight: '1.7142857',
-  marginTop: '1.7142857em',
-  marginBottom: '1.7142857em',
-  borderRadius: vars.borderRadius.md,
-  overflowX: 'auto',
-});
-
-globalStyle(`${noteBase} .rich-code-block pre`, {
-  padding: '0.8571429em 1.1428571em',
-  margin: 0,
+  paddingLeft: '0.25em',
 });
 
 // ─── Tables ─────────────────────────────────────────────
-globalStyle(note(sharedStyles.table), {
-  marginTop: '2em',
-  marginBottom: '2em',
-  fontSize: '0.875em',
-  lineHeight: '1.7142857',
-});
-
-globalStyle(note(`${sharedStyles.table} ${sharedStyles.paragraph}`), {
-  margin: 0,
-  padding: 0,
-  lineHeight: 'inherit',
-});
 
 globalStyle(note(`${sharedStyles.table} ${sharedStyles.paragraph}:first-child::first-letter`), {
   float: 'none',
@@ -267,8 +128,8 @@ globalStyle(note(`${sharedStyles.table} ${sharedStyles.paragraph}:first-child::f
 
 // ─── Images ─────────────────────────────────────────────
 globalStyle(`${noteBase} .rich-image`, {
-  marginTop: '2em',
-  marginBottom: '2em',
+  marginTop: vars.flow.block,
+  marginBottom: vars.flow.block,
 });
 
 globalStyle(`${noteBase} .rich-image[data-layout^="float"]`, {
@@ -286,10 +147,10 @@ globalStyle(`${noteBase} .rich-image img`, {
 });
 
 globalStyle(`${noteBase} .rich-image figcaption`, {
-  fontSize: '0.875em',
-  lineHeight: '1.4285714',
-  marginTop: '0.8571429em',
-  color: vars.color.textSecondary,
+  fontSize: vars.typography.fontSizeCaption,
+  lineHeight: vars.typography.lineHeightCompact,
+  marginTop: '1em',
+  color: vars.color.textTertiary,
   textAlign: 'center',
 });
 

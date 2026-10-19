@@ -3,6 +3,7 @@ import { globalStyle, style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
   card: 'rr-code-card',
+  header: 'rr-code-header',
   lang: 'rr-code-lang',
   langIcon: 'rr-code-lang-icon',
   copyButton: 'rr-code-copy',
@@ -19,17 +20,34 @@ export const semanticClassNames = {
 
 /* ---- Card ---- */
 export const card = style({
-  vars: {
-    '--rr-code-accent': '#737373',
-  },
   position: 'relative',
   maxWidth: '100%',
   minWidth: 0,
-  margin: '1.5rem 0',
-  borderRadius: '0.5rem',
+  margin: `${vars.flow.block} 0`,
+  borderRadius: vars.borderRadius.md,
+  border: `1px solid ${vars.color.border}`,
   overflow: 'hidden',
-  fontSize: vars.typography.fontSizeMd,
+  backgroundColor: vars.color.codeBg,
+  color: vars.color.text,
+  fontSize: vars.typography.fontSizeCode,
   fontFamily: vars.typography.fontMono,
+  lineHeight: vars.typography.lineHeightCode,
+});
+
+export const header = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '0.75rem',
+  height: '36px',
+  padding: '0 6px 0 14px',
+  backgroundColor: vars.color.codeHeaderBg,
+  borderBottom: `1px solid ${vars.color.border}`,
+  fontFamily: vars.typography.fontFamilySans,
+  fontSize: '12px',
+  lineHeight: 1,
+  color: vars.color.textTertiary,
+  userSelect: 'none',
 });
 
 /* ---- Language input (edit mode) ---- */
@@ -50,23 +68,19 @@ export const langInput = style({
   },
 });
 
-/* ---- Language label (bottom-right) ---- */
 export const lang = style({
-  position: 'absolute',
-  bottom: '0.75rem',
-  right: '0.75rem',
-  zIndex: 1,
   display: 'flex',
   alignItems: 'center',
-  gap: '0.375rem',
-  fontSize: vars.typography.fontSizeMd,
-  opacity: 0.6,
-  pointerEvents: 'none',
-  selectors: {
-    [`&:has(${langInput})`]: {
-      pointerEvents: 'auto',
-    },
-  },
+  gap: '8px',
+  minWidth: 0,
+  whiteSpace: 'nowrap',
+});
+
+export const langMark = style({
+  width: '10px',
+  height: '10px',
+  borderRadius: '3px',
+  flexShrink: 0,
 });
 
 export const langIcon = style({
@@ -79,36 +93,28 @@ globalStyle(`${langIcon} svg`, {
   height: '100%',
 });
 
-/* ---- Copy button (top-right, hover reveal) ---- */
 export const copyButton = style({
-  appearance: 'none',
-  position: 'absolute',
-  right: '0.5rem',
-  top: '0.5rem',
-  zIndex: 3,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  padding: '0.375rem',
-  borderRadius: '0.375rem',
-  border: '1px solid color-mix(in srgb, var(--rr-code-accent) 5%, transparent)',
-  background: 'color-mix(in srgb, var(--rr-code-accent) 80%, transparent)',
-  color: 'white',
-  cursor: 'pointer',
-  opacity: 0,
-  transition: 'opacity 0.2s ease',
-  backdropFilter: 'blur(8px)',
-  selectors: {
-    [`${card}:hover &`]: {
-      opacity: 1,
-    },
+  'appearance': 'none',
+  'display': 'inline-flex',
+  'alignItems': 'center',
+  'gap': '6px',
+  'padding': '6px 8px',
+  'border': 'none',
+  'borderRadius': '6px',
+  'background': 'transparent',
+  'color': vars.color.textTertiary,
+  'font': 'inherit',
+  'cursor': 'pointer',
+  'transition': 'color 0.15s ease, background-color 0.15s ease',
+  ':hover': {
+    color: vars.color.text,
+    backgroundColor: vars.color.fill,
   },
 });
 
 /* ---- Body background ---- */
 export const bodyBackground = style({
   position: 'relative',
-  background: 'color-mix(in srgb, var(--rr-code-accent) 5%, transparent)',
   padding: 0,
 });
 
@@ -152,20 +158,21 @@ globalStyle(`${body} .cm-editor`, {
 
 globalStyle(`${body} .cm-scroller`, {
   fontFamily: `${vars.typography.fontMono} !important` as any,
-  lineHeight: '1.6',
+  lineHeight: vars.typography.lineHeightCode,
+  paddingBlock: '12px',
 });
 
 globalStyle(`${body} .cm-content`, {
   paddingTop: 0,
   paddingBottom: 0,
-  paddingLeft: '1.25rem',
-  paddingRight: '1.25rem',
-  minHeight: '1.6em',
+  paddingLeft: '16px',
+  paddingRight: '16px',
+  minHeight: `calc(1em * ${vars.typography.lineHeightCode})`,
 });
 
 globalStyle(`${body}:has(.cm-gutters) .cm-content`, {
-  paddingLeft: '0.5rem',
-  paddingRight: '1.25rem',
+  paddingLeft: 0,
+  paddingRight: '16px',
 });
 
 globalStyle(`${body} .cm-line`, {
@@ -174,14 +181,15 @@ globalStyle(`${body} .cm-line`, {
 
 globalStyle(`${body} .cm-gutters`, {
   borderRight: 'none',
-  paddingLeft: '1.25rem',
+  backgroundColor: 'transparent',
+  paddingLeft: '16px',
 });
 
 globalStyle(`${body} .cm-lineNumbers .cm-gutterElement`, {
-  minWidth: '3em',
+  minWidth: 'calc(var(--rc-ln-digits, 2) * 1ch)',
+  padding: '0 16px 0 0',
   textAlign: 'right',
-  paddingRight: '2em',
-  color: `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent) !important` as any,
+  color: `${vars.color.textQuaternary} !important` as any,
 });
 
 globalStyle(`${body} > .shikicode.output`, {
@@ -196,32 +204,31 @@ globalStyle(`${bodyReadonly} > textarea.shikicode`, {
 /* ---- Expand ---- */
 export const expandWrap = style({
   position: 'absolute',
-  bottom: 0,
   left: 0,
   right: 0,
-  display: 'flex',
-  justifyContent: 'center',
-  padding: '0.5rem 0 0.75rem',
-  background: `linear-gradient(to bottom, transparent 0%, var(--bg, ${vars.color.bgSecondary}) 80%)`,
+  bottom: 0,
+  height: '56px',
+  background: `linear-gradient(to bottom, transparent, ${vars.color.codeBg})`,
   pointerEvents: 'none',
 });
 
 export const expandButton = style({
-  appearance: 'none',
-  border: 'none',
-  background: 'none',
-  cursor: 'pointer',
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  fontSize: vars.typography.fontSizeXs,
-  color: 'inherit',
-  opacity: 0.7,
-  pointerEvents: 'auto',
-  selectors: {
-    '&:hover': {
-      opacity: 1,
-    },
+  'appearance': 'none',
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'gap': '6px',
+  'width': '100%',
+  'height': '32px',
+  'border': 'none',
+  'borderTop': `1px solid ${vars.color.border}`,
+  'background': vars.color.codeBg,
+  'color': vars.color.textTertiary,
+  'fontFamily': vars.typography.fontFamilySans,
+  'fontSize': '12px',
+  'cursor': 'pointer',
+  ':hover': {
+    color: vars.color.text,
   },
 });
 
@@ -254,6 +261,10 @@ globalStyle(`${card} pre`, {
   overflow: 'auto',
 });
 
+globalStyle(`${card} ${scroll} > pre`, {
+  padding: '12px 0 !important' as any,
+});
+
 globalStyle(`${card} pre code`, {
   display: 'flex',
   flexDirection: 'column',
@@ -278,9 +289,9 @@ globalStyle(
 // When textarea has .line-numbers: align output ::before to match textarea padding
 globalStyle(`${body}:has(.shikicode.input.line-numbers) .shikicode.output .line::before`, {
   backgroundColor: 'transparent !important' as any,
-  color: `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent) !important` as any,
-  width: '5em',
-  paddingRight: '2em',
+  color: `${vars.color.textQuaternary} !important` as any,
+  minWidth: 'calc(var(--rc-ln-digits, 2) * 1ch)',
+  paddingRight: '16px',
 });
 
 // When textarea does NOT have .line-numbers: hide output ::before entirely
@@ -290,19 +301,19 @@ globalStyle(`${body}:not(:has(.shikicode.input.line-numbers)) .shikicode.output 
 
 globalStyle(`${card} .line`, {
   display: 'block',
-  padding: '0 1.25rem',
+  padding: '0 16px',
 });
 
 globalStyle(`${card} .shikicode.input.line-numbers`, {
-  paddingLeft: 'calc(5em + 1.25rem)',
+  paddingLeft: 'calc(2ch + 32px)',
 });
 
 globalStyle(`${card} .shikicode.input:not(.line-numbers)`, {
-  paddingLeft: '1.25rem',
+  paddingLeft: '16px',
 });
 
 globalStyle(`${card} .line > span:last-child`, {
-  marginRight: '1.25rem',
+  marginRight: '16px',
 });
 
 globalStyle(`${card} .line::after`, { content: "' '" });
@@ -323,11 +334,11 @@ globalStyle(`${card} .highlighted::before, ${card} .diff::before`, {
 });
 
 globalStyle(`${card} .highlighted`, {
-  background: 'color-mix(in srgb, var(--rr-code-accent) 20%, transparent)',
+  background: `color-mix(in oklab, ${vars.color.accent} 8%, transparent)`,
 });
 
 globalStyle(`${card} .highlighted::before`, {
-  background: 'var(--rr-code-accent)',
+  background: vars.color.accent,
 });
 
 globalStyle(`${card} .diff.add`, {
@@ -369,8 +380,8 @@ globalStyle(`${lined} .line::before`, {
   content: 'counter(shiki-line)',
   color: 'transparent',
   textAlign: 'right',
-  boxSizing: 'border-box',
-  width: '2em',
+  boxSizing: 'content-box',
+  minWidth: 'calc(var(--rc-ln-digits, 2) * 1ch)',
   display: 'inline-block',
   position: 'sticky',
   left: 0,
@@ -379,10 +390,9 @@ globalStyle(`${lined} .line::before`, {
 export const linedWithNumbers = style({});
 
 globalStyle(`${linedWithNumbers} .line::before`, {
-  color: 'inherit',
-  opacity: 0.4,
-  width: '5em',
-  paddingRight: '2em',
+  color: vars.color.textQuaternary,
+  minWidth: 'calc(var(--rc-ln-digits, 2) * 1ch)',
+  paddingRight: '16px',
 });
 
 /* ---- Scrollbar ---- */
@@ -404,18 +414,21 @@ export const contentSemanticClassNames = {
 } as const;
 
 const contentRootStyles = {
+  display: 'block',
   fontFamily: vars.typography.fontMono,
-  fontSize: vars.typography.fontSizeMd,
+  fontSize: vars.typography.fontSizeCode,
+  lineHeight: vars.typography.lineHeightCode,
+  color: vars.color.text,
   backgroundColor: vars.color.codeBg,
   borderRadius: vars.borderRadius.md,
   overflow: 'hidden',
-  margin: `${vars.spacing.md} 0`,
+  margin: `${vars.flow.block} 0`,
   border: `1px solid ${vars.color.border}`,
 } as const;
 
 const contentPreStyles = {
   margin: 0,
-  padding: vars.spacing.md,
+  padding: '12px 16px',
   overflowX: 'auto',
 } as const;
 
@@ -424,6 +437,7 @@ const contentCodeStyles = {
   fontSize: 'inherit',
   background: 'none',
   border: 'none',
+  boxShadow: 'none',
   padding: 0,
   color: 'inherit',
 } as const;
@@ -432,38 +446,38 @@ const contentHeaderStyles = {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: `${vars.spacing.sm} ${vars.spacing.md}`,
+  height: '36px',
+  padding: '0 6px 0 14px',
+  backgroundColor: vars.color.codeHeaderBg,
   borderBottom: `1px solid ${vars.color.border}`,
   fontFamily: vars.typography.fontFamilySans,
-  fontSize: vars.typography.fontSizeMd,
-  color: vars.color.textSecondary,
+  fontSize: '12px',
+  lineHeight: 1,
+  color: vars.color.textTertiary,
   userSelect: 'none',
 } as const;
 
 const contentLangStyles = {
-  fontFamily: vars.typography.fontMono,
-  fontSize: '0.85em',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
+  fontFamily: 'inherit',
 } as const;
 
 const contentCopyButtonStyles = {
   appearance: 'none',
   border: 'none',
   background: 'none',
-  color: vars.color.textSecondary,
+  color: vars.color.textTertiary,
   cursor: 'pointer',
-  padding: `${vars.spacing.xs} ${vars.spacing.sm}`,
-  borderRadius: vars.borderRadius.sm,
-  fontFamily: vars.typography.fontFamily,
-  fontSize: vars.typography.fontSizeMd,
+  padding: '6px 8px',
+  borderRadius: '6px',
+  fontFamily: 'inherit',
+  fontSize: 'inherit',
   lineHeight: 1,
   transition: 'color 0.15s ease, background-color 0.15s ease',
 } as const;
 
 const contentCopyButtonHoverStyles = {
   color: vars.color.text,
-  backgroundColor: vars.color.fillSecondary,
+  backgroundColor: vars.color.fill,
 } as const;
 
 const contentNumberedLineStyles = {
@@ -473,13 +487,11 @@ const contentNumberedLineStyles = {
 const contentNumberedLineBeforeStyles = {
   content: 'counter(line)',
   display: 'inline-block',
-  width: '2.5em',
-  marginRight: vars.spacing.md,
+  minWidth: 'calc(var(--rc-ln-digits, 2) * 1ch)',
+  marginRight: '16px',
   textAlign: 'right',
-  color: `color-mix(in srgb, ${vars.color.textSecondary} 40%, transparent) !important` as any,
-  opacity: 0.4,
+  color: `${vars.color.textQuaternary} !important` as any,
   userSelect: 'none',
-  fontSize: vars.typography.fontSizeMd,
 } as const;
 
 export const contentRoot = style(contentRootStyles);
@@ -490,6 +502,10 @@ export const contentCopyButton = style(contentCopyButtonStyles);
 // Content node classes stay global because they're consumed across editor/renderer boundaries.
 globalStyle(`.${contentSemanticClassNames.root}`, contentRootStyles);
 globalStyle(`.${contentSemanticClassNames.root} pre`, contentPreStyles);
+globalStyle(`pre.${contentSemanticClassNames.root}, code.${contentSemanticClassNames.root}`, {
+  ...contentPreStyles,
+  whiteSpace: 'pre',
+});
 globalStyle(`.${contentSemanticClassNames.root} code`, contentCodeStyles);
 globalStyle(`.${contentSemanticClassNames.header}`, contentHeaderStyles);
 globalStyle(`.${contentSemanticClassNames.lang}`, contentLangStyles);
