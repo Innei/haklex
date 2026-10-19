@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-embed",
-  "version": "0.49.1",
+  "version": "0.50.0",
   "description": "Embed extension for Twitter, YouTube, etc.",
   "repository": {
     "type": "git",
