@@ -16,6 +16,6 @@ for pkg in $(node scripts/release/publish.mjs list); do
     echo "skip $pkg (already trusted)"
     continue
   fi
-  "${NPM[@]}" trust github "$pkg" --repo "$REPO" --file "$WORKFLOW" --yes
+  "${NPM[@]}" trust github "$pkg" --repo "$REPO" --file "$WORKFLOW" --allow-publish --yes
   sleep 2
 done
