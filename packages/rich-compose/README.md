@@ -219,6 +219,7 @@ Decorator slots (`rendererConfig` / module `renderers`) accept any React compone
 | -------------- | ----------------- | --------------------- | ------------------------------- | ------------------------- |
 | `alert`        | builtin           | —                     | sync                            | `rich-renderer-alert`     |
 | `banner`       | builtin           | —                     | sync                            | `rich-renderer-banner`    |
+| `chart`        | `ChartNode`       | `ChartEditNode`       | sync                            | `rich-ext-chart`          |
 | `chat`         | `ChatNode`        | `ChatEditNode`        | sync                            | `rich-ext-chat`           |
 | `code-block`   | builtin           | —                     | lazy + ssr fallback             | `rich-renderer-codeblock` |
 | `code-snippet` | `CodeSnippetNode` | `CodeSnippetEditNode` | sync                            | `rich-ext-code-snippet`   |

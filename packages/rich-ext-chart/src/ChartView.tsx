@@ -180,13 +180,25 @@ export interface ChartRendererProps extends Omit<ChartViewProps, 'spec'> {
   value: unknown;
 }
 
+function readRawFields(value: unknown): Record<string, unknown> {
+  let raw = value;
+  if (typeof raw === 'string') {
+    try {
+      raw = JSON.parse(raw);
+    } catch {
+      return {};
+    }
+  }
+  return typeof raw === 'object' && raw ? (raw as Record<string, unknown>) : {};
+}
+
 export function ChartRenderer({ value, ...rest }: ChartRendererProps) {
   const result = useMemo(
     () => (typeof value === 'string' ? parseChartSource(value) : validateChartSpec(value)),
     [value],
   );
   if (!result.ok) {
-    const raw = typeof value === 'object' && value ? (value as Record<string, unknown>) : {};
+    const raw = readRawFields(value);
     return (
       <ChartErrorCard
         issues={result.issues}

@@ -400,6 +400,14 @@ export function banner(
   };
 }
 
+export function chart(spec: string | object) {
+  return {
+    type: 'chart',
+    spec: typeof spec === 'string' ? spec : JSON.stringify(spec, null, 2),
+    version: 1,
+  };
+}
+
 export function excalidraw(snapshot: string) {
   return {
     type: 'excalidraw',

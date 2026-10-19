@@ -186,6 +186,19 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
     };
   });
 
+  registry.registerWriter('chart', (node) => {
+    const n = node as any;
+    const spec = typeof n.spec === 'string' ? n.spec : '';
+    if (!spec) {
+      return { tag: 'chart', attrs: optAttr(blockId(n)), selfClosing: true };
+    }
+    return {
+      tag: 'chart',
+      attrs: optAttr(blockId(n)),
+      children: [{ cdata: spec }],
+    };
+  });
+
   // -- Dynamic external component: url + initial height, props JSON as CDATA --
 
   registry.registerWriter('dynamic', (node) => {

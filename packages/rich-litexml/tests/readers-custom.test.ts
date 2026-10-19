@@ -290,6 +290,21 @@ describe('custom readers', () => {
     expect(nodes[0].snapshot).toBe('');
   });
 
+  it('reads <chart> CDATA as the raw spec string', () => {
+    const nodes = parse('<chart id="c1">\n  <![CDATA[{"type":"line"}]]>\n</chart>');
+    expect(nodes[0]).toEqual({
+      type: 'chart',
+      $: { blockId: 'c1' },
+      spec: '{"type":"line"}',
+      version: 1,
+    });
+  });
+
+  it('reads plain-text <chart> body trimmed', () => {
+    const nodes = parse('<chart>\n  {"type":"pie"}\n</chart>');
+    expect(nodes[0].spec).toBe('{"type":"pie"}');
+  });
+
   it('reads <dynamic> with props CDATA', () => {
     const nodes = parse(
       '<dynamic id="dyn1" url="https://cdn.example.com/widget.mjs" initial-height="480"><![CDATA[{"level":1}]]></dynamic>',

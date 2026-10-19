@@ -1,5 +1,6 @@
 import { alertEditModule } from './modules/alert/edit';
 import { bannerEditModule } from './modules/banner/edit';
+import { chartEditModule } from './modules/chart/edit';
 import { chatEditModule } from './modules/chat/edit';
 import { codeBlockEditModule } from './modules/code-block/edit';
 import { codeSnippetEditModule } from './modules/code-snippet/edit';
@@ -22,6 +23,7 @@ import { videoEditModule } from './modules/video/edit';
 export {
   alertEditModule,
   bannerEditModule,
+  chartEditModule,
   chatEditModule,
   codeBlockEditModule,
   codeSnippetEditModule,
@@ -45,6 +47,7 @@ export {
 export const allEditorModules = [
   alertEditModule,
   bannerEditModule,
+  chartEditModule,
   chatEditModule,
   codeBlockEditModule,
   codeSnippetEditModule,

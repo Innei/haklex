@@ -34,6 +34,7 @@ const PACKAGES_DIR = path.resolve(PKG_ROOT, '..');
 const MODULE_TO_PACKAGE: Record<string, string> = {
   'alert': 'rich-renderer-alert',
   'banner': 'rich-renderer-banner',
+  'chart': 'rich-ext-chart',
   'chat': 'rich-ext-chat',
   'code-block': 'rich-renderer-codeblock',
   'code-snippet': 'rich-ext-code-snippet',

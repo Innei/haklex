@@ -7,6 +7,7 @@ import { composeRenderer } from '../core/compose';
 import type { RichRendererModule } from '../core/types';
 import { alertModule } from '../modules/alert/module';
 import { bannerModule } from '../modules/banner/module';
+import { chartModule } from '../modules/chart/module';
 import { chatModule } from '../modules/chat/module';
 import { ChatRenderer } from '../modules/chat/renderer';
 import { codeBlockModule } from '../modules/code-block/module';
@@ -55,6 +56,7 @@ const syncRendererMap: Record<string, NonNullable<RichRendererModule['renderers'
 const previewRendererModules: RichRendererModule[] = [
   alertModule,
   bannerModule,
+  chartModule,
   chatModule,
   codeBlockModule,
   codeSnippetModule,

@@ -305,6 +305,19 @@ export const MERMAID_BLOCK_TRANSFORMER: ElementTransformer = {
   type: 'element',
 };
 
+export const CHART_BLOCK_TRANSFORMER: ElementTransformer = {
+  dependencies: [],
+  export: (node) => {
+    if (node.getType() !== 'chart') return null;
+    const spec = (node as any).__spec ?? '';
+    const f = fence(spec);
+    return `${f}chart\n${spec}\n${f}`;
+  },
+  regExp: NEVER,
+  replace: NOOP,
+  type: 'element',
+};
+
 export const NESTED_DOC_BLOCK_TRANSFORMER: ElementTransformer = {
   dependencies: [],
   export: (node) => {
@@ -514,6 +527,7 @@ export const allHeadlessTransformers = [
   LEGACY_CODE_NODE_TRANSFORMER,
   LINK_CARD_BLOCK_TRANSFORMER,
   MERMAID_BLOCK_TRANSFORMER,
+  CHART_BLOCK_TRANSFORMER,
   NESTED_DOC_BLOCK_TRANSFORMER,
   GRID_CONTAINER_BLOCK_TRANSFORMER,
   HORIZONTAL_RULE_BLOCK_TRANSFORMER,

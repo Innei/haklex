@@ -106,6 +106,43 @@ describe('roundtrip', () => {
     expect(result).toContain('<excalidraw');
   });
 
+  it('chart roundtrip with a valid spec', () => {
+    const input =
+      '<chart><![CDATA[{"version":1,"type":"bar","x":"k","series":[{"key":"v","label":"Value"}],"data":[{"k":"a","v":1},{"k":"b","v":2}]}]]></chart>';
+    expect(roundtrip(input)).toBe(input);
+  });
+
+  it('chart roundtrip keeps invalid JSON verbatim', () => {
+    const input = '<chart><![CDATA[{"type": "bar", "data": [1, 2 <oops> & more]]></chart>';
+    expect(roundtrip(input)).toBe(input);
+  });
+
+  it('chart roundtrip keeps a multi-line spec', () => {
+    const input = '<chart id="c2"><![CDATA[{\n  "version": 1,\n  "type": "pie"\n}]]></chart>';
+    expect(roundtrip(input)).toBe(input);
+  });
+
+  it('chart roundtrip with block id', () => {
+    const input = '<chart id="c1"><![CDATA[{"version":1}]]></chart>';
+    expect(roundtrip(input)).toBe(input);
+  });
+
+  it('empty chart roundtrip', () => {
+    expect(roundtrip('<chart id="c3" />')).toBe('<chart id="c3" />');
+    expect(roundtrip('<chart></chart>')).toBe('<chart />');
+  });
+
+  it('chart reads to a serialized node with the raw spec string', () => {
+    const state = deserializeFromXml(
+      '<doc><chart id="c1"><![CDATA[{"type":"bar"}]]></chart><chart /></doc>',
+      registry,
+    );
+    expect(state.root.children).toEqual([
+      { type: 'chart', $: { blockId: 'c1' }, spec: '{"type":"bar"}', version: 1 },
+      { type: 'chart', spec: '', version: 1 },
+    ]);
+  });
+
   it('dynamic roundtrip', () => {
     const input =
       '<dynamic id="dyn1" url="https://cdn.example.com/widget.mjs" initial-height="480"><![CDATA[{"level":1}]]></dynamic>';

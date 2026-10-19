@@ -2,6 +2,7 @@ import type { SerializedEditorState } from 'lexical';
 
 import {
   alertQuote,
+  chart,
   doc,
   FORMAT_BOLD,
   FORMAT_CODE,
@@ -209,6 +210,27 @@ console.log(greet('World'))`,
     D --> B`,
     version: 1,
   } as any,
+
+  heading('h2', text('Chart')),
+
+  chart({
+    version: 1,
+    type: 'bar',
+    title: 'Editor first-paint commits',
+    subtitle: 'React Profiler commit count while loading a 3,200-word article',
+    x: 'component',
+    series: [
+      { key: 'before', label: 'Before' },
+      { key: 'after', label: 'After' },
+    ],
+    data: [
+      { component: 'RichEditor', before: 48, after: 12 },
+      { component: 'Toolbar', before: 36, after: 9 },
+      { component: 'BlockHandle', before: 64, after: 14 },
+      { component: 'SlashMenu', before: 22, after: 8 },
+    ],
+    source: 'demo/ · 5-run median',
+  }) as any,
 
   heading('h2', text('Blockquote & Math')),
 

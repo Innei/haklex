@@ -390,6 +390,10 @@ export const ExcalidrawNode = headlessDecorator('excalidraw', ['snapshot'], {
   snapshot: '',
 });
 
+export const ChartNode = headlessDecorator('chart', ['spec'], {
+  spec: '',
+});
+
 export const DynamicNode = headlessDecorator('dynamic', ['url', 'props', 'initialHeight'], {
   url: '',
   props: {},
@@ -646,6 +650,7 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   CodeSnippetNode,
   GalleryNode,
   ExcalidrawNode,
+  ChartNode,
   DynamicNode,
   TagNode,
   CommentNode,

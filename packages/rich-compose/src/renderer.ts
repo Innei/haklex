@@ -1,5 +1,6 @@
 import { alertModule } from './modules/alert/module';
 import { bannerModule } from './modules/banner/module';
+import { chartModule } from './modules/chart/module';
 import { chatModule } from './modules/chat/module';
 import { codeBlockModule } from './modules/code-block/module';
 import { codeSnippetModule } from './modules/code-snippet/module';
@@ -21,6 +22,7 @@ import { videoModule } from './modules/video/module';
 export {
   alertModule,
   bannerModule,
+  chartModule,
   chatModule,
   codeBlockModule,
   codeSnippetModule,
@@ -43,6 +45,7 @@ export {
 export const allRendererModules = [
   alertModule,
   bannerModule,
+  chartModule,
   chatModule,
   codeBlockModule,
   codeSnippetModule,

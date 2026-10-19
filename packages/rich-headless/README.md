@@ -58,6 +58,7 @@ editor.read(() => {
 | `CodeSnippetNode`     | Multi-file code snippet                      |
 | `GalleryNode`         | Image gallery                                |
 | `ExcalidrawNode`      | Excalidraw drawing                           |
+| `ChartNode`           | Data chart (raw ChartSpec JSON string)       |
 | `BannerNode`          | Banner/callout with nested content           |
 | `AlertQuoteNode`      | GitHub-style alert quote with nested content |
 | `NestedDocNode`       | Nested document with nested content          |

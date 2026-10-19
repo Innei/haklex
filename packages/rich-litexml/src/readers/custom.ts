@@ -436,6 +436,17 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       }) as any,
   );
 
+  registry.registerReader(
+    'chart',
+    (el) =>
+      ({
+        type: 'chart',
+        ...extractBlockId(el),
+        spec: extractRawText(el).trim(),
+        version: 1,
+      }) as any,
+  );
+
   // -- Dynamic external component: props JSON in CDATA --
 
   registry.registerReader('dynamic', (el) => {

@@ -643,6 +643,9 @@ importers:
 
   packages/rich-compose:
     dependencies:
+      '@haklex/rich-ext-chart':
+        specifier: workspace:*
+        version: link:../rich-ext-chart
       '@haklex/rich-ext-chat':
         specifier: workspace:*
         version: link:../rich-ext-chat
@@ -1041,6 +1044,12 @@ importers:
 
   packages/rich-ext-chart:
     dependencies:
+      '@haklex/rich-editor':
+        specifier: workspace:^
+        version: link:../rich-editor
+      '@haklex/rich-editor-ui':
+        specifier: workspace:^
+        version: link:../rich-editor-ui
       '@haklex/rich-style-token':
         specifier: workspace:^
         version: link:../rich-style-token
@@ -1051,6 +1060,9 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0(@types/react@19.3.0)(react@19.3.1)
     devDependencies:
+      '@lexical/react':
+        specifier: ^0.52.0
+        version: 0.52.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(yjs@13.6.29)
       '@types/react':
         specifier: ^19.3.0
         version: 19.3.0
@@ -1063,6 +1075,9 @@ importers:
       '@vanilla-extract/vite-plugin':
         specifier: ^5.2.6
         version: 5.2.6(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(supports-color@10.2.2)(tsx@4.23.15)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(yaml@2.9.1)
+      lexical:
+        specifier: ^0.52.0
+        version: 0.52.0(typescript@7.0.2)
       react:
         specifier: ^19.3.1
         version: 19.3.1

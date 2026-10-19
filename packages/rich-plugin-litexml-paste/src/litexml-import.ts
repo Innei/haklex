@@ -24,6 +24,7 @@ const LITEXML_TAGS = [
   'footnote-section',
   'gallery',
   'excalidraw',
+  'chart',
   'grid',
   'cell',
   'agent-diff',

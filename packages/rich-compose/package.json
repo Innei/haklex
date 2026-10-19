@@ -37,6 +37,9 @@
     "./modules/code-snippet/edit": "./src/modules/code-snippet/edit.ts",
     "./modules/code-snippet/node": "./src/modules/code-snippet/node.ts",
     "./modules/code-snippet/renderer": "./src/modules/code-snippet/renderer.tsx",
+    "./modules/chart": "./src/modules/chart/index.ts",
+    "./modules/chart/edit": "./src/modules/chart/edit.ts",
+    "./modules/chart/node": "./src/modules/chart/node.ts",
     "./modules/chat": "./src/modules/chat/index.ts",
     "./modules/chat/edit": "./src/modules/chat/edit.ts",
     "./modules/chat/node": "./src/modules/chat/node.ts",
@@ -98,6 +101,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@haklex/rich-ext-chart": "workspace:*",
     "@haklex/rich-ext-chat": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
     "@haklex/rich-ext-dynamic": "workspace:*",
@@ -221,6 +225,14 @@
         "import": "./dist/modules/code-snippet/renderer.mjs",
         "types": "./dist/modules/code-snippet/renderer.d.ts"
       },
+      "./modules/chart": {
+        "import": "./dist/modules/chart/index.mjs",
+        "types": "./dist/modules/chart/index.d.ts"
+      },
+      "./modules/chart/node": {
+        "import": "./dist/modules/chart/node.mjs",
+        "types": "./dist/modules/chart/node.d.ts"
+      },
       "./modules/chat": {
         "import": "./dist/modules/chat/index.mjs",
         "types": "./dist/modules/chat/index.d.ts"
@@ -336,6 +348,10 @@
       "./modules/banner/edit": {
         "import": "./dist/modules/banner/edit.mjs",
         "types": "./dist/modules/banner/edit.d.ts"
+      },
+      "./modules/chart/edit": {
+        "import": "./dist/modules/chart/edit.mjs",
+        "types": "./dist/modules/chart/edit.d.ts"
       },
       "./modules/chat/edit": {
         "import": "./dist/modules/chat/edit.mjs",

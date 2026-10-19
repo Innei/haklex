@@ -591,6 +591,18 @@ describe('custom writers', () => {
     expect(xml).toContain('<excalidraw id="ex2" />');
   });
 
+  it('chart writes the raw spec as CDATA', () => {
+    const xml = serialize([
+      { type: 'chart', $: { blockId: 'c1' }, spec: '{"type":"bar"}', version: 1 },
+    ]);
+    expect(xml).toContain('<chart id="c1"><![CDATA[{"type":"bar"}]]></chart>');
+  });
+
+  it('chart with empty spec is self-closing', () => {
+    const xml = serialize([{ type: 'chart', spec: '', version: 1 }]);
+    expect(xml).toContain('<chart />');
+  });
+
   it('dynamic with props', () => {
     const xml = serialize([
       {

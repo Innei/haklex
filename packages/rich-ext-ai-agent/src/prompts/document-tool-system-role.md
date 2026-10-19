@@ -66,6 +66,13 @@ Use the document editing tools according to the following contract.
 - When **editing** an existing poll, preserve `poll-id` and existing `option id`s. Adding a new option without an `id` mints a new one. Removing an option deletes its tally permanently.
 - Minimum 2 options. `mode` defaults to `single`. Question is plain text (no inline formatting).
 
+### `<chart>` (data chart)
+
+- Shape: `<chart><![CDATA[{ChartSpec JSON}]]></chart>`. The body is exactly one JSON object inside CDATA.
+- ChartSpec: `{"version":1,"type":"bar|line|area|pie","x":"<category field>","series":[{"key":"<number field>","label":"..."}],"data":[{...rows}]}`, optional `title`, `subtitle`, `xLabel`, `stacked`, `donut`, `highlight` (a series key), `format: {unit, decimals, compact, signed}`, `y: {min, max}`, `refs: [{y, label}]`, `note`, `source`.
+- Values in series fields are bare numbers (`12.5`, not `"12.5ms"`); put the unit in `format.unit`. At most 6 series; a pie uses the first series, at most 6 non-negative slices.
+- Chart data the user provided or that exists in the document. If the numbers are illustrative, say so in `note`.
+
 ### `<dynamic>` (remote interactive component)
 
 - Shape: `<dynamic url="..." [initial-height="320"]><![CDATA[{...props JSON...}]]></dynamic>`. Self-closing when the component takes no props.
