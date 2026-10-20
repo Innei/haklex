@@ -12,12 +12,10 @@ export interface DynamicHostRendererProps extends DynamicSlotProps {
 
 type Status = 'loading' | 'mounted' | 'error';
 
-// new Function keeps the import() opaque to bundlers (vite/webpack/turbopack)
-// so the remote URL is loaded natively at runtime instead of being rewritten
-// into a "too dynamic" stub
-const importRemoteModule = new Function('url', 'return import(url)') as (
-  url: string,
-) => Promise<unknown>;
+// The ignore hints keep bundlers from rewriting the remote URL import into a
+// "too dynamic" stub; avoiding new Function keeps it CSP-safe without unsafe-eval
+const importRemoteModule = (url: string): Promise<unknown> =>
+  import(/* @vite-ignore */ /* webpackIgnore: true */ /* turbopackIgnore: true */ url);
 
 function parseProps(json: string): Record<string, unknown> {
   try {
