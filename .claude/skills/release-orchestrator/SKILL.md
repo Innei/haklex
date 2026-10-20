@@ -1,6 +1,6 @@
 ---
 name: release-orchestrator
-description: Use when releasing @haklex/* packages or propagating published haklex versions into Yohaku, mx-core, ryugi (superpowers), or related downstream consumers.
+description: Use when releasing @haklex/* packages or propagating published haklex versions into Yohaku, mx-core, ryugi, or related downstream consumers.
 user_invocable: true
 ---
 
