@@ -181,7 +181,7 @@ globalStyle(`${body} .cm-line`, {
 
 globalStyle(`${body} .cm-gutters`, {
   borderRight: 'none',
-  backgroundColor: 'transparent',
+  backgroundColor: vars.color.codeBg,
   paddingLeft: '16px',
 });
 
@@ -389,10 +389,22 @@ globalStyle(`${lined} .line::before`, {
 
 export const linedWithNumbers = style({});
 
+globalStyle(`${linedWithNumbers} code`, {
+  minWidth: '100%',
+  width: 'max-content',
+});
+
+globalStyle(`${card} ${linedWithNumbers} .line`, {
+  paddingLeft: 0,
+});
+
 globalStyle(`${linedWithNumbers} .line::before`, {
   color: vars.color.textQuaternary,
   minWidth: 'calc(var(--rc-ln-digits, 2) * 1ch)',
+  paddingLeft: '16px',
   paddingRight: '16px',
+  backgroundColor: vars.color.codeBg,
+  zIndex: 1,
 });
 
 /* ---- Scrollbar ---- */
