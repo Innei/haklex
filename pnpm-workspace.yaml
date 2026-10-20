@@ -18,4 +18,4 @@ allowBuilds:
   unrs-resolver: true
 minimumReleaseAgeExclude:
   - '@innei/react-tweet@4.0.0'
-  - pele@1.6.0
+  - pele@1.7.0

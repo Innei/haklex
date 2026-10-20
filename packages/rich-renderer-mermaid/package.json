@@ -24,7 +24,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "pele": "1.6.0",
+    "pele": "1.7.0",
     "react-zoom-pan-pinch": "^4.2.0"
   },
   "devDependencies": {
