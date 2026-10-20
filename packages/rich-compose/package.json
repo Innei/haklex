@@ -104,7 +104,6 @@
     "@haklex/rich-ext-chart": "workspace:*",
     "@haklex/rich-ext-chat": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
-    "@haklex/rich-ext-dynamic": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
     "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-gallery": "workspace:*",
@@ -128,6 +127,7 @@
   },
   "devDependencies": {
     "@haklex/rich-editor": "workspace:*",
+    "@haklex/rich-ext-dynamic": "workspace:*",
     "@lexical/react": "^0.52.0",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
@@ -144,11 +144,17 @@
   },
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",
+    "@haklex/rich-ext-dynamic": "workspace:^",
     "@lexical/react": "^0.52.0",
     "lexical": "^0.52.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
+  },
+  "peerDependenciesMeta": {
+    "@haklex/rich-ext-dynamic": {
+      "optional": true
+    }
   },
   "publishConfig": {
     "access": "public",

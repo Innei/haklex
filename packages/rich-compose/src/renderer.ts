@@ -4,7 +4,6 @@ import { chartModule } from './modules/chart/module';
 import { chatModule } from './modules/chat/module';
 import { codeBlockModule } from './modules/code-block/module';
 import { codeSnippetModule } from './modules/code-snippet/module';
-import { dynamicModule } from './modules/dynamic/module';
 import { embedModule } from './modules/embed/module';
 import { excalidrawModule } from './modules/excalidraw/module';
 import { fileModule } from './modules/file/module';
@@ -26,7 +25,6 @@ export {
   chatModule,
   codeBlockModule,
   codeSnippetModule,
-  dynamicModule,
   embedModule,
   excalidrawModule,
   fileModule,
@@ -49,7 +47,6 @@ export const allRendererModules = [
   chatModule,
   codeBlockModule,
   codeSnippetModule,
-  dynamicModule,
   embedModule,
   excalidrawModule,
   fileModule,

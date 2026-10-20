@@ -1,5 +1,6 @@
 import { composeEditor } from '@haklex/rich-compose';
 import { allEditorModules } from '@haklex/rich-compose/editor';
+import { dynamicEditModule } from '@haklex/rich-compose/modules/dynamic/edit';
 import type { RichEditorProps } from '@haklex/rich-editor';
 import { EmbedPlugin } from '@haklex/rich-ext-embed';
 import { BlockHandlePlugin } from '@haklex/rich-plugin-block-handle';
@@ -15,7 +16,7 @@ import { ConvertToLinkCardAction } from '@haklex/rich-renderer-linkcard';
 import type { ReactNode } from 'react';
 import { useCallback } from 'react';
 
-const ComposedEditor = composeEditor({ modules: allEditorModules });
+const ComposedEditor = composeEditor({ modules: [...allEditorModules, dynamicEditModule] });
 
 async function demoFileUpload(
   file: File,

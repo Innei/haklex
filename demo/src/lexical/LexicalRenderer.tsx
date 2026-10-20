@@ -1,7 +1,7 @@
 import { composeRenderer } from '@haklex/rich-compose';
+import { dynamicModule } from '@haklex/rich-compose/modules/dynamic';
 import {
   allRendererModules,
-  dynamicModule,
   excalidrawModule,
   galleryModule,
   imageModule,
@@ -18,9 +18,6 @@ import { onImageClick } from '../lightbox/lightbox-store';
 import * as dialogCss from './nested-doc-dialog.css';
 
 const modules = allRendererModules.map((module) => {
-  if (module === dynamicModule) {
-    return dynamicModule.setup({ validateUrl: isAllowedDynamicUrl });
-  }
   if (module === imageModule) return imageModule.setup({ onImageClick });
   if (module === galleryModule) return galleryModule.setup({ onImageClick });
   if (module === nestedDocModule) {
@@ -60,4 +57,6 @@ const modules = allRendererModules.map((module) => {
   return module;
 });
 
-export const LexicalRenderer = composeRenderer({ modules });
+export const LexicalRenderer = composeRenderer({
+  modules: [...modules, dynamicModule.setup({ validateUrl: isAllowedDynamicUrl })],
+});

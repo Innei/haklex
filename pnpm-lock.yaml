@@ -652,9 +652,6 @@ importers:
       '@haklex/rich-ext-code-snippet':
         specifier: workspace:*
         version: link:../rich-ext-code-snippet
-      '@haklex/rich-ext-dynamic':
-        specifier: workspace:*
-        version: link:../rich-ext-dynamic
       '@haklex/rich-ext-embed':
         specifier: workspace:*
         version: link:../rich-ext-embed
@@ -719,6 +716,9 @@ importers:
       '@haklex/rich-editor':
         specifier: workspace:*
         version: link:../rich-editor
+      '@haklex/rich-ext-dynamic':
+        specifier: workspace:*
+        version: link:../rich-ext-dynamic
       '@lexical/react':
         specifier: ^0.52.0
         version: 0.52.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(yjs@13.6.29)
