@@ -4,10 +4,15 @@ import { useEffect, useMemo, useState } from 'react';
 import type { CodeBlockChrome } from './CodeBlockCard';
 import { CodeBlockCard } from './CodeBlockCard';
 import { normalizeLanguage } from './constants';
-import { getHighlighterWithLang, SHIKI_DUAL_THEMES } from './shiki';
+import { highlightCode } from './highlight';
 import * as styles from './styles.css';
 
 export type { CodeBlockChrome } from './CodeBlockCard';
+export type { HighlightColorScheme } from './highlight';
+export { highlightCode } from './highlight';
+export type { CodeLanguage } from './languages';
+export { codeLanguages } from './languages';
+export { streamdownCodePlugin } from './streamdown-plugin';
 
 export interface CodeBlockProps {
   chrome?: CodeBlockChrome;
@@ -36,21 +41,11 @@ export function CodeBlock({
 
     setHtml(null);
 
-    (async () => {
-      const highlighter = await getHighlighterWithLang(normalizedLanguage);
-      if (cancelled) return;
-
-      const loaded: string[] = highlighter.getLoadedLanguages();
-      const lang = loaded.includes(normalizedLanguage) ? normalizedLanguage : 'text';
-      const result = highlighter.codeToHtml(code, {
-        lang,
-        themes: SHIKI_DUAL_THEMES,
-      });
-
-      if (!cancelled) {
-        setHtml(result);
-      }
-    })();
+    highlightCode(code, normalizedLanguage)
+      .then((result) => {
+        if (!cancelled) setHtml(result);
+      })
+      .catch(() => {});
 
     return () => {
       cancelled = true;

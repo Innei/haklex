@@ -8,7 +8,7 @@ import { $createCodeBlockNode, CodeBlockNode } from '../src/nodes/CodeBlockNode'
 import { $createKaTeXBlockNode, KaTeXBlockNode } from '../src/nodes/KaTeXBlockNode';
 import { $createKaTeXInlineNode, KaTeXInlineNode } from '../src/nodes/KaTeXInlineNode';
 
-// Static nodes must not reference renderers that pull shiki or katex: Metro
+// Static nodes must not reference renderers that pull a highlighter or katex: Metro
 // cannot split dynamic imports, so any reachable default ends up in native
 // bundles that render these blocks themselves.
 describe('heavy renderer defaults', () => {

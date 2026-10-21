@@ -139,7 +139,7 @@ export const scrollCollapsed = style({
   overflow: 'hidden',
 });
 
-/* ---- Code body (shikicode host) ---- */
+/* ---- Code body (CodeMirror host) ---- */
 export const body = style({
   position: 'relative',
   maxWidth: '100%',
@@ -192,15 +192,6 @@ globalStyle(`${body} .cm-lineNumbers .cm-gutterElement`, {
   color: `${vars.color.textQuaternary} !important` as any,
 });
 
-globalStyle(`${body} > .shikicode.output`, {
-  position: 'static !important' as any,
-  inset: 'auto !important' as any,
-});
-
-globalStyle(`${bodyReadonly} > textarea.shikicode`, {
-  display: 'none',
-});
-
 /* ---- Expand ---- */
 export const expandWrap = style({
   position: 'absolute',
@@ -232,26 +223,11 @@ export const expandButton = style({
   },
 });
 
-/* ---- Font normalization for textarea / output overlay alignment ---- */
-globalStyle(
-  `${card} .shikicode.input, ${card} .shikicode.output, ${card} .shikicode.output code, ${card} .shikicode.output .line, ${card} .shikicode.output .line span`,
-  {
-    fontVariantLigatures: 'none',
-    fontKerning: 'none',
-  },
-);
-
-globalStyle(`${card} .shikicode.input, ${card} .shikicode.output`, {
-  fontFamily: `${vars.typography.fontMono} !important` as any,
-});
-
-// Force shikicode output descendants to inherit font-family from the shikicode layer
-// (prevents Shiki theme / CSS reset overriding the font on pre/code)
 globalStyle(`${body} pre, ${body} code, ${body} .line, ${body} .line span`, {
   fontFamily: `${vars.typography.fontMono} !important` as any,
 });
 
-/* ---- Shiki output overrides ---- */
+/* ---- Highlighted output overrides ---- */
 globalStyle(`${card} pre`, {
   margin: '0 !important' as any,
   padding: '0 !important' as any,
@@ -271,45 +247,21 @@ globalStyle(`${card} pre code`, {
   fontFamily: `${vars.typography.fontMono} !important` as any,
 });
 
-globalStyle(`${card} .shiki, ${card} code, ${card} pre`, {
+globalStyle(`${card} .highlights, ${card} code, ${card} pre`, {
   background: 'transparent !important' as any,
 });
 
-/* ---- Shiki dual-theme: dark mode variable switch ---- */
+/* ---- Dual-theme: dark mode variable switch ---- */
 globalStyle(
-  `[data-theme='dark'] ${card} .shiki-themes, [data-theme='dark'] ${card} .shiki-themes span`,
+  `[data-theme='dark'] ${card} .highlights-themes, [data-theme='dark'] ${card} .highlights-themes span`,
   {
-    color: 'var(--shiki-dark) !important' as any,
-    fontStyle: 'var(--shiki-dark-font-style) !important' as any,
-    fontWeight: 'var(--shiki-dark-font-weight) !important' as any,
-    textDecoration: 'var(--shiki-dark-text-decoration) !important' as any,
+    color: 'var(--hls-dark) !important' as any,
   },
 );
-
-// When textarea has .line-numbers: align output ::before to match textarea padding
-globalStyle(`${body}:has(.shikicode.input.line-numbers) .shikicode.output .line::before`, {
-  backgroundColor: 'transparent !important' as any,
-  color: `${vars.color.textQuaternary} !important` as any,
-  minWidth: 'calc(var(--rc-ln-digits, 2) * 1ch)',
-  paddingRight: '16px',
-});
-
-// When textarea does NOT have .line-numbers: hide output ::before entirely
-globalStyle(`${body}:not(:has(.shikicode.input.line-numbers)) .shikicode.output .line::before`, {
-  display: 'none',
-});
 
 globalStyle(`${card} .line`, {
   display: 'block',
   padding: '0 16px',
-});
-
-globalStyle(`${card} .shikicode.input.line-numbers`, {
-  paddingLeft: 'calc(2ch + 32px)',
-});
-
-globalStyle(`${card} .shikicode.input:not(.line-numbers)`, {
-  paddingLeft: '16px',
 });
 
 globalStyle(`${card} .line > span:last-child`, {
@@ -369,15 +321,15 @@ globalStyle(`${card} .diff.remove::after`, {
 
 /* ---- Line-numbered container (fallback + static highlight) ---- */
 export const lined = style({
-  counterReset: 'shiki-line 0',
+  counterReset: 'code-line 0',
 });
 
 globalStyle(`${lined} .line`, {
-  counterIncrement: 'shiki-line 1',
+  counterIncrement: 'code-line 1',
 });
 
 globalStyle(`${lined} .line::before`, {
-  content: 'counter(shiki-line)',
+  content: 'counter(code-line)',
   color: 'transparent',
   textAlign: 'right',
   boxSizing: 'content-box',

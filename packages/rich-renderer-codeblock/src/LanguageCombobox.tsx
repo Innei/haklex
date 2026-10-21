@@ -1,4 +1,5 @@
 import {
+  codeLanguages,
   Combobox,
   ComboboxContent,
   ComboboxEmpty,
@@ -7,16 +8,12 @@ import {
   ComboboxList,
 } from '@haklex/rich-editor-ui';
 import { useCallback, useMemo, useState } from 'react';
-import { bundledLanguagesInfo } from 'shiki/bundle/full';
 
 import { normalizeLanguage } from './constants';
 import { hasLanguageIcon, LanguageIcon } from './icons';
 import * as styles from './styles.css';
 
-const languageItems = bundledLanguagesInfo.map((info) => ({
-  id: info.id,
-  name: info.name,
-}));
+const languageItems = codeLanguages.map(({ id, name }) => ({ id, name }));
 
 interface LanguageComboboxProps {
   language: string;

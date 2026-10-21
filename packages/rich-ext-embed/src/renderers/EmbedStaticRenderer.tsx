@@ -1,6 +1,7 @@
 import '../styles.css';
 
 import { useColorScheme } from '@haklex/rich-editor/static';
+import { highlightCode } from '@haklex/rich-editor-ui';
 import { SiGithub } from '@icons-pack/react-simple-icons';
 import type { ReactNode } from 'react';
 import { Component, lazy, Suspense, useEffect, useMemo, useState } from 'react';
@@ -58,9 +59,6 @@ function getLangFromPath(path: string): string {
   if (dot === -1) return 'text';
   return extToLang[path.slice(dot).toLowerCase()] || 'text';
 }
-
-// Pre-warm Shiki import (runs once, resolved from cache on subsequent calls)
-const shikiPromise = import('shiki/bundle/full').catch(() => null);
 
 export interface EmbedStaticRendererProps {
   type: EmbedType | null;
@@ -185,7 +183,7 @@ function TweetRenderer({ url }: { url: string }) {
 
 function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
   const colorScheme = useColorScheme();
-  const shikiTheme = colorScheme === 'dark' ? 'github-dark' : 'github-light';
+  const highlightScheme = colorScheme === 'dark' ? 'dark' : 'light';
 
   const split = url.pathname.split('/');
   const [, owner, repo, , ...rest] = split;
@@ -226,8 +224,8 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
       return res.text();
     });
 
-    Promise.all([fetchPromise, shikiPromise])
-      .then(([text, shikiMod]) => {
+    fetchPromise
+      .then((text) => {
         if (cancelled) return;
         setContent(text);
 
@@ -235,16 +233,7 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
         const end = endLine ?? lines.length;
         const displayCode = lines.slice(startLine, end).join('\n');
 
-        if (!shikiMod) {
-          setLoading(false);
-          return;
-        }
-
-        shikiMod
-          .codeToHtml(displayCode, {
-            lang,
-            theme: shikiTheme,
-          })
+        highlightCode(displayCode, lang, highlightScheme)
           .then((html) => {
             if (!cancelled) {
               setHighlightedHtml(html);
@@ -264,7 +253,7 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
     return () => {
       cancelled = true;
     };
-  }, [owner, repo, ref, path, lang, startLine, endLine, shikiTheme]);
+  }, [owner, repo, ref, path, lang, startLine, endLine, highlightScheme]);
 
   if (loading) {
     return (
@@ -289,7 +278,7 @@ function GithubFileEmbed({ url, href }: { url: URL; href: string }) {
       >
         {highlightedHtml ? (
           <div
-            className={`${styles.shiki} ${styles.semanticClassNames.shiki}`}
+            className={`${styles.code} ${styles.semanticClassNames.code}`}
             dangerouslySetInnerHTML={{ __html: highlightedHtml }}
             style={{ '--start-line': startLine } as React.CSSProperties}
           />

@@ -13,7 +13,6 @@
     ".": "./src/index.ts",
     "./constants": "./src/constants.ts",
     "./icons": "./src/icons/index.ts",
-    "./shiki": "./src/shiki.ts",
     "./static": "./src/static.tsx",
     "./style.css": "./dist/rich-renderer-codeblock.css"
   },
@@ -40,7 +39,6 @@
     "@vanilla-extract/vite-plugin": "^5.2.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "shiki": "^4.5.0",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.1.2",
     "vite": "^8.3.4"
@@ -51,8 +49,7 @@
     "@haklex/rich-style-token": "workspace:^",
     "lucide-react": "^1.0.0",
     "react": ">=19",
-    "react-dom": ">=19",
-    "shiki": ">=4.0.0"
+    "react-dom": ">=19"
   },
   "publishConfig": {
     "access": "public",
@@ -64,10 +61,6 @@
       "./static": {
         "import": "./dist/static.mjs",
         "types": "./dist/static.d.ts"
-      },
-      "./shiki": {
-        "import": "./dist/shiki.mjs",
-        "types": "./dist/shiki.d.ts"
       },
       "./constants": {
         "import": "./dist/constants.mjs",

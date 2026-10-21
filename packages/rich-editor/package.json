@@ -52,7 +52,6 @@
     "lucide-react": "^1.59.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "shiki": "^4.5.0",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.1.2",
     "vite": "^8.3.4"
@@ -70,14 +69,10 @@
     "lexical": "^0.52.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
-    "react-dom": ">=19",
-    "shiki": ">=4.0.0"
+    "react-dom": ">=19"
   },
   "peerDependenciesMeta": {
     "katex": {
-      "optional": true
-    },
-    "shiki": {
       "optional": true
     }
   },

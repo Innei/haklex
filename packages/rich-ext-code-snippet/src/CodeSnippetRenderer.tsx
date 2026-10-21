@@ -1,6 +1,6 @@
+import { highlightCode } from '@haklex/rich-editor-ui';
 import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants';
 import { FileIcon } from '@haklex/rich-renderer-codeblock/icons';
-import { getHighlighterWithLang, SHIKI_DUAL_THEMES } from '@haklex/rich-renderer-codeblock/shiki';
 import { Check, Copy } from 'lucide-react';
 import type { ComponentType, FC } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -47,16 +47,10 @@ export const CodeSnippetRenderer: ComponentType<CodeSnippetRendererProps> = ({ f
 
       for (const file of files) {
         const lang = normalizeLanguage(file.language ?? getLanguageFromFilename(file.filename));
-        const highlighter = await getHighlighterWithLang(lang);
+        const html = await highlightCode(file.code, lang);
         if (cancelled) return;
 
-        const loaded: string[] = highlighter.getLoadedLanguages();
-        const resolvedLang = loaded.includes(lang) ? lang : 'text';
-
-        newHtmlMap[file.filename] = highlighter.codeToHtml(file.code, {
-          lang: resolvedLang,
-          themes: SHIKI_DUAL_THEMES,
-        });
+        newHtmlMap[file.filename] = html;
       }
 
       if (!cancelled) setHtmlMap(newHtmlMap);

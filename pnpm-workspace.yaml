@@ -19,3 +19,4 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - '@innei/react-tweet@4.0.0'
   - pele@1.7.0
+  - '@pierre/highlights@0.2.0'

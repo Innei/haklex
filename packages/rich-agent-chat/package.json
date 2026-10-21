@@ -24,7 +24,6 @@
   "dependencies": {
     "@haklex/rich-agent-core": "workspace:*",
     "@haklex/rich-diff-core": "workspace:*",
-    "@streamdown/code": "^2.0.0",
     "streamdown": "^2.7.0",
     "zustand": "^5.0.15"
   },

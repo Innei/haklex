@@ -10,8 +10,18 @@ export type { BadgeProps } from './components/badge';
 export { Badge } from './components/badge';
 export type { AnimatedCheckboxProps } from './components/checkbox';
 export { AnimatedCheckbox } from './components/checkbox';
-export type { CodeBlockChrome, CodeBlockProps } from './components/code-block';
-export { CodeBlock } from './components/code-block';
+export type {
+  CodeBlockChrome,
+  CodeBlockProps,
+  CodeLanguage,
+  HighlightColorScheme,
+} from './components/code-block';
+export {
+  CodeBlock,
+  codeLanguages,
+  highlightCode,
+  streamdownCodePlugin,
+} from './components/code-block';
 export type {
   CollapsiblePanelProps,
   CollapsibleProps,

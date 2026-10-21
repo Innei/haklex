@@ -1,10 +1,9 @@
+import { highlightCode } from '@haklex/rich-editor-ui';
 import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useColorScheme } from '../../context/ColorSchemeContext';
 import { useVariant } from '../../context/RendererConfigContext';
-import type { CodeToHtmlFn } from '../../utils/shiki';
-import { loadCodeToHtml } from '../../utils/shiki';
 
 export interface CodeBlockRendererProps {
   code: string;
@@ -27,7 +26,6 @@ export function CodeBlockRenderer({
   const variant = useVariant();
   const showLineNumbers = showLineNumbersProp ?? (variant !== 'comment' && variant !== 'chat');
   const colorScheme = useColorScheme();
-  const shikiTheme = colorScheme === 'dark' ? 'github-dark' : 'github-light';
   const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const copyTimerRef = useRef<ReturnType<typeof setTimeout>>(undefined);
@@ -36,13 +34,7 @@ export function CodeBlockRenderer({
     let cancelled = false;
     setHighlightedHtml(null);
 
-    loadCodeToHtml()
-      .then((toHtml: CodeToHtmlFn) =>
-        toHtml(code, {
-          lang: language,
-          theme: shikiTheme,
-        }),
-      )
+    highlightCode(code, language, colorScheme === 'dark' ? 'dark' : 'light')
       .then((html: string) => {
         if (!cancelled) {
           setHighlightedHtml(html);
@@ -57,7 +49,7 @@ export function CodeBlockRenderer({
     return () => {
       cancelled = true;
     };
-  }, [code, language, shikiTheme]);
+  }, [code, language, colorScheme]);
 
   useEffect(() => {
     return () => clearTimeout(copyTimerRef.current);

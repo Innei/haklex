@@ -22,7 +22,8 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@haklex/rich-style-token": "workspace:*"
+    "@haklex/rich-style-token": "workspace:*",
+    "@pierre/highlights": "0.2.0"
   },
   "devDependencies": {
     "@lexical/react": "^0.52.0",
@@ -44,17 +45,13 @@
     "lexical": "^0.52.0",
     "lucide-react": "^1.0.0",
     "react": ">=19",
-    "react-dom": ">=19",
-    "shiki": ">=4.0.0"
+    "react-dom": ">=19"
   },
   "peerDependenciesMeta": {
     "@lexical/react": {
       "optional": true
     },
     "lexical": {
-      "optional": true
-    },
-    "shiki": {
       "optional": true
     }
   },

@@ -31,7 +31,6 @@ globalStyle(
   },
 );
 
-// Hide line numbers in comment variant (covers both shikicode and fallback)
 globalStyle(`${commentBase} .line::before`, {
   display: 'none !important' as any,
 });

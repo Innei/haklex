@@ -42,18 +42,6 @@ export default defineConfig({
   resolve: {
     alias: [
       {
-        find: /^shiki$/,
-        replacement: path.resolve(process.cwd(), 'src/cli/shiki-cdn.ts'),
-      },
-      {
-        find: /^shiki\/bundle\/(web|full)$/,
-        replacement: path.resolve(process.cwd(), 'src/cli/shiki-cdn.ts'),
-      },
-      {
-        find: /^shiki\/engine\/javascript$/,
-        replacement: path.resolve(process.cwd(), 'src/cli/shiki-engine-cdn.ts'),
-      },
-      {
         find: /^\.{1,2}\/components\/renderers\/KaTeXRenderer$/,
         replacement: path.resolve(process.cwd(), 'src/cli/katex-cdn-renderer.tsx'),
       },

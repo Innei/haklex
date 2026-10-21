@@ -933,7 +933,7 @@ const codeSnippetSamples: CodeSnippetSample[] = [
   {
     key: 'single',
     label: 'Single File',
-    description: 'A single TypeScript module rendered with shiki dual-theme highlighting.',
+    description: 'A single TypeScript module rendered with dual-theme syntax highlighting.',
     files: [
       {
         filename: 'fibonacci.ts',
@@ -1006,9 +1006,9 @@ function CodeSnippetDetail() {
             fontSize: 14,
           }}
         >
-          Static renderer uses <code>shiki</code> with dual light/dark themes. The edit variant
-          overlays an <strong>Edit</strong> button that opens a CodeMirror modal for tab-based
-          multi-file editing.
+          Static renderer uses <code>@pierre/highlights</code> with dual light/dark themes. The edit
+          variant overlays an <strong>Edit</strong> button that opens a CodeMirror modal for
+          tab-based multi-file editing.
         </p>
 
         <div className="biz-grid">

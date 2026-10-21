@@ -210,12 +210,9 @@ globalStyle(`${codeBody} code`, {
 
 /* ---- Shiki dual-theme: dark mode variable switch ---- */
 globalStyle(
-  `[data-theme='dark'] ${codeBody} .shiki-themes, [data-theme='dark'] ${codeBody} .shiki-themes span`,
+  `[data-theme='dark'] ${codeBody} .highlights-themes, [data-theme='dark'] ${codeBody} .highlights-themes span`,
   {
-    color: 'var(--shiki-dark) !important' as any,
-    fontStyle: 'var(--shiki-dark-font-style) !important' as any,
-    fontWeight: 'var(--shiki-dark-font-weight) !important' as any,
-    textDecoration: 'var(--shiki-dark-text-decoration) !important' as any,
+    color: 'var(--hls-dark) !important' as any,
   },
 );
 

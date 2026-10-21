@@ -1,5 +1,4 @@
-import { CodeBlock } from '@haklex/rich-editor-ui';
-import { code } from '@streamdown/code';
+import { CodeBlock, streamdownCodePlugin } from '@haklex/rich-editor-ui';
 import type { ReactElement } from 'react';
 import { Streamdown } from 'streamdown';
 
@@ -10,7 +9,7 @@ interface StreamdownBubbleProps {
   isStreaming: boolean;
 }
 
-const plugins = { code };
+const plugins = { code: streamdownCodePlugin };
 
 const components = {
   pre: ({ children, ...props }: any) => {

@@ -26,7 +26,6 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "@streamdown/code": "^2.0.0",
     "nanoid": "^6.0.2",
     "streamdown": "^2.7.0"
   },

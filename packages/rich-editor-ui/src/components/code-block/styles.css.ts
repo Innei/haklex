@@ -186,15 +186,15 @@ export const expandButton = style({
 });
 
 export const lined = style({
-  counterReset: 'shiki-line 0',
+  counterReset: 'code-line 0',
 });
 
 globalStyle(`${lined} .line`, {
-  counterIncrement: 'shiki-line 1',
+  counterIncrement: 'code-line 1',
 });
 
 globalStyle(`${lined} .line::before`, {
-  content: 'counter(shiki-line)',
+  content: 'counter(code-line)',
   color: 'transparent',
   textAlign: 'right',
   boxSizing: 'content-box',
@@ -238,18 +238,15 @@ globalStyle(`${card} pre code`, {
   lineHeight: 'inherit',
 });
 
-globalStyle(`${card} .shiki, ${card} code, ${card} pre`, {
+globalStyle(`${card} .highlights, ${card} code, ${card} pre`, {
   background: 'transparent !important' as any,
   lineHeight: 'inherit',
 });
 
 globalStyle(
-  `[data-theme='dark'] ${card} .shiki-themes, [data-theme='dark'] ${card} .shiki-themes span`,
+  `[data-theme='dark'] ${card} .highlights-themes, [data-theme='dark'] ${card} .highlights-themes span`,
   {
-    color: 'var(--shiki-dark) !important' as any,
-    fontStyle: 'var(--shiki-dark-font-style) !important' as any,
-    fontWeight: 'var(--shiki-dark-font-weight) !important' as any,
-    textDecoration: 'var(--shiki-dark-text-decoration) !important' as any,
+    color: 'var(--hls-dark) !important' as any,
   },
 );
 

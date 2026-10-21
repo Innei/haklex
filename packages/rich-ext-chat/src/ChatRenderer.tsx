@@ -1,4 +1,4 @@
-import { code } from '@streamdown/code';
+import { streamdownCodePlugin } from '@haklex/rich-editor-ui';
 import type { FC, ReactElement } from 'react';
 import { Streamdown } from 'streamdown';
 
@@ -11,7 +11,7 @@ import type {
   ChatVariant,
 } from './types';
 
-const streamdownPlugins = { code };
+const streamdownPlugins = { code: streamdownCodePlugin };
 
 const UNKNOWN: ChatParticipant = {
   id: '__unknown__',

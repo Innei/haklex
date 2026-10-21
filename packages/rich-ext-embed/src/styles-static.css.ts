@@ -15,7 +15,7 @@ export const semanticClassNames = {
   githubFileCodeLong: 'embed-static-github-file__code--long',
   githubFileLine: 'embed-static-github-file__line',
   githubFileLineNum: 'embed-static-github-file__line-num',
-  shiki: 'embed-static-shiki',
+  code: 'embed-static-code',
   fallback: 'embed-static-fallback',
   fallbackGeneric: 'embed-static-fallback--generic',
   fallbackTweet: 'embed-static-fallback--tweet',
@@ -143,11 +143,11 @@ export const githubFileLineNum = style({
   userSelect: 'none',
 });
 
-export const shiki = style({
-  counterReset: 'shiki-line var(--start-line, 0)',
+export const code = style({
+  counterReset: 'code-line var(--start-line, 0)',
 });
 
-globalStyle(`${shiki} pre`, {
+globalStyle(`${code} pre`, {
   margin: 0,
   padding: 16,
   borderRadius: 8,
@@ -157,20 +157,20 @@ globalStyle(`${shiki} pre`, {
   overflowX: 'auto',
 });
 
-globalStyle(`${shiki} code`, {
+globalStyle(`${code} code`, {
   fontFamily: 'inherit',
   display: 'flex',
   flexDirection: 'column',
 });
 
-globalStyle(`${shiki} .line`, {
+globalStyle(`${code} .line`, {
   display: 'flex',
   lineHeight: 1.5,
 });
 
-globalStyle(`${shiki} .line::before`, {
-  counterIncrement: 'shiki-line',
-  content: 'counter(shiki-line)',
+globalStyle(`${code} .line::before`, {
+  counterIncrement: 'code-line',
+  content: 'counter(code-line)',
   flexShrink: 0,
   width: '4ch',
   textAlign: 'right',
