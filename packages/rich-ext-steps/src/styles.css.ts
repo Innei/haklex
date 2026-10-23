@@ -11,12 +11,17 @@ export const semanticClassNames = {
 
 const MARKER_SIZE = '1.75em';
 
+// The marker is placed against the list's edge (no positioned <li>, top left
+// at its static position) and shifted so its digit starts where the prose
+// starts; the circle overflows into the gutter. The rail uses the marker's
+// font size so 0.5ch lands on the same centre.
+
 export const root = style({
   position: 'relative',
   listStyle: 'none',
   margin: `${vars.flow.block} 0`,
   padding: 0,
-  paddingInlineStart: `calc(${MARKER_SIZE} + 0.875em)`,
+  paddingInlineStart: '2em',
   display: 'flex',
   flexDirection: 'column',
   gap: '1.75em',
@@ -26,7 +31,9 @@ export const root = style({
     '&::before': {
       content: '""',
       position: 'absolute',
-      insetInlineStart: `calc(${MARKER_SIZE} / 2)`,
+      insetInlineStart: 'calc(0.5ch - 0.5px)',
+      fontSize: vars.typography.fontSizeSmall,
+      fontVariantNumeric: 'tabular-nums',
       top: '0.5em',
       bottom: '0.5em',
       width: 1,
@@ -36,7 +43,6 @@ export const root = style({
 });
 
 export const item = style({
-  position: 'relative',
   display: 'flex',
   flexDirection: 'column',
   gap: '0.5em',
@@ -45,8 +51,8 @@ export const item = style({
 
 export const marker = style({
   position: 'absolute',
-  insetInlineStart: `calc(-1 * (${MARKER_SIZE} + 0.875em))`,
-  top: 0,
+  insetInlineStart: 0,
+  transform: 'translateX(calc(-50% + 0.5ch))',
   width: MARKER_SIZE,
   height: MARKER_SIZE,
   borderRadius: '50%',
