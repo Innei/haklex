@@ -7,64 +7,18 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type { LexicalEditor } from 'lexical';
 import { $getNodeByKey } from 'lexical';
 import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
-import type { CompositionEvent, KeyboardEvent } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { $isStepsEditNode, type StepsEditNode } from './nodes/StepsEditNode';
 import * as styles from './styles.css';
 import * as editStyles from './styles-edit.css';
+import { TitleInput } from './TitleInput';
 import type { StepItem } from './types';
 
 interface StepsEditDecoratorProps {
   nodeKey: string;
   stepEditors: LexicalEditor[];
   steps: StepItem[];
-}
-
-function TitleInput({
-  value,
-  autoFocus,
-  onValueChange,
-  onEnter,
-}: {
-  autoFocus: boolean;
-  onEnter: () => void;
-  onValueChange: (next: string) => void;
-  value: string;
-}) {
-  const [local, setLocal] = useState(value);
-  const composingRef = useRef(false);
-
-  useEffect(() => {
-    if (!composingRef.current) setLocal(value);
-  }, [value]);
-
-  return (
-    <input
-      aria-label="Step title"
-      autoFocus={autoFocus}
-      className={`${editStyles.titleInput} ${editStyles.editClassNames.titleInput}`}
-      placeholder="Step title"
-      value={local}
-      onChange={(event) => {
-        setLocal(event.target.value);
-        if (!composingRef.current) onValueChange(event.target.value);
-      }}
-      onCompositionEnd={(event: CompositionEvent<HTMLInputElement>) => {
-        composingRef.current = false;
-        onValueChange(event.currentTarget.value);
-      }}
-      onCompositionStart={() => {
-        composingRef.current = true;
-      }}
-      onKeyDown={(event: KeyboardEvent<HTMLInputElement>) => {
-        if (event.key === 'Enter' && !composingRef.current) {
-          event.preventDefault();
-          onEnter();
-        }
-      }}
-    />
-  );
 }
 
 export function StepsEditDecorator({ nodeKey, steps, stepEditors }: StepsEditDecoratorProps) {
