@@ -38,6 +38,7 @@ const MODULE_TO_PACKAGE: Record<string, string> = {
   'banner': 'rich-renderer-banner',
   'chart': 'rich-ext-chart',
   'chat': 'rich-ext-chat',
+  'steps': 'rich-ext-steps',
   'code-block': 'rich-renderer-codeblock',
   'code-snippet': 'rich-ext-code-snippet',
   'dynamic': 'rich-ext-dynamic',

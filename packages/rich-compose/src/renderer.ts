@@ -16,6 +16,7 @@ import { mermaidModule } from './modules/mermaid/module';
 import { nestedDocModule } from './modules/nested-doc/module';
 import { pollModule } from './modules/poll/module';
 import { rubyModule } from './modules/ruby/module';
+import { stepsModule } from './modules/steps/module';
 import { videoModule } from './modules/video/module';
 
 export {
@@ -37,6 +38,7 @@ export {
   nestedDocModule,
   pollModule,
   rubyModule,
+  stepsModule,
   videoModule,
 };
 
@@ -59,5 +61,6 @@ export const allRendererModules = [
   nestedDocModule,
   pollModule,
   rubyModule,
+  stepsModule,
   videoModule,
 ];

@@ -26,6 +26,7 @@ import { nestedDocModule } from '../modules/nested-doc/module';
 import { pollModule } from '../modules/poll/module';
 import { PollRenderer } from '../modules/poll/renderer';
 import { rubyModule } from '../modules/ruby/module';
+import { stepsModule } from '../modules/steps/module';
 import { videoModule } from '../modules/video/module';
 
 type Theme = 'light' | 'dark';
@@ -75,6 +76,7 @@ const previewRendererModules: RichRendererModule[] = [
   nestedDocModule,
   pollModule,
   rubyModule,
+  stepsModule,
   videoModule,
 ];
 

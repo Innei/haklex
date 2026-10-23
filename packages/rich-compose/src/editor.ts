@@ -17,6 +17,7 @@ import { nestedDocEditModule } from './modules/nested-doc/edit';
 import { pollEditModule } from './modules/poll/edit';
 import { rubyEditModule } from './modules/ruby/edit';
 import { slashMenuEditModule } from './modules/slash-menu/edit';
+import { stepsEditModule } from './modules/steps/edit';
 import { videoEditModule } from './modules/video/edit';
 
 export {
@@ -39,6 +40,7 @@ export {
   pollEditModule,
   rubyEditModule,
   slashMenuEditModule,
+  stepsEditModule,
   videoEditModule,
 };
 
@@ -62,5 +64,6 @@ export const allEditorModules = [
   pollEditModule,
   rubyEditModule,
   slashMenuEditModule,
+  stepsEditModule,
   videoEditModule,
 ];

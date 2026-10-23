@@ -44,6 +44,10 @@
     "./modules/chat/edit": "./src/modules/chat/edit.ts",
     "./modules/chat/node": "./src/modules/chat/node.ts",
     "./modules/chat/renderer": "./src/modules/chat/renderer.tsx",
+    "./modules/steps": "./src/modules/steps/index.ts",
+    "./modules/steps/edit": "./src/modules/steps/edit.ts",
+    "./modules/steps/node": "./src/modules/steps/node.ts",
+    "./modules/steps/renderer": "./src/modules/steps/renderer.tsx",
     "./modules/alert": "./src/modules/alert/index.ts",
     "./modules/alert/edit": "./src/modules/alert/edit.ts",
     "./modules/alert/renderer": "./src/modules/alert/renderer.tsx",
@@ -109,6 +113,7 @@
     "@haklex/rich-ext-gallery": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
     "@haklex/rich-ext-poll": "workspace:*",
+    "@haklex/rich-ext-steps": "workspace:*",
     "@haklex/rich-litexml": "workspace:*",
     "@haklex/rich-plugin-slash-menu": "workspace:*",
     "@haklex/rich-renderer-alert": "workspace:*",
@@ -251,6 +256,18 @@
         "import": "./dist/modules/chat/renderer.mjs",
         "types": "./dist/modules/chat/renderer.d.ts"
       },
+      "./modules/steps": {
+        "import": "./dist/modules/steps/index.mjs",
+        "types": "./dist/modules/steps/index.d.ts"
+      },
+      "./modules/steps/node": {
+        "import": "./dist/modules/steps/node.mjs",
+        "types": "./dist/modules/steps/node.d.ts"
+      },
+      "./modules/steps/renderer": {
+        "import": "./dist/modules/steps/renderer.mjs",
+        "types": "./dist/modules/steps/renderer.d.ts"
+      },
       "./modules/alert": {
         "import": "./dist/modules/alert/index.mjs",
         "types": "./dist/modules/alert/index.d.ts"
@@ -362,6 +379,10 @@
       "./modules/chat/edit": {
         "import": "./dist/modules/chat/edit.mjs",
         "types": "./dist/modules/chat/edit.d.ts"
+      },
+      "./modules/steps/edit": {
+        "import": "./dist/modules/steps/edit.mjs",
+        "types": "./dist/modules/steps/edit.d.ts"
       },
       "./modules/code-block/edit": {
         "import": "./dist/modules/code-block/edit.mjs",

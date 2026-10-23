@@ -664,6 +664,9 @@ importers:
       '@haklex/rich-ext-poll':
         specifier: workspace:*
         version: link:../rich-ext-poll
+      '@haklex/rich-ext-steps':
+        specifier: workspace:*
+        version: link:../rich-ext-steps
       '@haklex/rich-litexml':
         specifier: workspace:*
         version: link:../rich-litexml
