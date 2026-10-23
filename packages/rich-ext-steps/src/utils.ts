@@ -40,8 +40,9 @@ export function createStep(title = ''): StepItem {
 export function normalizeSteps(raw: unknown): StepItem[] {
   if (!Array.isArray(raw)) return [];
   return raw.map((item) => {
-    const step = (item ?? {}) as Partial<StepItem>;
+    const step = (item && typeof item === 'object' ? item : {}) as Partial<StepItem>;
     return {
+      ...step,
       id: typeof step.id === 'string' && step.id ? step.id : createStepId(),
       title: typeof step.title === 'string' ? step.title : '',
       content: step.content?.root ? step.content : createEmptyContentState(),

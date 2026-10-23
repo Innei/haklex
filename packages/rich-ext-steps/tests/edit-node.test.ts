@@ -178,4 +178,27 @@ describe('StepsEditNode', () => {
     expect(json.steps[0].title).toBe('');
     expect(json.steps[0].id).not.toBe('b');
   });
+
+  it('shows one empty step for imported data with no steps', () => {
+    const json = run(() =>
+      StepsEditNode.importJSON({
+        type: 'steps',
+        version: 1,
+        steps: [],
+      } as SerializedStepsNode).exportJSON(),
+    );
+    expect(json.steps).toHaveLength(1);
+    expect(json.steps[0].title).toBe('');
+  });
+
+  it('keeps editors aligned with steps after setSteps', () => {
+    const json = run(() => {
+      const node = twoSteps();
+      const [a, b] = node.getSteps();
+      node.setSteps([b, { id: 'c', title: 'Three', content: content('third') }, a]);
+      return node.exportJSON();
+    });
+    expect(json.steps.map((s) => s.id)).toEqual(['b', 'c', 'a']);
+    expect(textOf(json)).toEqual(['second', 'third', 'first']);
+  });
 });

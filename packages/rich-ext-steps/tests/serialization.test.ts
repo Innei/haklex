@@ -148,4 +148,19 @@ describe('StepsNode', () => {
       { discrete: true },
     );
   });
+
+  it('keeps step fields it does not know about', () => {
+    const editor = makeEditor();
+    editor.update(
+      () => {
+        const node = StepsNode.importJSON({
+          type: 'steps',
+          version: 1,
+          steps: [{ id: 's_a', title: 'One', content: content('x'), icon: 'rocket' }],
+        } as unknown as SerializedStepsNode);
+        expect((node.exportJSON().steps[0] as any).icon).toBe('rocket');
+      },
+      { discrete: true },
+    );
+  });
 });

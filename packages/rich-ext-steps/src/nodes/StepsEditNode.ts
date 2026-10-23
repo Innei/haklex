@@ -49,12 +49,22 @@ export class StepsEditNode extends StepsNode {
   }
 
   constructor(steps?: StepItem[], key?: NodeKey, stepEditors?: LexicalEditor[]) {
-    super(steps, key);
+    super(steps?.length ? steps : undefined, key);
     this.__stepEditors = stepEditors ?? this.__steps.map(createStepEditor);
   }
 
   getStepEditors(): LexicalEditor[] {
     return this.getLatest().__stepEditors;
+  }
+
+  setSteps(steps: StepItem[]): void {
+    const writable = this.getWritable();
+    const next = steps.length ? steps : [createStep()];
+    const editorsById = new Map(
+      writable.__steps.map((step, i) => [step.id, writable.__stepEditors[i]] as const),
+    );
+    writable.__steps = next;
+    writable.__stepEditors = next.map((step) => editorsById.get(step.id) ?? createStepEditor(step));
   }
 
   setStepTitle(id: string, title: string): void {
