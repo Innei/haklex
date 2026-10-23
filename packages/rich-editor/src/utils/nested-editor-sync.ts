@@ -5,13 +5,19 @@ import { $addUpdateTag, $getNodeByKey, HISTORY_MERGE_TAG, SKIP_DOM_SELECTION_TAG
 // listeners such as autosave or collab miss the edit. Re-dirtying the owner
 // node makes the parent re-export it, which reads the nested state live.
 // The parent must not restore its own stale selection, or typing loses focus.
+// Plugins that register node transforms on mount re-dirty nodes without
+// changing them, so only a change in the serialized content counts.
 export function registerNestedEditorSync(
   parentEditor: LexicalEditor,
   nestedEditor: LexicalEditor,
   ownerKey: NodeKey,
 ): () => void {
-  return nestedEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves }) => {
+  let synced = JSON.stringify(nestedEditor.getEditorState().toJSON());
+  return nestedEditor.registerUpdateListener(({ dirtyElements, dirtyLeaves, editorState }) => {
     if (dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
+    const content = JSON.stringify(editorState.toJSON());
+    if (content === synced) return;
+    synced = content;
     parentEditor.update(() => {
       const owner = $getNodeByKey(ownerKey);
       if (!owner) return;

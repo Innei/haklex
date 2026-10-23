@@ -7,6 +7,7 @@ import {
   HISTORY_MERGE_TAG,
   type LexicalEditor,
   type NodeKey,
+  ParagraphNode,
   SKIP_DOM_SELECTION_TAG,
 } from 'lexical';
 import { describe, expect, it } from 'vitest';
@@ -86,6 +87,17 @@ describe('registerNestedEditorSync', () => {
     registerNestedEditorSync(parent, nested, ownerKey);
 
     nested.update(() => $setSelection(null), { discrete: true });
+    await Promise.resolve();
+
+    expect(parentUpdates).toEqual([]);
+  });
+
+  it('ignores updates that leave the content unchanged', async () => {
+    const { nested, ownerKey, parent, parentUpdates } = setup();
+    registerNestedEditorSync(parent, nested, ownerKey);
+
+    nested.registerNodeTransform(ParagraphNode, () => {});
+    await Promise.resolve();
     await Promise.resolve();
 
     expect(parentUpdates).toEqual([]);
