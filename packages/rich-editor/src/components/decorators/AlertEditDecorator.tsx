@@ -16,7 +16,7 @@ import {
   KEY_ARROW_DOWN_COMMAND,
   KEY_ENTER_COMMAND,
 } from 'lexical';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 
 import type { AlertType } from '../../nodes/AlertQuoteNode';
 import { $isAlertQuoteNode } from '../../nodes/AlertQuoteNode';
@@ -24,6 +24,7 @@ import { ALERT_NODE_KEY } from '../../types/renderer-keys';
 import { AlertRenderer } from '../renderers/AlertRenderer';
 import { RendererWrapper } from '../RendererWrapper';
 import { NestedEditorCorePlugins } from './NestedEditorCorePlugins';
+import { useNestedEditorSync } from './useNestedEditorSync';
 
 function ExitBlockPlugin({
   parentEditor,
@@ -150,6 +151,8 @@ interface AlertEditDecoratorProps {
 
 export function AlertEditDecorator({ nodeKey, alertType, contentEditor }: AlertEditDecoratorProps) {
   const [editor] = useLexicalComposerContext();
+  const contentEditors = useMemo(() => [contentEditor], [contentEditor]);
+  useNestedEditorSync(contentEditors, nodeKey);
   const editable = editor.isEditable();
 
   const handleTypeChange = useCallback(

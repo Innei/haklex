@@ -1,4 +1,4 @@
-import { NestedEditorCorePlugins } from '@haklex/rich-editor';
+import { NestedEditorCorePlugins, useNestedEditorSync } from '@haklex/rich-editor';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
@@ -24,6 +24,7 @@ interface StepsEditDecoratorProps {
 export function StepsEditDecorator({ nodeKey, steps, stepEditors }: StepsEditDecoratorProps) {
   const [editor] = useLexicalComposerContext();
   const [focusId, setFocusId] = useState<string | null>(null);
+  useNestedEditorSync(stepEditors, nodeKey);
 
   const mutate = useCallback(
     (fn: (node: StepsEditNode) => void) => {

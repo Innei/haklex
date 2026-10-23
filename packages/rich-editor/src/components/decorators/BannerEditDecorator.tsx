@@ -5,7 +5,7 @@ import { LexicalNestedComposer } from '@lexical/react/LexicalNestedComposer';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type { LexicalEditor } from 'lexical';
 import { $getNodeByKey } from 'lexical';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import type { BannerType } from '../../nodes/BannerNode';
 import { $isBannerNode } from '../../nodes/BannerNode';
@@ -13,6 +13,7 @@ import { BANNER_NODE_KEY } from '../../types/renderer-keys';
 import { BannerRenderer } from '../renderers/BannerRenderer';
 import { RendererWrapper } from '../RendererWrapper';
 import { NestedEditorCorePlugins } from './NestedEditorCorePlugins';
+import { useNestedEditorSync } from './useNestedEditorSync';
 
 interface BannerEditDecoratorProps {
   bannerType: BannerType;
@@ -26,6 +27,8 @@ export function BannerEditDecorator({
   contentEditor,
 }: BannerEditDecoratorProps) {
   const [editor] = useLexicalComposerContext();
+  const contentEditors = useMemo(() => [contentEditor], [contentEditor]);
+  useNestedEditorSync(contentEditors, nodeKey);
   const editable = editor.isEditable();
 
   const handleTypeChange = useCallback(

@@ -1,5 +1,6 @@
 export { CorePlugins } from './components/CorePlugins';
 export { NestedEditorCorePlugins } from './components/decorators/NestedEditorCorePlugins';
+export { useNestedEditorSync } from './components/decorators/useNestedEditorSync';
 export type { LinkFaviconProps } from './components/LinkFavicon';
 export { LinkFavicon } from './components/LinkFavicon';
 export { RichEditor } from './components/RichEditor';
@@ -76,6 +77,7 @@ export {
   buildBlockAnchor,
   buildRangeAnchor,
 } from './utils/comment-anchor';
+export { registerNestedEditorSync } from './utils/nested-editor-sync';
 export type { DOMSelectionTarget, TextSelectionSnapshot } from './utils/text-selection';
 export {
   $captureTextSelection,

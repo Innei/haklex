@@ -14,6 +14,7 @@ import { gridClassNames, gridStyles } from '../../styles/grid.css';
 import { clsx } from '../utils';
 import { scheduleGridCellAutoFocus } from './gridAutoFocus';
 import { NestedEditorCorePlugins } from './NestedEditorCorePlugins';
+import { useNestedEditorSync } from './useNestedEditorSync';
 
 interface GridEditDecoratorProps {
   autoFocusOnMount?: boolean;
@@ -34,6 +35,7 @@ export function GridEditDecorator({
 }: GridEditDecoratorProps) {
   const [editor] = useLexicalComposerContext();
   const [currentCols, setCurrentCols] = useState(initialCols);
+  useNestedEditorSync(cellEditors, nodeKey);
 
   useEffect(() => {
     return editor.registerUpdateListener(({ editorState }) => {
@@ -52,12 +54,15 @@ export function GridEditDecorator({
     return scheduleGridCellAutoFocus({
       cellEditors,
       clearAutoFocusIntent: () => {
-        editor.update(() => {
-          const node = $getNodeByKey(nodeKey);
-          if ($isGridEditNode(node)) {
-            node.setShouldAutoFocusOnMount(false);
-          }
-        }, { discrete: true });
+        editor.update(
+          () => {
+            const node = $getNodeByKey(nodeKey);
+            if ($isGridEditNode(node)) {
+              node.setShouldAutoFocusOnMount(false);
+            }
+          },
+          { discrete: true },
+        );
       },
     });
   }, [autoFocusOnMount, cellEditors, editor, nodeKey]);
