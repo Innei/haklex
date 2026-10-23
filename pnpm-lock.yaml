@@ -1552,6 +1552,61 @@ importers:
         specifier: ^8.3.4
         version: 8.3.4(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
 
+  packages/rich-ext-steps:
+    dependencies:
+      '@haklex/rich-editor-ui':
+        specifier: workspace:^
+        version: link:../rich-editor-ui
+      '@haklex/rich-style-token':
+        specifier: workspace:^
+        version: link:../rich-style-token
+      lucide-react:
+        specifier: ^1.0.0
+        version: 1.59.0(@types/react@19.3.0)(react@19.3.1)
+      nanoid:
+        specifier: ^6.0.2
+        version: 6.0.2
+    devDependencies:
+      '@haklex/rich-editor':
+        specifier: workspace:*
+        version: link:../rich-editor
+      '@lexical/markdown':
+        specifier: ^0.52.0
+        version: 0.52.0(typescript@7.0.2)
+      '@lexical/react':
+        specifier: ^0.52.0
+        version: 0.52.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)(typescript@7.0.2)(yjs@13.6.29)
+      '@types/react':
+        specifier: ^19.3.0
+        version: 19.3.0
+      '@types/react-dom':
+        specifier: ^19.3.0
+        version: 19.3.0(@types/react@19.3.0)
+      '@vanilla-extract/css':
+        specifier: ^1.21.3
+        version: 1.21.3
+      '@vanilla-extract/vite-plugin':
+        specifier: ^5.2.6
+        version: 5.2.6(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(supports-color@10.2.2)(tsx@4.23.15)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))(yaml@2.9.1)
+      lexical:
+        specifier: ^0.52.0
+        version: 0.52.0(typescript@7.0.2)
+      react:
+        specifier: ^19.3.1
+        version: 19.3.1
+      react-dom:
+        specifier: ^19.3.1
+        version: 19.3.1(react@19.3.1)
+      typescript:
+        specifier: ^7.0.2
+        version: 7.0.2
+      unplugin-dts:
+        specifier: ^1.1.2
+        version: 1.1.2(esbuild@0.28.1)(rolldown@1.2.14)(supports-color@10.2.2)(typescript@7.0.2)(vite@8.3.4(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1))
+      vite:
+        specifier: ^8.3.4
+        version: 8.3.4(@types/node@26.6.5)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.15)(yaml@2.9.1)
+
   packages/rich-headless:
     dependencies:
       '@lexical/code-core':
