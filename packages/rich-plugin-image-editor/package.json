@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-image-editor",
-  "version": "0.54.1",
+  "version": "0.54.2",
   "description": "Pre-upload image edit modal plugin (crop + annotate)",
   "repository": {
     "type": "git",

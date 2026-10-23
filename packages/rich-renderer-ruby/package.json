@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-ruby",
-  "version": "0.54.1",
+  "version": "0.54.2",
   "description": "Ruby annotation renderer for haklex rich editor",
   "repository": {
     "type": "git",
