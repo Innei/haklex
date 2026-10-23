@@ -347,6 +347,16 @@ export function registerCustomWriters(registry: LitexmlRegistry): void {
     return { tag: 'code-snippet', attrs: blockId(n), children: files };
   });
 
+  registry.registerWriter('steps', (node, ctx) => {
+    const n = node as any;
+    const steps: XmlElement[] = (n.steps ?? []).map((step: any) => ({
+      tag: 'step',
+      attrs: optAttr({ id: step.id, title: step.title }),
+      children: ctx.serializeNestedState(step.content),
+    }));
+    return { tag: 'steps', attrs: blockId(n), children: steps };
+  });
+
   registry.registerWriter('chat', (node) => {
     const n = node as any;
     const participantsEl: XmlElement = {

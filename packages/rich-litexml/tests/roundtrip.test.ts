@@ -166,6 +166,33 @@ describe('roundtrip', () => {
     expect(result).toContain('</grid>');
   });
 
+  it('steps roundtrip keeps step ids, titles and content', () => {
+    const input =
+      '<steps id="st1"><step id="s_a" title="Install &quot;it&quot;"><p>A</p></step><step id="s_b" title="Configure"><p>B</p><ul><li>one</li></ul></step></steps>';
+    const result = roundtrip(input);
+    expect(result).toContain('<steps id="st1">');
+    expect(result).toContain('<step id="s_a" title="Install &quot;it&quot;">');
+    expect(result).toContain('<p>A</p>');
+    expect(result).toContain('<step id="s_b" title="Configure">');
+    expect(result).toContain('<p>B</p>');
+    expect(result).toContain('<li>one</li>');
+    expect(result).toContain('</steps>');
+  });
+
+  it('steps reader builds step objects with nested content', () => {
+    const registry = createDefaultRegistry();
+    const [node] = deserializeFromXml(
+      '<steps id="st1"><step title="No id"><p>Body</p></step></steps>',
+      registry,
+    ).root.children as any[];
+    expect(node.type).toBe('steps');
+    expect(node.$).toEqual({ blockId: 'st1' });
+    expect(node.steps).toHaveLength(1);
+    expect(node.steps[0].title).toBe('No id');
+    expect(node.steps[0].id).toMatch(/^s_[\da-z]+$/);
+    expect(node.steps[0].content.root.children[0].type).toBe('paragraph');
+  });
+
   it('gallery roundtrip with aspect, fit, and max-item-height', () => {
     const input =
       '<gallery id="g1" layout="masonry" aspect="16:9" fit="contain" max-item-height="480"><img src="/a.jpg" alt="A" /><img src="/b.jpg" alt="B" /></gallery>';

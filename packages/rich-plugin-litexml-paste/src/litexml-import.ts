@@ -27,6 +27,8 @@ const LITEXML_TAGS = [
   'chart',
   'grid',
   'cell',
+  'steps',
+  'step',
   'agent-diff',
   'code-snippet',
   'chat',

@@ -8,6 +8,7 @@ const makePollIdSuffix = customAlphabet(idAlphabet, 10);
 const makeOptionIdSuffix = customAlphabet(idAlphabet, 6);
 const makeChatParticipantId = customAlphabet(idAlphabet, 6);
 const makeChatMessageId = customAlphabet(idAlphabet, 8);
+const makeStepId = customAlphabet(idAlphabet, 8);
 
 function extractBlockId(el: Element): Record<string, any> {
   const id = el.getAttribute('id');
@@ -530,6 +531,33 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
       type: 'code-snippet',
       ...extractBlockId(el),
       files,
+      version: 1,
+    } as any;
+  });
+
+  registry.registerReader('steps', (el, ctx) => {
+    const steps: Array<{ id: string; title: string; content: SerializedEditorState }> = [];
+    for (const child of el.children) {
+      if (child.tagName.toLowerCase() !== 'step') continue;
+      steps.push({
+        id: child.getAttribute('id') || `s_${makeStepId()}`,
+        title: child.getAttribute('title') ?? '',
+        content: {
+          root: {
+            type: 'root',
+            children: ctx.parseChildren(child),
+            direction: 'ltr',
+            format: '',
+            indent: 0,
+            version: 1,
+          },
+        } as SerializedEditorState,
+      });
+    }
+    return {
+      type: 'steps',
+      ...extractBlockId(el),
+      steps,
       version: 1,
     } as any;
   });

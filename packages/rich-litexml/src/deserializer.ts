@@ -124,6 +124,8 @@ const BLOCK_TAGS = new Set([
   'footnote-section',
   'grid',
   'cell',
+  'steps',
+  'step',
   'excalidraw',
 ]);
 
