@@ -342,6 +342,24 @@ export const GRID_CONTAINER_BLOCK_TRANSFORMER: ElementTransformer = {
   type: 'element',
 };
 
+export const STEPS_BLOCK_TRANSFORMER: ElementTransformer = {
+  dependencies: [],
+  export: (node) => {
+    if (node.getType() !== 'steps') return null;
+    const j = node.exportJSON() as any;
+    const steps = (j.steps ?? [])
+      .map(
+        (s: { title?: string; content?: unknown }) =>
+          `::: step{title="${qA(String(s.title ?? ''))}"}\n${stateText(s.content)}\n:::`,
+      )
+      .join('\n');
+    return `::: steps\n${steps}\n:::`;
+  },
+  regExp: NEVER,
+  replace: NOOP,
+  type: 'element',
+};
+
 export const HORIZONTAL_RULE_BLOCK_TRANSFORMER: ElementTransformer = {
   dependencies: [],
   export: (node) => (node.getType() === 'horizontalrule' ? '---' : null),
@@ -530,6 +548,7 @@ export const allHeadlessTransformers = [
   CHART_BLOCK_TRANSFORMER,
   NESTED_DOC_BLOCK_TRANSFORMER,
   GRID_CONTAINER_BLOCK_TRANSFORMER,
+  STEPS_BLOCK_TRANSFORMER,
   HORIZONTAL_RULE_BLOCK_TRANSFORMER,
   TABLE_BLOCK_TRANSFORMER,
   CODE_SNIPPET_BLOCK_TRANSFORMER,

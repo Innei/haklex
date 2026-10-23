@@ -632,6 +632,52 @@ export class GridContainerNode extends DecoratorNode<null> {
   }
 }
 
+export class StepsNode extends DecoratorNode<null> {
+  __steps: Array<{ id: string; title: string; content: unknown }> = [];
+
+  static getType(): string {
+    return 'steps';
+  }
+  constructor(key?: NodeKey) {
+    super(key);
+  }
+  static clone(node: StepsNode): StepsNode {
+    const n = new StepsNode((node as any).__key);
+    n.__steps = node.__steps;
+    return n;
+  }
+  static importJSON(_json: SerializedLexicalNode & Record<string, unknown>): StepsNode {
+    const node = new StepsNode();
+    node.__steps = Array.isArray(_json.steps) ? (_json.steps as StepsNode['__steps']) : [];
+    return node.updateFromJSON(_json);
+  }
+  exportJSON(): SerializedLexicalNode {
+    return {
+      ...super.exportJSON(),
+      type: 'steps',
+      version: 1,
+      steps: this.__steps,
+    } as SerializedLexicalNode;
+  }
+  createDOM(): HTMLElement {
+    return stubDOM();
+  }
+  updateDOM(): boolean {
+    return false;
+  }
+  decorate(): null {
+    return null;
+  }
+  isInline(): boolean {
+    return false;
+  }
+  getTextContent(): string {
+    return this.__steps
+      .map((step) => [step.title, extractText(step.content)].filter(Boolean).join('\n'))
+      .join('\n');
+  }
+}
+
 // ── Aggregate ──
 
 export const customHeadlessNodes: Klass<LexicalNode>[] = [
@@ -662,6 +708,7 @@ export const customHeadlessNodes: Klass<LexicalNode>[] = [
   AlertQuoteNode,
   NestedDocNode,
   GridContainerNode,
+  StepsNode,
   PollNode,
   ChatNode,
 ];
