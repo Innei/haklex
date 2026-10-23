@@ -1,4 +1,5 @@
 export { CorePlugins } from './components/CorePlugins';
+export { NestedEditorCorePlugins } from './components/decorators/NestedEditorCorePlugins';
 export type { LinkFaviconProps } from './components/LinkFavicon';
 export { LinkFavicon } from './components/LinkFavicon';
 export { RichEditor } from './components/RichEditor';
@@ -40,6 +41,7 @@ export {
   useTextSelectionSnapshot,
   useTextSelectionStore,
 } from './context/TextSelectionContext';
+export { createNestedEditor, NESTED_EDITOR_NODES } from './nodes/shared';
 export { blockIdState } from './plugins/BlockIdPlugin';
 export * from './styles';
 export type { RichEditorProps, RichEditorVariant } from './types';
