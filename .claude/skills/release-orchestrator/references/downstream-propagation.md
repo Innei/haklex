@@ -51,6 +51,17 @@ If any published haklex package advanced a non-`@haklex/*` peer floor, downstrea
 
 Use [../scripts/registry-peer-floors.sh](../scripts/registry-peer-floors.sh) to aggregate peer floors from the actual registry-published manifests. Use [../scripts/downstream-dispatch.sh](../scripts/downstream-dispatch.sh) to produce concrete rewrite rows:
 
+```bash
+SCRIPTS=/Users/innei/git/innei-repo/haklex/.claude/skills/release-orchestrator/scripts
+PEER_FLOORS=$("$SCRIPTS/registry-peer-floors.sh" "$NEW_VERSION")
+NEW_VERSION="$NEW_VERSION" \
+  DOWNSTREAM_MANIFESTS="$DOWNSTREAM_MANIFESTS" \
+  PEER_FLOORS="$PEER_FLOORS" \
+  "$SCRIPTS/downstream-dispatch.sh"
+```
+
+Pass the output as-is: both scripts read the package set from `publish.mjs list` themselves, and `registry-peer-floors.sh` already emits raw `lib<TAB>range` lines, so do not expand `$PUBLISH_SET` as arguments (zsh does not word-split it) or post-process with `tr`. `downstream-dispatch.sh` resolves `semver` from the haklex checkout and exits non-zero rather than emitting rows when it cannot compare a range.
+
 ```text
 peer<TAB><manifest><TAB><section><TAB><lib><TAB><current><TAB><new>
 ```
