@@ -137,6 +137,7 @@ const INLINE_TAGS = new Set([
   'strong',
   'em',
   'del',
+  'strike',
   'a',
   'mention',
   'tag',

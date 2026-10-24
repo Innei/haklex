@@ -240,6 +240,11 @@ describe('formatting whitespace', () => {
     expect(children.map((c: any) => c.type)).toEqual(['excalidraw']);
   });
 
+  it('keeps the space between format tags beside a <strike>', () => {
+    const children = childrenOf('<doc><p id="p1">a <strike>x</strike> <b>b</b> <i>c</i></p></doc>');
+    expect(children.map((c: any) => c.text)).toEqual(['a ', 'x', ' ', 'b', ' ', 'c']);
+  });
+
   it('keeps text spacing when a paragraph is inline only', () => {
     const children = childrenOf('<doc><p id="p1">  padded text  </p></doc>');
     expect(children.map((c: any) => c.type)).toEqual(['text']);
