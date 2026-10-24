@@ -50,8 +50,9 @@ export function DynamicHostRenderer({
     const container = hostRef.current?.shadowRoot?.firstElementChild;
     if (container instanceof HTMLElement) {
       container.style.minHeight = `${initialHeight}px`;
+      container.style.colorScheme = theme;
     }
-  }, [initialHeight]);
+  }, [initialHeight, theme]);
 
   useEffect(() => {
     const hostEl = hostRef.current;
@@ -67,6 +68,11 @@ export function DynamicHostRenderer({
     const shadow = hostEl.shadowRoot ?? hostEl.attachShadow({ mode: 'open' });
     shadow.replaceChildren();
     const container = document.createElement('div');
+    // Inherited properties cross the shadow boundary, including the inline
+    // white-space: pre-wrap / word-break that Lexical sets on its editable root
+    container.style.all = 'initial';
+    container.style.display = 'block';
+    container.style.colorScheme = theme;
     // initialHeight is the box's permanent floor, mirrored inside the shadow
     // root, so mount never shrinks the reserved space (zero-CLS contract)
     container.style.minHeight = `${initialHeight}px`;
