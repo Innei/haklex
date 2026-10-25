@@ -1,14 +1,19 @@
 import { RendererWrapper } from '@haklex/rich-editor/static';
 import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalEditable } from '@lexical/react/useLexicalEditable';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import type { NodeKey } from 'lexical';
+import { $getNodeByKey } from 'lexical';
 import type { MouseEvent } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { ChartBlockRenderer } from './ChartBlockRenderer';
+import { $isChartNode } from './ChartNode';
 import type { ChartViewMode } from './ChartView';
 import { ChartRenderer } from './ChartView';
+import { ChartConfigPanel } from './config/ChartConfigPanel';
+import { popup as configPopup } from './config/config.css';
 import * as s from './edit.css';
 import type { ChartSlotProps } from './slot';
 import { CHART_NODE_KEY } from './slot';
@@ -43,9 +48,11 @@ function formatRawSpec(spec: string): string {
 const stopPropagation = (event: MouseEvent) => event.stopPropagation();
 
 function ChartEditRendererInner({ spec, nodeKey }: ChartEditRendererProps) {
+  const [editor] = useLexicalComposerContext();
   const [isSelected, setSelected, clearSelection] = useLexicalNodeSelection(nodeKey);
   const [view, setView] = useState<ChartViewMode>('chart');
   const [rawOpen, setRawOpen] = useState(false);
+  const [configOpen, setConfigOpen] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const isValid = useMemo(() => parseChartSource(spec).ok, [spec]);
@@ -73,13 +80,29 @@ function ChartEditRendererInner({ spec, nodeKey }: ChartEditRendererProps) {
       .catch(() => {});
   }, [spec]);
 
-  const showToolbar = isSelected || rawOpen;
+  const handleSpecChange = useCallback(
+    (next: string) => {
+      editor.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if ($isChartNode(node)) node.setSpec(next);
+      });
+    },
+    [editor, nodeKey],
+  );
+
+  const showToolbar = isSelected || rawOpen || configOpen;
 
   return (
     <div className={`${s.frame}${isSelected ? ` ${s.frameSelected}` : ''}`} onClick={handleSelect}>
       <ChartRenderer hideToggle defaultView={view} key={view} value={spec} />
       {showToolbar && (
         <div className={s.toolbar} onClick={stopPropagation}>
+          <Popover open={configOpen} onOpenChange={setConfigOpen}>
+            <PopoverTrigger className={s.toolbarButton}>Edit chart</PopoverTrigger>
+            <PopoverPanel align="end" className={configPopup} side="bottom" sideOffset={6}>
+              <ChartConfigPanel spec={spec} onChange={handleSpecChange} />
+            </PopoverPanel>
+          </Popover>
           {isValid && (
             <button
               aria-pressed={view === 'table'}

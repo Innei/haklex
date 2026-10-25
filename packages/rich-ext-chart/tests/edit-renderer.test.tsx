@@ -1,13 +1,18 @@
 // @vitest-environment happy-dom
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
+import type { LexicalEditor } from 'lexical';
+import { $getRoot } from 'lexical';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
 
 import { ChartEditNode } from '../src/ChartEditNode';
+import type { ChartNode } from '../src/ChartNode';
+import { popup } from '../src/config/config.css';
 
 declare global {
   var IS_REACT_ACT_ENVIRONMENT: boolean;
@@ -44,6 +49,19 @@ function editorState(spec: string) {
 
 let container: HTMLDivElement | null = null;
 let root: Root | null = null;
+let editorRef: LexicalEditor | null = null;
+
+function CaptureEditor() {
+  const [editor] = useLexicalComposerContext();
+  editorRef = editor;
+  return null;
+}
+
+function nodeSpec() {
+  return editorRef!
+    .getEditorState()
+    .read(() => ($getRoot().getFirstChild() as ChartNode).getSpec());
+}
 
 async function mount(spec: string, editable = true) {
   container = document.createElement('div');
@@ -66,6 +84,7 @@ async function mount(spec: string, editable = true) {
           ErrorBoundary={LexicalErrorBoundary}
           contentEditable={<ContentEditable />}
         />
+        <CaptureEditor />
       </LexicalComposer>,
     );
   });
@@ -102,6 +121,33 @@ describe('ChartEditRenderer', () => {
     const pre = document.body.querySelector('pre');
     expect(pre?.textContent).toBe(JSON.stringify(JSON.parse(SPEC), null, 2));
     expect(buttonByText(document.body, 'Copy')).toBeDefined();
+  });
+
+  it('edits the spec through the Edit chart panel', async () => {
+    const el = await mount(SPEC);
+    await act(async () => {
+      el.querySelector('figure')!.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    await act(async () => buttonByText(el, 'Edit chart')!.click());
+
+    const title = [...document.body.querySelectorAll('label')]
+      .find((l) => l.querySelector('span')?.textContent === 'Title')!
+      .querySelector('input')!;
+    expect(title.value).toBe('Commits');
+    expect(title.closest(`.${popup}`)).not.toBeNull();
+    await act(async () => {
+      title.focus();
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')!.set!.call(
+        title,
+        'Pushes',
+      );
+      title.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+    await act(async () => title.blur());
+
+    expect(JSON.parse(nodeSpec()).title).toBe('Pushes');
+    expect(el.textContent).toContain('Pushes');
+    expect(buttonByText(el, 'Edit chart')).toBeDefined();
   });
 
   it('shows the error card for invalid JSON and hides the data toggle', async () => {
