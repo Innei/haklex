@@ -55,10 +55,10 @@ export const diffReviewAcceptBtn = style([
 export const diffReviewRejectBtn = style([
   diffReviewActionBtn,
   {
-    'borderColor': 'var(--hk-color-text-error, #dc2626)',
-    'color': 'var(--hk-color-text-error, #dc2626)',
+    'borderColor': vars.color.alertCaution,
+    'color': vars.color.alertCaution,
     ':hover': {
-      background: 'rgba(220, 38, 38, 0.06)',
+      background: `color-mix(in oklab, ${vars.color.alertCaution} 6%, transparent)`,
     },
   },
 ]);
@@ -73,12 +73,12 @@ export const diffHunkRow = style({
 });
 
 export const diffHunkInsert = style({
-  background: 'rgba(22, 163, 74, 0.08)',
+  background: `color-mix(in oklab, ${vars.color.alertTip} 8%, transparent)`,
   color: vars.color.text,
 });
 
 export const diffHunkDelete = style({
-  background: 'rgba(220, 38, 38, 0.06)',
+  background: `color-mix(in oklab, ${vars.color.alertCaution} 6%, transparent)`,
   color: vars.color.text,
   textDecoration: 'line-through',
   opacity: 0.7,

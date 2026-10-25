@@ -1,21 +1,22 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { globalStyle, keyframes, style } from '@vanilla-extract/css'
+import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
 // --- Animations ---
 
 const fadeInZoom = keyframes({
   from: { opacity: 0, transform: 'scale(0.95)' },
   to: { opacity: 1, transform: 'scale(1)' },
-})
+});
 
 const fadeOutZoom = keyframes({
   from: { opacity: 1, transform: 'scale(1)' },
   to: { opacity: 0, transform: 'scale(0.95)' },
-})
+});
 
 // --- Trigger ---
 
 export const triggerButton = style({
+  ...chromeTypography,
   'display': 'inline-flex',
   'alignItems': 'center',
   'justifyContent': 'space-between',
@@ -25,21 +26,20 @@ export const triggerButton = style({
   'fontSize': vars.typography.fontSizeSmall,
   'lineHeight': 1.35,
   'fontFamily': vars.typography.fontFamilySans,
-  'border': `1px solid ${vars.color.border}`,
+  'border': 'none',
   'borderRadius': vars.borderRadius.md,
   'background': 'transparent',
   'color': vars.color.text,
   'cursor': 'pointer',
   'outline': 'none',
   'whiteSpace': 'nowrap',
-  'boxShadow': `0 1px 2px rgba(0, 0, 0, 0.05)`,
+  'boxShadow': vars.boxShadow.xs,
   'transition': 'color 150ms ease, box-shadow 150ms ease, border-color 150ms ease',
   ':hover': {
     background: vars.color.fillQuaternary,
   },
   ':focus-visible': {
-    borderColor: vars.color.accent,
-    boxShadow: `0 0 0 3px ${vars.color.accentLight}`,
+    boxShadow: `0 0 0 1px ${vars.color.accent}, 0 0 0 3px ${vars.color.accentLight}`,
   },
   'selectors': {
     '&[data-popup-open]': {
@@ -50,7 +50,7 @@ export const triggerButton = style({
       cursor: 'not-allowed',
     },
   },
-})
+});
 
 export const triggerIcon = style({
   width: '16px',
@@ -58,7 +58,7 @@ export const triggerIcon = style({
   color: vars.color.textTertiary,
   flexShrink: 0,
   pointerEvents: 'none',
-})
+});
 
 // --- Positioner ---
 
@@ -66,17 +66,18 @@ export const positioner = style({
   outline: 'none',
   zIndex: 50,
   isolation: 'isolate',
-})
+});
 
 // --- Popup / Content ---
 
 export const popup = style({
+  ...chromeTypography,
   background: vars.color.bg,
   color: vars.color.text,
   fontFamily: vars.typography.fontFamilySans,
   fontSize: vars.typography.fontSizeSmall,
-  borderRadius: vars.borderRadius.md,
-  boxShadow: `0 0 0 1px color-mix(in srgb, ${vars.color.text} 10%, transparent), ${vars.boxShadow.menu}`,
+  borderRadius: vars.borderRadius.lg,
+  boxShadow: vars.boxShadow.menu,
   width: 'min(var(--anchor-width), calc(100vw - 0.75rem))',
   maxWidth: 'calc(100vw - 0.75rem)',
   maxHeight: 'var(--available-height)',
@@ -102,7 +103,7 @@ export const popup = style({
       overflow: 'hidden',
     },
   },
-})
+});
 
 // --- Group ---
 
@@ -113,7 +114,7 @@ export const group = style({
       borderTop: `1px solid ${vars.color.hrBorder}`,
     },
   },
-})
+});
 
 // --- Item ---
 
@@ -141,14 +142,14 @@ export const item = style({
       pointerEvents: 'none',
     },
   },
-})
+});
 
 globalStyle(`${item} svg`, {
   pointerEvents: 'none',
   flexShrink: 0,
   width: '16px',
   height: '16px',
-})
+});
 
 // --- Item Indicator (check mark) ---
 
@@ -162,11 +163,11 @@ export const itemIndicator = style({
   height: '16px',
   pointerEvents: 'none',
   color: vars.color.textSecondary,
-})
+});
 
 globalStyle(`${item}[data-highlighted] ${itemIndicator}`, {
   color: vars.color.text,
-})
+});
 
 // --- Group Label ---
 
@@ -176,7 +177,7 @@ export const groupLabel = style({
   fontWeight: 500,
   lineHeight: 1.4,
   color: vars.color.textTertiary,
-})
+});
 
 // --- Separator ---
 
@@ -184,7 +185,7 @@ export const separator = style({
   height: '1px',
   backgroundColor: vars.color.hrBorder,
   margin: '4px -4px',
-})
+});
 
 // --- Scroll buttons ---
 
@@ -198,9 +199,9 @@ export const scrollButton = style({
   color: vars.color.textTertiary,
   background: vars.color.bg,
   zIndex: 10,
-})
+});
 
 globalStyle(`${scrollButton} svg`, {
   width: '16px',
   height: '16px',
-})
+});

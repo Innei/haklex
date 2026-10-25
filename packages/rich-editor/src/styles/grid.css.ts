@@ -31,7 +31,7 @@ export const toolbar = style({
   borderRadius: vars.borderRadius.md,
   pointerEvents: 'none',
   background: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
+  border: 'none',
   boxShadow: vars.boxShadow.topBar,
   zIndex: 10,
   userSelect: 'none',

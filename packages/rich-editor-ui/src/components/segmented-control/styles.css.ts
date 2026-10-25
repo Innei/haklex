@@ -1,12 +1,12 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { recipe } from '@vanilla-extract/recipes'
+import { vars } from '@haklex/rich-style-token/styles';
+import { recipe } from '@vanilla-extract/recipes';
 
 export const container = recipe({
   base: {
     position: 'relative',
     display: 'inline-flex',
     alignItems: 'center',
-    borderRadius: '0.5rem',
+    borderRadius: vars.borderRadius.md,
     backgroundColor: vars.color.bgTertiary,
     padding: '0.25rem',
   },
@@ -32,16 +32,16 @@ export const container = recipe({
     size: 'sm',
     fullWidth: false,
   },
-})
+});
 
 export const indicator = recipe({
   base: {
     position: 'absolute',
     top: '0.25rem',
     bottom: '0.25rem',
-    borderRadius: '0.375rem',
+    borderRadius: vars.borderRadius.sm,
     backgroundColor: vars.color.bg,
-    boxShadow: '0 1px 2px 0 rgba(0,0,0,0.05)',
+    boxShadow: vars.boxShadow.xs,
     transition: 'all 300ms cubic-bezier(0.25, 1, 0.5, 1)',
     pointerEvents: 'none',
   },
@@ -56,7 +56,7 @@ export const indicator = recipe({
   defaultVariants: {
     ready: true,
   },
-})
+});
 
 export const item = recipe({
   base: {
@@ -66,7 +66,7 @@ export const item = recipe({
     alignItems: 'center',
     justifyContent: 'center',
     whiteSpace: 'nowrap',
-    borderRadius: '0.375rem',
+    borderRadius: vars.borderRadius.sm,
     fontWeight: 500,
     outline: 'none',
     border: 'none',
@@ -116,4 +116,4 @@ export const item = recipe({
     disabled: false,
     fullWidth: false,
   },
-})
+});

@@ -1,3 +1,4 @@
+export { chromeTypography, contentTypography } from './baseline';
 export { type ThemeTokens } from './create-theme-style';
 export { createThemeStyle } from './create-theme-style';
 export {

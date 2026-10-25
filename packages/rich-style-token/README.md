@@ -11,8 +11,8 @@ pnpm add @haklex/rich-style-token
 ## Peer Dependencies
 
 | Package | Version |
-| --- | --- |
-| `react` | `>=19` |
+| ------- | ------- |
+| `react` | `>=19`  |
 
 ## Usage
 
@@ -32,58 +32,80 @@ const style = createThemeStyle(articleTheme)
 </PortalThemeProvider>
 ```
 
+## Host Theming
+
+Every color token and every font-family token resolves through a host variable first:
+
+```css
+--rc-text: var(--rc-host-text, #171717);
+--rc-font-family-sans: var(--rc-host-font-family-sans, -apple-system, …);
+```
+
+A host remaps the editor by defining `--rc-host-*` once on `:root`. The value reaches content, the editable surface, and portaled chrome (menus, tooltips, toolbars) in both light and dark mode, so the host owns its own light/dark switching:
+
+```css
+:root {
+  --rc-host-text: var(--color-fg);
+  --rc-host-bg: var(--color-surface-card);
+  --rc-host-border: var(--color-border);
+  --rc-host-accent: var(--color-accent);
+}
+```
+
+The host variable name is the token name with `--rc-` replaced by `--rc-host-` (`--rc-text-secondary` → `--rc-host-text-secondary`). Setting `--rc-*` directly on an element (for example `--rc-font-family` inline) still works for that subtree.
+
 ## Exports
 
 ### Theme Construction
 
-| Export | Description |
-| --- | --- |
+| Export                     | Description                                            |
+| -------------------------- | ------------------------------------------------------ |
 | `createThemeStyle(tokens)` | Generate a CSS variable style object from theme tokens |
 
 ### Context Providers
 
-| Export | Description |
-| --- | --- |
-| `PortalContainerProvider` | Provide a custom portal container element |
-| `usePortalContainer()` | Access the portal container element |
-| `PortalThemeProvider` | Provide theme context for portaled overlays |
-| `PortalThemeWrapper` | Wrapper element that applies theme variables |
-| `usePortalTheme()` | Access the current portal theme |
+| Export                    | Description                                  |
+| ------------------------- | -------------------------------------------- |
+| `PortalContainerProvider` | Provide a custom portal container element    |
+| `usePortalContainer()`    | Access the portal container element          |
+| `PortalThemeProvider`     | Provide theme context for portaled overlays  |
+| `PortalThemeWrapper`      | Wrapper element that applies theme variables |
+| `usePortalTheme()`        | Access the current portal theme              |
 
 ### Design Tokens
 
-| Export | Description |
-| --- | --- |
-| `articleLayout` | Layout tokens for the `article` variant (sans-serif, 16px) |
-| `noteLayout` | Layout tokens for the `note` variant (CJK serif, 16px) |
-| `commentLayout` | Layout tokens for the `comment` variant (sans-serif, 14px) |
-| `darkColors` | Color tokens for dark mode |
-| `lightArticleColors` | Color tokens for light article/note mode |
-| `lightCommentColors` | Color tokens for light comment mode |
-| `fonts` | Font family definitions |
+| Export               | Description                                                |
+| -------------------- | ---------------------------------------------------------- |
+| `articleLayout`      | Layout tokens for the `article` variant (sans-serif, 16px) |
+| `noteLayout`         | Layout tokens for the `note` variant (CJK serif, 16px)     |
+| `commentLayout`      | Layout tokens for the `comment` variant (sans-serif, 14px) |
+| `darkColors`         | Color tokens for dark mode                                 |
+| `lightArticleColors` | Color tokens for light article/note mode                   |
+| `lightCommentColors` | Color tokens for light comment mode                        |
+| `fonts`              | Font family definitions                                    |
 
 ### Theme Objects
 
-| Export | Description |
-| --- | --- |
-| `articleTheme` | Complete theme for the `article` variant |
-| `noteTheme` | Complete theme for the `note` variant |
-| `commentTheme` | Complete theme for the `comment` variant |
-| `vars` | Typed CSS variable references (use in Vanilla Extract styles) |
+| Export         | Description                                                   |
+| -------------- | ------------------------------------------------------------- |
+| `articleTheme` | Complete theme for the `article` variant                      |
+| `noteTheme`    | Complete theme for the `note` variant                         |
+| `commentTheme` | Complete theme for the `comment` variant                      |
+| `vars`         | Typed CSS variable references (use in Vanilla Extract styles) |
 
 ### Types
 
-| Export | Description |
-| --- | --- |
+| Export        | Description                         |
+| ------------- | ----------------------------------- |
 | `ThemeTokens` | Shape of a complete theme token set |
-| `PortalTheme` | Portal theme descriptor |
+| `PortalTheme` | Portal theme descriptor             |
 
 ### Sub-path Exports
 
-| Import Path | Description |
-| --- | --- |
-| `@haklex/rich-style-token` | All tokens, themes, providers, and utilities |
-| `@haklex/rich-style-token/styles` | Vanilla Extract style definitions |
+| Import Path                       | Description                                  |
+| --------------------------------- | -------------------------------------------- |
+| `@haklex/rich-style-token`        | All tokens, themes, providers, and utilities |
+| `@haklex/rich-style-token/styles` | Vanilla Extract style definitions            |
 
 ## Part of Haklex
 

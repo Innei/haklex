@@ -86,7 +86,7 @@ export const image = style({
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
   backgroundColor: vars.color.bgTertiary,
-  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.04)',
+  boxShadow: `inset 0 0 0 1px ${vars.color.ring}`,
   zIndex: 1,
 });
 
@@ -97,9 +97,9 @@ export const icon = style({
   justifyContent: 'center',
   width: '2.5rem',
   height: '2.5rem',
-  borderRadius: '0.5rem',
+  borderRadius: vars.borderRadius.md,
   backgroundColor: vars.color.bgTertiary,
-  boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.04)',
+  boxShadow: `inset 0 0 0 1px ${vars.color.ring}`,
   zIndex: 1,
 });
 

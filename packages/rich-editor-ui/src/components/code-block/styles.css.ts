@@ -90,7 +90,7 @@ export const copyButton = style({
   },
   'selectors': {
     [`${card}[data-chrome="compact"] &`]: {
-      backgroundColor: vars.color.fill,
+      background: `linear-gradient(${vars.color.fill}, ${vars.color.fill}), ${vars.color.codeBg}`,
       color: vars.color.text,
     },
   },

@@ -1,5 +1,5 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { globalStyle, style } from '@vanilla-extract/css'
+import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
 export const mentionMenu = style({
   position: 'absolute',
@@ -9,93 +9,92 @@ export const mentionMenu = style({
   maxHeight: 300,
   overflowY: 'auto',
   overflowX: 'hidden',
-  fontFamily: vars.typography.fontFamily,
+  ...chromeTypography,
+  fontSize: 13,
+  lineHeight: 1.35,
   background: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 10,
+  border: 'none',
+  borderRadius: vars.borderRadius.lg,
   boxShadow: vars.boxShadow.menu,
-  padding: '6px 0',
+  padding: 4,
   listStyle: 'none',
   margin: 0,
-})
+});
 
 globalStyle(`${mentionMenu}::-webkit-scrollbar`, {
   width: 6,
-})
+});
 
 globalStyle(`${mentionMenu}::-webkit-scrollbar-thumb`, {
-  background: 'rgba(0,0,0,0.1)',
+  background: vars.color.fill,
   borderRadius: 3,
-})
+});
 
 export const mentionMenuItem = style({
   display: 'flex',
   alignItems: 'center',
   gap: 10,
-  padding: '6px 10px',
-  margin: '0 6px',
-  borderRadius: 8,
+  padding: '6px 8px',
+  margin: 0,
+  borderRadius: vars.borderRadius.md,
   cursor: 'pointer',
-  transition: 'background 0.1s ease',
-})
+  transition: 'background 120ms ease-out',
+});
 
-globalStyle(
-  `${mentionMenuItem}:hover, ${mentionMenuItem}[aria-selected="true"]`,
-  {
-    background: vars.color.fill,
-  },
-)
+globalStyle(`${mentionMenuItem}:hover, ${mentionMenuItem}[aria-selected="true"]`, {
+  background: vars.color.fillSecondary,
+});
 
 export const mentionMenuItemIcon = style({
-  width: 32,
-  height: 32,
+  width: 28,
+  height: 28,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: 16,
+  fontSize: 14,
   flexShrink: 0,
   borderRadius: 6,
-  background: vars.color.bgSecondary,
+  background: vars.color.bg,
   border: `1px solid ${vars.color.border}`,
   color: vars.color.textSecondary,
   lineHeight: 1,
-})
+});
 
 export const mentionMenuItemText = style({
   display: 'flex',
   flexDirection: 'column',
   minWidth: 0,
   gap: 1,
-})
+});
 
 export const mentionMenuItemTitle = style({
-  fontSize: 14,
+  fontSize: 13,
   fontWeight: 500,
   lineHeight: '1.3',
   color: vars.color.text,
-})
+});
 
 export const mentionMenuItemDescription = style({
   fontSize: 12,
   lineHeight: '1.3',
-  color: vars.color.textSecondary,
+  color: vars.color.textTertiary,
   whiteSpace: 'nowrap',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
-})
+});
 
 export const mentionMenuHint = style({
-  padding: '8px 14px',
+  padding: '8px 10px',
   fontSize: 12,
-  color: vars.color.textSecondary,
+  color: vars.color.textTertiary,
   userSelect: 'none',
-})
+});
 
 // ─── Phase 2: platform tag + handle input prompt ────────
 export const phase2Container = style({
   padding: '8px 10px',
-  margin: '0 6px',
-})
+  margin: 0,
+});
 
 export const platformTag = style({
   display: 'inline-flex',
@@ -106,27 +105,27 @@ export const platformTag = style({
   fontSize: 12,
   fontWeight: 500,
   lineHeight: '1.3',
-  background: vars.color.bgSecondary,
-  border: `1px solid ${vars.color.border}`,
+  background: vars.color.fillSecondary,
+  border: 'none',
   color: vars.color.text,
   marginBottom: 6,
-})
+});
 
 export const platformTagIcon = style({
   display: 'flex',
   alignItems: 'center',
   fontSize: 14,
-})
+});
 
 export const phase2Hint = style({
   fontSize: 12,
-  color: vars.color.textSecondary,
+  color: vars.color.textTertiary,
   marginTop: 2,
-})
+});
 
 export const phase2Handle = style({
   fontSize: 14,
   fontWeight: 500,
   color: vars.color.text,
   marginTop: 4,
-})
+});

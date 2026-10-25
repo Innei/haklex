@@ -25,16 +25,16 @@ export const handleBtn = style({
   'justifyContent': 'center',
   'width': 24,
   'height': 24,
-  'borderRadius': 4,
+  'borderRadius': 6,
   'border': 'none',
   'background': 'transparent',
-  'color': `color-mix(in srgb, ${vars.color.text} 35%, transparent)`,
+  'color': vars.color.textQuaternary,
   'cursor': 'pointer',
   'padding': 0,
-  'transition': 'background-color 0.15s, color 0.15s',
+  'transition': 'background-color 120ms ease-out, color 120ms ease-out',
   ':hover': {
-    background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-    color: `color-mix(in srgb, ${vars.color.text} 70%, transparent)`,
+    background: vars.color.fillSecondary,
+    color: vars.color.textSecondary,
   },
 });
 
@@ -53,9 +53,9 @@ export const dragPreview = style({
   boxSizing: 'border-box',
   opacity: 0.9,
   backgroundColor: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: vars.borderRadius.sm,
-  boxShadow: vars.boxShadow.topBar,
+  border: 'none',
+  borderRadius: vars.borderRadius.md,
+  boxShadow: vars.boxShadow.menu,
 });
 
 // ─── Drop indicator ────────────────────────────────────
@@ -70,10 +70,10 @@ export const dropIndicator = style({
 
 // ─── Block selection ────────────────────────────────────
 export const blockSelected = style({
-  boxShadow: `0 0 0 2px color-mix(in srgb, ${vars.color.accent} 30%, transparent)`,
-  backgroundColor: `color-mix(in srgb, ${vars.color.accent} 6%, transparent)`,
+  boxShadow: `0 0 0 2px ${vars.color.accentLight}`,
+  backgroundColor: vars.color.accentLight,
   borderRadius: vars.borderRadius.sm,
-  transition: 'box-shadow 0.15s ease, background-color 0.15s ease',
+  transition: 'box-shadow 120ms ease-out, background-color 120ms ease-out',
 });
 
 export const dragCountBadge = style({
@@ -84,14 +84,15 @@ export const dragCountBadge = style({
   height: 20,
   borderRadius: 10,
   backgroundColor: vars.color.accent,
-  color: '#fff',
+  color: vars.color.bg,
+  fontFamily: vars.typography.fontFamilySans,
   fontSize: 12,
   fontWeight: 600,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   padding: '0 6px',
-  boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+  boxShadow: vars.boxShadow.xs,
 });
 
 // ─── Context menu destructive item ─────────────────────

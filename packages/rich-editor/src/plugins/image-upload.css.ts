@@ -37,7 +37,7 @@ export const toast = style({
   gap: '0.375rem',
   padding: '0.375rem 0.625rem',
   borderRadius: vars.borderRadius.sm,
-  border: `1px solid ${vars.color.border}`,
+  border: 'none',
   backgroundColor: `color-mix(in srgb, ${vars.color.bg} 95%, transparent)`,
   color: vars.color.text,
   fontSize: vars.typography.fontSizeXs,

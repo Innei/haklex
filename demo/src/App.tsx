@@ -19,6 +19,7 @@ import { ChartsPage } from './pages/ChartsPage';
 import { CommentsPage } from './pages/CommentsPage';
 import { EditorPage } from './pages/EditorPage';
 import { ExtensionsPage } from './pages/ExtensionsPage';
+import { HostilePage } from './pages/HostilePage';
 import { NodeShowcase } from './pages/NodeShowcase';
 import { PresetsPage } from './pages/PresetsPage';
 
@@ -32,6 +33,7 @@ const navItems = [
   { path: '/extensions', label: 'Extensions' },
   { path: '/charts', label: 'Charts' },
   { path: '/ai', label: 'AI' },
+  { path: '/hostile', label: 'Hostile host' },
 ] as const;
 
 function useSystemColorScheme(): ColorScheme {
@@ -220,6 +222,7 @@ export const router = createBrowserRouter([
       { path: '/extensions', element: <ExtensionsPage /> },
       { path: '/charts', element: <ChartsPage /> },
       { path: '/ai', element: <AgentPage /> },
+      { path: '/hostile', element: <HostilePage /> },
       { path: '*', element: <Navigate replace to="/editor" /> },
     ],
   },

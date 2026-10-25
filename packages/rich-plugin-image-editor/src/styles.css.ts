@@ -104,7 +104,7 @@ export const toolButton = style({
   border: 'none',
   borderRadius: vars.borderRadius.sm,
   backgroundColor: 'transparent',
-  color: '#737373',
+  color: vars.color.textTertiary,
   cursor: 'pointer',
   selectors: {
     '&:hover:not(:disabled)': {
@@ -112,7 +112,7 @@ export const toolButton = style({
       color: vars.color.text,
     },
     '&:disabled': {
-      color: '#a3a3a3',
+      color: vars.color.textQuaternary,
       cursor: 'default',
       opacity: 0.55,
     },
@@ -189,13 +189,13 @@ export const swatch = style({
   width: 18,
   height: 18,
   padding: 0,
-  border: '1px solid rgba(115, 115, 115, 0.35)',
+  border: `1px solid ${vars.color.border}`,
   borderRadius: '50%',
   cursor: 'pointer',
 });
 
 export const swatchActive = style({
-  boxShadow: `0 0 0 2px ${vars.color.bg}, 0 0 0 4px #737373`,
+  boxShadow: `0 0 0 2px ${vars.color.bg}, 0 0 0 4px ${vars.color.textTertiary}`,
 });
 
 export const optionButton = style({
@@ -208,7 +208,7 @@ export const optionButton = style({
   border: 'none',
   borderRadius: vars.borderRadius.sm,
   backgroundColor: 'transparent',
-  color: '#737373',
+  color: vars.color.textTertiary,
   cursor: 'pointer',
   selectors: {
     '&:hover:not(:disabled)': {
@@ -216,7 +216,7 @@ export const optionButton = style({
       color: vars.color.text,
     },
     '&:disabled': {
-      color: '#a3a3a3',
+      color: vars.color.textQuaternary,
       cursor: 'default',
       opacity: 0.55,
     },
@@ -248,7 +248,7 @@ export const errorState = style({
   padding: 24,
   borderRadius: vars.borderRadius.md,
   backgroundColor: vars.color.bg,
-  color: '#737373',
+  color: vars.color.textTertiary,
   fontSize: 13,
   boxShadow: vars.boxShadow.modal,
 });
@@ -258,11 +258,11 @@ export const attribution = style({
   right: 10,
   bottom: 8,
   fontSize: 11,
-  color: '#a3a3a3',
+  color: vars.color.textQuaternary,
   textDecoration: 'none',
   selectors: {
     '&:hover': {
-      color: '#737373',
+      color: vars.color.textTertiary,
       textDecoration: 'underline',
     },
   },
@@ -284,7 +284,7 @@ export const footerSpacer = style({
 });
 
 export const footerError = style({
-  color: '#dc2626',
+  color: vars.color.alertCaution,
   fontSize: 12,
 });
 
@@ -311,7 +311,7 @@ export const ghostButton = style([
   {
     border: 'none',
     backgroundColor: 'transparent',
-    color: '#737373',
+    color: vars.color.textTertiary,
     selectors: {
       '&:hover:not(:disabled)': {
         backgroundColor: vars.color.fillSecondary,
@@ -374,7 +374,7 @@ export const rangeField = style({
   alignItems: 'center',
   gap: 8,
   fontSize: 12,
-  color: '#737373',
+  color: vars.color.textTertiary,
 });
 
 export const rangeInput = style({
@@ -419,6 +419,6 @@ export const sizeInput = style({
 
 export const sizeOutput = style({
   fontSize: 12,
-  color: '#737373',
+  color: vars.color.textTertiary,
   fontVariantNumeric: 'tabular-nums',
 });

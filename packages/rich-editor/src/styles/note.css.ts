@@ -58,7 +58,6 @@ globalStyle(`${rendererTopParagraph}:first-of-type::first-letter`, {
 globalStyle(`${editorTopParagraph}:first-of-type::first-letter`, {
   fontSize: '1.5em',
   fontWeight: 700,
-  color: vars.color.accent,
 });
 
 globalStyle(`${editorTopParagraph}:last-child, ${rendererTopParagraph}:last-child`, {
@@ -72,40 +71,12 @@ globalStyle(note(sharedStyles.textBold), {
   color: vars.color.text,
 });
 
-// ─── Blockquote (sticky-note style) ─────────────────────
 globalStyle(note(sharedStyles.quote), {
   fontFamily: vars.typography.fontFamilyKai,
-  fontStyle: 'normal',
-  lineHeight: '1.75',
-  color: `color-mix(in srgb, ${vars.color.accent} 60%, ${vars.color.text})`,
-  backgroundColor: `color-mix(in srgb, ${vars.color.accent} 12%, ${vars.color.bg})`,
+  color: vars.color.textSecondary,
   marginTop: '1.6em',
   marginBottom: '1.6em',
-  marginLeft: 0,
-  marginRight: 0,
-  paddingTop: '1.2em',
-  paddingBottom: '1.2em',
-  paddingLeft: '1.5em',
-  paddingRight: '1.5em',
-  borderRadius: '2px',
-  boxShadow: '2px 3px 8px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)',
-  transform: 'rotate(-0.6deg)',
   textIndent: 0,
-});
-
-globalStyle(`${note(sharedStyles.quote)}::before`, {
-  content: '""',
-  position: 'absolute',
-  top: '-7px',
-  left: '50%',
-  transform: 'translateX(-50%) rotate(1.2deg)',
-  width: '56px',
-  height: '16px',
-  background: `repeating-linear-gradient(105deg, transparent, transparent 2px, rgba(255,255,255,0.08) 2px, rgba(255,255,255,0.08) 4px), color-mix(in srgb, ${vars.color.accent} 20%, rgba(0,0,0,0.06))`,
-  boxShadow: '0 1px 2px rgba(0,0,0,0.06)',
-  borderRadius: '1px',
-  bottom: 'auto',
-  opacity: 0.85,
 });
 
 globalStyle(note(`${sharedStyles.quote} ${sharedStyles.paragraph}:first-child::first-letter`), {

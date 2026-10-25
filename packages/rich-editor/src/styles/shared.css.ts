@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { contentTypography, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
@@ -63,7 +63,7 @@ const highlightKf = keyframes({
 });
 
 const footnoteFlash = keyframes({
-  '0%': { backgroundColor: 'rgba(239, 68, 68, 0.24)' },
+  '0%': { backgroundColor: vars.color.accentLight },
   '100%': { backgroundColor: 'transparent' },
 });
 
@@ -86,10 +86,9 @@ export const richContent = style({
   // flow-root establishes a BFC so floated images (data-layout^="float")
   // cannot overflow past the end of the rendered content
   display: 'flow-root',
-  fontFamily: vars.typography.fontFamily,
+  ...contentTypography,
   fontSize: vars.typography.fontSizeBase,
   lineHeight: vars.typography.lineHeight,
-  color: vars.color.text,
   wordWrap: 'break-word',
   overflowWrap: 'break-word',
 });
@@ -142,9 +141,8 @@ export const textCode = style({
   fontWeight: 'normal',
   backgroundColor: vars.color.codeBg,
   color: 'inherit',
-  padding: '0.12em 0.36em',
+  padding: '0.12em 0.4em',
   borderRadius: vars.borderRadius.sm,
-  boxShadow: `inset 0 0 0 1px ${vars.color.border}`,
   selectors: {
     '[contenteditable="true"] &': {
       paddingRight: 0,
@@ -154,9 +152,8 @@ export const textCode = style({
 
 export const textHighlight = style({
   'vars': {
-    '--rc-hl-lightness': '0.3',
     '--rc-hl-highlighted': '1',
-    '--rc-hl-color': `oklch(from ${vars.color.accent} l c h / var(--rc-hl-lightness))`,
+    '--rc-hl-color': vars.color.accentLight,
   },
   'background':
     'linear-gradient(120deg, var(--rc-hl-color, lightblue) 50%, transparent 50%) 110% 0 / 200% 100% no-repeat',
@@ -179,11 +176,6 @@ export const textHighlight = style({
         '--rc-hl-highlighted': '1',
       },
       animation: 'none',
-    },
-    "[data-theme='dark'] &": {
-      vars: {
-        '--rc-hl-lightness': '0.35',
-      },
     },
   },
 });
@@ -216,10 +208,11 @@ const hideBadgeWhenNarrow = {
 
 export const headingH1 = style({
   'position': 'relative',
-  'fontSize': '2em',
+  'fontSize': '1.875em',
   'fontWeight': 700,
-  'lineHeight': vars.typography.lineHeightTight,
-  'marginTop': headingTop(1.25, 2),
+  'lineHeight': 1.2667,
+  'letterSpacing': '-0.015em',
+  'marginTop': headingTop(1.25, 1.875),
   'marginBottom': '0.6em',
   'selectors': {
     '[contenteditable="true"] &::before': {
@@ -233,8 +226,9 @@ export const headingH1 = style({
 export const headingH2 = style({
   'position': 'relative',
   'fontSize': '1.5em',
-  'fontWeight': 700,
-  'lineHeight': vars.typography.lineHeightTight,
+  'fontWeight': 650,
+  'lineHeight': 1.3333,
+  'letterSpacing': '-0.01em',
   'marginTop': headingTop(1.1, 1.5),
   'marginBottom': '0.5em',
   'selectors': {
@@ -250,7 +244,7 @@ export const headingH3 = style({
   'position': 'relative',
   'fontSize': '1.25em',
   'fontWeight': 600,
-  'lineHeight': vars.typography.lineHeightTight,
+  'lineHeight': 1.4,
   'marginTop': headingTop(1, 1.25),
   'marginBottom': '0.4em',
   'selectors': {
@@ -264,10 +258,10 @@ export const headingH3 = style({
 
 export const headingH4 = style({
   'position': 'relative',
-  'fontSize': '1.125em',
+  'fontSize': '1.0625em',
   'fontWeight': 600,
-  'lineHeight': vars.typography.lineHeightTight,
-  'marginTop': headingTop(0.9, 1.125),
+  'lineHeight': 1.5294,
+  'marginTop': headingTop(0.9, 1.0625),
   'marginBottom': '0.35em',
   'selectors': {
     '[contenteditable="true"] &::before': {
@@ -370,7 +364,7 @@ export const listItem = style({
   marginBottom: vars.flow.list,
   selectors: {
     '&::marker': {
-      color: vars.color.textQuaternary,
+      color: vars.color.textTertiary,
     },
   },
 });
@@ -547,7 +541,7 @@ export const tableCell = style({
 
 export const tableCellHeader = style({
   border: 'none',
-  borderBottom: `1px solid color-mix(in oklab, ${vars.color.text} 18%, transparent)`,
+  borderBottom: `1px solid ${vars.color.border}`,
   padding: '8px 14px',
   textAlign: 'start',
   verticalAlign: 'bottom',
@@ -862,8 +856,8 @@ export const footnoteSectionItemRemove = style({
   transition: 'color 0.15s ease, background-color 0.15s ease',
   selectors: {
     '&:hover': {
-      color: '#ef4444',
-      backgroundColor: 'rgba(239, 68, 68, 0.1)',
+      color: vars.color.alertCaution,
+      backgroundColor: `color-mix(in oklab, ${vars.color.alertCaution} 10%, transparent)`,
     },
   },
 });
@@ -982,6 +976,7 @@ globalStyle(`${headingH6}:hover ${headingAnchor}:hover`, {
 });
 
 globalStyle(`${linkFavicon} img`, {
+  display: 'inline-block',
   width: '1em',
   height: '1em',
   borderRadius: '2px',
@@ -989,6 +984,7 @@ globalStyle(`${linkFavicon} img`, {
 });
 
 globalStyle(`${linkFavicon} svg`, {
+  display: 'inline-block',
   width: '0.9em',
   height: '0.9em',
 });

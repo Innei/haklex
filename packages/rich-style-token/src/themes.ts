@@ -9,69 +9,70 @@ export const fonts = {
     '"SF Mono", SFMono-Regular, ui-monospace, "DejaVu Sans Mono", Menlo, Consolas, "PingFang SC", "Noto Sans SC", monospace',
 };
 
-// Neutral palette (Tailwind neutral) + blue accent
 export const lightArticleColors = {
-  text: '#171717', // neutral-900
-  textSecondary: '#404040', // neutral-700
-  textTertiary: '#737373', // neutral-500
-  textQuaternary: '#a3a3a3', // neutral-400
+  text: '#171717',
+  textSecondary: '#404040',
+  textTertiary: '#737373',
+  textQuaternary: '#a3a3a3',
   bg: '#ffffff',
-  bgSecondary: '#fafafa', // neutral-50
-  bgTertiary: '#f5f5f5', // neutral-100
-  fill: '#e8e8e8', // interactive fill 1 — list item selected/hover
-  fillSecondary: '#eeeeee', // interactive fill 2 — button/control hover
-  fillTertiary: '#f5f5f5', // interactive fill 3 — large area hover (card, table row)
-  fillQuaternary: '#fafafa', // interactive fill 4 — most subtle feedback
-  border: '#e8e8e8',
+  bgSecondary: '#fafafa',
+  bgTertiary: '#f5f5f5',
+  fill: 'rgb(0 0 0 / 0.07)',
+  fillSecondary: 'rgb(0 0 0 / 0.045)',
+  fillTertiary: 'rgb(0 0 0 / 0.03)',
+  fillQuaternary: 'rgb(0 0 0 / 0.02)',
+  border: '#e5e5e5',
   borderSubtle: '#f0f0f0',
+  ring: 'rgb(0 0 0 / 0.08)',
   accent: '#2563eb',
-  accentLight: 'color-mix(in oklab, var(--rc-accent) 12%, transparent)',
+  accentLight: 'color-mix(in oklab, var(--rc-accent) 10%, transparent)',
   link: '#2563eb',
-  codeText: '#404040', // neutral-700
-  codeBg: '#f5f5f5', // neutral-100
-  codeHeaderBg: '#f0f0f0',
-  hrBorder: '#e8e8e8',
-  quoteBorder: 'color-mix(in oklab, var(--rc-text) 18%, transparent)',
-  quoteBg: '#f5f5f5', // neutral-100
-  alertInfo: '#2f6db5',
-  alertWarning: '#b7791f',
-  alertTip: '#2f855a',
-  alertCaution: '#c53030',
-  alertImportant: '#6b46c1',
+  codeText: '#171717',
+  codeBg: '#f5f5f5',
+  codeHeaderBg: '#f5f5f5',
+  hrBorder: '#e5e5e5',
+  quoteBorder: '#e5e5e5',
+  quoteBg: '#f5f5f5',
+  alertInfo: '#2563eb',
+  alertWarning: '#b45309',
+  alertTip: '#15803d',
+  alertCaution: '#dc2626',
+  alertImportant: '#7c3aed',
 };
 
 export const lightCommentColors = {
   ...lightArticleColors,
-  quoteBg: '#fafafa', // neutral-50
+  quoteBg: '#fafafa',
 };
 
 export const darkColors = {
   text: '#ededed',
-  textSecondary: '#c2c2c2',
-  textTertiary: '#8a8a8a',
-  textQuaternary: '#525252', // neutral-600
-  bg: '#0a0a0a', // neutral-950
-  bgSecondary: '#171717', // neutral-900
-  bgTertiary: '#262626', // neutral-800
-  fill: '#2a2a2a', // interactive fill 1 — list item selected/hover
-  fillSecondary: '#222222', // interactive fill 2 — button/control hover
-  fillTertiary: '#1a1a1a', // interactive fill 3 — large area hover
-  fillQuaternary: '#141414', // interactive fill 4 — most subtle feedback
-  border: '#2e2e2e',
-  borderSubtle: '#1f1f1f',
+  textSecondary: '#c4c4c4',
+  textTertiary: '#8f8f8f',
+  textQuaternary: '#5c5c5c',
+  bg: '#0a0a0a',
+  bgSecondary: '#121212',
+  bgTertiary: '#1a1a1a',
+  fill: 'rgb(255 255 255 / 0.09)',
+  fillSecondary: 'rgb(255 255 255 / 0.06)',
+  fillTertiary: 'rgb(255 255 255 / 0.04)',
+  fillQuaternary: 'rgb(255 255 255 / 0.025)',
+  border: '#262626',
+  borderSubtle: '#1c1c1c',
+  ring: 'rgb(255 255 255 / 0.1)',
   accent: '#60a5fa',
-  accentLight: 'color-mix(in oklab, var(--rc-accent) 12%, transparent)',
+  accentLight: 'color-mix(in oklab, var(--rc-accent) 16%, transparent)',
   link: '#60a5fa',
-  codeText: '#d4d4d4', // neutral-300
+  codeText: '#ededed',
   codeBg: '#1a1a1a',
-  codeHeaderBg: '#212121',
-  hrBorder: '#2e2e2e',
-  quoteBorder: 'color-mix(in oklab, var(--rc-text) 22%, transparent)',
-  quoteBg: '#262626', // neutral-800
-  alertInfo: '#7aa7e0',
-  alertWarning: '#e0a458',
-  alertTip: '#6cbf8f',
-  alertCaution: '#ef7d7d',
+  codeHeaderBg: '#1a1a1a',
+  hrBorder: '#262626',
+  quoteBorder: '#262626',
+  quoteBg: '#1a1a1a',
+  alertInfo: '#60a5fa',
+  alertWarning: '#fbbf24',
+  alertTip: '#4ade80',
+  alertCaution: '#f87171',
   alertImportant: '#a78bfa',
 };
 
@@ -85,14 +86,18 @@ const sharedSpacing = {
 };
 const sharedBorderRadius = { sm: '4px', md: '8px', lg: '12px' };
 const sharedBoxShadow = {
-  topBar: '0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-  modal: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)',
-  menu: '0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.08)',
+  xs: '0 0 0 1px var(--rc-ring), 0 1px 2px rgb(0 0 0 / 0.05)',
+  topBar:
+    '0 0 0 1px var(--rc-ring), 0 4px 12px rgb(0 0 0 / 0.06), 0 12px 32px -8px rgb(0 0 0 / 0.12)',
+  modal: '0 0 0 1px rgb(0 0 0 / 0.06), 0 16px 48px -12px rgb(0 0 0 / 0.25)',
+  menu: '0 0 0 1px var(--rc-ring), 0 4px 12px rgb(0 0 0 / 0.06), 0 12px 32px -8px rgb(0 0 0 / 0.12)',
 };
 export const darkBoxShadow = {
-  topBar: '0 8px 30px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3)',
-  modal: '0 10px 15px -3px rgba(0,0,0,0.4), 0 4px 6px -4px rgba(0,0,0,0.35)',
-  menu: '0 1px 4px rgba(0,0,0,0.25), 0 4px 16px rgba(0,0,0,0.4)',
+  xs: '0 0 0 1px var(--rc-ring), 0 1px 2px rgb(0 0 0 / 0.4)',
+  topBar:
+    '0 0 0 1px var(--rc-ring), 0 8px 24px rgb(0 0 0 / 0.5), 0 16px 40px -8px rgb(0 0 0 / 0.6)',
+  modal: '0 0 0 1px rgb(255 255 255 / 0.08), 0 16px 48px -12px rgb(0 0 0 / 0.7)',
+  menu: '0 0 0 1px var(--rc-ring), 0 8px 24px rgb(0 0 0 / 0.5), 0 16px 40px -8px rgb(0 0 0 / 0.6)',
 };
 const baseTypography = {
   fontFamilySans: fonts.fontFamilySans,

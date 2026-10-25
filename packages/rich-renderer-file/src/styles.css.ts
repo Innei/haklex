@@ -112,12 +112,12 @@ export const cardProgressFill = style({
 });
 
 export const cardError = style({
-  borderColor: '#fecaca',
-  background: 'color-mix(in srgb, #ef4444 6%, transparent)',
+  borderColor: `color-mix(in oklab, ${vars.color.alertCaution} 25%, transparent)`,
+  background: `color-mix(in oklab, ${vars.color.alertCaution} 6%, transparent)`,
 });
 
 export const cardErrorText = style({
-  color: '#b91c1c',
+  color: vars.color.alertCaution,
 });
 
 export const chip = style({
@@ -210,5 +210,5 @@ export const editInput = style({
 
 export const editError = style({
   fontSize: '0.75rem',
-  color: '#b91c1c',
+  color: vars.color.alertCaution,
 });

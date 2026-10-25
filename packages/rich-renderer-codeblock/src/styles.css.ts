@@ -25,7 +25,7 @@ export const card = style({
   minWidth: 0,
   margin: `${vars.flow.block} 0`,
   borderRadius: vars.borderRadius.md,
-  border: `1px solid ${vars.color.border}`,
+  border: `1px solid ${vars.color.borderSubtle}`,
   overflow: 'hidden',
   backgroundColor: vars.color.codeBg,
   color: vars.color.text,
@@ -42,7 +42,7 @@ export const header = style({
   height: '36px',
   padding: '0 6px 0 14px',
   backgroundColor: vars.color.codeHeaderBg,
-  borderBottom: `1px solid ${vars.color.border}`,
+  borderBottom: `1px solid ${vars.color.borderSubtle}`,
   fontFamily: vars.typography.fontFamilySans,
   fontSize: '12px',
   lineHeight: 1,
@@ -105,10 +105,10 @@ export const copyButton = style({
   'color': vars.color.textTertiary,
   'font': 'inherit',
   'cursor': 'pointer',
-  'transition': 'color 0.15s ease, background-color 0.15s ease',
+  'transition': 'color 120ms ease-out, background-color 120ms ease-out',
   ':hover': {
     color: vars.color.text,
-    backgroundColor: vars.color.fill,
+    backgroundColor: vars.color.fillSecondary,
   },
 });
 
@@ -212,7 +212,7 @@ export const expandButton = style({
   'width': '100%',
   'height': '32px',
   'border': 'none',
-  'borderTop': `1px solid ${vars.color.border}`,
+  'borderTop': `1px solid ${vars.color.borderSubtle}`,
   'background': vars.color.codeBg,
   'color': vars.color.textTertiary,
   'fontFamily': vars.typography.fontFamilySans,
@@ -294,29 +294,29 @@ globalStyle(`${card} .highlighted::before`, {
 });
 
 globalStyle(`${card} .diff.add`, {
-  background: 'rgba(34, 197, 94, 0.15)',
+  background: `color-mix(in oklab, ${vars.color.alertTip} 12%, transparent)`,
 });
 
-globalStyle(`${card} .diff.add::before`, { background: '#22c55e' });
+globalStyle(`${card} .diff.add::before`, { background: vars.color.alertTip });
 
 globalStyle(`${card} .diff.add::after`, {
   content: "' +'",
   position: 'absolute',
   left: 0,
-  color: '#22c55e',
+  color: vars.color.alertTip,
 });
 
 globalStyle(`${card} .diff.remove`, {
-  background: 'rgba(239, 68, 68, 0.15)',
+  background: `color-mix(in oklab, ${vars.color.alertCaution} 12%, transparent)`,
 });
 
-globalStyle(`${card} .diff.remove::before`, { background: '#ef4444' });
+globalStyle(`${card} .diff.remove::before`, { background: vars.color.alertCaution });
 
 globalStyle(`${card} .diff.remove::after`, {
   content: "' -'",
   position: 'absolute',
   left: 0,
-  color: '#ef4444',
+  color: vars.color.alertCaution,
 });
 
 /* ---- Line-numbered container (fallback + static highlight) ---- */
@@ -387,7 +387,7 @@ const contentRootStyles = {
   borderRadius: vars.borderRadius.md,
   overflow: 'hidden',
   margin: `${vars.flow.block} 0`,
-  border: `1px solid ${vars.color.border}`,
+  border: `1px solid ${vars.color.borderSubtle}`,
 } as const;
 
 const contentPreStyles = {
@@ -413,7 +413,7 @@ const contentHeaderStyles = {
   height: '36px',
   padding: '0 6px 0 14px',
   backgroundColor: vars.color.codeHeaderBg,
-  borderBottom: `1px solid ${vars.color.border}`,
+  borderBottom: `1px solid ${vars.color.borderSubtle}`,
   fontFamily: vars.typography.fontFamilySans,
   fontSize: '12px',
   lineHeight: 1,
@@ -441,7 +441,7 @@ const contentCopyButtonStyles = {
 
 const contentCopyButtonHoverStyles = {
   color: vars.color.text,
-  backgroundColor: vars.color.fill,
+  backgroundColor: vars.color.fillSecondary,
 } as const;
 
 const contentNumberedLineStyles = {

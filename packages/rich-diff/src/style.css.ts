@@ -1,9 +1,10 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const root = style({
+  ...chromeTypography,
   border: `1px solid ${vars.color.border}`,
-  borderRadius: 6,
+  borderRadius: vars.borderRadius.md,
   overflow: 'hidden',
   fontSize: 14,
 });

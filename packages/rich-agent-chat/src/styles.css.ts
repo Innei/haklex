@@ -1,9 +1,10 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
 import { keyframes, style } from '@vanilla-extract/css';
 
 // ── Layout ──
 
 export const chatPanel = style({
+  ...chromeTypography,
   display: 'flex',
   flexDirection: 'column',
   gap: 0,
@@ -170,13 +171,13 @@ export const toolCallErrorPre = style({
   margin: 0,
   overflowX: 'auto',
   padding: 6,
-  background: 'rgba(220, 38, 38, 0.04)',
+  background: `color-mix(in oklab, ${vars.color.alertCaution} 4%, transparent)`,
   borderRadius: vars.borderRadius.sm,
   fontFamily: vars.typography.fontMono,
   fontSize: '11px',
   whiteSpace: 'pre-wrap',
   wordBreak: 'break-all',
-  color: 'var(--hk-color-text-error, #dc2626)',
+  color: vars.color.alertCaution,
 });
 
 export const toolCallGroupItems = style({
@@ -257,14 +258,14 @@ export const errorInline = style({
   alignItems: 'baseline',
   gap: 8,
   fontSize: '13px',
-  color: 'var(--hk-color-text-error, #dc2626)',
+  color: vars.color.alertCaution,
   lineHeight: 1.5,
   margin: '8px 0',
 });
 
 export const errorRetryLink = style({
   'fontSize': '12px',
-  'color': 'var(--hk-color-text-error, #dc2626)',
+  'color': vars.color.alertCaution,
   'textDecoration': 'underline',
   'cursor': 'pointer',
   'background': 'none',
@@ -310,7 +311,7 @@ export const composerStatusDotOuter = style({
   width: 6,
   height: 6,
   borderRadius: '50%',
-  background: '#34d399',
+  background: vars.color.alertTip,
   opacity: 0.75,
   animation: `${statusDotPing} 1s cubic-bezier(0, 0, 0.2, 1) infinite`,
 });
@@ -321,7 +322,7 @@ export const composerStatusDotInner = style({
   width: 6,
   height: 6,
   borderRadius: '50%',
-  background: '#22c55e',
+  background: vars.color.alertTip,
 });
 
 export const composerStatusLine = style({
@@ -468,13 +469,13 @@ export const composerAbortButton = style({
   'width': 28,
   'height': 28,
   'flexShrink': 0,
-  'border': '1px solid var(--hk-color-text-error, #dc2626)',
+  'border': `1px solid ${vars.color.alertCaution}`,
   'borderRadius': 8,
   'background': vars.color.bg,
-  'color': 'var(--hk-color-text-error, #dc2626)',
+  'color': vars.color.alertCaution,
   'cursor': 'pointer',
   'transition': 'background 160ms ease',
   ':hover': {
-    background: 'rgba(220, 38, 38, 0.06)',
+    background: `color-mix(in oklab, ${vars.color.alertCaution} 6%, transparent)`,
   },
 });

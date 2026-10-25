@@ -39,7 +39,7 @@ export function ThinkingChain({
             }
           />
         </span>
-        <span style={isStreaming ? { color: 'var(--hk-color-text)' } : undefined}>Thinking</span>
+        <span style={isStreaming ? { color: 'var(--rc-text)' } : undefined}>Thinking</span>
 
         {isStreaming ? (
           <span style={{ display: 'flex', alignItems: 'center', gap: 2 }}>

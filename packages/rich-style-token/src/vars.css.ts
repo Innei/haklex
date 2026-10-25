@@ -6,6 +6,7 @@ import {
   globalStyle,
 } from '@vanilla-extract/css';
 
+import { withHostFallback } from './host';
 import {
   articleLayout,
   chatLayout,
@@ -33,45 +34,47 @@ export const vars = createGlobalThemeContract({
     bgSecondary: 'rc-bg-secondary',
     /** 默认值: '#f5f5f5' */
     bgTertiary: 'rc-bg-tertiary',
-    /** 默认值: '#e8e8e8' — 交互态填充色 1 (list selected/hover) */
+    /** 默认值: 'rgb(0 0 0 / 0.07)' — 交互态填充色 1 (list selected/hover) */
     fill: 'rc-fill',
-    /** 默认值: '#eeeeee' — 交互态填充色 2 (button hover) */
+    /** 默认值: 'rgb(0 0 0 / 0.045)' — 交互态填充色 2 (button hover) */
     fillSecondary: 'rc-fill-secondary',
-    /** 默认值: '#f5f5f5' — 交互态填充色 3 (large area hover) */
+    /** 默认值: 'rgb(0 0 0 / 0.03)' — 交互态填充色 3 (large area hover) */
     fillTertiary: 'rc-fill-tertiary',
-    /** 默认值: '#fafafa' — 交互态填充色 4 (most subtle) */
+    /** 默认值: 'rgb(0 0 0 / 0.02)' — 交互态填充色 4 (most subtle) */
     fillQuaternary: 'rc-fill-quaternary',
-    /** 默认值: '#e8e8e8' */
+    /** 默认值: '#e5e5e5' */
     border: 'rc-border',
     /** 默认值: '#f0f0f0' — 最弱的分隔线（表格行线等） */
     borderSubtle: 'rc-border-subtle',
+    /** 默认值: 'rgb(0 0 0 / 0.08)' — 弹层外轮廓 */
+    ring: 'rc-ring',
     /** 默认值: '#2563eb' */
     accent: 'rc-accent',
-    /** 默认值: 'color-mix(in oklab, var(--rc-accent) 12%, transparent)' */
+    /** 默认值: 'color-mix(in oklab, var(--rc-accent) 10%, transparent)' */
     accentLight: 'rc-accent-light',
     /** 默认值: '#2563eb' */
     link: 'rc-link',
-    /** 默认值: '#404040' */
+    /** 默认值: '#171717' */
     codeText: 'rc-code-text',
     /** 默认值: '#f5f5f5' */
     codeBg: 'rc-code-bg',
-    /** 默认值: '#f0f0f0' */
+    /** 默认值: '#f5f5f5' */
     codeHeaderBg: 'rc-code-header-bg',
-    /** 默认值: '#e8e8e8' */
+    /** 默认值: '#e5e5e5' */
     hrBorder: 'rc-hr-border',
-    /** 默认值: 'color-mix(in oklab, var(--rc-text) 18%, transparent)' */
+    /** 默认值: '#e5e5e5' */
     quoteBorder: 'rc-quote-border',
     /** 默认值: '#f5f5f5' */
     quoteBg: 'rc-quote-bg',
-    /** 默认值: '#2f6db5' */
+    /** 默认值: '#2563eb' */
     alertInfo: 'rc-alert-info',
-    /** 默认值: '#b7791f' */
+    /** 默认值: '#b45309' */
     alertWarning: 'rc-alert-warning',
-    /** 默认值: '#2f855a' */
+    /** 默认值: '#15803d' */
     alertTip: 'rc-alert-tip',
-    /** 默认值: '#c53030' */
+    /** 默认值: '#dc2626' */
     alertCaution: 'rc-alert-caution',
-    /** 默认值: '#6b46c1' */
+    /** 默认值: '#7c3aed' */
     alertImportant: 'rc-alert-important',
   },
   spacing: {
@@ -147,26 +150,44 @@ export const vars = createGlobalThemeContract({
     maxWidth: 'rc-max-width',
   },
   boxShadow: {
-    /** 默认值: '0 8px 30px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)' */
+    /** 默认值: '0 0 0 1px var(--rc-ring), 0 1px 2px rgb(0 0 0 / 0.05)' — 分段控件滑块、输入框 */
+    xs: 'rc-shadow-xs',
+    /** 默认值: '0 0 0 1px var(--rc-ring), 0 4px 12px rgb(0 0 0 / 0.06), 0 12px 32px -8px rgb(0 0 0 / 0.12)' */
     topBar: 'rc-shadow-top-bar',
-    /** 默认值: '0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)' */
+    /** 默认值: '0 0 0 1px rgb(0 0 0 / 0.06), 0 16px 48px -12px rgb(0 0 0 / 0.25)' */
     modal: 'rc-shadow-modal',
-    /** 默认值: '0 1px 4px rgba(0,0,0,0.04), 0 4px 16px rgba(0,0,0,0.08)' */
+    /** 默认值: '0 0 0 1px var(--rc-ring), 0 4px 12px rgb(0 0 0 / 0.06), 0 12px 32px -8px rgb(0 0 0 / 0.12)' */
     menu: 'rc-shadow-menu',
+  },
+});
+
+const hostColors = (colors: typeof lightArticleColors) => withHostFallback(vars.color, colors);
+
+const hostLayout = <L extends { typography: Record<string, string> }>(layout: L): L => ({
+  ...layout,
+  typography: {
+    ...layout.typography,
+    ...withHostFallback(vars.typography, {
+      fontFamily: layout.typography.fontFamily,
+      fontFamilySans: layout.typography.fontFamilySans,
+      fontFamilySerif: layout.typography.fontFamilySerif,
+      fontFamilyKai: layout.typography.fontFamilyKai,
+      fontMono: layout.typography.fontMono,
+    }),
   },
 });
 
 // :root default (light article)
 createGlobalTheme(':root', vars, {
-  color: lightArticleColors,
-  ...articleLayout,
+  color: hostColors(lightArticleColors),
+  ...hostLayout(articleLayout),
 });
 
 // Global dark fallback: colors/shadows ONLY. Must not redefine typography —
 // `[data-theme="dark"]` lands on the same element as the variant theme class
 // with equal specificity, so a full createGlobalTheme here would let CSS
 // bundle order decide whether note's serif font survives in dark mode.
-const darkColorVars = assignVars(vars.color, darkColors);
+const darkColorVars = assignVars(vars.color, hostColors(darkColors));
 const darkShadowVars = assignVars(vars.boxShadow, darkBoxShadow);
 globalStyle(':root.dark, [data-theme="dark"]', {
   vars: { ...darkColorVars, ...darkShadowVars },
@@ -174,23 +195,23 @@ globalStyle(':root.dark, [data-theme="dark"]', {
 
 // Three variant theme classes (light colors only; dark handled by CSS override)
 export const articleTheme = createTheme(vars, {
-  color: lightArticleColors,
-  ...articleLayout,
+  color: hostColors(lightArticleColors),
+  ...hostLayout(articleLayout),
 });
 
 export const noteTheme = createTheme(vars, {
-  color: lightArticleColors,
-  ...noteLayout,
+  color: hostColors(lightArticleColors),
+  ...hostLayout(noteLayout),
 });
 
 export const commentTheme = createTheme(vars, {
-  color: lightCommentColors,
-  ...commentLayout,
+  color: hostColors(lightCommentColors),
+  ...hostLayout(commentLayout),
 });
 
 export const chatTheme = createTheme(vars, {
-  color: lightCommentColors,
-  ...chatLayout,
+  color: hostColors(lightCommentColors),
+  ...hostLayout(chatLayout),
 });
 
 // Per-variant dark override (higher specificity for variant-specific color tweaks)

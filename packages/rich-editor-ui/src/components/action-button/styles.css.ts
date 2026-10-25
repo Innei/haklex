@@ -77,7 +77,7 @@ export const actionButton = recipe({
       },
       accent: {
         backgroundColor: vars.color.accent,
-        color: '#fff',
+        color: vars.color.bg,
         selectors: {
           '&:hover:not(:disabled)': {
             filter: 'brightness(0.9)',

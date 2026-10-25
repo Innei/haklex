@@ -60,7 +60,7 @@ export const diffInlineBarBtn = style({
   cursor: 'pointer',
   padding: '3px 9px',
   borderRadius: '6px',
-  fontFamily: 'system-ui, sans-serif',
+  fontFamily: vars.typography.fontFamilySans,
   fontSize: '11px',
   fontWeight: 500,
   lineHeight: 1.2,
@@ -121,7 +121,7 @@ export const diffGlobalMeta = style({
 
 export const diffGlobalTitle = style({
   color: vars.color.text,
-  fontFamily: 'system-ui, sans-serif',
+  fontFamily: vars.typography.fontFamilySans,
   fontSize: '12px',
   fontWeight: 650,
   lineHeight: 1.2,
@@ -129,7 +129,7 @@ export const diffGlobalTitle = style({
 
 export const diffGlobalCount = style({
   color: vars.color.textTertiary,
-  fontFamily: 'system-ui, sans-serif',
+  fontFamily: vars.typography.fontFamilySans,
   fontSize: '12px',
   lineHeight: 1.2,
   fontVariantNumeric: 'tabular-nums',

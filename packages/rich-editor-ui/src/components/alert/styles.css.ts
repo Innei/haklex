@@ -1,3 +1,4 @@
+import { vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
@@ -7,27 +8,25 @@ export const alert = recipe({
     alignItems: 'flex-start',
     gap: '8px',
     padding: '8px 12px',
-    borderRadius: '8px',
+    borderRadius: vars.borderRadius.md,
     fontSize: '13px',
     lineHeight: '1.5',
     border: '1px solid transparent',
+    color: vars.color.text,
   },
   variants: {
     variant: {
       info: {
-        backgroundColor: 'rgba(59, 130, 246, 0.06)',
-        borderColor: 'rgba(59, 130, 246, 0.24)',
-        color: '#1e40af',
+        backgroundColor: `color-mix(in oklab, ${vars.color.alertInfo} 6%, transparent)`,
+        borderColor: `color-mix(in oklab, ${vars.color.alertInfo} 18%, transparent)`,
       },
       warning: {
-        backgroundColor: 'rgba(245, 158, 11, 0.06)',
-        borderColor: 'rgba(245, 158, 11, 0.24)',
-        color: '#92400e',
+        backgroundColor: `color-mix(in oklab, ${vars.color.alertWarning} 6%, transparent)`,
+        borderColor: `color-mix(in oklab, ${vars.color.alertWarning} 18%, transparent)`,
       },
       error: {
-        backgroundColor: 'rgba(239, 68, 68, 0.06)',
-        borderColor: 'rgba(239, 68, 68, 0.24)',
-        color: '#991b1b',
+        backgroundColor: `color-mix(in oklab, ${vars.color.alertCaution} 6%, transparent)`,
+        borderColor: `color-mix(in oklab, ${vars.color.alertCaution} 18%, transparent)`,
       },
     },
   },
@@ -40,6 +39,7 @@ export const alertContent = style({
 });
 
 export const alertIcon = style({
+  display: 'block',
   width: '16px',
   height: '16px',
   flexShrink: 0,

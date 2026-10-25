@@ -125,7 +125,7 @@ export const tooltip = style({
   lineHeight: 1.5,
   pointerEvents: 'none',
   background: vars.color.bg,
-  border: `1px solid ${vars.color.hrBorder}`,
+  border: 'none',
   boxShadow: vars.boxShadow.menu,
   whiteSpace: 'nowrap',
 });

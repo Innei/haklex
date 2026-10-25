@@ -13,7 +13,8 @@ export const detailsClassNames = {
 
 export const details = style({
   margin: `${vars.spacing.md} 0`,
-  border: 'none',
+  border: `1px solid ${vars.color.border}`,
+  borderRadius: vars.borderRadius.md,
   backgroundColor: 'transparent',
   interpolateSize: 'allow-keywords',
 });
@@ -24,21 +25,21 @@ export const summary = style({
   gap: vars.spacing.sm,
   cursor: 'pointer',
   userSelect: 'none',
-  padding: `${vars.spacing.xs} 0`,
+  padding: '0.5em 0.875em',
   color: vars.color.text,
   fontWeight: 500,
   fontSize: '1em',
   lineHeight: vars.typography.lineHeight,
   listStyle: 'none',
   outline: 'none',
-  borderRadius: vars.borderRadius.sm,
-  transition: 'opacity 0.2s ease, color 0.2s ease, box-shadow 0.2s ease',
+  borderRadius: vars.borderRadius.md,
+  transition: 'background-color 120ms ease-out, box-shadow 120ms ease-out',
   selectors: {
     '&:hover': {
-      opacity: '0.82',
+      backgroundColor: vars.color.fillTertiary,
     },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accentLight}`,
+      boxShadow: `inset 0 0 0 1px ${vars.color.accent}, 0 0 0 3px ${vars.color.accentLight}`,
     },
     '&::-webkit-details-marker': {
       display: 'none',
@@ -70,11 +71,8 @@ export const chevron = style({
 });
 
 export const content = style({
-  marginTop: vars.spacing.xs,
-  padding: `${vars.spacing.sm} ${vars.spacing.xl}`,
+  padding: `0 0.875em 0.75em calc(0.875em + 1.25rem + ${vars.spacing.sm})`,
   color: vars.color.textSecondary,
-  backgroundColor: `color-mix(in srgb, ${vars.color.accent} 6%, ${vars.color.bgSecondary})`,
-  borderRadius: vars.borderRadius.md,
 });
 
 globalStyle(`${summary}:hover ${chevron}`, {
@@ -82,7 +80,7 @@ globalStyle(`${summary}:hover ${chevron}`, {
 });
 
 globalStyle(`${details}[open] ${chevron}`, {
-  color: vars.color.accent,
+  color: vars.color.textSecondary,
   transform: 'rotate(90deg)',
 });
 

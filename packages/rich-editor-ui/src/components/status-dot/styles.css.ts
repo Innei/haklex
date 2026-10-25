@@ -1,3 +1,4 @@
+import { vars } from '@haklex/rich-style-token/styles';
 import { keyframes, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
@@ -22,11 +23,11 @@ export const dot = recipe({
   },
   variants: {
     status: {
-      idle: { backgroundColor: '#a3a3a3' },
-      active: { backgroundColor: '#3b82f6' },
-      success: { backgroundColor: '#22c55e' },
-      error: { backgroundColor: '#ef4444' },
-      warning: { backgroundColor: '#f59e0b' },
+      idle: { backgroundColor: vars.color.textQuaternary },
+      active: { backgroundColor: vars.color.alertInfo },
+      success: { backgroundColor: vars.color.alertTip },
+      error: { backgroundColor: vars.color.alertCaution },
+      warning: { backgroundColor: vars.color.alertWarning },
     },
     size: {
       sm: { width: '8px', height: '8px' },
@@ -44,11 +45,11 @@ export const pulseRing = recipe({
   },
   variants: {
     status: {
-      idle: { backgroundColor: '#a3a3a3' },
-      active: { backgroundColor: '#3b82f6' },
-      success: { backgroundColor: '#22c55e' },
-      error: { backgroundColor: '#ef4444' },
-      warning: { backgroundColor: '#f59e0b' },
+      idle: { backgroundColor: vars.color.textQuaternary },
+      active: { backgroundColor: vars.color.alertInfo },
+      success: { backgroundColor: vars.color.alertTip },
+      error: { backgroundColor: vars.color.alertCaution },
+      warning: { backgroundColor: vars.color.alertWarning },
     },
     size: {
       sm: { width: '8px', height: '8px' },

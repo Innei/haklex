@@ -22,10 +22,10 @@ export const toolbar = style({
   alignItems: 'center',
   gap: 2,
   padding: 2,
-  border: `1px solid ${vars.color.border}`,
+  border: 'none',
   borderRadius: 8,
   backgroundColor: vars.color.bg,
-  boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
+  boxShadow: vars.boxShadow.menu,
   transform: 'translateY(-100%)',
 });
 

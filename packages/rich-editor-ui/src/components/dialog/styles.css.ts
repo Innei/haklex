@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
 const fadeIn = keyframes({
@@ -37,6 +37,7 @@ export const backdrop = style({
 });
 
 export const popup = style({
+  ...chromeTypography,
   'position': 'fixed',
   'top': '50%',
   'left': '50%',
@@ -47,7 +48,7 @@ export const popup = style({
   'maxWidth': 'calc(100% - 2rem)',
   'gap': 0,
   'borderRadius': vars.borderRadius.lg,
-  'border': `1px solid ${vars.color.border}`,
+  'border': 'none',
   'padding': 0,
   'fontFamily': vars.typography.fontFamilySans,
 
@@ -225,7 +226,7 @@ export const sheetContainer = style({
   backgroundColor: vars.color.bg,
   color: vars.color.text,
   fontFamily: vars.typography.fontFamilySans,
-  boxShadow: '0 -4px 24px rgba(0, 0, 0, 0.15)',
+  boxShadow: vars.boxShadow.modal,
   willChange: 'transform',
   selectors: {
     '&[data-open]': {

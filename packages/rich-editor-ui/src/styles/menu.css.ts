@@ -1,27 +1,27 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import type { StyleRule } from '@vanilla-extract/css'
-import { globalStyle, keyframes, style } from '@vanilla-extract/css'
+import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import type { StyleRule } from '@vanilla-extract/css';
+import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
 const popupIn = keyframes({
   from: { opacity: 0, transform: 'scale(0.95)' },
   to: { opacity: 1, transform: 'scale(1)' },
-})
+});
 
 const popupOut = keyframes({
   from: { opacity: 1, transform: 'scale(1)' },
   to: { opacity: 0, transform: 'scale(0.95)' },
-})
+});
 
 export const popupBase: StyleRule = {
   minWidth: '8rem',
   borderRadius: vars.borderRadius.lg,
   padding: vars.spacing.xs,
   backgroundColor: vars.color.bg,
-  boxShadow: `0 0 0 1px color-mix(in srgb, ${vars.color.text} 10%, transparent), ${vars.boxShadow.menu}`,
+  boxShadow: vars.boxShadow.menu,
   outline: 'none',
-  color: vars.color.text,
-  fontFamily: vars.typography.fontFamilySans,
+  ...chromeTypography,
   fontSize: vars.typography.fontSizeSmall,
+  lineHeight: vars.typography.lineHeightTight,
   zIndex: 50,
   maxHeight: 'var(--available-height)',
   overflowX: 'hidden',
@@ -45,7 +45,7 @@ export const popupBase: StyleRule = {
       overflow: 'hidden',
     },
   },
-}
+};
 
 export const itemBase: StyleRule = {
   display: 'flex',
@@ -71,7 +71,7 @@ export const itemBase: StyleRule = {
       pointerEvents: 'none',
     },
   },
-}
+};
 
 export function applyItemSvgStyles(itemClass: string) {
   globalStyle(`${itemClass} svg`, {
@@ -81,18 +81,18 @@ export function applyItemSvgStyles(itemClass: string) {
     height: '1rem',
     color: vars.color.textSecondary,
     transition: 'color 100ms ease',
-  })
+  });
 
   globalStyle(`${itemClass}[data-highlighted] svg`, {
     color: vars.color.text,
-  })
+  });
 }
 
 export const separator = style({
   height: '1px',
   backgroundColor: vars.color.hrBorder,
   margin: '0.25rem -0.25rem',
-})
+});
 
 export const label = style({
   fontSize: vars.typography.fontSizeXs,
@@ -100,4 +100,4 @@ export const label = style({
   lineHeight: 1.4,
   color: vars.color.textTertiary,
   padding: '0.25rem 0.375rem',
-})
+});

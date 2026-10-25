@@ -13,19 +13,24 @@ const bannerTypeColors = {
 
 const bannerTypeStyles = {
   note: {
-    backgroundColor: `color-mix(in oklab, ${vars.color.alertInfo} 8%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertInfo} 6%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${vars.color.alertInfo} 18%, transparent)`,
   },
   tip: {
-    backgroundColor: `color-mix(in oklab, ${vars.color.alertTip} 8%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertTip} 6%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${vars.color.alertTip} 18%, transparent)`,
   },
   important: {
-    backgroundColor: `color-mix(in oklab, ${vars.color.alertImportant} 8%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertImportant} 6%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${vars.color.alertImportant} 18%, transparent)`,
   },
   warning: {
-    backgroundColor: `color-mix(in oklab, ${vars.color.alertWarning} 8%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertWarning} 6%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${vars.color.alertWarning} 18%, transparent)`,
   },
   caution: {
-    backgroundColor: `color-mix(in oklab, ${vars.color.alertCaution} 8%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${vars.color.alertCaution} 6%, transparent)`,
+    boxShadow: `inset 0 0 0 1px color-mix(in oklab, ${vars.color.alertCaution} 18%, transparent)`,
   },
 } as const;
 
@@ -65,7 +70,7 @@ export const semanticTypeClassNames = {
 const bannerRootStyles = {
   borderRadius: vars.borderRadius.md,
   border: 'none',
-  padding: '14px 18px',
+  padding: '12px 16px',
   margin: `${vars.flow.block} 0`,
   color: vars.color.text,
   lineHeight: vars.typography.lineHeight,
@@ -132,15 +137,15 @@ export const bannerTrigger = style({
   font: 'inherit',
   lineHeight: 'inherit',
   cursor: 'pointer',
-  borderRadius: '4px',
+  borderRadius: vars.borderRadius.sm,
   border: 'none',
   background: 'none',
   padding: '0 2px',
   margin: '0 -2px',
-  transition: 'background-color 0.15s',
+  transition: 'background-color 120ms ease-out',
   selectors: {
     '&:hover': {
-      backgroundColor: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
+      backgroundColor: vars.color.fillSecondary,
     },
   },
 });
@@ -185,7 +190,7 @@ const compactScopes = [commentVariant, chatVariant].map((v) => `.${v}`);
 
 for (const type of Object.keys(bannerTypeColors) as Array<keyof typeof bannerTypeColors>) {
   globalStyle(darkScopes.map((d) => `${d} .${semanticTypeClassNames.root[type]}`).join(', '), {
-    backgroundColor: `color-mix(in oklab, ${bannerTypeColors[type]} 14%, transparent)`,
+    backgroundColor: `color-mix(in oklab, ${bannerTypeColors[type]} 10%, transparent)`,
   });
 }
 

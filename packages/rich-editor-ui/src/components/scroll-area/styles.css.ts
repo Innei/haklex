@@ -1,9 +1,10 @@
+import { vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const scrollArea = style({
   'overflow': 'auto',
   'scrollbarWidth': 'thin',
-  'scrollbarColor': 'rgba(0,0,0,0.15) transparent',
+  'scrollbarColor': `color-mix(in oklab, ${vars.color.text} 18%, transparent) transparent`,
   '::-webkit-scrollbar': {
     width: '6px',
   },
@@ -11,7 +12,7 @@ export const scrollArea = style({
     background: 'transparent',
   },
   '::-webkit-scrollbar-thumb': {
-    background: 'rgba(0,0,0,0.15)',
+    background: `color-mix(in oklab, ${vars.color.text} 18%, transparent)`,
     borderRadius: '3px',
   },
 });

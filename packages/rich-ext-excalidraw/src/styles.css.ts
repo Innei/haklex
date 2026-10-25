@@ -312,7 +312,7 @@ export const excalidrawConfirmBtnPrimary = style({
   'fontWeight': 500,
   'cursor': 'pointer',
   'transition': 'opacity 0.15s',
-  'color': '#fff',
+  'color': vars.color.bg,
   ':hover': {
     opacity: 0.9,
   },

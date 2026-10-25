@@ -70,7 +70,7 @@ export const alertTrigger = style({
   gap: '6px',
   cursor: 'pointer',
   padding: '2px 6px',
-  borderRadius: '4px',
+  borderRadius: vars.borderRadius.sm,
   marginInline: '-6px',
   border: 'none',
   background: 'none',
@@ -78,10 +78,10 @@ export const alertTrigger = style({
   fontWeight: 600,
   fontSize: '13px',
   lineHeight: 1.4,
-  transition: 'background-color 0.15s',
+  transition: 'background-color 120ms ease-out',
   selectors: {
     '&:hover': {
-      backgroundColor: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
+      backgroundColor: vars.color.fillSecondary,
     },
   },
 });

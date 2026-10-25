@@ -1,16 +1,15 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const toolbarContainer = style({
   display: 'flex',
   flexDirection: 'column',
+  ...chromeTypography,
   gap: 4,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 12,
-  backgroundColor: `color-mix(in srgb, ${vars.color.bg} 90%, transparent)`,
-  backdropFilter: 'blur(8px)',
+  border: 'none',
+  borderRadius: vars.borderRadius.lg,
+  backgroundColor: vars.color.bg,
   boxShadow: vars.boxShadow.topBar,
-  fontFamily: vars.typography.fontFamilySans,
   position: 'sticky',
   top: 0,
   zIndex: 50,
@@ -25,7 +24,7 @@ export const toolbarRow = style({
   gap: 4,
   flexWrap: 'wrap',
   minHeight: 36,
-  padding: '6px 16px',
+  padding: '6px 12px',
 });
 
 export const toolbarButton = style({
@@ -37,21 +36,21 @@ export const toolbarButton = style({
   'height': 32,
   'border': 'none',
   'background': 'transparent',
-  'borderRadius': 6,
+  'borderRadius': vars.borderRadius.md,
   'color': vars.color.textSecondary,
   'cursor': 'pointer',
   'padding': 0,
-  'transition': 'color 0.15s, background-color 0.15s',
+  'transition': 'color 120ms ease-out, background-color 120ms ease-out',
   ':hover': {
-    backgroundColor: vars.color.fillQuaternary,
+    backgroundColor: vars.color.fillSecondary,
     color: vars.color.text,
   },
   'selectors': {
     '&:active': {
-      backgroundColor: vars.color.fillTertiary,
+      backgroundColor: vars.color.fill,
     },
     '&[data-popup-open]': {
-      backgroundColor: vars.color.fillTertiary,
+      backgroundColor: vars.color.fill,
       color: vars.color.text,
     },
     '&:disabled': {
@@ -71,10 +70,10 @@ globalStyle(`${toolbarButton} svg`, {
 
 export const toolbarButtonActive = style({
   'color': vars.color.text,
-  'backgroundColor': vars.color.fillTertiary,
+  'backgroundColor': vars.color.fill,
   ':hover': {
     color: vars.color.text,
-    backgroundColor: vars.color.fillTertiary,
+    backgroundColor: vars.color.fill,
   },
 });
 
@@ -86,15 +85,16 @@ export const toolbarDropdownTrigger = style({
   'padding': '0 10px',
   'border': 'none',
   'background': 'transparent',
-  'borderRadius': 6,
-  'color': vars.color.textSecondary,
+  'borderRadius': vars.borderRadius.md,
+  'color': vars.color.text,
   'cursor': 'pointer',
+  'fontFamily': 'inherit',
   'fontSize': 13,
   'fontWeight': 500,
   'lineHeight': 1,
-  'transition': 'color 0.15s, background-color 0.15s',
+  'transition': 'color 120ms ease-out, background-color 120ms ease-out',
   ':hover': {
-    backgroundColor: vars.color.fillQuaternary,
+    backgroundColor: vars.color.fillSecondary,
     color: vars.color.text,
   },
 });
@@ -107,14 +107,14 @@ export const toolbarDropdownTriggerChevron = style({
 
 export const toolbarSeparator = style({
   width: 1,
-  height: 24,
+  height: 18,
   backgroundColor: vars.color.border,
   marginInline: 6,
   flexShrink: 0,
 });
 
 export const toolbarDropdownItemActive = style({
-  backgroundColor: vars.color.fillTertiary,
+  backgroundColor: vars.color.fill,
   color: vars.color.text,
 });
 

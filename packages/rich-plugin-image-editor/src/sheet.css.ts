@@ -35,7 +35,7 @@ export const row = style({
 });
 
 export const rowFailed = style({
-  borderColor: 'rgba(239, 68, 68, 0.55)',
+  borderColor: `color-mix(in oklab, ${vars.color.alertCaution} 55%, transparent)`,
 });
 
 export const thumb = style({
@@ -81,7 +81,7 @@ export const badge = style({
 });
 
 export const meta = style({
-  color: '#737373',
+  color: vars.color.textTertiary,
   fontSize: 12,
   fontVariantNumeric: 'tabular-nums',
 });
@@ -90,12 +90,12 @@ export const gpsTag = style({
   display: 'flex',
   alignItems: 'center',
   gap: 4,
-  color: '#b45309',
+  color: vars.color.alertWarning,
   fontSize: 12,
 });
 
 export const errorText = style({
-  color: '#dc2626',
+  color: vars.color.alertCaution,
   fontSize: 12,
 });
 
@@ -104,9 +104,9 @@ export const gpsPanel = style({
   flexDirection: 'column',
   gap: 8,
   padding: '10px 12px',
-  border: '1px solid rgba(245, 158, 11, 0.35)',
+  border: `1px solid color-mix(in oklab, ${vars.color.alertWarning} 35%, transparent)`,
   borderRadius: vars.borderRadius.md,
-  backgroundColor: 'rgba(245, 158, 11, 0.1)',
+  backgroundColor: `color-mix(in oklab, ${vars.color.alertWarning} 10%, transparent)`,
   fontSize: 13,
 });
 
@@ -122,7 +122,7 @@ export const gpsCoords = style({
   alignItems: 'center',
   gap: 8,
   paddingLeft: 24,
-  color: '#737373',
+  color: vars.color.textTertiary,
   fontSize: 12,
   fontVariantNumeric: 'tabular-nums',
 });
@@ -145,7 +145,7 @@ export const footer = style({
 
 export const hint = style({
   flex: 1,
-  color: '#737373',
+  color: vars.color.textTertiary,
   fontSize: 12,
 });
 
@@ -159,7 +159,7 @@ export const iconButton = style({
   border: 'none',
   borderRadius: vars.borderRadius.sm,
   backgroundColor: 'transparent',
-  color: '#737373',
+  color: vars.color.textTertiary,
   cursor: 'pointer',
   selectors: {
     '&:hover': {

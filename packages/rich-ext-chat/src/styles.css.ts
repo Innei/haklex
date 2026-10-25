@@ -326,7 +326,7 @@ export const messageTextarea = style({
   width: '100%',
   border: 0,
   padding: '10px 12px',
-  fontFamily: '-apple-system, "JetBrains Mono", monospace',
+  fontFamily: vars.typography.fontMono,
   fontSize: 13,
   lineHeight: 1.55,
   color: vars.color.text,

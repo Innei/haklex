@@ -1,13 +1,14 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { style } from '@vanilla-extract/css'
+import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import { style } from '@vanilla-extract/css';
 
 export const root = style({
+  ...chromeTypography,
   position: 'relative',
-})
+});
 
 export const tablist = style({
   display: 'flex',
-})
+});
 
 export const tab = style({
   position: 'relative',
@@ -29,11 +30,11 @@ export const tab = style({
       outlineOffset: '2px',
     },
   },
-})
+});
 
 export const tabActive = style({
   color: vars.color.text,
-})
+});
 
 export const border = style({
   position: 'absolute',
@@ -42,7 +43,7 @@ export const border = style({
   right: 0,
   height: '1px',
   backgroundColor: vars.color.border,
-})
+});
 
 export const indicator = style({
   position: 'absolute',
@@ -50,4 +51,4 @@ export const indicator = style({
   height: '2px',
   backgroundColor: vars.color.text,
   transition: 'left 300ms ease-in-out, width 300ms ease-in-out',
-})
+});
