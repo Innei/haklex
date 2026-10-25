@@ -642,3 +642,81 @@ export function computeDiff(
 
   return hunks;
 }
+
+export type InlineDiffBlockType = 'equal' | 'modify' | 'insert' | 'delete';
+
+export interface InlineDiffBlock {
+  node: SerializedLexicalNode;
+  type: InlineDiffBlockType;
+}
+
+function containsMark(node: SerializedLexicalNode): boolean {
+  if (isTextNode(node)) {
+    const style = typeof node.style === 'string' ? node.style : '';
+    return style.includes(DELETE_MARK_STYLE) || style.includes(INSERT_MARK_STYLE);
+  }
+  return getChildren(node)?.some(containsMark) ?? false;
+}
+
+function containsOpaqueNode(node: SerializedLexicalNode): boolean {
+  if (isTextNode(node)) return false;
+  const children = getChildren(node);
+  return children ? children.some(containsOpaqueNode) : true;
+}
+
+function hasUnmarkableChange(
+  oldNode: SerializedLexicalNode,
+  newNode: SerializedLexicalNode,
+): boolean {
+  if (getNodeTypeKey(oldNode) !== getNodeTypeKey(newNode)) return true;
+  const oldChildren = getChildren(oldNode);
+  const newChildren = getChildren(newNode);
+  if (!oldChildren || !newChildren) return !nodesEqual(oldNode, newNode);
+
+  return alignNodes(oldChildren, newChildren).some((op) => {
+    switch (op.kind) {
+      case 'equal': {
+        return false;
+      }
+      case 'insert':
+      case 'delete': {
+        return containsOpaqueNode(op.node);
+      }
+      case 'modify': {
+        if (isTextNode(op.oldNode) && isTextNode(op.newNode)) return false;
+        return hasUnmarkableChange(op.oldNode, op.newNode);
+      }
+    }
+  });
+}
+
+export function computeInlineDiff(
+  oldState: SerializedEditorState,
+  newState: SerializedEditorState,
+): InlineDiffBlock[] {
+  return alignNodes(oldState.root.children, newState.root.children).flatMap(
+    (op): InlineDiffBlock[] => {
+      switch (op.kind) {
+        case 'equal': {
+          return [{ type: 'equal', node: op.node }];
+        }
+        case 'modify': {
+          const merged = diffMergedNode(op.oldNode, op.newNode);
+          if (containsMark(merged) && !hasUnmarkableChange(op.oldNode, op.newNode)) {
+            return [{ type: 'modify', node: merged }];
+          }
+          return [
+            { type: 'delete', node: decorateSubtree(op.oldNode, 'delete') },
+            { type: 'insert', node: decorateSubtree(op.newNode, 'insert') },
+          ];
+        }
+        case 'delete': {
+          return [{ type: 'delete', node: decorateSubtree(op.node, 'delete') }];
+        }
+        case 'insert': {
+          return [{ type: 'insert', node: decorateSubtree(op.node, 'insert') }];
+        }
+      }
+    },
+  );
+}

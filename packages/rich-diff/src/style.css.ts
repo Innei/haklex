@@ -146,3 +146,26 @@ globalStyle(`${dc} > :first-child`, {
 globalStyle(`${dc} > :last-child`, {
   marginBottom: 0,
 });
+
+export const inlineCell = style({
+  padding: '4px 12px',
+  borderBottom: `1px solid ${vars.color.border}`,
+  selectors: {
+    '&:last-child': {
+      borderBottom: 'none',
+    },
+  },
+});
+
+export const collapsed = style({
+  padding: '4px 12px',
+  fontSize: 12,
+  color: vars.color.textSecondary,
+  background: vars.color.bgSecondary,
+  borderBottom: `1px solid ${vars.color.border}`,
+  selectors: {
+    '&:last-child': {
+      borderBottom: 'none',
+    },
+  },
+});
