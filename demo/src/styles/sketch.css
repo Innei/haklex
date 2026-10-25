@@ -1,0 +1,73 @@
+.sk-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.sk-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sk-line {
+  height: 5px;
+  border-radius: 3px;
+  background: var(--rc-fill);
+}
+
+.sk-line-strong {
+  background: var(--rc-text-quaternary);
+}
+
+.sk-box {
+  border: 1px solid var(--rc-text-quaternary);
+  border-radius: 4px;
+}
+
+.sk-card {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: var(--rc-bg);
+  box-shadow: 0 0 0 1px var(--rc-border);
+}
+
+.sk-fill {
+  border-radius: 4px;
+  background: var(--rc-fill);
+}
+
+.sk-callout {
+  padding: 8px 10px;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--sk-tone) 6%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sk-tone) 18%, transparent);
+}
+
+.sk-callout-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--sk-tone);
+}
+
+.sk-math {
+  font-family: 'Times New Roman', serif;
+  font-size: 18px;
+  font-style: italic;
+}
+
+.sk-mono {
+  font-family: var(--rc-font-mono);
+  font-size: 11px;
+  color: var(--rc-text-tertiary);
+}
+
+.sk-svg {
+  color: var(--rc-text-quaternary);
+}
+
+.sk-dashed {
+  border: 1px dashed var(--rc-text-quaternary);
+  box-shadow: none;
+}

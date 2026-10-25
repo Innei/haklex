@@ -1,0 +1,283 @@
+.doc-title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.doc-title-row .doc-title {
+  margin: 0;
+}
+
+.doc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.doc-table th {
+  padding: 0 12px 10px 0;
+  border-bottom: 1px solid var(--rc-border);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  color: var(--rc-text-secondary);
+}
+
+.doc-table td {
+  padding: 10px 12px 10px 0;
+  border-bottom: 1px solid var(--rc-border-subtle);
+  vertical-align: top;
+  color: var(--rc-text-secondary);
+}
+
+.doc-table code,
+.doc-table kbd {
+  font-family: var(--rc-font-mono);
+  font-size: 12px;
+  color: var(--rc-text);
+}
+
+.doc-empty {
+  margin: 0;
+  padding: 16px;
+  border: 1px dashed var(--rc-border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--rc-text-tertiary);
+}
+
+.review-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px;
+  border: 1px solid var(--rc-border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rc-text-secondary);
+}
+
+.review-dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--rc-text-quaternary);
+}
+
+.review-dot[data-status='issues'] {
+  background: var(--rc-alert-caution);
+}
+
+.review-dot[data-status='passed'] {
+  background: var(--rc-alert-tip);
+}
+
+.finding-state {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rc-alert-caution);
+}
+
+.finding-state[data-state='fixed'] {
+  color: var(--rc-alert-tip);
+}
+
+.tf-pair {
+  display: flex;
+  gap: 16px;
+}
+
+.tf {
+  flex: 1 1 0;
+  min-width: 0;
+  border: 1px solid var(--rc-border);
+  border-radius: 12px;
+}
+
+.tf-head {
+  display: flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border-bottom: 1px solid var(--rc-border-subtle);
+  font-size: 12px;
+  color: var(--rc-text-tertiary);
+}
+
+.tf-stage {
+  position: relative;
+  min-height: 180px;
+  padding: 32px;
+  border-radius: 0 0 11px 11px;
+  color-scheme: light;
+  background: var(--rc-bg);
+  color: var(--rc-text);
+}
+
+.tf-stage[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+.tf-stage.stage-tall {
+  min-height: 320px;
+}
+
+.force {
+  display: contents;
+}
+
+.state-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 24px;
+}
+
+.state-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.state-label {
+  font-size: 12px;
+  color: var(--rc-text-tertiary);
+}
+
+.state-body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.state-table {
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.state-table th {
+  padding: 0 16px 12px 0;
+  font-weight: 500;
+  text-align: left;
+  color: var(--rc-text-tertiary);
+}
+
+.state-table td {
+  padding: 0 16px 12px 0;
+}
+
+.demo-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 116px;
+}
+
+.demo-top {
+  display: flex;
+  align-items: flex-start;
+}
+
+.demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.demo-row-tall {
+  align-items: flex-start;
+  gap: 220px;
+  min-height: 240px;
+}
+
+.demo-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.demo-fill {
+  width: 100%;
+}
+
+.demo-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--rc-text-secondary);
+}
+
+.demo-text {
+  margin: 0 0 8px;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--rc-text-secondary);
+}
+
+.demo-scroll {
+  height: 160px;
+}
+
+.demo-field {
+  width: 220px;
+}
+
+.demo-menu {
+  width: 240px;
+}
+
+.demo-popover {
+  width: 260px;
+}
+
+.chrome-editor {
+  margin: -32px;
+}
+
+.chrome-hint {
+  margin: 0;
+  padding: 10px 16px;
+  border-top: 1px solid var(--rc-border-subtle);
+  font-size: 12px;
+  color: var(--rc-text-tertiary);
+}
+
+.slash-states {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(288px, 1fr));
+  gap: 24px;
+}
+
+.slash-frozen {
+  position: relative;
+  min-height: 420px;
+}
+
+.slash-anchor {
+  font-family: var(--rc-font-mono);
+  font-size: 13px;
+  color: var(--rc-text);
+}
+
+@media (max-width: 1023px) {
+  .tf-pair,
+  .tk-type,
+  .tk-spacing {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.doc-h2 + .tf,
+.doc-h2 + .tf-pair,
+.doc-h2 + .doc-table {
+  margin-top: 16px;
+}

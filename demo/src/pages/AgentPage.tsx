@@ -18,7 +18,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { type LexicalEditor as LexicalEditorInstance, type SerializedEditorState } from 'lexical';
 import { useCallback, useMemo, useRef, useState } from 'react';
 
-import { useFullWidth } from '../context/FullWidthContext';
+import { Workbench } from '../components/workbench/Workbench';
 import { useTheme } from '../context/ThemeContext';
 import { useDynamicCatalogSystemMessages } from '../fixtures/dynamic-catalog';
 import { LexicalEditor } from '../lexical';
@@ -357,43 +357,48 @@ function AgentEditorWithChat({ store }: { store: ReturnType<typeof createAgentSt
   );
 
   return (
-    <div className="agent-split">
-      <div className="agent-pane-editor">
-        <MentionPlatformProvider platforms={{}}>
-          <LexicalEditor
-            extraNodes={[AgentDiffEditNode]}
-            floatingToolbarActions={provider ? <AgentAskAIAction /> : undefined}
-            header={<ToolbarPlugin />}
-            initialValue={initialContent}
-          >
-            {provider && <AgentPanelPlugin provider={provider} store={store} />}
-            {provider && <AgentSelectionPinPlugin store={store} />}
-            <DiffReviewOverlayPlugin store={store} />
-            <AgentLoopCapture
-              editorRef={editorRef}
-              loopRef={agentLoopRef}
-              provider={provider}
+    <Workbench
+      panelLabel="Agent chat"
+      panelTitle="Chat"
+      panelWidth={380}
+      title="AI Agent"
+      panel={
+        <div className="agent-chat" data-theme={theme}>
+          <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
+            <ChatPanel
+              providerGroups={providerGroups}
+              selectedModel={selectedModel}
               store={store}
+              onAbort={handleAbort}
+              onAcceptBatch={handleAcceptBatch}
+              onRejectBatch={handleRejectBatch}
+              onRetry={handleRetry}
+              onSelectModel={handleSelectModel}
+              onSend={handleSend}
             />
-          </LexicalEditor>
-        </MentionPlatformProvider>
-      </div>
-      <div className="agent-pane-chat" data-theme={theme}>
-        <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
-          <ChatPanel
-            providerGroups={providerGroups}
-            selectedModel={selectedModel}
+          </PortalThemeProvider>
+        </div>
+      }
+    >
+      <MentionPlatformProvider platforms={{}}>
+        <LexicalEditor
+          extraNodes={[AgentDiffEditNode]}
+          floatingToolbarActions={provider ? <AgentAskAIAction /> : undefined}
+          header={<ToolbarPlugin className="wb-toolbar" />}
+          initialValue={initialContent}
+        >
+          {provider && <AgentPanelPlugin provider={provider} store={store} />}
+          {provider && <AgentSelectionPinPlugin store={store} />}
+          <DiffReviewOverlayPlugin store={store} />
+          <AgentLoopCapture
+            editorRef={editorRef}
+            loopRef={agentLoopRef}
+            provider={provider}
             store={store}
-            onAbort={handleAbort}
-            onAcceptBatch={handleAcceptBatch}
-            onRejectBatch={handleRejectBatch}
-            onRetry={handleRetry}
-            onSelectModel={handleSelectModel}
-            onSend={handleSend}
           />
-        </PortalThemeProvider>
-      </div>
-    </div>
+        </LexicalEditor>
+      </MentionPlatformProvider>
+    </Workbench>
   );
 }
 
@@ -444,7 +449,6 @@ function AgentLoopCaptureInner({
 }
 
 export function AgentPage() {
-  useFullWidth();
   const store = useMemo(() => createAgentStore(), []);
 
   return <AgentEditorWithChat store={store} />;

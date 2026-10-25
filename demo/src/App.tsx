@@ -1,40 +1,44 @@
 import 'modern-normalize/modern-normalize.css';
 import './lexical/style';
+import './styles/base.css';
+import './styles/shell.css';
+import './styles/palette.css';
+import './styles/doc.css';
+import './styles/sketch.css';
+import './styles/workbench.css';
+import './styles/catalog.css';
+import './styles/tokens.css';
+import './styles/component-sketch.css';
 import './demo.css';
 
 import type { ColorScheme, RichEditorVariant } from '@haklex/rich-editor';
 import { DialogStackProvider } from '@haklex/rich-editor-ui';
 import { PollDataProvider } from '@haklex/rich-ext-poll';
-import { Monitor, Moon, Sun } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Menu } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 
 import { Logo } from './components/Logo';
-import { FullWidthContext, SetFullWidthContext } from './context/FullWidthContext';
+import { CommandPalette } from './components/shell/CommandPalette';
+import type { ThemeMode } from './components/shell/Sidebar';
+import { Sidebar } from './components/shell/Sidebar';
 import { ThemeContext } from './context/ThemeContext';
 import { SetVariantContext, VariantContext } from './context/VariantContext';
 import { mockPollAdapter } from './fixtures/mock-poll-adapter';
 import { AgentPage } from './pages/AgentPage';
-import { ChartsPage } from './pages/ChartsPage';
+import { ChartKindPage } from './pages/charts/ChartKindPage';
+import { ChartsOverview } from './pages/charts/ChartsOverview';
 import { CommentsPage } from './pages/CommentsPage';
+import { ComponentPage } from './pages/components/ComponentPage';
+import { ComponentsOverview } from './pages/components/ComponentsOverview';
 import { EditorPage } from './pages/EditorPage';
-import { ExtensionsPage } from './pages/ExtensionsPage';
+import { ExtensionPage } from './pages/extensions/ExtensionPage';
+import { ExtensionsOverview } from './pages/extensions/ExtensionsOverview';
 import { HostilePage } from './pages/HostilePage';
-import { NodeShowcase } from './pages/NodeShowcase';
+import { NodesOverview } from './pages/nodes/NodesOverview';
+import { NodeTypePage } from './pages/nodes/NodeTypePage';
 import { PresetsPage } from './pages/PresetsPage';
-
-type ThemeMode = 'system' | 'light' | 'dark';
-
-const navItems = [
-  { path: '/editor', label: 'Editor' },
-  { path: '/presets', label: 'Presets' },
-  { path: '/comments', label: 'Comments' },
-  { path: '/nodes', label: 'Nodes' },
-  { path: '/extensions', label: 'Extensions' },
-  { path: '/charts', label: 'Charts' },
-  { path: '/ai', label: 'AI' },
-  { path: '/hostile', label: 'Hostile host' },
-] as const;
+import { TokensPage } from './pages/tokens/TokensPage';
 
 function useSystemColorScheme(): ColorScheme {
   const [scheme, setScheme] = useState<ColorScheme>(() =>
@@ -55,63 +59,34 @@ function Layout() {
   const location = useLocation();
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
   const [variant, setVariant] = useState<RichEditorVariant>('article');
-  const [fullWidth, setFullWidth] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
   const systemScheme = useSystemColorScheme();
-  const headerRef = useRef<HTMLElement | null>(null);
-  const [headerHeight, setHeaderHeight] = useState(88);
-
   const resolved: ColorScheme = themeMode === 'system' ? systemScheme : themeMode;
 
-  const dataTheme = useMemo(
-    () => (themeMode === 'system' ? systemScheme : themeMode),
-    [systemScheme, themeMode],
-  );
+  useEffect(() => {
+    setDrawerOpen(false);
+  }, [location.pathname, location.search]);
 
-  const cycleTheme = useCallback(() => {
-    setThemeMode((m) => {
-      if (m === 'system') return 'light';
-      if (m === 'light') return 'dark';
-      return 'system';
-    });
-  }, []);
-
-  const themeLabel = themeMode === 'system' ? 'System' : themeMode === 'light' ? 'Light' : 'Dark';
-  const ThemeIcon = themeMode === 'system' ? Monitor : themeMode === 'light' ? Sun : Moon;
-
-  const isActivePath = useCallback(
-    (path: string) => {
-      if (path === '/') return location.pathname === '/';
-      return location.pathname === path || location.pathname.startsWith(`${path}/`);
-    },
-    [location.pathname],
-  );
+  useLayoutEffect(() => {
+    if (!location.hash && mainRef.current) mainRef.current.scrollTop = 0;
+  }, [location.pathname, location.hash]);
 
   useEffect(() => {
-    const headerNode = headerRef.current;
-
-    if (!headerNode) {
-      return;
-    }
-
-    const updateHeaderHeight = () => {
-      setHeaderHeight(headerNode.offsetHeight);
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
     };
-
-    updateHeaderHeight();
-
-    const observer = new ResizeObserver(updateHeaderHeight);
-    observer.observe(headerNode);
-
-    return () => {
-      observer.disconnect();
-    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
   useEffect(() => {
     const previousBodyMargin = document.body.style.margin;
-
     document.body.style.margin = '0';
-
     return () => {
       document.body.style.margin = previousBodyMargin;
     };
@@ -121,88 +96,36 @@ function Layout() {
     <ThemeContext value={resolved}>
       <DialogStackProvider>
         <PollDataProvider adapter={mockPollAdapter}>
-          <div
-            className="app"
-            data-theme={dataTheme}
-            style={{ ['--app-header-height' as string]: `${headerHeight}px` }}
-          >
-            <header
-              className="app-header"
-              ref={headerRef}
-              style={{ left: 0, position: 'fixed', right: 0, top: 0 }}
-            >
-              <div className="app-header-content">
-                <Link className="app-logo" to="/">
-                  <Logo size={20} />
-                  <span className="app-logo-text">haklex</span>
-                </Link>
-                <nav className="app-nav">
-                  {navItems.map((item) => (
-                    <Link
-                      className={isActivePath(item.path) ? 'nav-tab nav-tab-active' : 'nav-tab'}
-                      key={item.path}
-                      to={item.path}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </nav>
-                <div className="app-header-right">
-                  <a
-                    className="nav-icon-btn"
-                    href="https://github.com/innei/haklex"
-                    rel="noreferrer"
-                    target="_blank"
-                    title="GitHub"
-                  >
-                    <svg fill="currentColor" height={18} viewBox="0 0 24 24" width={18}>
-                      <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2Z" />
-                    </svg>
-                  </a>
-                  <button className="nav-icon-btn" title={themeLabel} onClick={cycleTheme}>
-                    <ThemeIcon size={16} />
-                  </button>
-                </div>
-              </div>
-            </header>
-
-            <main
-              className="app-main"
-              style={{
-                bottom: 0,
-                left: 0,
-                margin: 0,
-                maxWidth: 'none',
-                overflowY: 'auto',
-                padding: 0,
-                paddingBottom: fullWidth ? 0 : '64px',
-                position: 'fixed',
-                right: 0,
-                top: `${headerHeight}px`,
-                width: 'auto',
-              }}
-            >
-              <div
-                style={{
-                  boxSizing: 'border-box',
-                  margin: '0 auto',
-                  maxWidth: fullWidth ? 'none' : '1200px',
-                  minHeight: '100%',
-                  padding: fullWidth ? 0 : '24px',
-                  width: '100%',
-                }}
+          <div className="app" data-drawer={drawerOpen ? 'open' : 'closed'} data-theme={resolved}>
+            <header className="mobile-bar">
+              <button
+                aria-expanded={drawerOpen}
+                aria-label="Open navigation"
+                className="icon-btn"
+                type="button"
+                onClick={() => setDrawerOpen(true)}
               >
-                <SetFullWidthContext value={setFullWidth}>
-                  <FullWidthContext value={fullWidth}>
-                    <SetVariantContext value={setVariant}>
-                      <VariantContext value={variant}>
-                        <Outlet />
-                      </VariantContext>
-                    </SetVariantContext>
-                  </FullWidthContext>
-                </SetFullWidthContext>
-              </div>
+                <Menu size={18} />
+              </button>
+              <Link className="sidebar-brand" to="/editor">
+                <Logo size={20} />
+                haklex
+              </Link>
+            </header>
+            <div aria-hidden="true" className="drawer-scrim" onClick={() => setDrawerOpen(false)} />
+            <Sidebar
+              themeMode={themeMode}
+              onOpenSearch={() => setPaletteOpen(true)}
+              onThemeModeChange={setThemeMode}
+            />
+            <main className="app-main" ref={mainRef}>
+              <SetVariantContext value={setVariant}>
+                <VariantContext value={variant}>
+                  <Outlet />
+                </VariantContext>
+              </SetVariantContext>
             </main>
+            {paletteOpen && <CommandPalette onClose={() => setPaletteOpen(false)} />}
           </div>
         </PollDataProvider>
       </DialogStackProvider>
@@ -218,9 +141,17 @@ export const router = createBrowserRouter([
       { path: '/editor', element: <EditorPage /> },
       { path: '/presets', element: <PresetsPage /> },
       { path: '/comments', element: <CommentsPage /> },
-      { path: '/nodes', element: <NodeShowcase /> },
-      { path: '/extensions', element: <ExtensionsPage /> },
-      { path: '/charts', element: <ChartsPage /> },
+      { path: '/nodes', element: <NodesOverview /> },
+      { path: '/nodes/:type', element: <NodeTypePage /> },
+      { path: '/extensions', element: <ExtensionsOverview /> },
+      { path: '/extensions/:id', element: <ExtensionPage /> },
+      { path: '/charts', element: <ChartsOverview /> },
+      { path: '/charts/:kind', element: <ChartKindPage /> },
+      { path: '/tokens', element: <TokensPage /> },
+      { path: '/ui', element: <ComponentsOverview key="ui" kind="ui" /> },
+      { path: '/ui/:id', element: <ComponentPage key="ui" kind="ui" /> },
+      { path: '/chrome', element: <ComponentsOverview key="chrome" kind="chrome" /> },
+      { path: '/chrome/:id', element: <ComponentPage key="chrome" kind="chrome" /> },
       { path: '/ai', element: <AgentPage /> },
       { path: '/hostile', element: <HostilePage /> },
       { path: '*', element: <Navigate replace to="/editor" /> },

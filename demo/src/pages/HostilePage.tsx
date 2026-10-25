@@ -3,6 +3,8 @@ import { use, useEffect, useState } from 'react';
 
 import { Panel } from '../components/Panel';
 import { VariantPicker } from '../components/VariantPicker';
+import { InspectorSection, SwitchRow } from '../components/workbench/Inspector';
+import { Workbench } from '../components/workbench/Workbench';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { initialContent } from '../fixtures/initial-content';
@@ -38,38 +40,36 @@ export function HostilePage() {
   }, [theme]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <div className="toolbar">
-        <VariantPicker />
-        <div className="toolbar-group">
-          <span className="toolbar-label">Host</span>
-          <button
-            className={hostile ? 'btn btn-active' : 'btn'}
-            onClick={() => setHostile((v) => !v)}
-          >
-            Hostile CSS
-          </button>
-          <button
-            className={mapping ? 'btn btn-active' : 'btn'}
-            onClick={() => setMapping((v) => !v)}
-          >
-            Stone mapping
-          </button>
-        </div>
+    <Workbench
+      baseSurface
+      meta={<span className="badge">{variant}</span>}
+      panelLabel="Inspector"
+      panelTitle="Inspector"
+      title="Hostile host"
+      panel={
+        <>
+          <InspectorSection title="Variant">
+            <VariantPicker block />
+          </InspectorSection>
+          <InspectorSection title="Host">
+            <SwitchRow checked={hostile} label="Hostile CSS" onChange={setHostile} />
+            <SwitchRow checked={mapping} label="Stone mapping" onChange={setMapping} />
+          </InspectorSection>
+        </>
+      }
+    >
+      <LexicalEditor
+        header={<ToolbarPlugin className="wb-toolbar" />}
+        initialValue={initialContent}
+        theme={theme}
+        variant={variant}
+      />
+
+      <div className="wb-extra">
+        <Panel badge={variant} title="Renderer">
+          <LexicalRenderer theme={theme} value={initialContent} variant={variant} />
+        </Panel>
       </div>
-
-      <Panel badge={variant} bodyStyle={{ padding: 0 }} title="Editor">
-        <LexicalEditor
-          header={<ToolbarPlugin />}
-          initialValue={initialContent}
-          theme={theme}
-          variant={variant}
-        />
-      </Panel>
-
-      <Panel badge={variant} title="Renderer">
-        <LexicalRenderer theme={theme} value={initialContent} variant={variant} />
-      </Panel>
-    </div>
+    </Workbench>
   );
 }

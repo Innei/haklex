@@ -1,69 +1,54 @@
 ---
 name: demo-ui-direction
-description: Use when modifying demo/ UI — adding pages, components, or styles. Defines the monochrome visual system, layout patterns, and component conventions for the haklex demo site.
+description: Use when modifying demo/ UI — adding pages, components, or styles. Defines the left-sidebar shell, the Doc and Workbench page templates, and the flat-line Quiet Ink conventions for the haklex demo site.
 ---
 
 # Demo UI Direction
 
-Monochrome, minimal aesthetic inspired by Linear/Vercel. All demo/ UI work must follow these conventions.
+The demo site is haklex's docs + playground. Its chrome uses the same Quiet Ink tokens as the editor (`--rc-*`); there is no second palette. Direction: modern, flat, 1px lines, translucent fills for interaction, no card shadows.
 
 **Sub-references:**
 
-- `demo-ui-tokens` — full color/spacing/typography/radius token tables
-- `demo-ui-components` — all component CSS classes, specs, and anatomy diagrams
+- `demo-ui-tokens` — which `--rc-*` token each chrome role reads, sizes, the dark "lift"
+- `demo-ui-components` — shell, Doc, Workbench and primitive classes/components
 
-## Visual System
+Design spec: `docs/superpowers/specs/2026-10-25-docs-site-layout-design.md`.
 
-**Palette**: Black/white only. No colored accents. See `demo-ui-tokens` for full color table.
+## Shell
 
-- Light: `#171717` text, `#fafafa` bg, `#e5e5e5` border
-- Dark: `#fafafa` text, `#0a0a0a` bg, `#262626` border
-- Accent = text color itself. Subtle bg = `rgba(text, 0.06)`
+`demo/src/App.tsx` → `.app` is a 2-column grid: `Sidebar` (260px) + `.app-main` (the only scroll container). No top header. Below 768px the sidebar becomes a drawer opened from `.mobile-bar`.
 
-**Typography**: `-apple-system, 'Inter', system-ui, sans-serif`. Headings: tight letter-spacing (-0.3px to -0.5px), 700 weight. See `demo-ui-tokens` for full size/weight matrix.
+- Sidebar data comes from `demo/src/site/catalog.ts` (`navGroups`). Never hard-code nav items in components. Adding a page = add a route in `App.tsx` + an entry in `navGroups` (tree leaves for per-item pages).
+- Groups: Playground (Editor, Presets, Comments) · Reference (Nodes, Extensions, Charts) · Labs (AI Agent, Hostile host).
+- The active section expands into a tree; the current leaf is marked by its 1px left line turning `text` color (no fill).
+- Theme switch (System / Light / Dark) lives only in the sidebar footer.
+- ⌘K / Ctrl+K opens `CommandPalette`, backed by `searchCatalog()`.
 
-**Spacing**: 32px page padding, 16px card gaps, 24-28px section gaps. Increments of 2/4/8. See `demo-ui-tokens` for complete spacing scale.
+## Two page templates
 
-**Borders**: 1px `var(--demo-border)`. Hover darkens to `var(--demo-text-muted)`. No shadows on cards.
+| Template  | Component                        | Use for                                                    | Shape                                                                                                            |
+| --------- | -------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Doc       | `components/doc/DocPage`         | reading / comparing (Nodes, Extensions, Charts)            | breadcrumb → H1 → lead → meta chips → body ≤760 + auto TOC (200) + prev/next. `wide` → ≤1080, no TOC (overviews) |
+| Workbench | `components/workbench/Workbench` | trying / tweaking (Editor, Presets, Comments, AI, Hostile) | 56px top bar (title, meta, actions) + flush stage + right panel (300, AI 380)                                    |
 
-**Radius**: 6-10px cards/panels, 999px pills/badges. See `demo-ui-tokens` for per-component values.
+Doc rules:
 
-## Logo
+- Overview pages use `OverviewSection` + `Tile` with static line drawings from `components/doc/sketches/*`. Never render live components in tiles.
+- The TOC collects only `h2.doc-h2`, `h2.panel-title`, `h2.chart-sample-title` — headings inside rendered editor content are ignored.
+- Extension pages wrap their demo sections in `.doc-flat`, which turns `Panel` into flat H2 sections separated by 1px lines.
 
-SVG angle brackets `< >` + center 4-point sparkle on rounded-square (`rx="7"`). Uses `currentColor` fill, `var(--demo-bg)` for inner paths. Component at `demo/src/components/Logo.tsx`.
+Workbench rules:
 
-## Layout
+- The stage is flush: no padding, no card around the editor. Pass `className="wb-toolbar"` to `ToolbarPlugin` so it becomes a flat full-width bar sticky under the top bar.
+- Secondary panels (Renderer, JSON, Import) go in `.wb-extra` below the editor.
+- Page controls go in the right panel via `InspectorSection`, `Segmented`, `OptionButton`, `Chip`, `SwitchRow` — never as a toolbar row on the stage.
+- In dark mode the stage is lifted one surface step (see `demo-ui-tokens`). `baseSurface` opts out (Hostile host does, so Stone mapping stays honest).
 
-**Header**: 56px fixed, `max-width: 1200px`. Logo left, 4 nav tabs center, GitHub + theme toggle right.
+## Anti-patterns
 
-**Nav items**: Playground (`/`), Nodes (`/nodes`), Extensions (`/extensions`), AI (`/ai`).
-
-**Content area**: `max-width: 1200px`, `padding: 24px`.
-
-## Component Patterns
-
-See `demo-ui-components` for full CSS specs and anatomy of each pattern.
-
-| Pattern           | CSS Class                                | Usage                                   |
-| ----------------- | ---------------------------------------- | --------------------------------------- |
-| Filter pills      | `.nodes-filter-pill`                     | Category filtering with count badge     |
-| Segmented control | `.playground-tabs`                       | Tab switching within a page             |
-| Card grid         | `.nodes-grid` / `.ext-grid`              | 3-col (nodes) or 2-col (extensions)     |
-| Card expand       | `.node-card` + `.node-card-expanded`     | Click to reveal detail panel            |
-| Page header       | `.nodes-page-title` + `.nodes-page-desc` | Title + one-line description            |
-| Action button     | `.playground-action-btn`                 | Bordered, transparent bg, hover darkens |
-
-## Page Conventions
-
-- **Playground**: Segmented tabs for sub-views. Shared variant selector in top bar.
-- **Nodes**: Filter → grid → card with preview → expand for JSON/edit toggle.
-- **Extensions**: Sidebar + detail area. Click sidebar item to show live demo.
-- **AI**: Full-bleed split layout, no max-width. Editor left, chat 380px right.
-
-## Anti-Patterns
-
-- No teal (#33a6b8) or pink (#f596aa) — monochrome only
-- No box shadows on cards — border darkening only
-- No colored badges — use `var(--demo-accent-bg)` (subtle gray)
-- No subtitle in header — logo + text only
-- No `useContext()` — use `use(Context)` (React 19 rule)
+- Raw hex / rgba in chrome CSS — read `var(--rc-*)` (user data like color presets and chart palettes are exempt)
+- Shadows on cards or panels — only popovers/palette use `--rc-shadow-menu` / `--rc-shadow-modal`
+- Accent color for selected state — selected = `--rc-fill`; accent is for focus rings and prose links only
+- Solid hover fills — hover = `--rc-fill-secondary`
+- A title repeated in both the top bar and a card header
+- `useContext()` — use `use(Context)` (React 19 rule)

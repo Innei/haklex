@@ -9,6 +9,7 @@ import { CommentHighlighter } from '../components/comments/CommentHighlightPlugi
 import { CommentSidebar } from '../components/comments/CommentSidebar';
 import { SelectionCommentPopup } from '../components/comments/SelectionCommentPopup';
 import { VariantPicker } from '../components/VariantPicker';
+import { Workbench } from '../components/workbench/Workbench';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { initialContent } from '../fixtures/initial-content';
@@ -71,15 +72,23 @@ export function CommentsPage() {
 
   return (
     <MentionPlatformProvider platforms={{}}>
-      <div className="toolbar" style={{ marginBlockEnd: 12 }}>
-        <VariantPicker />
-        <div className="toolbar-group">
-          <span className="toolbar-label">Info</span>
-          <span className="badge">{comments.length} comments</span>
-        </div>
-      </div>
-
-      <div className="comments-layout">
+      <Workbench
+        actions={<VariantPicker />}
+        meta={<span className="badge">{`${comments.length} comments`}</span>}
+        panelLabel="Comments"
+        panelTitle="Comments"
+        title="Comments"
+        panel={
+          <div className="comments-panel">
+            <CommentSidebar
+              activeId={activeCommentId}
+              comments={comments}
+              onDelete={handleDeleteComment}
+              onHover={setActiveCommentId}
+            />
+          </div>
+        }
+      >
         <div className="comments-editor" ref={containerRef}>
           <ShiroRenderer theme={theme} value={initialContent} variant={variant} />
           <SelectionCommentPopup
@@ -100,26 +109,7 @@ export function CommentsPage() {
             containerRef={containerRef}
           />
         </div>
-
-        <div className="comments-sidebar">
-          <div className="panel">
-            <div className="panel-header">
-              <div className="panel-header-left">
-                <h3 className="panel-title">Comments</h3>
-                {comments.length > 0 && <span className="badge">{comments.length}</span>}
-              </div>
-            </div>
-            <div className="panel-body">
-              <CommentSidebar
-                activeId={activeCommentId}
-                comments={comments}
-                onDelete={handleDeleteComment}
-                onHover={setActiveCommentId}
-              />
-            </div>
-          </div>
-        </div>
-      </div>
+      </Workbench>
     </MentionPlatformProvider>
   );
 }
