@@ -13,6 +13,11 @@ export const baseTheme: Extension = EditorView.theme({
   '&.cm-editor.cm-focused': {
     outline: 'none',
   },
+  // Compound selector outranks oneDark's tinted `.cm-gutters` background.
+  '&.cm-editor .cm-gutters': {
+    backgroundColor: 'transparent',
+    border: 'none',
+  },
   '.cm-scroller': {
     overflow: 'auto',
     fontFamily: 'inherit',
