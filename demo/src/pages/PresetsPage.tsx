@@ -1,138 +1,117 @@
-import type { RichEditorVariant } from '@haklex/rich-editor';
 import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import type { SerializedEditorState } from 'lexical';
-import { use, useCallback, useEffect, useState } from 'react';
+import { use, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
-import { JsonViewer } from '../components/JsonViewer';
-import { Panel } from '../components/Panel';
+import { Segmented } from '../components/ui/Segmented';
 import { VariantPicker } from '../components/VariantPicker';
-import { useFullWidth } from '../context/FullWidthContext';
+import { InspectorSection } from '../components/workbench/Inspector';
+import { JsonPanel } from '../components/workbench/JsonPanel';
+import { PanelTabs } from '../components/workbench/PanelTabs';
+import { Workbench } from '../components/workbench/Workbench';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { presets } from '../fixtures';
 import { allExtraPlatformMeta } from '../fixtures/extra-mention-platforms';
 import { LexicalEditor, LexicalRenderer } from '../lexical';
 
-// ── Helpers ──
+type Mode = 'edit' | 'readonly';
 
-const validPresetKeys = new Set(presets.map((p) => p.key));
-const validVariants = new Set<RichEditorVariant>(['article', 'comment', 'note']);
-const validModes = new Set(['edit', 'readonly'] as const);
-
-function getPresetsInitialState() {
-  const params = new URLSearchParams(window.location.search);
-  const preset = params.get('preset');
-  const variant = params.get('variant') as RichEditorVariant | null;
-  const mode = params.get('mode') as 'edit' | 'readonly' | null;
-  return {
-    selectedKey: preset && validPresetKeys.has(preset) ? preset : presets[0].key,
-    variant: variant && validVariants.has(variant) ? variant : ('article' as RichEditorVariant),
-    mode: mode && validModes.has(mode) ? mode : ('edit' as 'edit' | 'readonly'),
-  };
-}
-
-function updateSearchParams(key: string, value: string) {
-  const params = new URLSearchParams(window.location.search);
-  params.set(key, value);
-  const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
-  window.history.replaceState(null, '', newUrl);
-}
-
-// ── PresetsPage ──
+const modeOptions = [
+  { value: 'edit' as const, label: 'Edit' },
+  { value: 'readonly' as const, label: 'Render' },
+];
 
 export function PresetsPage() {
-  useFullWidth();
   const variant = use(VariantContext);
   const theme = useTheme();
-  const [initial] = useState(getPresetsInitialState);
-  const [selectedKey, _setSelectedKey] = useState(initial.selectedKey);
-  const [mode, _setMode] = useState<'edit' | 'readonly'>(initial.mode);
-  const [liveState, setLiveState] = useState<SerializedEditorState | null>(null);
+  const [params, setParams] = useSearchParams();
+  const [sideTab, setSideTab] = useState<'inspector' | 'json'>('inspector');
+  const [liveState, setLiveState] = useState<{ key: string; state: SerializedEditorState }>();
 
-  const setSelectedKey = useCallback((key: string) => {
-    _setSelectedKey(key);
-    updateSearchParams('preset', key);
-  }, []);
+  const selected = presets.find((p) => p.key === params.get('preset')) ?? presets[0];
+  const mode: Mode = params.get('mode') === 'readonly' ? 'readonly' : 'edit';
+  const live = liveState?.key === selected.key ? liveState.state : undefined;
+  const jsonData = mode === 'edit' ? (live ?? selected.data) : selected.data;
 
-  const setMode = useCallback((m: 'edit' | 'readonly') => {
-    _setMode(m);
-    updateSearchParams('mode', m);
-  }, []);
-
-  const selected = presets.find((p) => p.key === selectedKey) || presets[0];
-  const jsonData = mode === 'edit' ? (liveState ?? selected.data) : selected.data;
-
-  useEffect(() => {
-    setLiveState(null);
-  }, [selectedKey]);
+  const setMode = (next: Mode) => {
+    setParams(
+      (prev) => {
+        const nextParams = new URLSearchParams(prev);
+        nextParams.set('mode', next);
+        return nextParams;
+      },
+      { replace: true },
+    );
+  };
 
   return (
     <MentionPlatformProvider platforms={allExtraPlatformMeta}>
-      <div className="presets-layout">
-        <aside className="presets-sidebar">
-          <div className="sidebar-header">
-            <span className="sidebar-label">Presets</span>
-            <div className="sidebar-header-actions">
-              <button
-                className={mode === 'edit' ? 'sidebar-pill sidebar-pill-active' : 'sidebar-pill'}
-                onClick={() => setMode('edit')}
-              >
-                Edit
-              </button>
-              <button
-                className={
-                  mode === 'readonly' ? 'sidebar-pill sidebar-pill-active' : 'sidebar-pill'
+      <Workbench
+        panelLabel="Preset tools"
+        panelWidth={sideTab === 'inspector' ? 300 : 440}
+        title={selected.label}
+        meta={
+          <span className="badge">{`${variant} · ${mode === 'edit' ? 'edit' : 'render'}`}</span>
+        }
+        panel={
+          <>
+            <PanelTabs
+              label="Preset tools"
+              value={sideTab}
+              tabs={[
+                { label: 'Inspector', value: 'inspector' },
+                { label: 'JSON', value: 'json' },
+              ]}
+              onChange={setSideTab}
+            />
+            {sideTab === 'json' && (
+              <JsonPanel
+                data={jsonData}
+                note={
+                  mode === 'edit' ? 'Live EditorState. Updates as you type.' : 'Preset EditorState.'
                 }
-                onClick={() => setMode('readonly')}
-              >
-                Read
-              </button>
-            </div>
-          </div>
-          <div className="sidebar-list">
-            {presets.map((preset) => (
-              <button
-                key={preset.key}
-                className={
-                  selectedKey === preset.key ? 'sidebar-item sidebar-item-active' : 'sidebar-item'
-                }
-                onClick={() => setSelectedKey(preset.key)}
-              >
-                <div className="sidebar-item-name">{preset.label}</div>
-                <div className="sidebar-item-desc">{preset.description}</div>
-              </button>
-            ))}
-          </div>
-        </aside>
-
-        <div className="presets-main">
-          <div className="toolbar">
-            <VariantPicker />
-          </div>
-          <Panel badge={`${variant} · ${mode}`} title={selected.label}>
-            {mode === 'edit' ? (
-              <LexicalEditor
-                initialValue={selected.data}
-                key={`${selected.key}-edit`}
-                theme={theme}
-                variant={variant}
-                onChange={setLiveState}
-              />
-            ) : (
-              <LexicalRenderer
-                key={`${selected.key}-readonly`}
-                theme={theme}
-                value={selected.data}
-                variant={variant}
               />
             )}
-          </Panel>
-
-          <Panel title="Serialized JSON">
-            <JsonViewer data={jsonData} defaultExpanded={false} />
-          </Panel>
-        </div>
-      </div>
+            {sideTab === 'inspector' && (
+              <>
+                <InspectorSection title="Preset">
+                  <p className="wb-section-text">{selected.description}</p>
+                </InspectorSection>
+                <InspectorSection title="Variant">
+                  <VariantPicker block />
+                </InspectorSection>
+                <InspectorSection title="Mode">
+                  <Segmented
+                    block
+                    label="Mode"
+                    options={modeOptions}
+                    value={mode}
+                    onChange={setMode}
+                  />
+                </InspectorSection>
+              </>
+            )}
+          </>
+        }
+      >
+        {mode === 'edit' ? (
+          <LexicalEditor
+            initialValue={selected.data}
+            key={`${selected.key}-edit`}
+            theme={theme}
+            variant={variant}
+            onChange={(state) => setLiveState({ key: selected.key, state })}
+          />
+        ) : (
+          <LexicalRenderer
+            key={`${selected.key}-readonly`}
+            theme={theme}
+            value={selected.data}
+            variant={variant}
+          />
+        )}
+      </Workbench>
     </MentionPlatformProvider>
   );
 }

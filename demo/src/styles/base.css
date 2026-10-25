@@ -1,0 +1,351 @@
+html {
+  overflow: hidden;
+  color-scheme: light dark;
+}
+
+.app {
+  --demo-bg: var(--rc-bg);
+  --demo-surface: var(--rc-bg);
+  --demo-surface-alt: var(--rc-bg-secondary);
+  --demo-text: var(--rc-text);
+  --demo-text-secondary: var(--rc-text-secondary);
+  --demo-text-muted: var(--rc-text-tertiary);
+  --demo-border: var(--rc-border);
+  --demo-border-light: var(--rc-border-subtle);
+  --demo-hover: var(--rc-fill-secondary);
+  --demo-accent: var(--rc-text);
+  --demo-accent-bg: var(--rc-fill);
+  --demo-mono: var(--rc-font-mono);
+  --demo-focus-ring: 0 0 0 1px var(--rc-accent), 0 0 0 4px var(--rc-accent-light);
+
+  height: 100dvh;
+  background: var(--rc-bg);
+  color: var(--rc-text);
+  font-family: var(--rc-font-family-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app ::selection {
+  background-color: var(--rc-accent-light);
+  color: inherit;
+}
+
+:is(
+  .nav-item,
+  .nav-leaf,
+  .sidebar-brand,
+  .sidebar-search,
+  .sidebar-link,
+  .seg-btn,
+  .btn,
+  .btn-active,
+  .icon-btn,
+  .opt,
+  .chip,
+  .switch-row,
+  .wb-panel-tab,
+  .doc-tab,
+  .doc-toc-link,
+  .doc-pager a,
+  .tile
+):focus-visible {
+  outline: none;
+  box-shadow: var(--demo-focus-ring);
+}
+
+.app a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.mono {
+  font-family: var(--rc-font-mono);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 24px;
+}
+
+.toolbar-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-label {
+  margin-right: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rc-text-tertiary);
+}
+
+.btn,
+.btn-active {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--rc-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--rc-text-secondary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    background-color 0.12s,
+    color 0.12s;
+}
+
+.btn:hover {
+  background: var(--rc-fill-secondary);
+  color: var(--rc-text);
+}
+
+.btn-active {
+  border-color: transparent;
+  background: var(--rc-fill);
+  color: var(--rc-text);
+  font-weight: 500;
+}
+
+.btn-primary {
+  border-color: transparent;
+  background: var(--rc-text);
+  color: var(--rc-bg);
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: var(--rc-text);
+  color: var(--rc-bg);
+  opacity: 0.88;
+}
+
+.btn-sm {
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--rc-text-tertiary);
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: var(--rc-fill-secondary);
+  color: var(--rc-text);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  height: 20px;
+  padding: 0 6px;
+  border: 1px solid var(--rc-border);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--rc-text-tertiary);
+}
+
+.chip-code {
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: var(--rc-bg-tertiary);
+  font-family: var(--rc-font-mono);
+  font-size: 12px;
+  color: var(--rc-text-secondary);
+}
+
+.panel {
+  border-radius: 12px;
+  background: var(--rc-bg);
+  box-shadow: 0 0 0 1px var(--rc-border);
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  padding: 0 8px 0 16px;
+  border-bottom: 1px solid var(--rc-border-subtle);
+}
+
+.panel-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.panel-title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--rc-text);
+}
+
+.panel-body {
+  padding: 16px;
+}
+
+.codebox {
+  overflow: hidden;
+  border-radius: 12px;
+  background: var(--rc-bg-secondary);
+  box-shadow: inset 0 0 0 1px var(--rc-border-subtle);
+}
+
+.codebox-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding: 0 8px 0 16px;
+  border-bottom: 1px solid var(--rc-border-subtle);
+  font-family: var(--rc-font-mono);
+  font-size: 12px;
+  color: var(--rc-text-tertiary);
+}
+
+.codebox pre {
+  overflow: auto;
+  max-height: 480px;
+  margin: 0;
+  padding: 16px;
+  font-family: var(--rc-font-mono);
+  font-size: 12px;
+  line-height: 1.7;
+  color: var(--rc-text-secondary);
+}
+
+.tips {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tips-title {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--rc-text-tertiary);
+}
+
+.tips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tips-grid code {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--rc-bg-tertiary);
+  font-family: var(--rc-font-mono);
+  font-size: 12px;
+  color: var(--rc-text-secondary);
+}
+
+.import-textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--rc-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--rc-text);
+  font-family: var(--rc-font-mono);
+  font-size: 12px;
+  resize: vertical;
+}
+
+.import-textarea:focus {
+  outline: none;
+  box-shadow: var(--demo-focus-ring);
+}
+
+.node-description {
+  margin: 0 0 12px;
+  font-size: 13px;
+  color: var(--rc-text-tertiary);
+}
+
+.node-render {
+  margin-bottom: 12px;
+}
+
+.seg {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--rc-border);
+  border-radius: 8px;
+}
+
+.seg-block {
+  display: flex;
+}
+
+.seg-btn {
+  display: inline-flex;
+  flex: 1 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 26px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--rc-text-tertiary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.seg-btn:hover {
+  color: var(--rc-text);
+}
+
+.seg-btn[aria-pressed='true'] {
+  background: var(--rc-fill);
+  color: var(--rc-text);
+  font-weight: 500;
+}
+
+.seg-btn-icon {
+  flex: none;
+  width: 28px;
+  padding: 0;
+}
+
+.seg-count {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--rc-text-tertiary);
+}

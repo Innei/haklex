@@ -1,0 +1,152 @@
+.tk-group + .tk-group {
+  margin-top: 24px;
+}
+
+.tk-h3 {
+  margin: 28px 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rc-text-secondary);
+}
+
+.tk-group .tk-h3 {
+  margin-top: 0;
+}
+
+.tk-colors td {
+  vertical-align: middle;
+}
+
+.tk-val {
+  font-family: var(--rc-font-mono);
+  font-size: 12px;
+  color: var(--rc-text-tertiary);
+  overflow-wrap: anywhere;
+}
+
+.tk-pair {
+  display: inline-flex;
+  overflow: hidden;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--rc-border);
+}
+
+.tk-pair > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+
+.tk-pair i {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+}
+
+.tk-type {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.tk-spacing {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+}
+
+.tk-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tk-bar-row {
+  display: grid;
+  grid-template-columns: 96px auto 1fr;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.tk-bar {
+  height: 12px;
+  border-radius: 2px;
+  background: var(--rc-text-quaternary);
+}
+
+.tk-radii {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+
+.tk-radius {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+}
+
+.tk-radius-box {
+  width: 72px;
+  height: 72px;
+  border: 1px solid var(--rc-border);
+  background: var(--rc-bg-secondary);
+}
+
+.tk-concentric {
+  width: 72px;
+  height: 72px;
+  box-sizing: border-box;
+  box-shadow: 0 0 0 1px var(--rc-border);
+}
+
+.tk-concentric > div {
+  height: 100%;
+  background: var(--rc-fill);
+}
+
+.tk-shadows {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.tk-shadow {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 16px;
+  font-size: 12px;
+}
+
+.tk-shadow-box {
+  grid-row: span 2;
+  width: 72px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--rc-bg);
+}
+
+.tk-colors {
+  table-layout: fixed;
+}
+
+.tk-colors th:nth-child(1) {
+  width: 76px;
+}
+
+.tk-colors th:nth-child(2) {
+  width: 30%;
+}
+
+.tk-colors th:nth-child(3),
+.tk-colors th:nth-child(4) {
+  width: 20%;
+}
