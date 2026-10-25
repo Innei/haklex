@@ -19,8 +19,8 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 8px 12px;
-  min-height: 56px;
-  padding: 8px 16px 8px 32px;
+  min-height: 44px;
+  padding: 4px 16px 4px 32px;
   box-sizing: border-box;
   border-bottom: 1px solid var(--rc-border);
   background: var(--rc-bg);
@@ -80,7 +80,7 @@
 }
 
 .wb .wb-toolbar {
-  top: 56px;
+  top: 44px;
   max-width: none;
   margin: 0;
   border-bottom: 1px solid var(--rc-border);
@@ -111,7 +111,7 @@
   display: flex;
   flex: none;
   align-items: center;
-  height: 56px;
+  height: 44px;
   padding: 0 20px;
   box-sizing: border-box;
   border-bottom: 1px solid var(--rc-border);
@@ -311,7 +311,7 @@
 }
 
 .wb-panel-tab {
-  height: 56px;
+  height: 44px;
   margin-bottom: -1px;
   padding: 0;
   border: 0;

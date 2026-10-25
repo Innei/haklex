@@ -48,7 +48,7 @@ Registry: `site/components.ts` (+ `site/component-data/`). Review findings: edit
 | `OptionButton`                  | Full-width single-choice row, `aria-pressed`                                                                                               |
 | `Chip`                          | Pill toggle, `aria-pressed`; selected = text-colored border                                                                                |
 | `SwitchRow`                     | `role=switch` row; `.switch` track turns `--rc-text` when on                                                                               |
-| `PanelTabs`                     | Underline tabs in the 56px panel head (`.wb-panel-tab[aria-selected]`); use instead of `panelTitle` when the right panel has several views |
+| `PanelTabs`                     | Underline tabs in the 44px panel head (`.wb-panel-tab[aria-selected]`); use instead of `panelTitle` when the right panel has several views |
 | `JsonPanel`                     | Full-height live JSON with Copy; for EditorState output                                                                                    |
 | `ImportPanel` (`pages/editor/`) | Paste + "Load into editor"; validates with `parseEditorState()` and shows inline errors                                                    |
 

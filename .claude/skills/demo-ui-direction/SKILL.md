@@ -29,7 +29,7 @@ Design spec: `docs/superpowers/specs/2026-10-25-docs-site-layout-design.md`.
 | Template  | Component                        | Use for                                                    | Shape                                                                                                            |
 | --------- | -------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | Doc       | `components/doc/DocPage`         | reading / comparing (Nodes, Extensions, Charts)            | breadcrumb → H1 → lead → meta chips → body ≤760 + auto TOC (200) + prev/next. `wide` → ≤1080, no TOC (overviews) |
-| Workbench | `components/workbench/Workbench` | trying / tweaking (Editor, Presets, Comments, AI, Hostile) | 56px top bar (title, meta, actions) + flush stage + right panel (300, AI 380)                                    |
+| Workbench | `components/workbench/Workbench` | trying / tweaking (Editor, Presets, Comments, AI, Hostile) | 44px top bar (title, meta, actions) + flush stage + right panel (300, AI 380)                                    |
 
 Doc rules:
 

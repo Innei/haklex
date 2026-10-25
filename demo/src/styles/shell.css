@@ -17,7 +17,7 @@
   flex: none;
   align-items: center;
   gap: 10px;
-  height: 56px;
+  height: 44px;
   padding: 0 20px;
 }
 
@@ -201,7 +201,7 @@
 @media (max-width: 767px) {
   .app {
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 56px minmax(0, 1fr);
+    grid-template-rows: 44px minmax(0, 1fr);
   }
 
   .mobile-bar {

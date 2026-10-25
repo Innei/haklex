@@ -40,7 +40,7 @@ In dark mode `.wb-stage` moves one surface step up by remapping the host interfa
 | Item                                                  | Value                                           |
 | ----------------------------------------------------- | ----------------------------------------------- |
 | Sidebar                                               | 260                                             |
-| Header rows (sidebar head, Workbench bar, panel head) | 56                                              |
+| Header rows (sidebar head, Workbench bar, panel head) | 44                                              |
 | Nav item                                              | 32 high, radius 8                               |
 | Tree leaf                                             | 28 high, 1px left line                          |
 | Doc article / wide                                    | ≤760 / ≤1080                                    |
