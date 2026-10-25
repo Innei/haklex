@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeRadius, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 const _sheetPopup = style({});
@@ -31,7 +31,7 @@ export const row = style({
   gap: 12,
   padding: '8px 8px 8px 10px',
   border: `1px solid ${vars.color.border}`,
-  borderRadius: vars.borderRadius.md,
+  borderRadius: chromeRadius.md,
 });
 
 export const rowFailed = style({
@@ -42,7 +42,7 @@ export const thumb = style({
   width: 80,
   height: 56,
   flexShrink: 0,
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.sm,
   objectFit: 'cover',
   backgroundColor: vars.color.fillSecondary,
 });
@@ -105,7 +105,7 @@ export const gpsPanel = style({
   gap: 8,
   padding: '10px 12px',
   border: `1px solid color-mix(in oklab, ${vars.color.alertWarning} 35%, transparent)`,
-  borderRadius: vars.borderRadius.md,
+  borderRadius: chromeRadius.md,
   backgroundColor: `color-mix(in oklab, ${vars.color.alertWarning} 10%, transparent)`,
   fontSize: 13,
 });
@@ -157,7 +157,7 @@ export const iconButton = style({
   height: 32,
   padding: 0,
   border: 'none',
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.sm,
   backgroundColor: 'transparent',
   color: vars.color.textTertiary,
   cursor: 'pointer',

@@ -242,7 +242,7 @@ export function FloatingToolbarPlugin({
   actions,
 }: FloatingToolbarPluginProps = {}): ReactElement | null {
   const [editor] = useLexicalComposerContext();
-  const { className: portalClassName } = usePortalTheme();
+  const { className: portalClassName, theme: portalTheme } = usePortalTheme();
   const portalContainer = usePortalContainer();
   const selectionSnapshot = useTextSelectionSnapshot();
   const toolbarRef = useRef<HTMLDivElement>(null);
@@ -607,6 +607,7 @@ export function FloatingToolbarPlugin({
           <div
             aria-label="Text formatting"
             className={toolbarClassName}
+            data-theme={portalClassName ? portalTheme : undefined}
             ref={toolbarRef}
             role="toolbar"
             style={{ position: 'fixed', zIndex: 50 }}
@@ -705,6 +706,7 @@ export function FloatingToolbarPlugin({
         createPortal(
           <div
             className={rubyEditorClassName}
+            data-theme={portalClassName ? portalTheme : undefined}
             ref={rubyEditorRef}
             style={{ position: 'fixed', zIndex: 51 }}
           >
@@ -735,8 +737,7 @@ export function FloatingToolbarPlugin({
               />
               <button
                 aria-label="Confirm"
-                className={css.rubyActionBtn}
-                style={{ color: '#22c55e' }}
+                className={`${css.rubyActionBtn} ${css.rubyConfirm}`}
                 type="button"
                 onMouseDown={(e) => {
                   e.preventDefault();
@@ -761,8 +762,7 @@ export function FloatingToolbarPlugin({
 
               <button
                 aria-label="Delete ruby"
-                className={css.rubyActionBtn}
-                style={{ color: '#ef4444' }}
+                className={`${css.rubyActionBtn} ${css.rubyRemove}`}
                 type="button"
                 onMouseDown={(e) => {
                   e.preventDefault();

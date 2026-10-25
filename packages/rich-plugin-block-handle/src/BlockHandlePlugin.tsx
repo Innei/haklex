@@ -1,12 +1,4 @@
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@haklex/rich-editor-ui';
+import { DropdownMenu, DropdownMenuTrigger } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import { $createCodeNode } from '@lexical/code-core';
 import {
@@ -32,34 +24,23 @@ import {
   DRAGSTART_COMMAND,
   DROP_COMMAND,
 } from 'lexical';
-import {
-  ArrowDown,
-  ArrowUp,
-  Code2,
-  Copy,
-  GripVertical,
-  Heading1,
-  Heading2,
-  Heading3,
-  List,
-  ListChecks,
-  ListOrdered,
-  Minus,
-  Plus,
-  TextQuote,
-  Trash2,
-  Type,
-} from 'lucide-react';
-import type { ComponentType, MouseEvent as ReactMouseEvent, ReactElement } from 'react';
+import { GripVertical, Plus } from 'lucide-react';
+import type { MouseEvent as ReactMouseEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { BlockMenu } from './BlockMenu';
+import { $moveBlocks } from './blockMoves';
+import { handleTop, parseLineHeight } from './geometry';
 import * as css from './styles.css';
+import { useBlockMoveShortcuts } from './useBlockMoveShortcuts';
 import { useBlockSelection } from './useBlockSelection';
+import { useGapInsert } from './useGapInsert';
 
 const DRAG_DATA_KEY = 'application/x-rich-editor-drag';
 const HIDE_DELAY = 300;
-const HANDLE_OFFSET = 52;
+const GUTTER_INSET = 26;
+const GRIP_HEIGHT = 24;
 
 interface HandlePosition {
   left: number;
@@ -74,25 +55,6 @@ interface DropLineState {
   visible: boolean;
   width: number;
 }
-
-interface TurnIntoItem {
-  icon: ComponentType<{ size?: number }>;
-  key: string;
-  label: string;
-}
-
-const TURN_INTO_ITEMS: TurnIntoItem[] = [
-  { key: 'paragraph', label: 'Text', icon: Type },
-  { key: 'h1', label: 'Heading 1', icon: Heading1 },
-  { key: 'h2', label: 'Heading 2', icon: Heading2 },
-  { key: 'h3', label: 'Heading 3', icon: Heading3 },
-  { key: 'bullet', label: 'Bullet List', icon: List },
-  { key: 'numbered', label: 'Numbered List', icon: ListOrdered },
-  { key: 'todo', label: 'To-do', icon: ListChecks },
-  { key: 'quote', label: 'Quote', icon: TextQuote },
-  { key: 'divider', label: 'Divider', icon: Minus },
-  { key: 'code', label: 'Code', icon: Code2 },
-];
 
 function getBlockElement(editor: LexicalEditor, target: HTMLElement): HTMLElement | null {
   const rootElement = editor.getRootElement();
@@ -258,6 +220,7 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
       const blockRect = element.getBoundingClientRect();
       const rootRect = rootElement.getBoundingClientRect();
       const page = toPagePosition(blockRect);
+      const computed = getComputedStyle(element);
 
       let nodeKey: string | null = null;
       editor.read(() => {
@@ -267,8 +230,15 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
 
       setHandle({
         visible: true,
-        top: page.top,
-        left: toPagePosition(rootRect).left - HANDLE_OFFSET,
+        top: handleTop(
+          {
+            top: page.top,
+            paddingTop: Number.parseFloat(computed.paddingTop) || 0,
+            lineHeight: parseLineHeight(computed.lineHeight, computed.fontSize),
+          },
+          GRIP_HEIGHT,
+        ),
+        left: toPagePosition(rootRect).left - GUTTER_INSET,
         nodeKey,
       });
     },
@@ -325,16 +295,20 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
     [editor, updatePositionFromBlock],
   );
 
-  const handleAddBlock = useCallback(() => {
-    if (!handle.nodeKey) return;
-    editor.update(() => {
-      const node = $getNodeByKey(handle.nodeKey!);
-      if (!node) return;
-      const paragraph = $createParagraphNode();
-      node.insertAfter(paragraph);
-      paragraph.selectStart();
-    });
-  }, [editor, handle.nodeKey]);
+  useBlockMoveShortcuts(editor, getSelectedKeys);
+
+  const isBlockTarget = useCallback(
+    (target: HTMLElement) => getBlockElement(editor, target) !== null,
+    [editor],
+  );
+  const { gap, insertAtGap, onPlusEnter, onPlusLeave } = useGapInsert(editor, isBlockTarget);
+
+  useEffect(() => {
+    if (!gap || menuOpenCountRef.current > 0) return;
+    clearHideTimer();
+    activeBlockRef.current = null;
+    setHandle((state) => (state.visible ? { ...state, visible: false, nodeKey: null } : state));
+  }, [clearHideTimer, gap]);
 
   const handleTurnInto = useCallback(
     (type: string) => {
@@ -404,49 +378,17 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
     });
   }, [editor, getSelectedKeys, handle.nodeKey]);
 
-  const handleMoveUp = useCallback(() => {
-    const selectedKeys = getSelectedKeys();
-    const keys = selectedKeys.length > 0 ? selectedKeys : handle.nodeKey ? [handle.nodeKey] : [];
-    if (!keys.length) return;
-
-    editor.update(() => {
-      const root = $getRoot();
-      const children = root.getChildren();
-      const keySet = new Set(keys);
-      const selectedNodes = children.filter((child) => keySet.has(child.getKey()));
-      if (!selectedNodes.length) return;
-
-      const firstSelected = selectedNodes[0];
-      const previousSibling = firstSelected.getPreviousSibling();
-      if (!previousSibling || keySet.has(previousSibling.getKey())) return;
-
-      const lastSelected = selectedNodes.at(-1)!;
-      previousSibling.remove();
-      lastSelected.insertAfter(previousSibling);
-    });
-  }, [editor, getSelectedKeys, handle.nodeKey]);
-
-  const handleMoveDown = useCallback(() => {
-    const selectedKeys = getSelectedKeys();
-    const keys = selectedKeys.length > 0 ? selectedKeys : handle.nodeKey ? [handle.nodeKey] : [];
-    if (!keys.length) return;
-
-    editor.update(() => {
-      const root = $getRoot();
-      const children = root.getChildren();
-      const keySet = new Set(keys);
-      const selectedNodes = children.filter((child) => keySet.has(child.getKey()));
-      if (!selectedNodes.length) return;
-
-      const lastSelected = selectedNodes.at(-1)!;
-      const nextSibling = lastSelected.getNextSibling();
-      if (!nextSibling || keySet.has(nextSibling.getKey())) return;
-
-      const firstSelected = selectedNodes[0];
-      nextSibling.remove();
-      firstSelected.insertBefore(nextSibling);
-    });
-  }, [editor, getSelectedKeys, handle.nodeKey]);
+  const moveBlocks = useCallback(
+    (direction: 'up' | 'down') => {
+      const selectedKeys = getSelectedKeys();
+      const keys = selectedKeys.length > 0 ? selectedKeys : handle.nodeKey ? [handle.nodeKey] : [];
+      if (!keys.length) return;
+      editor.update(() => {
+        $moveBlocks(keys, direction);
+      });
+    },
+    [editor, getSelectedKeys, handle.nodeKey],
+  );
 
   const [gripMenuOpen, setGripMenuOpen] = useState(false);
   const dragStartedRef = useRef(false);
@@ -564,8 +506,9 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
       const { nodeKey } = handle;
       const { shiftKey } = event;
       editor.focus(() => selectBlock(nodeKey, shiftKey));
+      if (!shiftKey) onGripOpenChange(true);
     },
-    [editor, handle.nodeKey, selectBlock],
+    [editor, handle.nodeKey, onGripOpenChange, selectBlock],
   );
 
   const onGripContextMenu = useCallback(
@@ -794,56 +737,45 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
         onMouseEnter={onHandleEnter}
         onMouseLeave={onHandleLeave}
       >
-        <button aria-label="Add block" className={css.handleBtn} onClick={handleAddBlock}>
-          <Plus size={14} />
-        </button>
-
         <DropdownMenu open={gripMenuOpen} onOpenChange={onGripOpenChange}>
           <DropdownMenuTrigger
             draggable
             aria-label="Block actions"
-            className={css.handleBtn}
+            className={css.grip}
             onClick={onGripClick}
             onContextMenu={onGripContextMenu}
             onDragStart={onGripDragStart as any}
             onMouseDownCapture={onGripMouseDownCapture}
           >
-            <GripVertical size={14} />
+            <GripVertical size={16} />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" side="bottom" sideOffset={4}>
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>TURN INTO</DropdownMenuLabel>
-              {TURN_INTO_ITEMS.map((item) => (
-                <DropdownMenuItem key={item.key} onClick={() => handleTurnInto(item.key)}>
-                  <item.icon />
-                  {item.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuLabel>ACTIONS</DropdownMenuLabel>
-              <DropdownMenuItem onClick={handleDuplicate}>
-                <Copy />
-                Duplicate
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleMoveUp}>
-                <ArrowUp />
-                Move Up
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleMoveDown}>
-                <ArrowDown />
-                Move Down
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className={css.menuItemDestructive} onClick={handleDelete}>
-              <Trash2 />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
+          <BlockMenu
+            onDelete={handleDelete}
+            onDuplicate={handleDuplicate}
+            onMoveDown={() => moveBlocks('down')}
+            onMoveUp={() => moveBlocks('up')}
+            onTurnInto={handleTurnInto}
+          />
         </DropdownMenu>
       </div>
+
+      {gap && (
+        <>
+          <div className={css.gapLine} style={{ top: gap.top, left: gap.left, width: gap.width }} />
+          <button
+            aria-label="Insert block"
+            className={css.gapPlus}
+            style={{ top: gap.top, left: gap.left - GUTTER_INSET }}
+            type="button"
+            onClick={insertAtGap}
+            onMouseDown={(event) => event.preventDefault()}
+            onMouseEnter={onPlusEnter}
+            onMouseLeave={onPlusLeave}
+          >
+            <Plus size={14} />
+          </button>
+        </>
+      )}
 
       {dropLine.visible && (
         <div

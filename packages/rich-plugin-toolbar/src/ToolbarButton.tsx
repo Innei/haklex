@@ -52,9 +52,8 @@ export function ToolbarButton({
   return (
     <TooltipRoot>
       <TooltipTrigger render={button}>{icon}</TooltipTrigger>
-      <TooltipContent side="bottom" sideOffset={4}>
+      <TooltipContent shortcut={shortcut} side="bottom" sideOffset={4}>
         {title}
-        {shortcut && <span className={css.tooltipShortcut}>{shortcut}</span>}
       </TooltipContent>
     </TooltipRoot>
   );

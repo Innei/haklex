@@ -11,13 +11,13 @@ const countIn = <T extends { category: string }>(items: T[], category: string) =
   items.filter((i) => i.category === category).length;
 
 describe('uiComponents', () => {
-  it('lists 19 components: 6 overlays, 6 controls, 7 display', () => {
-    expect(uiComponents).toHaveLength(19);
-    expect(uiCategories.map((c) => countIn(uiComponents, c.key))).toEqual([6, 6, 7]);
+  it('lists 20 components: 6 overlays, 6 controls, 8 display', () => {
+    expect(uiComponents).toHaveLength(20);
+    expect(uiCategories.map((c) => countIn(uiComponents, c.key))).toEqual([6, 6, 8]);
   });
 
   it('maps every id to a component directory in rich-editor-ui', () => {
-    expect(uiDirs.length).toBeGreaterThan(19);
+    expect(uiDirs.length).toBeGreaterThan(20);
     for (const c of uiComponents) expect(uiDirs, c.id).toContain(c.id);
   });
 

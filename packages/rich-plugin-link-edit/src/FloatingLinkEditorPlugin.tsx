@@ -1,6 +1,4 @@
 import {
-  ActionBar,
-  ActionButton,
   getActionButtonClassName,
   Popover,
   PopoverPopup,
@@ -18,11 +16,15 @@ import {
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import { ExternalLink, Link, Unlink } from 'lucide-react';
 import type { KeyboardEvent, ReactElement, ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { isEmptyLink } from './link-display';
+import type { LinkEditorMode } from './LinkEditorPanel';
+import { LinkEditorPanel } from './LinkEditorPanel';
 import * as styles from './styles.css';
+
+const COPIED_FEEDBACK_MS = 1500;
 
 function $findLinkNode(node: LexicalNode): LinkNode | null {
   let current: LexicalNode | null = node;
@@ -61,6 +63,9 @@ export function FloatingLinkEditorPlugin({
     linkDom: null,
   });
   const [inputUrl, setInputUrl] = useState('');
+  const [mode, setMode] = useState<LinkEditorMode>('view');
+  const [copied, setCopied] = useState(false);
+  const shownKeyRef = useRef('');
 
   const updateLink = useCallback(() => {
     if (panelFocusedRef.current) return;
@@ -73,11 +78,8 @@ export function FloatingLinkEditorPlugin({
 
     const anchorNode = selection.anchor.getNode();
     const linkNode = $findLinkNode(anchorNode);
-    if (!linkNode) {
-      setVisible(false);
-      return;
-    }
-    if ($isAutoLinkNode(linkNode) && linkNode.getIsUnlinked()) {
+    if (!linkNode || ($isAutoLinkNode(linkNode) && linkNode.getIsUnlinked())) {
+      shownKeyRef.current = '';
       setVisible(false);
       return;
     }
@@ -86,6 +88,11 @@ export function FloatingLinkEditorPlugin({
     const key = linkNode.getKey();
     const dom = editor.getElementByKey(key);
 
+    if (shownKeyRef.current !== key) {
+      shownKeyRef.current = key;
+      setMode(isEmptyLink(url) ? 'edit' : 'view');
+      setCopied(false);
+    }
     setLinkState({ url, linkKey: key, linkDom: dom });
     setInputUrl(url);
     setVisible(true);
@@ -157,34 +164,58 @@ export function FloatingLinkEditorPlugin({
     };
   }, [editor]);
 
+  useEffect(() => {
+    if (visible && mode === 'edit') inputRef.current?.focus();
+  }, [visible, mode, linkState.linkKey]);
+
+  useEffect(() => {
+    if (!copied) return;
+    const timer = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
   const commitUrl = useCallback(() => {
     const trimmed = inputUrl.trim();
-    if (!trimmed) return;
+    if (isEmptyLink(trimmed)) return false;
     editor.update(() => {
       const node = $getNodeByKey(linkState.linkKey);
       if ($isLinkNode(node) && node.getURL() !== trimmed) {
         node.setURL(trimmed);
       }
     });
+    return true;
   }, [editor, inputUrl, linkState.linkKey]);
+
+  const returnToEditor = useCallback(() => {
+    panelFocusedRef.current = false;
+    setMode('view');
+    editor.focus();
+  }, [editor]);
+
+  const handleSave = useCallback(() => {
+    if (commitUrl()) returnToEditor();
+  }, [commitUrl, returnToEditor]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        commitUrl();
-        editor.focus();
+        handleSave();
       } else if (e.key === 'Escape') {
         e.preventDefault();
         setInputUrl(linkState.url);
-        editor.focus();
+        returnToEditor();
       }
     },
-    [commitUrl, editor, linkState.url],
+    [handleSave, linkState.url, returnToEditor],
   );
 
   const handleOpen = useCallback(() => {
     window.open(linkState.url, '_blank', 'noopener');
+  }, [linkState.url]);
+
+  const handleCopy = useCallback(() => {
+    void navigator.clipboard?.writeText(linkState.url).then(() => setCopied(true));
   }, [linkState.url]);
 
   const handleUnlink = useCallback(() => {
@@ -205,6 +236,7 @@ export function FloatingLinkEditorPlugin({
         node.remove();
       }
     });
+    panelFocusedRef.current = false;
     setVisible(false);
   }, [editor, linkState.linkKey]);
 
@@ -217,7 +249,7 @@ export function FloatingLinkEditorPlugin({
       const panel = e.currentTarget;
       if (!panel.contains(e.relatedTarget as Node)) {
         panelFocusedRef.current = false;
-        commitUrl();
+        if (commitUrl()) setMode('view');
         editor.focus();
       }
     },
@@ -229,42 +261,38 @@ export function FloatingLinkEditorPlugin({
   return (
     <Popover open={visible}>
       <PopoverPortal>
-        <PopoverPositioner align="center" anchor={linkState.linkDom} side="bottom" sideOffset={8}>
+        <PopoverPositioner
+          align="center"
+          anchor={linkState.linkDom}
+          collisionAvoidance={{ side: 'none', align: 'shift' }}
+          collisionBoundary={editor.getRootElement() ?? undefined}
+          side="bottom"
+          sideOffset={8}
+        >
           <PopoverPopup
             className={`${styles.panel} ${styles.semanticClassNames.panel}`}
             onBlur={handlePanelFocusOut}
             onFocus={handlePanelFocusIn}
           >
-            <div className={`${styles.urlRow} ${styles.semanticClassNames.urlRow}`}>
-              <Link
-                className={`${styles.linkIcon} ${styles.semanticClassNames.linkIcon}`}
-                size={16}
-              />
-              <input
-                className={`${styles.input} ${styles.semanticClassNames.input}`}
-                placeholder="https://..."
-                ref={inputRef}
-                type="url"
-                value={inputUrl}
-                onChange={(e) => setInputUrl(e.target.value)}
-                onKeyDown={handleKeyDown}
-              />
-            </div>
-            <ActionBar>
-              <ActionButton onClick={handleOpen}>
-                <ExternalLink size={14} />
-                Open
-              </ActionButton>
-              {renderExtraActions?.({
+            <LinkEditorPanel
+              copied={copied}
+              inputRef={inputRef}
+              inputUrl={inputUrl}
+              mode={mode}
+              url={linkState.url}
+              extraActions={renderExtraActions?.({
                 url: linkState.url,
                 linkKey: linkState.linkKey,
-                actionButtonClassName: getActionButtonClassName(),
+                actionButtonClassName: getActionButtonClassName({ size: 'md' }),
               })}
-              <ActionButton danger onClick={handleUnlink}>
-                <Unlink size={14} />
-                Unlink
-              </ActionButton>
-            </ActionBar>
+              onCopy={handleCopy}
+              onEdit={() => setMode('edit')}
+              onInputChange={setInputUrl}
+              onKeyDown={handleKeyDown}
+              onOpen={handleOpen}
+              onSave={handleSave}
+              onUnlink={handleUnlink}
+            />
           </PopoverPopup>
         </PopoverPositioner>
       </PopoverPortal>

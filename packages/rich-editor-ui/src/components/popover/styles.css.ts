@@ -1,40 +1,22 @@
-import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
-import { globalStyle, keyframes, style } from '@vanilla-extract/css';
+import { chromeRadius, chromeText, chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
-const popoverIn = keyframes({
-  from: { opacity: 0, transform: 'translateY(2px) scale(0.96)' },
-  to: { opacity: 1, transform: 'translateY(0) scale(1)' },
-});
-
-const popoverOut = keyframes({
-  from: { opacity: 1, transform: 'translateY(0) scale(1)' },
-  to: { opacity: 0, transform: 'translateY(2px) scale(0.96)' },
-});
+import { popupMotion } from '../../styles/menu.css';
 
 export const popup = style({
   ...chromeTypography,
+  ...popupMotion,
   zIndex: 50,
-  width: 288,
-  borderRadius: vars.borderRadius.lg,
+  width: 280,
+  maxWidth: 'calc(100vw - 0.75rem)',
+  boxSizing: 'border-box',
+  borderRadius: chromeRadius.lg,
   border: 'none',
-  padding: '1rem',
-  backgroundColor: vars.color.bg,
+  padding: '12px',
+  backgroundColor: vars.color.bgElevated,
   boxShadow: vars.boxShadow.menu,
   outline: 'none',
-  transition: 'opacity 150ms ease-out, transform 150ms ease-out',
   fontFamily: vars.typography.fontFamilySans,
-  selectors: {
-    '&[data-open]': {
-      animation: `${popoverIn} 150ms ease-out`,
-    },
-    '&[data-ending-style]': {
-      opacity: 0,
-      transform: 'translateY(2px) scale(0.96)',
-    },
-    '&[data-closed]': {
-      animation: `${popoverOut} 150ms ease-in`,
-    },
-  },
 });
 
 export const arrow = style({
@@ -44,24 +26,22 @@ export const arrow = style({
 });
 
 globalStyle(`${arrow} > polygon`, {
-  fill: vars.color.bg,
+  fill: vars.color.bgElevated,
 });
 
 globalStyle(`${arrow} > polyline`, {
-  stroke: vars.color.border,
+  stroke: vars.color.ring,
   fill: 'none',
 });
 
 export const title = style({
-  fontSize: vars.typography.fontSizeMd,
+  ...chromeText.item,
   fontWeight: 600,
-  lineHeight: 1,
   color: vars.color.text,
 });
 
 export const description = style({
-  fontSize: vars.typography.fontSizeMd,
-  lineHeight: '1.25rem',
+  ...chromeText.control,
   color: vars.color.textSecondary,
-  marginTop: '0.25rem',
+  marginTop: '4px',
 });

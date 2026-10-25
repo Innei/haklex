@@ -10,6 +10,7 @@ const Composed = composeEditor({ modules: allEditorModules });
 interface ChromeEditorProps {
   actions?: ReactNode;
   children?: ReactNode;
+  gutter?: boolean;
   header?: ReactNode;
   hint: string;
   initialValue: SerializedEditorState;
@@ -19,13 +20,14 @@ interface ChromeEditorProps {
 export function ChromeEditor({
   actions,
   children,
+  gutter = false,
   header,
   hint,
   initialValue,
   theme,
 }: ChromeEditorProps) {
   return (
-    <div className="chrome-editor">
+    <div className={gutter ? 'chrome-editor chrome-editor-gutter' : 'chrome-editor'}>
       <Composed
         actions={actions}
         header={header}

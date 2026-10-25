@@ -8,16 +8,19 @@ const spin = keyframes({
 export const spinner = recipe({
   base: {
     display: 'inline-block',
+    boxSizing: 'border-box',
     borderRadius: '50%',
-    border: '2px solid currentColor',
-    borderTopColor: 'transparent',
-    animation: `${spin} 0.6s linear infinite`,
+    borderStyle: 'solid',
+    borderColor: 'color-mix(in oklab, currentColor 20%, transparent)',
+    borderTopColor: 'currentColor',
+    animation: `${spin} 0.7s linear infinite`,
     flexShrink: 0,
   },
   variants: {
     size: {
-      sm: { width: '14px', height: '14px' },
-      md: { width: '20px', height: '20px' },
+      sm: { width: '12px', height: '12px', borderWidth: '1.5px' },
+      md: { width: '16px', height: '16px', borderWidth: '2px' },
+      lg: { width: '20px', height: '20px', borderWidth: '2px' },
     },
   },
   defaultVariants: { size: 'sm' },

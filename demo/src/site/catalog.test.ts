@@ -64,9 +64,9 @@ describe('navGroups', () => {
     const tree = section('ui').tree!;
     expect(tree.map((g) => g.label)).toEqual([undefined, 'Overlays', 'Controls', 'Display']);
     expect(tree[0].items).toEqual([{ label: 'Overview', path: '/ui' }]);
-    expect(leafPaths('ui')).toHaveLength(20);
+    expect(leafPaths('ui')).toHaveLength(21);
     expect(leafPaths('ui')).toContain('/ui/dropdown-menu');
-    expect(section('ui').count).toBe(19);
+    expect(section('ui').count).toBe(20);
   });
 
   it('builds the editor chrome tree grouped as bars, menus, in place', () => {

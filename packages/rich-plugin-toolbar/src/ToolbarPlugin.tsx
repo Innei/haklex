@@ -1,72 +1,38 @@
-import { $toggleSpoilerSelection, collectCommandItems } from '@haklex/rich-editor/commands';
+import { collectCommandItems } from '@haklex/rich-editor/commands';
 import type { TooltipRootProps } from '@haklex/rich-editor-ui';
 import {
   createTooltipHandle,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   TooltipContent,
   TooltipProvider,
   TooltipRoot,
-  TooltipTrigger,
 } from '@haklex/rich-editor-ui';
-import {
-  INSERT_CHECK_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-} from '@lexical/list';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $createHeadingNode } from '@lexical/rich-text';
 import { $setBlocksType } from '@lexical/selection';
-import {
-  $createParagraphNode,
-  $getSelection,
-  $isRangeSelection,
-  FORMAT_ELEMENT_COMMAND,
-  FORMAT_TEXT_COMMAND,
-  REDO_COMMAND,
-  UNDO_COMMAND,
-} from 'lexical';
-import {
-  AlignCenter,
-  AlignJustify,
-  AlignLeft,
-  AlignRight,
-  Bold,
-  Code,
-  Ellipsis,
-  EyeOff,
-  Heading1,
-  Heading2,
-  Heading3,
-  Highlighter,
-  Italic,
-  List,
-  ListChecks,
-  ListOrdered,
-  Pilcrow,
-  Redo,
-  Strikethrough,
-  Underline,
-  Undo,
-} from 'lucide-react';
-import type { CSSProperties, ReactElement } from 'react';
-import { useMemo, useState } from 'react';
+import type { ElementNode, LexicalEditor } from 'lexical';
+import { $createParagraphNode, $getSelection, $isRangeSelection } from 'lexical';
+import { Ellipsis, Heading1, Heading2, Heading3, Pilcrow, Plus } from 'lucide-react';
+import type { CSSProperties, ReactElement, ReactNode } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { applyFontFamily } from './actions';
 import { BLOCK_TYPE_LABELS, FONT_FAMILIES, getFontLabel } from './constants';
+import type { ToolbarEntry } from './entries';
+import {
+  buttonEntry,
+  dropdownEntry,
+  formattingButtons,
+  separatorEntry,
+  TOOLBAR_BUTTON_SIZE,
+  TOOLBAR_GAP,
+} from './entries';
+import { fitCount } from './overflow';
 import * as css from './styles.css';
-import { ToolbarButton } from './ToolbarButton';
-import { ToolbarDropdown } from './ToolbarDropdown';
-import { ToolbarSeparator } from './ToolbarSeparator';
+import { ToolbarMenuButton, ToolbarMenuItems, ToolbarOverflowMenu } from './ToolbarOverflowMenu';
 import type { ToolbarTooltipPayload } from './types';
 import { useToolbarState } from './use-toolbar-state';
-
-const ICON_SIZE = 15;
-const ICON_STROKE = 2;
-
-// ─── Component ──────────────────────────────────────────
 
 const DEFAULT_MAX_VISIBLE_INSERT_ITEMS = 5;
 
@@ -76,6 +42,33 @@ export interface ToolbarPluginProps {
   maxVisibleInsertItems?: number;
 }
 
+function setBlock(editor: LexicalEditor, create: () => ElementNode) {
+  editor.update(() => {
+    const selection = $getSelection();
+    if ($isRangeSelection(selection)) $setBlocksType(selection, create);
+  });
+}
+
+const HEADINGS: { icon: ReactNode; label: string; type: string }[] = [
+  { label: 'Text', type: 'paragraph', icon: <Pilcrow size={16} /> },
+  { label: 'Heading 1', type: 'h1', icon: <Heading1 size={16} /> },
+  { label: 'Heading 2', type: 'h2', icon: <Heading2 size={16} /> },
+  { label: 'Heading 3', type: 'h3', icon: <Heading3 size={16} /> },
+];
+
+function useAvailableWidth() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [width, setWidth] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const observer = new ResizeObserver(([entry]) => setWidth(entry.contentRect.width));
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+  return [ref, width] as const;
+}
+
 export function ToolbarPlugin({
   className,
   maxVisibleInsertItems = DEFAULT_MAX_VISIBLE_INSERT_ITEMS,
@@ -83,9 +76,10 @@ export function ToolbarPlugin({
 }: ToolbarPluginProps): ReactElement {
   const [editor] = useLexicalComposerContext();
   const state = useToolbarState();
-  const [tooltipHandle] = useState(() => createTooltipHandle<ToolbarTooltipPayload>());
+  const [handle] = useState(() => createTooltipHandle<ToolbarTooltipPayload>());
+  const [rowRef, available] = useAvailableWidth();
 
-  const toolbarItems = useMemo(() => {
+  const insertItems = useMemo(() => {
     const items = collectCommandItems(editor).filter(
       (item) => item.placement?.includes('toolbar') && item.group === 'insert',
     );
@@ -97,306 +91,121 @@ export function ToolbarPlugin({
     });
   }, [editor, insertItemOrder]);
 
-  const fontFamilyItems = useMemo(
-    () =>
-      FONT_FAMILIES.map((def) => ({
-        label: def.label,
-        active: state.fontFamily === def.value,
-        style: def.value ? ({ fontFamily: def.value } as CSSProperties) : undefined,
-        onSelect: () => applyFontFamily(editor, def.value),
-      })),
-    [editor, state.fontFamily],
-  );
+  const entries = useMemo(() => {
+    const list: ToolbarEntry[] = [
+      dropdownEntry(
+        'font',
+        {
+          title: 'Font family',
+          label: getFontLabel(state.fontFamily),
+          width: 76,
+          items: FONT_FAMILIES.map((def) => ({
+            label: def.label,
+            active: state.fontFamily === def.value,
+            style: def.value ? ({ fontFamily: def.value } as CSSProperties) : undefined,
+            onSelect: () => applyFontFamily(editor, def.value),
+          })),
+        },
+        handle,
+      ),
+      separatorEntry('sep-font'),
+      dropdownEntry(
+        'block',
+        {
+          title: 'Block type',
+          label: BLOCK_TYPE_LABELS[state.blockType] ?? 'Text',
+          width: 112,
+          items: HEADINGS.map((heading) => ({
+            label: heading.label,
+            icon: heading.icon,
+            active: state.blockType === heading.type,
+            onSelect: () =>
+              setBlock(editor, () =>
+                heading.type === 'paragraph'
+                  ? $createParagraphNode()
+                  : $createHeadingNode(heading.type as 'h1' | 'h2' | 'h3'),
+              ),
+          })),
+        },
+        handle,
+      ),
+    ];
+    for (const [index, group] of formattingButtons(editor, state).entries()) {
+      list.push(separatorEntry(`sep-${index}`));
+      for (const spec of group) list.push(buttonEntry(spec, handle));
+    }
+    if (insertItems.length > 0) {
+      list.push(separatorEntry('sep-insert'));
+      for (const item of insertItems.slice(0, maxVisibleInsertItems)) {
+        list.push(
+          buttonEntry(
+            {
+              key: `insert-${item.title}`,
+              label: item.title,
+              icon: item.icon,
+              shortcut: item.shortcut,
+              onSelect: () => item.onSelect(editor, ''),
+            },
+            handle,
+          ),
+        );
+      }
+      const rest = insertItems.slice(maxVisibleInsertItems).map((item) => ({
+        label: item.title,
+        icon: item.icon,
+        shortcut: item.shortcut,
+        onSelect: () => item.onSelect(editor, ''),
+      }));
+      if (rest.length > 0) {
+        list.push({
+          key: 'insert-menu',
+          width: TOOLBAR_BUTTON_SIZE,
+          menu: { label: 'Insert', items: rest },
+          node: (
+            <DropdownMenu key="insert-menu" modal={false}>
+              <ToolbarMenuButton handle={handle} title="Insert">
+                <Plus size={16} />
+              </ToolbarMenuButton>
+              <DropdownMenuContent positionMethod="fixed" sideOffset={4}>
+                <ToolbarMenuItems items={rest} />
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ),
+        });
+      }
+    }
+    return list;
+  }, [editor, state, handle, insertItems, maxVisibleInsertItems]);
 
-  const headingItems = useMemo(
-    () => [
-      {
-        label: 'Text',
-        icon: <Pilcrow size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-        active: state.blockType === 'paragraph',
-        onSelect: () => {
-          editor.update(() => {
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createParagraphNode());
-            }
-          });
-        },
-      },
-      {
-        label: 'Heading 1',
-        icon: <Heading1 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-        active: state.blockType === 'h1',
-        onSelect: () => {
-          editor.update(() => {
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createHeadingNode('h1'));
-            }
-          });
-        },
-      },
-      {
-        label: 'Heading 2',
-        icon: <Heading2 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-        active: state.blockType === 'h2',
-        onSelect: () => {
-          editor.update(() => {
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createHeadingNode('h2'));
-            }
-          });
-        },
-      },
-      {
-        label: 'Heading 3',
-        icon: <Heading3 size={ICON_SIZE} strokeWidth={ICON_STROKE} />,
-        active: state.blockType === 'h3',
-        onSelect: () => {
-          editor.update(() => {
-            const selection = $getSelection();
-            if ($isRangeSelection(selection)) {
-              $setBlocksType(selection, () => $createHeadingNode('h3'));
-            }
-          });
-        },
-      },
-    ],
-    [editor, state.blockType],
-  );
-
-  const containerClassName = className
-    ? `${css.toolbarContainer} ${className}`
-    : css.toolbarContainer;
-
-  const h = tooltipHandle;
+  const visibleCount = fitCount(entries, {
+    available,
+    gap: TOOLBAR_GAP,
+    reserve: TOOLBAR_BUTTON_SIZE,
+  });
+  const hidden = entries.slice(visibleCount);
 
   return (
     <TooltipProvider delay={300}>
-      <TooltipRoot disableHoverablePopup handle={tooltipHandle as TooltipRootProps['handle']}>
+      <TooltipRoot disableHoverablePopup handle={handle as TooltipRootProps['handle']}>
         {
           ((props: { payload?: ToolbarTooltipPayload }) =>
             props.payload !== undefined ? (
-              <TooltipContent side="bottom" sideOffset={4}>
+              <TooltipContent shortcut={props.payload.shortcut} side="bottom" sideOffset={4}>
                 {props.payload.title}
-                {props.payload.shortcut && (
-                  <span className={css.tooltipShortcut}>{props.payload.shortcut}</span>
-                )}
               </TooltipContent>
             ) : null) as TooltipRootProps['children']
         }
       </TooltipRoot>
 
-      <div aria-label="Editor toolbar" className={containerClassName} role="toolbar">
-        <div className={css.toolbarRow}>
-          {/* Font Family */}
-          <ToolbarDropdown
-            items={fontFamilyItems}
-            label={getFontLabel(state.fontFamily)}
-            title="Font family"
-            tooltipHandle={h}
-            triggerWidth={76}
-          />
-
-          <ToolbarSeparator />
-
-          {/* Heading dropdown */}
-          <ToolbarDropdown
-            items={headingItems}
-            label={BLOCK_TYPE_LABELS[state.blockType] ?? 'Text'}
-            title="Block type"
-            tooltipHandle={h}
-            triggerWidth={120}
-          />
-
-          <ToolbarSeparator />
-
-          {/* Undo / Redo */}
-          <ToolbarButton
-            disabled={!state.canUndo}
-            icon={<Undo size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            shortcut="Ctrl+Z"
-            title="Undo"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(UNDO_COMMAND, undefined)}
-          />
-          <ToolbarButton
-            disabled={!state.canRedo}
-            icon={<Redo size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            shortcut="Ctrl+Y"
-            title="Redo"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(REDO_COMMAND, undefined)}
-          />
-
-          <ToolbarSeparator />
-
-          {/* Format buttons */}
-          <ToolbarButton
-            active={state.isBold}
-            icon={<Bold size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            shortcut="Ctrl+B"
-            title="Bold"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'bold')}
-          />
-          <ToolbarButton
-            active={state.isItalic}
-            icon={<Italic size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            shortcut="Ctrl+I"
-            title="Italic"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'italic')}
-          />
-          <ToolbarButton
-            active={state.isUnderline}
-            icon={<Underline size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            shortcut="Ctrl+U"
-            title="Underline"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'underline')}
-          />
-          <ToolbarButton
-            active={state.isStrikethrough}
-            icon={<Strikethrough size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Strikethrough"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'strikethrough')}
-          />
-          <ToolbarButton
-            active={state.isCode}
-            icon={<Code size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Inline Code"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'code')}
-          />
-
-          <ToolbarSeparator />
-
-          {/* Highlight */}
-          <ToolbarButton
-            active={state.isHighlight}
-            icon={<Highlighter size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Highlight"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_TEXT_COMMAND, 'highlight')}
-          />
-          <ToolbarButton
-            active={state.isSpoiler}
-            icon={<EyeOff size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Spoiler"
-            tooltipHandle={h}
-            onClick={() => editor.update($toggleSpoilerSelection)}
-          />
-
-          <ToolbarSeparator />
-
-          {/* List buttons */}
-          <ToolbarButton
-            active={state.blockType === 'bullet'}
-            icon={<List size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Bulleted List"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined)}
-          />
-          <ToolbarButton
-            active={state.blockType === 'number'}
-            icon={<ListOrdered size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Numbered List"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined)}
-          />
-          <ToolbarButton
-            active={state.blockType === 'check'}
-            icon={<ListChecks size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Checklist"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined)}
-          />
-
-          <ToolbarSeparator />
-
-          {/* Alignment */}
-          <ToolbarButton
-            active={state.elementFormat === 'left' || state.elementFormat === ''}
-            icon={<AlignLeft size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Align Left"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'left')}
-          />
-          <ToolbarButton
-            active={state.elementFormat === 'center'}
-            icon={<AlignCenter size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Align Center"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'center')}
-          />
-          <ToolbarButton
-            active={state.elementFormat === 'right'}
-            icon={<AlignRight size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Align Right"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'right')}
-          />
-          <ToolbarButton
-            active={state.elementFormat === 'justify'}
-            icon={<AlignJustify size={ICON_SIZE} strokeWidth={ICON_STROKE} />}
-            title="Justify"
-            tooltipHandle={h}
-            onClick={() => editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, 'justify')}
-          />
-
-          {/* Dynamic insert items */}
-          {toolbarItems.length > 0 && (
-            <>
-              <ToolbarSeparator />
-              {toolbarItems.slice(0, maxVisibleInsertItems).map((item) => (
-                <ToolbarButton
-                  icon={item.icon}
-                  key={item.title}
-                  shortcut={item.shortcut}
-                  title={item.title}
-                  tooltipHandle={h}
-                  onClick={() => item.onSelect(editor, '')}
-                />
-              ))}
-              {toolbarItems.length > maxVisibleInsertItems && (
-                <DropdownMenu modal={false}>
-                  <TooltipTrigger
-                    handle={h}
-                    payload={{ title: 'More' } satisfies ToolbarTooltipPayload}
-                    render={
-                      <DropdownMenuTrigger
-                        className={css.toolbarButton}
-                        render={<button type="button" />}
-                      />
-                    }
-                  >
-                    <Ellipsis size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-                  </TooltipTrigger>
-                  <DropdownMenuContent positionMethod="fixed" sideOffset={4}>
-                    {toolbarItems.slice(maxVisibleInsertItems).map((item) => (
-                      <DropdownMenuItem key={item.title} onClick={() => item.onSelect(editor, '')}>
-                        {item.icon && (
-                          <span
-                            style={{
-                              marginRight: 8,
-                              display: 'inline-flex',
-                              transform: 'scale(0.8)',
-                              transformOrigin: 'left center',
-                            }}
-                          >
-                            {item.icon}
-                          </span>
-                        )}
-                        {item.title}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </>
+      <div
+        aria-label="Editor toolbar"
+        className={className ? `${css.toolbarContainer} ${className}` : css.toolbarContainer}
+        role="toolbar"
+      >
+        <div className={css.toolbarRow} ref={rowRef}>
+          {entries.slice(0, visibleCount).map((entry) => entry.node)}
+          {hidden.length > 0 && (
+            <ToolbarOverflowMenu entries={hidden} handle={handle} icon={<Ellipsis size={16} />} />
           )}
         </div>
       </div>

@@ -1,4 +1,4 @@
 export {
   FloatingLinkEditorPlugin,
   type FloatingLinkEditorPluginProps,
-} from './FloatingLinkEditorPlugin'
+} from './FloatingLinkEditorPlugin';

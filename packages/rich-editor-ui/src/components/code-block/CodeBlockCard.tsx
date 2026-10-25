@@ -112,6 +112,7 @@ export function CodeBlockCard({
             <button
               aria-label={copied ? 'Copied' : 'Copy code'}
               className={styles.copyButton}
+              data-copied={copied || undefined}
               type="button"
               onClick={handleCopy}
             >

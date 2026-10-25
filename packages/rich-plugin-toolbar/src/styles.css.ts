@@ -1,30 +1,39 @@
-import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import {
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  chromeTypography,
+  focusRing,
+  vars,
+} from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
+const stateTransition = `color ${chromeMotion.state} ease, background-color ${chromeMotion.state} ease`;
+
 export const toolbarContainer = style({
-  display: 'flex',
-  flexDirection: 'column',
   ...chromeTypography,
-  gap: 4,
-  border: 'none',
-  borderRadius: vars.borderRadius.lg,
-  backgroundColor: vars.color.bg,
-  boxShadow: vars.boxShadow.topBar,
   position: 'sticky',
   top: 0,
   zIndex: 50,
-  margin: '12px auto 0',
-  maxWidth: vars.layout.maxWidth,
+  display: 'flex',
+  flexDirection: 'column',
+  width: '100%',
+  boxSizing: 'border-box',
+  backgroundColor: vars.color.bg,
+  borderBottom: `1px solid ${vars.color.borderSubtle}`,
 });
 
 export const toolbarRow = style({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  gap: 4,
-  flexWrap: 'wrap',
-  minHeight: 36,
-  padding: '6px 12px',
+  gap: 2,
+  flexWrap: 'nowrap',
+  height: 40,
+  boxSizing: 'border-box',
+  padding: '0 8px',
+  minWidth: 0,
+  overflow: 'hidden',
 });
 
 export const toolbarButton = style({
@@ -32,18 +41,23 @@ export const toolbarButton = style({
   'display': 'flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 32,
-  'height': 32,
+  'flexShrink': 0,
+  'width': 28,
+  'height': 28,
   'border': 'none',
   'background': 'transparent',
-  'borderRadius': vars.borderRadius.md,
+  'borderRadius': chromeRadius.md,
   'color': vars.color.textSecondary,
   'cursor': 'pointer',
   'padding': 0,
-  'transition': 'color 120ms ease-out, background-color 120ms ease-out',
+  'outline': 'none',
+  'transition': stateTransition,
   ':hover': {
     backgroundColor: vars.color.fillSecondary,
     color: vars.color.text,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
   },
   'selectors': {
     '&:active': {
@@ -54,48 +68,58 @@ export const toolbarButton = style({
       color: vars.color.text,
     },
     '&:disabled': {
-      opacity: 0.35,
+      opacity: 0.5,
       cursor: 'default',
       backgroundColor: 'transparent',
-      color: vars.color.textQuaternary,
+      color: vars.color.textSecondary,
     },
   },
 });
 
 globalStyle(`${toolbarButton} svg`, {
-  width: 15,
-  height: 15,
+  width: 16,
+  height: 16,
   strokeWidth: 2,
 });
 
 export const toolbarButtonActive = style({
-  'color': vars.color.text,
-  'backgroundColor': vars.color.fill,
-  ':hover': {
-    color: vars.color.text,
-    backgroundColor: vars.color.fill,
+  selectors: {
+    '&&': {
+      color: vars.color.text,
+      backgroundColor: vars.color.fill,
+    },
   },
 });
 
 export const toolbarDropdownTrigger = style({
+  ...chromeText.control,
   'display': 'inline-flex',
   'alignItems': 'center',
+  'flexShrink': 0,
   'gap': 4,
-  'height': 32,
-  'padding': '0 10px',
+  'height': 28,
+  'boxSizing': 'border-box',
+  'padding': '0 6px 0 8px',
   'border': 'none',
   'background': 'transparent',
-  'borderRadius': vars.borderRadius.md,
+  'borderRadius': chromeRadius.md,
   'color': vars.color.text,
   'cursor': 'pointer',
-  'fontFamily': 'inherit',
-  'fontSize': 13,
+  'fontFamily': vars.typography.fontFamilySans,
   'fontWeight': 500,
-  'lineHeight': 1,
-  'transition': 'color 120ms ease-out, background-color 120ms ease-out',
+  'whiteSpace': 'nowrap',
+  'outline': 'none',
+  'transition': stateTransition,
   ':hover': {
     backgroundColor: vars.color.fillSecondary,
-    color: vars.color.text,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
+  },
+  'selectors': {
+    '&[data-popup-open]': {
+      backgroundColor: vars.color.fill,
+    },
   },
 });
 
@@ -103,23 +127,18 @@ export const toolbarDropdownTriggerChevron = style({
   marginLeft: 'auto',
   display: 'inline-flex',
   flexShrink: 0,
+  color: vars.color.textTertiary,
 });
 
 export const toolbarSeparator = style({
   width: 1,
-  height: 18,
-  backgroundColor: vars.color.border,
+  height: 16,
+  backgroundColor: vars.color.borderSubtle,
   marginInline: 6,
   flexShrink: 0,
 });
 
 export const toolbarDropdownItemActive = style({
-  backgroundColor: vars.color.fill,
-  color: vars.color.text,
-});
-
-export const tooltipShortcut = style({
-  fontSize: 11,
-  opacity: 0.7,
-  marginLeft: 6,
+  fontWeight: 500,
+  backgroundColor: vars.color.fillTertiary,
 });

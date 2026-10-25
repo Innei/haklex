@@ -1,10 +1,17 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import {
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  focusRing,
+  inDarkScheme,
+  vars,
+} from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const card = style({
   position: 'relative',
   margin: `${vars.flow.block} 0`,
-  borderRadius: vars.borderRadius.md,
+  borderRadius: chromeRadius.md,
   overflow: 'hidden',
   backgroundColor: vars.color.codeBg,
   color: vars.color.text,
@@ -22,18 +29,19 @@ export const header = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '0.75rem',
+  gap: '12px',
   fontFamily: vars.typography.fontFamilySans,
-  fontSize: '12px',
-  lineHeight: 1,
+  ...chromeText.label,
+  fontWeight: 400,
   color: vars.color.textTertiary,
   userSelect: 'none',
   selectors: {
     [`${card}[data-chrome="bar"] &`]: {
-      height: '36px',
-      padding: '0 6px 0 14px',
+      height: '32px',
+      boxSizing: 'border-box',
+      padding: '0 4px 0 12px',
       backgroundColor: vars.color.codeHeaderBg,
-      borderBottom: `1px solid ${vars.color.border}`,
+      borderBottom: `1px solid ${vars.color.borderSubtle}`,
     },
     [`${card}[data-chrome="compact"] &`]: {
       position: 'absolute',
@@ -76,19 +84,31 @@ export const copyButton = style({
   'display': 'inline-flex',
   'alignItems': 'center',
   'gap': '6px',
-  'padding': '6px 8px',
+  'height': '24px',
+  'boxSizing': 'border-box',
+  'padding': '0 8px',
   'border': 'none',
-  'borderRadius': '6px',
+  'borderRadius': chromeRadius.md,
   'background': 'transparent',
   'color': vars.color.textTertiary,
   'font': 'inherit',
   'cursor': 'pointer',
-  'transition': 'color 0.15s ease, background-color 0.15s ease, opacity 0.15s ease',
+  'outline': 'none',
+  'transition': `color ${chromeMotion.state} ease, background-color ${chromeMotion.state} ease, opacity ${chromeMotion.state} ease`,
   ':hover': {
     color: vars.color.text,
+    backgroundColor: vars.color.fillSecondary,
+  },
+  ':active': {
     backgroundColor: vars.color.fill,
   },
+  ':focus-visible': {
+    boxShadow: focusRing,
+  },
   'selectors': {
+    '&[data-copied]': {
+      color: vars.color.text,
+    },
     [`${card}[data-chrome="compact"] &`]: {
       background: `linear-gradient(${vars.color.fill}, ${vars.color.fill}), ${vars.color.codeBg}`,
       color: vars.color.text,
@@ -174,14 +194,20 @@ export const expandButton = style({
   'width': '100%',
   'height': '32px',
   'border': 'none',
-  'borderTop': `1px solid ${vars.color.border}`,
+  'borderTop': `1px solid ${vars.color.borderSubtle}`,
   'background': vars.color.codeBg,
   'color': vars.color.textTertiary,
   'fontFamily': vars.typography.fontFamilySans,
-  'fontSize': '12px',
+  ...chromeText.label,
+  'fontWeight': 400,
   'cursor': 'pointer',
+  'outline': 'none',
+  'transition': `color ${chromeMotion.state} ease`,
   ':hover': {
     color: vars.color.text,
+  },
+  ':focus-visible': {
+    boxShadow: `inset 0 0 0 1px ${vars.color.accent}, inset 0 0 0 3px ${vars.color.accentLight}`,
   },
 });
 
@@ -243,12 +269,9 @@ globalStyle(`${card} .highlights, ${card} code, ${card} pre`, {
   lineHeight: 'inherit',
 });
 
-globalStyle(
-  `[data-theme='dark'] ${card} .highlights-themes, [data-theme='dark'] ${card} .highlights-themes span`,
-  {
-    color: 'var(--hls-dark) !important' as any,
-  },
-);
+globalStyle(inDarkScheme(`${card} .highlights-themes, ${card} .highlights-themes span`), {
+  color: 'var(--hls-dark) !important' as any,
+});
 
 globalStyle(`${card} .line`, {
   display: 'block',

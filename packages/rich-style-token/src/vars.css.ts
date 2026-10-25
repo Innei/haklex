@@ -34,6 +34,8 @@ export const vars = createGlobalThemeContract({
     bgSecondary: 'rc-bg-secondary',
     /** 默认值: '#f5f5f5' */
     bgTertiary: 'rc-bg-tertiary',
+    /** 默认值: '#ffffff' — 浮层底色（菜单、弹出框、对话框）；暗色下抬亮 */
+    bgElevated: 'rc-bg-elevated',
     /** 默认值: 'rgb(0 0 0 / 0.07)' — 交互态填充色 1 (list selected/hover) */
     fill: 'rc-fill',
     /** 默认值: 'rgb(0 0 0 / 0.045)' — 交互态填充色 2 (button hover) */
@@ -48,6 +50,8 @@ export const vars = createGlobalThemeContract({
     borderSubtle: 'rc-border-subtle',
     /** 默认值: 'rgb(0 0 0 / 0.08)' — 弹层外轮廓 */
     ring: 'rc-ring',
+    /** 默认值: 'rgb(0 0 0 / 0.32)' — 对话框遮罩；暗色 .56 */
+    scrim: 'rc-scrim',
     /** 默认值: '#2563eb' */
     accent: 'rc-accent',
     /** 默认值: 'color-mix(in oklab, var(--rc-accent) 10%, transparent)' */
@@ -214,12 +218,38 @@ export const chatTheme = createTheme(vars, {
   ...hostLayout(chatLayout),
 });
 
+const themeScopes = [
+  { themeClass: articleTheme, colors: lightArticleColors, layout: articleLayout },
+  { themeClass: noteTheme, colors: lightArticleColors, layout: noteLayout },
+  { themeClass: commentTheme, colors: lightCommentColors, layout: commentLayout },
+  { themeClass: chatTheme, colors: lightCommentColors, layout: chatLayout },
+];
+
 // Per-variant dark override (higher specificity for variant-specific color tweaks)
-for (const themeClass of [articleTheme, noteTheme, commentTheme, chatTheme]) {
+for (const { themeClass } of themeScopes) {
   globalStyle(`.dark .${themeClass}, [data-theme="dark"] .${themeClass}`, {
     vars: { ...darkColorVars, ...darkShadowVars },
   });
   globalStyle(`.dark.${themeClass}, [data-theme="dark"].${themeClass}`, {
+    vars: { ...darkColorVars, ...darkShadowVars },
+  });
+}
+
+// A light scope inside a dark ancestor (preview frames, portals carrying the
+// editor's theme) must beat the dark descendant rule above, which matches any
+// dark ancestor rather than the nearest one. An element's own data-theme always
+// wins (doubled attribute for specificity); descendants resolve one nesting level.
+for (const { themeClass, colors, layout } of themeScopes) {
+  const lightVars = {
+    ...assignVars(vars.color, hostColors(colors)),
+    ...assignVars(vars.boxShadow, layout.boxShadow),
+  };
+  globalStyle(`[data-theme="dark"] [data-theme="light"] .${themeClass}`, { vars: lightVars });
+  globalStyle(`[data-theme="light"] [data-theme="dark"] .${themeClass}`, {
+    vars: { ...darkColorVars, ...darkShadowVars },
+  });
+  globalStyle(`[data-theme="light"][data-theme].${themeClass}`, { vars: lightVars });
+  globalStyle(`[data-theme="dark"][data-theme].${themeClass}`, {
     vars: { ...darkColorVars, ...darkShadowVars },
   });
 }

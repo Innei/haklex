@@ -20,8 +20,11 @@ export function ActionBar({ className, gap, style, ...props }: ActionBarProps) {
 
 // -- ActionButton --
 
+type ActionButtonVariant = 'ghost' | 'solid' | 'outline' | 'accent';
+
 type ActionButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: 'ghost' | 'solid' | 'outline' | 'accent';
+  /** `accent` is deprecated and renders as `solid`. Toggle buttons set `aria-pressed`. */
+  variant?: ActionButtonVariant;
   size?: 'sm' | 'md' | 'lg';
   end?: boolean;
   danger?: boolean;
@@ -57,7 +60,7 @@ export function ActionButton({
 }
 
 export function getActionButtonClassName(options?: {
-  variant?: 'ghost' | 'solid' | 'outline' | 'accent';
+  variant?: ActionButtonVariant;
   size?: 'sm' | 'md' | 'lg';
 }) {
   return `${css.actionButton(options)} ${css.semanticClassNames.actionButton}`;

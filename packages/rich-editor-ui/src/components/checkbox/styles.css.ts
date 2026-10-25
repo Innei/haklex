@@ -1,119 +1,108 @@
-import { vars } from '@haklex/rich-style-token/styles'
-import { keyframes, style } from '@vanilla-extract/css'
-
-const checkboxBounce = keyframes({
-  '0%': { transform: 'scale(1)' },
-  '40%': { transform: 'scale(0.85)' },
-  '100%': { transform: 'scale(1)' },
-})
-
-const checkboxRipple = keyframes({
-  '0%': {
-    boxShadow: `0 0 0 0 color-mix(in srgb, ${vars.color.accent} 40%, transparent)`,
-  },
-  '100%': { boxShadow: '0 0 0 6px transparent' },
-})
+import {
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  focusRing,
+  vars,
+} from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
 export const root = style({
   display: 'inline-flex',
   alignItems: 'flex-start',
-  gap: '0.75rem',
-  borderRadius: '0.5rem',
-  padding: '0.25rem',
+  gap: '8px',
+  borderRadius: chromeRadius.sm,
+  padding: 0,
   textAlign: 'left',
   border: 'none',
   background: 'none',
   cursor: 'pointer',
-  fontFamily: 'inherit',
-  fontSize: 'inherit',
+  fontFamily: vars.typography.fontFamilySans,
   color: 'inherit',
-  ':focus-visible': {
-    outline: `2px solid ${vars.color.accent}`,
-    outlineOffset: '2px',
-  },
-})
+  outline: 'none',
+});
 
 export const rootDisabled = style({
   cursor: 'not-allowed',
   opacity: 0.5,
-})
+});
 
 export const box = style({
   position: 'relative',
   display: 'flex',
-  width: '1.125rem',
-  height: '1.125rem',
+  width: '16px',
+  height: '16px',
+  marginTop: '2px',
   flexShrink: 0,
   alignItems: 'center',
   justifyContent: 'center',
-  borderRadius: '0.3rem',
-  borderWidth: '2px',
-  borderStyle: 'solid',
-  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
+  borderRadius: chromeRadius.sm,
+  border: `1px solid ${vars.color.textQuaternary}`,
+  color: vars.color.bg,
+  transition: `background-color ${chromeMotion.state} ease, border-color ${chromeMotion.state} ease`,
   boxSizing: 'border-box',
-})
+});
+
+globalStyle(`${root}:focus-visible ${box}`, {
+  boxShadow: focusRing,
+});
 
 export const boxUnchecked = style({
-  borderColor: `color-mix(in srgb, ${vars.color.textSecondary} 50%, transparent)`,
   backgroundColor: 'transparent',
-})
+});
+
+globalStyle(`${root}:hover:not(${rootDisabled}) ${boxUnchecked}`, {
+  borderColor: vars.color.textTertiary,
+});
 
 export const boxChecked = style({
-  borderColor: vars.color.accent,
-  backgroundColor: vars.color.accent,
-})
+  selectors: {
+    '&&': {
+      borderColor: vars.color.text,
+      backgroundColor: vars.color.text,
+    },
+  },
+});
 
-export const boxBouncing = style({
-  animation: `${checkboxBounce} 0.4s ease-out`,
-})
+export const mark = style({
+  'position': 'absolute',
+  'width': '12px',
+  'height': '12px',
+  'transition': `opacity ${chromeMotion.state} ease, transform ${chromeMotion.state} ease`,
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      transition: 'none',
+    },
+  },
+});
 
-export const checkmark = style({
-  width: '0.75rem',
-  height: '0.75rem',
-  transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-})
-
-export const checkmarkVisible = style({
+export const markVisible = style({
   opacity: 1,
   transform: 'scale(1)',
-})
+});
 
-export const checkmarkHidden = style({
+export const markHidden = style({
   opacity: 0,
-  transform: 'scale(0.5)',
-})
-
-export const ripple = style({
-  position: 'absolute',
-  inset: 0,
-  borderRadius: '0.3rem',
-  pointerEvents: 'none',
-})
-
-export const rippleActive = style({
-  animation: `${checkboxRipple} 0.4s ease-out`,
-})
+  transform: 'scale(0.8)',
+});
 
 export const labelArea = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: '0.125rem',
-})
+  gap: '2px',
+});
 
 export const label = style({
-  fontSize: vars.typography.fontSizeMd,
+  ...chromeText.item,
   fontWeight: 500,
-  lineHeight: 1.25,
   color: vars.color.text,
-  transition: 'color 0.2s',
-})
+});
 
 export const labelDisabled = style({
   color: vars.color.textSecondary,
-})
+});
 
 export const description = style({
-  fontSize: vars.typography.fontSizeXs,
-  lineHeight: 1.25,
+  ...chromeText.control,
   color: vars.color.textSecondary,
-})
+});

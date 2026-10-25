@@ -127,10 +127,16 @@ export const chromeDemos: Record<string, ComponentDemo> = {
     ),
   },
   'block-handle': {
-    note: 'Live editors with only the block handle mounted.',
+    note: 'Live editors with the block handle and the slash menu it opens from the + in a gap.',
     statesNote: triggerNote('Hover a block, then drag the handle or open its menu'),
     Preview: ({ theme }) => (
-      <ChromeEditor hint="Hover a block to show the handle." initialValue={blockDoc} theme={theme}>
+      <ChromeEditor
+        gutter
+        actions={<SlashMenuPlugin />}
+        hint="Hover a block to show the handle."
+        initialValue={blockDoc}
+        theme={theme}
+      >
         <BlockHandlePlugin />
       </ChromeEditor>
     ),

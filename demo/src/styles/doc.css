@@ -345,6 +345,10 @@
   }
 }
 
+.doc-flat .biz-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .doc-flat .biz-grid > .panel,
 .doc-flat .biz-masonry > .panel {
   margin-top: 0;

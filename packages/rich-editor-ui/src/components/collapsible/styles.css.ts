@@ -1,5 +1,11 @@
-import { vars } from '@haklex/rich-style-token/styles';
-import { style } from '@vanilla-extract/css';
+import {
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  focusRing,
+  vars,
+} from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
 export const trigger = style({
   'display': 'flex',
@@ -8,21 +14,28 @@ export const trigger = style({
   'cursor': 'pointer',
   'border': 'none',
   'background': 'none',
+  ...chromeText.control,
+  'fontWeight': 500,
   'padding': 0,
-  'color': vars.color.textTertiary,
-  'fontSize': 'inherit',
-  'fontFamily': 'inherit',
+  'borderRadius': chromeRadius.sm,
+  'color': vars.color.textSecondary,
+  'fontFamily': vars.typography.fontFamilySans,
   'width': '100%',
   'textAlign': 'left',
+  'outline': 'none',
+  'transition': `color ${chromeMotion.state} ease`,
   ':hover': {
-    color: vars.color.textSecondary,
+    color: vars.color.text,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
   },
 });
 
 export const chevron = style({
-  transition: 'transform 0.2s ease',
-  width: '14px',
-  height: '14px',
+  transition: `transform ${chromeMotion.layout}`,
+  width: '16px',
+  height: '16px',
   flexShrink: 0,
   selectors: {
     '[data-panel-open] &': {
@@ -32,11 +45,16 @@ export const chevron = style({
 });
 
 export const panel = style({
-  overflow: 'hidden',
-  interpolateSize: 'allow-keywords',
-  height: 'var(--collapsible-panel-height)',
-  transition: 'height 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-  selectors: {
+  'overflow': 'hidden',
+  'interpolateSize': 'allow-keywords',
+  'height': 'var(--collapsible-panel-height)',
+  'transition': `height ${chromeMotion.layout}`,
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      transition: 'none',
+    },
+  },
+  'selectors': {
     '&[data-closed]': {
       height: 0,
     },
@@ -47,4 +65,13 @@ export const panel = style({
       height: 0,
     },
   },
+});
+
+export const panelContent = style({
+  paddingTop: '4px',
+  paddingLeft: '22px',
+});
+
+globalStyle(`${trigger}[data-no-chevron] ~ ${panel} > ${panelContent}`, {
+  paddingLeft: 0,
 });

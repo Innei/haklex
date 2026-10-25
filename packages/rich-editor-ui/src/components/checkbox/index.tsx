@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 
 import * as css from './styles.css';
 
@@ -12,6 +12,8 @@ export interface AnimatedCheckboxProps {
   defaultChecked?: boolean;
   description?: string;
   disabled?: boolean;
+  /** Shows a dash and reports `aria-checked="mixed"`; the next click checks the box. */
+  indeterminate?: boolean;
   label?: string;
   onChange?: (checked: boolean) => void;
 }
@@ -21,73 +23,55 @@ export function AnimatedCheckbox({
   description,
   checked: controlledChecked,
   defaultChecked = false,
+  indeterminate = false,
   onChange,
   disabled = false,
   className,
 }: AnimatedCheckboxProps) {
   const [internalChecked, setInternalChecked] = useState(defaultChecked);
-  const [bouncing, setBouncing] = useState(false);
   const isControlled = controlledChecked !== undefined;
   const isChecked = isControlled ? controlledChecked : internalChecked;
-  const isFirstRender = useRef(true);
-  const rippleKey = useRef(0);
-
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    setBouncing(true);
-    rippleKey.current += 1;
-    const timer = setTimeout(() => setBouncing(false), 400);
-    return () => clearTimeout(timer);
-  }, [isChecked]);
+  const filled = indeterminate || isChecked;
 
   const handleToggle = () => {
     if (disabled) return;
-    const next = !isChecked;
+    const next = indeterminate ? true : !isChecked;
     if (!isControlled) setInternalChecked(next);
     onChange?.(next);
   };
 
   return (
     <button
-      aria-checked={isChecked}
+      aria-checked={indeterminate ? 'mixed' : isChecked}
       aria-disabled={disabled}
       className={cx(css.root, disabled && css.rootDisabled, className)}
       role="checkbox"
       type="button"
       onClick={handleToggle}
     >
-      <span
-        className={cx(
-          css.box,
-          isChecked ? css.boxChecked : css.boxUnchecked,
-          bouncing && css.boxBouncing,
-        )}
-      >
+      <span className={cx(css.box, filled ? css.boxChecked : css.boxUnchecked)}>
         <svg
-          className={cx(css.checkmark, isChecked ? css.checkmarkVisible : css.checkmarkHidden)}
+          aria-hidden
+          className={cx(css.mark, isChecked && !indeterminate ? css.markVisible : css.markHidden)}
           fill="none"
-          viewBox="0 0 12 10"
+          viewBox="0 0 12 12"
         >
           <path
-            d="M1 5.5L4 8.5L11 1.5"
+            d="M2.5 6.25L5 8.75L9.5 3.5"
             stroke="currentColor"
             strokeLinecap="round"
             strokeLinejoin="round"
-            strokeWidth="2"
-            style={{
-              color: '#fff',
-              strokeDasharray: 20,
-              strokeDashoffset: isChecked ? 0 : 20,
-              transition: isChecked
-                ? 'stroke-dashoffset 0.4s ease-out 0.1s'
-                : 'stroke-dashoffset 0.2s ease-in',
-            }}
+            strokeWidth="1.75"
           />
         </svg>
-        <span className={cx(css.ripple, bouncing && css.rippleActive)} key={rippleKey.current} />
+        <svg
+          aria-hidden
+          className={cx(css.mark, indeterminate ? css.markVisible : css.markHidden)}
+          fill="none"
+          viewBox="0 0 12 12"
+        >
+          <path d="M3 6H9" stroke="currentColor" strokeLinecap="round" strokeWidth="1.75" />
+        </svg>
       </span>
 
       {(label || description) && (

@@ -1,16 +1,11 @@
-import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
-import { keyframes, style } from '@vanilla-extract/css';
-
-/** Vercel-inspired line tooltip: thin border, minimal shadow, clean typography */
-const tooltipIn = keyframes({
-  from: { opacity: 0, transform: 'translateY(2px)' },
-  to: { opacity: 1, transform: 'translateY(0)' },
-});
-
-const tooltipOut = keyframes({
-  from: { opacity: 1, transform: 'translateY(0)' },
-  to: { opacity: 0, transform: 'translateY(2px)' },
-});
+import {
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  chromeTypography,
+  vars,
+} from '@haklex/rich-style-token/styles';
+import { style } from '@vanilla-extract/css';
 
 export const positioner = style({
   zIndex: 50,
@@ -19,30 +14,48 @@ export const positioner = style({
 
 export const popup = style({
   ...chromeTypography,
-  maxWidth: 320,
-  padding: `${vars.spacing.xs} ${vars.spacing.sm}`,
-  fontSize: vars.typography.fontSizeXs,
-  lineHeight: 1.4,
-  color: vars.color.text,
-  backgroundColor: vars.color.bg,
-  border: 'none',
-  borderRadius: vars.borderRadius.md,
-  boxShadow: vars.boxShadow.menu,
-  outline: 'none',
-  whiteSpace: 'normal',
-  wordBreak: 'break-word',
-  pointerEvents: 'none',
-  transition: 'opacity 120ms ease-out, transform 120ms ease-out',
-  selectors: {
-    '&[data-open]': {
-      animation: `${tooltipIn} 120ms ease-out`,
+  ...chromeText.label,
+  'display': 'flex',
+  'alignItems': 'center',
+  'gap': '8px',
+  'maxWidth': 320,
+  'boxSizing': 'border-box',
+  'padding': '4px 8px',
+  'color': vars.color.bg,
+  'backgroundColor': vars.color.text,
+  'border': 'none',
+  'borderRadius': chromeRadius.md,
+  'outline': 'none',
+  'whiteSpace': 'normal',
+  'wordBreak': 'break-word',
+  'pointerEvents': 'none',
+  'transformOrigin': 'var(--transform-origin)',
+  'transition': `opacity ${chromeMotion.popupIn}, transform ${chromeMotion.popupIn}`,
+  'selectors': {
+    '&[data-starting-style]': {
+      opacity: 0,
+      transform: 'scale(0.97)',
     },
     '&[data-ending-style]': {
       opacity: 0,
-      transform: 'translateY(2px)',
+      transform: 'scale(0.97)',
+      transition: `opacity ${chromeMotion.popupOut}, transform ${chromeMotion.popupOut}`,
     },
-    '&[data-closed]': {
-      animation: `${tooltipOut} 120ms ease-in`,
+    '&[data-instant]': {
+      transition: 'none',
     },
   },
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      selectors: {
+        '&[data-starting-style], &[data-ending-style]': {
+          transform: 'none',
+        },
+      },
+    },
+  },
+});
+
+export const shortcut = style({
+  marginRight: '-4px',
 });

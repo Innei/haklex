@@ -1,4 +1,11 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import {
+  chromeHeight,
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  focusRing,
+  vars,
+} from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
@@ -17,28 +24,52 @@ export const actionBar = style({
   gap: '4px',
 });
 
-const transition = 'color 150ms ease, background-color 150ms ease';
-const transitionWithBorder =
-  'background-color 150ms ease, border-color 150ms ease, color 150ms ease';
+const transition = `color ${chromeMotion.state} ease, background-color ${chromeMotion.state} ease, opacity ${chromeMotion.state} ease`;
+
+const primary = {
+  backgroundColor: vars.color.text,
+  color: vars.color.bg,
+  selectors: {
+    '&:hover:not(:disabled)': {
+      opacity: 0.86,
+    },
+    '&:active:not(:disabled)': {
+      opacity: 0.78,
+    },
+  },
+};
+
+const iconSquare = (size: string, fontSize: string) => ({
+  width: size,
+  height: size,
+  padding: 0,
+  gap: 0,
+  fontSize,
+  color: vars.color.textSecondary,
+});
 
 export const actionButton = recipe({
   base: {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
+    flexShrink: 0,
+    boxSizing: 'border-box',
     appearance: 'none',
     border: 'none',
     background: 'none',
     cursor: 'pointer',
-    fontFamily: 'inherit',
+    fontFamily: vars.typography.fontFamilySans,
+    whiteSpace: 'nowrap',
+    borderRadius: chromeRadius.md,
     transition,
     outline: 'none',
     selectors: {
       '&:focus-visible': {
-        boxShadow: `0 0 0 2px ${vars.color.accentLight}`,
+        boxShadow: focusRing,
       },
       '&:disabled': {
-        opacity: 0.45,
+        opacity: 0.5,
         cursor: 'not-allowed',
       },
     },
@@ -51,73 +82,50 @@ export const actionButton = recipe({
           '&:hover:not(:disabled)': {
             backgroundColor: vars.color.fillSecondary,
           },
+          '&:active:not(:disabled), &[aria-pressed="true"], &[aria-pressed="true"]:hover:not(:disabled)':
+            {
+              backgroundColor: vars.color.fill,
+              color: vars.color.text,
+            },
         },
       },
-      solid: {
-        backgroundColor: vars.color.text,
-        color: vars.color.bg,
-        transition: transitionWithBorder,
-        selectors: {
-          '&:hover:not(:disabled)': {
-            backgroundColor: `color-mix(in srgb, ${vars.color.text} 86%, transparent)`,
-          },
-        },
-      },
+      solid: primary,
       outline: {
         background: vars.color.bg,
-        color: vars.color.textSecondary,
+        color: vars.color.text,
         border: `1px solid ${vars.color.border}`,
-        transition: transitionWithBorder,
         selectors: {
           '&:hover:not(:disabled)': {
             background: vars.color.fillSecondary,
-            color: vars.color.text,
           },
+          '&:active:not(:disabled), &[aria-pressed="true"], &[aria-pressed="true"]:hover:not(:disabled)':
+            {
+              background: vars.color.fill,
+            },
         },
       },
-      accent: {
-        backgroundColor: vars.color.accent,
-        color: vars.color.bg,
-        selectors: {
-          '&:hover:not(:disabled)': {
-            filter: 'brightness(0.9)',
-          },
-          '&:disabled': {
-            opacity: 0.5,
-            cursor: 'default',
-            pointerEvents: 'none',
-          },
-        },
-      },
+      accent: primary,
     },
     size: {
       sm: {
-        gap: '6px',
-        fontSize: vars.typography.fontSizeSm,
-        fontWeight: 500,
-        padding: '4px 8px',
-        borderRadius: vars.borderRadius.sm,
-        height: '24px',
-        whiteSpace: 'nowrap',
+        ...chromeText.label,
+        gap: '4px',
+        padding: '0 8px',
+        height: chromeHeight.sm,
       },
       md: {
-        gap: '6px',
-        fontSize: vars.typography.fontSizeSm,
+        ...chromeText.control,
         fontWeight: 500,
-        padding: '4px 10px',
-        borderRadius: vars.borderRadius.md,
-        height: '28px',
-        lineHeight: 1.4,
-        whiteSpace: 'nowrap',
+        gap: '6px',
+        padding: '0 10px',
+        height: chromeHeight.md,
       },
       lg: {
+        ...chromeText.item,
+        fontWeight: 500,
         gap: '8px',
-        fontSize: vars.typography.fontSizeSmall,
-        fontWeight: 600,
         padding: '0 14px',
-        borderRadius: vars.borderRadius.md,
-        height: '36px',
-        whiteSpace: 'nowrap',
+        height: chromeHeight.lg,
       },
     },
     icon: {
@@ -140,73 +148,22 @@ export const actionButton = recipe({
   compoundVariants: [
     {
       variants: { icon: true, size: 'sm' },
-      style: {
-        fontSize: vars.typography.fontSizeSmall,
-        width: '24px',
-        height: '24px',
-        padding: 0,
-        gap: 0,
-        color: `color-mix(in srgb, ${vars.color.textSecondary} 60%, transparent)`,
-        selectors: {
-          '&:hover:not(:disabled)': {
-            color: vars.color.text,
-            backgroundColor: vars.color.fillSecondary,
-          },
-          '&:disabled': {
-            opacity: 0.3,
-            pointerEvents: 'none',
-          },
-        },
-      },
+      style: iconSquare(chromeHeight.sm, '14px'),
     },
     {
       variants: { icon: true, size: 'md' },
-      style: {
-        fontSize: vars.typography.fontSizeBase,
-        padding: 6,
-        borderRadius: vars.borderRadius.md,
-        height: 'auto',
-        width: 'auto',
-        gap: 0,
-        color: vars.color.textSecondary,
-        selectors: {
-          '&:hover:not(:disabled)': {
-            color: vars.color.text,
-            backgroundColor: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-          },
-          '&:disabled': {
-            opacity: 0.3,
-            cursor: 'default',
-          },
-          '&:disabled:hover': {
-            background: 'none',
-            color: vars.color.textSecondary,
-          },
-        },
-      },
+      style: iconSquare(chromeHeight.md, '16px'),
     },
     {
       variants: { icon: true, size: 'lg' },
+      style: iconSquare(chromeHeight.lg, '18px'),
+    },
+    {
+      variants: { icon: true, variant: 'ghost' },
       style: {
-        fontSize: '20px',
-        padding: 8,
-        borderRadius: vars.borderRadius.md,
-        height: 'auto',
-        width: 'auto',
-        gap: 0,
-        color: vars.color.textSecondary,
         selectors: {
           '&:hover:not(:disabled)': {
             color: vars.color.text,
-            backgroundColor: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-          },
-          '&:disabled': {
-            opacity: 0.3,
-            cursor: 'default',
-          },
-          '&:disabled:hover': {
-            background: 'none',
-            color: vars.color.textSecondary,
           },
         },
       },

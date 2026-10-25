@@ -15,8 +15,8 @@ const resetText = {
 export const chromeTypography = {
   ...resetText,
   fontFamily: vars.typography.fontFamilySans,
-  fontSize: vars.typography.fontSizeSmall,
-  lineHeight: vars.typography.lineHeightCompact,
+  fontSize: '14px',
+  lineHeight: '20px',
 } as const;
 
 export const contentTypography = {

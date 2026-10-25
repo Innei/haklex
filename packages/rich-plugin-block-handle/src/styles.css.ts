@@ -1,16 +1,14 @@
-import { vars } from '@haklex/rich-style-token/styles';
-import { globalStyle, style } from '@vanilla-extract/css';
+import { chromeMotion, chromeRadius, focusRing, vars } from '@haklex/rich-style-token/styles';
+import { style } from '@vanilla-extract/css';
 
-// ─── Handle container ──────────────────────────────────
 export const handleContainer = style({
   display: 'flex',
   alignItems: 'center',
-  gap: 1,
   position: 'absolute',
   zIndex: 30,
   opacity: 0,
   pointerEvents: 'none',
-  transition: 'opacity 0.15s',
+  transition: `opacity ${chromeMotion.state} ease`,
 });
 
 export const handleContainerVisible = style({
@@ -18,27 +16,69 @@ export const handleContainerVisible = style({
   pointerEvents: 'auto',
 });
 
-// ─── Handle button ─────────────────────────────────────
-export const handleBtn = style({
+export const grip = style({
   'display': 'flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 24,
+  'width': 20,
   'height': 24,
-  'borderRadius': 6,
+  'borderRadius': chromeRadius.sm,
   'border': 'none',
   'background': 'transparent',
   'color': vars.color.textQuaternary,
-  'cursor': 'pointer',
+  'cursor': 'grab',
   'padding': 0,
-  'transition': 'background-color 120ms ease-out, color 120ms ease-out',
+  'outline': 'none',
+  'transition': `background-color ${chromeMotion.state} ease, color ${chromeMotion.state} ease`,
   ':hover': {
     background: vars.color.fillSecondary,
     color: vars.color.textSecondary,
   },
+  ':focus-visible': {
+    boxShadow: focusRing,
+  },
+  'selectors': {
+    '&[data-popup-open]': {
+      background: vars.color.fill,
+      color: vars.color.text,
+    },
+  },
 });
 
-// ─── Drag state ────────────────────────────────────────
+export const gapLine = style({
+  position: 'absolute',
+  zIndex: 30,
+  height: 1,
+  backgroundColor: vars.color.textQuaternary,
+  pointerEvents: 'none',
+});
+
+export const gapPlus = style({
+  'position': 'absolute',
+  'zIndex': 31,
+  'display': 'flex',
+  'alignItems': 'center',
+  'justifyContent': 'center',
+  'width': 20,
+  'height': 20,
+  'padding': 0,
+  'border': 'none',
+  'borderRadius': '6px',
+  'backgroundColor': vars.color.bgElevated,
+  'boxShadow': vars.boxShadow.xs,
+  'color': vars.color.textSecondary,
+  'cursor': 'pointer',
+  'outline': 'none',
+  'transform': 'translateY(-50%)',
+  'transition': `color ${chromeMotion.state} ease`,
+  ':hover': {
+    color: vars.color.text,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
+  },
+});
+
 export const draggingBlock = style({
   opacity: 0.35,
 });
@@ -52,28 +92,27 @@ export const dragPreview = style({
   margin: 0,
   boxSizing: 'border-box',
   opacity: 0.9,
-  backgroundColor: vars.color.bg,
+  backgroundColor: vars.color.bgElevated,
   border: 'none',
-  borderRadius: vars.borderRadius.md,
+  borderRadius: chromeRadius.md,
   boxShadow: vars.boxShadow.menu,
 });
 
-// ─── Drop indicator ────────────────────────────────────
 export const dropIndicator = style({
   position: 'absolute',
-  height: 2,
-  background: vars.color.accent,
+  height: 0,
+  borderTop: `2px solid ${vars.color.accent}`,
   borderRadius: 1,
+  transform: 'translateY(-1px)',
   zIndex: 30,
   pointerEvents: 'none',
 });
 
-// ─── Block selection ────────────────────────────────────
 export const blockSelected = style({
   boxShadow: `0 0 0 2px ${vars.color.accentLight}`,
   backgroundColor: vars.color.accentLight,
-  borderRadius: vars.borderRadius.sm,
-  transition: 'box-shadow 120ms ease-out, background-color 120ms ease-out',
+  borderRadius: chromeRadius.sm,
+  transition: `box-shadow ${chromeMotion.state} ease, background-color ${chromeMotion.state} ease`,
 });
 
 export const dragCountBadge = style({
@@ -82,8 +121,9 @@ export const dragCountBadge = style({
   right: -8,
   minWidth: 20,
   height: 20,
+  boxSizing: 'border-box',
   borderRadius: 10,
-  backgroundColor: vars.color.accent,
+  backgroundColor: vars.color.text,
   color: vars.color.bg,
   fontFamily: vars.typography.fontFamilySans,
   fontSize: 12,
@@ -93,23 +133,4 @@ export const dragCountBadge = style({
   justifyContent: 'center',
   padding: '0 6px',
   boxShadow: vars.boxShadow.xs,
-});
-
-// ─── Context menu destructive item ─────────────────────
-export const menuItemDestructive = style({
-  color: vars.color.alertCaution,
-  selectors: {
-    '&[data-highlighted]': {
-      color: vars.color.alertCaution,
-      backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 8%, transparent)`,
-    },
-  },
-});
-
-globalStyle(`${menuItemDestructive} svg`, {
-  color: vars.color.alertCaution,
-});
-
-globalStyle(`${menuItemDestructive}[data-highlighted] svg`, {
-  color: vars.color.alertCaution,
 });

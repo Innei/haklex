@@ -1,4 +1,10 @@
-import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import {
+  chromeMotion,
+  chromeText,
+  chromeTypography,
+  focusRing,
+  vars,
+} from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const root = style({
@@ -11,11 +17,14 @@ export const tablist = style({
 });
 
 export const tab = style({
+  ...chromeText.control,
   position: 'relative',
-  padding: '0.625rem 1rem',
-  fontSize: vars.typography.fontSizeMd,
+  height: '36px',
+  boxSizing: 'border-box',
+  padding: '0 12px',
+  fontFamily: vars.typography.fontFamilySans,
   fontWeight: 500,
-  transition: 'color 200ms',
+  transition: `color ${chromeMotion.state} ease`,
   cursor: 'pointer',
   border: 'none',
   background: 'none',
@@ -23,11 +32,11 @@ export const tab = style({
   outline: 'none',
   selectors: {
     '&:hover': {
-      color: 'color-mix(in srgb, currentColor 80%, transparent)',
+      color: vars.color.text,
     },
     '&:focus-visible': {
-      outline: `2px solid ${vars.color.accent}`,
-      outlineOffset: '2px',
+      borderRadius: '6px',
+      boxShadow: focusRing,
     },
   },
 });
@@ -42,13 +51,18 @@ export const border = style({
   left: 0,
   right: 0,
   height: '1px',
-  backgroundColor: vars.color.border,
+  backgroundColor: vars.color.borderSubtle,
 });
 
 export const indicator = style({
-  position: 'absolute',
-  bottom: 0,
-  height: '2px',
-  backgroundColor: vars.color.text,
-  transition: 'left 300ms ease-in-out, width 300ms ease-in-out',
+  'position': 'absolute',
+  'bottom': 0,
+  'height': '2px',
+  'backgroundColor': vars.color.text,
+  'transition': `left ${chromeMotion.layout}, width ${chromeMotion.layout}`,
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      transition: 'none',
+    },
+  },
 });

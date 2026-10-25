@@ -1,24 +1,34 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import {
+  chromeHeight,
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  focusRing,
+  vars,
+} from '@haklex/rich-style-token/styles';
 import { recipe } from '@vanilla-extract/recipes';
 
 export const container = recipe({
   base: {
     position: 'relative',
     display: 'inline-flex',
-    alignItems: 'center',
-    borderRadius: vars.borderRadius.md,
-    backgroundColor: vars.color.bgTertiary,
-    padding: '0.25rem',
+    alignItems: 'stretch',
+    boxSizing: 'border-box',
+    borderRadius: chromeRadius.md,
+    backgroundColor: vars.color.fillSecondary,
+    padding: '2px',
+    fontFamily: vars.typography.fontFamilySans,
   },
   variants: {
     size: {
       sm: {
-        height: '2rem',
-        fontSize: vars.typography.fontSizeXs,
+        ...chromeText.label,
+        height: chromeHeight.md,
       },
       md: {
-        height: '2.5rem',
-        fontSize: vars.typography.fontSizeMd,
+        ...chromeText.control,
+        fontWeight: 500,
+        height: chromeHeight.lg,
       },
     },
     fullWidth: {
@@ -36,14 +46,19 @@ export const container = recipe({
 
 export const indicator = recipe({
   base: {
-    position: 'absolute',
-    top: '0.25rem',
-    bottom: '0.25rem',
-    borderRadius: vars.borderRadius.sm,
-    backgroundColor: vars.color.bg,
-    boxShadow: vars.boxShadow.xs,
-    transition: 'all 300ms cubic-bezier(0.25, 1, 0.5, 1)',
-    pointerEvents: 'none',
+    'position': 'absolute',
+    'top': '2px',
+    'bottom': '2px',
+    'borderRadius': '6px',
+    'backgroundColor': vars.color.bg,
+    'boxShadow': vars.boxShadow.xs,
+    'transition': `left ${chromeMotion.layout}, width ${chromeMotion.layout}`,
+    'pointerEvents': 'none',
+    '@media': {
+      '(prefers-reduced-motion: reduce)': {
+        transition: 'none',
+      },
+    },
   },
   variants: {
     ready: {
@@ -66,28 +81,31 @@ export const item = recipe({
     alignItems: 'center',
     justifyContent: 'center',
     whiteSpace: 'nowrap',
-    borderRadius: vars.borderRadius.sm,
+    borderRadius: '6px',
+    font: 'inherit',
     fontWeight: 500,
     outline: 'none',
     border: 'none',
     background: 'transparent',
     cursor: 'pointer',
-    transition: 'color 200ms',
+    transition: `color ${chromeMotion.state} ease`,
     color: vars.color.textSecondary,
     selectors: {
+      '&:hover': {
+        color: vars.color.text,
+      },
       '&:focus-visible': {
-        outline: `2px solid ${vars.color.accent}`,
-        outlineOffset: '1px',
+        boxShadow: focusRing,
       },
     },
   },
   variants: {
     size: {
       sm: {
-        padding: '0 0.75rem',
+        padding: '0 10px',
       },
       md: {
-        padding: '0 1rem',
+        padding: '0 12px',
       },
     },
     active: {
@@ -99,7 +117,7 @@ export const item = recipe({
     disabled: {
       true: {
         pointerEvents: 'none',
-        opacity: 0.4,
+        opacity: 0.5,
       },
       false: {},
     },

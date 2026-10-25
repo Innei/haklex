@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { inDarkScheme, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
 
@@ -209,12 +209,9 @@ globalStyle(`${codeBody} code`, {
 });
 
 /* ---- Shiki dual-theme: dark mode variable switch ---- */
-globalStyle(
-  `[data-theme='dark'] ${codeBody} .highlights-themes, [data-theme='dark'] ${codeBody} .highlights-themes span`,
-  {
-    color: 'var(--hls-dark) !important' as any,
-  },
-);
+globalStyle(inDarkScheme(`${codeBody} .highlights-themes, ${codeBody} .highlights-themes span`), {
+  color: 'var(--hls-dark) !important' as any,
+});
 
 export const fileIcon = style({
   display: 'inline-flex',

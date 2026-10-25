@@ -2,7 +2,7 @@ import { Collapsible as CollapsiblePrimitive } from '@base-ui/react/collapsible'
 import { ChevronRight } from 'lucide-react';
 import type { ComponentProps, ReactElement, ReactNode } from 'react';
 
-import { chevron, panel, trigger } from './styles.css';
+import { chevron, panel, panelContent, trigger } from './styles.css';
 
 export type CollapsibleProps = ComponentProps<typeof CollapsiblePrimitive.Root>;
 export function Collapsible(props: CollapsibleProps): ReactElement {
@@ -27,6 +27,7 @@ export function CollapsibleTrigger({
     <CollapsiblePrimitive.Trigger
       {...props}
       className={`${trigger}${className ? ` ${className}` : ''}`}
+      data-no-chevron={hideChevron || undefined}
     >
       {!hideChevron && <ChevronRight className={chevron} />}
       {children}
@@ -51,7 +52,7 @@ export function CollapsiblePanel({
       {...props}
       className={`${panel}${className ? ` ${className}` : ''}`}
     >
-      {children}
+      <div className={panelContent}>{children}</div>
     </CollapsiblePrimitive.Panel>
   );
 }

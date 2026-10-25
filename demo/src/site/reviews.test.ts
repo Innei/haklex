@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { chromeComponents, reviewKey, uiComponents } from './components';
 import { countByStatus, reviewOf, reviews } from './reviews';
 
 describe('reviewOf', () => {
@@ -29,6 +30,19 @@ describe('reviews', () => {
     for (const [key, review] of Object.entries(reviews)) {
       const open = review.findings.some((f) => f.state === 'open');
       if (open) expect(review.status, key).toBe('issues');
+    }
+  });
+});
+
+describe('polish pass', () => {
+  it('marks polished parts passed and keeps open findings on dialog and the image editor', () => {
+    const withIssues = new Set(['ui/dialog', 'chrome/image-editor']);
+    const keys = [
+      ...uiComponents.map((c) => reviewKey('ui', c.id)),
+      ...chromeComponents.map((c) => reviewKey('chrome', c.id)),
+    ];
+    for (const key of keys) {
+      expect(reviewOf(key).status, key).toBe(withIssues.has(key) ? 'issues' : 'passed');
     }
   });
 });

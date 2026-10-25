@@ -3,6 +3,7 @@ import { PortalThemeWrapper } from '@haklex/rich-style-token';
 import { Check } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 
+import { Kbd } from '../kbd';
 import * as css from './styles.css';
 
 // -- Root --
@@ -103,15 +104,26 @@ export function DropdownMenuLabel({ className, ...props }: DropdownMenuLabelProp
 
 type DropdownMenuItemProps = ComponentProps<typeof MenuPrimitive.Item> & {
   className?: string;
+  /** Shortcut shown as keycaps at the end of the item, e.g. `"Mod+D"` or `['mod', 'd']`. */
+  shortcut?: string | string[];
+  variant?: 'default' | 'destructive';
 };
 
-export function DropdownMenuItem({ className, ...props }: DropdownMenuItemProps) {
+export function DropdownMenuItem({
+  className,
+  children,
+  shortcut,
+  variant = 'default',
+  ...props
+}: DropdownMenuItemProps) {
+  const classes = [css.item, variant === 'destructive' && css.destructive, className]
+    .filter(Boolean)
+    .join(' ');
   return (
-    <MenuPrimitive.Item
-      className={`${css.item}${className ? ` ${className}` : ''}`}
-      data-slot="dropdown-menu-item"
-      {...props}
-    />
+    <MenuPrimitive.Item className={classes} data-slot="dropdown-menu-item" {...props}>
+      {children}
+      {shortcut && <Kbd className={css.shortcut} keys={shortcut} size="sm" tone="muted" />}
+    </MenuPrimitive.Item>
   );
 }
 

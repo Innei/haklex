@@ -49,6 +49,14 @@ describe('token contract', () => {
   it('adds the ring token', () => {
     expect(vars.color.ring).toBe('var(--rc-ring)');
   });
+
+  it('adds the elevated surface token', () => {
+    expect(vars.color.bgElevated).toBe('var(--rc-bg-elevated)');
+  });
+
+  it('adds the scrim token for modal backdrops', () => {
+    expect(vars.color.scrim).toBe('var(--rc-scrim)');
+  });
 });
 
 describe('Quiet Ink values', () => {
@@ -64,6 +72,17 @@ describe('Quiet Ink values', () => {
     expect(darkColors.textSecondary).toBe('#c4c4c4');
     expect(darkColors.border).toBe('#262626');
     expect(darkColors.fillSecondary).toMatch(/^rgb\(255 255 255 \/ /);
+  });
+
+  it('lifts floating surfaces in dark and keeps them white in light', () => {
+    expect(lightArticleColors.bgElevated).toBe('#ffffff');
+    expect(darkColors.bgElevated).toBe('#171717');
+    expect(darkColors.ring).toBe('rgb(255 255 255 / 0.12)');
+  });
+
+  it('dims the page behind modals at .32 in light and .56 in dark', () => {
+    expect(lightArticleColors.scrim).toBe('rgb(0 0 0 / 0.32)');
+    expect(darkColors.scrim).toBe('rgb(0 0 0 / 0.56)');
   });
 });
 
@@ -109,11 +128,8 @@ describe('code surface tokens', () => {
 });
 
 describe('chrome baseline size', () => {
-  it('pins font size and line height so portals never inherit host body metrics', async () => {
+  it('pins chrome to fixed px so neither portals nor variants change its size', async () => {
     const { chromeTypography } = await import('../src/baseline');
-    expect(chromeTypography).toMatchObject({
-      fontSize: vars.typography.fontSizeSmall,
-      lineHeight: vars.typography.lineHeightCompact,
-    });
+    expect(chromeTypography).toMatchObject({ fontSize: '14px', lineHeight: '20px' });
   });
 });

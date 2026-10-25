@@ -1,4 +1,10 @@
-import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import {
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  chromeTypography,
+  vars,
+} from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 // ─── Menu container ──────────────────────────────────────
@@ -11,11 +17,10 @@ export const slashMenu = style({
   overflowY: 'auto',
   overflowX: 'hidden',
   ...chromeTypography,
-  fontSize: 13,
-  lineHeight: 1.35,
-  background: vars.color.bg,
+  ...chromeText.control,
+  background: vars.color.bgElevated,
   border: 'none',
-  borderRadius: vars.borderRadius.lg,
+  borderRadius: chromeRadius.lg,
   boxShadow: vars.boxShadow.menu,
   listStyle: 'none',
   margin: 0,
@@ -23,7 +28,7 @@ export const slashMenu = style({
 });
 
 globalStyle(`${slashMenu}::-webkit-scrollbar`, {
-  width: 5,
+  width: 6,
 });
 
 globalStyle(`${slashMenu}::-webkit-scrollbar-track`, {
@@ -31,8 +36,8 @@ globalStyle(`${slashMenu}::-webkit-scrollbar-track`, {
 });
 
 globalStyle(`${slashMenu}::-webkit-scrollbar-thumb`, {
-  background: vars.color.fill,
-  borderRadius: 3,
+  background: vars.color.textQuaternary,
+  borderRadius: 9999,
 });
 
 // ─── Section wrapper ─────────────────────────────────────
@@ -42,7 +47,7 @@ export const slashMenuSectionWrapper = style({});
 export const slashMenuSectionDivider = style({
   height: 1,
   background: vars.color.borderSubtle,
-  margin: '4px -4px',
+  margin: '4px 0',
 });
 
 // ─── Section header ──────────────────────────────────────
@@ -50,17 +55,14 @@ export const slashMenuSection = style({
   'position': 'sticky',
   'top': 0,
   'zIndex': 10,
-  'padding': '8px 10px 4px',
-  'fontSize': 11,
-  'fontWeight': 600,
-  'letterSpacing': '0.06em',
-  'textTransform': 'uppercase',
+  ...chromeText.label,
+  'padding': '8px 8px 4px',
   'color': vars.color.textTertiary,
   'userSelect': 'none',
-  'background': vars.color.bg,
+  'background': vars.color.bgElevated,
   '@supports': {
     '(backdrop-filter: blur(8px))': {
-      background: `color-mix(in srgb, ${vars.color.bg} 92%, transparent)`,
+      background: `color-mix(in srgb, ${vars.color.bgElevated} 92%, transparent)`,
       backdropFilter: 'blur(8px)',
     },
   },
@@ -78,11 +80,13 @@ export const slashMenuItem = style({
   display: 'flex',
   alignItems: 'center',
   gap: 10,
-  padding: '6px 8px',
+  minHeight: 32,
+  boxSizing: 'border-box',
+  padding: '4px 8px',
   margin: 0,
-  borderRadius: vars.borderRadius.md,
+  borderRadius: chromeRadius.md,
   cursor: 'pointer',
-  transition: 'background 120ms ease-out',
+  transition: `background-color ${chromeMotion.state} ease`,
   color: vars.color.text,
 });
 
@@ -100,8 +104,8 @@ export const slashMenuItemIcon = style({
   fontSize: 14,
   flexShrink: 0,
   borderRadius: 6,
-  background: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
+  background: vars.color.bgElevated,
+  border: `1px solid ${vars.color.borderSubtle}`,
   color: vars.color.textSecondary,
   lineHeight: 1,
 });
@@ -116,9 +120,8 @@ export const slashMenuItemText = style({
 });
 
 export const slashMenuItemTitle = style({
-  fontSize: 13,
+  ...chromeText.control,
   fontWeight: 500,
-  lineHeight: '1.35',
   color: vars.color.text,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
@@ -126,8 +129,8 @@ export const slashMenuItemTitle = style({
 });
 
 export const slashMenuItemDescription = style({
-  fontSize: 12,
-  lineHeight: '1.3',
+  ...chromeText.label,
+  fontWeight: 400,
   color: vars.color.textTertiary,
   whiteSpace: 'nowrap',
   overflow: 'hidden',
@@ -136,8 +139,7 @@ export const slashMenuItemDescription = style({
 
 // ─── Empty state ─────────────────────────────────────────
 export const slashMenuEmpty = style({
-  padding: '32px 12px',
+  padding: '24px 12px',
   color: vars.color.textTertiary,
-  fontSize: 13,
   textAlign: 'center',
 });

@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@haklex/rich-editor-ui';
-import { Copy, CopyPlus, FolderInput } from 'lucide-react';
+import { Copy, CopyPlus, FolderInput, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Force, highlighted } from '../../../components/preview/States';
@@ -35,11 +35,11 @@ function DropdownPreview() {
       <DropdownMenu modal={false} {...pinned}>
         <DropdownMenuTrigger className={triggerClass}>Options</DropdownMenuTrigger>
         <DropdownMenuContent className="demo-menu">
-          <DropdownMenuItem>
+          <DropdownMenuItem shortcut="Mod+Shift+C">
             <Copy />
             Copy link
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem shortcut="Mod+D">
             <CopyPlus />
             Duplicate
           </DropdownMenuItem>
@@ -58,6 +58,11 @@ function DropdownPreview() {
             <DropdownMenuRadioItem value="article">Article</DropdownMenuRadioItem>
             <DropdownMenuRadioItem value="note">Note</DropdownMenuRadioItem>
           </DropdownMenuRadioGroup>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem shortcut="Mod+Backspace" variant="destructive">
+            <Trash2 />
+            Delete
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

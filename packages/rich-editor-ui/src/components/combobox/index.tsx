@@ -29,7 +29,7 @@ type ComboboxInputProps = ComponentProps<typeof ComboboxPrimitive.Input> & {
 };
 
 export function ComboboxInput({ className, ...props }: ComboboxInputProps) {
-  return <ComboboxPrimitive.Input className={className} {...props} />;
+  return <ComboboxPrimitive.Input className={className ?? css.input} {...props} />;
 }
 
 // -- Portal --

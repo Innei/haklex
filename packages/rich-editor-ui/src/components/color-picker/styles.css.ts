@@ -1,26 +1,41 @@
-import { vars } from '@haklex/rich-style-token/styles';
-import { keyframes, style } from '@vanilla-extract/css';
+import {
+  chromeHeight,
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  focusRing,
+  vars,
+} from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
-const fadeIn = keyframes({
-  from: { opacity: 0, transform: 'scale(0.95)' },
-  to: { opacity: 1, transform: 'scale(1)' },
-});
+const stateTransition = `color ${chromeMotion.state} ease, background-color ${chromeMotion.state} ease`;
 
 export const trigger = style({
   'display': 'flex',
   'alignItems': 'center',
   'gap': 2,
-  'height': 32,
+  'height': chromeHeight.lg,
+  'boxSizing': 'border-box',
   'padding': '0 6px',
   'border': 'none',
   'background': 'none',
-  'borderRadius': 8,
+  'borderRadius': chromeRadius.md,
   'cursor': 'pointer',
   'color': vars.color.textSecondary,
-  'transition': 'color 0.1s, background-color 0.1s',
+  'outline': 'none',
+  'transition': stateTransition,
   ':hover': {
     color: vars.color.text,
-    backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
+    backgroundColor: vars.color.fillSecondary,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
+  },
+  'selectors': {
+    '&[data-popup-open]': {
+      color: vars.color.text,
+      backgroundColor: vars.color.fill,
+    },
   },
 });
 
@@ -31,7 +46,7 @@ export const triggerLabel = style({
 });
 
 export const triggerLetter = style({
-  fontSize: vars.typography.fontSizeXs,
+  ...chromeText.label,
   fontWeight: 600,
   lineHeight: 1,
 });
@@ -46,17 +61,13 @@ export const triggerBar = style({
 export const triggerChevron = style({
   width: 12,
   height: 12,
-  transition: 'transform 0.15s',
+  transition: `transform ${chromeMotion.state} ease`,
 });
 
 export const panel = style({
+  ...chromeText.control,
   padding: 8,
   width: 220,
-  selectors: {
-    '&[data-open]': {
-      animation: `${fadeIn} 120ms ease-out`,
-    },
-  },
 });
 
 export const grid = style({
@@ -74,27 +85,30 @@ export const swatch = style({
   'height': 28,
   'border': 'none',
   'background': 'none',
-  'borderRadius': 8,
+  'borderRadius': chromeRadius.md,
   'cursor': 'pointer',
   'padding': 0,
-  'transition': 'background-color 0.1s',
+  'outline': 'none',
+  'transition': stateTransition,
   ':hover': {
-    backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
+    backgroundColor: vars.color.fillSecondary,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
   },
 });
 
 export const swatchDot = style({
   width: 16,
   height: 16,
+  boxSizing: 'border-box',
   borderRadius: '50%',
-  border: `1px solid color-mix(in srgb, ${vars.color.text} 10%, transparent)`,
+  boxShadow: `inset 0 0 0 1px ${vars.color.ring}`,
+  transition: `box-shadow ${chromeMotion.state} ease`,
 });
 
-export const swatchCheck = style({
-  position: 'absolute',
-  width: 10,
-  height: 10,
-  color: vars.color.bg,
+globalStyle(`${swatch}[aria-pressed="true"] ${swatchDot}`, {
+  boxShadow: `inset 0 0 0 1px ${vars.color.ring}, 0 0 0 2px ${vars.color.bgElevated}, 0 0 0 3.5px ${vars.color.text}`,
 });
 
 export const addSwatchDot = style({
@@ -126,18 +140,25 @@ export const backButton = style({
   'alignItems': 'center',
   'gap': 4,
   'alignSelf': 'flex-start',
-  'padding': '2px 6px',
-  'marginBottom': 2,
+  'height': chromeHeight.sm,
+  'boxSizing': 'border-box',
+  'padding': '0 6px',
+  'marginLeft': -6,
   'border': 'none',
   'background': 'none',
-  'borderRadius': 6,
+  'borderRadius': chromeRadius.md,
   'cursor': 'pointer',
-  'fontSize': vars.typography.fontSizeXs,
+  ...chromeText.label,
+  'fontFamily': vars.typography.fontFamilySans,
   'color': vars.color.textTertiary,
-  'transition': 'color 0.1s, background-color 0.1s',
+  'outline': 'none',
+  'transition': stateTransition,
   ':hover': {
     color: vars.color.text,
-    backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
+    backgroundColor: vars.color.fillSecondary,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
   },
 });
 
@@ -150,7 +171,7 @@ export const satSquare = style({
   position: 'relative',
   width: '100%',
   height: 140,
-  borderRadius: 6,
+  borderRadius: chromeRadius.md,
   cursor: 'crosshair',
   touchAction: 'none',
   userSelect: 'none',
@@ -186,7 +207,7 @@ export const hueTrack = style({
   position: 'relative',
   width: '100%',
   height: 10,
-  borderRadius: 5,
+  borderRadius: 9999,
   background:
     'linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)',
   cursor: 'pointer',
@@ -198,7 +219,7 @@ export const alphaTrack = style({
   position: 'relative',
   width: '100%',
   height: 10,
-  borderRadius: 5,
+  borderRadius: 9999,
   background: 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 0 / 8px 8px',
   cursor: 'pointer',
   touchAction: 'none',
@@ -231,27 +252,29 @@ export const hexRow = style({
 });
 
 export const hexInput = style({
+  ...chromeText.mono,
   'flex': 1,
   'minWidth': 0,
-  'fontFamily':
-    'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", "Courier New", monospace',
-  'fontSize': vars.typography.fontSizeXs,
-  'padding': '4px 6px',
-  'border': `1px solid ${vars.color.border}`,
-  'borderRadius': 6,
-  'background': vars.color.bgSecondary,
+  'height': chromeHeight.md,
+  'boxSizing': 'border-box',
+  'padding': '0 8px',
+  'border': 'none',
+  'borderRadius': chromeRadius.md,
+  'background': vars.color.bg,
+  'boxShadow': vars.boxShadow.xs,
   'color': vars.color.text,
   'outline': 'none',
   'textTransform': 'uppercase',
-  ':focus': {
-    borderColor: vars.color.accent,
+  'transition': `box-shadow ${chromeMotion.state} ease`,
+  ':focus-visible': {
+    boxShadow: focusRing,
   },
 });
 
 export const hexInputInvalid = style({
-  'borderColor': '#ef4444',
-  ':focus': {
-    borderColor: '#ef4444',
+  'boxShadow': `0 0 0 1px ${vars.color.alertCaution}`,
+  ':focus-visible': {
+    boxShadow: `0 0 0 1px ${vars.color.alertCaution}, 0 0 0 3px color-mix(in srgb, ${vars.color.alertCaution} 16%, transparent)`,
   },
 });
 
@@ -259,33 +282,43 @@ export const iconButton = style({
   'display': 'flex',
   'alignItems': 'center',
   'justifyContent': 'center',
-  'width': 24,
-  'height': 24,
-  'border': `1px solid ${vars.color.border}`,
-  'borderRadius': 6,
-  'background': vars.color.bg,
+  'width': chromeHeight.md,
+  'height': chromeHeight.md,
+  'flexShrink': 0,
+  'border': 'none',
+  'borderRadius': chromeRadius.md,
+  'background': 'none',
   'color': vars.color.textSecondary,
   'cursor': 'pointer',
   'padding': 0,
-  'transition': 'background-color 0.1s, color 0.1s',
+  'outline': 'none',
+  'transition': stateTransition,
   ':hover': {
     color: vars.color.text,
-    backgroundColor: vars.color.fillTertiary,
+    backgroundColor: vars.color.fillSecondary,
+  },
+  ':active': {
+    backgroundColor: vars.color.fill,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
   },
 });
 
 export const icon = style({
-  width: 12,
-  height: 12,
+  width: 16,
+  height: 16,
 });
 
 export const previewPair = style({
   display: 'flex',
+  flexShrink: 0,
   width: 40,
-  height: 24,
-  borderRadius: 6,
+  height: chromeHeight.md,
+  boxSizing: 'border-box',
+  borderRadius: chromeRadius.md,
   overflow: 'hidden',
-  border: `1px solid ${vars.color.border}`,
+  boxShadow: `inset 0 0 0 1px ${vars.color.ring}`,
   background: 'repeating-conic-gradient(#ddd 0% 25%, #fff 0% 50%) 0 / 6px 6px',
 });
 
@@ -295,30 +328,10 @@ export const previewCell = style({
 
 export const actionRow = style({
   display: 'flex',
-  gap: 6,
-  marginTop: 2,
+  gap: 8,
+  marginTop: 4,
 });
 
 export const actionButton = style({
-  'flex': 1,
-  'height': 28,
-  'borderRadius': 6,
-  'fontSize': vars.typography.fontSizeXs,
-  'border': `1px solid ${vars.color.border}`,
-  'background': vars.color.bg,
-  'color': vars.color.text,
-  'cursor': 'pointer',
-  'transition': 'background-color 0.1s',
-  ':hover': {
-    backgroundColor: vars.color.fillTertiary,
-  },
-});
-
-export const actionButtonPrimary = style({
-  'background': vars.color.text,
-  'color': vars.color.bg,
-  'borderColor': vars.color.text,
-  ':hover': {
-    backgroundColor: `color-mix(in srgb, ${vars.color.text} 85%, transparent)`,
-  },
+  flex: 1,
 });

@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeRadius, vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const menuItemDestructive = style({
@@ -47,7 +47,7 @@ export const handleBtn = style({
   'justifyContent': 'center',
   'width': 16,
   'height': 16,
-  'borderRadius': vars.borderRadius.sm,
+  'borderRadius': chromeRadius.sm,
   'border': 'none',
   'background': 'transparent',
   'color': vars.color.textQuaternary,

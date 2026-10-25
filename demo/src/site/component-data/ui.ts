@@ -3,10 +3,18 @@ import type { AnatomyRow, ComponentMeta, PartRow, UiCategory } from '../componen
 const a = (part: string, spec: string, token: string): AnatomyRow => ({ part, spec, token });
 const p = (name: string, props: string): PartRow => ({ name, props });
 
-const popupRow = a('Popup', 'radius 12, padding 4, enter 120ms scale .97→1', 'bg · boxShadow.menu');
-const itemRow = a('Item', 'height 32, radius 8 (12 − 4), padding 0 8, 13px', 'textSecondary');
-const highlightRow = a('Item highlighted', 'translucent fill, no accent fill', 'fill · text');
-const labelRow = a('Group label', '12px / 500', 'textTertiary');
+const popupRow = a(
+  'Popup',
+  'radius 12, padding 4, in 120ms scale .97→1, out 80ms',
+  'bgElevated · boxShadow.menu',
+);
+const itemRow = a('Item', 'height 32, radius 8, padding 0 8, 14/20', 'text');
+const highlightRow = a(
+  'Item highlighted',
+  'hover fillSecondary, pressed fill',
+  'fillSecondary · fill',
+);
+const labelRow = a('Group label', '12/16 · 500', 'textTertiary');
 const separatorRow = a('Separator', '1px, 4px vertical margin', 'borderSubtle');
 const focusRow = a('Focus ring', '1px accent ring + 3px halo', 'accent · accentLight');
 
@@ -34,11 +42,20 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'overlays',
     'A modal window built on Base UI Dialog. Used for nested documents, image editing and every presentDialog call.',
     [
-      a('Popup', 'radius 12, max width 28rem, enter 120ms scale .97→1', 'bg · boxShadow.modal'),
-      a('Backdrop', 'translucent ink, not solid black', '—'),
-      a('Title', '15px / 600', 'text'),
-      a('Description', '13px / 20', 'textTertiary'),
-      a('Close button', '28px, radius 8, hover fill', 'textTertiary · fillSecondary'),
+      a(
+        'Popup',
+        'radius 12, max width 28rem, in 120ms scale .97→1, out 80ms',
+        'bgElevated · boxShadow.modal',
+      ),
+      a('Scrim', '.32 light, .56 dark', 'scrim'),
+      a('Header', 'padding 16 48 0 16; footer padding 16', '—'),
+      a('Title', '16/24 · 600, chrome sans', 'text'),
+      a('Description', '14/22', 'textSecondary'),
+      a(
+        'Close button',
+        '28px square, radius 8, 12 from the corner',
+        'textSecondary · fillSecondary',
+      ),
     ],
     [
       p('Dialog', 'open onOpenChange modal'),
@@ -54,10 +71,14 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'overlays',
     'A floating panel anchored to a trigger, built on Base UI Popover. Used by the link editor, color picker and node settings.',
     [
-      popupRow,
-      a('Title', '13px / 600', 'text'),
-      a('Description', '13px / 20', 'textTertiary'),
-      a('Arrow', 'optional, matches popup fill', 'bg'),
+      a(
+        'Popup',
+        'width 280, radius 12, padding 12, grows from the anchor side',
+        'bgElevated · boxShadow.menu',
+      ),
+      a('Title', '14/20 · 600', 'text'),
+      a('Description', '13/20', 'textSecondary'),
+      a('Arrow', 'optional, popup fill with ring stroke', 'bgElevated · ring'),
     ],
     [
       p('Popover', 'open onOpenChange modal'),
@@ -77,8 +98,9 @@ export const uiData: ComponentMeta<UiCategory>[] = [
       highlightRow,
       labelRow,
       separatorRow,
-      a('Shortcut', 'mono 11px, right aligned', 'textTertiary'),
-      a('Disabled', '45% opacity, no hover', '—'),
+      a('Shortcut', 'Kbd sm muted, right aligned', 'fillTertiary · textTertiary'),
+      a('Destructive', 'caution text and icon', 'alertCaution'),
+      a('Disabled', '50% opacity, no hover', '—'),
     ],
     [
       p('DropdownMenu', 'Root; controlled or uncontrolled open state'),
@@ -87,6 +109,7 @@ export const uiData: ComponentMeta<UiCategory>[] = [
       p('DropdownMenuGroup · DropdownMenuLabel', 'Groups items under a label'),
       p('DropdownMenuRadioGroup · DropdownMenuRadioItem', 'Single choice'),
       p('DropdownMenuCheckboxItem', 'Toggle with check indicator'),
+      p('DropdownMenuItem', 'shortcut variant (default · destructive)'),
     ],
   ),
   ui(
@@ -95,11 +118,17 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'overlays',
     'A single-choice picker built on Base UI Select. Used for code block languages and settings fields.',
     [
-      a('Trigger', 'height 32, radius 8, 1px line, 13px', 'border · text'),
+      a(
+        'Trigger',
+        'height 28, radius 8, 13/20, hover fillSecondary, open fill',
+        'boxShadow.xs · text',
+      ),
       popupRow,
       itemRow,
       highlightRow,
       a('Selected indicator', 'check icon, neutral', 'text'),
+      labelRow,
+      separatorRow,
     ],
     [
       p('Select', 'value onValueChange items'),
@@ -114,11 +143,12 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'overlays',
     'A filterable list with a text input, built on Base UI Combobox. Used where a select has too many options.',
     [
-      a('Input', 'height 32, radius 8, 1px line, focus ring', 'border · accent'),
+      a('Input', 'height 28, radius 8, 13/20, focus ring', 'boxShadow.xs · accent'),
       popupRow,
       itemRow,
       highlightRow,
-      a('Empty', '13px, centered, padding 8', 'textTertiary'),
+      a('Popup width', 'matches the input', '—'),
+      a('Empty', '13/20, centered, padding 8 12', 'textTertiary'),
     ],
     [
       p('Combobox', 'items value onValueChange'),
@@ -133,7 +163,12 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'overlays',
     'A short label shown on hover or focus, built on Base UI Tooltip. Used by toolbar buttons.',
     [
-      a('Popup', 'radius 8, padding 4 8, 12px, inverted ink', 'text (bg) · bg (fg)'),
+      a(
+        'Popup',
+        'radius 8, padding 4 8, 12/16 · 500, inverted, no shadow',
+        'text (ground) · bg (text)',
+      ),
+      a('Shortcut', 'Kbd sm inverted', '—'),
       a('Offset', '6px from trigger', '—'),
       a('Delay', 'opens after hover delay, instant within a group', '—'),
     ],
@@ -141,7 +176,7 @@ export const uiData: ComponentMeta<UiCategory>[] = [
       p('TooltipProvider', 'delay closeDelay'),
       p('TooltipRoot', 'open onOpenChange'),
       p('TooltipTrigger', 'The anchor'),
-      p('TooltipContent', 'side align sideOffset'),
+      p('TooltipContent', 'side align sideOffset shortcut'),
     ],
   ),
   ui(
@@ -150,15 +185,17 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'controls',
     'The button used across editor chrome and dialogs. Four variants, three sizes, plus danger, icon-only and rounded forms.',
     [
-      a('Ghost', 'transparent, hover fill', 'fillSecondary · textSecondary'),
-      a('Solid', 'neutral fill, hover deeper fill', 'fill · text'),
-      a('Outline', '1px line, hover fill', 'border · fillSecondary'),
-      a('Accent (primary)', 'near-black ground with bg-colored text', 'text · bg'),
-      a('Sizes', 'sm 24 · md 28 · lg 32, radius 8', 'borderRadius.md'),
+      a('Ghost', 'transparent, hover fillSecondary, pressed fill', 'fillSecondary · fill'),
+      a('Solid (primary)', 'ink ground with bg-colored text', 'text · bg'),
+      a('Outline', '1px line, hover fillSecondary', 'border · fillSecondary'),
+      a('Accent', 'deprecated, renders as solid', 'text · bg'),
+      a('Toggle', 'aria-pressed="true" keeps the pressed fill', 'fill'),
+      a('Sizes', 'sm 24 · md 28 · lg 32, radius 8; icon buttons square', '—'),
+      a('Disabled', '50% opacity', '—'),
       focusRow,
     ],
     [
-      p('ActionButton', 'variant size danger icon rounded end'),
+      p('ActionButton', 'variant size danger icon rounded end aria-pressed'),
       p('ActionBar', 'gap; lays buttons out in a row'),
       p('getActionButtonClassName', 'Class for non-button elements'),
     ],
@@ -169,10 +206,11 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'controls',
     'A row of mutually exclusive options with a sliding thumb.',
     [
-      a('Track', 'radius 8, padding 2', 'fillTertiary'),
-      a('Thumb', 'radius 6 (8 − 2), raised', 'bg · boxShadow.xs'),
-      a('Item', '13px, selected text darker', 'textTertiary → text'),
-      a('Sizes', 'sm 24 · md 28', '—'),
+      a('Track', 'radius 8, padding 2', 'fillSecondary'),
+      a('Thumb', 'radius 6 (8 − 2), slides in 200ms', 'bg · boxShadow.xs'),
+      a('Item', 'hover and selected go to text', 'textSecondary → text'),
+      a('Sizes', 'sm 28 (12/16) · md 32 (13/20)', '—'),
+      focusRow,
     ],
     [
       p('SegmentedControl', 'items value onChange size fullWidth'),
@@ -185,9 +223,10 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'controls',
     'Tabs with an underline indicator that slides to the active tab.',
     [
-      a('Tab', '13px / 500, padding 0 8', 'textTertiary → text'),
-      a('Indicator', '2px line under the active tab', 'text'),
-      a('Rail', '1px line under the row', 'border'),
+      a('Tab', 'height 36, 13/20 · 500, hover text', 'textSecondary → text'),
+      a('Indicator', '2px line under the active tab, slides in 200ms', 'text'),
+      a('Rail', '1px line under the row', 'borderSubtle'),
+      focusRow,
     ],
     [p('AnimatedTabs', 'tabs value defaultTab onChange')],
   ),
@@ -197,13 +236,18 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'controls',
     'A checkbox with an animated check mark, label and optional description.',
     [
-      a('Box', '16px, radius 4, 1px line', 'border'),
-      a('Checked', 'ink fill, bg-colored mark', 'text · bg'),
-      a('Label', '13px', 'text'),
-      a('Description', '12px', 'textTertiary'),
-      focusRow,
+      a('Box', '16px, radius 4, 1px line, 120ms, no bounce', 'textQuaternary'),
+      a('Checked · indeterminate', 'ink fill, bg-colored check or dash', 'text · bg'),
+      a('Label', '14/20 · 500', 'text'),
+      a('Description', '13/20', 'textSecondary'),
+      a('Focus ring', 'on the box', 'accent · accentLight'),
     ],
-    [p('AnimatedCheckbox', 'checked defaultChecked onChange label description disabled')],
+    [
+      p(
+        'AnimatedCheckbox',
+        'checked defaultChecked indeterminate onChange label description disabled',
+      ),
+    ],
   ),
   ui(
     'color-picker',
@@ -211,9 +255,11 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'controls',
     'Swatch grid with a custom color view. Used for text color and highlight in the toolbar.',
     [
-      a('Swatch', '20px, radius 4, 1px ring', 'ring'),
-      a('Selected swatch', '2px ring offset', 'text'),
-      a('Custom view', 'saturation field, hue slider, hex input', 'border'),
+      a('Swatch', '16px dot in a 28px target, radius 8 hover', 'ring · fillSecondary'),
+      a('Selected swatch', '1.5px ring, 2px offset', 'text'),
+      a('Custom view', 'saturation field radius 8, round sliders', '—'),
+      a('Hex input', 'mono 12/16, height 28, caution ring when invalid', 'fontMono · alertCaution'),
+      a('Actions', 'Cancel outline · Apply solid ActionButton md', '—'),
     ],
     [p('ColorPicker', 'currentColor onSelect className')],
   ),
@@ -223,8 +269,10 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'controls',
     'A textarea that grows with its content between a minimum and maximum row count.',
     [
-      a('Field', 'radius 8, 1px line, padding 8 10, 13px', 'border · text'),
-      a('Placeholder', '13px', 'textQuaternary'),
+      a('Field', 'radius 8, padding 4 10, 14/20, one line 28 high', 'boxShadow.xs · text'),
+      a('Placeholder', '14/20', 'textTertiary'),
+      a('Invalid', 'aria-invalid draws a caution ring', 'alertCaution'),
+      a('Disabled', '50% opacity', '—'),
       focusRow,
     ],
     [p('AutoResizeTextArea', 'minRows maxRows + textarea attributes')],
@@ -237,13 +285,15 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     [
       a(
         'Container',
-        'semantic 6% ground + 18% ring, radius 8, no side bar',
-        'alertInfo · alertWarning · alertCaution',
+        'semantic 4% ground + 32% line, radius 8, no side bar',
+        'alertInfo · alertTip · alertWarning · alertCaution',
       ),
+      a('Neutral', 'fillTertiary ground, border line', 'fillTertiary · border'),
       a('Icon', '16px, semantic color', 'alert*'),
-      a('Text', '13px / 20', 'text'),
+      a('Title · text', '13/20 · 600, then 13/20', 'text'),
+      a('Action', 'semantic text on 12% ground, 18% on hover', 'alert*'),
     ],
-    [p('Alert', 'variant (info · warning · error) action')],
+    [p('Alert', 'variant (info · success · warning · error · neutral) title action')],
   ),
   ui(
     'badge',
@@ -251,15 +301,32 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'display',
     'A short status label. Semantic colors are allowed here.',
     [
-      a('Neutral', '1px line, no fill', 'border · textTertiary'),
+      a('Neutral', 'quiet fill', 'fillSecondary · textSecondary'),
       a(
         'Semantic',
-        'tinted ground, semantic text',
+        '10% ground, semantic text',
         'alertTip · alertCaution · alertWarning · alertInfo',
       ),
-      a('Sizes', 'sm 18 · md 20, radius 4', 'borderRadius.sm'),
+      a('Sizes', 'sm 18 (11/16) · md 20 (12/16), radius 4', '—'),
+      a('Dot', 'optional 6px dot in the text color', 'currentColor'),
     ],
-    [p('Badge', 'variant (neutral · success · error · warning · info) size')],
+    [p('Badge', 'variant (neutral · success · error · warning · info) size dot')],
+  ),
+  ui(
+    'kbd',
+    'Kbd',
+    'display',
+    'Keycaps for a shortcut, one cap per key. Shows ⌘ ⇧ ⌥ on macOS and words elsewhere; Enter, Backspace, Delete and arrows draw icons.',
+    [
+      a('Cap', 'md 20 · sm 18, radius 4, 2px between caps', '—'),
+      a('Default', 'bg ground, inset line, heavier bottom edge', 'bg · border'),
+      a('Muted', 'for menus', 'fillTertiary · borderSubtle · textTertiary'),
+      a('Inverted', 'for tooltips and primary buttons', 'bg 16% · bg'),
+    ],
+    [
+      p('Kbd', 'keys (string or array) size (sm · md) tone (default · muted · inverted) platform'),
+      p('parseShortcut', "'Ctrl+B' or '⌘⇧Z' → ['mod', 'b']"),
+    ],
   ),
   ui(
     'status-dot',
@@ -267,8 +334,8 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'display',
     'A dot that shows a process state, with an optional pulse.',
     [
-      a('Dot', 'sm 6 · md 8, round', 'alert* · textQuaternary'),
-      a('Pulse', 'expanding ring, same hue', '—'),
+      a('Dot', 'sm 8 · md 10, round', 'alert* · textQuaternary'),
+      a('Pulse', 'expanding ring, same hue, only when motion is allowed', '—'),
     ],
     [p('StatusDot', 'status (idle · active · success · error · warning) pulse size')],
   ),
@@ -277,8 +344,11 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'Spinner',
     'display',
     'An indeterminate loading indicator.',
-    [a('Ring', 'sm 14 · md 18, 1.5px stroke', 'textTertiary')],
-    [p('Spinner', 'size (sm · md)')],
+    [
+      a('Ring', 'sm 12 · md 16 · lg 20, two-tone: 20% track + solid arc', 'currentColor'),
+      a('Speed', 'one turn per 0.7s', '—'),
+    ],
+    [p('Spinner', 'size (sm · md · lg)')],
   ),
   ui(
     'collapsible',
@@ -286,8 +356,9 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'display',
     'A trigger that shows and hides a panel, built on Base UI Collapsible.',
     [
-      a('Trigger', '13px / 500, chevron rotates', 'textSecondary'),
-      a('Panel', 'height animates, no ground', '—'),
+      a('Trigger', '13/20 · 500, hover text, 16px chevron rotates', 'textSecondary → text'),
+      a('Panel', 'content aligned with the title text (22px), 4px top; height animates 200ms', '—'),
+      focusRow,
     ],
     [
       p('Collapsible', 'open defaultOpen onOpenChange'),
@@ -301,8 +372,8 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'display',
     'A scroll container with a thin overlay scrollbar.',
     [
-      a('Scrollbar', '6px thumb, radius full', 'fill'),
-      a('Hover', 'thumb darkens', 'textQuaternary'),
+      a('Scrollbar', '6px thumb, radius full', 'textQuaternary'),
+      a('Hover', 'thumb darkens', 'textTertiary'),
     ],
     [p('ScrollArea', 'autoScrollToBottom scrollRef className')],
   ),
@@ -312,9 +383,11 @@ export const uiData: ComponentMeta<UiCategory>[] = [
     'display',
     'A read-only highlighted code block with a header, copy button and collapse.',
     [
-      a('Frame', 'radius 8, borderSubtle ring', 'codeBg · borderSubtle'),
-      a('Header', '36px, language name and copy button', 'textTertiary'),
+      a('Frame', 'radius 8', 'codeBg · border'),
+      a('Header', '32px, 12/16, borderSubtle line', 'textTertiary · borderSubtle'),
+      a('Copy button', 'hover fillSecondary, pressed fill, copied state', 'fillSecondary · fill'),
       a('Code', 'mono 0.8125em / 1.7', 'codeText'),
+      focusRow,
     ],
     [
       p('CodeBlock', 'code language chrome collapsible showCopyButton showLineNumbers'),

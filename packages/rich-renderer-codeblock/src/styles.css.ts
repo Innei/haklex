@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { inDarkScheme, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
@@ -252,12 +252,9 @@ globalStyle(`${card} .highlights, ${card} code, ${card} pre`, {
 });
 
 /* ---- Dual-theme: dark mode variable switch ---- */
-globalStyle(
-  `[data-theme='dark'] ${card} .highlights-themes, [data-theme='dark'] ${card} .highlights-themes span`,
-  {
-    color: 'var(--hls-dark) !important' as any,
-  },
-);
+globalStyle(inDarkScheme(`${card} .highlights-themes, ${card} .highlights-themes span`), {
+  color: 'var(--hls-dark) !important' as any,
+});
 
 globalStyle(`${card} .line`, {
   display: 'block',

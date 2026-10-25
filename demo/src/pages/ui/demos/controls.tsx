@@ -11,7 +11,6 @@ import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
 import {
-  focus,
   focusVisible,
   Force,
   hover,
@@ -104,6 +103,14 @@ export const actionButtonDemo: ComponentDemo = {
             Rounded
           </ActionButton>
         </StateCell>
+        <StateCell label="Pressed (aria-pressed)">
+          <ActionButton aria-pressed variant="ghost">
+            Bold
+          </ActionButton>
+          <ActionButton aria-pressed variant="outline">
+            Bold
+          </ActionButton>
+        </StateCell>
       </StateGrid>
     </div>
   ),
@@ -194,6 +201,9 @@ export const checkboxDemo: ComponentDemo = {
       <StateCell label="Checked">
         <AnimatedCheckbox checked label="Label" />
       </StateCell>
+      <StateCell label="Indeterminate">
+        <AnimatedCheckbox indeterminate label="Label" />
+      </StateCell>
       <StateCell label="Hover">
         <Force attrs={hover}>
           <AnimatedCheckbox label="Label" />
@@ -243,9 +253,12 @@ export const textareaDemo: ComponentDemo = {
         <AutoResizeTextArea defaultValue="A caption that wraps onto a second line." minRows={2} />
       </StateCell>
       <StateCell label="Focus">
-        <Force attrs={focus}>
+        <Force attrs={focusVisible}>
           <AutoResizeTextArea minRows={2} placeholder="Focused" />
         </Force>
+      </StateCell>
+      <StateCell label="Invalid">
+        <AutoResizeTextArea aria-invalid defaultValue="Too long" minRows={2} />
       </StateCell>
       <StateCell label="Disabled">
         <AutoResizeTextArea disabled minRows={2} placeholder="Disabled" />

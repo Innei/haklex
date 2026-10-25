@@ -190,6 +190,13 @@
   gap: 12px;
 }
 
+.demo-ink {
+  display: inline-flex;
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--rc-text);
+}
+
 .demo-row-tall {
   align-items: flex-start;
   gap: 220px;
@@ -223,7 +230,12 @@
 }
 
 .demo-scroll {
+  width: 100%;
   height: 160px;
+}
+
+.demo-scroll > * {
+  height: 100%;
 }
 
 .demo-field {
@@ -240,6 +252,10 @@
 
 .chrome-editor {
   margin: -32px;
+}
+
+.chrome-editor-gutter {
+  padding-left: 32px;
 }
 
 .chrome-hint {
@@ -259,6 +275,15 @@
 .slash-frozen {
   position: relative;
   min-height: 420px;
+}
+
+/* Frozen lists use the live floating positioning, which flips above the anchor
+   near the viewport bottom and spills over the previews; pin them in flow. */
+.slash-frozen > :not(.slash-anchor) {
+  position: relative !important;
+  inset: auto !important;
+  transform: none !important;
+  margin-top: 8px;
 }
 
 .slash-anchor {

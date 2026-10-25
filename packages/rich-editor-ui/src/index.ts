@@ -109,6 +109,8 @@ export {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './components/dropdown-menu';
+export type { KbdIcon, KbdPlatform, KbdProps, KeyDisplay } from './components/kbd';
+export { detectPlatform, Kbd, keyDisplay, parseShortcut, useKbdPlatform } from './components/kbd';
 export type {
   PopoverArrowProps,
   PopoverCloseProps,

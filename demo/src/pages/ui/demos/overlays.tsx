@@ -133,7 +133,7 @@ export const tooltipDemo: ComponentDemo = {
               </ActionButton>
             }
           />
-          <TooltipContent>Bold ⌘B</TooltipContent>
+          <TooltipContent shortcut="Mod+B">Bold</TooltipContent>
         </TooltipRoot>
       </TooltipProvider>
     </div>

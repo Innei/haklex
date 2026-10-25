@@ -1,1 +1,1 @@
-export { BlockHandlePlugin } from './BlockHandlePlugin'
+export { BlockHandlePlugin } from './BlockHandlePlugin';

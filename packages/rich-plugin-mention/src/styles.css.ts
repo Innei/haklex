@@ -1,4 +1,10 @@
-import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
+import {
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  chromeTypography,
+  vars,
+} from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const mentionMenu = style({
@@ -10,11 +16,10 @@ export const mentionMenu = style({
   overflowY: 'auto',
   overflowX: 'hidden',
   ...chromeTypography,
-  fontSize: 13,
-  lineHeight: 1.35,
-  background: vars.color.bg,
+  ...chromeText.control,
+  background: vars.color.bgElevated,
   border: 'none',
-  borderRadius: vars.borderRadius.lg,
+  borderRadius: chromeRadius.lg,
   boxShadow: vars.boxShadow.menu,
   padding: 4,
   listStyle: 'none',
@@ -26,19 +31,21 @@ globalStyle(`${mentionMenu}::-webkit-scrollbar`, {
 });
 
 globalStyle(`${mentionMenu}::-webkit-scrollbar-thumb`, {
-  background: vars.color.fill,
-  borderRadius: 3,
+  background: vars.color.textQuaternary,
+  borderRadius: 9999,
 });
 
 export const mentionMenuItem = style({
   display: 'flex',
   alignItems: 'center',
   gap: 10,
-  padding: '6px 8px',
+  minHeight: 32,
+  boxSizing: 'border-box',
+  padding: '4px 8px',
   margin: 0,
-  borderRadius: vars.borderRadius.md,
+  borderRadius: chromeRadius.md,
   cursor: 'pointer',
-  transition: 'background 120ms ease-out',
+  transition: `background-color ${chromeMotion.state} ease`,
 });
 
 globalStyle(`${mentionMenuItem}:hover, ${mentionMenuItem}[aria-selected="true"]`, {
@@ -54,8 +61,8 @@ export const mentionMenuItemIcon = style({
   fontSize: 14,
   flexShrink: 0,
   borderRadius: 6,
-  background: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
+  background: vars.color.bgElevated,
+  border: `1px solid ${vars.color.borderSubtle}`,
   color: vars.color.textSecondary,
   lineHeight: 1,
 });

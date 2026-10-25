@@ -44,6 +44,7 @@ export const colorGroups: ColorGroup[] = [
       row('bg', 'Canvas, popovers'),
       row('bgSecondary', 'Code blocks, table heads'),
       row('bgTertiary', 'Inline code, quote ground'),
+      row('bgElevated', 'Menus, popovers, dialogs'),
     ],
   },
   {
@@ -61,6 +62,7 @@ export const colorGroups: ColorGroup[] = [
       row('border', 'Structure lines, frames'),
       row('borderSubtle', 'Rows, code headers'),
       row('ring', 'Popover outline'),
+      row('scrim', 'Dialog backdrop'),
     ],
   },
   {

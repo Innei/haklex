@@ -31,7 +31,7 @@ export const dot = recipe({
     },
     size: {
       sm: { width: '8px', height: '8px' },
-      md: { width: '12px', height: '12px' },
+      md: { width: '10px', height: '10px' },
     },
   },
   defaultVariants: { status: 'idle', size: 'sm' },
@@ -39,9 +39,13 @@ export const dot = recipe({
 
 export const pulseRing = recipe({
   base: {
-    position: 'absolute',
-    borderRadius: '50%',
-    animation: `${pulse} 1.5s ease-in-out infinite`,
+    'position': 'absolute',
+    'borderRadius': '50%',
+    '@media': {
+      '(prefers-reduced-motion: no-preference)': {
+        animation: `${pulse} 1.5s ease-in-out infinite`,
+      },
+    },
   },
   variants: {
     status: {
@@ -53,7 +57,7 @@ export const pulseRing = recipe({
     },
     size: {
       sm: { width: '8px', height: '8px' },
-      md: { width: '12px', height: '12px' },
+      md: { width: '10px', height: '10px' },
     },
   },
   defaultVariants: { status: 'idle', size: 'sm' },

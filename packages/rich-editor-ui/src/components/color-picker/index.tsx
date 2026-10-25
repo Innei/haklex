@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 import { Popover, PopoverPanel, PopoverTrigger } from '../popover';
@@ -69,6 +69,7 @@ export function ColorPicker({ currentColor, onSelect, className }: ColorPickerPr
             {TEXT_COLORS.map((color) => (
               <button
                 aria-label={color.name}
+                aria-pressed={currentColor === color.value}
                 className={css.swatch}
                 key={color.value}
                 type="button"
@@ -81,7 +82,6 @@ export function ColorPicker({ currentColor, onSelect, className }: ColorPickerPr
                     backgroundColor: color.value === 'inherit' ? 'currentColor' : color.value,
                   }}
                 />
-                {currentColor === color.value && <Check className={css.swatchCheck} />}
               </button>
             ))}
             <button

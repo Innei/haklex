@@ -6,6 +6,7 @@ import {
   Collapsible,
   CollapsiblePanel,
   CollapsibleTrigger,
+  Kbd,
   ScrollArea,
   Spinner,
   StatusDot,
@@ -14,11 +15,13 @@ import {
 import { Force, hover, StateCell, StateGrid } from '../../../components/preview/States';
 import type { ComponentDemo } from '../../components/types';
 
-const alertVariants = ['info', 'warning', 'error'] as const;
+const alertVariants = ['info', 'success', 'warning', 'error', 'neutral'] as const;
 const alertCopy = {
   info: 'Changes sync when you go back online.',
+  success: 'Published. Readers see the new version now.',
   warning: 'This image is larger than 5 MB.',
   error: 'Upload failed. Check the connection and try again.',
+  neutral: 'Drafts are kept for 30 days.',
 };
 
 export const alertDemo: ComponentDemo = {
@@ -36,14 +39,15 @@ export const alertDemo: ComponentDemo = {
       {alertVariants.map((v) => (
         <Alert
           key={v}
+          title={`${v[0].toUpperCase()}${v.slice(1)}`}
           variant={v}
           action={
             <ActionButton size="sm" variant="ghost">
-              Retry
+              Action
             </ActionButton>
           }
         >
-          {`${v} with an action`}
+          {alertCopy[v]}
         </Alert>
       ))}
     </div>
@@ -73,6 +77,13 @@ export const badgeDemo: ComponentDemo = {
           ))}
         </StateCell>
       ))}
+      <StateCell label="Dot">
+        {badgeVariants.map((v) => (
+          <Badge dot key={v} variant={v}>
+            {v}
+          </Badge>
+        ))}
+      </StateCell>
     </StateGrid>
   ),
 };
@@ -113,6 +124,7 @@ export const spinnerDemo: ComponentDemo = {
     <div className="demo-center demo-row">
       <Spinner size="sm" />
       <Spinner size="md" />
+      <Spinner size="lg" />
     </div>
   ),
   States: () => (
@@ -122,6 +134,9 @@ export const spinnerDemo: ComponentDemo = {
       </StateCell>
       <StateCell label="Size md">
         <Spinner size="md" />
+      </StateCell>
+      <StateCell label="Size lg">
+        <Spinner size="lg" />
       </StateCell>
     </StateGrid>
   ),
@@ -217,5 +232,33 @@ export const codeBlockDemo: ComponentDemo = {
         </div>
       </StateCell>
     </div>
+  ),
+};
+
+export const kbdDemo: ComponentDemo = {
+  Preview: () => (
+    <div className="demo-center demo-row">
+      <Kbd keys="Mod+K" />
+      <Kbd keys="Mod+Shift+Z" />
+      <Kbd keys="Enter" />
+      <Kbd keys={['alt', 'up']} />
+    </div>
+  ),
+  States: () => (
+    <StateGrid>
+      {(['default', 'muted', 'inverted'] as const).map((tone) => (
+        <StateCell key={tone} label={`Tone ${tone}`}>
+          <span className={tone === 'inverted' ? 'demo-ink' : undefined}>
+            <Kbd keys="Mod+Shift+Up" tone={tone} />
+          </span>
+        </StateCell>
+      ))}
+      <StateCell label="Size sm">
+        <Kbd keys="Mod+B" size="sm" />
+      </StateCell>
+      <StateCell label="Other platforms">
+        <Kbd keys="Mod+Shift+Z" platform="other" />
+      </StateCell>
+    </StateGrid>
   ),
 };

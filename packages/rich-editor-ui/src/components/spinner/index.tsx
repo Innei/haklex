@@ -4,7 +4,7 @@ import { spinner } from './styles.css';
 
 export interface SpinnerProps {
   className?: string;
-  size?: 'sm' | 'md';
+  size?: 'sm' | 'md' | 'lg';
 }
 
 export function Spinner({ size, className }: SpinnerProps): ReactElement {

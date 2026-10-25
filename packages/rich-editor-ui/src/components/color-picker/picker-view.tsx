@@ -1,6 +1,7 @@
 import { ArrowLeft, Pipette } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
+import { ActionButton } from '../action-button';
 import {
   clamp,
   hexToHsva,
@@ -215,22 +216,24 @@ export function PickerView({ initialColor, onApply, onCancel, onBack }: PickerVi
       </div>
 
       <div className={css.actionRow}>
-        <button
+        <ActionButton
           className={css.actionButton}
-          type="button"
+          size="md"
+          variant="outline"
           onClick={onCancel}
           onMouseDown={(e) => e.preventDefault()}
         >
           Cancel
-        </button>
-        <button
-          className={`${css.actionButton} ${css.actionButtonPrimary}`}
-          type="button"
+        </ActionButton>
+        <ActionButton
+          className={css.actionButton}
+          size="md"
+          variant="solid"
           onClick={handleApply}
           onMouseDown={(e) => e.preventDefault()}
         >
           Apply
-        </button>
+        </ActionButton>
       </div>
     </div>
   );

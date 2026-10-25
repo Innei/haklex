@@ -50,7 +50,7 @@ export function ToolbarDropdown({
     <>
       {label}
       <span className={css.toolbarDropdownTriggerChevron}>
-        <ChevronDown size={12} />
+        <ChevronDown size={14} />
       </span>
     </>
   );
@@ -64,18 +64,7 @@ export function ToolbarDropdown({
           style={item.style}
           onClick={item.onSelect}
         >
-          {item.icon && (
-            <span
-              style={{
-                marginRight: 8,
-                display: 'inline-flex',
-                transform: 'scale(0.8)',
-                transformOrigin: 'left center',
-              }}
-            >
-              {item.icon}
-            </span>
-          )}
+          {item.icon}
           {item.label}
         </DropdownMenuItem>
       ))}

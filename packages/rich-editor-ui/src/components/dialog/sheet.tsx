@@ -122,7 +122,7 @@ export const SheetStackEntry: FC<{
 
   const zIndex = 50 + index;
   const sheetHeight = sheetRef.current?.offsetHeight || 1;
-  const backdropOpacity = isDragging ? Math.max(0, 1 - translateY / sheetHeight) * 0.5 : 0.5;
+  const backdropOpacity = isDragging ? Math.max(0, 1 - translateY / sheetHeight) : 1;
 
   return (
     <PortalThemeProvider className={portalClassName ?? ''} theme={theme}>

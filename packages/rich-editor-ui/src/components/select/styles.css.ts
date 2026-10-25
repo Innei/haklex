@@ -1,49 +1,49 @@
-import { chromeTypography, vars } from '@haklex/rich-style-token/styles';
-import { globalStyle, keyframes, style } from '@vanilla-extract/css';
+import {
+  chromeHeight,
+  chromeMotion,
+  chromeRadius,
+  chromeText,
+  focusRing,
+  vars,
+} from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
-// --- Animations ---
-
-const fadeInZoom = keyframes({
-  from: { opacity: 0, transform: 'scale(0.95)' },
-  to: { opacity: 1, transform: 'scale(1)' },
-});
-
-const fadeOutZoom = keyframes({
-  from: { opacity: 1, transform: 'scale(1)' },
-  to: { opacity: 0, transform: 'scale(0.95)' },
-});
-
-// --- Trigger ---
+import {
+  applyItemSvgStyles,
+  itemBase,
+  label,
+  popupBase,
+  separator as sharedSeparator,
+} from '../../styles/menu.css';
 
 export const triggerButton = style({
-  ...chromeTypography,
+  ...chromeText.control,
   'display': 'inline-flex',
   'alignItems': 'center',
   'justifyContent': 'space-between',
   'gap': '6px',
-  'height': '36px',
-  'padding': '8px 8px 8px 10px',
-  'fontSize': vars.typography.fontSizeSmall,
-  'lineHeight': 1.35,
+  'height': chromeHeight.md,
+  'boxSizing': 'border-box',
+  'padding': '0 6px 0 10px',
   'fontFamily': vars.typography.fontFamilySans,
   'border': 'none',
-  'borderRadius': vars.borderRadius.md,
+  'borderRadius': chromeRadius.md,
   'background': 'transparent',
   'color': vars.color.text,
   'cursor': 'pointer',
   'outline': 'none',
   'whiteSpace': 'nowrap',
   'boxShadow': vars.boxShadow.xs,
-  'transition': 'color 150ms ease, box-shadow 150ms ease, border-color 150ms ease',
+  'transition': `background-color ${chromeMotion.state} ease, box-shadow ${chromeMotion.state} ease`,
   ':hover': {
-    background: vars.color.fillQuaternary,
+    background: vars.color.fillSecondary,
   },
   ':focus-visible': {
-    boxShadow: `0 0 0 1px ${vars.color.accent}, 0 0 0 3px ${vars.color.accentLight}`,
+    boxShadow: focusRing,
   },
   'selectors': {
     '&[data-popup-open]': {
-      background: vars.color.fillQuaternary,
+      background: vars.color.fill,
     },
     '&[data-disabled]': {
       opacity: 0.5,
@@ -60,98 +60,27 @@ export const triggerIcon = style({
   pointerEvents: 'none',
 });
 
-// --- Positioner ---
-
 export const positioner = style({
   outline: 'none',
   zIndex: 50,
   isolation: 'isolate',
 });
 
-// --- Popup / Content ---
-
 export const popup = style({
-  ...chromeTypography,
-  background: vars.color.bg,
+  ...popupBase,
   color: vars.color.text,
-  fontFamily: vars.typography.fontFamilySans,
-  fontSize: vars.typography.fontSizeSmall,
-  borderRadius: vars.borderRadius.lg,
-  boxShadow: vars.boxShadow.menu,
   width: 'min(var(--anchor-width), calc(100vw - 0.75rem))',
   maxWidth: 'calc(100vw - 0.75rem)',
-  maxHeight: 'var(--available-height)',
-  overflowX: 'hidden',
-  overflowY: 'auto',
-  outline: 'none',
-  transformOrigin: 'var(--transform-origin)',
-  transition: 'opacity 100ms ease-out, transform 100ms ease-out',
-  selectors: {
-    '&[data-open]': {
-      animation: `${fadeInZoom} 100ms ease-out`,
-    },
-    '&[data-starting-style]': {
-      opacity: 0,
-      transform: 'scale(0.95)',
-    },
-    '&[data-ending-style]': {
-      opacity: 0,
-      transform: 'scale(0.95)',
-    },
-    '&[data-closed]': {
-      animation: `${fadeOutZoom} 100ms ease-in`,
-      overflow: 'hidden',
-    },
-  },
 });
 
-// --- Group ---
-
-export const group = style({
-  padding: '4px',
-  selectors: {
-    '& + &': {
-      borderTop: `1px solid ${vars.color.hrBorder}`,
-    },
-  },
-});
-
-// --- Item ---
+export const group = style({});
 
 export const item = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '6px 32px 6px 8px',
-  borderRadius: vars.borderRadius.sm,
-  fontSize: vars.typography.fontSizeSmall,
-  lineHeight: 1.35,
-  outline: 'none',
-  userSelect: 'none',
-  cursor: 'default',
-  color: vars.color.text,
-  position: 'relative',
-  transition: 'background-color 100ms ease, color 100ms ease',
-  selectors: {
-    '&[data-highlighted]': {
-      backgroundColor: vars.color.fillSecondary,
-      color: vars.color.text,
-    },
-    '&[data-disabled]': {
-      opacity: 0.5,
-      pointerEvents: 'none',
-    },
-  },
+  ...itemBase,
+  paddingRight: '32px',
 });
 
-globalStyle(`${item} svg`, {
-  pointerEvents: 'none',
-  flexShrink: 0,
-  width: '16px',
-  height: '16px',
-});
-
-// --- Item Indicator (check mark) ---
+applyItemSvgStyles(item);
 
 export const itemIndicator = style({
   position: 'absolute',
@@ -162,32 +91,17 @@ export const itemIndicator = style({
   width: '16px',
   height: '16px',
   pointerEvents: 'none',
-  color: vars.color.textSecondary,
-});
-
-globalStyle(`${item}[data-highlighted] ${itemIndicator}`, {
   color: vars.color.text,
 });
 
-// --- Group Label ---
-
-export const groupLabel = style({
-  padding: '6px 8px',
-  fontSize: vars.typography.fontSizeXs,
-  fontWeight: 500,
-  lineHeight: 1.4,
-  color: vars.color.textTertiary,
+globalStyle(`${itemIndicator} svg`, {
+  width: '16px',
+  height: '16px',
 });
 
-// --- Separator ---
+export const groupLabel = label;
 
-export const separator = style({
-  height: '1px',
-  backgroundColor: vars.color.hrBorder,
-  margin: '4px -4px',
-});
-
-// --- Scroll buttons ---
+export const separator = sharedSeparator;
 
 export const scrollButton = style({
   display: 'flex',
@@ -197,7 +111,7 @@ export const scrollButton = style({
   padding: '4px 0',
   cursor: 'default',
   color: vars.color.textTertiary,
-  background: vars.color.bg,
+  background: vars.color.bgElevated,
   zIndex: 10,
 });
 

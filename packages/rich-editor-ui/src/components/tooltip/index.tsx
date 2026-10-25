@@ -2,6 +2,7 @@ import { Tooltip as TooltipPrimitive } from '@base-ui/react/tooltip';
 import { PortalThemeWrapper } from '@haklex/rich-style-token';
 import type { ComponentProps, ReactNode } from 'react';
 
+import { Kbd } from '../kbd';
 import * as css from './styles.css';
 
 // -- Provider (shared delay for multiple tooltips) --
@@ -53,15 +54,17 @@ export function TooltipPositioner(props: TooltipPositionerProps) {
 type TooltipPopupProps = Omit<ComponentProps<typeof TooltipPrimitive.Popup>, 'render'> & {
   className?: string;
   children?: ReactNode;
+  shortcut?: string | string[];
 };
 
-export function TooltipPopup({ className, children, ...props }: TooltipPopupProps) {
+export function TooltipPopup({ className, children, shortcut, ...props }: TooltipPopupProps) {
   return (
     <TooltipPrimitive.Popup
       className={`${css.popup}${className ? ` ${className}` : ''}`}
       {...props}
     >
       {children}
+      {shortcut && <Kbd className={css.shortcut} keys={shortcut} size="sm" tone="inverted" />}
     </TooltipPrimitive.Popup>
   );
 }

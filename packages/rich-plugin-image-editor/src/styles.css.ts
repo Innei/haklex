@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeRadius, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
 const fullscreenIn = keyframes({
@@ -102,7 +102,7 @@ export const toolButton = style({
   width: 36,
   height: 36,
   border: 'none',
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.sm,
   backgroundColor: 'transparent',
   color: vars.color.textTertiary,
   cursor: 'pointer',
@@ -206,7 +206,7 @@ export const optionButton = style({
   height: 26,
   padding: 0,
   border: 'none',
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.sm,
   backgroundColor: 'transparent',
   color: vars.color.textTertiary,
   cursor: 'pointer',
@@ -246,7 +246,7 @@ export const errorState = style({
   alignItems: 'center',
   gap: 8,
   padding: 24,
-  borderRadius: vars.borderRadius.md,
+  borderRadius: chromeRadius.md,
   backgroundColor: vars.color.bg,
   color: vars.color.textTertiary,
   fontSize: 13,
@@ -296,7 +296,7 @@ const buttonBase = style({
   padding: '0 14px',
   fontSize: 13,
   fontWeight: 500,
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.sm,
   cursor: 'pointer',
   selectors: {
     '&:disabled': {
@@ -398,7 +398,7 @@ export const sizeSelect = style({
   height: 30,
   padding: '0 8px',
   border: `1px solid ${vars.color.border}`,
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.sm,
   backgroundColor: vars.color.bg,
   color: vars.color.text,
   fontSize: 12,
@@ -410,7 +410,7 @@ export const sizeInput = style({
   boxSizing: 'border-box',
   padding: '0 8px',
   border: `1px solid ${vars.color.border}`,
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.sm,
   backgroundColor: vars.color.bg,
   color: vars.color.text,
   fontSize: 12,
