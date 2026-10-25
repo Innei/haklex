@@ -45,6 +45,7 @@
     "@haklex/rich-style-token": "workspace:^",
     "@lexical/react": "^0.52.0",
     "lexical": "^0.52.0",
+    "lucide-react": "^1.0.0",
     "react": ">=19",
     "react-dom": ">=19"
   },
