@@ -65,7 +65,7 @@ globalStyle(article(sharedStyles.hr), {
 });
 
 globalStyle(
-  `${article(sharedStyles.hr)} + *, ${articleBase} :where([data-virtual-editor-content]) > [data-document-prev-tag="hr"]`,
+  `${article(sharedStyles.hr)} + *, ${articleBase} :where([data-virtual-editor-content], [data-virtual-renderer-content]) > [data-document-prev-tag="hr"]`,
   {
     marginTop: '0',
   },

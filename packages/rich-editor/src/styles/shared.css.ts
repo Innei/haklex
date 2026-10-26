@@ -309,7 +309,7 @@ globalStyle(
   [headingH1, headingH2, headingH3, headingH4, headingH5, headingH6]
     .flatMap((h, i) => [
       `${h} + *`,
-      `:where([data-virtual-editor-content]) > [data-document-prev-tag="h${i + 1}"]`,
+      `:where([data-virtual-editor-content], [data-virtual-renderer-content]) > [data-document-prev-tag="h${i + 1}"]`,
     ])
     .join(', '),
   { marginTop: 0 },
@@ -916,14 +916,14 @@ globalStyle(`${richContent} img`, {
 });
 
 globalStyle(
-  `${richContent} > *:first-child, ${richContent} .rich-editor__content:not(:where([data-virtual-editor-content])) > *:first-child, ${richContent} [data-virtual-editor-content] > [data-document-first]`,
+  `${richContent} > *:first-child, ${richContent} .rich-editor__content:not(:where([data-virtual-editor-content], [data-virtual-renderer-content])) > *:first-child, ${richContent} [data-virtual-editor-content] > [data-document-first], ${richContent} :where([data-virtual-renderer-content]) > [data-document-first]`,
   {
     marginTop: 0,
   },
 );
 
 globalStyle(
-  `${richContent} > *:last-child, ${richContent} .rich-editor__content:not(:where([data-virtual-editor-content])) > *:last-child, ${richContent} [data-virtual-editor-content] > [data-document-last]`,
+  `${richContent} > *:last-child, ${richContent} .rich-editor__content:not(:where([data-virtual-editor-content], [data-virtual-renderer-content])) > *:last-child, ${richContent} [data-virtual-editor-content] > [data-document-last], ${richContent} :where([data-virtual-renderer-content]) > [data-document-last]`,
   {
     marginBottom: 0,
   },
@@ -1146,7 +1146,7 @@ globalStyle('.rich-image-wrapper[data-layout^="float"]', {
 // Float layouts are tuned at one column width; only flowing text may wrap a
 // float that overran its paragraphs at another width, every other block starts below it.
 globalStyle(
-  `${richContent} > :not(p, ul, ol, blockquote), ${richContent} .rich-editor__content > :not(p, ul, ol, blockquote)`,
+  `${richContent} > :not(p, ul, ol, blockquote), ${richContent} .rich-editor__content > :not(p, ul, ol, blockquote), ${richContent} :where([data-virtual-renderer-content]) > :not(p, ul, ol, blockquote)`,
   {
     clear: 'both',
   },

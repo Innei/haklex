@@ -2,7 +2,9 @@ import type { RendererConfig, RichEditorVariant } from '@haklex/rich-editor/stat
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
 import type { ComponentType, CSSProperties, ElementType, ReactNode } from 'react';
 
+import type { RendererSurface } from '../static-renderer/surface';
 import type { BlockAnchorRenderer, BuiltinNodeRenderer } from '../static-renderer/types';
+import type { RendererVirtualization } from '../virtualization/plugin';
 
 export type RendererKey = keyof RendererConfig;
 
@@ -15,6 +17,7 @@ export interface RichRendererModule {
   Provider?: ComponentType<{ children: ReactNode }>;
   renderers?: Partial<RendererConfig>;
   ssrFallback?: Partial<Record<RendererKey, ReactNode>>;
+  surface?: RendererSurface;
 }
 
 export interface RichEditorModule extends RichRendererModule {
@@ -50,4 +53,5 @@ export interface RichRendererBaseProps {
   theme?: 'light' | 'dark';
   value: SerializedEditorState;
   variant?: RichEditorVariant;
+  virtualization?: RendererVirtualization;
 }

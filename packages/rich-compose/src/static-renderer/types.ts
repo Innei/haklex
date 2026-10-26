@@ -2,6 +2,9 @@ import type { ColorScheme, RendererConfig, RichEditorVariant } from '@haklex/ric
 import type { Klass, LexicalNode, SerializedEditorState } from 'lexical';
 import type { CSSProperties, ElementType, ReactNode } from 'react';
 
+import type { RendererVirtualization } from '../virtualization/plugin';
+import type { RendererSurface } from './surface';
+
 export type BuiltinNodeRenderer = (
   node: any,
   key: string,
@@ -24,7 +27,9 @@ export interface RichRendererProps {
   nested?: boolean;
   rendererConfig?: RendererConfig;
   style?: CSSProperties;
+  surface?: RendererSurface;
   theme?: ColorScheme;
   value: SerializedEditorState;
   variant?: RichEditorVariant;
+  virtualization?: RendererVirtualization;
 }

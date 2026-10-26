@@ -93,7 +93,8 @@
     "./style/*": "./dist/style/*",
     "./litexml-html-preview-client.js": "./dist/litexml-html-preview-client.js",
     "./litexml-html-preview-client.css": "./dist/litexml-html-preview-client.css",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./virtualization": "./src/virtualization-entry.ts"
   },
   "main": "./src/index.ts",
   "files": [
@@ -472,7 +473,11 @@
       "./style/*": "./dist/style/*",
       "./litexml-html-preview-client.js": "./dist/litexml-html-preview-client.js",
       "./litexml-html-preview-client.css": "./dist/litexml-html-preview-client.css",
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./virtualization": {
+        "import": "./dist/virtualization-entry.mjs",
+        "types": "./dist/virtualization-entry.d.ts"
+      }
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"

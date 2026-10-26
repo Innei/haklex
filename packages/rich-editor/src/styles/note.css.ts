@@ -20,20 +20,27 @@ const plainListItem = `${sharedStyles.listItem}:not(${sharedStyles.listItemCheck
 // top-level prose paragraphs, not paragraphs nested inside alerts, quotes, tables, etc.
 const editorTopParagraph = `${noteBase} .rich-editor__content:not(:where([data-virtual-editor-content])) > ${sharedStyles.paragraph}`;
 const virtualTopParagraph = `${noteBase} [data-virtual-editor-content] > ${sharedStyles.paragraph}`;
+const virtualRendererParagraph = `${noteBase} [data-virtual-renderer-content]:not([data-rich-nested='true']) > ${sharedStyles.paragraph}`;
 const rendererTopParagraph = `${noteBase}.rich-content:not([data-rich-nested='true']) > ${sharedStyles.paragraph}`;
 
-globalStyle(`${editorTopParagraph}, ${virtualTopParagraph}, ${rendererTopParagraph}`, {
-  marginTop: 0,
-  marginBottom: vars.flow.paragraph,
-});
+globalStyle(
+  `${editorTopParagraph}, ${virtualTopParagraph}, ${virtualRendererParagraph}, ${rendererTopParagraph}`,
+  {
+    marginTop: 0,
+    marginBottom: vars.flow.paragraph,
+  },
+);
 
-globalStyle(`${rendererTopParagraph}:not(:first-of-type)`, {
-  textIndent: '2em',
-});
+globalStyle(
+  `${rendererTopParagraph}:not(:first-of-type), ${virtualRendererParagraph}:not([data-document-first-paragraph])`,
+  {
+    textIndent: '2em',
+  },
+);
 
 // text-indent is inherited: inline-block children (footnote refs, mention
 // chips) would indent their own first line by 2em.
-globalStyle(`${rendererTopParagraph} *`, {
+globalStyle(`${rendererTopParagraph} *, ${virtualRendererParagraph} *`, {
   textIndent: 0,
 });
 
@@ -52,12 +59,15 @@ globalStyle(
 );
 
 // Keep the note lead-paragraph treatment while preserving the new indent rules.
-globalStyle(`${rendererTopParagraph}:first-of-type::first-letter`, {
-  float: 'left',
-  fontSize: '2.4em',
-  marginRight: '0.2em',
-  lineHeight: '1',
-});
+globalStyle(
+  `${rendererTopParagraph}:first-of-type::first-letter, ${virtualRendererParagraph}[data-document-first-paragraph]::first-letter`,
+  {
+    float: 'left',
+    fontSize: '2.4em',
+    marginRight: '0.2em',
+    lineHeight: '1',
+  },
+);
 
 globalStyle(
   `${editorTopParagraph}:first-of-type::first-letter, ${virtualTopParagraph}[data-document-first-paragraph]::first-letter`,
@@ -68,7 +78,7 @@ globalStyle(
 );
 
 globalStyle(
-  `${editorTopParagraph}:last-child, ${virtualTopParagraph}[data-document-last], ${rendererTopParagraph}:last-child`,
+  `${editorTopParagraph}:last-child, ${virtualTopParagraph}[data-document-last], ${virtualRendererParagraph}[data-document-last], ${rendererTopParagraph}:last-child`,
   {
     marginBottom: 0,
   },

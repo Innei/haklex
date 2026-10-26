@@ -18,7 +18,8 @@
     "./static": "./src/static-entry.ts",
     "./style.css": "./dist/rich-editor.css",
     "./styles": "./src/styles-entry.ts",
-    "./virtualization": "./src/virtualization-entry.ts"
+    "./virtualization": "./src/virtualization-entry.ts",
+    "./recycler": "./src/recycler-entry.ts"
   },
   "main": "./src/index.ts",
   "files": [
@@ -112,6 +113,10 @@
       "./virtualization": {
         "import": "./dist/virtualization-entry.mjs",
         "types": "./dist/virtualization-entry.d.ts"
+      },
+      "./recycler": {
+        "import": "./dist/recycler-entry.mjs",
+        "types": "./dist/recycler-entry.d.ts"
       }
     },
     "main": "./dist/index.mjs",

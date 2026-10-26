@@ -66,6 +66,39 @@ const RichEditor = composeEditor({ modules: allEditorModules });
 
 Both helpers return memoized React components. `composeEditor` internally wires `composeRenderer` for nested editor states.
 
+### Optional renderer virtualization
+
+Rendering remains complete by default. Enable the recycler with props:
+
+```tsx
+const scrollRef = useRef<HTMLDivElement>(null);
+const virtualization = useMemo(() => ({ scrollContainer: scrollRef, preserveCapacity: 32 }), []);
+
+<ScrollArea scrollRef={scrollRef}>
+  <RichContent value={editorState} virtualization={virtualization} />
+</ScrollArea>;
+```
+
+The viewport must have a bounded height. `scrollContainer` accepts its DOM element, a ref, or a getter; it must contain the rendered content. Without it, the recycler finds the nearest scrolling ancestor, then uses the window.
+
+Alternatively, install the implementation as a compose module:
+
+```tsx
+import { rendererVirtualizationModule } from '@haklex/rich-compose/virtualization';
+
+const RichContent = composeRenderer({
+  modules: [...allRendererModules, rendererVirtualizationModule({ preserveCapacity: 32 })],
+});
+```
+
+An explicit `virtualization={false}` overrides an installed module. The module supplies a rendering surface; it does not turn on a second full-document renderer. Nested renderers keep their ordinary surface unless explicitly enabled.
+
+The editor and renderer share typed recycling pools, measured margin collapse, and the keep-mounted manager. Up to 32 offscreen mounts are retained by default; LRU eviction saves details/dynamic state before reusing an instance. Set `preserveCapacity: 0` for immediate state restoration. Dynamic components need `getState`/`setState` to survive eviction; custom components can use `useEditorBlock().nodeState()` and `retain()`.
+
+Heading anchors and footnote numbering are prepared from the complete document, while React trees are created only for rendered windows. Opt-in virtual SSR emits a bounded initial window; default SSR stays complete. Float images and the flowing text through their clearing block remain one native flow unit, as does the note lead paragraph with its next block. A very large flow unit or single table is not virtualized internally. Initial parsing and document replacement still scale with document size. Changing the document, variant, or recycler options rebuilds the transient view cache. Native selection/copy across unmounted content and browser find-in-page remain limited to mounted windows.
+
+The demo's **20,000 Complex Nodes** preset supports both Edit and Render. Both use the UI `ScrollArea` viewport explicitly, with a fixed inspector beside it. Rendering and editing share the same article width and horizontal spacing.
+
 ## Three consumer modes
 
 ### Mode A — defaults

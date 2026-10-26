@@ -1,6 +1,6 @@
 import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import type { SerializedEditorState } from 'lexical';
-import { use, useState } from 'react';
+import { use, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 import { Segmented } from '../components/ui/Segmented';
@@ -14,6 +14,7 @@ import { VariantContext } from '../context/VariantContext';
 import { presets } from '../fixtures';
 import { allExtraPlatformMeta } from '../fixtures/extra-mention-platforms';
 import { LexicalEditor, LexicalRenderer } from '../lexical';
+import { readingContent } from '../lexical/reading-content.css';
 
 type Mode = 'edit' | 'readonly';
 
@@ -28,6 +29,8 @@ export function PresetsPage() {
   const [params, setParams] = useSearchParams();
   const [sideTab, setSideTab] = useState<'inspector' | 'json'>('inspector');
   const [liveState, setLiveState] = useState<{ key: string; state: SerializedEditorState }>();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const virtualizationOptions = useMemo(() => ({ scrollContainer: scrollRef }), []);
 
   const selected = presets.find((p) => p.key === params.get('preset')) ?? presets[0];
   const mode: Mode = params.get('mode') === 'readonly' ? 'readonly' : 'edit';
@@ -53,6 +56,7 @@ export function PresetsPage() {
       <Workbench
         panelLabel="Preset tools"
         panelWidth={sideTab === 'inspector' ? 300 : 440}
+        scrollRef={scrollRef}
         title={selected.label}
         meta={
           <span className="badge">{`${variant} · ${mode === 'edit' ? 'edit' : 'render'}`}</span>
@@ -93,15 +97,13 @@ export function PresetsPage() {
                     onChange={(next) => setOption('mode', next)}
                   />
                 </InspectorSection>
-                {mode === 'edit' && (
-                  <InspectorSection title="Performance">
-                    <SwitchRow
-                      checked={virtualization}
-                      label="Virtual scrolling"
-                      onChange={(enabled) => setOption('virtualization', String(enabled))}
-                    />
-                  </InspectorSection>
-                )}
+                <InspectorSection title="Performance">
+                  <SwitchRow
+                    checked={virtualization}
+                    label="Virtual scrolling"
+                    onChange={(enabled) => setOption('virtualization', String(enabled))}
+                  />
+                </InspectorSection>
               </>
             )}
           </>
@@ -113,15 +115,17 @@ export function PresetsPage() {
             key={`${selected.key}-edit`}
             theme={theme}
             variant={variant}
-            virtualization={virtualization}
+            virtualization={virtualization ? virtualizationOptions : false}
             onChange={(state) => setLiveState({ key: selected.key, state })}
           />
         ) : (
           <LexicalRenderer
+            className={readingContent}
             key={`${selected.key}-readonly`}
             theme={theme}
             value={selected.data}
             variant={variant}
+            virtualization={virtualization ? virtualizationOptions : false}
           />
         )}
       </Workbench>

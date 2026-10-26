@@ -30,6 +30,7 @@ import {
 import { PreserveNodeManager } from './preserve';
 import { $syncChildren } from './sync';
 import type { EditorVirtualizationOptions } from './types';
+import { resolveScrollContainer } from './viewport';
 
 export interface Island {
   data: string;
@@ -40,28 +41,6 @@ export interface Island {
   retained: number;
   source: boolean;
   unsubscribe: () => void;
-}
-
-function scrollTarget(
-  canvas: HTMLElement,
-  options: EditorVirtualizationOptions,
-): HTMLElement | Window {
-  const configured = options.scrollContainer;
-  const element =
-    typeof configured === 'function'
-      ? configured()
-      : configured && 'current' in configured
-        ? configured.current
-        : configured;
-  if (configured) {
-    if (!element) throw new Error('Virtual editor scrollContainer is not mounted');
-    if (!element.contains(canvas))
-      throw new Error('Virtual editor scrollContainer must contain the editor');
-    return element;
-  }
-  for (let parent = canvas.parentElement; parent; parent = parent.parentElement)
-    if (/auto|scroll/.test(getComputedStyle(parent).overflowY)) return parent;
-  return window;
 }
 
 export class EditorRecycler {
@@ -87,7 +66,7 @@ export class EditorRecycler {
     readonly canvas: HTMLElement,
     readonly options: EditorVirtualizationOptions,
   ) {
-    this.viewport = scrollTarget(canvas, options);
+    this.viewport = resolveScrollContainer(canvas, options.scrollContainer);
     this.preserve = new PreserveNodeManager(options.preserveCapacity ?? 32, (id) => {
       this.pool.slots.find((slot) => slot.id === id)?.beforeRelease?.();
     });

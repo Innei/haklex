@@ -1,4 +1,4 @@
-import { EditorSurfacePlugins } from '@haklex/rich-editor';
+import { EditorSurfacePlugins, getVariantClass } from '@haklex/rich-editor';
 import {
   type NestedDocDialogEditorProps,
   NestedDocDialogEditorProvider,
@@ -8,7 +8,8 @@ import { ToolbarPlugin } from '@haklex/rich-plugin-toolbar';
 import { MentionPlatformProvider } from '@haklex/rich-renderer-mention/static';
 import { createThemeStyle } from '@haklex/rich-style-token';
 import type { SerializedEditorState } from 'lexical';
-import { use, useCallback, useMemo, useState } from 'react';
+import { use, useCallback, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 import { Panel } from '../components/Panel';
 import { JsonPanel } from '../components/workbench/JsonPanel';
@@ -85,6 +86,9 @@ const sideTabs: { label: string; value: SideTab }[] = [
 
 export function EditorPage() {
   const [virtualization, setVirtualization] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const virtualizationOptions = useMemo(() => ({ scrollContainer: scrollRef }), []);
+  const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
   const variant = use(VariantContext);
   const theme = useTheme();
   const [editorState, setEditorState] = useState<SerializedEditorState | null>(null);
@@ -166,7 +170,9 @@ export function EditorPage() {
           meta={<span className="badge">{variant}</span>}
           panelLabel="Editor tools"
           panelWidth={sideTab === 'inspector' ? 300 : 440}
+          scrollRef={scrollRef}
           title="Editor"
+          toolbarRef={setToolbarHost}
           panel={
             <>
               <PanelTabs
@@ -213,13 +219,23 @@ export function EditorPage() {
             style={themeOverrideStyle}
             theme={theme}
             variant={variant}
-            virtualization={virtualization}
+            virtualization={virtualization ? virtualizationOptions : false}
             header={
-              <ToolbarPlugin
-                className="wb-toolbar"
-                insertItemOrder={insertItemOrder}
-                maxVisibleInsertItems={5}
-              />
+              toolbarHost &&
+              createPortal(
+                <div
+                  className={getVariantClass(variant)}
+                  data-theme={theme}
+                  style={{ ...themeOverrideStyle, maxWidth: 'none' }}
+                >
+                  <ToolbarPlugin
+                    className="wb-toolbar"
+                    insertItemOrder={insertItemOrder}
+                    maxVisibleInsertItems={5}
+                  />
+                </div>,
+                toolbarHost,
+              )
             }
             onChange={handleChange}
             onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
@@ -237,6 +253,7 @@ export function EditorPage() {
                   theme={theme}
                   value={editorState ?? source.value}
                   variant={variant}
+                  virtualization={virtualization ? virtualizationOptions : false}
                 />
               </Panel>
             )}

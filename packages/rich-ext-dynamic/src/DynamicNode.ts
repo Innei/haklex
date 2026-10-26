@@ -107,6 +107,7 @@ export class DynamicNode extends DecoratorNode<ReactElement> {
 
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createRendererDecoration(DYNAMIC_NODE_KEY, DynamicSSRRenderer, {
+      nodeKey: this.__key,
       url: this.__url,
       componentProps: this.__props,
       initialHeight: this.__initialHeight,

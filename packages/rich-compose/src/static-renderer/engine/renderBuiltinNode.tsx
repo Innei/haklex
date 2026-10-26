@@ -52,6 +52,7 @@ export function renderBuiltinNode(
   children: ReactNode[] | null,
   headingSlugs: Map<string, number>,
   textContent?: string,
+  headingSlug?: string,
 ): ReactNode {
   switch (node.type) {
     case 'root': {
@@ -69,8 +70,8 @@ export function renderBuiltinNode(
       const Tag = node.tag as 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
       const text = textContent || extractText(node);
       const baseSlug = textToSlug(text);
-      let slug = baseSlug;
-      if (baseSlug) {
+      let slug = headingSlug ?? baseSlug;
+      if (headingSlug === undefined && baseSlug) {
         const count = headingSlugs.get(baseSlug);
         if (count !== undefined) {
           slug = `${baseSlug}-${count}`;

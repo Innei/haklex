@@ -398,3 +398,42 @@
 .wb-stage .panel {
   background: transparent;
 }
+
+/* The editor/renderer examples own their viewport beside the inspector. */
+.wb-contained {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.wb-contained .wb-main {
+  min-height: 0;
+}
+
+.wb-toolbar-host {
+  flex: none;
+}
+
+.wb-stage-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+}
+
+.wb-stage-scroll > .wb-stage {
+  min-height: 100%;
+}
+
+.wb-contained .wb-toolbar {
+  top: 0;
+}
+
+@media (max-width: 1023px) {
+  .wb-contained .wb-panel {
+    flex: none;
+    max-height: 40dvh;
+    overflow: auto;
+  }
+}

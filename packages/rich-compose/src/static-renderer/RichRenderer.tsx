@@ -16,12 +16,22 @@ import {
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { createHeadlessEditor } from '@lexical/headless';
 import type { LexicalEditor, SerializedEditorState } from 'lexical';
-import { $getRoot } from 'lexical';
-import { cloneElement, createElement, isValidElement, type ReactNode, useMemo } from 'react';
+import { $getRoot, $isElementNode } from 'lexical';
+import {
+  cloneElement,
+  createElement,
+  Fragment,
+  isValidElement,
+  type ReactNode,
+  useMemo,
+} from 'react';
 
-import { renderBuiltinNode } from './engine/renderBuiltinNode';
+import { createVirtualizationSurface } from '../virtualization/plugin';
+import { renderBuiltinNode, textToSlug } from './engine/renderBuiltinNode';
 import { renderTextNode } from './engine/renderTextNode';
+import { groupRendererBlocks } from './flow';
 import { preprocessFootnotes } from './preprocess/footnote';
+import type { RendererDocument, RendererRow, RendererSurfaceProps } from './surface';
 import type { BlockAnchorRenderer, BuiltinNodeRenderer, RichRendererProps } from './types';
 
 export { createHeadlessEditor };
@@ -34,6 +44,8 @@ interface EditorConfig {
 interface RenderOptions {
   blockAnchor?: BlockAnchorRenderer;
   builtinNodeOverrides?: Record<string, BuiltinNodeRenderer>;
+  headingIds?: Map<string, string>;
+  recycleKeys?: boolean;
 }
 
 const alertClassName = (type: string) =>
@@ -105,7 +117,8 @@ export function renderTree(
   blockId: string | undefined,
   options: RenderOptions,
 ): ReactNode {
-  const nodeKey = node.getKey ? node.getKey() : key;
+  const nodeKey = options.recycleKeys ? key : node.getKey ? node.getKey() : key;
+  const headingSlug = options.headingIds?.get(node.getKey?.());
   const { builtinNodeOverrides } = options;
 
   if (typeof node.decorate === 'function') {
@@ -165,7 +178,7 @@ export function renderTree(
   const override = builtinNodeOverrides?.[serialized.type];
   if (override) {
     const defaultRenderer = () =>
-      renderBuiltinNode(serialized, nodeKey, children, headingSlugs, textContent);
+      renderBuiltinNode(serialized, nodeKey, children, headingSlugs, textContent, headingSlug);
     return applyBlockId(
       override(serialized, nodeKey, children, defaultRenderer),
       blockId,
@@ -175,19 +188,20 @@ export function renderTree(
   }
 
   return applyBlockId(
-    renderBuiltinNode(serialized, nodeKey, children, headingSlugs, textContent),
+    renderBuiltinNode(serialized, nodeKey, children, headingSlugs, textContent, headingSlug),
     blockId,
     nodeKey,
     options,
   );
 }
 
-function renderEditorToReact(
+function createRendererDocument(
   value: SerializedEditorState,
   nodes: any[],
   options: RenderOptions,
+  noteLead: boolean,
 ): {
-  content: ReactNode;
+  document: RendererDocument;
   footnoteData: ReturnType<typeof preprocessFootnotes>;
   renderNestedContent: (state: SerializedEditorState) => ReactNode;
 } {
@@ -210,25 +224,91 @@ function renderEditorToReact(
 
   const rawRootChildren = (normalizedValue as any).root?.children as any[] | undefined;
 
-  let content: ReactNode = null;
-  editorState.read(() => {
-    const root = $getRoot();
-    const headingSlugs = new Map<string, number>();
-    const children = root
-      .getChildren()
-      .map((child: any, i: number) =>
-        renderTree(
-          child,
-          editor,
-          editorConfig,
-          headingSlugs,
-          `ssr-${i}`,
-          rawRootChildren?.[i]?.$?.blockId,
-          options,
-        ),
-      );
-    content = <>{children}</>;
+  const headingIds = new Map<string, string>();
+  const headingRows = new Map<string, number>();
+  const paths = new Map<string, string>();
+  const children = editorState.read(() => {
+    const counts = new Map<string, number>();
+    const walk = (node: any, row: number, path: string) => {
+      paths.set(node.getKey(), path);
+      if (node.getType() === 'heading') {
+        const base = textToSlug(node.getTextContent());
+        const count = counts.get(base) ?? 0;
+        const slug = base ? `${base}${count ? `-${count}` : ''}` : '';
+        counts.set(base, count + 1);
+        headingIds.set(node.getKey(), slug);
+        if (slug) headingRows.set(slug, row);
+      }
+      if ($isElementNode(node))
+        node.getChildren().forEach((child, index) => walk(child, row, `${path}.${index}`));
+    };
+    const children = $getRoot().getChildren();
+    children.forEach((node, index) => walk(node, index, `${index}:0`));
+    return children;
   });
+  const used = new Set<string>();
+  const blocks = children.map((node, index) => {
+    const data = rawRootChildren?.[index] ?? { type: node.getType(), version: 1 };
+    let id = data.$?.blockId ?? `renderer-${index}`;
+    while (used.has(id)) id = `${id}:${index}`;
+    used.add(id);
+    return {
+      id,
+      data,
+      index,
+      pool: `${data.type}:${data.type === 'dynamic' ? data.url : (data.tag ?? '')}`,
+    };
+  });
+  const groups = groupRendererBlocks(
+    blocks.map((block) => block.data),
+    noteLead,
+  );
+  const rowByBlock = new Map<number, number>();
+  const rows: RendererRow[] = groups.map((indices, index) => {
+    const members = indices.map((i) => {
+      rowByBlock.set(i, index);
+      return blocks[i];
+    });
+    const first = members[0];
+    return {
+      blocks: members,
+      id: first.id,
+      data:
+        members.length === 1
+          ? first.data
+          : { type: 'flow-group', version: 1, children: members.map((block) => block.data) },
+      pool: members.length === 1 ? first.pool : 'flow-group',
+    };
+  });
+  for (const [slug, index] of headingRows) headingRows.set(slug, rowByBlock.get(index)!);
+  const render = (index: number, slot?: number) =>
+    editorState.read(() => {
+      const row = rows[index];
+      return row ? (
+        <Fragment key={slot === undefined ? row.id : `recycler-${slot}`}>
+          {row.blocks.map((block, position) =>
+            renderTree(
+              children[block.index],
+              editor,
+              editorConfig,
+              new Map(),
+              slot === undefined ? `ssr-${block.index}` : `recycler-${slot}-${position}`,
+              rawRootChildren?.[block.index]?.$?.blockId,
+              { ...options, headingIds, recycleKeys: slot !== undefined },
+            ),
+          )}
+        </Fragment>
+      ) : null;
+    });
+  let fullContent: ReactNode;
+  const document: RendererDocument = {
+    editor,
+    rows,
+    headingRows,
+    render,
+    renderAll: () => (fullContent ??= <>{rows.map((_, index) => render(index))}</>),
+    nodePath: (key) => (key ? (paths.get(key) ?? key) : '0'),
+  };
 
   const renderNestedContent = (state: SerializedEditorState): ReactNode => {
     const nestedEditor = createHeadlessEditor({
@@ -269,7 +349,11 @@ function renderEditorToReact(
     return nested;
   };
 
-  return { content, footnoteData, renderNestedContent };
+  return { document, footnoteData, renderNestedContent };
+}
+
+function FullSurface({ document }: RendererSurfaceProps) {
+  return document.renderAll();
 }
 
 export function RichRenderer({
@@ -284,15 +368,46 @@ export function RichRenderer({
   extraNodes,
   builtinNodeOverrides,
   blockAnchor,
+  surface,
+  virtualization,
 }: RichRendererProps) {
   const variantClass = getVariantClass(variant);
 
   const outerRenderNestedContent = useOptionalNestedContentRenderer();
 
-  const { content, footnoteData, renderNestedContent } = useMemo(() => {
+  const { document, footnoteData, renderNestedContent } = useMemo(() => {
     const nodes = extraNodes ? [...allNodes, ...extraNodes] : allNodes;
-    return renderEditorToReact(value, nodes, { blockAnchor, builtinNodeOverrides });
-  }, [blockAnchor, builtinNodeOverrides, extraNodes, value]);
+    return createRendererDocument(
+      value,
+      nodes,
+      { blockAnchor, builtinNodeOverrides },
+      variant === 'note',
+    );
+  }, [blockAnchor, builtinNodeOverrides, extraNodes, value, variant]);
+
+  const { scrollContainer, overscan, estimateBlockHeight, preserveCapacity } =
+    typeof virtualization === 'object' ? virtualization : {};
+  const enabled = !!virtualization;
+  const disabled = virtualization === false;
+  const Surface = useMemo(() => {
+    if (disabled) return FullSurface;
+    if (enabled)
+      return createVirtualizationSurface({
+        scrollContainer,
+        overscan,
+        estimateBlockHeight,
+        preserveCapacity,
+      });
+    return surface ?? FullSurface;
+  }, [
+    surface,
+    enabled,
+    disabled,
+    scrollContainer,
+    overscan,
+    estimateBlockHeight,
+    preserveCapacity,
+  ]);
 
   const classes = ['rich-content', variantClass, className].filter(Boolean).join(' ');
   const hostProps =
@@ -315,7 +430,7 @@ export function RichRenderer({
           >
             <NestedContentRendererProvider value={outerRenderNestedContent ?? renderNestedContent}>
               <Component {...hostProps} style={style}>
-                {content}
+                <Surface document={document} />
               </Component>
             </NestedContentRendererProvider>
           </FootnoteDefinitionsProvider>

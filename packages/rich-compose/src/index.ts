@@ -27,4 +27,5 @@ export type {
   BuiltinNodeRenderer,
   RichRendererProps,
 } from './static-renderer';
+export type { RendererDocument, RendererSurface, RendererSurfaceProps } from './static-renderer';
 export { RichRenderer } from './static-renderer';

@@ -59,6 +59,7 @@ export function composeRenderer(
   const ComposedProviders = composeProviders(merged);
   const builtinNodeOverrides = opts.builtinNodeOverrides;
   const blockAnchor = opts.blockAnchor;
+  const surface = [...merged].reverse().find((module) => module.surface)?.surface;
 
   function ComposedRenderer(props: RichRendererBaseProps) {
     const { theme, variant } = props;
@@ -81,9 +82,11 @@ export function composeRenderer(
             nested={props.nested}
             rendererConfig={finalConfig}
             style={props.style}
+            surface={props.nested ? undefined : surface}
             theme={theme}
             value={props.value}
             variant={variant}
+            virtualization={props.virtualization}
           />
         </ComposedProviders>
       </NestedContentRendererProvider>
