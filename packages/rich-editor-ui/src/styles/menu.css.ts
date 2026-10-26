@@ -89,7 +89,7 @@ export function applyItemSvgStyles(itemClass: string) {
   });
 
   globalStyle(`${itemClass}[data-highlighted] svg:not(kbd svg)`, {
-    color: vars.color.text,
+    color: 'inherit',
   });
 }
 
