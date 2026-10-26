@@ -307,7 +307,10 @@ export const headingH6 = style({
 
 globalStyle(
   [headingH1, headingH2, headingH3, headingH4, headingH5, headingH6]
-    .map((h) => `${h} + *`)
+    .flatMap((h, i) => [
+      `${h} + *`,
+      `:where([data-virtual-editor-content]) > [data-document-prev-tag="h${i + 1}"]`,
+    ])
     .join(', '),
   { marginTop: 0 },
 );
@@ -913,15 +916,18 @@ globalStyle(`${richContent} img`, {
 });
 
 globalStyle(
-  `${richContent} > *:first-child, ${richContent} .rich-editor__content > *:first-child`,
+  `${richContent} > *:first-child, ${richContent} .rich-editor__content:not(:where([data-virtual-editor-content])) > *:first-child, ${richContent} [data-virtual-editor-content] > [data-document-first]`,
   {
     marginTop: 0,
   },
 );
 
-globalStyle(`${richContent} > *:last-child, ${richContent} .rich-editor__content > *:last-child`, {
-  marginBottom: 0,
-});
+globalStyle(
+  `${richContent} > *:last-child, ${richContent} .rich-editor__content:not(:where([data-virtual-editor-content])) > *:last-child, ${richContent} [data-virtual-editor-content] > [data-document-last]`,
+  {
+    marginBottom: 0,
+  },
+);
 
 globalStyle(`${headingAnchor} svg`, {
   flexShrink: 0,

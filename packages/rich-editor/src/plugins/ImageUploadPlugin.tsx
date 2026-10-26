@@ -18,6 +18,7 @@ import {
 import { Check, Info, Link2, Upload } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { useEditorBlock } from '../context/EditorBlockContext';
 import { useImagePreprocess } from '../context/ImagePreprocessContext';
 import { $createImageNode } from '../nodes/ImageNode';
 import { $withAdaptiveImageDisplayWidth } from '../utils/image-insertion';
@@ -88,6 +89,9 @@ interface ImageUploadPluginProps {
 }
 
 export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
+  const block = useEditorBlock();
+  const blockRef = useRef(block);
+  blockRef.current = block;
   const [editor] = useLexicalComposerContext();
   const uploadRef = useRef(onUpload);
   uploadRef.current = onUpload;
@@ -99,6 +103,9 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   const toastTimerRef = useRef<number | null>(null);
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  useEffect(() => {
+    if (dialogOpen) return block?.retain();
+  }, [block, dialogOpen]);
   const [tab, setTab] = useState<'upload' | 'url'>('upload');
   const [rootDragActive, setRootDragActive] = useState(false);
   const [dialogDragActive, setDialogDragActive] = useState(false);
@@ -141,6 +148,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
       options?: { after?: Promise<unknown>; closeDialog?: boolean },
     ) => {
       if (!isImageFile(file)) return false;
+      const release = blockRef.current?.retain();
 
       const closeDialog = Boolean(options?.closeDialog);
 
@@ -178,6 +186,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
         pushToast('error', 'Image upload failed');
         return false;
       } finally {
+        queueMicrotask(() => release?.());
         setPendingUploads((value) => Math.max(value - 1, 0));
         setDialogUploading(false);
       }
@@ -191,10 +200,16 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
       if (images.length === 0) return false;
 
       void (async () => {
-        const targets = await resolvePreprocessTargets(images, source, getPreprocess());
-        let previous: Promise<unknown> = Promise.resolve();
-        for (const file of targets) {
-          previous = insertByUpload(file, target, { after: previous });
+        const release = blockRef.current?.retain();
+        try {
+          const targets = await resolvePreprocessTargets(images, source, getPreprocess());
+          let previous: Promise<unknown> = Promise.resolve();
+          for (const file of targets) {
+            previous = insertByUpload(file, target, { after: previous });
+          }
+          await previous;
+        } finally {
+          queueMicrotask(() => release?.());
         }
       })();
       return true;

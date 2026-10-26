@@ -40,6 +40,41 @@ import '@haklex/rich-editor/style.css';
 
 For read-only rendering, use `@haklex/rich-compose` (exports `RichRenderer` and the modular composition API).
 
+## Experimental editor recycler
+
+Virtualization is **off by default**. The optional plugin keeps the full document in the main editor and projects visible blocks into editable Lexical instances. The recycler implementation loads on demand. Native selection currently spans one editing instance; collaboration and custom plugins still need compatibility work. See the [integration contract and validation](../../demo/src/poc-virtualization/EDITOR-RESULTS.md).
+
+```tsx
+const scrollRef = useRef<HTMLDivElement>(null);
+
+<div ref={scrollRef} style={{ height: 600, overflow: 'auto' }}>
+  <RichEditor
+    initialValue={savedState}
+    onChange={save} // receives the full document
+    virtualization={{ scrollContainer: scrollRef, preserveCapacity: 32 }}
+  />
+</div>;
+```
+
+Alternatively, inject the same recycler as a child plugin:
+
+```tsx
+import { RichEditor } from '@haklex/rich-editor';
+import { VirtualizationPlugin } from '@haklex/rich-editor/virtualization';
+
+<RichEditor initialValue={savedState} onChange={save}>
+  <VirtualizationPlugin scrollContainer={scrollRef} />
+</RichEditor>;
+```
+
+The scroll container must contain the editor; pass its DOM element, ref, or getter. Without an explicit container, the recycler finds the nearest scrolling ancestor, falling back to the window. `virtualization={false}` overrides a plugin. Options also accept `overscan` in pixels and `estimateBlockHeight(block, width)` for custom block estimates.
+
+`preserveCapacity` defaults to **32 offscreen nodes**. Their portals, DOM and editor instances stay mounted in detached hosts. Returning to a preserved node keeps its internal state directly. Once the budget is exceeded, the least recently used offscreen node falls back to state capture and recycling; `0` always uses that fallback. Focused/composing nodes and retained async operations are excluded from eviction. Dormant DOM plugins are suspended, while node components remain mounted. Components with background work can use `useEditorBlock().active` to pause it.
+
+The core exposes generic `EditorSurfacePlugin` and `EditorSurfacePlugins` extension points. The virtualization plugin owns its view, node preservation/LRU policy, measurement, scrolling and document bridge. `EditorSurfacePlugins` installs DOM/selection plugins in the selected view; save/history plugins remain on the document editor. `ActiveEditorScope` routes toolbar actions to the focused view editor, and `useActiveEditor()` exposes that editor. In composed modules, use `surfacePlugins` for DOM/selection plugins and `plugins` for document-level extensions, including `VirtualizationPlugin` itself. Do not put the surface-registering plugin inside `EditorSurfacePlugins`.
+
+`useEditorBlock()` provides logical node state and `retain()` for UI/async operations. Retention also postpones a requested view switch until the operation commits. Built-in media uploads use this contract. Custom components need a fallback state adapter if their internal state must survive LRU eviction; details and dynamic components are already adapted. Dynamic `getState()` should return an independent snapshot, and `setState(undefined)` must reset a fresh binding.
+
 ## Exports
 
 ### Components

@@ -18,10 +18,11 @@ const plainListItem = `${sharedStyles.listItem}:not(${sharedStyles.listItemCheck
 // ─── Paragraphs ─────────────────────────────────────────
 // Use direct-child selectors so first-line indent only affects
 // top-level prose paragraphs, not paragraphs nested inside alerts, quotes, tables, etc.
-const editorTopParagraph = `${noteBase} .rich-editor__content > ${sharedStyles.paragraph}`;
+const editorTopParagraph = `${noteBase} .rich-editor__content:not(:where([data-virtual-editor-content])) > ${sharedStyles.paragraph}`;
+const virtualTopParagraph = `${noteBase} [data-virtual-editor-content] > ${sharedStyles.paragraph}`;
 const rendererTopParagraph = `${noteBase}.rich-content:not([data-rich-nested='true']) > ${sharedStyles.paragraph}`;
 
-globalStyle(`${editorTopParagraph}, ${rendererTopParagraph}`, {
+globalStyle(`${editorTopParagraph}, ${virtualTopParagraph}, ${rendererTopParagraph}`, {
   marginTop: 0,
   marginBottom: vars.flow.paragraph,
 });
@@ -43,9 +44,12 @@ globalStyle(`${editorTopParagraph}:first-of-type, ${rendererTopParagraph}:first-
 // Instead of text-indent (which indents the entire first line including
 // inline decorators like mention/katex), apply margin on the first text
 // child only. If the paragraph starts with a decorator, no indent is added.
-globalStyle(`${editorTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child`, {
-  marginInlineStart: '2em',
-});
+globalStyle(
+  `${editorTopParagraph}:not(:first-of-type) > [data-lexical-text]:first-child, ${virtualTopParagraph}:not([data-document-first-paragraph]) > [data-lexical-text]:first-child`,
+  {
+    marginInlineStart: '2em',
+  },
+);
 
 // Keep the note lead-paragraph treatment while preserving the new indent rules.
 globalStyle(`${rendererTopParagraph}:first-of-type::first-letter`, {
@@ -55,14 +59,20 @@ globalStyle(`${rendererTopParagraph}:first-of-type::first-letter`, {
   lineHeight: '1',
 });
 
-globalStyle(`${editorTopParagraph}:first-of-type::first-letter`, {
-  fontSize: '1.5em',
-  fontWeight: 700,
-});
+globalStyle(
+  `${editorTopParagraph}:first-of-type::first-letter, ${virtualTopParagraph}[data-document-first-paragraph]::first-letter`,
+  {
+    fontSize: '1.5em',
+    fontWeight: 700,
+  },
+);
 
-globalStyle(`${editorTopParagraph}:last-child, ${rendererTopParagraph}:last-child`, {
-  marginBottom: 0,
-});
+globalStyle(
+  `${editorTopParagraph}:last-child, ${virtualTopParagraph}[data-document-last], ${rendererTopParagraph}:last-child`,
+  {
+    marginBottom: 0,
+  },
+);
 
 // ─── Bold uses sans-serif ────────────────────────────────
 globalStyle(note(sharedStyles.textBold), {

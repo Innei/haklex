@@ -1,12 +1,14 @@
 import type { DynamicMountHandle, DynamicMountInput } from '@haklex/rich-dynamic-protocol';
 import { isDynamicComponentModule } from '@haklex/rich-dynamic-protocol';
-import { useColorScheme } from '@haklex/rich-editor/static';
-import { useEffect, useRef, useState } from 'react';
+import { useColorScheme, useEditorBlock } from '@haklex/rich-editor/static';
+import type { NodeKey } from 'lexical';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { DynamicSlotProps } from './slot';
 import * as css from './styles.css';
 
 export interface DynamicHostRendererProps extends DynamicSlotProps {
+  nodeKey?: NodeKey;
   validateUrl?: (url: string) => boolean;
 }
 
@@ -31,6 +33,7 @@ export function DynamicHostRenderer({
   componentProps,
   initialHeight,
   validateUrl,
+  nodeKey,
 }: DynamicHostRendererProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const handleRef = useRef<DynamicMountHandle | null>(null);
@@ -39,12 +42,22 @@ export function DynamicHostRenderer({
   const [attempt, setAttempt] = useState(0);
   const theme = useColorScheme();
   const propsJson = JSON.stringify(componentProps ?? {});
+  const binding = useEditorBlock();
+  const state = useMemo(() => binding?.nodeState(nodeKey), [binding, nodeKey]);
+  const latestState = useRef(state);
+  latestState.current = state;
+  const ownerState = useRef(state);
 
   useEffect(() => {
     const input: DynamicMountInput = { props: parseProps(propsJson), host: { theme } };
     latestInputRef.current = input;
-    handleRef.current?.update?.(input);
-  }, [propsJson, theme]);
+    const handle = handleRef.current;
+    if (handle?.getState && ownerState.current)
+      ownerState.current.set('dynamic', handle.getState());
+    handle?.update?.(input);
+    if (state !== ownerState.current) handle?.setState?.(state?.get('dynamic'));
+    ownerState.current = state;
+  }, [propsJson, state, theme]);
 
   useEffect(() => {
     const container = hostRef.current?.shadowRoot?.firstElementChild;
@@ -90,6 +103,15 @@ export function DynamicHostRenderer({
           host: { theme },
         };
         handleRef.current = component.mount(container, input);
+        if (latestState.current) {
+          if (!handleRef.current.getState || !handleRef.current.setState) {
+            handleRef.current.unmount();
+            handleRef.current = null;
+            throw new Error('Virtualized dynamic components require getState/setState');
+          }
+          handleRef.current.setState(latestState.current.get('dynamic'));
+          ownerState.current = latestState.current;
+        }
         setStatus('mounted');
       })
       .catch((error: unknown) => {
@@ -101,6 +123,8 @@ export function DynamicHostRenderer({
     return () => {
       cancelled = true;
       try {
+        if (handleRef.current?.getState && ownerState.current)
+          ownerState.current.set('dynamic', handleRef.current.getState());
         handleRef.current?.unmount();
       } catch (error) {
         console.error('[DynamicHostRenderer]', error);

@@ -24,6 +24,8 @@ export interface RichEditorModule extends RichRendererModule {
   editRenderers?: Partial<RendererConfig>;
   nestedEditorPlugins?: ReactNode;
   plugins?: ReactNode;
+  /** DOM/selection plugins installed in each editing surface instead of the document model. */
+  surfacePlugins?: ReactNode;
 }
 
 export interface ComposeRendererOptions {

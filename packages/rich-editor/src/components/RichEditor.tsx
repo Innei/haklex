@@ -1,4 +1,5 @@
 import { allEditNodes } from '../config-edit';
+import { EditorSurfacePlugins } from '../context/EditorSurfaceContext';
 import { ExtraNodesProvider } from '../context/ExtraNodesContext';
 import { FileUploadProvider } from '../context/FileUploadContext';
 import { ImagePreprocessProvider } from '../context/ImagePreprocessContext';
@@ -36,17 +37,19 @@ export function RichEditor({
           <FileUploadProvider upload={fileUpload ?? null}>
             <ExtraNodesProvider extraNodes={extraNodes}>
               <RichEditorShell nodes={nodes} {...shellProps}>
-                <CorePlugins />
-                <ImagePlugin />
-                <ImageUploadPlugin onUpload={resolvedImageUpload} />
-                {videoUpload ? <VideoUploadPlugin onUpload={videoUpload} /> : null}
-                {fileUpload ? <FileUploadPlugin onUpload={fileUpload} /> : null}
-                <KaTeXPlugin />
-                <AlertPlugin />
-                <MermaidPlugin />
-                <LinkFaviconPlugin />
+                <EditorSurfacePlugins>
+                  <CorePlugins />
+                  <ImagePlugin />
+                  <ImageUploadPlugin onUpload={resolvedImageUpload} />
+                  {videoUpload ? <VideoUploadPlugin onUpload={videoUpload} /> : null}
+                  {fileUpload ? <FileUploadPlugin onUpload={fileUpload} /> : null}
+                  <KaTeXPlugin />
+                  <AlertPlugin />
+                  <MermaidPlugin />
+                  <LinkFaviconPlugin />
+                  <TextSelectionPlugin />
+                </EditorSurfacePlugins>
                 <BlockIdPlugin />
-                <TextSelectionPlugin />
                 {children}
               </RichEditorShell>
             </ExtraNodesProvider>

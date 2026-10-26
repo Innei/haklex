@@ -24,7 +24,7 @@ const headingClassNames = {
   h6: shared('headingH6'),
 } as const;
 
-function textToSlug(text: string): string {
+export function textToSlug(text: string): string {
   return (
     text
       .toLowerCase()

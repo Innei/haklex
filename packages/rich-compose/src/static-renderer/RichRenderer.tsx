@@ -24,6 +24,8 @@ import { renderTextNode } from './engine/renderTextNode';
 import { preprocessFootnotes } from './preprocess/footnote';
 import type { BlockAnchorRenderer, BuiltinNodeRenderer, RichRendererProps } from './types';
 
+export { createHeadlessEditor };
+
 interface EditorConfig {
   namespace: string;
   theme: Record<string, any>;
@@ -94,7 +96,7 @@ function applyBlockId(
   return (options.blockAnchor ?? domBlockAnchor)(element, blockId, nodeKey);
 }
 
-function renderTree(
+export function renderTree(
   node: any,
   editor: LexicalEditor,
   editorConfig: EditorConfig,

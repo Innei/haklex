@@ -9,6 +9,17 @@ export { RichEditorShell } from './components/RichEditorShell';
 export { getVariantClass } from './components/utils';
 export type { ColorScheme } from './context/ColorSchemeContext';
 export { ColorSchemeProvider, useColorScheme } from './context/ColorSchemeContext';
+export {
+  useEditorBlock,
+  useEditorBlock as useVirtualizedBlock,
+} from './context/EditorBlockContext';
+export type { EditorSurfaceProps } from './context/EditorSurfaceContext';
+export {
+  ActiveEditorScope,
+  EditorSurfacePlugin,
+  EditorSurfacePlugins,
+  useActiveEditor,
+} from './context/EditorSurfaceContext';
 export { ExtraNodesProvider, useExtraNodes } from './context/ExtraNodesContext';
 export type { FootnoteDefinitionsContextValue } from './context/FootnoteDefinitionsContext';
 export {
@@ -44,6 +55,7 @@ export {
 } from './context/TextSelectionContext';
 export { createNestedEditor, NESTED_EDITOR_NODES } from './nodes/shared';
 export { blockIdState } from './plugins/BlockIdPlugin';
+export { VirtualizationPlugin } from './plugins/VirtualizationPlugin';
 export * from './styles';
 export type { RichEditorProps, RichEditorVariant } from './types';
 export type { RendererConfig } from './types/renderer-config';
@@ -90,3 +102,4 @@ export {
   getTextOffsetFromDOMPoint,
 } from './utils/text-selection';
 export { TEXT_SELECTION_HIGHLIGHT_NAME } from './utils/text-selection-constants';
+export type { EditorVirtualization, EditorVirtualizationOptions } from './virtualization/types';

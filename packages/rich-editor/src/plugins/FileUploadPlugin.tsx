@@ -10,6 +10,7 @@ import {
 } from 'lexical';
 import { useCallback, useEffect, useRef } from 'react';
 
+import { useEditorBlock } from '../context/EditorBlockContext';
 import { $createFileNode, $isFileNode, fileExtFromName } from '../nodes/FileNode';
 import { OPEN_FILE_PICKER_COMMAND } from './file-upload-command';
 import { setFileUploadEntry } from './file-upload-store';
@@ -32,6 +33,9 @@ interface FileUploadPluginProps {
 }
 
 export function FileUploadPlugin({ onUpload }: FileUploadPluginProps) {
+  const block = useEditorBlock();
+  const blockRef = useRef(block);
+  blockRef.current = block;
   const [editor] = useLexicalComposerContext();
   const uploadRef = useRef(onUpload);
   uploadRef.current = onUpload;
@@ -61,6 +65,7 @@ export function FileUploadPlugin({ onUpload }: FileUploadPluginProps) {
     };
 
     const run = async () => {
+      const release = blockRef.current?.retain();
       const base = { percent: 0, retry: () => void run(), remove };
       setFileUploadEntry(target, nodeKey, { ...base, status: 'uploading' });
       try {
@@ -81,6 +86,8 @@ export function FileUploadPlugin({ onUpload }: FileUploadPluginProps) {
       } catch (err: unknown) {
         console.error('[FileUploadPlugin]', err);
         setFileUploadEntry(target, nodeKey, { ...base, status: 'error', error: 'Upload failed' });
+      } finally {
+        queueMicrotask(() => release?.());
       }
     };
 

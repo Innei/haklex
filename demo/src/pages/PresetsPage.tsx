@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 
 import { Segmented } from '../components/ui/Segmented';
 import { VariantPicker } from '../components/VariantPicker';
-import { InspectorSection } from '../components/workbench/Inspector';
+import { InspectorSection, SwitchRow } from '../components/workbench/Inspector';
 import { JsonPanel } from '../components/workbench/JsonPanel';
 import { PanelTabs } from '../components/workbench/PanelTabs';
 import { Workbench } from '../components/workbench/Workbench';
@@ -31,14 +31,17 @@ export function PresetsPage() {
 
   const selected = presets.find((p) => p.key === params.get('preset')) ?? presets[0];
   const mode: Mode = params.get('mode') === 'readonly' ? 'readonly' : 'edit';
+  const virtualization = params.has('virtualization')
+    ? params.get('virtualization') === 'true'
+    : (selected.virtualization ?? false);
   const live = liveState?.key === selected.key ? liveState.state : undefined;
   const jsonData = mode === 'edit' ? (live ?? selected.data) : selected.data;
 
-  const setMode = (next: Mode) => {
+  const setOption = (name: string, value: string) => {
     setParams(
       (prev) => {
         const nextParams = new URLSearchParams(prev);
-        nextParams.set('mode', next);
+        nextParams.set(name, value);
         return nextParams;
       },
       { replace: true },
@@ -87,9 +90,18 @@ export function PresetsPage() {
                     label="Mode"
                     options={modeOptions}
                     value={mode}
-                    onChange={setMode}
+                    onChange={(next) => setOption('mode', next)}
                   />
                 </InspectorSection>
+                {mode === 'edit' && (
+                  <InspectorSection title="Performance">
+                    <SwitchRow
+                      checked={virtualization}
+                      label="Virtual scrolling"
+                      onChange={(enabled) => setOption('virtualization', String(enabled))}
+                    />
+                  </InspectorSection>
+                )}
               </>
             )}
           </>
@@ -101,6 +113,7 @@ export function PresetsPage() {
             key={`${selected.key}-edit`}
             theme={theme}
             variant={variant}
+            virtualization={virtualization}
             onChange={(state) => setLiveState({ key: selected.key, state })}
           />
         ) : (

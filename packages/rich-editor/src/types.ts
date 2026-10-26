@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 import type { ColorScheme } from './context/ColorSchemeContext';
 import type { RendererConfig } from './types/renderer-config';
+import type { EditorVirtualization } from './virtualization/types';
 
 export type RichEditorVariant = 'article' | 'chat' | 'comment' | 'note';
 
@@ -39,4 +40,6 @@ export interface RichEditorProps {
     file: File,
     opts?: { onProgress?: (percent: number) => void },
   ) => Promise<{ src: string }>;
+  /** Experimental editor recycler. Disabled unless explicitly enabled or injected by a plugin. */
+  virtualization?: EditorVirtualization;
 }

@@ -8,6 +8,10 @@ export interface DynamicMountInput {
 }
 
 export interface DynamicMountHandle {
+  /** Optional view-state pair for hosts that rebind mounted instances. */
+  getState?: () => unknown;
+  /** Passing undefined resets view state for a fresh binding. */
+  setState?: (state: unknown) => void;
   unmount: () => void;
   update?: (input: DynamicMountInput) => void;
 }

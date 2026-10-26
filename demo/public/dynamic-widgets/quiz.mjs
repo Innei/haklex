@@ -140,7 +140,20 @@ function createQuiz(container) {
     render();
   }
 
-  return { apply, destroy: () => el.remove() };
+  return {
+    apply,
+    getState: () => ({ answered }),
+    setState: (state) => {
+      answered =
+        Number.isInteger(state?.answered) &&
+        state.answered >= 0 &&
+        state.answered < config.options.length
+          ? state.answered
+          : null;
+      render();
+    },
+    destroy: () => el.remove(),
+  };
 }
 
 export default {
@@ -148,6 +161,8 @@ export default {
     const quiz = createQuiz(container);
     quiz.apply(input);
     return {
+      getState: quiz.getState,
+      setState: quiz.setState,
       update(next) {
         quiz.apply(next);
       },

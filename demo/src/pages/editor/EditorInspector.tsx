@@ -28,10 +28,12 @@ interface EditorInspectorProps {
   onSelectPreset: (label: string) => void;
   onShowRendererChange: (show: boolean) => void;
   onTogglePlatform: (key: string) => void;
+  onVirtualizationChange: (enabled: boolean) => void;
   presets: ColorPreset[];
   selectedPreset: string;
   showRenderer: boolean;
   theme: ColorScheme;
+  virtualization: boolean;
 }
 
 export function EditorInspector({
@@ -45,11 +47,21 @@ export function EditorInspector({
   selectedPreset,
   showRenderer,
   theme,
+  virtualization,
+  onVirtualizationChange,
 }: EditorInspectorProps) {
   return (
     <>
       <InspectorSection title="Variant">
         <VariantPicker block />
+      </InspectorSection>
+      <InspectorSection title="Performance">
+        <SwitchRow
+          checked={virtualization}
+          label="Virtual scrolling"
+          onChange={onVirtualizationChange}
+        />
+        <p className="wb-section-text">Cross-window text selection is not yet supported.</p>
       </InspectorSection>
 
       <InspectorSection title="Colors">

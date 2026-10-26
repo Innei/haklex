@@ -64,9 +64,12 @@ globalStyle(article(sharedStyles.hr), {
   marginRight: 'auto',
 });
 
-globalStyle(`${article(sharedStyles.hr)} + *`, {
-  marginTop: '0',
-});
+globalStyle(
+  `${article(sharedStyles.hr)} + *, ${articleBase} :where([data-virtual-editor-content]) > [data-document-prev-tag="hr"]`,
+  {
+    marginTop: '0',
+  },
+);
 
 globalStyle(`${articleBase} .rich-banner`, {
   margin: `${vars.flow.block} 0`,

@@ -93,7 +93,15 @@ function createWidget(container) {
     render();
   }
 
-  return { apply, destroy: () => el.remove() };
+  return {
+    apply,
+    getState: () => ({ count }),
+    setState: (state) => {
+      count = typeof state?.count === 'number' && Number.isFinite(state.count) ? state.count : 0;
+      render();
+    },
+    destroy: () => el.remove(),
+  };
 }
 
 export default {
@@ -101,6 +109,8 @@ export default {
     const widget = createWidget(container);
     widget.apply(input);
     return {
+      getState: widget.getState,
+      setState: widget.setState,
       update(next) {
         widget.apply(next);
       },

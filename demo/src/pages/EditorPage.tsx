@@ -1,3 +1,4 @@
+import { EditorSurfacePlugins } from '@haklex/rich-editor';
 import {
   type NestedDocDialogEditorProps,
   NestedDocDialogEditorProvider,
@@ -83,6 +84,7 @@ const sideTabs: { label: string; value: SideTab }[] = [
 ];
 
 export function EditorPage() {
+  const [virtualization, setVirtualization] = useState(false);
   const variant = use(VariantContext);
   const theme = useTheme();
   const [editorState, setEditorState] = useState<SerializedEditorState | null>(null);
@@ -147,6 +149,10 @@ export function EditorPage() {
   const handleChange = useCallback((state: SerializedEditorState) => {
     setEditorState(state);
   }, []);
+  const handleVirtualizationChange = useCallback((enabled: boolean) => {
+    setVirtualization(enabled);
+    if (enabled) setShowRenderer(false);
+  }, []);
 
   const handleLoad = useCallback((state: SerializedEditorState) => {
     setSource((prev) => ({ value: state, version: prev.version + 1 }));
@@ -177,9 +183,11 @@ export function EditorPage() {
                   selectedPreset={selectedPreset}
                   showRenderer={showRenderer}
                   theme={theme}
+                  virtualization={virtualization}
                   onCustomAccent={setCustomAccent}
                   onShowRendererChange={setShowRenderer}
                   onTogglePlatform={togglePlatform}
+                  onVirtualizationChange={handleVirtualizationChange}
                   onSelectPreset={(label) => {
                     setSelectedPreset(label);
                     setCustomAccent('');
@@ -205,6 +213,7 @@ export function EditorPage() {
             style={themeOverrideStyle}
             theme={theme}
             variant={variant}
+            virtualization={virtualization}
             header={
               <ToolbarPlugin
                 className="wb-toolbar"
@@ -215,7 +224,9 @@ export function EditorPage() {
             onChange={handleChange}
             onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
           >
-            <NestedDocPlugin />
+            <EditorSurfacePlugins>
+              <NestedDocPlugin />
+            </EditorSurfacePlugins>
           </LexicalEditor>
 
           <div className="wb-extra">

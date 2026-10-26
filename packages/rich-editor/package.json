@@ -17,7 +17,8 @@
     "./renderers": "./src/renderers-entry.ts",
     "./static": "./src/static-entry.ts",
     "./style.css": "./dist/rich-editor.css",
-    "./styles": "./src/styles-entry.ts"
+    "./styles": "./src/styles-entry.ts",
+    "./virtualization": "./src/virtualization-entry.ts"
   },
   "main": "./src/index.ts",
   "files": [
@@ -107,7 +108,11 @@
         "import": "./dist/styles-entry.mjs",
         "types": "./dist/styles-entry.d.ts"
       },
-      "./style.css": "./dist/rich-editor.css"
+      "./style.css": "./dist/rich-editor.css",
+      "./virtualization": {
+        "import": "./dist/virtualization-entry.mjs",
+        "types": "./dist/virtualization-entry.d.ts"
+      }
     },
     "main": "./dist/index.mjs",
     "types": "./dist/index.d.ts"

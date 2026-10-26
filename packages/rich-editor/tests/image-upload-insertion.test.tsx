@@ -3,10 +3,11 @@ import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { DRAG_DROP_PASTE } from '@lexical/rich-text';
 import { $getRoot, type LexicalEditor } from 'lexical';
-import { act, useEffect } from 'react';
+import { act, type ReactNode, useEffect, useMemo } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { EditorBlockContext } from '../src/context/EditorBlockContext';
 import { $isImageNode, ImageNode } from '../src/nodes/ImageNode';
 import { createNestedEditor } from '../src/nodes/shared';
 import { ImageUploadPlugin } from '../src/plugins/ImageUploadPlugin';
@@ -102,6 +103,74 @@ function editorHasImageNode(editor: LexicalEditor): boolean {
 describe('ImageUploadPlugin insertByUpload target routing', () => {
   let container: HTMLDivElement | null = null;
   let root: Root | null = null;
+
+  it('retains a recycled block until its asynchronous insertion has committed', async () => {
+    let editor: LexicalEditor | undefined;
+    let retained = 0;
+    let finish: (result: { src: string }) => void = () => {};
+    const releasedAfterInsertion: boolean[] = [];
+    function Boundary({ children }: { children: ReactNode }) {
+      const [current] = useLexicalComposerContext();
+      editor = current;
+      const value = useMemo(
+        () => ({
+          active: true,
+          blockId: 'original',
+          editor: current,
+          nodeState: () => new Map<string, unknown>(),
+          retain: () => {
+            retained++;
+            return () => {
+              releasedAfterInsertion.push(editorHasImageNode(current));
+              retained--;
+            };
+          },
+        }),
+        [current],
+      );
+      return <EditorBlockContext value={value}>{children}</EditorBlockContext>;
+    }
+    container = document.createElement('div');
+    root = createRoot(container);
+    await act(async () =>
+      root!.render(
+        <LexicalComposer
+          initialConfig={{
+            namespace: 'retained-upload',
+            nodes: [ImageNode],
+            onError: (error) => {
+              throw error;
+            },
+          }}
+        >
+          <Boundary>
+            <ImageUploadPlugin
+              onUpload={() =>
+                new Promise((resolve) => {
+                  finish = resolve;
+                })
+              }
+            />
+          </Boundary>
+        </LexicalComposer>,
+      ),
+    );
+    await act(async () => {
+      editor!.dispatchCommand(DRAG_DROP_PASTE, [
+        new File(['image'], 'a.png', { type: 'image/png' }),
+      ]);
+      await flushMicrotasks();
+    });
+    expect(retained).toBeGreaterThan(0);
+    await act(async () => {
+      finish({ src: 'https://example.com/retained.png' });
+      await flushMicrotasks();
+    });
+    expect(editorHasImageNode(editor!)).toBe(true);
+    expect(retained).toBe(0);
+    expect(releasedAfterInsertion.length).toBeGreaterThan(0);
+    expect(releasedAfterInsertion.every(Boolean)).toBe(true);
+  });
 
   afterEach(() => {
     if (root) {

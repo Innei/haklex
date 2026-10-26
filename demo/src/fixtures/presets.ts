@@ -1,5 +1,6 @@
 import type { SerializedEditorState } from 'lexical';
 
+import { fixture } from '../poc-virtualization/fixtures';
 import {
   alertQuote,
   doc,
@@ -453,6 +454,7 @@ export interface Preset {
   description: string;
   key: string;
   label: string;
+  virtualization?: boolean;
 }
 
 const notePreset: Preset = {
@@ -532,10 +534,22 @@ const notePreset: Preset = {
   ),
 };
 
+let complexNodesData: SerializedEditorState | undefined;
+
 export const presets: Preset[] = [
   notePreset,
   inneiAboutPreset,
   markdownTestPreset,
+  {
+    key: 'complex-20000',
+    label: '20,000 Complex Nodes',
+    description:
+      '20,000 个顶层块：长短文字、图片、嵌套折叠面板、动态计数器与问答、表格、引用、列表和代码。默认开启虚拟化，可滚动检查交互状态保持。',
+    virtualization: true,
+    get data() {
+      return (complexNodesData ??= fixture('complex', 20_000, false));
+    },
+  },
   {
     key: 'image-wrap-layout',
     label: 'Image Wrap Layout',

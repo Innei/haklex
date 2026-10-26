@@ -1,9 +1,7 @@
 import { QuoteAttributionPlugin } from '@haklex/rich-editor-ui';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
-import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin';
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type {
   Klass,
   LexicalEditor,
@@ -11,14 +9,18 @@ import type {
   LexicalNodeReplacement,
   SerializedEditorState,
 } from 'lexical';
-import type { ReactNode } from 'react';
+import { type ReactNode, useMemo } from 'react';
 
 import type { ColorScheme } from '../context/ColorSchemeContext';
 import { ColorSchemeProvider } from '../context/ColorSchemeContext';
+import {
+  ActiveEditorScope,
+  EditorSurfacePlugins,
+  EditorSurfaceProvider,
+} from '../context/EditorSurfaceContext';
 import { RendererConfigProvider } from '../context/RendererConfigContext';
 import { TextSelectionStoreProvider } from '../context/TextSelectionContext';
 import { setResolvedEditNodes } from '../node-registry';
-import { AutoFocusPlugin } from '../plugins/AutoFocusPlugin';
 import { EditorRefPlugin } from '../plugins/EditorRefPlugin';
 import { FootnotePlugin } from '../plugins/FootnotePlugin';
 import { OnChangePlugin } from '../plugins/OnChangePlugin';
@@ -27,8 +29,10 @@ import { editorTheme } from '../styles/theme';
 import type { RichEditorVariant } from '../types';
 import type { RendererConfig } from '../types/renderer-config';
 import { normalizeSerializedEditorState } from '../utils/normalizeSerializedEditorState';
-import { ContentEditable } from './ContentEditable';
+import type { EditorVirtualization } from '../virtualization/types';
+import { EditorSurfaceHost } from './EditorSurfaceHost';
 import { clsx, getVariantClass } from './utils';
+import { VirtualizationFromProps } from './VirtualizationFromProps';
 
 export interface RichEditorShellProps {
   actions?: ReactNode;
@@ -48,6 +52,7 @@ export interface RichEditorShellProps {
   style?: React.CSSProperties;
   theme?: ColorScheme;
   variant?: RichEditorVariant;
+  virtualization?: EditorVirtualization;
 }
 
 export function RichEditorShell({
@@ -68,11 +73,13 @@ export function RichEditorShell({
   rendererConfig,
   debounceMs,
   children,
+  virtualization,
 }: RichEditorShellProps) {
   setResolvedEditNodes(nodes);
-  const normalizedInitialValue = initialValue
-    ? normalizeSerializedEditorState(initialValue)
-    : undefined;
+  const normalizedInitialValue = useMemo(
+    () => (initialValue ? normalizeSerializedEditorState(initialValue) : undefined),
+    [initialValue],
+  );
   const initialConfig = {
     namespace: 'RichEditor',
     theme: editorTheme,
@@ -91,36 +98,40 @@ export function RichEditorShell({
       <ColorSchemeProvider colorScheme={theme}>
         <RendererConfigProvider config={rendererConfig} mode="editor" variant={variant}>
           <LexicalComposer initialConfig={initialConfig}>
-            <TextSelectionStoreProvider>
-              <FootnotePlugin>
-                <div
-                  suppressHydrationWarning
-                  className={clsx('rich-editor', variantClass, className)}
-                  data-theme={theme}
-                  style={{ ...style, maxWidth: 'none' }}
-                >
-                  {header}
-                  <RichTextPlugin
-                    ErrorBoundary={LexicalErrorBoundary}
-                    contentEditable={
-                      <ContentEditable
-                        className={contentClassName}
-                        hasHeader={!!header}
-                        placeholder={placeholder}
-                      />
-                    }
-                  />
-                  <HistoryPlugin />
-                  <OnChangePlugin debounceMs={debounceMs} onChange={onChange} />
-                  <SubmitShortcutPlugin onSubmit={onSubmit} />
-                  <EditorRefPlugin onEditorReady={onEditorReady} />
-                  <QuoteAttributionPlugin />
-                  {autoFocus && <AutoFocusPlugin />}
-                  {children}
-                  {actions && <div className="rich-editor__actions">{actions}</div>}
-                </div>
-              </FootnotePlugin>
-            </TextSelectionStoreProvider>
+            <EditorSurfaceProvider>
+              <VirtualizationFromProps value={virtualization} />
+              <TextSelectionStoreProvider>
+                <FootnotePlugin>
+                  <div
+                    suppressHydrationWarning
+                    className={clsx('rich-editor', variantClass, className)}
+                    data-theme={theme}
+                    style={{ ...style, maxWidth: 'none' }}
+                  >
+                    <ActiveEditorScope>{header}</ActiveEditorScope>
+                    <EditorSurfaceHost
+                      autoFocus={autoFocus}
+                      className={contentClassName}
+                      hasHeader={!!header}
+                      placeholder={placeholder}
+                    />
+                    <HistoryPlugin />
+                    <OnChangePlugin debounceMs={debounceMs} onChange={onChange} />
+                    <SubmitShortcutPlugin onSubmit={onSubmit} />
+                    <EditorRefPlugin onEditorReady={onEditorReady} />
+                    <EditorSurfacePlugins>
+                      <QuoteAttributionPlugin />
+                    </EditorSurfacePlugins>
+                    {children}
+                    {actions && (
+                      <div className="rich-editor__actions">
+                        <ActiveEditorScope>{actions}</ActiveEditorScope>
+                      </div>
+                    )}
+                  </div>
+                </FootnotePlugin>
+              </TextSelectionStoreProvider>
+            </EditorSurfaceProvider>
           </LexicalComposer>
         </RendererConfigProvider>
       </ColorSchemeProvider>

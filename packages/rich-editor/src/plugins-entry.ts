@@ -1,4 +1,11 @@
 export { CorePlugins } from './components/CorePlugins';
+export type { EditorSurfaceProps } from './context/EditorSurfaceContext';
+export {
+  ActiveEditorScope,
+  EditorSurfacePlugin,
+  EditorSurfacePlugins,
+  useActiveEditor,
+} from './context/EditorSurfaceContext';
 export { FileUploadProvider, useFileUpload } from './context/FileUploadContext';
 export {
   type ImagePreprocessContextValue,
@@ -52,5 +59,7 @@ export {
   VideoUploadPlugin,
   type VideoUploadResult,
 } from './plugins/VideoUploadPlugin';
+export { VirtualizationPlugin } from './plugins/VirtualizationPlugin';
 export { ALL_TRANSFORMERS } from './transformers';
 export { resolvePreprocessTargets } from './utils/image-preprocess';
+export type { EditorVirtualization, EditorVirtualizationOptions } from './virtualization/types';

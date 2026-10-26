@@ -1,4 +1,5 @@
 import {
+  EditorSurfacePlugins,
   NestedContentRendererProvider,
   NestedEditorPluginsProvider,
   type RendererConfig,
@@ -72,10 +73,13 @@ export function composeEditor(opts: ComposeEditorOptions): ComponentType<RichEdi
   const ComposedEditorProviders = composeProviders(merged, 'EditorProvider');
 
   const modulePlugins: ReactNode[] = [];
+  const surfacePlugins: ReactNode[] = [];
   const moduleActions: ReactNode[] = [];
   const nestedEditorPlugins: ReactNode[] = [];
   for (const m of merged) {
     if (m.plugins) modulePlugins.push(<Fragment key={`p:${m.name}`}>{m.plugins}</Fragment>);
+    if (m.surfacePlugins)
+      surfacePlugins.push(<Fragment key={`s:${m.name}`}>{m.surfacePlugins}</Fragment>);
     if (m.actions) moduleActions.push(<Fragment key={`a:${m.name}`}>{m.actions}</Fragment>);
     if (m.nestedEditorPlugins) {
       nestedEditorPlugins.push(<Fragment key={`nep:${m.name}`}>{m.nestedEditorPlugins}</Fragment>);
@@ -122,6 +126,7 @@ export function composeEditor(opts: ComposeEditorOptions): ComponentType<RichEdi
                 }
               >
                 {modulePlugins}
+                <EditorSurfacePlugins>{surfacePlugins}</EditorSurfacePlugins>
                 {children}
               </RichEditor>
             </ComposedEditorProviders>

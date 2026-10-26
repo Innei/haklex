@@ -10,6 +10,10 @@ export { getVariantClass } from './components/utils';
 export { allNodes, builtinNodes, customNodes } from './config';
 export type { ColorScheme } from './context/ColorSchemeContext';
 export { ColorSchemeProvider, useColorScheme } from './context/ColorSchemeContext';
+export {
+  useEditorBlock,
+  useEditorBlock as useVirtualizedBlock,
+} from './context/EditorBlockContext';
 export { ExtraNodesProvider, useExtraNodes } from './context/ExtraNodesContext';
 export type { FootnoteDefinitionsContextValue } from './context/FootnoteDefinitionsContext';
 export {

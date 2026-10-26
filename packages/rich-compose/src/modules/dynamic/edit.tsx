@@ -9,5 +9,5 @@ const dynamicEditNodes: Array<Klass<LexicalNode>> = [DynamicEditNode];
 export const dynamicEditModule: RichEditorModule = {
   ...dynamicModule,
   editNodes: dynamicEditNodes,
-  plugins: <DynamicPlugin />,
+  surfacePlugins: <DynamicPlugin />,
 };

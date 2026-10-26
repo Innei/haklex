@@ -6,5 +6,5 @@ import { linkCardModule } from './module';
 export const linkCardEditModule: RichEditorModule = {
   ...linkCardModule,
   editNodes: linkCardEditNodes,
-  plugins: <PasteLinkCardPlugin />,
+  surfacePlugins: <PasteLinkCardPlugin />,
 };

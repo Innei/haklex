@@ -9,5 +9,5 @@ const excalidrawEditNodes: Array<Klass<LexicalNode>> = [ExcalidrawEditNode];
 export const excalidrawEditModule: RichEditorModule = {
   ...excalidrawModule,
   editNodes: excalidrawEditNodes,
-  plugins: <ExcalidrawPlugin />,
+  surfacePlugins: <ExcalidrawPlugin />,
 };

@@ -4,6 +4,7 @@ import { $insertNodes, COMMAND_PRIORITY_CRITICAL, PASTE_COMMAND } from 'lexical'
 import { Check, Info } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { useEditorBlock } from '../context/EditorBlockContext';
 import { $createVideoNode } from '../nodes/VideoNode';
 import * as css from './image-upload.css';
 
@@ -32,6 +33,9 @@ interface VideoUploadPluginProps {
 }
 
 export function VideoUploadPlugin({ onUpload }: VideoUploadPluginProps) {
+  const block = useEditorBlock();
+  const blockRef = useRef(block);
+  blockRef.current = block;
   const [editor] = useLexicalComposerContext();
   const uploadRef = useRef(onUpload);
   uploadRef.current = onUpload;
@@ -55,6 +59,7 @@ export function VideoUploadPlugin({ onUpload }: VideoUploadPluginProps) {
 
   const uploadVideo = useCallback(
     async (file: File) => {
+      const release = blockRef.current?.retain();
       const id = nextUploadIdRef.current++;
       setUploads((prev) => new Map(prev).set(id, 0));
 
@@ -73,6 +78,7 @@ export function VideoUploadPlugin({ onUpload }: VideoUploadPluginProps) {
         console.error('[VideoUploadPlugin]', err);
         pushToast('error', 'Video upload failed');
       } finally {
+        queueMicrotask(() => release?.());
         setUploads((prev) => {
           const next = new Map(prev);
           next.delete(id);

@@ -1,0 +1,31 @@
+.recycler-canvas {
+  position: relative;
+  max-width: calc(100% - 48px);
+  margin: 24px auto;
+}
+.recycler-slot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flow-root;
+}
+.recycler-slot::after {
+  display: block;
+  clear: both;
+  content: '';
+}
+.recycler-slot[data-recycler-restoring] details::details-content,
+.recycler-slot[data-recycler-restoring] .rich-details-chevron {
+  transition: none !important;
+}
+.recycler-summary {
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--rc-border);
+  color: var(--rc-text-secondary);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.recycler-loading {
+  color: var(--rc-text-secondary);
+}

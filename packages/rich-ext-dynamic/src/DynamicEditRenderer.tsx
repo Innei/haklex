@@ -1,4 +1,4 @@
-import { useRendererMode } from '@haklex/rich-editor/static';
+import { useEditorBlock, useRendererMode } from '@haklex/rich-editor/static';
 import {
   ActionBar,
   ActionButton,
@@ -46,12 +46,17 @@ function DynamicEditRendererInner({
   nodeKey,
 }: DynamicEditRendererProps) {
   const [editor] = useLexicalComposerContext();
+  const binding = useEditorBlock();
 
   const [open, setOpen] = useState(!url);
   const [editUrl, setEditUrl] = useState(url);
   const [editHeight, setEditHeight] = useState(String(initialHeight));
   const [editProps, setEditProps] = useState(() => JSON.stringify(componentProps ?? {}, null, 2));
   const [propsError, setPropsError] = useState<string | null>(null);
+  useEffect(() => {
+    if (open) return binding?.retain();
+  }, [binding, open]);
+  useEffect(() => setOpen(!url), [binding?.blockId]);
 
   const resetDraft = useCallback(() => {
     setEditUrl(url);
@@ -108,6 +113,7 @@ function DynamicEditRendererInner({
         <DynamicHostRenderer
           componentProps={componentProps}
           initialHeight={initialHeight}
+          nodeKey={nodeKey}
           url={url}
         />
       ) : (

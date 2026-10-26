@@ -1,7 +1,7 @@
 import { composeEditor } from '@haklex/rich-compose';
 import { allEditorModules } from '@haklex/rich-compose/editor';
 import { dynamicEditModule } from '@haklex/rich-compose/modules/dynamic/edit';
-import type { RichEditorProps } from '@haklex/rich-editor';
+import { EditorSurfacePlugins, type RichEditorProps } from '@haklex/rich-editor';
 import { EmbedPlugin } from '@haklex/rich-ext-embed';
 import { BlockHandlePlugin } from '@haklex/rich-plugin-block-handle';
 import { FloatingToolbarPlugin } from '@haklex/rich-plugin-floating-toolbar';
@@ -71,25 +71,23 @@ export function LexicalEditor({
   return (
     <ComposedEditor
       {...props}
+      actions={actions}
       fileUpload={fileUpload}
       theme={theme}
       variant={variant}
-      actions={
-        <>
-          <SlashMenuPlugin />
-          <MentionMenuPlugin extraPlatforms={extraMentionPlatforms} />
-          {actions}
-        </>
-      }
     >
-      <BlockHandlePlugin />
-      <ImageEditModalPlugin />
-      <LiteXmlPastePlugin />
-      <FloatingToolbarPlugin actions={floatingToolbarActions} />
-      <FloatingLinkEditorPlugin renderExtraActions={renderLinkExtraActions} />
-      <EmbedPlugin selfHostnames={selfHostnames} />
-      <TableRowColumnHandlesPlugin />
-      <TableCellResizerPlugin />
+      <EditorSurfacePlugins>
+        <SlashMenuPlugin />
+        <MentionMenuPlugin extraPlatforms={extraMentionPlatforms} />
+        <BlockHandlePlugin />
+        <ImageEditModalPlugin />
+        <LiteXmlPastePlugin />
+        <FloatingToolbarPlugin actions={floatingToolbarActions} />
+        <FloatingLinkEditorPlugin renderExtraActions={renderLinkExtraActions} />
+        <EmbedPlugin selfHostnames={selfHostnames} />
+        <TableRowColumnHandlesPlugin />
+        <TableCellResizerPlugin />
+      </EditorSurfacePlugins>
       {children}
     </ComposedEditor>
   );
