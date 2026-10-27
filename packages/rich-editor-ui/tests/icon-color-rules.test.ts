@@ -6,15 +6,19 @@ import { describe, expect, it } from 'vitest';
 const packagesDir = path.join(__dirname, '../..');
 
 /**
- * `color` inherits, so an icon follows its owner's text color for free. A rule
- * that colors `svg` from an ancestor selector, though, out-specifies the icon's
- * own class: variants and consumer overrides stop reaching it. Declare the
- * color on the element that owns it instead.
+ * Icons take their tone from the label: either the text level ladder or a
+ * derived step of the label color. A rule that pins a palette color on `svg`
+ * from an ancestor selector breaks that — it out-specifies the icon's own
+ * class, so variants and consumer overrides stop reaching it. Delegating
+ * (`color: someVar` / `var(--…)`) is fine: it stays overridable.
  */
 function svgColorDeclarations(source: string): string[] {
   const found: string[] = [];
+  const paletteLiteral = /vars\.color\.|#[\da-f]{3,8}\b|\brgba?\(|\bhsla?\(/i;
   const push = (selector: string, body: string) => {
-    if (/\bsvg\b/.test(selector) && /\bcolor\s*:/.test(body)) found.push(selector.trim());
+    if (!/\bsvg\b/.test(selector)) return;
+    const values = [...body.matchAll(/\bcolor\s*:\s*([^\n,}]+)/g)].map((match) => match[1].trim());
+    if (values.some((value) => paletteLiteral.test(value))) found.push(selector.trim());
   };
 
   // globalStyle(`<selector>`, { ... })
@@ -129,7 +133,7 @@ function repoViolations(): string[] {
 }
 
 describe('icon colors come from the icon, not from an ancestor rule', () => {
-  it('flags a color declared on a descendant svg rule', () => {
+  it('flags a palette color pinned on a descendant svg rule', () => {
     expect(
       svgColorDeclarations(
         "globalStyle(`${item} svg`, { width: '16px', color: vars.color.textSecondary });",
@@ -140,13 +144,21 @@ describe('icon colors come from the icon, not from an ancestor rule', () => {
         "const a = style({ selectors: { '& svg': { color: vars.color.text } } });",
       ),
     ).toEqual(['& svg']);
+    expect(svgColorDeclarations("globalStyle(`.x svg`, { color: 'rgb(1, 2, 3)' });")).toEqual([
+      '.x svg',
+    ]);
   });
 
-  it('accepts sizing-only descendant rules and colors on the owner', () => {
+  it('accepts sizing-only rules, owner colors and delegated tones', () => {
     expect(svgColorDeclarations("globalStyle(`${icon} svg`, { width: '16px' });")).toEqual([]);
     expect(
       svgColorDeclarations(
         "export const icon = style({ color: vars.color.textTertiary });\nglobalStyle(`${icon} svg`, { width: '1em' });",
+      ),
+    ).toEqual([]);
+    expect(
+      svgColorDeclarations(
+        'const tone = createVar();\nglobalStyle(`:where(${item}) svg`, { color: tone });',
       ),
     ).toEqual([]);
   });

@@ -3,10 +3,16 @@ import {
   chromeRadius,
   chromeText,
   chromeTypography,
+  iconTone,
+  textLevel,
+  toneDown,
   vars,
 } from '@haklex/rich-style-token/styles';
 import type { StyleRule } from '@vanilla-extract/css';
-import { globalStyle, style } from '@vanilla-extract/css';
+import { createVar, globalStyle, style } from '@vanilla-extract/css';
+
+/** Default icon tone for a menu item; consumers can override it per item. */
+const iconToneVar = createVar();
 
 export const popupMotion: StyleRule = {
   'transformOrigin': 'var(--transform-origin)',
@@ -62,7 +68,8 @@ export const itemBase: StyleRule = {
   outline: 'none',
   userSelect: 'none',
   cursor: 'default',
-  color: vars.color.text,
+  color: textLevel[4],
+  vars: { [iconToneVar]: iconTone(4) },
   transition: `background-color ${chromeMotion.state} ease, color ${chromeMotion.state} ease`,
   selectors: {
     '&[data-highlighted]': {
@@ -79,20 +86,23 @@ export const itemBase: StyleRule = {
 };
 
 /**
- * Icons inside a menu item are not recolored here: `color` already inherits, so
- * an icon without its own color follows the item's text color — including
- * variants (`destructive`) and consumer overrides — while icons that carry a
- * semantic color (alert/banner types) keep it.
+ * A menu item opts icons into the text level scale: `iconTone(4)` sits one step
+ * below the label's `textLevel[4]`, so the glyph is quieter than the text by
+ * default. The color travels as a custom property, which means consumers win by
+ * declaring their own — and the `:where()` ancestor keeps the rule at element
+ * specificity, so a class on the icon wins too. Icons that carry their own
+ * semantic color (alert/banner types) simply out-specify it.
  *
- * Size is one type step below the label (16px text → 14px icon), expressed in
- * `em` so it follows the item's font-size instead of pinning a pixel value.
+ * Size follows the same "one step below the label" rule, in `em` so it tracks
+ * the item's font-size instead of pinning a pixel value.
  */
 export function applyItemSvgStyles(itemClass: string) {
-  globalStyle(`${itemClass} svg:not(kbd svg)`, {
+  globalStyle(`:where(${itemClass}) svg:not(:where(kbd svg))`, {
     pointerEvents: 'none',
     flexShrink: 0,
     width: '0.875em',
     height: '0.875em',
+    color: iconToneVar,
     transition: `color ${chromeMotion.state} ease`,
   });
 }
@@ -101,6 +111,7 @@ export const destructive = style({
   selectors: {
     '&&': {
       color: vars.color.alertCaution,
+      vars: { [iconToneVar]: toneDown(vars.color.alertCaution) },
     },
     '&&[data-highlighted]': {
       backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 8%, transparent)`,

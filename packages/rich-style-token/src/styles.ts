@@ -3,6 +3,7 @@ export { chromeHeight, chromeMotion, chromeRadius, chromeText, focusRing } from 
 export { type ThemeTokens } from './create-theme-style';
 export { createThemeStyle } from './create-theme-style';
 export { inDarkScheme } from './scheme';
+export { iconTone, type TextLevel, textLevel, toneDown } from './text-level';
 export {
   articleLayout,
   chatLayout,
