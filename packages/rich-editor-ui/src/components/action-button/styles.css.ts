@@ -4,10 +4,34 @@ import {
   chromeRadius,
   chromeText,
   focusRing,
+  iconTone,
+  type TextLevel,
+  textLevel,
+  toneDown,
   vars,
 } from '@haklex/rich-style-token/styles';
-import { globalStyle, style } from '@vanilla-extract/css';
+import { createVar, fallbackVar, globalStyle, style } from '@vanilla-extract/css';
 import { recipe } from '@vanilla-extract/recipes';
+
+/** Icon tone override; unset means "derive one step from the label color". */
+const iconToneVar = createVar();
+
+/** Label level → label color plus the tone its icon takes, one step below. */
+const levelRule = (level: TextLevel) => ({
+  selectors: {
+    '&&': {
+      color: textLevel[level],
+      vars: { [iconToneVar]: iconTone(level) },
+    },
+  },
+});
+
+export const levelTone = {
+  1: style(levelRule(1)),
+  2: style(levelRule(2)),
+  3: style(levelRule(3)),
+  4: style(levelRule(4)),
+} satisfies Record<TextLevel, string>;
 
 export const semanticClassNames = {
   actionBar: 're-ui-action-bar',
@@ -29,6 +53,8 @@ const transition = `color ${chromeMotion.state} ease, background-color ${chromeM
 const primary = {
   backgroundColor: vars.color.text,
   color: vars.color.bg,
+  // Inverted label on a filled ground: the glyph keeps the label's tone.
+  vars: { [iconToneVar]: vars.color.bg },
   selectors: {
     '&:hover:not(:disabled)': {
       opacity: 0.86,
@@ -194,15 +220,23 @@ export const actionButton = recipe({
   },
 });
 
-/** Icon + label: the glyph is one type step below the label. */
-globalStyle(`.${semanticClassNames.actionButton} svg`, {
+/**
+ * Icon + label: the glyph is one type step below the label — smaller, and one
+ * step quieter than the label color. The tone derives from `currentColor`, so
+ * it follows hover, pressed, danger and inverted (solid) states without a rule
+ * per state; `level` pins it to the neutral ladder instead when the label's
+ * level is known.
+ */
+globalStyle(`:where(.${semanticClassNames.actionButton}) svg`, {
   width: '0.875em',
   height: '0.875em',
   flexShrink: 0,
+  color: fallbackVar(iconToneVar, toneDown('currentColor')),
 });
 
-/** Icon-only squares: the glyph is the content, centred at the square's own size. */
+/** Icon-only squares: the glyph is the content, centred and at the label's own tone. */
 globalStyle(`.${semanticClassNames.actionButton}.${semanticClassNames.actionButtonIcon} svg`, {
   width: '1em',
   height: '1em',
+  color: 'currentColor',
 });

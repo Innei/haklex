@@ -98,6 +98,14 @@ export const actionButtonDemo: ComponentDemo = {
             </ActionButton>
           </StateCell>
         ))}
+        {([4, 3, 2, 1] as const).map((level) => (
+          <StateCell key={`level-${level}`} label={`Level ${level}`}>
+            <ActionButton level={level} variant="outline">
+              <Trash2 />
+              Delete
+            </ActionButton>
+          </StateCell>
+        ))}
         <StateCell label="Rounded">
           <ActionButton rounded variant="solid">
             Rounded
