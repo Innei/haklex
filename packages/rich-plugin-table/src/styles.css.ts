@@ -1,16 +1,6 @@
 import { chromeRadius, vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
-export const menuItemDestructive = style({
-  color: vars.color.alertCaution,
-  selectors: {
-    '&[data-highlighted]': {
-      color: vars.color.alertCaution,
-      backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 8%, transparent)`,
-    },
-  },
-});
-
 export const resizeHandle = style({
   'position': 'fixed',
   'zIndex': 20,

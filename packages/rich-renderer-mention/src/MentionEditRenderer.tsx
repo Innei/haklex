@@ -196,11 +196,11 @@ function MentionEditRendererInner({ platform, handle, displayName }: MentionRend
         </div>
         <ActionBar>
           <ActionButton onClick={handleOpen}>
-            <ExternalLink size={14} />
+            <ExternalLink />
             Open
           </ActionButton>
           <ActionButton danger onClick={handleDelete}>
-            <Trash2 size={14} />
+            <Trash2 />
             Remove
           </ActionButton>
         </ActionBar>

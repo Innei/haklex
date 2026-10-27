@@ -34,10 +34,10 @@ export const actionButtonDemo: ComponentDemo = {
           </ActionButton>
         ))}
         <ActionButton icon aria-label="Add" variant="ghost">
-          <Plus size={16} />
+          <Plus />
         </ActionButton>
         <ActionButton danger variant="outline">
-          <Trash2 size={14} />
+          <Trash2 />
           Delete
         </ActionButton>
       </ActionBar>
@@ -94,7 +94,7 @@ export const actionButtonDemo: ComponentDemo = {
               Button
             </ActionButton>
             <ActionButton icon aria-label="Add" size={s} variant="outline">
-              <Plus size={14} />
+              <Plus />
             </ActionButton>
           </StateCell>
         ))}

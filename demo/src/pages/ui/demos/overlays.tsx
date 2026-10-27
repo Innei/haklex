@@ -129,7 +129,7 @@ export const tooltipDemo: ComponentDemo = {
           <TooltipTrigger
             render={
               <ActionButton icon aria-label="Bold" variant="ghost">
-                <Bold size={16} />
+                <Bold />
               </ActionButton>
             }
           />

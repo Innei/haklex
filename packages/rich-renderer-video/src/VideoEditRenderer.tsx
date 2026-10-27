@@ -259,17 +259,17 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
                 }}
               />
               <ActionButton disabled={uploading} onClick={() => fileInputRef.current?.click()}>
-                <Upload size={14} />
+                <Upload />
                 {uploading ? `Uploading ${uploadPercent}%` : 'Upload'}
               </ActionButton>
             </>
           )}
           <ActionButton onClick={handleOpen}>
-            <ExternalLink size={14} />
+            <ExternalLink />
             Open
           </ActionButton>
           <ActionButton danger onClick={handleDelete}>
-            <Trash2 size={14} />
+            <Trash2 />
             Remove
           </ActionButton>
         </ActionBar>

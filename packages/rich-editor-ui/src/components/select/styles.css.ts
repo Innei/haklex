@@ -91,12 +91,7 @@ export const itemIndicator = style({
   width: '16px',
   height: '16px',
   pointerEvents: 'none',
-  color: vars.color.text,
-});
-
-globalStyle(`${itemIndicator} svg`, {
-  width: '16px',
-  height: '16px',
+  color: 'inherit',
 });
 
 export const groupLabel = label;

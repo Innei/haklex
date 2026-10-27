@@ -23,10 +23,10 @@ export function AgentActionBar({
         {pendingCount} pending change{pendingCount !== 1 ? 's' : ''}
       </span>
       <ActionButton onClick={onAcceptAll}>
-        <Check size={14} /> Accept All
+        <Check /> Accept All
       </ActionButton>
       <ActionButton onClick={onRejectAll}>
-        <X size={14} /> Reject All
+        <X /> Reject All
       </ActionButton>
     </div>
   );

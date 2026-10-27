@@ -194,7 +194,15 @@ export const actionButton = recipe({
   },
 });
 
-globalStyle(`.${semanticClassNames.actionButtonIcon} svg`, {
+/** Icon + label: the glyph is one type step below the label. */
+globalStyle(`.${semanticClassNames.actionButton} svg`, {
+  width: '0.875em',
+  height: '0.875em',
+  flexShrink: 0,
+});
+
+/** Icon-only squares: the glyph is the content, centred at the square's own size. */
+globalStyle(`.${semanticClassNames.actionButton}.${semanticClassNames.actionButtonIcon} svg`, {
   width: '1em',
   height: '1em',
 });

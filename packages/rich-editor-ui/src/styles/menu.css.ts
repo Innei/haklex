@@ -78,18 +78,22 @@ export const itemBase: StyleRule = {
   },
 };
 
+/**
+ * Icons inside a menu item are not recolored here: `color` already inherits, so
+ * an icon without its own color follows the item's text color — including
+ * variants (`destructive`) and consumer overrides — while icons that carry a
+ * semantic color (alert/banner types) keep it.
+ *
+ * Size is one type step below the label (16px text → 14px icon), expressed in
+ * `em` so it follows the item's font-size instead of pinning a pixel value.
+ */
 export function applyItemSvgStyles(itemClass: string) {
   globalStyle(`${itemClass} svg:not(kbd svg)`, {
     pointerEvents: 'none',
     flexShrink: 0,
-    width: '16px',
-    height: '16px',
-    color: vars.color.textSecondary,
+    width: '0.875em',
+    height: '0.875em',
     transition: `color ${chromeMotion.state} ease`,
-  });
-
-  globalStyle(`${itemClass}[data-highlighted] svg:not(kbd svg)`, {
-    color: 'inherit',
   });
 }
 
@@ -102,10 +106,6 @@ export const destructive = style({
       backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 8%, transparent)`,
     },
   },
-});
-
-globalStyle(`${destructive}${destructive} svg:not(kbd svg)`, {
-  color: vars.color.alertCaution,
 });
 
 export const shortcut = style({

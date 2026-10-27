@@ -194,7 +194,7 @@ function FileEditRendererInner({
         {uploadEntry.status === 'error' && (
           <ActionBar>
             <ActionButton onClick={uploadEntry.retry}>
-              <RefreshCw size={14} />
+              <RefreshCw />
               Retry
             </ActionButton>
             <ActionButton danger onClick={uploadEntry.remove}>
@@ -290,24 +290,24 @@ function FileEditRendererInner({
                 }}
               />
               <ActionButton disabled={replacing} onClick={() => fileInputRef.current?.click()}>
-                <RefreshCw size={14} />
+                <RefreshCw />
                 {replacing ? `Uploading ${replacePercent}%` : 'Replace'}
               </ActionButton>
             </>
           )}
           <ActionButton onClick={handleToggleDisplay}>
-            <Pilcrow size={14} />
+            <Pilcrow />
             {isInline ? 'To block' : 'To inline'}
           </ActionButton>
           <ActionButton disabled={!src} onClick={handleCopyLink}>
-            <Link2 size={14} />
+            <Link2 />
             Copy link
           </ActionButton>
-          <ActionButton disabled={!src} onClick={handleDownload}>
-            <Download size={14} />
+          <ActionButton icon aria-label="Download file" disabled={!src} onClick={handleDownload}>
+            <Download />
           </ActionButton>
-          <ActionButton danger onClick={handleDelete}>
-            <Trash2 size={14} />
+          <ActionButton danger icon aria-label="Delete file" onClick={handleDelete}>
+            <Trash2 />
           </ActionButton>
         </ActionBar>
       </PopoverPanel>

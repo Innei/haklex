@@ -348,16 +348,16 @@ function TableRowColumnHandlesInner({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" side="right" sideOffset={4}>
             <DropdownMenuItem onClick={insertRowAbove}>
-              <ArrowUp size={14} />
+              <ArrowUp />
               Insert row above
             </DropdownMenuItem>
             <DropdownMenuItem onClick={insertRowBelow}>
-              <ArrowDown size={14} />
+              <ArrowDown />
               Insert row below
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className={css.menuItemDestructive} onClick={deleteRow}>
-              <Trash2 size={14} />
+            <DropdownMenuItem variant="destructive" onClick={deleteRow}>
+              <Trash2 />
               Delete row
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -385,16 +385,16 @@ function TableRowColumnHandlesInner({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" side="bottom" sideOffset={4}>
             <DropdownMenuItem onClick={insertColumnLeft}>
-              <ArrowLeft size={14} />
+              <ArrowLeft />
               Insert column left
             </DropdownMenuItem>
             <DropdownMenuItem onClick={insertColumnRight}>
-              <ArrowRight size={14} />
+              <ArrowRight />
               Insert column right
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className={css.menuItemDestructive} onClick={deleteColumn}>
-              <Trash2 size={14} />
+            <DropdownMenuItem variant="destructive" onClick={deleteColumn}>
+              <Trash2 />
               Delete column
             </DropdownMenuItem>
           </DropdownMenuContent>

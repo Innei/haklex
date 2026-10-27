@@ -164,15 +164,15 @@ export function LinkCardEditDecorator({ nodeKey, payload, children }: LinkCardEd
         </div>
         <ActionBar>
           <ActionButton onClick={handleOpen}>
-            <ExternalLink size={14} />
+            <ExternalLink />
             Open
           </ActionButton>
           <ActionButton onClick={handleConvertToLink}>
-            <RemoveFormatting size={14} />
+            <RemoveFormatting />
             To Link
           </ActionButton>
           <ActionButton danger onClick={handleDelete}>
-            <Unlink size={14} />
+            <Unlink />
             Remove
           </ActionButton>
         </ActionBar>

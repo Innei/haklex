@@ -151,8 +151,6 @@ export const bannerTrigger = style({
 });
 
 export const bannerMenuIcon = style({
-  width: '16px',
-  height: '16px',
   flexShrink: 0,
 });
 

@@ -114,8 +114,6 @@ export const alertLabel = style({
 });
 
 export const alertMenuIcon = style({
-  width: '16px',
-  height: '16px',
   flexShrink: 0,
   color: alertColor,
 });

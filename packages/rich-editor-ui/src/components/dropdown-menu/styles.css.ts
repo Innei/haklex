@@ -1,4 +1,3 @@
-import { vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 import {
@@ -48,7 +47,7 @@ const indicator = style({
   height: '16px',
   flexShrink: 0,
   pointerEvents: 'none',
-  color: vars.color.text,
+  color: 'inherit',
 });
 
 export const checkboxIndicator = indicator;

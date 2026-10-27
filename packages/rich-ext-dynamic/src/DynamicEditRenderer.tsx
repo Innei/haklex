@@ -189,7 +189,7 @@ function DynamicEditRendererInner({
           <ActionBar>
             <ActionButton onClick={commitChanges}>Apply</ActionButton>
             <ActionButton danger onClick={handleDelete}>
-              <Trash2 size={14} />
+              <Trash2 />
               Remove
             </ActionButton>
           </ActionBar>

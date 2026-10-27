@@ -101,6 +101,7 @@ export const icon = style({
   backgroundColor: vars.color.bgTertiary,
   boxShadow: `inset 0 0 0 1px ${vars.color.ring}`,
   zIndex: 1,
+  color: vars.color.textTertiary,
 });
 
 globalStyle(`${icon} img`, {
@@ -112,7 +113,6 @@ globalStyle(`${icon} img`, {
 globalStyle(`${icon} svg`, {
   width: '1.25rem',
   height: '1.25rem',
-  color: vars.color.textTertiary,
 });
 
 export const content = style({
@@ -269,12 +269,12 @@ export const errorIcon = style({
   height: '2rem',
   borderRadius: '0.5rem',
   backgroundColor: vars.color.bgSecondary,
+  color: vars.color.textQuaternary,
 });
 
 globalStyle(`${errorIcon} svg`, {
   width: '0.875rem',
   height: '0.875rem',
-  color: vars.color.textQuaternary,
 });
 
 export const errorContent = style({

@@ -466,7 +466,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           variant="outline"
           onClick={() => resolveAllDiffNodes('rejected')}
         >
-          <XCircle size={14} />
+          <XCircle />
           Reject all
         </ActionButton>
         <ActionButton
@@ -474,7 +474,7 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
           variant="solid"
           onClick={() => resolveAllDiffNodes('accepted')}
         >
-          <CheckCheck size={14} />
+          <CheckCheck />
           Accept all
         </ActionButton>
       </div>
