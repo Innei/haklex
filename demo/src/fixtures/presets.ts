@@ -535,6 +535,7 @@ const notePreset: Preset = {
 };
 
 let complexNodesData: SerializedEditorState | undefined;
+let textNodesData: SerializedEditorState | undefined;
 
 export const presets: Preset[] = [
   notePreset,
@@ -548,6 +549,16 @@ export const presets: Preset[] = [
     virtualization: true,
     get data() {
       return (complexNodesData ??= fixture('complex', 20_000, false));
+    },
+  },
+  {
+    key: 'text-10000',
+    label: '10,000 Text Nodes',
+    description:
+      '10,000 个顶层段落，默认开启虚拟化。选区保持：在某段中选中文字，点击右侧面板让焦点离开编辑器，滚动到很远再滚回来，选区应仍在。',
+    virtualization: true,
+    get data() {
+      return (textNodesData ??= fixture('text', 10_000, false));
     },
   },
   {
