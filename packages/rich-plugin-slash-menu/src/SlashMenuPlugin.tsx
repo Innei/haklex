@@ -1,3 +1,5 @@
+import { normalizeCommandItems } from '@haklex/rich-editor/command-registry';
+import type { CommandItemConfig } from '@haklex/rich-editor/commands';
 import { collectCommandItems } from '@haklex/rich-editor/commands';
 import { PortalThemeWrapper } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -22,24 +24,50 @@ export interface SlashMenuPluginProps {
   triggerChar?: string;
 }
 
-export function collectNodeSlashItems(editor: LexicalEditor): SlashMenuItem[] {
-  const configs = collectCommandItems(editor);
-  return configs
-    .filter((c) => !c.placement || c.placement.includes('slash'))
-    .map(
-      (c) =>
-        new SlashMenuItemClass(c.title, {
-          description: c.description,
-          icon: isValidElement(c.icon) ? c.icon : undefined,
-          keywords: c.keywords,
-          nested: c.nested,
-          section: c.section,
-          onSelect: c.onSelect,
-        }),
-    );
+function toSlashItem(config: CommandItemConfig): SlashMenuItem {
+  return new SlashMenuItemClass(config.title, {
+    description: config.description,
+    icon: isValidElement(config.icon) ? config.icon : undefined,
+    keywords: config.keywords,
+    nested: config.nested,
+    section: config.section,
+    onSelect: config.onSelect,
+  });
 }
 
-function filterItems(query: string, items: SlashMenuItem[]): SlashMenuItem[] {
+export function normalizeSlashItems(items: SlashMenuItem[]): SlashMenuItem[] {
+  return normalizeCommandItems(
+    items.map((item) => ({
+      title: item.title,
+      description: item.description || undefined,
+      icon: item.icon,
+      keywords: item.keywords,
+      nested: item.nested,
+      section: item.section,
+      onSelect: item.onSelect,
+    })),
+  ).map(toSlashItem);
+}
+
+export function collectNodeSlashItems(editor: LexicalEditor): SlashMenuItem[] {
+  const configs = collectCommandItems(editor).filter(
+    (c) => !c.placement || c.placement.includes('slash'),
+  );
+  return normalizeCommandItems(configs).map(toSlashItem);
+}
+
+export function getDefaultSlashItems(
+  editor: LexicalEditor,
+  extraItems?: SlashMenuItem[],
+): SlashMenuItem[] {
+  return normalizeSlashItems([
+    ...getBuiltinItems(),
+    ...collectNodeSlashItems(editor),
+    ...(extraItems ?? []),
+  ]);
+}
+
+export function filterSlashItems(query: string, items: SlashMenuItem[]): SlashMenuItem[] {
   if (!query) return items;
   const lower = query.toLowerCase();
   return items.filter((item) => {
@@ -58,21 +86,12 @@ export function SlashMenuPlugin({
   const [queryString, setQueryString] = useState<string | null>(null);
 
   const allItems = useMemo(() => {
-    let combined: SlashMenuItem[];
-    if (items) {
-      combined = items;
-    } else {
-      const builtins = getBuiltinItems();
-      const nodeItems = collectNodeSlashItems(editor);
-      combined = extraItems
-        ? [...builtins, ...nodeItems, ...extraItems]
-        : [...builtins, ...nodeItems];
-    }
+    const combined = items ?? getDefaultSlashItems(editor, extraItems);
     return nested ? combined.filter((item) => item.nested !== false) : combined;
   }, [items, extraItems, nested, editor]);
 
   const filteredItems = useMemo(
-    () => filterItems(queryString ?? '', allItems),
+    () => filterSlashItems(queryString ?? '', allItems),
     [queryString, allItems],
   );
 
@@ -108,16 +127,16 @@ export function SlashMenuPlugin({
       menuRenderFn={(
         anchorElementRef,
         { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
+        matchingString,
       ) => {
         const anchorElement = anchorElementRef.current;
-        if (!anchorElement || filteredItems.length === 0) {
-          return null;
-        }
+        if (!anchorElement) return null;
         return createPortal(
           <PortalThemeWrapper>
             <SlashMenuList
               anchorElement={anchorElement}
               options={filteredItems}
+              query={matchingString}
               selectOptionAndCleanUp={selectOptionAndCleanUp}
               selectedIndex={selectedIndex}
               setHighlightedIndex={setHighlightedIndex}

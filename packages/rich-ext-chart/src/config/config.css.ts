@@ -1,9 +1,7 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeRadius, chromeText, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const popup = style({
-  width: 'min(340px, calc(100vw - 32px))',
-  padding: 0,
   overflow: 'hidden',
 });
 
@@ -11,42 +9,56 @@ export const panel = style({
   display: 'flex',
   flexDirection: 'column',
   maxHeight: 'min(520px, calc(100vh - 96px))',
+  ...chromeText.control,
   fontFamily: vars.typography.fontFamilySans,
-  fontSize: 13,
   color: vars.color.text,
 });
 
 export const tabs = style({
-  padding: 6,
-  borderBottom: `1px solid ${vars.color.border}`,
+  padding: '8px 12px',
+  borderBottom: `1px solid ${vars.color.borderSubtle}`,
 });
 
 export const body = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: 14,
-  padding: 14,
+  gap: 12,
+  padding: 12,
   overflowY: 'auto',
   minHeight: 0,
 });
 
 export const notice = style({
-  padding: 14,
-  fontSize: 12,
-  lineHeight: 1.5,
+  ...chromeText.label,
+  fontWeight: 400,
+  margin: 0,
+  padding: 12,
   color: vars.color.textSecondary,
 });
 
 export const field = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: 6,
+  gap: 4,
   minWidth: 0,
 });
 
 export const fieldLabel = style({
-  fontSize: 12,
-  color: vars.color.textTertiary,
+  ...chromeText.label,
+  color: vars.color.textSecondary,
+});
+
+export const select = style({
+  width: '100%',
+});
+
+export const seriesKey = style({
+  width: 92,
+  flexShrink: 0,
+});
+
+export const seriesLabel = style({
+  flex: 1,
 });
 
 export const pair = style({
@@ -55,52 +67,11 @@ export const pair = style({
   gap: 8,
 });
 
-const control = {
-  boxSizing: 'border-box',
-  height: 32,
-  minWidth: 0,
-  padding: '0 10px',
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 6,
-  background: vars.color.bg,
-  color: vars.color.text,
-  font: 'inherit',
-  outline: 'none',
-  selectors: {
-    '&:focus-visible': { borderColor: vars.color.accent },
-  },
-} as const;
-
-export const input = style(control);
-
-export const select = style({ ...control, padding: '0 8px' });
-
-export const check = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 8,
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-});
-
-export const checkbox = style({ width: 16, height: 16, margin: 0 });
-
 export const seriesRow = style({
   display: 'flex',
   alignItems: 'center',
   gap: 6,
 });
-
-export const seriesKey = style({
-  ...control,
-  width: 92,
-  flexShrink: 0,
-  padding: '0 8px',
-  fontFamily: vars.typography.fontMono,
-  fontSize: 12,
-});
-
-export const seriesLabel = style({ ...control, flex: 1, padding: '0 8px' });
 
 export const swatchButton = style({
   display: 'inline-flex',
@@ -111,7 +82,7 @@ export const swatchButton = style({
   height: 28,
   padding: 0,
   border: 0,
-  borderRadius: 6,
+  borderRadius: chromeRadius.md,
   background: 'transparent',
   cursor: 'pointer',
   selectors: {
@@ -140,45 +111,11 @@ export const paletteOption = style({
   height: 28,
   padding: 0,
   border: `2px solid transparent`,
-  borderRadius: 6,
+  borderRadius: chromeRadius.md,
   background: 'transparent',
   cursor: 'pointer',
   selectors: {
     '&[aria-pressed="true"]': { borderColor: vars.color.text },
-  },
-});
-
-export const iconButton = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  flexShrink: 0,
-  width: 28,
-  height: 28,
-  padding: 0,
-  border: 0,
-  borderRadius: 6,
-  background: 'transparent',
-  color: vars.color.textTertiary,
-  cursor: 'pointer',
-  selectors: {
-    '&:hover:not(:disabled)': { background: vars.color.fillSecondary, color: vars.color.text },
-    '&:disabled': { opacity: 0.4, cursor: 'default' },
-  },
-});
-
-export const addButton = style({
-  height: 30,
-  border: `1px dashed ${vars.color.border}`,
-  borderRadius: 6,
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  font: 'inherit',
-  fontSize: 12,
-  cursor: 'pointer',
-  selectors: {
-    '&:hover:not(:disabled)': { background: vars.color.fillSecondary, color: vars.color.text },
-    '&:disabled': { opacity: 0.5, cursor: 'default' },
   },
 });
 
@@ -192,7 +129,7 @@ export const tableScroll = style({
   overflow: 'auto',
   maxHeight: 300,
   border: `1px solid ${vars.color.border}`,
-  borderRadius: 6,
+  borderRadius: chromeRadius.md,
 });
 
 export const table = style({

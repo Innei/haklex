@@ -1,41 +1,81 @@
-import { ArrowDown, ArrowUp, Trash2 } from 'lucide-react';
+import {
+  ActionButton,
+  Field,
+  ModalShell,
+  ModalShellBody,
+  ModalShellFooter,
+  ModalShellHeader,
+  SegmentedControl,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  TextInput,
+} from '@haklex/rich-editor-ui';
+import { ArrowDown, ArrowUp, MessageSquare, Plus, Trash2 } from 'lucide-react';
 import type { ChangeEvent, FC } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 import * as styles from './styles.css';
 import type { ChatMessage, ChatParticipant, ChatVariant } from './types';
 import { createMessageId } from './utils';
 import { switchVariant } from './variant-reducer';
 
-export interface ChatEditorModalProps {
-  dismiss: () => void;
-  initial: { variant: ChatVariant; participants: ChatParticipant[]; messages: ChatMessage[] };
-  onCancel?: () => void;
-  onCommit?: (next: {
-    variant: ChatVariant;
-    participants: ChatParticipant[];
-    messages: ChatMessage[];
-  }) => void;
+interface ChatDraft {
+  messages: ChatMessage[];
+  participants: ChatParticipant[];
+  variant: ChatVariant;
 }
 
-const VARIANT_LABELS: Record<ChatVariant, { name: string; hint: string }> = {
-  'user-agent': { name: 'user · agent', hint: 'Bubble + article' },
-  'user-user': { name: 'user · user', hint: 'Both bubbles' },
-};
+export interface ChatEditorModalProps {
+  dismiss: () => void;
+  initial: ChatDraft;
+  onCancel?: () => void;
+  onCommit?: (next: ChatDraft) => void;
+  onDirtyChange?: (dirty: boolean) => void;
+  requestDismiss?: () => void;
+}
+
+const VARIANT_ITEMS: { label: string; value: ChatVariant }[] = [
+  { value: 'user-agent', label: 'User · agent' },
+  { value: 'user-user', label: 'User · user' },
+];
 
 function defaultName(p: ChatParticipant): string {
   return p.name ?? (p.kind === 'agent' ? 'Assistant' : 'User');
 }
 
+function kindLabel(p: ChatParticipant): string {
+  return p.kind === 'agent' ? 'Agent' : 'User';
+}
+
 export const ChatEditorModal: FC<ChatEditorModalProps> = ({
   initial,
   dismiss,
+  requestDismiss,
   onCommit,
   onCancel,
+  onDirtyChange,
 }) => {
+  const idPrefix = useId();
   const [variant, setVariant] = useState<ChatVariant>(initial.variant);
   const [participants, setParticipants] = useState<ChatParticipant[]>(initial.participants);
   const [messages, setMessages] = useState<ChatMessage[]>(initial.messages);
+
+  const dirty = useMemo(
+    () => JSON.stringify({ variant, participants, messages }) !== JSON.stringify(initial),
+    [variant, participants, messages, initial],
+  );
+
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+
+  const participantItems = useMemo(
+    () => participants.map((p) => ({ value: p.id, label: `${defaultName(p)} (${kindLabel(p)})` })),
+    [participants],
+  );
 
   const handleVariantChange = useCallback((next: ChatVariant) => {
     setVariant(next);
@@ -75,117 +115,125 @@ export const ChatEditorModal: FC<ChatEditorModalProps> = ({
     setMessages((prev) => prev.filter((m) => m.id !== id));
   }, []);
 
-  const handleDone = useCallback(() => {
+  const handleSave = useCallback(() => {
     onCommit?.({ variant, participants, messages });
     dismiss();
   }, [onCommit, variant, participants, messages, dismiss]);
 
   const handleCancel = useCallback(() => {
+    if (requestDismiss) {
+      requestDismiss();
+      return;
+    }
     onCancel?.();
     dismiss();
-  }, [onCancel, dismiss]);
+  }, [requestDismiss, onCancel, dismiss]);
 
   return (
-    <div className={styles.modal}>
-      <div className={styles.modalHeader}>Edit chat</div>
+    <ModalShell className={styles.modal} onSave={handleSave}>
+      <ModalShellHeader
+        icon={<MessageSquare />}
+        title="Edit chat"
+        center={
+          <SegmentedControl items={VARIANT_ITEMS} value={variant} onChange={handleVariantChange} />
+        }
+        onClose={handleCancel}
+      />
 
-      <div className={styles.modalBody}>
+      <ModalShellBody className={styles.modalBody}>
         <aside className={styles.rail}>
-          <div className={styles.sectionLabel}>Variant</div>
-          <div className={styles.variantStack}>
-            {(Object.keys(VARIANT_LABELS) as ChatVariant[]).map((key) => (
-              <button
-                className={`${styles.variantPill} ${variant === key ? styles.variantPillActive : ''}`}
-                key={key}
-                type="button"
-                onClick={() => handleVariantChange(key)}
-              >
-                <div className={styles.variantPillName}>{VARIANT_LABELS[key].name}</div>
-                <div className={styles.variantPillHint}>{VARIANT_LABELS[key].hint}</div>
-              </button>
-            ))}
-          </div>
-
           <div className={styles.sectionLabel}>Participants</div>
           {participants.map((p) => (
             <div className={styles.participantCard} key={p.id}>
-              <div className={styles.participantRow}>
-                <span
-                  className={`${styles.participantPill} ${p.kind === 'user' ? styles.participantPillUser : ''}`}
-                >
-                  {p.kind}
-                </span>
-                <input
-                  className={styles.participantInput}
-                  placeholder="Display name"
-                  type="text"
+              <span
+                className={`${styles.participantPill} ${p.kind === 'user' ? styles.participantPillUser : ''}`}
+              >
+                {kindLabel(p)}
+              </span>
+              <Field id={`${idPrefix}-${p.id}-name`} label="Display name">
+                <TextInput
+                  id={`${idPrefix}-${p.id}-name`}
+                  placeholder={defaultName(p)}
                   value={p.name ?? ''}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     updateParticipant(p.id, { name: e.target.value || undefined })
                   }
                 />
-              </div>
-              <div className={styles.participantRow}>
-                <span className={styles.participantLabel}>Avatar</span>
-                <input
-                  className={styles.participantInput}
-                  placeholder="URL (optional)"
-                  type="text"
+              </Field>
+              <Field id={`${idPrefix}-${p.id}-avatar`} label="Avatar URL">
+                <TextInput
+                  id={`${idPrefix}-${p.id}-avatar`}
+                  placeholder="Optional"
+                  type="url"
                   value={p.avatar ?? ''}
                   onChange={(e: ChangeEvent<HTMLInputElement>) =>
                     updateParticipant(p.id, { avatar: e.target.value || undefined })
                   }
                 />
-              </div>
+              </Field>
             </div>
           ))}
         </aside>
 
-        <main className={styles.pane}>
-          <div className={styles.sectionLabel}>Messages — {messages.length}</div>
+        <div className={styles.pane}>
+          <div className={styles.sectionLabel}>Messages</div>
 
-          {messages.map((m) => (
+          {messages.map((m, index) => (
             <div className={styles.messageCard} key={m.id}>
               <div className={styles.messageHead}>
-                <select
-                  className={styles.messageSelect}
+                <Select
+                  items={participantItems}
                   value={m.participantId}
-                  onChange={(e) => updateMessage(m.id, { participantId: e.target.value })}
+                  onValueChange={(value) => {
+                    if (typeof value === 'string') updateMessage(m.id, { participantId: value });
+                  }}
                 >
-                  {participants.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {defaultName(p)} ({p.kind})
-                    </option>
-                  ))}
-                </select>
+                  <SelectTrigger
+                    aria-label={`Author of message ${index + 1}`}
+                    className={styles.messageSelect}
+                  >
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {participantItems.map((item) => (
+                      <SelectItem key={item.value} value={item.value}>
+                        {item.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <div className={styles.messageActions}>
-                  <button
+                  <ActionButton
+                    icon
                     aria-label="Move up"
-                    className={`${styles.button} ${styles.buttonGhost}`}
-                    type="button"
+                    disabled={index === 0}
+                    size="sm"
                     onClick={() => moveMessage(m.id, -1)}
                   >
-                    <ArrowUp size={12} />
-                  </button>
-                  <button
+                    <ArrowUp />
+                  </ActionButton>
+                  <ActionButton
+                    icon
                     aria-label="Move down"
-                    className={`${styles.button} ${styles.buttonGhost}`}
-                    type="button"
+                    disabled={index === messages.length - 1}
+                    size="sm"
                     onClick={() => moveMessage(m.id, 1)}
                   >
-                    <ArrowDown size={12} />
-                  </button>
-                  <button
-                    aria-label="Delete"
-                    className={`${styles.button} ${styles.buttonGhost}`}
-                    type="button"
+                    <ArrowDown />
+                  </ActionButton>
+                  <ActionButton
+                    danger
+                    icon
+                    aria-label="Delete message"
+                    size="sm"
                     onClick={() => deleteMessage(m.id)}
                   >
-                    <Trash2 size={12} />
-                  </button>
+                    <Trash2 />
+                  </ActionButton>
                 </div>
               </div>
               <textarea
+                aria-label={`Message ${index + 1}`}
                 className={styles.messageTextarea}
                 value={m.content}
                 onChange={(e) => updateMessage(m.id, { content: e.target.value })}
@@ -194,25 +242,20 @@ export const ChatEditorModal: FC<ChatEditorModalProps> = ({
           ))}
 
           <div className={styles.addMessage}>
-            <button className={styles.addMessageButton} type="button" onClick={addMessage}>
-              + Add message
-            </button>
+            <ActionButton size="md" variant="outline" onClick={addMessage}>
+              <Plus />
+              Add message
+            </ActionButton>
           </div>
-        </main>
-      </div>
+        </div>
+      </ModalShellBody>
 
-      <div className={styles.modalFooter}>
-        <button className={styles.button} type="button" onClick={handleCancel}>
-          Cancel
-        </button>
-        <button
-          className={`${styles.button} ${styles.buttonPrimary}`}
-          type="button"
-          onClick={handleDone}
-        >
-          Done
-        </button>
-      </div>
-    </div>
+      <ModalShellFooter
+        dirty={dirty}
+        status={`${messages.length} ${messages.length === 1 ? 'message' : 'messages'}`}
+        onCancel={handleCancel}
+        onSave={handleSave}
+      />
+    </ModalShell>
   );
 };

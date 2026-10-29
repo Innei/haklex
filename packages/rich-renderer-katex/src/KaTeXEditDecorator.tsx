@@ -1,18 +1,30 @@
 import { $isKaTeXBlockNode, $isKaTeXInlineNode } from '@haklex/rich-editor/nodes';
 import { KaTeXRenderer } from '@haklex/rich-editor/renderers';
 import {
-  ActionBar,
   ActionButton,
-  AnimatedTabs,
+  confirmDiscardChanges,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Field,
+  Kbd,
   Popover,
+  PopoverBody,
+  PopoverFooter,
+  PopoverHeader,
   PopoverPanel,
   PopoverTrigger,
+  SegmentedControl,
+  TextInput,
+  toast,
 } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getNodeByKey, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
-import { Check, Copy, RotateCcw, Search, Terminal, Trash2 } from 'lucide-react';
+import { Copy, Ellipsis, Sigma, Trash2 } from 'lucide-react';
 import type { ReactElement } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { getEditorHistoryShortcut } from './history-shortcuts';
 import { CURSOR_TOKEN, filterKaTeXSnippets, insertSnippetAtSelection } from './snippets';
@@ -26,7 +38,14 @@ interface KaTeXEditDecoratorProps {
   nodeKey: string;
 }
 
+type KaTeXTab = 'edit' | 'snippets';
+
 const SNIPPET_CATEGORY_ORDER = ['Basic', 'Greek', 'Operators', 'Structures'] as const;
+
+const TAB_ITEMS: { label: string; value: KaTeXTab }[] = [
+  { value: 'edit', label: 'Edit' },
+  { value: 'snippets', label: 'Snippets' },
+];
 
 export function KaTeXEditDecorator({
   nodeKey,
@@ -37,17 +56,19 @@ export function KaTeXEditDecorator({
 }: KaTeXEditDecoratorProps) {
   const [editor] = useLexicalComposerContext();
   const editable = editor.isEditable();
+  const fieldId = useId();
 
   const [open, setOpen] = useState(autoOpenOnMount);
   const [value, setValue] = useState(equation);
-  const [copied, setCopied] = useState(false);
-  const [activeTab, setActiveTab] = useState<'editor' | 'snippets'>('editor');
+  const [activeTab, setActiveTab] = useState<KaTeXTab>('edit');
   const [snippetQuery, setSnippetQuery] = useState('');
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const selectionRef = useRef<{ start: number | null; end: number | null }>({
     start: null,
     end: null,
   });
+
+  const dirty = value !== equation;
 
   const syncSelection = useCallback((target: HTMLTextAreaElement | null) => {
     if (!target) return;
@@ -80,42 +101,61 @@ export function KaTeXEditDecorator({
     }
   }, [open, syncSelection]);
 
+  const close = useCallback(() => {
+    setValue(equation);
+    setActiveTab('edit');
+    setSnippetQuery('');
+    setOpen(false);
+  }, [equation]);
+
+  const confirmingRef = useRef(false);
+  const requestClose = useCallback(async () => {
+    if (!dirty) {
+      close();
+      return;
+    }
+    if (confirmingRef.current) return;
+    confirmingRef.current = true;
+    try {
+      if (await confirmDiscardChanges()) close();
+    } finally {
+      confirmingRef.current = false;
+    }
+  }, [close, dirty]);
+
   const commit = useCallback(() => {
     const trimmed = value.trim();
     if (!trimmed) return;
     editor.update(() => {
       const node = $getNodeByKey(nodeKey);
-      if ($isKaTeXInlineNode(node) && node.getEquation() !== trimmed) {
-        node.setEquation(trimmed);
-      } else if ($isKaTeXBlockNode(node) && node.getEquation() !== trimmed) {
+      if (($isKaTeXInlineNode(node) || $isKaTeXBlockNode(node)) && node.getEquation() !== trimmed) {
         node.setEquation(trimmed);
       }
     });
+    setActiveTab('edit');
+    setSnippetQuery('');
     setOpen(false);
   }, [editor, nodeKey, value]);
 
-  const cancel = useCallback(() => {
-    setValue(equation);
-    setOpen(false);
-  }, [equation]);
-
   const handleDelete = useCallback(() => {
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
-      if (node) node.remove();
+      $getNodeByKey(nodeKey)?.remove();
     });
-  }, [editor, nodeKey]);
+    toast({
+      title: displayMode ? 'Math block deleted' : 'Math deleted',
+      action: {
+        label: 'Undo',
+        onClick: () => editor.dispatchCommand(UNDO_COMMAND, undefined),
+      },
+    });
+  }, [displayMode, editor, nodeKey]);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(value);
-    setCopied(true);
-    setTimeout(setCopied, 2000, false);
+    void navigator.clipboard?.writeText(value).then(
+      () => toast({ title: 'LaTeX copied', tone: 'success' }),
+      () => toast({ title: 'Could not copy LaTeX', tone: 'error' }),
+    );
   }, [value]);
-
-  const handleReset = useCallback(() => {
-    setValue(equation);
-    inputRef.current?.focus();
-  }, [equation]);
 
   const handleInsertSnippet = useCallback(
     (template: string) => {
@@ -127,7 +167,7 @@ export function KaTeXEditDecorator({
       );
 
       setValue(next.value);
-      setActiveTab('editor');
+      setActiveTab('edit');
 
       requestAnimationFrame(() => {
         const input = inputRef.current;
@@ -158,7 +198,7 @@ export function KaTeXEditDecorator({
     (e: React.KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        cancel();
+        void requestClose();
       } else if (displayMode && e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         commit();
@@ -167,13 +207,13 @@ export function KaTeXEditDecorator({
         commit();
       }
     },
-    [commit, cancel, displayMode],
+    [requestClose, commit, displayMode],
   );
 
   const handlePanelKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
       const shortcut = getEditorHistoryShortcut(e, {
-        isDirty: value !== equation || snippetQuery !== '',
+        isDirty: dirty || snippetQuery !== '',
       });
       if (!shortcut) return;
 
@@ -181,22 +221,44 @@ export function KaTeXEditDecorator({
       e.stopPropagation();
       editor.dispatchCommand(shortcut === 'undo' ? UNDO_COMMAND : REDO_COMMAND, undefined);
     },
-    [editor, equation, snippetQuery, value],
+    [dirty, editor, snippetQuery],
   );
 
   if (!editable) {
     return children;
   }
 
+  const menu = (
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<ActionButton icon aria-label="More actions" size="md" />}>
+        <Ellipsis />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem disabled={!value.trim()} onClick={handleCopy}>
+          <Copy />
+          Copy LaTeX
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onClick={handleDelete}>
+          <Trash2 />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <Popover
       open={open}
-      onOpenChange={(nextOpen) => {
-        setOpen(nextOpen);
-
-        if (!nextOpen) {
-          setValue(equation);
+      onOpenChange={(nextOpen, details) => {
+        if (nextOpen) {
+          setOpen(true);
+          return;
         }
+        const outside = details?.reason === 'outside-press' || details?.reason === 'focus-out';
+        if (outside && dirty) return;
+        if (details?.reason === 'escape-key') void requestClose();
+        else close();
       }}
     >
       <PopoverTrigger
@@ -211,144 +273,82 @@ export function KaTeXEditDecorator({
         {children}
       </PopoverTrigger>
       <PopoverPanel
+        flush
         className={`${styles.panel} ${styles.semanticClassNames.panel}`}
         initialFocus={inputRef}
         side="bottom"
-        sideOffset={8}
+        size="lg"
         onKeyDown={handlePanelKeyDown}
       >
-        {/* Header */}
-        <div className={`${styles.header} ${styles.semanticClassNames.header}`}>
-          <div className={`${styles.headerLeft} ${styles.semanticClassNames.headerLeft}`}>
-            <div className={`${styles.iconWrap} ${styles.semanticClassNames.iconWrap}`}>
-              <Terminal size={12} />
-            </div>
-            <span className={`${styles.title} ${styles.semanticClassNames.title}`}>
-              Math Editor
-            </span>
-          </div>
-          <div className={`${styles.headerRight} ${styles.semanticClassNames.headerRight}`}>
-            <span className={`${styles.mode} ${styles.semanticClassNames.mode}`}>
-              {displayMode ? 'Block' : 'Inline'}
-            </span>
-            <button
-              className={`${styles.deleteButton} ${styles.semanticClassNames.deleteButton}`}
-              title="Delete node"
-              type="button"
-              onClick={handleDelete}
-            >
-              <Trash2 size={14} />
-            </button>
-          </div>
-        </div>
-
-        {/* Tabs */}
-        <AnimatedTabs
-          className={`${styles.tabs} ${styles.semanticClassNames.tabs}`}
-          value={activeTab}
-          tabs={[
-            { id: 'editor', label: 'Editor' },
-            { id: 'snippets', label: 'Snippets' },
-          ]}
-          onChange={(id) => setActiveTab(id as 'editor' | 'snippets')}
+        <PopoverHeader
+          className={styles.semanticClassNames.header}
+          icon={<Sigma />}
+          title={displayMode ? 'Math block' : 'Inline math'}
+          actions={
+            <>
+              <SegmentedControl
+                className={`${styles.tabs} ${styles.semanticClassNames.tabs}`}
+                items={TAB_ITEMS}
+                value={activeTab}
+                onChange={setActiveTab}
+              />
+              {menu}
+            </>
+          }
         />
 
-        {/* Body (scrollarea for stable popover height) */}
         <div className={`${styles.bodyScrollArea} ${styles.semanticClassNames.bodyScrollArea}`}>
-          {/* Editor Tab */}
-          {activeTab === 'editor' && (
-            <div className={`${styles.body} ${styles.semanticClassNames.body}`}>
-              <div className={`${styles.field} ${styles.semanticClassNames.field}`}>
-                <label className={`${styles.label} ${styles.semanticClassNames.label}`}>
-                  LaTeX Input
-                </label>
-                <div className={`${styles.inputWrap} ${styles.semanticClassNames.inputWrap}`}>
-                  <textarea
-                    autoCapitalize="off"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    className={`${styles.textarea} ${styles.semanticClassNames.textarea}`}
-                    placeholder="e.g. \frac{-b \pm \sqrt{b^2-4ac}}{2a}"
-                    ref={inputRef}
-                    rows={displayMode ? 4 : 3}
-                    spellCheck={false}
-                    value={value}
-                    onClick={(e) => syncSelection(e.currentTarget)}
-                    onKeyDown={handleKeyDown}
-                    onKeyUp={(e) => syncSelection(e.currentTarget)}
-                    onSelect={(e) => syncSelection(e.currentTarget)}
-                    onChange={(e) => {
-                      setValue(e.target.value);
-                      syncSelection(e.target);
-                    }}
-                  />
-                  <div
-                    className={`${styles.inputActions} ${styles.semanticClassNames.inputActions}`}
+          {activeTab === 'edit' && (
+            <PopoverBody className={styles.semanticClassNames.body}>
+              <Field id={fieldId} label="LaTeX">
+                <textarea
+                  autoCapitalize="off"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  className={`${styles.textarea} ${styles.semanticClassNames.textarea}`}
+                  id={fieldId}
+                  placeholder="e.g. \frac{-b \pm \sqrt{b^2-4ac}}{2a}"
+                  ref={inputRef}
+                  rows={displayMode ? 4 : 2}
+                  spellCheck={false}
+                  value={value}
+                  onClick={(e) => syncSelection(e.currentTarget)}
+                  onKeyDown={handleKeyDown}
+                  onKeyUp={(e) => syncSelection(e.currentTarget)}
+                  onSelect={(e) => syncSelection(e.currentTarget)}
+                  onChange={(e) => {
+                    setValue(e.target.value);
+                    syncSelection(e.target);
+                  }}
+                />
+              </Field>
+              <div
+                aria-label="Preview"
+                className={`${styles.preview} ${styles.semanticClassNames.preview}`}
+                role="img"
+              >
+                {value.trim() ? (
+                  <KaTeXRenderer displayMode={displayMode} equation={value} />
+                ) : (
+                  <span
+                    className={`${styles.previewEmpty} ${styles.semanticClassNames.previewEmpty}`}
                   >
-                    <ActionButton
-                      icon
-                      disabled={!value.trim()}
-                      size="sm"
-                      title="Copy LaTeX"
-                      onClick={handleCopy}
-                    >
-                      {copied ? (
-                        <Check size={12} style={{ color: '#22c55e' }} />
-                      ) : (
-                        <Copy size={12} />
-                      )}
-                    </ActionButton>
-                    <ActionButton
-                      icon
-                      disabled={value === equation}
-                      size="sm"
-                      title="Reset"
-                      onClick={handleReset}
-                    >
-                      <RotateCcw size={12} />
-                    </ActionButton>
-                  </div>
-                </div>
+                    Preview appears as you type
+                  </span>
+                )}
               </div>
-
-              <div className={`${styles.field} ${styles.semanticClassNames.field}`}>
-                <label className={`${styles.label} ${styles.semanticClassNames.label}`}>
-                  Preview
-                </label>
-                <div className={`${styles.preview} ${styles.semanticClassNames.preview}`}>
-                  {value.trim() ? (
-                    <KaTeXRenderer displayMode={displayMode} equation={value} />
-                  ) : (
-                    <span
-                      className={`${styles.previewEmpty} ${styles.semanticClassNames.previewEmpty}`}
-                    >
-                      Enter a formula
-                    </span>
-                  )}
-                </div>
-              </div>
-            </div>
+            </PopoverBody>
           )}
 
-          {/* Snippets Tab */}
           {activeTab === 'snippets' && (
-            <div className={`${styles.body} ${styles.semanticClassNames.body}`}>
-              <div
-                className={`${styles.snippetSearchWrap} ${styles.semanticClassNames.snippetSearchWrap}`}
-              >
-                <Search
-                  className={`${styles.snippetSearchIcon} ${styles.semanticClassNames.snippetSearchIcon}`}
-                  size={14}
-                />
-                <input
-                  autoComplete="off"
-                  className={`${styles.snippetSearchInput} ${styles.semanticClassNames.snippetSearchInput}`}
-                  placeholder="Search snippets: frac, matrix, sum..."
-                  type="text"
-                  value={snippetQuery}
-                  onChange={(e) => setSnippetQuery(e.target.value)}
-                />
-              </div>
+            <PopoverBody className={styles.semanticClassNames.body}>
+              <TextInput
+                aria-label="Search snippets"
+                autoComplete="off"
+                placeholder="Search snippets: frac, matrix, sum…"
+                value={snippetQuery}
+                onChange={(e) => setSnippetQuery(e.target.value)}
+              />
 
               {groupedSnippets.length > 0 ? (
                 <div
@@ -374,7 +374,7 @@ export function KaTeXEditDecorator({
                             type="button"
                             onClick={() => handleInsertSnippet(snippet.template)}
                           >
-                            <div
+                            <span
                               className={`${styles.snippetMeta} ${styles.semanticClassNames.snippetMeta}`}
                             >
                               <span
@@ -387,7 +387,7 @@ export function KaTeXEditDecorator({
                               >
                                 {snippet.template.replace(CURSOR_TOKEN, '')}
                               </span>
-                            </div>
+                            </span>
                             <span
                               className={`${styles.snippetPreview} ${styles.semanticClassNames.snippetPreview}`}
                             >
@@ -409,24 +409,26 @@ export function KaTeXEditDecorator({
                   No snippets match &ldquo;{snippetQuery.trim()}&rdquo;
                 </div>
               )}
-            </div>
+            </PopoverBody>
           )}
         </div>
 
-        {/* Footer */}
-        <div className={`${styles.footer} ${styles.semanticClassNames.footer}`}>
-          <span className={`${styles.charCount} ${styles.semanticClassNames.charCount}`}>
-            {value.trim() ? `${value.length} chars` : 'Enter a formula'}
-          </span>
-          <ActionBar>
-            <ActionButton size="md" variant="ghost" onClick={cancel}>
-              Cancel
-            </ActionButton>
-            <ActionButton disabled={!value.trim()} size="md" variant="accent" onClick={commit}>
-              Save
-            </ActionButton>
-          </ActionBar>
-        </div>
+        <PopoverFooter
+          className={styles.semanticClassNames.footer}
+          hint={
+            <span className={styles.semanticClassNames.charCount}>
+              {`${value.length} ${value.length === 1 ? 'character' : 'characters'}`}
+            </span>
+          }
+        >
+          <ActionButton size="md" variant="outline" onClick={close}>
+            Cancel
+          </ActionButton>
+          <ActionButton disabled={!value.trim()} size="md" variant="solid" onClick={commit}>
+            Save
+            <Kbd keys={displayMode ? ['mod', 'enter'] : ['enter']} size="sm" tone="inverted" />
+          </ActionButton>
+        </PopoverFooter>
       </PopoverPanel>
     </Popover>
   );

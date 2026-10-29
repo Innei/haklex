@@ -19,10 +19,16 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { getThemeExtensions, loadLanguageExtension } from '@haklex/cm-editor';
 import type { ColorScheme } from '@haklex/rich-editor/static';
+import {
+  ModalShell,
+  ModalShellBody,
+  ModalShellFooter,
+  ModalShellHeader,
+} from '@haklex/rich-editor-ui';
 import { normalizeLanguage } from '@haklex/rich-renderer-codeblock/constants';
 import { FileIcon } from '@haklex/rich-renderer-codeblock/icons';
 import { usePortalTheme } from '@haklex/rich-style-token';
-import { GripVertical, Plus, Trash2, X } from 'lucide-react';
+import { FileCode2, GripVertical, Plus, Trash2 } from 'lucide-react';
 import type { CSSProperties, FC } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -35,10 +41,11 @@ export interface CodeEditorModalProps {
   colorScheme: ColorScheme;
   dismiss: () => void;
   files: CodeFile[];
+  onDirtyChange?: (dirty: boolean) => void;
   onFilesChange?: (files: CodeFile[]) => void;
+  requestDismiss?: () => void;
 }
 
-// ─── Sortable file item ──────────────────────────────────
 const SortableFileItem: FC<{
   file: CodeFile;
   isActive: boolean;
@@ -129,11 +136,12 @@ const SortableFileItem: FC<{
   );
 };
 
-// ─── Main modal ─────────────────────────────────────────
 export const CodeEditorModal: FC<CodeEditorModalProps> = ({
   files: initialFiles,
   onFilesChange,
+  onDirtyChange,
   dismiss,
+  requestDismiss,
   colorScheme,
 }) => {
   const [editFiles, setEditFiles] = useState<CodeFile[]>(() => initialFiles.map((f) => ({ ...f })));
@@ -154,13 +162,21 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
   const editFilesRef = useRef(editFiles);
   editFilesRef.current = editFiles;
 
+  const dirty = useMemo(
+    () => JSON.stringify(editFiles) !== JSON.stringify(initialFiles),
+    [editFiles, initialFiles],
+  );
+
+  useEffect(() => {
+    onDirtyChange?.(dirty);
+  }, [dirty, onDirtyChange]);
+
   const activeFile = editFiles.find((f) => f.filename === activeFilename) ?? editFiles[0];
 
   onCodeChangeRef.current = (code: string) => {
     setEditFiles((prev) => prev.map((f) => (f.filename === activeFilename ? { ...f, code } : f)));
   };
 
-  // Recreate editor when switching files
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -206,7 +222,6 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
     };
   }, [activeFilename]);
 
-  // Sync theme when colorScheme changes
   useEffect(() => {
     const editor = editorRef.current;
     if (!editor) return;
@@ -215,10 +230,12 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
     });
   }, [colorScheme]);
 
-  const handleDismiss = useCallback(() => {
+  const handleSave = useCallback(() => {
     onFilesChange?.(editFiles);
     dismiss();
   }, [editFiles, onFilesChange, dismiss]);
+
+  const handleCancel = requestDismiss ?? dismiss;
 
   const handleAddFile = useCallback(() => {
     const name = `untitled-${editFiles.length + 1}.ts`;
@@ -265,7 +282,6 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
     [editFiles, activeFilename],
   );
 
-  // DnD
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
 
   const fileIds = useMemo(() => editFiles.map((f) => f.filename), [editFiles]);
@@ -294,24 +310,12 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
     : '';
 
   return (
-    <div className={`${styles.modal} ${styles.semanticClassNames.modal}`}>
-      {/* Title bar */}
-      <div className={`${styles.modalTitlebar} ${styles.semanticClassNames.modalTitlebar}`}>
-        <span className={`${styles.modalTitle} ${styles.semanticClassNames.modalTitle}`}>
-          Code Snippet
-        </span>
-        <button
-          className={`${styles.modalIconButton} ${styles.semanticClassNames.modalIconButton}`}
-          type="button"
-          onClick={handleDismiss}
-        >
-          <X size={14} />
-        </button>
-      </div>
-
-      {/* Body */}
-      <div className={`${styles.modalBody} ${styles.semanticClassNames.modalBody}`}>
-        {/* Sidebar */}
+    <ModalShell
+      className={`${styles.modal} ${styles.semanticClassNames.modal}`}
+      onSave={handleSave}
+    >
+      <ModalShellHeader icon={<FileCode2 />} title="Code snippet" onClose={handleCancel} />
+      <ModalShellBody className={`${styles.modalBody} ${styles.semanticClassNames.modalBody}`}>
         <div className={`${styles.modalSidebar} ${styles.semanticClassNames.modalSidebar}`}>
           <div className={`${styles.sidebarHeader} ${styles.semanticClassNames.sidebarHeader}`}>
             <span>Files</span>
@@ -383,9 +387,7 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
           </div>
         </div>
 
-        {/* Code panel */}
         <div className={`${styles.modalEditor} ${styles.semanticClassNames.modalEditor}`}>
-          {/* Breadcrumb bar */}
           <div className={`${styles.breadcrumb} ${styles.semanticClassNames.breadcrumb}`}>
             <div className={`${styles.breadcrumbLeft} ${styles.semanticClassNames.breadcrumbLeft}`}>
               {activeFile && (
@@ -412,13 +414,18 @@ export const CodeEditorModal: FC<CodeEditorModalProps> = ({
             </div>
           </div>
 
-          {/* Editor container */}
           <div
             className={`${styles.editorContainer} ${styles.semanticClassNames.editorContainer}`}
             ref={containerRef}
           />
         </div>
-      </div>
-    </div>
+      </ModalShellBody>
+      <ModalShellFooter
+        dirty={dirty}
+        status={`${editFiles.length} ${editFiles.length === 1 ? 'file' : 'files'}`}
+        onCancel={handleCancel}
+        onSave={handleSave}
+      />
+    </ModalShell>
   );
 };

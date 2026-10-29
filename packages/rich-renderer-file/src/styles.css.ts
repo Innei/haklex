@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeText, vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
@@ -15,9 +15,6 @@ export const semanticClassNames = {
   chipName: 'rr-file-chip-name',
   editTrigger: 'rr-file-edit-trigger',
   editPanel: 'rr-file-edit-panel',
-  editField: 'rr-file-edit-field',
-  editInput: 'rr-file-edit-input',
-  editError: 'rr-file-edit-error',
 } as const;
 
 const hoverBorder = `color-mix(in srgb, ${vars.color.border}, ${vars.color.text} 25%)`;
@@ -168,47 +165,22 @@ export const editTriggerInline = style({
   cursor: 'pointer',
 });
 
-export const editPanel = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '0.5rem',
-  selectors: {
-    '&&': {
-      width: 'max-content',
-      minWidth: '18rem',
-      maxWidth: 'min(26rem, 92vw)',
-    },
-  },
-});
+export const editPanel = style({});
 
-export const editField = style({
+export const inspectorRow = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '0.5rem',
+  justifyContent: 'space-between',
+  gap: 12,
 });
 
-export const editFieldIcon = style({
-  flex: 'none',
+export const inspectorLabel = style({
+  ...chromeText.label,
+  color: vars.color.textSecondary,
+});
+
+export const footerNote = style({
+  ...chromeText.label,
+  fontWeight: 400,
   color: vars.color.textTertiary,
-});
-
-export const editInput = style({
-  'flex': 1,
-  'minWidth': 0,
-  'padding': '0.375rem 0.5rem',
-  'border': `1px solid ${vars.color.border}`,
-  'borderRadius': '0.375rem',
-  'background': vars.color.bg,
-  'color': vars.color.text,
-  'fontSize': '0.8125rem',
-  'fontFamily': 'inherit',
-  'outline': 'none',
-  ':focus': {
-    borderColor: hoverBorder,
-  },
-});
-
-export const editError = style({
-  fontSize: '0.75rem',
-  color: vars.color.alertCaution,
 });

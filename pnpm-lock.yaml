@@ -1711,6 +1711,9 @@ importers:
 
   packages/rich-plugin-block-handle:
     dependencies:
+      '@haklex/rich-editor':
+        specifier: workspace:^
+        version: link:../rich-editor
       '@haklex/rich-editor-ui':
         specifier: workspace:^
         version: link:../rich-editor-ui
@@ -1959,6 +1962,9 @@ importers:
 
   packages/rich-plugin-mention:
     dependencies:
+      '@floating-ui/react-dom':
+        specifier: ^2.1.9
+        version: 2.1.9(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       '@haklex/rich-editor':
         specifier: workspace:^
         version: link:../rich-editor
@@ -2011,6 +2017,9 @@ importers:
       '@haklex/rich-editor':
         specifier: workspace:^
         version: link:../rich-editor
+      '@haklex/rich-editor-ui':
+        specifier: workspace:^
+        version: link:../rich-editor-ui
       '@haklex/rich-style-token':
         specifier: workspace:^
         version: link:../rich-style-token
@@ -2121,6 +2130,9 @@ importers:
       '@haklex/rich-editor-ui':
         specifier: workspace:^
         version: link:../rich-editor-ui
+      '@haklex/rich-plugin-slash-menu':
+        specifier: workspace:^
+        version: link:../rich-plugin-slash-menu
       '@haklex/rich-style-token':
         specifier: workspace:^
         version: link:../rich-style-token

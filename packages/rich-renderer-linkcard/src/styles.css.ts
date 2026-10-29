@@ -21,11 +21,6 @@ export const semanticClassNames = {
   errorContent: 'link-card__error-content',
   errorUrl: 'link-card__error-url',
   errorHint: 'link-card__error-hint',
-  editWrapper: 'rich-link-card-edit-wrapper',
-  editPanel: 'rich-link-card-edit-panel',
-  editUrlRow: 'rich-link-card-edit-url-row',
-  editLinkIcon: 'rich-link-card-edit-link-icon',
-  editInput: 'rich-link-card-edit-input',
 } as const;
 
 const hoverBorder = `color-mix(in srgb, ${vars.color.border}, ${vars.color.text} 25%)`;
@@ -297,51 +292,6 @@ export const errorHint = style({
   marginTop: '0.125rem',
   fontSize: vars.typography.fontSizeXs,
   color: vars.color.textQuaternary,
-});
-
-/* ───── edit decorator (unchanged) ───── */
-export const editWrapper = style({
-  display: 'block',
-});
-
-export const editPanel = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  width: '340px',
-  padding: '12px',
-  fontSize: vars.typography.fontSizeSm,
-  backgroundColor: vars.color.bg,
-  borderColor: vars.color.border,
-  color: vars.color.text,
-});
-
-export const editUrlRow = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '8px 12px',
-  backgroundColor: vars.color.bgSecondary,
-  borderRadius: vars.borderRadius.md,
-  minWidth: 0,
-});
-
-export const editLinkIcon = style({
-  flexShrink: 0,
-  color: vars.color.textSecondary,
-});
-
-export const editInput = style({
-  flex: 1,
-  appearance: 'none',
-  border: 'none',
-  backgroundColor: 'transparent',
-  color: vars.color.text,
-  fontFamily: vars.typography.fontMono,
-  fontSize: vars.typography.fontSizeSm,
-  padding: 0,
-  outline: 'none',
-  minWidth: 0,
 });
 
 /* ───── shape lookup ───── */

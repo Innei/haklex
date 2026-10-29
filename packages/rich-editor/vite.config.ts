@@ -10,6 +10,7 @@ export default createViteConfig({
     'nodes-entry': 'src/nodes-entry.ts',
     'plugins-entry': 'src/plugins-entry.ts',
     'commands-entry': 'src/commands-entry.ts',
+    'command-registry-entry': 'src/command-registry-entry.ts',
     'renderers-entry': 'src/renderers-entry.ts',
     'virtualization-entry': 'src/virtualization-entry.ts',
   },

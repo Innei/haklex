@@ -58,12 +58,18 @@ function button(el: HTMLElement, name: string) {
 function field(el: HTMLElement, name: string) {
   const byAria = el.querySelector<HTMLInputElement>(`[aria-label="${name}"]`);
   if (byAria) return byAria;
-  const label = [...el.querySelectorAll('label')].find(
-    (l) => l.querySelector('span')?.textContent === name,
-  );
-  const control = label?.querySelector<HTMLInputElement>('input, select');
+  const label = [...el.querySelectorAll('label')].find((l) => l.textContent === name);
+  const control = label?.htmlFor ? el.ownerDocument.getElementById(label.htmlFor) : null;
   if (!control) throw new Error(`field "${name}" not found`);
-  return control;
+  return control as HTMLInputElement;
+}
+
+function checkbox(el: HTMLElement, name: string) {
+  const found = [...el.querySelectorAll<HTMLElement>('[role="checkbox"]')].find(
+    (box) => box.textContent === name,
+  );
+  if (!found) throw new Error(`checkbox "${name}" not found`);
+  return found;
 }
 
 async function type(input: HTMLInputElement, text: string) {
@@ -114,12 +120,12 @@ describe('ChartConfigPanel · Setup', () => {
     const el = await mount(
       JSON.stringify({ ...JSON.parse(SPEC), data: [{ month: 'Jan', region: 'EU', visits: 1 }] }),
     );
-    const select = field(el, 'Category field (x)') as unknown as HTMLSelectElement;
-    expect([...select.options].map((o) => o.value)).toEqual(['month', 'region']);
-    await act(async () => {
-      select.value = 'region';
-      select.dispatchEvent(new Event('change', { bubbles: true }));
-    });
+    const trigger = field(el, 'Category field (x)');
+    expect(trigger.getAttribute('role')).toBe('combobox');
+    await act(async () => trigger.click());
+    const options = [...document.body.querySelectorAll<HTMLElement>('[role="option"]')];
+    expect(options.map((o) => o.textContent)).toEqual(['month', 'region']);
+    await act(async () => options[1].click());
     expect(spec().x).toBe('region');
   });
 
@@ -220,14 +226,14 @@ describe('ChartConfigPanel · Style', () => {
     await click(button(el, 'Setup'));
     await click(button(el, 'Add series'));
     await click(button(el, 'Style'));
-    await click(field(el, 'Stacked'));
+    await click(checkbox(el, 'Stacked'));
     expect(spec().stacked).toBe(true);
 
     await click(button(el, 'Setup'));
     await click(button(el, 'Pie'));
     await click(button(el, 'Style'));
     expect(el.textContent).not.toContain('Stacked');
-    await click(field(el, 'Donut'));
+    await click(checkbox(el, 'Donut'));
     expect(spec().donut).toBe(true);
   });
 });

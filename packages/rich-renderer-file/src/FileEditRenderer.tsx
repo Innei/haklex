@@ -1,31 +1,38 @@
-import { $createFileNode, $isFileNode, fileExtFromName } from '@haklex/rich-editor/nodes';
-import { useFileUpload, useFileUploadEntry } from '@haklex/rich-editor/plugins';
+import type { FileDisplay } from '@haklex/rich-editor/nodes';
+import { $createFileNode, $isFileNode } from '@haklex/rich-editor/nodes';
+import { useFileUploadEntry } from '@haklex/rich-editor/plugins';
 import type { FileRendererProps } from '@haklex/rich-editor/renderers';
 import { fileMetaText } from '@haklex/rich-editor/renderers';
 import { useRendererMode } from '@haklex/rich-editor/static';
 import {
-  ActionBar,
-  ActionButton,
+  Field,
+  Kbd,
   Popover,
+  PopoverBody,
+  PopoverFooter,
+  PopoverHeader,
   PopoverPanel,
   PopoverTrigger,
+  SegmentedControl,
+  TextInput,
+  toast,
+  useLiveEdit,
 } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createParagraphNode, $getNodeByKey } from 'lexical';
-import {
-  AlertCircle,
-  Download,
-  Link2,
-  Paperclip,
-  Pencil,
-  Pilcrow,
-  RefreshCw,
-  Trash2,
-} from 'lucide-react';
-import { useCallback, useRef, useState } from 'react';
+import { $createParagraphNode, $getNodeByKey, HISTORY_MERGE_TAG, UNDO_COMMAND } from 'lexical';
+import { Paperclip } from 'lucide-react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
+import { FileActionsMenu } from './FileActionsMenu';
 import { FileCardContent, FileChipContent, FileRenderer } from './FileRenderer';
+import { FileReplaceButton, useFileReplace } from './FileReplaceButton';
+import { FileUploadCard } from './FileUploadCard';
 import * as styles from './styles.css';
+
+const DISPLAY_ITEMS: { label: string; value: FileDisplay }[] = [
+  { value: 'block', label: 'Block' },
+  { value: 'inline', label: 'Inline' },
+];
 
 export function FileEditRenderer(props: FileRendererProps) {
   const mode = useRendererMode();
@@ -48,104 +55,73 @@ function FileEditRendererInner({
 }: FileRendererProps & { nodeKey: string }) {
   const [editor] = useLexicalComposerContext();
   const editable = editor.isEditable();
-  const fileUpload = useFileUpload();
   const uploadEntry = useFileUploadEntry(editor, nodeKey);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const id = useId();
 
   const [open, setOpen] = useState(false);
   const [editName, setEditName] = useState(name);
-  const [replacing, setReplacing] = useState(false);
-  const [replacePercent, setReplacePercent] = useState(0);
-  const [replaceError, setReplaceError] = useState<string | null>(null);
 
-  const commitName = useCallback(() => {
-    const trimmed = editName.trim();
-    if (!trimmed || trimmed === name) {
-      setEditName(name);
-      return;
-    }
-    editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
-      if ($isFileNode(node)) node.setName(trimmed);
-    });
-  }, [editor, editName, name, nodeKey]);
+  const values = useMemo(() => ({ name }), [name]);
+  const applyName = useCallback(
+    (patch: Partial<{ name: string }>, merge: boolean) => {
+      if (patch.name === undefined) return;
+      const next = patch.name;
+      editor.update(
+        () => {
+          const node = $getNodeByKey(nodeKey);
+          if ($isFileNode(node)) node.setName(next);
+        },
+        merge ? { tag: HISTORY_MERGE_TAG } : undefined,
+      );
+    },
+    [editor, nodeKey],
+  );
+  const { apply, revert } = useLiveEdit(values, open, applyName);
+
+  useEffect(() => {
+    if (open) setEditName(name);
+  }, [open]);
 
   const handleDelete = useCallback(() => {
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
-      if (node) node.remove();
+      $getNodeByKey(nodeKey)?.remove();
     });
     setOpen(false);
-  }, [editor, nodeKey]);
-
-  const handleToggleDisplay = useCallback(() => {
-    editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
-      if (!$isFileNode(node)) return;
-      const payload = node.getPayload();
-      const nextDisplay = payload.display === 'inline' ? 'block' : 'inline';
-      const replacement = $createFileNode({ ...payload, display: nextDisplay });
-      if (nextDisplay === 'inline') {
-        const paragraph = $createParagraphNode();
-        paragraph.append(replacement);
-        node.replace(paragraph);
-      } else {
-        node.getTopLevelElementOrThrow().insertAfter(replacement);
-        node.remove();
-      }
+    toast({
+      title: 'File deleted',
+      action: {
+        label: 'Undo',
+        onClick: () => editor.dispatchCommand(UNDO_COMMAND, undefined),
+      },
     });
-    setOpen(false);
   }, [editor, nodeKey]);
 
-  const handleCopyLink = useCallback(() => {
-    if (src) void navigator.clipboard.writeText(src);
-    setOpen(false);
-  }, [src]);
-
-  const handleDownload = useCallback(() => {
-    if (!src) return;
-    const anchor = document.createElement('a');
-    anchor.href = src;
-    anchor.download = name;
-    anchor.rel = 'noopener noreferrer';
-    anchor.target = '_blank';
-    anchor.click();
-  }, [src, name]);
-
-  const handleReplaceFile = useCallback(
-    async (file: File | null) => {
-      if (!file || !fileUpload) return;
-
-      setReplacing(true);
-      setReplacePercent(0);
-      setReplaceError(null);
-
-      try {
-        const result = await fileUpload(file, {
-          onProgress: (percent) => setReplacePercent(Math.round(percent)),
-        });
-        editor.update(() => {
-          const node = $getNodeByKey(nodeKey);
-          if (!$isFileNode(node)) return;
-          node.setFilePayload({
-            src: result.src,
-            name: file.name,
-            size: file.size,
-            mimeType: file.type || undefined,
-            ext: fileExtFromName(file.name),
-          });
-        });
-        setEditName(file.name);
-        setOpen(false);
-      } catch (err: unknown) {
-        console.error('[FileEditRenderer]', err);
-        setReplaceError('Upload failed');
-      } finally {
-        setReplacing(false);
-      }
+  const handleSetDisplay = useCallback(
+    (nextDisplay: FileDisplay) => {
+      if (nextDisplay === display) return;
+      editor.update(() => {
+        const node = $getNodeByKey(nodeKey);
+        if (!$isFileNode(node)) return;
+        const replacement = $createFileNode({ ...node.getPayload(), display: nextDisplay });
+        if (nextDisplay === 'inline') {
+          const paragraph = $createParagraphNode();
+          paragraph.append(replacement);
+          node.replace(paragraph);
+        } else {
+          node.getTopLevelElementOrThrow().insertAfter(replacement);
+          node.remove();
+        }
+      });
+      setOpen(false);
     },
-    [editor, fileUpload, nodeKey],
+    [display, editor, nodeKey],
   );
+
+  const handleReplaced = useCallback((fileName: string) => {
+    setEditName(fileName);
+    setOpen(false);
+  }, []);
+  const { available: canReplace, ...replace } = useFileReplace(nodeKey, handleReplaced);
 
   if (!editable) {
     return (
@@ -161,64 +137,19 @@ function FileEditRendererInner({
   }
 
   if (uploadEntry) {
-    return (
-      <span
-        className={`${styles.card} ${uploadEntry.status === 'error' ? styles.cardError : ''} ${styles.semanticClassNames.card}`}
-      >
-        {uploadEntry.status === 'error' ? (
-          <AlertCircle className={`${styles.cardIcon} ${styles.cardErrorText}`} size={20} />
-        ) : (
-          <Paperclip className={styles.cardIcon} />
-        )}
-        <span className={`${styles.cardMeta} ${styles.semanticClassNames.cardMeta}`}>
-          <span className={`${styles.cardName} ${styles.semanticClassNames.cardName}`}>{name}</span>
-          {uploadEntry.status === 'error' ? (
-            <span className={`${styles.cardSub} ${styles.cardErrorText}`}>
-              {uploadEntry.error ?? 'Upload failed'}
-            </span>
-          ) : (
-            <>
-              <span className={`${styles.cardSub} ${styles.semanticClassNames.cardSub}`}>
-                <span>Uploading...</span>
-                <span>{uploadEntry.percent}%</span>
-              </span>
-              <span className={`${styles.cardProgress} ${styles.semanticClassNames.cardProgress}`}>
-                <span
-                  className={`${styles.cardProgressFill} ${styles.semanticClassNames.cardProgressFill}`}
-                  style={{ width: `${uploadEntry.percent}%` }}
-                />
-              </span>
-            </>
-          )}
-        </span>
-        {uploadEntry.status === 'error' && (
-          <ActionBar>
-            <ActionButton onClick={uploadEntry.retry}>
-              <RefreshCw />
-              Retry
-            </ActionButton>
-            <ActionButton danger onClick={uploadEntry.remove}>
-              Remove
-            </ActionButton>
-          </ActionBar>
-        )}
-      </span>
-    );
+    return <FileUploadCard entry={uploadEntry} name={name} />;
   }
 
   const isInline = display === 'inline';
+  const nameInvalid = editName.trim() === '';
+  const meta = fileMetaText(name, size, ext);
 
   return (
     <Popover
       open={open}
-      onOpenChange={(nextOpen: boolean) => {
+      onOpenChange={(nextOpen, details) => {
+        if (!nextOpen && details?.reason === 'escape-key') revert();
         setOpen(nextOpen);
-        if (nextOpen) {
-          setEditName(name);
-          setReplaceError(null);
-        } else {
-          commitName();
-        }
       }}
     >
       <PopoverTrigger
@@ -244,72 +175,51 @@ function FileEditRendererInner({
         )}
       </PopoverTrigger>
       <PopoverPanel
+        flush
         className={`${styles.editPanel} ${styles.semanticClassNames.editPanel}`}
         side="bottom"
-        sideOffset={8}
+        size="md"
       >
-        <div className={`${styles.editField} ${styles.semanticClassNames.editField}`}>
-          <Pencil className={styles.editFieldIcon} size={14} />
-          <input
-            className={`${styles.editInput} ${styles.semanticClassNames.editInput}`}
-            placeholder="File name"
-            value={editName}
-            onBlur={commitName}
-            onChange={(e) => setEditName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault();
-                commitName();
-                setOpen(false);
-              } else if (e.key === 'Escape') {
-                e.preventDefault();
-                setEditName(name);
-                setOpen(false);
-              }
-            }}
-          />
-        </div>
-        {fileMetaText(name, size, ext) && (
-          <span className={styles.cardSub}>{fileMetaText(name, size, ext)}</span>
-        )}
-        {replaceError && (
-          <span className={`${styles.editError} ${styles.semanticClassNames.editError}`}>
-            {replaceError}
-          </span>
-        )}
-        <ActionBar>
-          {fileUpload && (
-            <>
-              <input
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                type="file"
-                onChange={(e) => {
-                  void handleReplaceFile(e.currentTarget.files?.[0] ?? null);
-                  e.currentTarget.value = '';
-                }}
+        <PopoverHeader
+          actions={<FileActionsMenu name={name} src={src} onDelete={handleDelete} />}
+          icon={<Paperclip />}
+          title="File"
+        />
+        <PopoverBody>
+          <Field
+            error={nameInvalid ? 'Enter a file name' : undefined}
+            hint={meta || undefined}
+            id={`${id}-name`}
+            label="Name"
+          >
+            <TextInput
+              id={`${id}-name`}
+              invalid={nameInvalid}
+              value={editName}
+              onChange={(e) => {
+                setEditName(e.target.value);
+                if (e.target.value.trim()) apply({ name: e.target.value });
+              }}
+            />
+          </Field>
+          <div className={styles.inspectorRow}>
+            <span className={styles.inspectorLabel} id={`${id}-display`}>
+              Display as
+            </span>
+            <div aria-labelledby={`${id}-display`} role="group">
+              <SegmentedControl
+                items={DISPLAY_ITEMS}
+                value={display ?? 'block'}
+                onChange={handleSetDisplay}
               />
-              <ActionButton disabled={replacing} onClick={() => fileInputRef.current?.click()}>
-                <RefreshCw />
-                {replacing ? `Uploading ${replacePercent}%` : 'Replace'}
-              </ActionButton>
-            </>
-          )}
-          <ActionButton onClick={handleToggleDisplay}>
-            <Pilcrow />
-            {isInline ? 'To block' : 'To inline'}
-          </ActionButton>
-          <ActionButton disabled={!src} onClick={handleCopyLink}>
-            <Link2 />
-            Copy link
-          </ActionButton>
-          <ActionButton icon aria-label="Download file" disabled={!src} onClick={handleDownload}>
-            <Download />
-          </ActionButton>
-          <ActionButton danger icon aria-label="Delete file" onClick={handleDelete}>
-            <Trash2 />
-          </ActionButton>
-        </ActionBar>
+            </div>
+          </div>
+          {canReplace && <FileReplaceButton {...replace} />}
+        </PopoverBody>
+        <PopoverFooter hint="Changes apply as you type">
+          <Kbd keys="Esc" size="sm" tone="muted" />
+          <span className={styles.footerNote}>revert</span>
+        </PopoverFooter>
       </PopoverPanel>
     </Popover>
   );

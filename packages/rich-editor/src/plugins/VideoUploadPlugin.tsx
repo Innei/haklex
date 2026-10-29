@@ -1,12 +1,13 @@
+import { toast, updateToast } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { DRAG_DROP_PASTE } from '@lexical/rich-text';
-import { $insertNodes, COMMAND_PRIORITY_CRITICAL, PASTE_COMMAND } from 'lexical';
-import { Check, Info } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { COMMAND_PRIORITY_CRITICAL, PASTE_COMMAND } from 'lexical';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useEditorBlock } from '../context/EditorBlockContext';
 import { $createVideoNode } from '../nodes/VideoNode';
 import * as css from './image-upload.css';
+import { $createInsertionCursor, $insertAtCursor, type InsertionCursor } from './insertion-cursor';
 
 export interface VideoUploadResult {
   src: string;
@@ -28,6 +29,8 @@ function hasVideoData(dataTransfer: DataTransfer | null): boolean {
   return [...dataTransfer.items].some((item) => item.type.startsWith('video/'));
 }
 
+const ERROR_TOAST_DURATION = 6000;
+
 interface VideoUploadPluginProps {
   onUpload: VideoUploadFn;
 }
@@ -39,54 +42,36 @@ export function VideoUploadPlugin({ onUpload }: VideoUploadPluginProps) {
   const [editor] = useLexicalComposerContext();
   const uploadRef = useRef(onUpload);
   uploadRef.current = onUpload;
-  const toastTimerRef = useRef<number | null>(null);
-  const nextUploadIdRef = useRef(0);
-
-  const [uploads, setUploads] = useState<ReadonlyMap<number, number>>(new Map());
-  const [rootDragActive, setRootDragActive] = useState(false);
-  const [toast, setToast] = useState<null | {
-    kind: 'success' | 'error';
-    message: string;
-  }>(null);
-
-  const pushToast = useCallback((kind: 'success' | 'error', message: string) => {
-    setToast({ kind, message });
-    if (toastTimerRef.current) {
-      window.clearTimeout(toastTimerRef.current);
-    }
-    toastTimerRef.current = window.setTimeout(setToast, 2200, null);
-  }, []);
 
   const uploadVideo = useCallback(
-    async (file: File) => {
+    async (file: File, cursor: InsertionCursor) => {
       const release = blockRef.current?.retain();
-      const id = nextUploadIdRef.current++;
-      setUploads((prev) => new Map(prev).set(id, 0));
+      const id = toast({ title: 'Uploading video…', tone: 'loading' });
 
       try {
         const result = await uploadRef.current(file, {
           onProgress: (percent) => {
-            setUploads((prev) => new Map(prev).set(id, percent));
+            updateToast(id, { title: `Uploading video… ${Math.round(percent)}%` });
           },
         });
 
         editor.update(() => {
-          $insertNodes([$createVideoNode({ src: result.src })]);
+          $insertAtCursor(cursor, [$createVideoNode({ src: result.src })]);
         });
-        pushToast('success', 'Video uploaded');
+        updateToast(id, { title: 'Video uploaded', tone: 'success' });
       } catch (err: unknown) {
         console.error('[VideoUploadPlugin]', err);
-        pushToast('error', 'Video upload failed');
+        updateToast(id, {
+          action: { label: 'Retry', onClick: () => void uploadVideo(file, cursor) },
+          duration: ERROR_TOAST_DURATION,
+          title: 'Video upload failed',
+          tone: 'error',
+        });
       } finally {
         queueMicrotask(() => release?.());
-        setUploads((prev) => {
-          const next = new Map(prev);
-          next.delete(id);
-          return next;
-        });
       }
     },
-    [editor, pushToast],
+    [editor],
   );
 
   const handleFiles = useCallback(
@@ -94,8 +79,9 @@ export function VideoUploadPlugin({ onUpload }: VideoUploadPluginProps) {
       const videos = files.filter(isVideoFile);
       if (videos.length === 0) return false;
 
+      const cursor = $createInsertionCursor();
       for (const file of videos) {
-        void uploadVideo(file);
+        void uploadVideo(file, cursor);
       }
       // Mixed drops keep propagating so ImageUploadPlugin can claim the rest.
       return videos.length === files.length;
@@ -128,7 +114,7 @@ export function VideoUploadPlugin({ onUpload }: VideoUploadPluginProps) {
 
     const rootElement = editor.getRootElement();
     const wrapper = rootElement?.parentElement ?? null;
-    if (!wrapper) {
+    if (!rootElement || !wrapper) {
       return () => {
         unregisterDragDrop();
         unregisterPaste();
@@ -137,15 +123,10 @@ export function VideoUploadPlugin({ onUpload }: VideoUploadPluginProps) {
 
     let dragCounter = 0;
 
-    const setWrapperDragging = (next: boolean) => {
-      setRootDragActive(next);
-      wrapper.classList.toggle(css.draggingWrapperClass, next);
-    };
-
     const onDragEnter = (event: DragEvent) => {
       if (!hasVideoData(event.dataTransfer)) return;
       dragCounter += 1;
-      setWrapperDragging(true);
+      wrapper.classList.add(css.draggingWrapperClass);
     };
 
     const onDragOver = (event: DragEvent) => {
@@ -155,63 +136,29 @@ export function VideoUploadPlugin({ onUpload }: VideoUploadPluginProps) {
 
     const onDragLeave = () => {
       dragCounter = Math.max(dragCounter - 1, 0);
-      if (dragCounter === 0) {
-        setWrapperDragging(false);
-      }
+      if (dragCounter === 0) wrapper.classList.remove(css.draggingWrapperClass);
     };
 
     const onDrop = () => {
       dragCounter = 0;
-      setWrapperDragging(false);
+      wrapper.classList.remove(css.draggingWrapperClass);
     };
 
-    rootElement?.addEventListener('dragenter', onDragEnter);
-    rootElement?.addEventListener('dragover', onDragOver);
-    rootElement?.addEventListener('dragleave', onDragLeave);
-    rootElement?.addEventListener('drop', onDrop);
+    rootElement.addEventListener('dragenter', onDragEnter);
+    rootElement.addEventListener('dragover', onDragOver);
+    rootElement.addEventListener('dragleave', onDragLeave);
+    rootElement.addEventListener('drop', onDrop);
 
     return () => {
-      if (toastTimerRef.current) {
-        window.clearTimeout(toastTimerRef.current);
-      }
       unregisterDragDrop();
       unregisterPaste();
-      setWrapperDragging(false);
-      rootElement?.removeEventListener('dragenter', onDragEnter);
-      rootElement?.removeEventListener('dragover', onDragOver);
-      rootElement?.removeEventListener('dragleave', onDragLeave);
-      rootElement?.removeEventListener('drop', onDrop);
+      wrapper.classList.remove(css.draggingWrapperClass);
+      rootElement.removeEventListener('dragenter', onDragEnter);
+      rootElement.removeEventListener('dragover', onDragOver);
+      rootElement.removeEventListener('dragleave', onDragLeave);
+      rootElement.removeEventListener('drop', onDrop);
     };
   }, [editor, handleFiles]);
 
-  const helperMessage = (() => {
-    if (uploads.size === 1) {
-      const percent = [...uploads.values()][0] ?? 0;
-      return `Uploading video... ${Math.round(percent)}%`;
-    }
-    if (uploads.size > 1) {
-      return `Uploading ${uploads.size} videos...`;
-    }
-    if (rootDragActive) return 'Drop video files to upload';
-    return null;
-  })();
-
-  if (!helperMessage && !toast) return null;
-
-  return (
-    <div className={css.toastStack}>
-      {helperMessage && (
-        <div className={`${css.toast} ${css.toastVariant.info}`}>
-          <span className={css.spinner} />
-          {helperMessage}
-        </div>
-      )}
-      {toast && (
-        <div className={`${css.toast} ${css.toastVariant[toast.kind]}`}>
-          {toast.kind === 'success' ? <Check size={12} /> : <Info size={12} />}
-          {toast.message}
-        </div>
-      )}
-    </div>
-  );
+  return null;
 }

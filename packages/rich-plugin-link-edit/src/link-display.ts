@@ -10,3 +10,10 @@ export function isEmptyLink(url: string): boolean {
   const trimmed = url.trim();
   return trimmed === '' || /^https?:\/\/$/.test(trimmed);
 }
+
+export function displayUrl(url: string): string {
+  return url
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/\/$/, '');
+}

@@ -1,7 +1,8 @@
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
   TooltipContent,
   TooltipRoot,
@@ -55,19 +56,23 @@ export function ToolbarDropdown({
     </>
   );
 
+  const activeLabel = items.find((item) => item.active)?.label ?? null;
   const menu = (
     <DropdownMenuContent sideOffset={4}>
-      {items.map((item) => (
-        <DropdownMenuItem
-          className={item.active ? css.toolbarDropdownItemActive : undefined}
-          key={item.label}
-          style={item.style}
-          onClick={item.onSelect}
-        >
-          {item.icon}
-          {item.label}
-        </DropdownMenuItem>
-      ))}
+      <DropdownMenuRadioGroup value={activeLabel}>
+        {items.map((item) => (
+          <DropdownMenuRadioItem
+            closeOnClick
+            key={item.label}
+            style={item.style}
+            value={item.label}
+            onClick={item.onSelect}
+          >
+            {item.icon}
+            {item.label}
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
     </DropdownMenuContent>
   );
 

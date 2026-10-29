@@ -52,6 +52,19 @@ export { MarkdownShortcutsPlugin } from './plugins/MarkdownShortcutsPlugin';
 export { MermaidPlugin } from './plugins/MermaidPlugin';
 export { OnChangePlugin } from './plugins/OnChangePlugin';
 export { PasteLinkPlugin } from './plugins/PasteLinkPlugin';
+export {
+  getImageEditor,
+  type GpsInfo,
+  ImageDialog,
+  type ImageDialogEntry,
+  type ImageDialogMode,
+  type ImageDialogOptions,
+  type ImageDialogProps,
+  type ImageEditorCapability,
+  type ImageEditPrivacy,
+  presentImageDialog,
+  registerImageEditor,
+} from './plugins/present-image-dialog';
 export { SubmitShortcutPlugin } from './plugins/SubmitShortcutPlugin';
 export { TextSelectionPlugin } from './plugins/TextSelectionPlugin';
 export {

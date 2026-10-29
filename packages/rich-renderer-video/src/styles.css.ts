@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeText, vars } from '@haklex/rich-style-token/styles';
 import { keyframes, style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
@@ -20,10 +20,6 @@ export const semanticClassNames = {
   editOverlay: 'rr-video-edit-overlay',
   editPlaceholder: 'rr-video-edit-placeholder',
   editPanel: 'rr-video-edit-panel',
-  editField: 'rr-video-edit-field',
-  editFieldIcon: 'rr-video-edit-field-icon',
-  editInput: 'rr-video-edit-input',
-  editError: 'rr-video-edit-error',
 } as const;
 
 export const root = style({ margin: '1.25rem 0' });
@@ -205,12 +201,12 @@ export const editOverlay = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  background: 'rgba(0, 0, 0, 0.35)',
+  background: `color-mix(in srgb, ${vars.color.scrim} 70%, transparent)`,
   color: '#fff',
   transition: 'background 0.2s',
   selectors: {
     [`${editTrigger}:hover &`]: {
-      background: 'rgba(0, 0, 0, 0.5)',
+      background: vars.color.scrim,
     },
   },
 });
@@ -235,49 +231,16 @@ export const editPlaceholder = style({
   },
 });
 
-export const editPanel = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  width: '340px',
-  padding: '12px',
+export const editPanel = style({});
 
-  fontFamily: vars.typography.fontFamilySans,
-});
-
-export const editField = style({
+export const fieldRow = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
-  padding: '6px 10px',
-  backgroundColor: vars.color.bgSecondary,
-  borderRadius: '6px',
-  minWidth: 0,
+  gap: 6,
 });
 
-export const editFieldIcon = style({
-  flexShrink: 0,
-  color: vars.color.textSecondary,
-});
-
-export const editError = style({
-  color: vars.color.alertCaution,
-  fontSize: vars.typography.fontSizeSm,
-});
-
-export const editInput = style({
-  flex: 1,
-  appearance: 'none',
-  border: 'none',
-  backgroundColor: 'transparent',
-  color: 'inherit',
-  fontSize: vars.typography.fontSizeSm,
-  padding: 0,
-  outline: 'none',
-  minWidth: 0,
-  selectors: {
-    '&::placeholder': {
-      color: vars.color.textSecondary,
-    },
-  },
+export const footerNote = style({
+  ...chromeText.label,
+  fontWeight: 400,
+  color: vars.color.textTertiary,
 });

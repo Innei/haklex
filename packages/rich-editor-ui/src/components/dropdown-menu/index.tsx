@@ -1,6 +1,6 @@
 import { Menu as MenuPrimitive } from '@base-ui/react/menu';
 import { PortalThemeWrapper } from '@haklex/rich-style-token';
-import { Check } from 'lucide-react';
+import { Check, ChevronRight } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 
 import { Kbd } from '../kbd';
@@ -127,6 +127,38 @@ export function DropdownMenuItem({
   );
 }
 
+type DropdownMenuSubProps = ComponentProps<typeof MenuPrimitive.SubmenuRoot>;
+
+export function DropdownMenuSub(props: DropdownMenuSubProps) {
+  return <MenuPrimitive.SubmenuRoot {...props} />;
+}
+
+type DropdownMenuSubTriggerProps = ComponentProps<typeof MenuPrimitive.SubmenuTrigger> & {
+  className?: string;
+  value?: ReactNode;
+};
+
+export function DropdownMenuSubTrigger({
+  className,
+  children,
+  value,
+  ...props
+}: DropdownMenuSubTriggerProps) {
+  return (
+    <MenuPrimitive.SubmenuTrigger
+      className={`${css.item} ${css.subTrigger}${className ? ` ${className}` : ''}`}
+      data-slot="dropdown-menu-sub-trigger"
+      {...props}
+    >
+      {children}
+      <span className={css.subTriggerValue}>
+        {value}
+        <ChevronRight />
+      </span>
+    </MenuPrimitive.SubmenuTrigger>
+  );
+}
+
 // -- Separator --
 
 type DropdownMenuSeparatorProps = ComponentProps<typeof MenuPrimitive.Separator>;
@@ -223,5 +255,7 @@ export type {
   DropdownMenuRadioGroupProps,
   DropdownMenuRadioItemProps,
   DropdownMenuSeparatorProps,
+  DropdownMenuSubProps,
+  DropdownMenuSubTriggerProps,
   DropdownMenuTriggerProps,
 };

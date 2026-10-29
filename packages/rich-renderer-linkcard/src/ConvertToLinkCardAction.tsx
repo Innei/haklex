@@ -1,14 +1,15 @@
 import { $isLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $createNodeSelection, $getNodeByKey, $setSelection } from 'lexical';
-import { CreditCard } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
 import { matchUrl } from './hooks/useUrlMatcher';
 import { $createLinkCardEditNode } from './LinkCardEditNode';
+import { LinkKindSwitch } from './LinkKindSwitch';
 import type { PluginRegistry } from './types';
 
 export interface ConvertToLinkCardActionProps {
+  /** Ignored since the action renders a `Link | Card` segmented control; kept for slot compatibility. */
   className?: string;
   linkKey: string;
   pluginRegistry?: PluginRegistry;
@@ -19,15 +20,12 @@ export function ConvertToLinkCardAction({
   url,
   linkKey,
   pluginRegistry,
-  className,
 }: ConvertToLinkCardActionProps) {
   const [editor] = useLexicalComposerContext();
 
   const info = useMemo(() => matchUrl(url, pluginRegistry), [url, pluginRegistry]);
 
-  if (!info) return null;
-
-  const handleConvert = () => {
+  const handleConvert = useCallback(() => {
     editor.update(() => {
       const linkNode = $getNodeByKey(linkKey);
       if (!linkNode || !$isLinkNode(linkNode)) return;
@@ -40,12 +38,16 @@ export function ConvertToLinkCardAction({
       nodeSelection.add(linkCardNode.getKey());
       $setSelection(nodeSelection);
     });
-  };
+  }, [editor, linkKey, url]);
+
+  if (!info) return null;
 
   return (
-    <button className={className} type="button" onClick={handleConvert}>
-      <CreditCard size={14} />
-      To Card
-    </button>
+    <LinkKindSwitch
+      value="link"
+      onChange={(kind) => {
+        if (kind === 'card') handleConvert();
+      }}
+    />
   );
 }

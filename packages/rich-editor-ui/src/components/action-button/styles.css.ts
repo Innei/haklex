@@ -71,7 +71,6 @@ const iconSquare = (size: string, fontSize: string) => ({
   padding: 0,
   gap: 0,
   fontSize,
-  color: vars.color.textSecondary,
 });
 
 export const actionButton = recipe({
@@ -185,8 +184,13 @@ export const actionButton = recipe({
       style: iconSquare(chromeHeight.lg, '18px'),
     },
     {
+      variants: { icon: true, variant: 'outline' },
+      style: { color: vars.color.textSecondary },
+    },
+    {
       variants: { icon: true, variant: 'ghost' },
       style: {
+        color: vars.color.textSecondary,
         selectors: {
           '&:hover:not(:disabled)': {
             color: vars.color.text,
@@ -197,6 +201,20 @@ export const actionButton = recipe({
     {
       variants: { rounded: true, icon: true },
       style: { borderRadius: '50%' },
+    },
+    {
+      variants: { danger: true, variant: 'solid' },
+      style: {
+        backgroundColor: vars.color.alertCaution,
+        color: vars.color.bg,
+        selectors: {
+          '&:hover:not(:disabled)': {
+            backgroundColor: vars.color.alertCaution,
+            color: vars.color.bg,
+            opacity: 0.86,
+          },
+        },
+      },
     },
     {
       variants: { danger: true },

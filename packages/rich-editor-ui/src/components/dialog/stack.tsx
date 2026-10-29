@@ -4,9 +4,17 @@ import { X } from 'lucide-react';
 import type { FC, PropsWithChildren } from 'react';
 import { createElement, useCallback, useEffect, useSyncExternalStore } from 'react';
 
+import { ToastViewport } from '../toast';
 import { SheetStackEntry } from './sheet';
 import type { DialogStackItem } from './store';
-import { dismissDialog, getSnapshot, removeDialog, subscribe } from './store';
+import {
+  dialogWidthStyle,
+  dismissDialog,
+  getSnapshot,
+  removeDialog,
+  requestDismissDialog,
+  subscribe,
+} from './store';
 import * as css from './styles.css';
 
 const MOBILE_QUERY = '(max-width: 640px)';
@@ -46,9 +54,11 @@ const DialogStackEntry: FC<{
     theme = 'light',
     showCloseButton = true,
     clickOutsideToDismiss = true,
+    width,
   } = item;
 
   const dismiss = useCallback(() => dismissDialog(id), [id]);
+  const requestDismiss = useCallback(() => requestDismissDialog(id), [id]);
 
   useEffect(() => {
     if (!open) {
@@ -66,7 +76,7 @@ const DialogStackEntry: FC<{
       disablePointerDismissal={!clickOutsideToDismiss}
       open={open}
       onOpenChange={(open) => {
-        if (!open) dismiss();
+        if (!open) requestDismiss();
       }}
     >
       <DialogPrimitive.Portal>
@@ -77,7 +87,7 @@ const DialogStackEntry: FC<{
               suppressHydrationWarning
               className={`${css.popup}${className ? ` ${className}` : ''}`}
               data-theme={theme}
-              style={{ zIndex: zIndex + 1 }}
+              style={{ zIndex: zIndex + 1, ...dialogWidthStyle(width) }}
             >
               {(title || description || showCloseButton) && (
                 <div className={css.header}>
@@ -100,7 +110,7 @@ const DialogStackEntry: FC<{
                   )}
                 </div>
               )}
-              {createElement(content, { dismiss })}
+              {createElement(content, { dismiss, requestDismiss })}
             </DialogPrimitive.Popup>
           </PortalThemeWrapper>
         </PortalThemeProvider>
@@ -116,6 +126,7 @@ export const DialogStackProvider: FC<PropsWithChildren> = ({ children }) => {
   return (
     <>
       {children}
+      <ToastViewport />
       {stack.map((item, index) =>
         shouldUseSheet(item.sheet, isMobile) ? (
           <SheetStackEntry index={index} item={item} key={item.id} />

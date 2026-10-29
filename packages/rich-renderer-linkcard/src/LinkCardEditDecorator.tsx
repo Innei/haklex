@@ -1,11 +1,5 @@
 import { $isLinkCardNode, type LinkCardNodePayload } from '@haklex/rich-editor/nodes';
-import {
-  ActionBar,
-  ActionButton,
-  Popover,
-  PopoverPanel,
-  PopoverTrigger,
-} from '@haklex/rich-editor-ui';
+import { Popover, PopoverPanel, PopoverTrigger, toast } from '@haklex/rich-editor-ui';
 import { $createLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
@@ -15,12 +9,13 @@ import {
   REDO_COMMAND,
   UNDO_COMMAND,
 } from 'lexical';
-import { ExternalLink, Link, RemoveFormatting, Unlink } from 'lucide-react';
-import type { ReactElement } from 'react';
+import type { KeyboardEvent, ReactElement } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import * as styles from './edit.css';
 import { getEditorHistoryShortcut } from './history-shortcuts';
-import * as styles from './styles.css';
+import type { LinkCardEditMode } from './LinkCardEditPanel';
+import { LinkCardForm, LinkCardView } from './LinkCardEditPanel';
 
 interface LinkCardEditDecoratorProps {
   children: ReactElement;
@@ -33,33 +28,75 @@ export function LinkCardEditDecorator({ nodeKey, payload, children }: LinkCardEd
   const editable = editor.isEditable();
 
   const [open, setOpen] = useState(() => !payload.url);
-
-  const [url, setUrl] = useState(payload.url);
+  const [mode, setModeState] = useState<LinkCardEditMode>(() => (payload.url ? 'view' : 'edit'));
+  const modeRef = useRef(mode);
+  const [draft, setDraftState] = useState(payload.url);
+  const draftRef = useRef(draft);
   const inputRef = useRef<HTMLInputElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef(false);
+
+  const setMode = useCallback((next: LinkCardEditMode) => {
+    modeRef.current = next;
+    setModeState(next);
+  }, []);
+
+  const setDraft = useCallback((next: string) => {
+    draftRef.current = next;
+    setDraftState(next);
+  }, []);
 
   useEffect(() => {
-    setUrl(payload.url);
-  }, [payload.url]);
+    setDraft(payload.url);
+  }, [payload.url, setDraft]);
 
   useEffect(() => {
-    if (open) {
-      requestAnimationFrame(() => {
-        inputRef.current?.focus();
-        inputRef.current?.select();
-      });
-    }
-  }, [open]);
+    if (!open || mode !== 'edit') return;
+    const frame = requestAnimationFrame(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [open, mode]);
 
-  const commitUrl = useCallback(() => {
-    const trimmed = url.trim();
-    if (!trimmed) return;
+  useEffect(() => {
+    if (mode !== 'view' || !restoreFocusRef.current) return;
+    restoreFocusRef.current = false;
+    popupRef.current?.querySelector<HTMLElement>('[data-link-action="edit"]')?.focus();
+  }, [mode]);
+
+  const commitDraft = useCallback(() => {
+    const trimmed = draftRef.current.trim();
+    if (!trimmed) return false;
     editor.update(() => {
       const node = $getNodeByKey(nodeKey);
       if ($isLinkCardNode(node) && node.getUrl() !== trimmed) {
         node.setUrl(trimmed);
       }
     });
-  }, [editor, nodeKey, url]);
+    return true;
+  }, [editor, nodeKey]);
+
+  const close = useCallback(() => {
+    setOpen(false);
+    setMode(payload.url ? 'view' : 'edit');
+  }, [payload.url, setMode]);
+
+  const revert = useCallback(() => {
+    setDraft(payload.url);
+    if (!payload.url) {
+      close();
+      return;
+    }
+    restoreFocusRef.current = true;
+    setMode('view');
+  }, [close, payload.url, setDraft, setMode]);
+
+  const handleSave = useCallback(() => {
+    if (!commitDraft()) return;
+    setOpen(false);
+    setMode('view');
+  }, [commitDraft, setMode]);
 
   const handleDelete = useCallback(() => {
     editor.update(() => {
@@ -74,64 +111,79 @@ export function LinkCardEditDecorator({ nodeKey, payload, children }: LinkCardEd
       const node = $getNodeByKey(nodeKey);
       if (!$isLinkCardNode(node)) return;
       const nodeUrl = node.getUrl();
-      const { title } = payload;
       const linkNode = $createLinkNode(nodeUrl);
-      linkNode.append($createTextNode(title || nodeUrl));
+      linkNode.append($createTextNode(payload.title || nodeUrl));
       const paragraph = $createParagraphNode();
       paragraph.append(linkNode);
       node.replace(paragraph);
       paragraph.selectEnd();
     });
     setOpen(false);
-  }, [editor, nodeKey, payload]);
+  }, [editor, nodeKey, payload.title]);
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
+  const handleInputKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        commitUrl();
+        handleSave();
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        setUrl(payload.url);
+        e.stopPropagation();
+        revert();
       }
     },
-    [commitUrl, payload.url],
+    [handleSave, revert],
   );
 
   const handlePanelKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const shortcut = getEditorHistoryShortcut(e, { isDirty: url !== payload.url });
+    (e: KeyboardEvent) => {
+      const shortcut = getEditorHistoryShortcut(e, {
+        isDirty: mode === 'edit' && draft !== payload.url,
+      });
       if (!shortcut) return;
 
       e.preventDefault();
       e.stopPropagation();
       editor.dispatchCommand(shortcut === 'undo' ? UNDO_COMMAND : REDO_COMMAND, undefined);
     },
-    [editor, payload.url, url],
+    [draft, editor, mode, payload.url],
   );
 
   const handleOpen = useCallback(() => {
     window.open(payload.url, '_blank', 'noopener,noreferrer');
   }, [payload.url]);
 
+  const handleCopy = useCallback(() => {
+    void navigator.clipboard?.writeText(payload.url).then(() => {
+      toast({ title: 'Link copied', tone: 'success' });
+    });
+  }, [payload.url]);
+
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean, details?: { reason?: string }) => {
+      if (nextOpen) {
+        setOpen(true);
+        return;
+      }
+      if (modeRef.current === 'edit') {
+        if (details?.reason === 'escape-key') {
+          revert();
+          return;
+        }
+        commitDraft();
+      }
+      close();
+    },
+    [close, commitDraft, revert],
+  );
+
   if (!editable) {
     return children;
   }
 
   return (
-    <Popover
-      open={open}
-      onOpenChange={(nextOpen: boolean) => {
-        setOpen(nextOpen);
-        if (!nextOpen) {
-          setUrl(payload.url);
-        }
-      }}
-    >
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger
-        openOnHover
-        closeDelay={300}
-        delay={200}
         nativeButton={false}
         render={
           <span className={`${styles.editWrapper} ${styles.semanticClassNames.editWrapper}`} />
@@ -140,42 +192,40 @@ export function LinkCardEditDecorator({ nodeKey, payload, children }: LinkCardEd
         {children}
       </PopoverTrigger>
       <PopoverPanel
+        flush
         className={`${styles.editPanel} ${styles.semanticClassNames.editPanel}`}
+        initialFocus={mode === 'edit' ? inputRef : undefined}
+        ref={popupRef}
         side="bottom"
-        sideOffset={8}
+        size="md"
         onKeyDown={handlePanelKeyDown}
       >
-        <div className={`${styles.editUrlRow} ${styles.semanticClassNames.editUrlRow}`}>
-          <Link
-            className={`${styles.editLinkIcon} ${styles.semanticClassNames.editLinkIcon}`}
-            size={16}
+        {mode === 'edit' ? (
+          <LinkCardForm
+            inputRef={inputRef}
+            url={draft}
+            onCancel={revert}
+            onChange={setDraft}
+            onKeyDown={handleInputKeyDown}
+            onSave={handleSave}
           />
-
-          <input
-            className={`${styles.editInput} ${styles.semanticClassNames.editInput}`}
-            placeholder="https://..."
-            ref={inputRef}
-            type="url"
-            value={url}
-            onBlur={commitUrl}
-            onChange={(e) => setUrl(e.target.value)}
-            onKeyDown={handleKeyDown}
+        ) : (
+          <LinkCardView
+            favicon={payload.favicon}
+            title={payload.title}
+            url={payload.url}
+            onCopy={handleCopy}
+            onOpen={handleOpen}
+            onRemove={handleDelete}
+            onEdit={() => {
+              setDraft(payload.url);
+              setMode('edit');
+            }}
+            onKindChange={(kind) => {
+              if (kind === 'link') handleConvertToLink();
+            }}
           />
-        </div>
-        <ActionBar>
-          <ActionButton onClick={handleOpen}>
-            <ExternalLink />
-            Open
-          </ActionButton>
-          <ActionButton onClick={handleConvertToLink}>
-            <RemoveFormatting />
-            To Link
-          </ActionButton>
-          <ActionButton danger onClick={handleDelete}>
-            <Unlink />
-            Remove
-          </ActionButton>
-        </ActionBar>
+        )}
       </PopoverPanel>
     </Popover>
   );

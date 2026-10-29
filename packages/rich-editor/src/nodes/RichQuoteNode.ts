@@ -1,5 +1,24 @@
 import { QuoteNode, type SerializedQuoteNode } from '@lexical/rich-text';
-import type { LexicalNode, NodeKey, SerializedLexicalNode, Spread } from 'lexical';
+import type {
+  DOMExportOutput,
+  EditorConfig,
+  ElementDOMSlot,
+  LexicalEditor,
+  LexicalNode,
+  NodeKey,
+  SerializedLexicalNode,
+  Spread,
+} from 'lexical';
+import { isHTMLElement, setDOMUnmanaged } from 'lexical';
+
+const ATTRIBUTION_SLOT_ATTR = 'data-quote-attribution-slot';
+
+function findAttributionSlot(element: HTMLElement): HTMLElement | null {
+  for (const child of element.children) {
+    if (child.hasAttribute(ATTRIBUTION_SLOT_ATTR)) return child as HTMLElement;
+  }
+  return null;
+}
 
 export type SerializedRichQuoteNode = Spread<{ attribution: string | null }, SerializedQuoteNode>;
 
@@ -31,6 +50,41 @@ export class RichQuoteNode extends QuoteNode {
     const serializedNode = _serializedNode as unknown as SerializedRichQuoteNode;
     const node = $createRichQuoteNode(serializedNode.attribution ?? null);
     return node.updateFromJSON(serializedNode);
+  }
+
+  createDOM(config: EditorConfig): HTMLElement {
+    const dom = super.createDOM(config);
+    const slot = document.createElement('div');
+    slot.setAttribute(ATTRIBUTION_SLOT_ATTR, '');
+    slot.contentEditable = 'false';
+    setDOMUnmanaged(slot, { captureSelection: true });
+    dom.append(slot);
+    return dom;
+  }
+
+  getDOMSlot(element: HTMLElement): ElementDOMSlot<HTMLElement> {
+    return super.getDOMSlot(element).withBefore(findAttributionSlot(element));
+  }
+
+  exportDOM(editor: LexicalEditor): DOMExportOutput {
+    const output = super.exportDOM(editor);
+    const { element } = output;
+    if (!isHTMLElement(element)) return output;
+    findAttributionSlot(element)?.remove();
+    const attribution = this.getAttribution();
+    if (!attribution) return output;
+    return {
+      ...output,
+      after: (generated) => {
+        const target = output.after ? output.after(generated) : generated;
+        if (isHTMLElement(target)) {
+          const footer = document.createElement('footer');
+          footer.textContent = `— ${attribution}`;
+          target.append(footer);
+        }
+        return target;
+      },
+    };
   }
 
   exportJSON(): SerializedRichQuoteNode {

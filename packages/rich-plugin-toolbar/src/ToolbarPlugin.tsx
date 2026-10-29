@@ -1,23 +1,20 @@
+import { getCommandMeta, normalizeCommandItems } from '@haklex/rich-editor/command-registry';
 import { collectCommandItems } from '@haklex/rich-editor/commands';
 import type { TooltipRootProps } from '@haklex/rich-editor-ui';
 import {
   createTooltipHandle,
-  DropdownMenu,
-  DropdownMenuContent,
   TooltipContent,
   TooltipProvider,
   TooltipRoot,
 } from '@haklex/rich-editor-ui';
+import { getDefaultSlashItems } from '@haklex/rich-plugin-slash-menu';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createHeadingNode } from '@lexical/rich-text';
-import { $setBlocksType } from '@lexical/selection';
-import type { ElementNode, LexicalEditor } from 'lexical';
-import { $createParagraphNode, $getSelection, $isRangeSelection } from 'lexical';
-import { Ellipsis, Heading1, Heading2, Heading3, Pilcrow, Plus } from 'lucide-react';
-import type { CSSProperties, ReactElement, ReactNode } from 'react';
+import { Ellipsis } from 'lucide-react';
+import type { CSSProperties, ReactElement } from 'react';
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 import { applyFontFamily } from './actions';
+import { blockTypeItems } from './block-types';
 import { BLOCK_TYPE_LABELS, FONT_FAMILIES, getFontLabel } from './constants';
 import type { ToolbarEntry } from './entries';
 import {
@@ -28,9 +25,10 @@ import {
   TOOLBAR_BUTTON_SIZE,
   TOOLBAR_GAP,
 } from './entries';
+import { InsertMenu } from './InsertMenu';
 import { fitCount } from './overflow';
 import * as css from './styles.css';
-import { ToolbarMenuButton, ToolbarMenuItems, ToolbarOverflowMenu } from './ToolbarOverflowMenu';
+import { ToolbarOverflowMenu } from './ToolbarOverflowMenu';
 import type { ToolbarTooltipPayload } from './types';
 import { useToolbarState } from './use-toolbar-state';
 
@@ -41,20 +39,6 @@ export interface ToolbarPluginProps {
   insertItemOrder?: string[];
   maxVisibleInsertItems?: number;
 }
-
-function setBlock(editor: LexicalEditor, create: () => ElementNode) {
-  editor.update(() => {
-    const selection = $getSelection();
-    if ($isRangeSelection(selection)) $setBlocksType(selection, create);
-  });
-}
-
-const HEADINGS: { icon: ReactNode; label: string; type: string }[] = [
-  { label: 'Text', type: 'paragraph', icon: <Pilcrow size={16} /> },
-  { label: 'Heading 1', type: 'h1', icon: <Heading1 size={16} /> },
-  { label: 'Heading 2', type: 'h2', icon: <Heading2 size={16} /> },
-  { label: 'Heading 3', type: 'h3', icon: <Heading3 size={16} /> },
-];
 
 function useAvailableWidth() {
   const ref = useRef<HTMLDivElement>(null);
@@ -80,16 +64,21 @@ export function ToolbarPlugin({
   const [rowRef, available] = useAvailableWidth();
 
   const insertItems = useMemo(() => {
-    const items = collectCommandItems(editor).filter(
-      (item) => item.placement?.includes('toolbar') && item.group === 'insert',
+    const items = normalizeCommandItems(
+      collectCommandItems(editor).filter(
+        (item) => item.placement?.includes('toolbar') && item.group === 'insert',
+      ),
     );
     if (!insertItemOrder || insertItemOrder.length === 0) return items;
+    const order = insertItemOrder.map((title) => getCommandMeta(title)?.title ?? title);
     return items.sort((a, b) => {
-      const ai = insertItemOrder.indexOf(a.title);
-      const bi = insertItemOrder.indexOf(b.title);
+      const ai = order.indexOf(a.title);
+      const bi = order.indexOf(b.title);
       return (ai === -1 ? Infinity : ai) - (bi === -1 ? Infinity : bi);
     });
   }, [editor, insertItemOrder]);
+
+  const slashItems = useMemo(() => getDefaultSlashItems(editor), [editor]);
 
   const entries = useMemo(() => {
     const list: ToolbarEntry[] = [
@@ -115,17 +104,7 @@ export function ToolbarPlugin({
           title: 'Block type',
           label: BLOCK_TYPE_LABELS[state.blockType] ?? 'Text',
           width: 112,
-          items: HEADINGS.map((heading) => ({
-            label: heading.label,
-            icon: heading.icon,
-            active: state.blockType === heading.type,
-            onSelect: () =>
-              setBlock(editor, () =>
-                heading.type === 'paragraph'
-                  ? $createParagraphNode()
-                  : $createHeadingNode(heading.type as 'h1' | 'h2' | 'h3'),
-              ),
-          })),
+          items: blockTypeItems(editor, state.blockType),
         },
         handle,
       ),
@@ -134,48 +113,42 @@ export function ToolbarPlugin({
       list.push(separatorEntry(`sep-${index}`));
       for (const spec of group) list.push(buttonEntry(spec, handle));
     }
-    if (insertItems.length > 0) {
-      list.push(separatorEntry('sep-insert'));
-      for (const item of insertItems.slice(0, maxVisibleInsertItems)) {
-        list.push(
-          buttonEntry(
-            {
-              key: `insert-${item.title}`,
-              label: item.title,
-              icon: item.icon,
-              shortcut: item.shortcut,
-              onSelect: () => item.onSelect(editor, ''),
-            },
-            handle,
-          ),
-        );
-      }
-      const rest = insertItems.slice(maxVisibleInsertItems).map((item) => ({
-        label: item.title,
-        icon: item.icon,
-        shortcut: item.shortcut,
-        onSelect: () => item.onSelect(editor, ''),
-      }));
-      if (rest.length > 0) {
-        list.push({
-          key: 'insert-menu',
-          width: TOOLBAR_BUTTON_SIZE,
-          menu: { label: 'Insert', items: rest },
-          node: (
-            <DropdownMenu key="insert-menu" modal={false}>
-              <ToolbarMenuButton handle={handle} title="Insert">
-                <Plus size={16} />
-              </ToolbarMenuButton>
-              <DropdownMenuContent positionMethod="fixed" sideOffset={4}>
-                <ToolbarMenuItems items={rest} />
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ),
-        });
-      }
+    list.push(separatorEntry('sep-insert'));
+    for (const item of insertItems.slice(0, maxVisibleInsertItems)) {
+      list.push(
+        buttonEntry(
+          {
+            key: `insert-${item.title}`,
+            label: item.title,
+            icon: item.icon,
+            shortcut: item.shortcut,
+            onSelect: () => item.onSelect(editor, ''),
+          },
+          handle,
+        ),
+      );
     }
+    const rest = insertItems.slice(maxVisibleInsertItems).map((item) => ({
+      label: item.title,
+      icon: item.icon,
+      shortcut: item.shortcut,
+      onSelect: () => item.onSelect(editor, ''),
+    }));
+    list.push({
+      key: 'insert-menu',
+      width: TOOLBAR_BUTTON_SIZE,
+      menu: rest.length > 0 ? { label: 'Insert', items: rest } : undefined,
+      node: (
+        <InsertMenu
+          handle={handle}
+          items={slashItems}
+          key="insert-menu"
+          onSelect={(item) => item.onSelect(editor, '')}
+        />
+      ),
+    });
     return list;
-  }, [editor, state, handle, insertItems, maxVisibleInsertItems]);
+  }, [editor, state, handle, insertItems, maxVisibleInsertItems, slashItems]);
 
   const visibleCount = fitCount(entries, {
     available,

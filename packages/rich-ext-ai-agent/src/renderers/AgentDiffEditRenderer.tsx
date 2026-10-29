@@ -5,23 +5,22 @@ import {
   useRendererConfig,
   useVariant,
 } from '@haklex/rich-editor/static';
+import { ActionButton } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { SerializedLexicalNode } from 'lexical';
 import { Check, X } from 'lucide-react';
 import type { ReactElement } from 'react';
 
 import { getAgentDiffReviewController } from '../plugins/diff-node-controller';
-import { rendererFrame } from '../plugins/diff-review-overlay.css';
 import {
-  diffInlineBar,
-  diffInlineBarAccept,
-  diffInlineBarReject,
-  diffInlineRoot,
-  diffInlineRow,
-  diffInlineStack,
-  diffRowDelete,
-  diffRowInsert,
-} from '../styles.css';
+  hunkAccept,
+  hunkBody,
+  hunkGutter,
+  hunkReject,
+  hunkRoot,
+  rendererFrame,
+} from '../plugins/diff-review-overlay.css';
+import { diffInlineRow, diffInlineStack, diffRowDelete, diffRowInsert } from '../styles.css';
 
 interface AgentDiffEditRendererProps {
   batchId: string;
@@ -60,58 +59,64 @@ export function AgentDiffEditRenderer({
   const extraNodes = useExtraNodes();
 
   return (
-    <div className={diffInlineRoot}>
-      <div className={diffInlineBar}>
-        <button
-          className={diffInlineBarReject}
-          title="Reject change"
-          type="button"
-          onClick={() => actions?.rejectNode(nodeKey, batchId, diffEntryId)}
-        >
-          <X size={13} />
-          Reject
-        </button>
-        <button
-          className={diffInlineBarAccept}
-          title="Accept change"
-          type="button"
-          onClick={() => actions?.acceptNode(nodeKey, batchId, diffEntryId)}
-        >
-          <Check size={13} />
-          Accept
-        </button>
+    <div className={hunkRoot}>
+      <div className={hunkBody}>
+        <div className={diffInlineStack}>
+          {originalNode && (
+            <div className={`${diffInlineRow} ${diffRowDelete}`}>
+              <div className={rendererFrame}>
+                <RichRenderer
+                  nested
+                  extraNodes={extraNodes}
+                  rendererConfig={rendererConfig}
+                  theme={theme}
+                  value={wrapDoc(originalNode)}
+                  variant={variant}
+                />
+              </div>
+            </div>
+          )}
+
+          {proposedNode && (
+            <div className={`${diffInlineRow} ${diffRowInsert}`}>
+              <div className={rendererFrame}>
+                <RichRenderer
+                  nested
+                  extraNodes={extraNodes}
+                  rendererConfig={rendererConfig}
+                  theme={theme}
+                  value={wrapDoc(proposedNode)}
+                  variant={variant}
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className={diffInlineStack}>
-        {originalNode && (
-          <div className={`${diffInlineRow} ${diffRowDelete}`}>
-            <div className={rendererFrame}>
-              <RichRenderer
-                nested
-                extraNodes={extraNodes}
-                rendererConfig={rendererConfig}
-                theme={theme}
-                value={wrapDoc(originalNode)}
-                variant={variant}
-              />
-            </div>
-          </div>
-        )}
-
-        {proposedNode && (
-          <div className={`${diffInlineRow} ${diffRowInsert}`}>
-            <div className={rendererFrame}>
-              <RichRenderer
-                nested
-                extraNodes={extraNodes}
-                rendererConfig={rendererConfig}
-                theme={theme}
-                value={wrapDoc(proposedNode)}
-                variant={variant}
-              />
-            </div>
-          </div>
-        )}
+      <div aria-label="Review change" className={hunkGutter} role="group">
+        <ActionButton
+          icon
+          aria-label="Reject change"
+          className={hunkReject}
+          size="sm"
+          title="Reject change"
+          variant="ghost"
+          onClick={() => actions?.rejectNode(nodeKey, batchId, diffEntryId)}
+        >
+          <X />
+        </ActionButton>
+        <ActionButton
+          icon
+          aria-label="Accept change"
+          className={hunkAccept}
+          size="sm"
+          title="Accept change"
+          variant="ghost"
+          onClick={() => actions?.acceptNode(nodeKey, batchId, diffEntryId)}
+        >
+          <Check />
+        </ActionButton>
       </div>
     </div>
   );

@@ -22,6 +22,7 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
+    "@floating-ui/react-dom": "^2.1.9",
     "@haklex/rich-renderer-mention": "workspace:*"
   },
   "devDependencies": {

@@ -1,3 +1,6 @@
+import { AnimatedCheckbox, Field } from '@haklex/rich-editor-ui';
+import { useId } from 'react';
+
 import type { ChartTabProps } from './ChartConfigPanel';
 import { CommitInput } from './CommitInput';
 import * as s from './config.css';
@@ -26,6 +29,7 @@ function nested(draft: ChartDraft, key: 'format' | 'y'): Record<string, unknown>
 }
 
 export function StyleTab({ draft, onChange }: ChartTabProps) {
+  const id = useId();
   const y = nested(draft, 'y');
   const format = nested(draft, 'format');
   const canStack = (draft.type === 'bar' || draft.type === 'area') && draft.series.length > 1;
@@ -45,87 +49,70 @@ export function StyleTab({ draft, onChange }: ChartTabProps) {
     <>
       <div className={s.pair}>
         {TEXT_FIELDS.map(({ key, label }) => (
-          <label className={s.field} key={key}>
-            <span className={s.fieldLabel}>{label}</span>
+          <Field id={`${id}-${key}`} key={key} label={label}>
             <CommitInput
-              className={s.input}
+              id={`${id}-${key}`}
               placeholder="Optional"
               value={typeof draft[key] === 'string' ? draft[key] : ''}
               onCommit={(value) => onChange(patchDraft(draft, { [key]: value }))}
             />
-          </label>
+          </Field>
         ))}
       </div>
       {draft.type !== 'pie' && (
         <div className={s.pair}>
-          <label className={s.field}>
-            <span className={s.fieldLabel}>Y min</span>
+          <Field id={`${id}-ymin`} label="Y min">
             <CommitInput
-              className={s.input}
+              id={`${id}-ymin`}
               inputMode="decimal"
               placeholder="Auto"
               value={numberText(y.min)}
               onCommit={(raw) => commitNumber('y', 'min', raw)}
             />
-          </label>
-          <label className={s.field}>
-            <span className={s.fieldLabel}>Y max</span>
+          </Field>
+          <Field id={`${id}-ymax`} label="Y max">
             <CommitInput
-              className={s.input}
+              id={`${id}-ymax`}
               inputMode="decimal"
               placeholder="Auto"
               value={numberText(y.max)}
               onCommit={(raw) => commitNumber('y', 'max', raw)}
             />
-          </label>
+          </Field>
         </div>
       )}
       <div className={s.pair}>
-        <label className={s.field}>
-          <span className={s.fieldLabel}>Unit</span>
+        <Field id={`${id}-unit`} label="Unit">
           <CommitInput
-            className={s.input}
+            id={`${id}-unit`}
             placeholder="e.g. %"
             value={typeof format.unit === 'string' ? format.unit : ''}
             onCommit={(unit) => onChange(patchNested(draft, 'format', { unit }))}
           />
-        </label>
-        <label className={s.field}>
-          <span className={s.fieldLabel}>Decimals</span>
+        </Field>
+        <Field id={`${id}-decimals`} label="Decimals">
           <CommitInput
-            className={s.input}
+            id={`${id}-decimals`}
             inputMode="numeric"
             placeholder="Auto"
             value={numberText(format.decimals)}
             onCommit={(raw) => commitNumber('format', 'decimals', raw, isDecimals)}
           />
-        </label>
+        </Field>
       </div>
       {canStack && (
-        <label className={s.check}>
-          <input
-            checked={draft.stacked === true}
-            className={s.checkbox}
-            type="checkbox"
-            onChange={(event) =>
-              onChange(patchDraft(draft, { stacked: event.target.checked || undefined }))
-            }
-          />
-          <span>Stacked</span>
-        </label>
+        <AnimatedCheckbox
+          checked={draft.stacked === true}
+          label="Stacked"
+          onChange={(checked) => onChange(patchDraft(draft, { stacked: checked || undefined }))}
+        />
       )}
       {draft.type === 'pie' && (
-        <label className={s.check}>
-          <input
-            checked={draft.donut === true}
-            className={s.checkbox}
-            type="checkbox"
-            onChange={(event) =>
-              onChange(patchDraft(draft, { donut: event.target.checked || undefined }))
-            }
-          />
-          <span>Donut</span>
-        </label>
+        <AnimatedCheckbox
+          checked={draft.donut === true}
+          label="Donut"
+          onChange={(checked) => onChange(patchDraft(draft, { donut: checked || undefined }))}
+        />
       )}
     </>
   );

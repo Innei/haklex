@@ -44,6 +44,7 @@
   },
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",
+    "@haklex/rich-editor-ui": "workspace:^",
     "@haklex/rich-style-token": "workspace:^",
     "@lexical/list": "^0.52.0",
     "@lexical/react": "^0.52.0",

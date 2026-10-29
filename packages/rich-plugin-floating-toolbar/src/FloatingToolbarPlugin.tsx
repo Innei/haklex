@@ -1,241 +1,41 @@
 import { getDOMRectFromTextSelection, useTextSelectionSnapshot } from '@haklex/rich-editor';
-import { $selectionTouchesSpoiler, $toggleSpoilerSelection } from '@haklex/rich-editor/commands';
-import {
-  $createRubyNode,
-  $isKaTeXInlineNode,
-  $isRubyNode,
-  type KaTeXInlineNode,
-} from '@haklex/rich-editor/nodes';
-import { ColorPicker } from '@haklex/rich-editor-ui';
-import { usePortalContainer, usePortalTheme, vars } from '@haklex/rich-style-token';
-import type { AutoLinkNode } from '@lexical/link';
-import { $isAutoLinkNode, $isLinkNode, TOGGLE_LINK_COMMAND } from '@lexical/link';
+import { $toggleSpoilerSelection } from '@haklex/rich-editor/commands';
+import { $isKaTeXInlineNode } from '@haklex/rich-editor/nodes';
+import type { TooltipRootProps } from '@haklex/rich-editor-ui';
+import { TooltipContent, TooltipProvider, TooltipRoot } from '@haklex/rich-editor-ui';
+import { usePortalContainer, usePortalTheme } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getSelectionStyleValueForProperty, $patchStyleText } from '@lexical/selection';
-import type { LexicalNode, RangeSelection } from 'lexical';
-import {
-  $createTextNode,
-  $getNodeByKey,
-  $getSelection,
-  $isRangeSelection,
-  COMMAND_PRIORITY_LOW,
-  FORMAT_TEXT_COMMAND,
-  SELECTION_CHANGE_COMMAND,
-} from 'lexical';
-import {
-  Bold,
-  Check,
-  Code,
-  EyeOff,
-  Highlighter,
-  Italic,
-  Languages,
-  Link as LinkIcon,
-  Strikethrough,
-  Subscript,
-  Superscript,
-  Trash2,
-  Underline,
-  X,
-} from 'lucide-react';
+import { $patchStyleText } from '@lexical/selection';
+import type { TextFormatType } from 'lexical';
+import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from 'lexical';
+import { Languages, Link as LinkIcon, Trash2, Unlink, X } from 'lucide-react';
 import type { ReactElement, ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import { $clearFormatting } from './actions';
+import { FormatBar } from './FormatBar';
+import { InlineInputBar } from './InlineInputBar';
+import type { Box } from './position';
+import { moveToolbarFocus, syncRovingTabIndex } from './roving';
+import type { ToolbarState } from './selection-state';
+import { getSelectionState, INITIAL_STATE } from './selection-state';
 import * as css from './styles.css';
+import type { ToolbarTooltipPayload } from './ToolbarButton';
+import { createToolbarTooltipHandle } from './ToolbarButton';
+import { useEditorBindings } from './use-editor-bindings';
+import { useInlineModes } from './use-inline-modes';
+import { useToolbarPosition } from './use-toolbar-position';
 
-function isEffectiveLinkNode(node: LexicalNode | null | undefined): boolean {
-  if (!$isLinkNode(node)) return false;
-  return !$isAutoLinkNode(node) || !node.getIsUnlinked();
-}
-
-function isRegularLinkNode(node: LexicalNode | null | undefined): boolean {
-  return $isLinkNode(node) && !$isAutoLinkNode(node);
-}
-
-function collectSelectedActiveAutoLinkNodes(selection: RangeSelection): AutoLinkNode[] {
-  const autoLinkNodes = new Map<string, AutoLinkNode>();
-
-  for (const node of selection.getNodes()) {
-    if ($isAutoLinkNode(node) && !node.getIsUnlinked()) {
-      autoLinkNodes.set(node.getKey(), node);
-    }
-
-    const parent = node.getParent();
-    if ($isAutoLinkNode(parent) && !parent.getIsUnlinked()) {
-      autoLinkNodes.set(parent.getKey(), parent);
-    }
-  }
-
-  return Array.from(autoLinkNodes.values());
-}
-
-interface ToolbarState {
-  fontColor: string;
-  isBold: boolean;
-  isCode: boolean;
-  isHighlight: boolean;
-  isItalic: boolean;
-  isLink: boolean;
-  isRuby: boolean;
-  isSpoiler: boolean;
-  isStrikethrough: boolean;
-  isSubscript: boolean;
-  isSuperscript: boolean;
-  isUnderline: boolean;
-}
-
-const INITIAL_STATE: ToolbarState = {
-  isBold: false,
-  isItalic: false,
-  isUnderline: false,
-  isStrikethrough: false,
-  isSuperscript: false,
-  isSubscript: false,
-  isCode: false,
-  isHighlight: false,
-  isLink: false,
-  isRuby: false,
-  isSpoiler: false,
-  fontColor: '',
-};
-
-function findRubyAncestor(node: LexicalNode | null | undefined) {
-  let current: LexicalNode | null | undefined = node;
-  while (current) {
-    if ($isRubyNode(current)) {
-      return current;
-    }
-    current = current.getParent();
-  }
-  return null;
-}
-
-function getSelectedRubyNodes(nodes: LexicalNode[]) {
-  const rubyNodes = new Map<string, ReturnType<typeof findRubyAncestor>>();
-
-  for (const node of nodes) {
-    const rubyNode = findRubyAncestor(node);
-    if (rubyNode) {
-      rubyNodes.set(rubyNode.getKey(), rubyNode);
-    }
-  }
-
-  return Array.from(rubyNodes.values());
-}
-
-function getSelectionState(selection: RangeSelection): ToolbarState {
-  const nodes = selection.getNodes();
-  const hasLink = nodes.some((node: LexicalNode) => {
-    const parent = node.getParent();
-    return isEffectiveLinkNode(parent) || isEffectiveLinkNode(node);
-  });
-  const hasRuby = getSelectedRubyNodes(nodes).length > 0;
-  const textColor = $getSelectionStyleValueForProperty(selection, 'color', '');
-  let fontColor = textColor;
-  if (!fontColor) {
-    const katex = nodes.find((n): n is KaTeXInlineNode => $isKaTeXInlineNode(n));
-    if (katex) fontColor = katex.getColor() ?? '';
-  }
-
-  return {
-    isBold: selection.hasFormat('bold'),
-    isItalic: selection.hasFormat('italic'),
-    isUnderline: selection.hasFormat('underline'),
-    isStrikethrough: selection.hasFormat('strikethrough'),
-    isSuperscript: selection.hasFormat('superscript'),
-    isSubscript: selection.hasFormat('subscript'),
-    isCode: selection.hasFormat('code'),
-    isHighlight: selection.hasFormat('highlight'),
-    isLink: hasLink,
-    isRuby: hasRuby,
-    isSpoiler: $selectionTouchesSpoiler(selection),
-    fontColor,
-  };
-}
-
-function computePosition(
-  rect: DOMRect,
-  toolbar: HTMLElement,
-  container: Element,
-): { top: number; left: number } | null {
-  if (rect.width === 0 && rect.height === 0) return null;
-
-  const toolbarWidth = toolbar.offsetWidth;
-  const toolbarHeight = toolbar.offsetHeight;
-
-  // When portaled inside a transformed ancestor (e.g. dialog popup),
-  // position:fixed becomes relative to that ancestor, not the viewport.
-  const isBody = container === document.body;
-  const containerRect = isBody ? undefined : container.getBoundingClientRect();
-  const offsetX = containerRect?.left ?? 0;
-  const offsetY = containerRect?.top ?? 0;
-  const availableWidth = containerRect?.width ?? window.innerWidth;
-
-  const rawLeft = rect.left - offsetX + rect.width / 2 - toolbarWidth / 2;
-  const clampedLeft = Math.max(8, Math.min(rawLeft, availableWidth - toolbarWidth - 8));
-
-  return {
-    top: rect.top - offsetY - toolbarHeight - 10,
-    left: clampedLeft,
-  };
-}
-
-interface ToolbarButtonProps {
-  active: boolean;
-  ariaLabel: string;
-  children: ReactElement;
-  onClick: () => void;
-}
-
-function ToolbarButton({ active, onClick, ariaLabel, children }: ToolbarButtonProps) {
-  return (
-    <button
-      aria-label={ariaLabel}
-      aria-pressed={active}
-      className={`${css.btn}${active ? ` ${css.btnActive}` : ''}`}
-      type="button"
-      onMouseDown={(e) => {
-        e.preventDefault();
-        onClick();
-      }}
-    >
-      {children}
-      {active && <span className={css.btnIndicator} />}
-    </button>
-  );
-}
-
-const ICON_SIZE = 15;
-const ICON_STROKE = 2;
-
-type CssVarName = `--${string}`;
-
-function extractCssVarName(value: string): CssVarName | null {
-  const match = value.match(/^var\((--[^\s),]+)(?:,[^)]+)?\)$/);
-  return (match?.[1] as CssVarName | undefined) ?? null;
-}
-
-function collectThemeVarNames(contract: unknown, output: Set<CssVarName>): Set<CssVarName> {
-  if (typeof contract === 'string') {
-    const cssVarName = extractCssVarName(contract);
-    if (cssVarName) output.add(cssVarName);
-    return output;
-  }
-
-  if (contract && typeof contract === 'object') {
-    for (const value of Object.values(contract as Record<string, unknown>)) {
-      collectThemeVarNames(value, output);
-    }
-  }
-
-  return output;
-}
-
-const THEME_VAR_NAMES = Array.from(collectThemeVarNames(vars, new Set()));
+const ICON = { size: 16, strokeWidth: 2 } as const;
 
 export interface FloatingToolbarPluginProps {
   actions?: ReactNode;
+}
+
+function toBox(rect: DOMRect): Box | null {
+  if (rect.width === 0 && rect.height === 0) return null;
+  return { top: rect.top, bottom: rect.bottom, left: rect.left, right: rect.right };
 }
 
 export function FloatingToolbarPlugin({
@@ -246,18 +46,17 @@ export function FloatingToolbarPlugin({
   const portalContainer = usePortalContainer();
   const selectionSnapshot = useTextSelectionSnapshot();
   const toolbarRef = useRef<HTMLDivElement>(null);
+  const [handle] = useState(createToolbarTooltipHandle);
   const [visible, setVisible] = useState(false);
   const [state, setState] = useState<ToolbarState>(INITIAL_STATE);
-  const [rubyEdit, setRubyEdit] = useState<{
-    nodeKey: string;
-    reading: string;
-    baseText: string;
-    isNew: boolean;
-  } | null>(null);
-  const rubyEditorRef = useRef<HTMLDivElement>(null);
-  const rubyInputRef = useRef<HTMLInputElement>(null);
-  const rubyEditRef = useRef(rubyEdit);
-  rubyEditRef.current = rubyEdit;
+  const [pendingFocus, setPendingFocus] = useState<{ target: string } | null>(null);
+  const lastAnchorRef = useRef<Box | null>(null);
+
+  const onClose = useCallback((target: string | null) => {
+    setPendingFocus(target ? { target } : null);
+  }, []);
+  const modes = useInlineModes(editor, onClose);
+  const { mode, modeRef, openLink, openRuby, editRuby, commitOnOutsideClick } = modes;
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -265,518 +64,206 @@ export function FloatingToolbarPlugin({
       setVisible(false);
       return;
     }
-
     setState(getSelectionState(selection));
     setVisible(true);
   }, []);
 
-  const applyThemeVars = useCallback(
-    (toolbar: HTMLElement) => {
-      const rootElement = editor.getRootElement();
-      if (!rootElement) return;
-
-      const computed = window.getComputedStyle(rootElement);
-      for (const name of THEME_VAR_NAMES) {
-        const value = computed.getPropertyValue(name).trim();
-        if (value) {
-          toolbar.style.setProperty(name, value);
-        }
-      }
-    },
-    [editor],
-  );
+  useEditorBindings({ editor, editRuby, modeRef, openLink, toolbarRef, updateToolbar });
 
   useEffect(() => {
-    const unregisterCommand = editor.registerCommand(
-      SELECTION_CHANGE_COMMAND,
-      () => {
-        updateToolbar();
-        return false;
-      },
-      COMMAND_PRIORITY_LOW,
-    );
-    const unregisterUpdate = editor.registerUpdateListener(({ editorState }) => {
-      editorState.read(() => {
-        updateToolbar();
-      });
-    });
-
-    return () => {
-      unregisterCommand();
-      unregisterUpdate();
-    };
-  }, [editor, updateToolbar]);
-
-  useEffect(() => {
-    if (!selectionSnapshot) {
-      setVisible(false);
-    }
+    if (!selectionSnapshot) setVisible(false);
   }, [selectionSnapshot]);
 
   useEffect(() => {
-    if (!visible || !toolbarRef.current || !selectionSnapshot) return;
+    if (!pendingFocus) return;
+    const button =
+      pendingFocus.target === 'editor'
+        ? null
+        : toolbarRef.current?.querySelector<HTMLElement>(`[aria-label="${pendingFocus.target}"]`);
+    if (button) button.focus();
+    else editor.focus();
+    setPendingFocus(null);
+  }, [editor, pendingFocus]);
 
-    const positionToolbar = () => {
-      const toolbar = toolbarRef.current;
-      if (!toolbar) return;
-
-      // Toolbar is portaled to document.body, so we need to re-attach
-      // editor theme variables for correct light/dark rendering.
-      applyThemeVars(toolbar);
-
-      const rootElement = editor.getRootElement();
-      if (!rootElement) {
-        setVisible(false);
-        return;
-      }
-
-      const rect = getDOMRectFromTextSelection(rootElement, selectionSnapshot);
-      if (!rect) {
-        setVisible(false);
-        return;
-      }
-
-      const pos = computePosition(rect, toolbar, portalContainer);
-      if (!pos) {
-        setVisible(false);
-        return;
-      }
-
-      toolbar.style.top = `${pos.top}px`;
-      toolbar.style.left = `${pos.left}px`;
+  useEffect(() => {
+    if (mode.kind === 'format') return;
+    const onPointerDown = (event: MouseEvent) => {
+      const target = event.target as Element | null;
+      if (toolbarRef.current?.contains(target)) return;
+      commitOnOutsideClick();
     };
+    const timer = setTimeout(() => document.addEventListener('mousedown', onPointerDown), 0);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('mousedown', onPointerDown);
+    };
+  }, [commitOnOutsideClick, mode.kind]);
 
-    requestAnimationFrame(positionToolbar);
-
-    // Listen to scroll on the nearest scrollable ancestor so toolbar follows content
+  const rubyKey = mode.kind === 'ruby' ? mode.draft.nodeKey : null;
+  const getAnchor = useCallback((): Box | null => {
     const rootElement = editor.getRootElement();
-    if (!rootElement) return;
-
-    let scrollParent: HTMLElement | Window = window;
-    let el: HTMLElement | null = rootElement.parentElement;
-    while (el) {
-      const { overflowY } = window.getComputedStyle(el);
-      if (overflowY === 'auto' || overflowY === 'scroll') {
-        scrollParent = el;
-        break;
-      }
-      el = el.parentElement;
+    let anchor: Box | null = null;
+    if (rubyKey) {
+      const dom = editor.getElementByKey(rubyKey);
+      anchor = dom ? toBox(dom.getBoundingClientRect()) : null;
+    } else if (rootElement && selectionSnapshot) {
+      const rect = getDOMRectFromTextSelection(rootElement, selectionSnapshot);
+      anchor = rect ? toBox(rect) : null;
     }
+    if (anchor) lastAnchorRef.current = anchor;
+    return anchor ?? lastAnchorRef.current;
+  }, [editor, rubyKey, selectionSnapshot]);
 
-    const onScroll = () => requestAnimationFrame(positionToolbar);
-    scrollParent.addEventListener('scroll', onScroll, { passive: true });
-    return () => scrollParent.removeEventListener('scroll', onScroll);
-  }, [applyThemeVars, editor, portalContainer, selectionSnapshot, state, visible]);
+  const shown = visible || mode.kind !== 'format';
+
+  useToolbarPosition({
+    active: shown,
+    editor,
+    getAnchor,
+    portalContainer,
+    toolbarRef,
+    trigger: `${mode.kind}:${JSON.stringify(state)}`,
+  });
 
   const handleFormat = useCallback(
-    (
-      format:
-        | 'bold'
-        | 'italic'
-        | 'underline'
-        | 'strikethrough'
-        | 'superscript'
-        | 'subscript'
-        | 'code'
-        | 'highlight',
-    ) => {
-      editor.dispatchCommand(FORMAT_TEXT_COMMAND, format);
-    },
+    (format: TextFormatType) => editor.dispatchCommand(FORMAT_TEXT_COMMAND, format),
     [editor],
   );
 
-  const handleLink = useCallback(() => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return;
-
-      const nodes = selection.getNodes();
-      const hasLink = nodes.some((node: LexicalNode) => {
-        const parent = node.getParent();
-        return isEffectiveLinkNode(parent) || isEffectiveLinkNode(node);
+  const patchSelection = useCallback(
+    (styles: Record<string, string | null>, katexColor?: string | null) => {
+      editor.update(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return;
+        $patchStyleText(selection, styles);
+        if (katexColor === undefined) return;
+        for (const node of selection.getNodes()) {
+          if ($isKaTeXInlineNode(node)) node.setColor(katexColor);
+        }
       });
-
-      if (hasLink) {
-        for (const autoLinkNode of collectSelectedActiveAutoLinkNodes(selection)) {
-          autoLinkNode.setIsUnlinked(true);
-          autoLinkNode.markDirty();
-        }
-
-        const hasRegularLink = nodes.some((node: LexicalNode) => {
-          const parent = node.getParent();
-          return isRegularLinkNode(parent) || isRegularLinkNode(node);
-        });
-
-        if (hasRegularLink) {
-          editor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
-        }
-      } else {
-        const text = selection.getTextContent();
-        const url = /^https?:\/\//.test(text) ? text : '';
-        editor.dispatchCommand(TOGGLE_LINK_COMMAND, url || 'https://');
-      }
-    });
-  }, [editor]);
+    },
+    [editor],
+  );
 
   const handleColor = useCallback(
     (value: string) => {
-      editor.update(() => {
-        const sel = $getSelection();
-        if (!$isRangeSelection(sel)) return;
-        const color = value === 'inherit' ? null : value;
-        $patchStyleText(sel, { color });
-        for (const node of sel.getNodes()) {
-          if ($isKaTeXInlineNode(node)) node.setColor(color);
-        }
-      });
+      const color = value === 'inherit' ? null : value;
+      patchSelection({ color }, color);
     },
-    [editor],
+    [patchSelection],
   );
 
-  const handleRuby = useCallback(() => {
-    editor.update(() => {
-      const selection = $getSelection();
-      if (!$isRangeSelection(selection)) return;
+  const handleBackgroundColor = useCallback(
+    (value: string) => {
+      patchSelection({ 'background-color': value === 'inherit' ? null : value });
+    },
+    [patchSelection],
+  );
 
-      const nodes = selection.getNodes();
-      const rubyNodes = getSelectedRubyNodes(nodes);
+  if (!shown) return null;
 
-      if (rubyNodes.length > 0) {
-        const rubyNode = rubyNodes[0];
-        if (!rubyNode) return;
-        setRubyEdit({
-          nodeKey: rubyNode.getKey(),
-          reading: rubyNode.getReading(),
-          baseText: rubyNode.getTextContent(),
-          isNew: false,
-        });
-      } else {
-        const text = selection.getTextContent();
-        if (!text.trim()) return;
-
-        selection.removeText();
-        const rubyNode = $createRubyNode('');
-        rubyNode.append($createTextNode(text));
-        const freshSelection = $getSelection();
-        if ($isRangeSelection(freshSelection)) {
-          freshSelection.insertNodes([rubyNode]);
-        }
-
-        setRubyEdit({
-          nodeKey: rubyNode.getKey(),
-          reading: '',
-          baseText: text,
-          isNew: true,
-        });
-      }
-    });
-  }, [editor]);
-
-  const handleRubyConfirm = useCallback(() => {
-    const edit = rubyEditRef.current;
-    if (!edit) return;
-    editor.update(() => {
-      const node = $getNodeByKey(edit.nodeKey);
-      if ($isRubyNode(node)) {
-        node.setReading(edit.reading);
-      }
-    });
-    setRubyEdit(null);
-  }, [editor]);
-
-  const handleRubyCancel = useCallback(() => {
-    const edit = rubyEditRef.current;
-    if (!edit) return;
-    if (edit.isNew) {
-      editor.update(() => {
-        const node = $getNodeByKey(edit.nodeKey);
-        if ($isRubyNode(node)) {
-          const children = node.getChildren();
-          for (const child of children) {
-            node.insertBefore(child);
-          }
-          node.remove();
-        }
-      });
-    }
-    setRubyEdit(null);
-  }, [editor]);
-
-  const handleRubyDelete = useCallback(() => {
-    const edit = rubyEditRef.current;
-    if (!edit) return;
-    editor.update(() => {
-      const node = $getNodeByKey(edit.nodeKey);
-      if ($isRubyNode(node)) {
-        const children = node.getChildren();
-        for (const child of children) {
-          node.insertBefore(child);
-        }
-        node.remove();
-      }
-    });
-    setRubyEdit(null);
-  }, [editor]);
-
-  const isRubyEditing = rubyEdit !== null;
-
-  useEffect(() => {
-    if (!isRubyEditing) return;
-
-    const handleClickOutside = (e: MouseEvent) => {
-      const currentEdit = rubyEditRef.current;
-      if (!currentEdit) return;
-      if (rubyEditorRef.current && !rubyEditorRef.current.contains(e.target as Node)) {
-        if (currentEdit.reading.trim()) {
-          editor.update(() => {
-            const node = $getNodeByKey(currentEdit.nodeKey);
-            if ($isRubyNode(node)) {
-              node.setReading(currentEdit.reading);
-            }
-          });
-        } else if (currentEdit.isNew) {
-          editor.update(() => {
-            const node = $getNodeByKey(currentEdit.nodeKey);
-            if ($isRubyNode(node)) {
-              const children = node.getChildren();
-              for (const child of children) {
-                node.insertBefore(child);
-              }
-              node.remove();
-            }
-          });
-        }
-        setRubyEdit(null);
-      }
-    };
-
-    const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-    }, 0);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [editor, isRubyEditing]);
-
-  useEffect(() => {
-    if (!rubyEdit || !rubyEditorRef.current) return;
-
-    const positionEditor = () => {
-      const editorEl = rubyEditorRef.current;
-      if (!editorEl) return;
-
-      applyThemeVars(editorEl);
-
-      const rubyDom = editor.getElementByKey(rubyEdit.nodeKey);
-      if (!rubyDom) return;
-
-      const rect = rubyDom.getBoundingClientRect();
-      const isBody = portalContainer === document.body;
-      const containerRect = isBody ? undefined : portalContainer.getBoundingClientRect();
-      const oX = containerRect?.left ?? 0;
-      const oY = containerRect?.top ?? 0;
-      const availW = containerRect?.width ?? window.innerWidth;
-
-      const editorWidth = editorEl.offsetWidth;
-      const rawLeft = rect.left - oX + rect.width / 2 - editorWidth / 2;
-      const clampedLeft = Math.max(8, Math.min(rawLeft, availW - editorWidth - 8));
-
-      editorEl.style.top = `${rect.bottom - oY + 8}px`;
-      editorEl.style.left = `${clampedLeft}px`;
-    };
-
-    requestAnimationFrame(positionEditor);
-    requestAnimationFrame(() => {
-      rubyInputRef.current?.focus();
-    });
-  }, [applyThemeVars, editor, rubyEdit]);
-
-  if (!visible && !rubyEdit) return null;
-  const toolbarClassName = portalClassName ? `${css.toolbar} ${portalClassName}` : css.toolbar;
-  const rubyEditorClassName = portalClassName
-    ? `${css.rubyEditor} ${portalClassName}`
-    : css.rubyEditor;
+  const toolbarClassName = [
+    css.toolbar,
+    mode.kind === 'link' && css.toolbarLink,
+    mode.kind === 'ruby' && css.toolbarRuby,
+    portalClassName,
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <>
-      {visible &&
-        !rubyEdit &&
-        createPortal(
-          <div
-            aria-label="Text formatting"
-            className={toolbarClassName}
-            data-theme={portalClassName ? portalTheme : undefined}
-            ref={toolbarRef}
-            role="toolbar"
-            style={{ position: 'fixed', zIndex: 50 }}
-          >
-            {/* Group 1: Basic formatting */}
-            <ToolbarButton
-              active={state.isBold}
-              ariaLabel="Bold"
-              onClick={() => handleFormat('bold')}
-            >
-              <Bold size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton
-              active={state.isItalic}
-              ariaLabel="Italic"
-              onClick={() => handleFormat('italic')}
-            >
-              <Italic size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton
-              active={state.isUnderline}
-              ariaLabel="Underline"
-              onClick={() => handleFormat('underline')}
-            >
-              <Underline size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton
-              active={state.isStrikethrough}
-              ariaLabel="Strikethrough"
-              onClick={() => handleFormat('strikethrough')}
-            >
-              <Strikethrough size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton
-              active={state.isSuperscript}
-              ariaLabel="Superscript"
-              onClick={() => handleFormat('superscript')}
-            >
-              <Superscript size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton
-              active={state.isSubscript}
-              ariaLabel="Subscript"
-              onClick={() => handleFormat('subscript')}
-            >
-              <Subscript size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-
-            <span className={css.separator} />
-
-            {/* Group 2: Code, Highlight, Link */}
-            <ToolbarButton
-              active={state.isCode}
-              ariaLabel="Code"
-              onClick={() => handleFormat('code')}
-            >
-              <Code size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton
-              active={state.isHighlight}
-              ariaLabel="Highlight"
-              onClick={() => handleFormat('highlight')}
-            >
-              <Highlighter size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton
-              active={state.isSpoiler}
-              ariaLabel="Spoiler"
-              onClick={() => editor.update($toggleSpoilerSelection)}
-            >
-              <EyeOff size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton active={state.isLink} ariaLabel="Link" onClick={handleLink}>
-              <LinkIcon size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-            <ToolbarButton active={state.isRuby} ariaLabel="Ruby annotation" onClick={handleRuby}>
-              <Languages size={ICON_SIZE} strokeWidth={ICON_STROKE} />
-            </ToolbarButton>
-
-            <span className={css.separator} />
-
-            {/* Group 3: Color picker */}
-            <ColorPicker currentColor={state.fontColor || 'inherit'} onSelect={handleColor} />
-
-            {actions && (
-              <>
-                <span className={css.separator} />
-                {actions}
-              </>
-            )}
-          </div>,
-          portalContainer,
-        )}
-
-      {rubyEdit &&
-        createPortal(
-          <div
-            className={rubyEditorClassName}
-            data-theme={portalClassName ? portalTheme : undefined}
-            ref={rubyEditorRef}
-            style={{ position: 'fixed', zIndex: 51 }}
-          >
-            <div className={css.rubyPreview}>
-              <span className={css.rubyPreviewReading}>{rubyEdit.reading || '\u00A0'}</span>
-              <span className={css.rubyPreviewBase}>{rubyEdit.baseText}</span>
-            </div>
-
-            <div className={css.rubyInputRow}>
-              <input
-                className={css.rubyInput}
-                placeholder="读音"
-                ref={rubyInputRef}
-                value={rubyEdit.reading}
-                onChange={(e) =>
-                  setRubyEdit((prev) => (prev ? { ...prev, reading: e.target.value } : null))
-                }
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleRubyConfirm();
-                  }
-                  if (e.key === 'Escape') {
-                    e.preventDefault();
-                    handleRubyCancel();
-                  }
-                }}
-              />
-              <button
-                aria-label="Confirm"
-                className={`${css.rubyActionBtn} ${css.rubyConfirm}`}
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleRubyConfirm();
-                }}
-              >
-                <Check size={14} strokeWidth={ICON_STROKE} />
-              </button>
-              <button
-                aria-label="Cancel"
-                className={css.rubyActionBtn}
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleRubyCancel();
-                }}
-              >
-                <X size={14} strokeWidth={ICON_STROKE} />
-              </button>
-
-              <span className={css.separator} />
-
-              <button
-                aria-label="Delete ruby"
-                className={`${css.rubyActionBtn} ${css.rubyRemove}`}
-                type="button"
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  handleRubyDelete();
-                }}
-              >
-                <Trash2 size={14} strokeWidth={ICON_STROKE} />
-              </button>
-            </div>
-
-            <span className={css.rubyHint}>Enter 保存 / Esc 取消</span>
-          </div>,
-          portalContainer,
-        )}
-    </>
+    <TooltipProvider delay={400}>
+      <TooltipRoot disableHoverablePopup handle={handle as TooltipRootProps['handle']}>
+        {
+          ((props: { payload?: ToolbarTooltipPayload }) =>
+            props.payload ? (
+              <TooltipContent data-slot="toolbar-tooltip" shortcut={props.payload.shortcut}>
+                {props.payload.label}
+              </TooltipContent>
+            ) : null) as TooltipRootProps['children']
+        }
+      </TooltipRoot>
+      {createPortal(
+        <div
+          aria-label={mode.kind === 'format' ? 'Text formatting' : undefined}
+          className={toolbarClassName}
+          data-theme={portalClassName ? portalTheme : undefined}
+          ref={toolbarRef}
+          role={mode.kind === 'format' ? 'toolbar' : 'group'}
+          style={{ position: 'fixed', zIndex: 50 }}
+          onFocus={(e) => syncRovingTabIndex(e.currentTarget, e.target)}
+          onKeyDown={(e) => {
+            if (mode.kind !== 'format') return;
+            if (moveToolbarFocus(e)) return;
+            if (e.key === 'Escape' || e.key === 'Tab') {
+              e.preventDefault();
+              editor.focus();
+            }
+          }}
+        >
+          {mode.kind === 'format' && (
+            <FormatBar
+              actions={actions}
+              handle={handle}
+              state={state}
+              onBackgroundColor={handleBackgroundColor}
+              onClearFormatting={() => editor.update($clearFormatting)}
+              onColor={handleColor}
+              onFormat={handleFormat}
+              onLink={() => openLink('toolbar')}
+              onRuby={() => openRuby('toolbar')}
+              onSpoiler={() => editor.update($toggleSpoilerSelection)}
+            />
+          )}
+          {mode.kind === 'link' && (
+            <InlineInputBar
+              handle={handle}
+              icon={<LinkIcon {...ICON} />}
+              label="URL"
+              placeholder="Paste or type a link"
+              type="url"
+              value={mode.draft}
+              secondary={
+                mode.existing
+                  ? {
+                      danger: true,
+                      icon: <Unlink {...ICON} />,
+                      label: 'Remove link',
+                      onClick: modes.removeLink,
+                    }
+                  : {
+                      icon: <X {...ICON} />,
+                      label: 'Back to formatting',
+                      shortcut: 'Escape',
+                      onClick: () => modes.cancel(true),
+                    }
+              }
+              onCancel={() => modes.cancel(true)}
+              onChange={modes.setLinkDraft}
+              onSubmit={() => modes.saveLink()}
+            />
+          )}
+          {mode.kind === 'ruby' && (
+            <InlineInputBar
+              handle={handle}
+              icon={<Languages {...ICON} />}
+              label="Reading"
+              placeholder="Reading"
+              value={mode.draft.reading}
+              secondary={{
+                danger: true,
+                icon: <Trash2 {...ICON} />,
+                label: 'Remove ruby',
+                onClick: modes.removeRuby,
+              }}
+              onCancel={modes.cancelRuby}
+              onChange={modes.setRubyDraft}
+              onSubmit={() => modes.saveRuby()}
+            />
+          )}
+        </div>,
+        portalContainer,
+      )}
+    </TooltipProvider>
   );
 }

@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeRadius, chromeText, focusRing, vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
@@ -8,11 +8,7 @@ export const semanticClassNames = {
   error: 'rich-dynamic-error',
   settingsButton: 'rich-dynamic-settings-button',
   editPanel: 'rich-dynamic-edit-panel',
-  editField: 'rich-dynamic-edit-field',
-  editFieldIcon: 'rich-dynamic-edit-field-icon',
-  editInput: 'rich-dynamic-edit-input',
   editTextarea: 'rich-dynamic-edit-textarea',
-  editError: 'rich-dynamic-edit-error',
 } as const;
 
 export const root = style({
@@ -91,69 +87,38 @@ export const settingsButton = style({
   },
 });
 
-export const editPanel = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  width: '340px',
-  padding: '12px',
-  fontFamily: vars.typography.fontFamilySans,
-});
-
-export const editField = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '6px 10px',
-  backgroundColor: vars.color.bgSecondary,
-  borderRadius: '6px',
-  minWidth: 0,
-});
-
-export const editFieldIcon = style({
-  flexShrink: 0,
-  color: vars.color.textSecondary,
-});
-
-export const editInput = style({
-  flex: 1,
-  appearance: 'none',
-  border: 'none',
-  backgroundColor: 'transparent',
-  color: 'inherit',
-  fontSize: vars.typography.fontSizeSm,
-  padding: 0,
-  outline: 'none',
-  minWidth: 0,
-  selectors: {
-    '&::placeholder': {
-      color: vars.color.textSecondary,
-    },
-  },
-});
+export const editPanel = style({});
 
 export const editTextarea = style({
+  ...chromeText.mono,
+  boxSizing: 'border-box',
+  display: 'block',
   width: '100%',
-  minHeight: '72px',
+  minHeight: 96,
+  padding: '6px 8px',
+  lineHeight: '18px',
   resize: 'vertical',
-  appearance: 'none',
   border: 'none',
-  backgroundColor: vars.color.bgSecondary,
-  borderRadius: '6px',
-  color: 'inherit',
-  fontFamily: vars.typography.fontMono,
-  fontSize: vars.typography.fontSizeXs,
-  padding: '6px 10px',
+  borderRadius: chromeRadius.md,
+  backgroundColor: vars.color.bg,
+  color: vars.color.text,
+  boxShadow: `0 0 0 1px ${vars.color.ring}`,
   outline: 'none',
   selectors: {
     '&::placeholder': {
-      color: vars.color.textSecondary,
-      fontFamily: vars.typography.fontFamilySans,
+      color: vars.color.textTertiary,
+    },
+    '&:focus': {
+      boxShadow: focusRing,
+    },
+    '&[aria-invalid="true"]': {
+      boxShadow: `0 0 0 1px ${vars.color.alertCaution}`,
     },
   },
 });
 
-export const editError = style({
-  color: vars.color.alertCaution,
-  fontSize: vars.typography.fontSizeSm,
+export const footerNote = style({
+  ...chromeText.label,
+  fontWeight: 400,
+  color: vars.color.textTertiary,
 });

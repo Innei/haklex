@@ -1,4 +1,4 @@
-import { SegmentedControl } from '@haklex/rich-editor-ui';
+import { SegmentedControl, TextInput } from '@haklex/rich-editor-ui';
 import type { FC } from 'react';
 
 import * as css from './styles.css';
@@ -37,16 +37,18 @@ export const GalleryDialogSubHeader: FC<{
   if (layout === 'masonry') {
     return (
       <div className={css.galleryDialogSubHeader}>
-        <span className={css.galleryDialogSubHeaderLabel}>Max height</span>
-        <input
-          className={css.galleryMaxHeightInput}
-          min={1}
-          placeholder="Auto"
-          type="number"
-          value={maxItemHeightInput}
-          onChange={(e) => onMaxItemHeightInputChange(e.target.value)}
-        />
-        <span className={css.galleryDialogSubHeaderLabel}>px</span>
+        <label className={css.galleryDialogSubHeaderGroup}>
+          <span className={css.galleryDialogSubHeaderLabel}>Max height</span>
+          <TextInput
+            className={css.galleryMaxHeightInput}
+            min={1}
+            placeholder="Auto"
+            type="number"
+            value={maxItemHeightInput}
+            onChange={(e) => onMaxItemHeightInputChange(e.target.value)}
+          />
+          <span className={css.galleryDialogSubHeaderLabel}>px</span>
+        </label>
       </div>
     );
   }

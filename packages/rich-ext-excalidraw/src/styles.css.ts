@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeText, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
 
 const ASPECT_RATIO = '16 / 9';
@@ -154,14 +154,6 @@ export const excalidrawDialogHeaderTitle = style({
   flex: 1,
 });
 
-export const excalidrawStatusDot = style({
-  width: 8,
-  height: 8,
-  borderRadius: '50%',
-  flexShrink: 0,
-  transition: 'background-color 0.3s',
-});
-
 export const excalidrawDialogTitle = style({
   fontSize: vars.typography.fontSizeMd,
   fontWeight: 600,
@@ -175,13 +167,6 @@ export const excalidrawDialogMeta = style({
   lineHeight: 1,
   paddingLeft: 10,
   borderLeft: `1px solid ${vars.color.border}`,
-});
-
-export const excalidrawHeaderActions = style({
-  marginLeft: 'auto',
-  display: 'flex',
-  alignItems: 'center',
-  gap: 2,
 });
 
 export const excalidrawHeaderClose = style({
@@ -204,73 +189,6 @@ export const excalidrawHeaderClose = style({
   },
 });
 
-// ── Header action buttons ────────────────────────────────────────
-
-export const excalidrawActionBarBtn = style({
-  'display': 'inline-flex',
-  'alignItems': 'center',
-  'gap': 4,
-  'padding': '4px 10px',
-  'borderRadius': 4,
-  'border': 'none',
-  'background': 'transparent',
-  'color': vars.color.textSecondary,
-  'cursor': 'pointer',
-  'fontSize': vars.typography.fontSizeSm,
-  'whiteSpace': 'nowrap',
-  'transition': 'background 0.15s, color 0.15s',
-  ':hover': {
-    background: 'color-mix(in srgb, currentColor 8%, transparent)',
-    color: vars.color.text,
-  },
-  'selectors': {
-    '&:disabled': {
-      opacity: 0.4,
-      pointerEvents: 'none',
-    },
-  },
-});
-
-globalStyle(`${excalidrawActionBarBtn} svg`, {
-  width: 14,
-  height: 14,
-  flexShrink: 0,
-});
-
-export const excalidrawActionBarSep = style({
-  width: 1,
-  height: 16,
-  margin: '0 4px',
-  background: vars.color.border,
-  flexShrink: 0,
-});
-
-export const excalidrawActionBarUrl = style({
-  'display': 'inline-flex',
-  'alignItems': 'center',
-  'padding': '3px 10px',
-  'borderRadius': 4,
-  'background': 'color-mix(in srgb, currentColor 4%, transparent)',
-  'color': vars.color.textSecondary,
-  'fontSize': vars.typography.fontSizeXs,
-  'fontFamily': vars.typography.fontMono,
-  'width': 200,
-  'maxWidth': '50%',
-  'overflow': 'hidden',
-  'textOverflow': 'ellipsis',
-  'whiteSpace': 'nowrap',
-  'border': `1px solid transparent`,
-  'outline': 'none',
-  'transition': 'background 0.15s, border-color 0.15s',
-  ':hover': {
-    background: 'color-mix(in srgb, currentColor 8%, transparent)',
-  },
-  ':focus': {
-    borderColor: vars.color.accent,
-    background: 'color-mix(in srgb, currentColor 6%, transparent)',
-  },
-});
-
 // ── Dialog canvas area ──────────────────────────────────────────
 
 export const excalidrawDialogCanvas = style({
@@ -279,58 +197,47 @@ export const excalidrawDialogCanvas = style({
   minHeight: 0,
 });
 
-// ── Unsaved-changes confirmation (used inside presentDialog) ────
+export const excalidrawShell = style({
+  flex: 1,
+  minHeight: 0,
+});
 
-export const excalidrawConfirmActions = style({
+globalStyle(`${excalidrawShell} ${excalidrawDialogCanvas}`, {
+  overflow: 'hidden',
+});
+
+export const excalidrawSavedDot = style({
+  width: 8,
+  height: 8,
+  borderRadius: '50%',
+  flexShrink: 0,
+  backgroundColor: vars.color.alertTip,
+});
+
+export const excalidrawOptionsActions = style({
   display: 'flex',
-  justifyContent: 'flex-end',
+  flexWrap: 'wrap',
   gap: 8,
-  padding: '0 1.5rem 1.25rem',
 });
 
-export const excalidrawConfirmBtn = style({
-  'padding': '6px 14px',
-  'borderRadius': 6,
-  'border': `1px solid ${vars.color.border}`,
-  'background': 'transparent',
-  'fontSize': vars.typography.fontSizeSm,
-  'fontWeight': 500,
-  'cursor': 'pointer',
-  'transition': 'background 0.15s',
-  'color': vars.color.text,
-  ':hover': {
-    background: 'color-mix(in srgb, currentColor 6%, transparent)',
-  },
+export const excalidrawOptionsAdvanced = style({
+  borderTop: `1px solid ${vars.color.borderSubtle}`,
 });
 
-export const excalidrawConfirmBtnPrimary = style({
-  'padding': '6px 14px',
-  'borderRadius': 6,
-  'border': `1px solid ${vars.color.accent}`,
-  'background': vars.color.accent,
-  'fontSize': vars.typography.fontSizeSm,
-  'fontWeight': 500,
-  'cursor': 'pointer',
-  'transition': 'opacity 0.15s',
-  'color': vars.color.bg,
-  ':hover': {
-    opacity: 0.9,
-  },
+export const excalidrawOptionsHeading = style({
+  ...chromeText.label,
+  color: vars.color.textTertiary,
 });
 
-export const excalidrawConfirmBtnDanger = style({
-  'padding': '6px 14px',
-  'borderRadius': 6,
-  'border': `1px solid ${vars.color.alertCaution}`,
-  'background': 'transparent',
-  'fontSize': vars.typography.fontSizeSm,
-  'fontWeight': 500,
-  'cursor': 'pointer',
-  'transition': 'background 0.15s',
-  'color': vars.color.alertCaution,
-  ':hover': {
-    background: `color-mix(in srgb, ${vars.color.alertCaution} 10%, transparent)`,
-  },
+export const excalidrawOptionsGroup = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 6,
+});
+
+export const excalidrawOptionsLabel = style({
+  ...chromeText.label,
+  color: vars.color.textSecondary,
 });
 
 // ── Edit overlay ────────────────────────────────────────────────

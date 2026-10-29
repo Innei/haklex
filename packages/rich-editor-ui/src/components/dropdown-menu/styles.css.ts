@@ -1,3 +1,4 @@
+import { chromeText, textLevel, vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 import {
@@ -52,3 +53,22 @@ const indicator = style({
 
 export const checkboxIndicator = indicator;
 export const radioIndicator = indicator;
+
+export const subTrigger = style({
+  selectors: {
+    '&[data-popup-open]': {
+      backgroundColor: vars.color.fillSecondary,
+    },
+  },
+});
+
+export const subTriggerValue = style({
+  ...chromeText.label,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+  marginLeft: 'auto',
+  paddingLeft: 16,
+  fontWeight: 400,
+  color: textLevel[2],
+});

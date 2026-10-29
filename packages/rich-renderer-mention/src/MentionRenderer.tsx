@@ -48,7 +48,7 @@ export const platformMetaMap: Record<string, MentionPlatformMeta> = {
     getUrl: (handle) => `https://github.com/${encodeURIComponent(handle)}`,
   },
   TW: {
-    label: 'Twitter',
+    label: 'X',
     icon: TwitterIcon,
     getUrl: (handle) => `https://twitter.com/${encodeURIComponent(handle)}`,
   },

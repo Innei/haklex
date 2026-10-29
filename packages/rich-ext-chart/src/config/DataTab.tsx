@@ -1,4 +1,5 @@
-import { X } from 'lucide-react';
+import { ActionButton } from '@haklex/rich-editor-ui';
+import { Plus, X } from 'lucide-react';
 
 import type { ChartValue } from '../types';
 import { CHART_PALETTE_SIZE } from '../types';
@@ -22,6 +23,7 @@ export function DataTab({ draft, onChange }: ChartTabProps) {
               {columns.map((key) => (
                 <th key={key} scope="col">
                   <CommitInput
+                    plain
                     aria-label={`Rename ${key}`}
                     className={`${s.cell} ${s.headCell}`}
                     value={key}
@@ -38,6 +40,7 @@ export function DataTab({ draft, onChange }: ChartTabProps) {
                 {columns.map((key) => (
                   <td key={key}>
                     <CommitInput
+                      plain
                       aria-label={`Row ${index + 1} ${key}`}
                       className={key === x ? s.cell : `${s.cell} ${s.cellNumber}`}
                       inputMode={key === x ? undefined : 'decimal'}
@@ -47,14 +50,14 @@ export function DataTab({ draft, onChange }: ChartTabProps) {
                   </td>
                 ))}
                 <td>
-                  <button
+                  <ActionButton
+                    icon
                     aria-label={`Remove row ${index + 1}`}
-                    className={s.iconButton}
-                    type="button"
+                    size="sm"
                     onClick={() => onChange(removeRow(draft, index))}
                   >
-                    <X size={14} />
-                  </button>
+                    <X />
+                  </ActionButton>
                 </td>
               </tr>
             ))}
@@ -62,17 +65,19 @@ export function DataTab({ draft, onChange }: ChartTabProps) {
         </table>
       </div>
       <div className={s.actions}>
-        <button className={s.addButton} type="button" onClick={() => onChange(addRow(draft))}>
+        <ActionButton size="md" variant="outline" onClick={() => onChange(addRow(draft))}>
+          <Plus />
           Add row
-        </button>
-        <button
-          className={s.addButton}
+        </ActionButton>
+        <ActionButton
           disabled={draft.series.length >= CHART_PALETTE_SIZE}
-          type="button"
+          size="md"
+          variant="outline"
           onClick={() => onChange(addSeries(draft))}
         >
+          <Plus />
           Add series
-        </button>
+        </ActionButton>
       </div>
     </>
   );

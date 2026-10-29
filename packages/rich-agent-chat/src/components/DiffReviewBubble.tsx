@@ -46,18 +46,18 @@ export function DiffReviewBubble({
         {isActionable && (
           <div className={css.diffReviewActions}>
             <button
-              className={css.diffReviewAcceptBtn}
-              type="button"
-              onClick={() => onAccept?.(batch.id)}
-            >
-              Accept
-            </button>
-            <button
               className={css.diffReviewRejectBtn}
               type="button"
               onClick={() => onReject?.(batch.id)}
             >
               Reject
+            </button>
+            <button
+              className={css.diffReviewAcceptBtn}
+              type="button"
+              onClick={() => onAccept?.(batch.id)}
+            >
+              Accept
             </button>
           </div>
         )}

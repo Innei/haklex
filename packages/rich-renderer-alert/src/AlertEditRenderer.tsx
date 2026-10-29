@@ -2,7 +2,8 @@ import type { AlertRendererProps } from '@haklex/rich-editor/renderers';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from '@haklex/rich-editor-ui';
 import { ChevronDown } from 'lucide-react';
@@ -24,21 +25,28 @@ export const AlertEditRenderer: FC<AlertRendererProps> = ({ type, editable, onTy
       className={`${css.alertHeader} ${css.alertType({ type })} ${css.semanticClassNames.header} ${css.semanticTypeClassNames.header[type]}`}
     >
       <DropdownMenu>
-        <DropdownMenuTrigger className={css.alertTrigger}>
+        <DropdownMenuTrigger aria-label={`Alert type: ${label}`} className={css.alertTrigger}>
           <Icon className={`${css.alertIcon} ${css.semanticClassNames.icon}`} />
           <span className={`${css.alertLabel} ${css.semanticClassNames.label}`}>{label}</span>
           <ChevronDown className={css.alertChevron} />
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" sideOffset={6}>
-          {ALL_TYPES.map((t) => {
-            const ItemIcon = ALERT_ICONS[t];
-            return (
-              <DropdownMenuItem key={t} onClick={() => onTypeChange(t)}>
-                <ItemIcon className={`${css.alertMenuIcon} ${css.alertType({ type: t })}`} />
-                <span>{ALERT_LABELS[t]}</span>
-              </DropdownMenuItem>
-            );
-          })}
+        <DropdownMenuContent align="start" sideOffset={8}>
+          <DropdownMenuRadioGroup
+            value={type}
+            onValueChange={(next) => {
+              if (next !== type) onTypeChange(next as AlertRendererProps['type']);
+            }}
+          >
+            {ALL_TYPES.map((t) => {
+              const ItemIcon = ALERT_ICONS[t];
+              return (
+                <DropdownMenuRadioItem key={t} value={t}>
+                  <ItemIcon className={`${css.alertMenuIcon} ${css.alertType({ type: t })}`} />
+                  <span>{ALERT_LABELS[t]}</span>
+                </DropdownMenuRadioItem>
+              );
+            })}
+          </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

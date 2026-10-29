@@ -1,17 +1,24 @@
 import { useColorScheme } from '@haklex/rich-editor/static';
-import { ActionBar, ActionButton } from '@haklex/rich-editor-ui';
+import {
+  confirmDiscardChanges,
+  ModalShell,
+  ModalShellBody,
+  ModalShellFooter,
+  ModalShellHeader,
+  presentDialog,
+} from '@haklex/rich-editor-ui';
 import { PortalContainerProvider, usePortalTheme } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { LexicalEditor, SerializedEditorState } from 'lexical';
-import { $getNodeByKey } from 'lexical';
-import { FileText, Pencil, X } from 'lucide-react';
-import { type KeyboardEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { $getNodeByKey, $getRoot } from 'lexical';
+import { FileText, Pencil } from 'lucide-react';
+import { type KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useNestedDocDialogEditor } from './NestedDocDialogEditorContext';
 import { $isNestedDocNode } from './NestedDocNode';
 import { NestedDocRenderer } from './NestedDocRenderer';
 import * as css from './styles.css';
-import { hasRenderableEditorState, truncateEditorState } from './utils';
+import { countWords, hasRenderableEditorState, truncateEditorState } from './utils';
 
 const PREVIEW_NODE_LIMIT = 6;
 
@@ -59,27 +66,33 @@ export function NestedDocEditDecorator({
   );
   const hasPreview = hasRenderableEditorState(previewState);
 
-  const handleOpenDialog = useCallback(async () => {
+  const handleOpenDialog = useCallback(() => {
     if (!DialogEditor) return;
 
-    const { presentDialog } = await import('@haklex/rich-editor-ui');
-
+    let dirty = false;
+    const initialState = contentEditor.getEditorState().toJSON();
     presentDialog({
-      content: ({ dismiss }) => (
+      content: ({ dismiss, requestDismiss }) => (
         <NestedDocDialogContent
           DialogEditor={DialogEditor}
           contentEditor={contentEditor}
-          initialState={contentEditor.getEditorState().toJSON()}
+          initialState={initialState}
           nodeKey={nodeKey}
           parentEditor={editor}
           onDismiss={dismiss}
+          onRequestDismiss={requestDismiss}
+          onDirtyChange={(next) => {
+            dirty = next;
+          }}
         />
       ),
       className: css.dialogPopup,
       portalClassName,
       theme: colorScheme,
+      width: 900,
+      sheet: 'auto',
       showCloseButton: false,
-      clickOutsideToDismiss: false,
+      confirmDismiss: () => !dirty || confirmDiscardChanges(),
     });
   }, [DialogEditor, colorScheme, contentEditor, editor, nodeKey, portalClassName]);
 
@@ -119,6 +132,8 @@ function NestedDocDialogContent({
   nodeKey,
   contentEditor,
   onDismiss,
+  onRequestDismiss,
+  onDirtyChange,
   DialogEditor,
 }: {
   initialState: SerializedEditorState;
@@ -126,21 +141,46 @@ function NestedDocDialogContent({
   nodeKey: string;
   contentEditor: LexicalEditor;
   onDismiss: () => void;
+  onRequestDismiss: () => void;
+  onDirtyChange: (dirty: boolean) => void;
   DialogEditor: React.ComponentType<{
     initialValue: SerializedEditorState;
     onEditorReady: (editor: LexicalEditor | null) => void;
   }>;
 }) {
+  const [dialogEditor, setDialogEditor] = useState<LexicalEditor | null>(null);
   const dialogEditorRef = useRef<LexicalEditor | null>(null);
   const [shellEl, setShellEl] = useState<HTMLDivElement | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [words, setWords] = useState(0);
 
-  const safeInitialState =
-    initialState?.root?.children?.length > 0 ? initialState : EMPTY_EDITOR_STATE;
+  const safeInitialState = useMemo(
+    () => (initialState?.root?.children?.length > 0 ? initialState : EMPTY_EDITOR_STATE),
+    [initialState],
+  );
 
-  const handleDone = useCallback(() => {
-    const dialogEditor = dialogEditorRef.current;
-    if (dialogEditor) {
-      const newState = dialogEditor.getEditorState().toJSON();
+  useEffect(() => {
+    if (!dialogEditor) return;
+    const baseline = JSON.stringify(dialogEditor.getEditorState().toJSON());
+    const measure = () => {
+      setWords(dialogEditor.getEditorState().read(() => countWords($getRoot().getTextContent())));
+    };
+    measure();
+    return dialogEditor.registerUpdateListener(({ editorState, dirtyElements, dirtyLeaves }) => {
+      if (dirtyElements.size === 0 && dirtyLeaves.size === 0) return;
+      setDirty(JSON.stringify(editorState.toJSON()) !== baseline);
+      measure();
+    });
+  }, [dialogEditor]);
+
+  useEffect(() => {
+    onDirtyChange(dirty);
+  }, [dirty, onDirtyChange]);
+
+  const handleSave = useCallback(() => {
+    const editor = dialogEditorRef.current;
+    if (editor) {
+      const newState = editor.getEditorState().toJSON();
       const parsed = contentEditor.parseEditorState(newState);
       contentEditor.setEditorState(parsed);
       parentEditor.update(() => {
@@ -160,55 +200,38 @@ function NestedDocDialogContent({
 
       if (event.key === 'Enter' || event.key.toLowerCase() === 's') {
         event.preventDefault();
-        handleDone();
+        event.stopPropagation();
+        handleSave();
       }
     },
-    [handleDone],
+    [handleSave],
   );
 
   const handleEditorReady = useCallback((editor: LexicalEditor | null) => {
     dialogEditorRef.current = editor;
+    setDialogEditor(editor);
   }, []);
 
   return (
     <div className={css.dialogShell} ref={setShellEl} onKeyDownCapture={handleKeyDownCapture}>
-      <div className={css.dialogHeader}>
-        <div className={css.dialogHeaderLeft}>
-          <h3 className={css.dialogTitle}>
-            <FileText size={18} />
-            <span>Nested document</span>
-          </h3>
-        </div>
-        <div className={css.dialogHeaderRight}>
-          <button
-            className={css.dialogHeaderCloseBtn}
-            title="Close"
-            type="button"
-            onClick={onDismiss}
-          >
-            <X size={14} />
-          </button>
-        </div>
-      </div>
+      <ModalShell>
+        <ModalShellHeader icon={<FileText />} title="Nested document" onClose={onRequestDismiss} />
 
-      <div className={css.editorArea}>
-        {shellEl && (
-          <PortalContainerProvider value={shellEl}>
-            <DialogEditor initialValue={safeInitialState} onEditorReady={handleEditorReady} />
-          </PortalContainerProvider>
-        )}
-      </div>
+        <ModalShellBody className={css.editorArea}>
+          {shellEl && (
+            <PortalContainerProvider value={shellEl}>
+              <DialogEditor initialValue={safeInitialState} onEditorReady={handleEditorReady} />
+            </PortalContainerProvider>
+          )}
+        </ModalShellBody>
 
-      <div className={css.dialogFooter}>
-        <ActionBar>
-          <ActionButton size="md" variant="ghost" onClick={onDismiss}>
-            Cancel
-          </ActionButton>
-          <ActionButton size="md" variant="accent" onClick={handleDone}>
-            Save
-          </ActionButton>
-        </ActionBar>
-      </div>
+        <ModalShellFooter
+          dirty={dirty}
+          status={`${words.toLocaleString('en-US')} ${words === 1 ? 'word' : 'words'}`}
+          onCancel={onRequestDismiss}
+          onSave={handleSave}
+        />
+      </ModalShell>
     </div>
   );
 }

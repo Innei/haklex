@@ -3,8 +3,21 @@ import type { FC } from 'react';
 import { createElement, useCallback, useEffect, useRef, useState } from 'react';
 
 import type { DialogStackItem } from './store';
-import { dismissDialog, removeDialog } from './store';
+import { dismissDialog, removeDialog, requestDismissDialog } from './store';
 import * as css from './styles.css';
+
+function isScrollRegion(el: HTMLElement): boolean {
+  if (el.isContentEditable || el.classList.contains('cm-editor')) return true;
+  const { overflowY } = getComputedStyle(el);
+  return (overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight;
+}
+
+function isInsideScrolledRegion(target: HTMLElement, boundary: HTMLElement | null): boolean {
+  for (let el: HTMLElement | null = target; el && el !== boundary; el = el.parentElement) {
+    if (el.scrollTop > 0 && isScrollRegion(el)) return true;
+  }
+  return false;
+}
 
 export const SheetStackEntry: FC<{
   item: DialogStackItem;
@@ -23,6 +36,7 @@ export const SheetStackEntry: FC<{
   } = item;
 
   const dismiss = useCallback(() => dismissDialog(id), [id]);
+  const requestDismiss = useCallback(() => requestDismissDialog(id), [id]);
 
   useEffect(() => {
     if (!open) {
@@ -42,7 +56,6 @@ export const SheetStackEntry: FC<{
 
   // Touch gesture state
   const sheetRef = useRef<HTMLDivElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
   const dragState = useRef<{
     startY: number;
     startTime: number;
@@ -55,11 +68,9 @@ export const SheetStackEntry: FC<{
   const handleTouchStart = useCallback((e: React.TouchEvent) => {
     const touch = e.touches[0];
     const target = e.target as HTMLElement;
-    const isHandle = target.closest(`.${css.sheetDragHandle}`) !== null;
-    const contentEl = contentRef.current;
-    const isContentAtTop = !contentEl || contentEl.scrollTop <= 0;
+    const isGrip = target.closest(`.${css.sheetDragHandle}, .${css.sheetHeader}`) !== null;
 
-    if (!isHandle && !isContentAtTop) return;
+    if (!isGrip && isInsideScrolledRegion(target, sheetRef.current)) return;
 
     dragState.current = {
       startY: touch.clientY,
@@ -110,15 +121,12 @@ export const SheetStackEntry: FC<{
     const sheetHeight = sheetRef.current?.offsetHeight ?? 0;
     const threshold = sheetHeight * 0.25;
 
-    if (deltaY > threshold || velocity > 500) {
-      dismiss();
-    } else {
-      setTranslateY(0);
-    }
+    setTranslateY(0);
+    if (deltaY > threshold || velocity > 500) requestDismiss();
 
     setIsDragging(false);
     dragState.current = null;
-  }, [dismiss]);
+  }, [requestDismiss]);
 
   const zIndex = 50 + index;
   const sheetHeight = sheetRef.current?.offsetHeight || 1;
@@ -134,7 +142,7 @@ export const SheetStackEntry: FC<{
             opacity: open ? backdropOpacity : 0,
             pointerEvents: open ? 'auto' : 'none',
           }}
-          onClick={clickOutsideToDismiss ? dismiss : undefined}
+          onClick={clickOutsideToDismiss ? requestDismiss : undefined}
         />
 
         <div
@@ -162,8 +170,8 @@ export const SheetStackEntry: FC<{
             </div>
           )}
 
-          <div className={css.sheetContent} ref={contentRef}>
-            {createElement(content, { dismiss })}
+          <div className={css.sheetContent}>
+            {createElement(content, { dismiss, requestDismiss })}
           </div>
         </div>
       </PortalThemeWrapper>

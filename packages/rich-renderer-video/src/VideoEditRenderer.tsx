@@ -2,22 +2,40 @@ import { useVideoUpload } from '@haklex/rich-editor/plugins';
 import type { VideoRendererProps } from '@haklex/rich-editor/renderers';
 import { useRendererMode } from '@haklex/rich-editor/static';
 import {
-  ActionBar,
   ActionButton,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  Field,
+  Kbd,
   Popover,
+  PopoverBody,
+  PopoverFooter,
+  PopoverHeader,
   PopoverPanel,
   PopoverTrigger,
+  TextInput,
+  toast,
+  updateToast,
+  useLiveEdit,
 } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $getNearestNodeFromDOMNode, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
-import { ExternalLink, ImageIcon, Trash2, Upload, Video } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { $getNearestNodeFromDOMNode, HISTORY_MERGE_TAG, UNDO_COMMAND } from 'lexical';
+import { Ellipsis, ExternalLink, Trash2, Upload, Video } from 'lucide-react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
-import { getEditorHistoryShortcut } from './history-shortcuts';
 import * as styles from './styles.css';
 import { VideoRenderer } from './VideoRenderer';
 
 const UNSAFE_VIDEO_URL_RE = /^(?:javascript\s*:|vbscript\s*:|data\s*:(?!video\/))/i;
+const UNSAFE_POSTER_URL_RE = /^(?:javascript\s*:|vbscript\s*:|data\s*:(?!image\/))/i;
+
+interface VideoMeta {
+  poster: string;
+  src: string;
+}
 
 export function VideoEditRenderer(props: VideoRendererProps) {
   const mode = useRendererMode();
@@ -32,6 +50,7 @@ export function VideoEditRenderer(props: VideoRendererProps) {
 function VideoEditRendererInner({ src, poster, width, height }: VideoRendererProps) {
   const [editor] = useLexicalComposerContext();
   const editable = editor.isEditable();
+  const id = useId();
   const wrapperRef = useRef<HTMLDivElement>(null);
   const srcInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -41,47 +60,53 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
   const [editSrc, setEditSrc] = useState(src);
   const [editPoster, setEditPoster] = useState(poster || '');
   const [uploading, setUploading] = useState(false);
-  const [uploadPercent, setUploadPercent] = useState(0);
-  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  const values = useMemo<VideoMeta>(() => ({ src, poster: poster || '' }), [src, poster]);
+
+  const writeNode = useCallback(
+    (patch: Partial<VideoMeta>, merge: boolean) => {
+      const wrapper = wrapperRef.current;
+      if (!wrapper) return;
+      editor.update(
+        () => {
+          const node = $getNearestNodeFromDOMNode(wrapper);
+          if (!node) return;
+          const writable = node.getWritable() as unknown as Record<string, unknown>;
+          if (patch.src !== undefined) writable.__src = patch.src;
+          if (patch.poster !== undefined) writable.__poster = patch.poster || undefined;
+        },
+        merge ? { tag: HISTORY_MERGE_TAG } : undefined,
+      );
+    },
+    [editor],
+  );
+
+  const { apply, revert } = useLiveEdit(values, open, writeNode);
 
   useEffect(() => {
+    if (!open) return;
     setEditSrc(src);
     setEditPoster(poster || '');
-  }, [src, poster]);
+  }, [open]);
 
   useEffect(() => {
     if (!src) setOpen(true);
   }, [src]);
 
-  useEffect(() => {
-    if (open) {
-      requestAnimationFrame(() => srcInputRef.current?.focus());
-    }
-  }, [open]);
-
-  const commitChanges = useCallback(() => {
-    const trimmedSrc = editSrc.trim();
-    if (!trimmedSrc) return;
-    if (UNSAFE_VIDEO_URL_RE.test(trimmedSrc)) return;
-    if (!wrapperRef.current) return;
-
-    editor.update(() => {
-      const node = $getNearestNodeFromDOMNode(wrapperRef.current!);
-      if (!node) return;
-      const writable = node.getWritable() as unknown as Record<string, unknown>;
-      writable.__src = trimmedSrc;
-      writable.__poster = editPoster.trim() || undefined;
-    });
-    setOpen(false);
-  }, [editor, editSrc, editPoster]);
-
   const handleDelete = useCallback(() => {
-    if (!wrapperRef.current) return;
+    const wrapper = wrapperRef.current;
+    if (!wrapper) return;
     editor.update(() => {
-      const node = $getNearestNodeFromDOMNode(wrapperRef.current!);
-      if (node) node.remove();
+      $getNearestNodeFromDOMNode(wrapper)?.remove();
     });
     setOpen(false);
+    toast({
+      title: 'Video deleted',
+      action: {
+        label: 'Undo',
+        onClick: () => editor.dispatchCommand(UNDO_COMMAND, undefined),
+      },
+    });
   }, [editor]);
 
   const handleOpen = useCallback(() => {
@@ -94,60 +119,29 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
       if (!file.type.startsWith('video/')) return;
 
       setUploading(true);
-      setUploadPercent(0);
-      setUploadError(null);
+      const toastId = toast({ title: `Uploading ${file.name}…`, tone: 'loading' });
 
       try {
         const result = await videoUpload(file, {
-          onProgress: (percent) => setUploadPercent(Math.round(percent)),
-        });
-
-        if (!wrapperRef.current) return;
-        editor.update(() => {
-          const node = $getNearestNodeFromDOMNode(wrapperRef.current!);
-          if (!node) return;
-          const writable = node.getWritable() as unknown as Record<string, unknown>;
-          writable.__src = result.src;
+          onProgress: (percent) =>
+            updateToast(toastId, { title: `Uploading ${file.name} · ${Math.round(percent)}%` }),
         });
         setEditSrc(result.src);
-        setOpen(false);
+        apply({ src: result.src });
+        updateToast(toastId, { title: 'Video uploaded', tone: 'success', duration: 2400 });
       } catch (err: unknown) {
         console.error('[VideoEditRenderer]', err);
-        setUploadError('Upload failed');
+        updateToast(toastId, {
+          title: 'Upload failed',
+          tone: 'error',
+          duration: 4000,
+          action: { label: 'Retry', onClick: () => void handleUploadFile(file) },
+        });
       } finally {
         setUploading(false);
       }
     },
-    [editor, videoUpload],
-  );
-
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        commitChanges();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        setEditSrc(src);
-        setEditPoster(poster || '');
-        setOpen(false);
-      }
-    },
-    [commitChanges, src, poster],
-  );
-
-  const handlePanelKeyDown = useCallback(
-    (e: React.KeyboardEvent) => {
-      const shortcut = getEditorHistoryShortcut(e, {
-        isDirty: editSrc !== src || editPoster !== (poster || ''),
-      });
-      if (!shortcut) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-      editor.dispatchCommand(shortcut === 'undo' ? UNDO_COMMAND : REDO_COMMAND, undefined);
-    },
-    [editPoster, editSrc, editor, poster, src],
+    [apply, videoUpload],
   );
 
   if (!editable) {
@@ -156,16 +150,34 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
 
   const aspectRatio =
     width && height && width > 0 && height > 0 ? `${width} / ${height}` : '16 / 9';
+  const srcInvalid = editSrc.trim() !== '' && UNSAFE_VIDEO_URL_RE.test(editSrc.trim());
+  const posterInvalid = editPoster.trim() !== '' && UNSAFE_POSTER_URL_RE.test(editPoster.trim());
+
+  const menu = (
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<ActionButton icon aria-label="More actions" size="md" />}>
+        <Ellipsis />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem disabled={!src} onClick={handleOpen}>
+          <ExternalLink />
+          Open original
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem variant="destructive" onClick={handleDelete}>
+          <Trash2 />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <Popover
       open={open}
-      onOpenChange={(nextOpen: boolean) => {
+      onOpenChange={(nextOpen, details) => {
+        if (!nextOpen && details?.reason === 'escape-key') revert();
         setOpen(nextOpen);
-        if (!nextOpen) {
-          setEditSrc(src);
-          setEditPoster(poster || '');
-        }
       }}
     >
       <PopoverTrigger
@@ -205,74 +217,81 @@ function VideoEditRendererInner({ src, poster, width, height }: VideoRendererPro
         )}
       </PopoverTrigger>
       <PopoverPanel
+        flush
         className={`${styles.editPanel} ${styles.semanticClassNames.editPanel}`}
+        initialFocus={srcInputRef}
         side="bottom"
-        sideOffset={8}
-        onKeyDown={handlePanelKeyDown}
+        size="md"
       >
-        <div className={`${styles.editField} ${styles.semanticClassNames.editField}`}>
-          <Video
-            className={`${styles.editFieldIcon} ${styles.semanticClassNames.editFieldIcon}`}
-            size={14}
-          />
-          <input
-            className={`${styles.editInput} ${styles.semanticClassNames.editInput}`}
-            placeholder="Video URL"
-            ref={srcInputRef}
-            type="url"
-            value={editSrc}
-            onChange={(e) => setEditSrc(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        </div>
-        <div className={`${styles.editField} ${styles.semanticClassNames.editField}`}>
-          <ImageIcon
-            className={`${styles.editFieldIcon} ${styles.semanticClassNames.editFieldIcon}`}
-            size={14}
-          />
-          <input
-            className={`${styles.editInput} ${styles.semanticClassNames.editInput}`}
-            placeholder="Poster URL (optional)"
-            type="url"
-            value={editPoster}
-            onBlur={commitChanges}
-            onChange={(e) => setEditPoster(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        </div>
-        {uploadError && (
-          <span className={`${styles.editError} ${styles.semanticClassNames.editError}`}>
-            {uploadError}
-          </span>
-        )}
-        <ActionBar>
-          {videoUpload && (
-            <>
-              <input
-                accept="video/*"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                type="file"
+        <PopoverHeader actions={menu} icon={<Video />} title="Video" />
+        <PopoverBody>
+          <Field
+            error={srcInvalid ? 'Enter a video URL' : undefined}
+            id={`${id}-src`}
+            label="Source"
+          >
+            <div className={styles.fieldRow}>
+              <TextInput
+                id={`${id}-src`}
+                invalid={srcInvalid}
+                placeholder="https://"
+                ref={srcInputRef}
+                type="url"
+                value={editSrc}
                 onChange={(e) => {
-                  void handleUploadFile(e.currentTarget.files?.[0] ?? null);
-                  e.currentTarget.value = '';
+                  setEditSrc(e.target.value);
+                  const next = e.target.value.trim();
+                  if (next && !UNSAFE_VIDEO_URL_RE.test(next)) apply({ src: next });
                 }}
               />
-              <ActionButton disabled={uploading} onClick={() => fileInputRef.current?.click()}>
-                <Upload />
-                {uploading ? `Uploading ${uploadPercent}%` : 'Upload'}
-              </ActionButton>
-            </>
-          )}
-          <ActionButton onClick={handleOpen}>
-            <ExternalLink />
-            Open
-          </ActionButton>
-          <ActionButton danger onClick={handleDelete}>
-            <Trash2 />
-            Remove
-          </ActionButton>
-        </ActionBar>
+              {videoUpload && (
+                <>
+                  <input
+                    accept="video/*"
+                    ref={fileInputRef}
+                    style={{ display: 'none' }}
+                    type="file"
+                    onChange={(e) => {
+                      void handleUploadFile(e.currentTarget.files?.[0] ?? null);
+                      e.currentTarget.value = '';
+                    }}
+                  />
+                  <ActionButton
+                    disabled={uploading}
+                    size="md"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload />
+                    Upload
+                  </ActionButton>
+                </>
+              )}
+            </div>
+          </Field>
+          <Field
+            error={posterInvalid ? 'Enter an image URL' : undefined}
+            hint="Optional · image URL"
+            id={`${id}-poster`}
+            label="Poster"
+          >
+            <TextInput
+              id={`${id}-poster`}
+              invalid={posterInvalid}
+              type="url"
+              value={editPoster}
+              onChange={(e) => {
+                setEditPoster(e.target.value);
+                const next = e.target.value.trim();
+                if (!UNSAFE_POSTER_URL_RE.test(next)) apply({ poster: next });
+              }}
+            />
+          </Field>
+        </PopoverBody>
+        <PopoverFooter hint="Changes apply as you type">
+          <Kbd keys="Esc" size="sm" tone="muted" />
+          <span className={styles.footerNote}>revert</span>
+        </PopoverFooter>
       </PopoverPanel>
     </Popover>
   );

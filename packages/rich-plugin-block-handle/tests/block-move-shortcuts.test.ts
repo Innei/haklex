@@ -71,3 +71,19 @@ describe('createBlockMoveHandler', () => {
     expect(order(parent)).toEqual(['A', 'B']);
   });
 });
+
+describe('duplicate shortcut', () => {
+  it('duplicates the caret block on Mod+D', async () => {
+    const parent = setup();
+    parent.dispatchCommand(KEY_DOWN_COMMAND, {
+      key: 'd',
+      shiftKey: false,
+      metaKey: true,
+      ctrlKey: false,
+      altKey: false,
+      preventDefault() {},
+    } as unknown as KeyboardEvent);
+    await flush();
+    expect(order(parent)).toEqual(['A', 'B', 'B']);
+  });
+});

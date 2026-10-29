@@ -43,6 +43,7 @@
     "vite": "^8.3.4"
   },
   "peerDependencies": {
+    "@haklex/rich-editor": "workspace:^",
     "@haklex/rich-editor-ui": "workspace:^",
     "@haklex/rich-style-token": "workspace:^",
     "@lexical/html": "^0.52.0",

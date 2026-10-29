@@ -1,3 +1,4 @@
+import { getCommandMeta, TURN_INTO_COMMAND_IDS } from '@haklex/rich-editor/command-registry';
 import type { CSSProperties } from 'react';
 
 export interface FontFamilyDef {
@@ -35,15 +36,15 @@ export function getFontLabel(fontFamily: string): string {
   return '默认';
 }
 
-export type BlockType = 'paragraph' | 'h1' | 'h2' | 'h3' | 'bullet' | 'number' | 'check' | 'other';
+export type BlockType =
+  'paragraph' | 'h1' | 'h2' | 'h3' | 'bullet' | 'number' | 'check' | 'quote' | 'code' | 'other';
 
-export const BLOCK_TYPE_LABELS: Record<BlockType, string> = {
-  paragraph: 'Text',
-  h1: 'Heading 1',
-  h2: 'Heading 2',
-  h3: 'Heading 3',
-  bullet: 'Bulleted List',
-  number: 'Numbered List',
-  check: 'To-do List',
-  other: 'Other',
-};
+export const TURN_INTO_BLOCK_TYPES = TURN_INTO_COMMAND_IDS as readonly Exclude<
+  BlockType,
+  'other'
+>[];
+
+export const BLOCK_TYPE_LABELS = Object.fromEntries([
+  ...TURN_INTO_BLOCK_TYPES.map((type) => [type, getCommandMeta(type)!.title]),
+  ['other', 'Other'],
+]) as Record<BlockType, string>;

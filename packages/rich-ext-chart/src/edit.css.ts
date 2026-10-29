@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeRadius, chromeTypography, vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
 export const frame = style({
@@ -14,61 +14,26 @@ export const frameSelected = style({
 });
 
 export const toolbar = style({
+  ...chromeTypography,
   position: 'absolute',
-  top: -6,
+  top: -8,
   right: 0,
   zIndex: 1,
   display: 'flex',
   alignItems: 'center',
   gap: 2,
-  padding: 2,
+  padding: 4,
   border: 'none',
-  borderRadius: 8,
-  backgroundColor: vars.color.bg,
+  borderRadius: chromeRadius.lg,
+  backgroundColor: vars.color.bgElevated,
   boxShadow: vars.boxShadow.menu,
   transform: 'translateY(-100%)',
-});
-
-export const toolbarButton = style({
-  appearance: 'none',
-  display: 'inline-flex',
-  alignItems: 'center',
-  height: 26,
-  padding: '0 8px',
-  border: 0,
-  borderRadius: 6,
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  font: 'inherit',
-  fontFamily: vars.typography.fontFamilySans,
-  fontSize: 12,
-  cursor: 'pointer',
-  selectors: {
-    '&:hover, &[aria-pressed="true"], &[data-popup-open]': {
-      background: vars.color.fillSecondary,
-      color: vars.color.text,
-    },
-    '&:focus-visible': { outline: `2px solid ${vars.color.accent}`, outlineOffset: 1 },
-  },
 });
 
 export const rawPanel = style({
   display: 'flex',
   flexDirection: 'column',
-  width: 'min(420px, calc(100vw - 32px))',
   maxHeight: 360,
-  fontFamily: vars.typography.fontFamilySans,
-});
-
-export const rawHead = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: 8,
-  padding: '6px 6px 6px 12px',
-  borderBottom: `1px solid ${vars.color.border}`,
-  fontSize: 12,
-  color: vars.color.textTertiary,
 });
 
 export const rawCode = style({

@@ -1,39 +1,55 @@
-import type { ImageDisplayMode, ImageDisplaySize } from '@haklex/rich-editor/nodes';
+import type { ImageDisplaySize } from '@haklex/rich-editor/nodes';
 import {
+  $isImageNode,
   computeImageDisplayPixels,
   convertImageDisplaySize,
   resolveImageDisplaySize,
   sanitizeImageDisplayWidth,
   sanitizeImageFixedPx,
 } from '@haklex/rich-editor/nodes';
-import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui';
-import { useAtom, useAtomValue, useStore } from 'jotai';
-import { Scaling } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import type { LiveApply } from '@haklex/rich-editor-ui';
+import { ActionButton, SegmentedControl, TextInput } from '@haklex/rich-editor-ui';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { atom, useAtom, useAtomValue, useStore } from 'jotai';
+import { $getNearestNodeFromDOMNode, HISTORY_MERGE_TAG } from 'lexical';
+import { ChevronDown } from 'lucide-react';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 import {
+  altTextAtom,
+  captionAtom,
   displayWidthAtom,
   fixedHeightAtom,
   fixedWidthAtom,
+  focusCaptionOnOpenAtom,
   heightAtom,
   layoutAtom,
-  sizeOpenAtom,
+  metaOpenAtom,
+  srcAtom,
   widthAtom,
   wrapperRefAtom,
 } from './atoms';
+import type { ImageInspectorFocus, ImageMetaValues } from './EditMetaPopover';
+import { ImageInspector } from './EditMetaPopover';
 import { applyImageSizePreview, readImageDisplayContext } from './image-metrics';
+import { ImageActionsMenu } from './ImageActionsMenu';
 import * as styles from './styles.css';
-import { useImageActions } from './useImageActions';
+import { stopMouseDown } from './ToolbarButton';
+
+export const inspectorFocusAtom = atom<ImageInspectorFocus | null>(null);
 
 const SIZE_PRESETS = [25, 50, 75, 100] as const;
 const SIZE_MIN = 10;
 const SIZE_MAX = 100;
 const SNAP_THRESHOLD = 3;
-const MODE_BUTTONS = [
-  ['percent', '%', 'Percent of content width'],
-  ['fixed-width', 'W', 'Fixed width'],
-  ['fixed-height', 'H', 'Fixed height'],
-] as const;
+
+type WidthMode = 'auto' | 'percent' | 'px';
+
+const WIDTH_MODES: { label: string; value: WidthMode }[] = [
+  { value: 'auto', label: 'Auto' },
+  { value: 'percent', label: '%' },
+  { value: 'px', label: 'px' },
+];
 
 function snapToPreset(value: number): number {
   for (const preset of SIZE_PRESETS) {
@@ -42,222 +58,223 @@ function snapToPreset(value: number): number {
   return value;
 }
 
-function tickLeft(preset: number): string {
-  const ratio = (preset - SIZE_MIN) / (SIZE_MAX - SIZE_MIN);
-  return `calc(6px + ${ratio} * (100% - 12px))`;
+export function formatImageSize(size: ImageDisplaySize): string {
+  switch (size.mode) {
+    case 'percent': {
+      return `${size.value}%`;
+    }
+    case 'fixed-width':
+    case 'fixed-height': {
+      return `${size.px}px`;
+    }
+    default: {
+      return 'Auto';
+    }
+  }
 }
 
-const toolbarButtonClass = `${styles.editToolbarButton} ${styles.semanticClassNames.editToolbarButton}`;
-
-const stopMouseDown = (e: React.MouseEvent) => {
-  e.preventDefault();
-  e.stopPropagation();
-};
-
-export function ImageSizeControl() {
-  const store = useStore();
-  const [sizeOpen, setSizeOpen] = useAtom(sizeOpenAtom);
+function useImageDisplaySize(): ImageDisplaySize {
   const displayWidth = useAtomValue(displayWidthAtom);
   const fixedWidth = useAtomValue(fixedWidthAtom);
   const fixedHeight = useAtomValue(fixedHeightAtom);
+  return useMemo(
+    () => resolveImageDisplaySize({ displayWidth, fixedWidth, fixedHeight }),
+    [displayWidth, fixedWidth, fixedHeight],
+  );
+}
+
+function useImageInspectorApply(): LiveApply<ImageMetaValues> {
+  const [editor] = useLexicalComposerContext();
+  const store = useStore();
+  return useCallback(
+    (patch, merge) => {
+      const wrapper = store.get(wrapperRefAtom).current;
+      if (!wrapper) return;
+      editor.update(
+        () => {
+          const node = $getNearestNodeFromDOMNode(wrapper);
+          if (!$isImageNode(node)) return;
+          if (patch.src !== undefined) node.setSrc(patch.src);
+          if (patch.altText !== undefined) node.setAltText(patch.altText);
+          if (patch.caption !== undefined) node.setCaption(patch.caption || undefined);
+          if (patch.size) node.applyDisplaySize(patch.size);
+        },
+        {
+          tag: merge ? [HISTORY_MERGE_TAG, 'skip-scroll-into-view'] : 'skip-scroll-into-view',
+        },
+      );
+    },
+    [editor, store],
+  );
+}
+
+interface ImageWidthControlProps {
+  onChange: (size: ImageDisplaySize) => void;
+  size: ImageDisplaySize;
+}
+
+export function ImageWidthControl({ size, onChange }: ImageWidthControlProps) {
+  const id = useId();
+  const store = useStore();
   const intrinsicWidth = useAtomValue(widthAtom);
   const intrinsicHeight = useAtomValue(heightAtom);
-  const { handleSetDisplaySize } = useImageActions();
   const [dragValue, setDragValue] = useState<number | null>(null);
-  const [fixedDraft, setFixedDraft] = useState<string | null>(null);
-
-  const size = resolveImageDisplaySize({ displayWidth, fixedWidth, fixedHeight });
+  const [pxDraft, setPxDraft] = useState<string | null>(null);
 
   useEffect(() => {
     setDragValue(null);
-    setFixedDraft(null);
-  }, [displayWidth, fixedWidth, fixedHeight]);
+    setPxDraft(null);
+  }, [size]);
 
-  const ctx = readImageDisplayContext(
-    store.get(wrapperRefAtom).current,
-    intrinsicWidth,
-    intrinsicHeight,
-  );
-  const committedPixels = ctx ? computeImageDisplayPixels(size, ctx) : {};
-  const committedPercent =
-    size.mode === 'percent'
-      ? size.value
-      : ctx && committedPixels.widthPx
-        ? sanitizeImageDisplayWidth((committedPixels.widthPx / ctx.containerWidth) * 100)
-        : undefined;
+  const readContext = () =>
+    readImageDisplayContext(store.get(wrapperRefAtom).current, intrinsicWidth, intrinsicHeight);
 
-  const previewSize: ImageDisplaySize =
-    dragValue === null
-      ? size
-      : size.mode === 'fixed-width' || size.mode === 'fixed-height'
-        ? ctx
-          ? convertImageDisplaySize({ mode: 'percent', value: dragValue }, size.mode, ctx)
-          : size
-        : { mode: 'percent', value: dragValue };
-  const previewPixels = ctx
-    ? computeImageDisplayPixels(previewSize, {
-        ...ctx,
-        renderedWidth: dragValue !== null ? undefined : ctx.renderedWidth,
-        renderedHeight: dragValue !== null ? undefined : ctx.renderedHeight,
-      })
-    : {};
-  const previewPercent =
-    dragValue ??
-    (ctx && previewPixels.widthPx
-      ? sanitizeImageDisplayWidth((previewPixels.widthPx / ctx.containerWidth) * 100)
-      : committedPercent);
+  const mode: WidthMode =
+    size.mode === 'auto' ? 'auto' : size.mode === 'percent' ? 'percent' : 'px';
 
-  const applyPreview = (next: ImageDisplaySize) => {
-    const trigger = store.get(wrapperRefAtom).current;
-    if (trigger) applyImageSizePreview(trigger, store.get(layoutAtom), next);
-  };
-
-  const switchMode = (to: ImageDisplayMode) => {
-    if (to === size.mode) return;
+  const switchMode = (to: WidthMode) => {
+    if (to === mode) return;
     if (to === 'auto') {
-      handleSetDisplaySize({ mode: 'auto' });
+      onChange({ mode: 'auto' });
       return;
     }
-    if (!ctx) return;
-    handleSetDisplaySize(convertImageDisplaySize(size, to, ctx));
-  };
-
-  const commitSlider = () => {
-    if (dragValue === null) return;
-    if (size.mode === 'fixed-width' || size.mode === 'fixed-height') {
-      if (dragValue === committedPercent || !ctx) return;
-      handleSetDisplaySize(
-        convertImageDisplaySize({ mode: 'percent', value: dragValue }, size.mode, ctx),
+    const ctx = readContext();
+    if (to === 'percent') {
+      onChange(
+        ctx ? convertImageDisplaySize(size, 'percent', ctx) : { mode: 'percent', value: 100 },
       );
       return;
     }
-    if (dragValue === (displayWidth ?? SIZE_MAX)) return;
-    handleSetDisplaySize({ mode: 'percent', value: dragValue });
-  };
-
-  const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const next = snapToPreset(Number(event.target.value));
-    setDragValue(next);
-    if (size.mode === 'fixed-width' || size.mode === 'fixed-height') {
-      if (!ctx) return;
-      applyPreview(convertImageDisplaySize({ mode: 'percent', value: next }, size.mode, ctx));
+    if (ctx) {
+      onChange(convertImageDisplaySize(size, 'fixed-width', ctx));
       return;
     }
-    applyPreview({ mode: 'percent', value: next });
+    const px = sanitizeImageFixedPx(intrinsicWidth);
+    if (px) onChange({ mode: 'fixed-width', px });
   };
 
-  const value = dragValue ?? committedPercent ?? SIZE_MAX;
-  const fill = `${((value - SIZE_MIN) / (SIZE_MAX - SIZE_MIN)) * 100}%`;
+  const preview = (next: ImageDisplaySize) => {
+    const wrapper = store.get(wrapperRefAtom).current;
+    if (wrapper) applyImageSizePreview(wrapper, store.get(layoutAtom), next);
+  };
+
+  const committedPercent = (() => {
+    if (size.mode === 'percent') return size.value;
+    const ctx = readContext();
+    if (!ctx) return undefined;
+    const { widthPx } = computeImageDisplayPixels(size, ctx);
+    return widthPx ? sanitizeImageDisplayWidth((widthPx / ctx.containerWidth) * 100) : undefined;
+  })();
+
+  const percent = dragValue ?? committedPercent ?? SIZE_MAX;
+  const fill = `${((percent - SIZE_MIN) / (SIZE_MAX - SIZE_MIN)) * 100}%`;
+
+  const commitSlider = () => {
+    if (dragValue === null || dragValue === committedPercent) return;
+    onChange({ mode: 'percent', value: dragValue });
+  };
+
   const fixedPx = size.mode === 'fixed-width' || size.mode === 'fixed-height' ? size.px : undefined;
+  const pxLabel = size.mode === 'fixed-height' ? 'Height in pixels' : 'Width in pixels';
 
   return (
-    <Popover open={sizeOpen} onOpenChange={setSizeOpen}>
-      <PopoverTrigger className={toolbarButtonClass} title="Image size" onMouseDown={stopMouseDown}>
-        <Scaling size={14} />
-      </PopoverTrigger>
-      <PopoverPanel className={styles.sizePanel} side="bottom" sideOffset={8}>
-        <div className={styles.sizePanelRow}>
-          <button
-            className={`${styles.sizeOption} ${size.mode === 'auto' ? styles.editToolbarButtonActive : ''}`.trim()}
-            title="Natural size"
-            type="button"
-            onMouseDown={stopMouseDown}
-            onClick={() => {
-              handleSetDisplaySize({ mode: 'auto' });
-              setSizeOpen(false);
-            }}
-          >
-            Auto
-          </button>
-          {MODE_BUTTONS.map(([mode, label, title]) => (
-            <button
-              className={`${styles.sizeOption} ${size.mode === mode ? styles.editToolbarButtonActive : ''}`.trim()}
-              key={mode}
-              title={title}
-              type="button"
-              onClick={() => switchMode(mode)}
-              onMouseDown={stopMouseDown}
-            >
-              {label}
-            </button>
-          ))}
-          <span className={styles.sizeReadout}>
-            {size.mode === 'fixed-width' || size.mode === 'fixed-height' ? (
-              <input
-                autoComplete="off"
-                className={`${styles.sizeValueField} ${styles.sizePxInput}`}
-                inputMode="numeric"
-                spellCheck={false}
-                aria-label={
-                  size.mode === 'fixed-width' ? 'Image width in pixels' : 'Image height in pixels'
-                }
-                value={
-                  fixedDraft ??
-                  (previewSize.mode === 'fixed-width' || previewSize.mode === 'fixed-height'
-                    ? String(previewSize.px)
-                    : String(fixedPx ?? ''))
-                }
-                onMouseDown={(e) => e.stopPropagation()}
-                onBlur={() => {
-                  const px = sanitizeImageFixedPx(Number(fixedDraft ?? fixedPx));
-                  if (px && (size.mode === 'fixed-width' || size.mode === 'fixed-height')) {
-                    handleSetDisplaySize({ mode: size.mode, px });
-                  }
-                  setFixedDraft(null);
-                }}
-                onChange={(event) => {
-                  setFixedDraft(event.target.value);
-                  const px = sanitizeImageFixedPx(Number(event.target.value));
-                  if (px && (size.mode === 'fixed-width' || size.mode === 'fixed-height')) {
-                    applyPreview({ mode: size.mode, px });
-                  }
-                }}
-              />
-            ) : (
-              <span className={styles.sizeValueField}>
-                {previewSize.mode === 'percent' ? `${previewSize.value}%` : 'Auto'}
-              </span>
-            )}
-            <span className={styles.sizeEquiv}>
-              {previewSize.mode === 'percent'
-                ? previewPixels.widthPx
-                  ? `${previewPixels.widthPx}px`
-                  : '\u00A0'
-                : previewSize.mode === 'auto'
-                  ? '\u00A0'
-                  : previewPercent
-                    ? `${previewPercent}%`
-                    : '\u00A0'}
-            </span>
-          </span>
-        </div>
-        <div className={styles.sizePanelRow}>
-          <span className={styles.sizeSliderWrap}>
+    <div className={styles.inspectorField}>
+      <span className={styles.inspectorLabel} id={`${id}-label`}>
+        Width
+      </span>
+      <div aria-labelledby={`${id}-label`} className={styles.widthRow} role="group">
+        <SegmentedControl items={WIDTH_MODES} value={mode} onChange={switchMode} />
+        {mode === 'percent' && (
+          <>
             <input
-              aria-label="Image width, percent of content width"
+              aria-label="Width, percent of content width"
               className={styles.sizeSlider}
               max={SIZE_MAX}
               min={SIZE_MIN}
               step={1}
               style={{ '--fill': fill } as React.CSSProperties}
               type="range"
-              value={value}
+              value={percent}
               onBlur={commitSlider}
-              onChange={handleSliderChange}
               onKeyUp={commitSlider}
-              onMouseDown={(e) => e.stopPropagation()}
               onPointerUp={commitSlider}
+              onChange={(event) => {
+                const next = snapToPreset(Number(event.target.value));
+                setDragValue(next);
+                preview({ mode: 'percent', value: next });
+              }}
             />
-            {SIZE_PRESETS.map((preset) => (
-              <span
-                className={styles.sizeSliderTick}
-                key={preset}
-                style={{ left: tickLeft(preset) }}
-              />
-            ))}
+            <span className={styles.widthReadout}>{`${percent}%`}</span>
+          </>
+        )}
+        {mode === 'px' && (
+          <span className={styles.pxField}>
+            <TextInput
+              aria-label={pxLabel}
+              autoComplete="off"
+              inputMode="numeric"
+              invalid={pxDraft !== null && sanitizeImageFixedPx(Number(pxDraft)) === undefined}
+              spellCheck={false}
+              value={pxDraft ?? String(fixedPx ?? '')}
+              onChange={(event) => {
+                setPxDraft(event.target.value);
+                const px = sanitizeImageFixedPx(Number(event.target.value));
+                if (px && (size.mode === 'fixed-width' || size.mode === 'fixed-height')) {
+                  onChange({ mode: size.mode, px });
+                }
+              }}
+            />
+            <span className={styles.pxSuffix}>px</span>
           </span>
-        </div>
-      </PopoverPanel>
-    </Popover>
+        )}
+        {mode === 'auto' && <span className={styles.widthHint}>Natural size</span>}
+      </div>
+    </div>
+  );
+}
+
+export function ImageSizeControl() {
+  const [open, setOpen] = useAtom(metaOpenAtom);
+  const [focus, setFocus] = useAtom(inspectorFocusAtom);
+  const [focusCaption, setFocusCaption] = useAtom(focusCaptionOnOpenAtom);
+  const src = useAtomValue(srcAtom);
+  const altText = useAtomValue(altTextAtom);
+  const caption = useAtomValue(captionAtom);
+  const size = useImageDisplaySize();
+  const onApply = useImageInspectorApply();
+
+  const values = useMemo<ImageMetaValues>(
+    () => ({ src, altText, caption: caption ?? '', size }),
+    [src, altText, caption, size],
+  );
+
+  return (
+    <ImageInspector
+      focus={focusCaption ? 'caption' : focus}
+      menu={<ImageActionsMenu />}
+      open={open}
+      renderWidth={(apply) => <ImageWidthControl size={size} onChange={apply} />}
+      values={values}
+      trigger={
+        <ActionButton
+          aria-label={`Image size, ${formatImageSize(size)}`}
+          className={styles.sizeButton}
+          size="md"
+          onClick={() => setFocus(null)}
+          onMouseDown={stopMouseDown}
+        >
+          <span>{formatImageSize(size)}</span>
+          <ChevronDown className={styles.sizeChevron} />
+        </ActionButton>
+      }
+      onApply={onApply}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        if (!nextOpen) {
+          setFocus(null);
+          setFocusCaption(false);
+        }
+      }}
+    />
   );
 }

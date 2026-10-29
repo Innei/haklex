@@ -130,9 +130,10 @@ describe('ChartEditRenderer', () => {
     });
     await act(async () => buttonByText(el, 'Edit chart')!.click());
 
-    const title = [...document.body.querySelectorAll('label')]
-      .find((l) => l.querySelector('span')?.textContent === 'Title')!
-      .querySelector('input')!;
+    const titleLabel = [...document.body.querySelectorAll('label')].find(
+      (l) => l.textContent === 'Title',
+    )!;
+    const title = document.getElementById(titleLabel.htmlFor) as HTMLInputElement;
     expect(title.value).toBe('Commits');
     expect(title.closest(`.${popup}`)).not.toBeNull();
     await act(async () => {

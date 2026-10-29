@@ -1,3 +1,4 @@
+import { TextInput } from '@haklex/rich-editor-ui';
 import type { InputHTMLAttributes, KeyboardEvent } from 'react';
 import { useState } from 'react';
 
@@ -5,11 +6,20 @@ export interface CommitInputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
   'onChange' | 'value'
 > {
+  mono?: boolean;
   onCommit: (value: string) => void;
+  plain?: boolean;
   value: string;
 }
 
-export function CommitInput({ value, onCommit, onKeyDown, ...props }: CommitInputProps) {
+export function CommitInput({
+  value,
+  onCommit,
+  onKeyDown,
+  plain,
+  mono,
+  ...props
+}: CommitInputProps) {
   const [draft, setDraft] = useState<string | null>(null);
 
   const commit = () => {
@@ -22,15 +32,15 @@ export function CommitInput({ value, onCommit, onKeyDown, ...props }: CommitInpu
     if (event.key === 'Enter') event.currentTarget.blur();
   };
 
-  return (
-    <input
-      type="text"
-      {...props}
-      value={draft ?? value}
-      onBlur={commit}
-      onChange={(event) => setDraft(event.target.value)}
-      onFocus={() => setDraft(value)}
-      onKeyDown={handleKeyDown}
-    />
-  );
+  const inputProps = {
+    type: 'text',
+    ...props,
+    value: draft ?? value,
+    onBlur: commit,
+    onChange: (event: React.ChangeEvent<HTMLInputElement>) => setDraft(event.target.value),
+    onFocus: () => setDraft(value),
+    onKeyDown: handleKeyDown,
+  };
+
+  return plain ? <input {...inputProps} /> : <TextInput mono={mono} {...inputProps} />;
 }

@@ -14,6 +14,7 @@
     "./nodes": "./src/nodes-entry.ts",
     "./plugins": "./src/plugins-entry.ts",
     "./commands": "./src/commands-entry.ts",
+    "./command-registry": "./src/command-registry-entry.ts",
     "./renderers": "./src/renderers-entry.ts",
     "./static": "./src/static-entry.ts",
     "./style.css": "./dist/rich-editor.css",
@@ -96,6 +97,10 @@
       "./commands": {
         "import": "./dist/commands-entry.mjs",
         "types": "./dist/commands-entry.d.ts"
+      },
+      "./command-registry": {
+        "import": "./dist/command-registry-entry.mjs",
+        "types": "./dist/command-registry-entry.d.ts"
       },
       "./renderers": {
         "import": "./dist/renderers-entry.mjs",

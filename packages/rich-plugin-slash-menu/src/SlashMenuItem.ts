@@ -27,7 +27,7 @@ export class SlashMenuItem extends MenuOption {
     this.icon = options.icon;
     this.description = options.description ?? '';
     this.keywords = options.keywords ?? [];
-    this.section = options.section ?? 'BASIC BLOCKS';
+    this.section = options.section ?? 'Basic blocks';
     this.nested = options.nested ?? true;
     this.onSelect = options.onSelect;
   }

@@ -66,7 +66,7 @@ describe('ImageInsertSheet', () => {
     const { onInsert } = await render({ files: [a, b, c] });
 
     await click(button('Remove b.jpg'));
-    await click(button('Insert 2 images'));
+    await click(button(/^Insert 2 images/));
 
     expect(onInsert).toHaveBeenCalledWith([a, c]);
   });
@@ -89,8 +89,10 @@ describe('ImageInsertSheet', () => {
     };
     const { onInsert } = await render({ files: [a], privacy });
 
-    expect(container!.textContent).toContain('This photo records where it was taken');
-    await click(button('Insert'));
+    expect(container!.querySelector('[role="checkbox"]')?.textContent).toContain(
+      'Remove before upload',
+    );
+    await click(button(/^Insert image/));
 
     expect(privacy.stripGps).toHaveBeenCalledWith(a);
     expect(onInsert).toHaveBeenCalledWith([clean]);
@@ -106,9 +108,9 @@ describe('ImageInsertSheet', () => {
     const onEdit = vi.fn().mockResolvedValue({ file: edited, summary: 'Cropped' });
     const { onInsert } = await render({ files: [a], onEdit, privacy });
 
-    await click(button(/Edit/));
+    await click(button(/^Edit/));
     expect(container!.textContent).toContain('Edited');
-    await click(button('Insert'));
+    await click(button(/^Insert image/));
 
     expect(privacy.stripGps).not.toHaveBeenCalled();
     expect(onInsert).toHaveBeenCalledWith([edited]);
@@ -122,12 +124,12 @@ describe('ImageInsertSheet', () => {
     };
     const { onInsert } = await render({ files: [a], privacy });
 
-    await click(button('Insert'));
+    await click(button(/^Insert image/));
     expect(onInsert).not.toHaveBeenCalled();
-    expect(button('Insert').disabled).toBe(true);
+    expect(button(/^Insert image/).disabled).toBe(true);
 
-    await click(container!.querySelector<HTMLInputElement>('input[type="checkbox"]')!);
-    await click(button('Insert'));
+    await click(container!.querySelector<HTMLElement>('[role="checkbox"]')!);
+    await click(button(/^Insert image/));
 
     expect(onInsert).toHaveBeenCalledWith([a]);
   });
@@ -147,7 +149,7 @@ describe('ImageInsertSheet', () => {
     };
     const { onInsert } = await render({ files: [a], privacy });
 
-    const insert = button('Insert');
+    const insert = button(/^Insert image/);
     await act(async () => {
       insert.click();
       resolveGps({ latitude: 1, longitude: 2 });
@@ -161,7 +163,7 @@ describe('ImageInsertSheet', () => {
     const a = file('a.jpg');
     const { onInsert } = await render({ files: [a], source: 'replace' });
 
-    await click(button('Replace'));
+    await click(button(/^Replace/));
 
     expect(onInsert).toHaveBeenCalledWith([a]);
   });

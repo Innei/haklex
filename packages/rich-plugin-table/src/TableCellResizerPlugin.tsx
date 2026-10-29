@@ -1,3 +1,4 @@
+import { PortalThemeWrapper } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { $getTableNodeFromLexicalNodeOrThrow, $isTableCellNode } from '@lexical/table';
 import { $getNearestNodeFromDOMNode, type LexicalEditor } from 'lexical';
@@ -211,38 +212,28 @@ function TableCellResizerInner({ editor }: { editor: LexicalEditor }): ReactElem
     <>
       {handlePos.right && (
         <div
-          className={`${css.resizeHandle} ${direction === 'right' ? css.resizeHandleActive : ''}`}
+          className={`${css.resizeHandle} ${css.resizeHandleRight} ${direction === 'right' ? css.resizeHandleActive : ''}`}
+          data-active={direction === 'right'}
           data-table-resizer-handle="true"
           data-testid="table-cell-resizer-right"
           style={{
             top: handlePos.right.top,
             left: handlePos.right.left,
             height: handlePos.right.height,
-            width: 8,
-            cursor: 'col-resize',
-            background:
-              direction === 'right'
-                ? 'linear-gradient(to right, transparent 3px, rgba(59,130,246,0.7) 3px, rgba(59,130,246,0.7) 5px, transparent 5px)'
-                : 'linear-gradient(to right, transparent 3px, rgba(59,130,246,0.5) 3px, rgba(59,130,246,0.5) 5px, transparent 5px)',
           }}
           onPointerDown={(e) => onPointerDown('right', e)}
         />
       )}
       {handlePos.bottom && (
         <div
-          className={`${css.resizeHandle} ${direction === 'bottom' ? css.resizeHandleActive : ''}`}
+          className={`${css.resizeHandle} ${css.resizeHandleBottom} ${direction === 'bottom' ? css.resizeHandleActive : ''}`}
+          data-active={direction === 'bottom'}
           data-table-resizer-handle="true"
           data-testid="table-cell-resizer-bottom"
           style={{
             top: handlePos.bottom.top,
             left: handlePos.bottom.left,
             width: handlePos.bottom.width,
-            height: 8,
-            cursor: 'row-resize',
-            background:
-              direction === 'bottom'
-                ? 'linear-gradient(to bottom, transparent 3px, rgba(59,130,246,0.7) 3px, rgba(59,130,246,0.7) 5px, transparent 5px)'
-                : 'linear-gradient(to bottom, transparent 3px, rgba(59,130,246,0.5) 3px, rgba(59,130,246,0.5) 5px, transparent 5px)',
           }}
           onPointerDown={(e) => onPointerDown('bottom', e)}
         />
@@ -254,5 +245,10 @@ function TableCellResizerInner({ editor }: { editor: LexicalEditor }): ReactElem
 export function TableCellResizerPlugin(): ReactElement {
   const [editor] = useLexicalComposerContext();
 
-  return createPortal(<TableCellResizerInner editor={editor} />, document.body);
+  return createPortal(
+    <PortalThemeWrapper>
+      <TableCellResizerInner editor={editor} />
+    </PortalThemeWrapper>,
+    document.body,
+  );
 }

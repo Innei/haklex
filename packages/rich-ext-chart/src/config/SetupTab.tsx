@@ -1,6 +1,15 @@
-import { SegmentedControl } from '@haklex/rich-editor-ui';
-import { X } from 'lucide-react';
-import { useState } from 'react';
+import {
+  ActionButton,
+  Field,
+  SegmentedControl,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@haklex/rich-editor-ui';
+import { Plus, X } from 'lucide-react';
+import { useId, useState } from 'react';
 
 import { seriesColors } from '../palette.css';
 import type { ChartSeries, ChartType } from '../types';
@@ -19,6 +28,7 @@ const TYPE_ITEMS: { label: string; value: ChartType }[] = [
 ];
 
 export function SetupTab({ draft, onChange }: ChartTabProps) {
+  const id = useId();
   const seriesKeys = new Set(draft.series.map((series) => series.key));
   const fields = dataFields(draft).filter((name) => name === draft.x || !seriesKeys.has(name));
   const xOptions = draft.x && !fields.includes(draft.x) ? [draft.x, ...fields] : fields;
@@ -26,50 +36,59 @@ export function SetupTab({ draft, onChange }: ChartTabProps) {
   return (
     <>
       <div className={s.field}>
-        <span className={s.fieldLabel}>Type</span>
-        <SegmentedControl
-          fullWidth
-          items={TYPE_ITEMS}
-          value={draft.type ?? 'bar'}
-          onChange={(type) => onChange(patchDraft(draft, { type }))}
-        />
+        <span className={s.fieldLabel} id={`${id}-type`}>
+          Type
+        </span>
+        <div aria-labelledby={`${id}-type`} role="group">
+          <SegmentedControl
+            fullWidth
+            items={TYPE_ITEMS}
+            value={draft.type ?? 'bar'}
+            onChange={(type) => onChange(patchDraft(draft, { type }))}
+          />
+        </div>
       </div>
-      <label className={s.field}>
-        <span className={s.fieldLabel}>Title</span>
+      <Field id={`${id}-title`} label="Title">
         <CommitInput
-          className={s.input}
+          id={`${id}-title`}
           value={draft.title ?? ''}
           onCommit={(title) => onChange(patchDraft(draft, { title }))}
         />
-      </label>
-      <label className={s.field}>
-        <span className={s.fieldLabel}>Category field (x)</span>
-        <select
-          className={s.select}
-          value={draft.x ?? ''}
-          onChange={(event) => onChange(patchDraft(draft, { x: event.target.value }))}
+      </Field>
+      <Field id={`${id}-x`} label="Category field (x)">
+        <Select
+          disabled={xOptions.length === 0}
+          value={draft.x ?? null}
+          onValueChange={(x) => {
+            if (typeof x === 'string') onChange(patchDraft(draft, { x }));
+          }}
         >
-          {xOptions.length === 0 && <option value="">(no data)</option>}
-          {xOptions.map((name) => (
-            <option key={name} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
-      </label>
+          <SelectTrigger className={s.select} id={`${id}-x`}>
+            <SelectValue placeholder="No data" />
+          </SelectTrigger>
+          <SelectContent>
+            {xOptions.map((name) => (
+              <SelectItem key={name} value={name}>
+                {name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </Field>
       <div className={s.field}>
         <span className={s.fieldLabel}>Series</span>
         {draft.series.map((series, index) => (
           <SeriesRow draft={draft} index={index} key={index} series={series} onChange={onChange} />
         ))}
-        <button
-          className={s.addButton}
+        <ActionButton
           disabled={draft.series.length >= CHART_PALETTE_SIZE}
-          type="button"
+          size="md"
+          variant="outline"
           onClick={() => onChange(addSeries(draft))}
         >
+          <Plus />
           Add series
-        </button>
+        </ActionButton>
       </div>
     </>
   );
@@ -111,6 +130,7 @@ function SeriesRow({ draft, index, series, onChange }: SeriesRowProps) {
           />
         </button>
         <CommitInput
+          mono
           aria-label={`Series ${n} key`}
           className={s.seriesKey}
           value={series.key}
@@ -123,15 +143,15 @@ function SeriesRow({ draft, index, series, onChange }: SeriesRowProps) {
           value={series.label ?? ''}
           onCommit={(label) => setSeries({ label: label || undefined })}
         />
-        <button
+        <ActionButton
+          icon
           aria-label={`Remove series ${n}`}
-          className={s.iconButton}
           disabled={draft.series.length <= 1}
-          type="button"
+          size="md"
           onClick={() => onChange(removeSeries(draft, series.key))}
         >
-          <X size={14} />
-        </button>
+          <X />
+        </ActionButton>
       </div>
       {paletteOpen && (
         <div className={s.palette}>

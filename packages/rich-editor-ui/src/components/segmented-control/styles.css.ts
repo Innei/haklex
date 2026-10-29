@@ -77,6 +77,7 @@ export const item = recipe({
   base: {
     position: 'relative',
     zIndex: 10,
+    flex: '1 0 auto',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

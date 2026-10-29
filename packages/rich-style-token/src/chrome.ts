@@ -12,6 +12,8 @@ export const chromeRadius = { sm: '4px', md: '8px', lg: '12px' } as const;
 
 export const chromeHeight = { sm: '24px', md: '28px', lg: '32px' } as const;
 
+export const chromeWidth = { sm: '280px', md: '320px', lg: '400px' } as const;
+
 export const focusRing = `0 0 0 1px ${vars.color.accent}, 0 0 0 3px ${vars.color.accentLight}`;
 
 export const chromeMotion = {

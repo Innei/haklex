@@ -34,7 +34,7 @@ export const popup = style({
   'transform': 'translate(-50%, -50%)',
   'zIndex': 50,
   'display': 'grid',
-  'width': '100%',
+  'width': 'var(--rc-dialog-width, 28rem)',
   'maxWidth': 'calc(100% - 2rem)',
   'boxSizing': 'border-box',
   'gap': 0,
@@ -57,9 +57,6 @@ export const popup = style({
     },
   },
   '@media': {
-    '(min-width: 640px)': {
-      maxWidth: '28rem',
-    },
     [reducedMotion]: {
       selectors: {
         '&[data-starting-style], &[data-ending-style]': {

@@ -1,6 +1,5 @@
 import type { AgentStore, ReviewBatch, ReviewEntry } from '@haklex/rich-agent-core';
 import { blockIdState } from '@haklex/rich-editor';
-import { ActionButton } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   $getNodeByKey,
@@ -13,22 +12,16 @@ import {
   type LexicalNode,
   type SerializedLexicalNode,
 } from 'lexical';
-import { CheckCheck, XCircle } from 'lucide-react';
 import type { ReactElement } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { $createAgentDiffEditNode, AgentDiffEditNode } from '../nodes/AgentDiffEditNode';
 import { $isAgentDiffNode } from '../nodes/AgentDiffNode';
 import type { AgentDiffNodePayload } from '../nodes/diff-node-state';
-import {
-  diffGlobalActions,
-  diffGlobalBar,
-  diffGlobalCount,
-  diffGlobalMeta,
-  diffGlobalTitle,
-} from '../styles.css';
 import { setAgentDiffReviewController } from './diff-node-controller';
+import { DiffReviewBar } from './DiffReviewBar';
 import { stripBlockIdFromSerializedNode } from './sanitize-operation-node';
+import { useReviewNavigation } from './use-review-navigation';
 
 function getBlockId(node: SerializedLexicalNode | undefined | null): string | undefined {
   return (node as any)?.$?.blockId as string | undefined;
@@ -141,6 +134,7 @@ function getPendingReviewSummary(store: AgentStore) {
 
   return {
     batchIds: batches.map((batch) => batch.id),
+    hunkKeys: [] as string[],
     pendingCount: batches.reduce(
       (total, batch) => total + batch.entries.filter((entry) => entry.status === 'pending').length,
       0,
@@ -150,17 +144,18 @@ function getPendingReviewSummary(store: AgentStore) {
 
 function getDocumentDiffSummary() {
   const batchIds = new Set<string>();
-  let pendingCount = 0;
+  const hunkKeys: string[] = [];
 
   for (const child of $getRoot().getChildren()) {
     if (!$isAgentDiffNode(child)) continue;
     batchIds.add(child.getBatchId());
-    pendingCount += 1;
+    hunkKeys.push(child.getKey());
   }
 
   return {
     batchIds: [...batchIds],
-    pendingCount,
+    hunkKeys,
+    pendingCount: hunkKeys.length,
   };
 }
 
@@ -448,36 +443,23 @@ export function DiffReviewOverlayPlugin({ store }: { store: AgentStore }): React
     return () => setAgentDiffReviewController(editor, null);
   }, [actions, editor]);
 
+  const navigation = useReviewNavigation(editor, pendingSummary.hunkKeys, actions);
+
   if (pendingSummary.pendingCount === 0) return null;
 
   return (
-    <div className={diffGlobalBar}>
-      <div className={diffGlobalMeta}>
-        <span className={diffGlobalTitle}>AI review</span>
-        <span className={diffGlobalCount}>
-          {pendingSummary.pendingCount} pending change
-          {pendingSummary.pendingCount === 1 ? '' : 's'}
-        </span>
-      </div>
-      <div className={diffGlobalActions}>
-        <ActionButton
-          danger
-          title="Reject all changes"
-          variant="outline"
-          onClick={() => resolveAllDiffNodes('rejected')}
-        >
-          <XCircle />
-          Reject all
-        </ActionButton>
-        <ActionButton
-          title="Accept all changes"
-          variant="solid"
-          onClick={() => resolveAllDiffNodes('accepted')}
-        >
-          <CheckCheck />
-          Accept all
-        </ActionButton>
-      </div>
-    </div>
+    <DiffReviewBar
+      canNavigate={navigation.total > 0}
+      pendingCount={pendingSummary.pendingCount}
+      position={navigation.position}
+      ref={navigation.barRef}
+      total={navigation.total}
+      onAccept={navigation.accept}
+      onAcceptAll={() => resolveAllDiffNodes('accepted')}
+      onNext={navigation.next}
+      onPrevious={navigation.previous}
+      onReject={navigation.reject}
+      onRejectAll={() => resolveAllDiffNodes('rejected')}
+    />
   );
 }

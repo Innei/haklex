@@ -1,121 +1,114 @@
-import { ActionBar, ActionButton, SegmentedControl } from '@haklex/rich-editor-ui';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { ImageIcon, Loader2, Upload } from 'lucide-react';
-
+import type { ImageNode } from '@haklex/rich-editor/nodes';
+import { $isImageNode } from '@haklex/rich-editor/nodes';
 import {
-  fileInputRefAtom,
-  replaceErrorAtom,
-  replaceLoadingAtom,
-  type ReplaceMode,
-  replaceModeAtom,
-  replacePreviewAtom,
-  replaceUrlAtom,
-} from './atoms';
-import * as styles from './styles.css';
+  defaultImageUpload,
+  getImageEditor,
+  presentImageDialog,
+  resolvePreprocessTargets,
+  useImagePreprocess,
+  useImageUpload,
+} from '@haklex/rich-editor/plugins';
+import { computeImageMeta } from '@haklex/rich-editor/renderers';
+import { toast, updateToast } from '@haklex/rich-editor-ui';
+import { usePortalTheme } from '@haklex/rich-style-token';
+import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { useStore } from 'jotai';
+import { $getNearestNodeFromDOMNode } from 'lexical';
+import { useCallback, useEffect, useRef } from 'react';
+
+import { wrapperRefAtom } from './atoms';
 import { useImageActions } from './useImageActions';
 
-const replaceModeItems: Array<{ value: ReplaceMode; label: string }> = [
-  { value: 'upload', label: 'Upload' },
-  { value: 'url', label: 'URL' },
-];
+const ERROR_TOAST_DURATION = 6000;
+
+export function useReplaceImageDialog(): () => Promise<void> {
+  const [editor] = useLexicalComposerContext();
+  const store = useStore();
+  const uploadImage = useImageUpload();
+  const preprocess = useImagePreprocess();
+  const portalTheme = usePortalTheme();
+  const openRef = useRef(false);
+
+  return useCallback(async () => {
+    if (openRef.current) return;
+    openRef.current = true;
+    const wrapper = store.get(wrapperRefAtom).current;
+    const withNode = (updater: (node: ImageNode) => void) => {
+      if (!wrapper) return;
+      editor.update(
+        () => {
+          const node = $getNearestNodeFromDOMNode(wrapper);
+          if ($isImageNode(node)) updater(node);
+        },
+        { tag: 'skip-scroll-into-view' },
+      );
+    };
+
+    try {
+      const imageEditor = getImageEditor(preprocess);
+      const entries = await presentImageDialog({
+        editor: imageEditor,
+        mode: 'replace',
+        portalClassName: portalTheme.className,
+        theme: portalTheme.theme,
+      });
+      const entry = entries?.[0];
+      if (!entry) return;
+
+      if (entry.kind === 'url') {
+        withNode((node) => {
+          node.setSrc(entry.src);
+          node.setDimensions(entry.width, entry.height);
+          node.setThumbhash(undefined);
+        });
+        return;
+      }
+
+      const [file] = imageEditor
+        ? [entry.file]
+        : await resolvePreprocessTargets([entry.file], 'replace', preprocess?.ref.current ?? null);
+      if (!file) return;
+
+      const upload = async () => {
+        const id = toast({ title: 'Uploading image…', tone: 'loading' });
+        try {
+          const uploader = uploadImage ?? defaultImageUpload;
+          const [result, meta] = await Promise.all([uploader(file), computeImageMeta(file)]);
+          withNode((node) => {
+            node.setSrc(result.src);
+            node.setAltText(result.altText ?? file.name);
+            node.setDimensions(result.width ?? meta.width, result.height ?? meta.height);
+            node.setThumbhash(result.thumbhash ?? meta.thumbhash);
+          });
+          updateToast(id, { title: 'Image replaced', tone: 'success' });
+        } catch (err: unknown) {
+          console.error('[ImageReplace]', err);
+          updateToast(id, {
+            action: { label: 'Retry', onClick: () => void upload() },
+            duration: ERROR_TOAST_DURATION,
+            title: 'Image replace failed',
+            tone: 'error',
+          });
+        }
+      };
+      await upload();
+    } finally {
+      openRef.current = false;
+    }
+  }, [editor, portalTheme, preprocess, store, uploadImage]);
+}
 
 export function ReplacePanel() {
-  const replaceMode = useAtomValue(replaceModeAtom);
-  const setReplaceMode = useSetAtom(replaceModeAtom);
-  const replaceUrl = useAtomValue(replaceUrlAtom);
-  const setReplaceUrl = useSetAtom(replaceUrlAtom);
-  const replacePreview = useAtomValue(replacePreviewAtom);
-  const replaceError = useAtomValue(replaceErrorAtom);
-  const replaceLoading = useAtomValue(replaceLoadingAtom);
-  const fileInputRef = useAtomValue(fileInputRefAtom);
-  const { handleReplaceFile, handlePreviewUrl, handleReplaceByUrl } = useImageActions();
+  const openReplaceDialog = useReplaceImageDialog();
+  const { handleReplaceOpenChange } = useImageActions();
+  const firedRef = useRef(false);
 
-  return (
-    <>
-      <SegmentedControl
-        fullWidth
-        items={replaceModeItems}
-        value={replaceMode}
-        onChange={setReplaceMode}
-      />
+  useEffect(() => {
+    if (firedRef.current) return;
+    firedRef.current = true;
+    handleReplaceOpenChange(false);
+    void openReplaceDialog();
+  }, [handleReplaceOpenChange, openReplaceDialog]);
 
-      {replaceMode === 'upload' ? (
-        <>
-          <input
-            accept="image/*"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            type="file"
-            onChange={(event) => {
-              const file = event.currentTarget.files?.[0] ?? null;
-              void handleReplaceFile(file);
-              event.currentTarget.value = '';
-            }}
-          />
-          <button
-            className={`${styles.replaceUploadArea} ${styles.semanticClassNames.replaceUploadArea}`}
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-          >
-            {replaceLoading ? (
-              <>
-                <Loader2 size={16} />
-                <span>Uploading image...</span>
-              </>
-            ) : (
-              <>
-                <Upload size={16} />
-                <span>Click to upload image</span>
-              </>
-            )}
-          </button>
-        </>
-      ) : (
-        <>
-          <div className={`${styles.editField} ${styles.semanticClassNames.editField}`}>
-            <ImageIcon
-              className={`${styles.editFieldIcon} ${styles.semanticClassNames.editFieldIcon}`}
-              size={14}
-            />
-            <input
-              className={`${styles.editInput} ${styles.semanticClassNames.editInput}`}
-              placeholder="https://example.com/image.jpg"
-              type="url"
-              value={replaceUrl}
-              onChange={(event) => setReplaceUrl(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  handlePreviewUrl();
-                }
-              }}
-            />
-          </div>
-          <ActionBar>
-            <ActionButton
-              disabled={replaceLoading || !replaceUrl.trim()}
-              onClick={handlePreviewUrl}
-            >
-              Preview
-            </ActionButton>
-            <ActionButton disabled={!replacePreview} variant="accent" onClick={handleReplaceByUrl}>
-              Apply
-            </ActionButton>
-          </ActionBar>
-        </>
-      )}
-
-      {replaceError && (
-        <span className={`${styles.panelHint} ${styles.semanticClassNames.panelHint}`}>
-          {replaceError}
-        </span>
-      )}
-
-      {replacePreview && (
-        <div className={`${styles.replacePreview} ${styles.semanticClassNames.replacePreview}`}>
-          <img alt="Replace preview" src={replacePreview} />
-        </div>
-      )}
-    </>
-  );
+  return null;
 }

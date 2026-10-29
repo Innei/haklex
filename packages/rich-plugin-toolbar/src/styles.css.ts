@@ -138,7 +138,23 @@ export const toolbarSeparator = style({
   flexShrink: 0,
 });
 
-export const toolbarDropdownItemActive = style({
-  fontWeight: 500,
-  backgroundColor: vars.color.fillTertiary,
+export const insertSearch = style({
+  position: 'relative',
+  display: 'flex',
+  alignItems: 'center',
+  padding: 8,
+  borderBottom: `1px solid ${vars.color.borderSubtle}`,
+});
+
+export const insertSearchIcon = style({
+  position: 'absolute',
+  left: 16,
+  color: vars.color.textTertiary,
+  pointerEvents: 'none',
+});
+
+export const insertSearchInput = style({
+  selectors: {
+    '&&': { paddingLeft: 28 },
+  },
 });

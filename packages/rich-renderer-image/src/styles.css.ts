@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeRadius, chromeText, chromeTypography, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, keyframes, style, styleVariants } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
@@ -15,16 +15,8 @@ export const semanticClassNames = {
   editPlaceholder: 'rr-image-edit-placeholder',
   editToolbar: 'rr-image-edit-toolbar',
   editToolbarVisible: 'rr-image-edit-toolbar-visible',
-  editToolbarButton: 'rr-image-edit-toolbar-button',
-  editToolbarButtonDanger: 'rr-image-edit-toolbar-danger',
-  editPanel: 'rr-image-edit-panel',
-  editField: 'rr-image-edit-field',
-  editFieldIcon: 'rr-image-edit-field-icon',
-  editInput: 'rr-image-edit-input',
-  replaceUploadArea: 'rr-image-replace-upload-area',
-  replacePreview: 'rr-image-replace-preview',
-  panelHint: 'rr-image-panel-hint',
   resizeHandle: 'rr-image-resize-handle',
+  inspector: 'rr-image-inspector',
 } as const;
 
 const floatWidthFallback = '42%';
@@ -327,19 +319,21 @@ export const editPlaceholder = style({
 });
 
 export const editToolbar = style({
+  ...chromeTypography,
   position: 'absolute',
-  top: '-2.5rem',
+  top: -44,
   left: '50%',
   transform: 'translateX(-50%)',
   zIndex: 20,
   display: 'inline-flex',
   alignItems: 'center',
-  gap: '4px',
-  padding: '4px',
-  borderRadius: '10px',
+  gap: 2,
+  padding: 4,
+  borderRadius: chromeRadius.lg,
   border: 'none',
-  background: `color-mix(in srgb, ${vars.color.bg} 96%, transparent)`,
-  boxShadow: vars.boxShadow.topBar,
+  backgroundColor: vars.color.bgElevated,
+  boxShadow: vars.boxShadow.menu,
+  whiteSpace: 'nowrap',
   opacity: 0,
   pointerEvents: 'none',
   transition: 'opacity 0.15s ease',
@@ -348,122 +342,6 @@ export const editToolbar = style({
 export const editToolbarVisible = style({
   opacity: 1,
   pointerEvents: 'auto',
-});
-
-export const editToolbarButton = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 30,
-  height: 30,
-  borderRadius: '8px',
-  border: 'none',
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  transition: 'background-color 0.15s ease, color 0.15s ease',
-  selectors: {
-    '&:hover': {
-      color: vars.color.text,
-      backgroundColor: vars.color.fillSecondary,
-    },
-  },
-});
-
-export const editToolbarButtonDanger = style({
-  selectors: {
-    '&:hover': {
-      color: vars.color.alertCaution,
-      backgroundColor: `color-mix(in srgb, ${vars.color.alertCaution} 12%, transparent)`,
-    },
-  },
-});
-
-export const editPanel = style({
-  position: 'relative',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '8px',
-  width: '360px',
-  padding: '12px',
-  fontSize: vars.typography.fontSizeBase,
-  fontFamily: vars.typography.fontFamily,
-  zIndex: 30,
-});
-
-export const editField = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '8px',
-  padding: '6px 10px',
-  backgroundColor: vars.color.bgSecondary,
-  borderRadius: '6px',
-  minWidth: 0,
-});
-
-export const editFieldIcon = style({
-  flexShrink: 0,
-  color: vars.color.textSecondary,
-});
-
-export const editInput = style({
-  flex: 1,
-  appearance: 'none',
-  border: 'none',
-  backgroundColor: 'transparent',
-  color: 'inherit',
-  fontSize: vars.typography.fontSizeSm,
-  padding: 0,
-  outline: 'none',
-  minWidth: 0,
-  selectors: {
-    '&::placeholder': {
-      color: vars.color.textSecondary,
-    },
-  },
-});
-
-export const replaceUploadArea = style({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: '0.45rem',
-  minHeight: 138,
-  borderRadius: vars.borderRadius.md,
-  border: `1.5px dashed ${vars.color.border}`,
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  transition: 'border-color 0.15s ease, background-color 0.15s ease',
-  selectors: {
-    '&:hover': {
-      borderColor: `color-mix(in srgb, ${vars.color.accent} 45%, transparent)`,
-      color: vars.color.text,
-      backgroundColor: `color-mix(in srgb, ${vars.color.accent} 7%, transparent)`,
-    },
-  },
-});
-
-export const replacePreview = style({
-  borderRadius: vars.borderRadius.md,
-  overflow: 'hidden',
-  border: `1px solid ${vars.color.border}`,
-  backgroundColor: `color-mix(in srgb, ${vars.color.text} 2%, transparent)`,
-});
-
-globalStyle(`${replacePreview} img`, {
-  width: '100%',
-  maxHeight: 188,
-  objectFit: 'cover',
-  display: 'block',
-});
-
-export const panelHint = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  gap: '0.4rem',
-  color: vars.color.textSecondary,
-  fontSize: vars.typography.fontSizeXs,
 });
 
 export const resizeHandle = style({
@@ -491,59 +369,6 @@ export const resizeHandleVisible = style({
   opacity: 1,
 });
 
-export const controlPanel = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '4px',
-  padding: '4px',
-  fontFamily: vars.typography.fontFamily,
-  zIndex: 30,
-});
-
-// The popover base popup fixes width at 288px; doubled selector outranks it
-// without depending on cross-package CSS order.
-globalStyle(`${controlPanel}${controlPanel}`, {
-  width: 'fit-content',
-});
-
-export const sizePanel = style({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'stretch',
-  gap: 2,
-  padding: 4,
-  fontFamily: vars.typography.fontFamily,
-  zIndex: 30,
-});
-
-globalStyle(`${sizePanel}${sizePanel}`, {
-  width: 272,
-});
-
-export const sizePanelRow = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-  minHeight: 26,
-});
-
-export const sizeReadout = style({
-  display: 'flex',
-  alignItems: 'center',
-  flexShrink: 0,
-  gap: 6,
-  marginLeft: 'auto',
-  paddingLeft: 8,
-});
-
-export const sizeSliderWrap = style({
-  position: 'relative',
-  display: 'flex',
-  alignItems: 'center',
-  flex: 1,
-  height: 24,
-});
-
 const sliderThumb = {
   appearance: 'none',
   width: 12,
@@ -557,7 +382,8 @@ const sliderThumb = {
 
 export const sizeSlider = style({
   appearance: 'none',
-  width: '100%',
+  flex: 1,
+  minWidth: 0,
   height: 24,
   margin: 0,
   background: 'transparent',
@@ -581,80 +407,92 @@ export const sizeSlider = style({
   },
 });
 
-export const sizeSliderTick = style({
-  position: 'absolute',
-  top: '50%',
-  width: 3,
-  height: 3,
-  borderRadius: '50%',
-  backgroundColor: vars.color.bg,
-  transform: 'translate(-50%, -50%)',
-  pointerEvents: 'none',
+export const inspector = style({
+  zIndex: 30,
 });
 
-export const sizeValueField = style({
-  boxSizing: 'border-box',
-  width: 52,
-  height: 26,
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: '6px',
-  backgroundColor: vars.color.bgSecondary,
-  color: vars.color.text,
-  fontSize: vars.typography.fontSizeXs,
-  fontVariantNumeric: 'tabular-nums',
-  textAlign: 'center',
-  lineHeight: '24px',
-  overflow: 'hidden',
-});
-
-export const sizePxInput = style({
-  appearance: 'none',
-  MozAppearance: 'textfield',
-  padding: 0,
-  outline: 'none',
-  minWidth: 0,
-  selectors: {
-    '&:focus': {
-      borderColor: vars.color.textSecondary,
-    },
-  },
-});
-
-export const sizeEquiv = style({
-  boxSizing: 'border-box',
-  width: 48,
-  textAlign: 'right',
-  fontSize: vars.typography.fontSizeXs,
-  fontVariantNumeric: 'tabular-nums',
+export const footerNote = style({
+  ...chromeText.label,
+  fontWeight: 400,
   color: vars.color.textTertiary,
 });
 
-export const sizeOption = style({
+export const toolbarGroup = style({
   display: 'inline-flex',
   alignItems: 'center',
-  justifyContent: 'center',
-  height: 26,
-  padding: '0 8px',
-  borderRadius: '6px',
-  border: 'none',
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  fontSize: vars.typography.fontSizeXs,
-  fontWeight: 500,
-  cursor: 'pointer',
-  transition: 'background-color 0.15s ease, color 0.15s ease',
-  selectors: {
-    '&:hover': {
-      color: vars.color.text,
-      backgroundColor: vars.color.fillSecondary,
-    },
-  },
+  gap: 2,
 });
 
-export const editToolbarButtonActive = style({
+export const toolbarSeparator = style({
+  alignSelf: 'stretch',
+  width: 1,
+  margin: '4px 2px',
+  backgroundColor: vars.color.borderSubtle,
+});
+
+export const textButton = style({
+  padding: '0 8px',
+});
+
+export const sizeButton = style({
+  gap: 4,
+  padding: '0 6px 0 8px',
+  fontVariantNumeric: 'tabular-nums',
+});
+
+export const sizeChevron = style({
+  width: 14,
+  height: 14,
+  color: vars.color.textTertiary,
+});
+
+globalStyle(`${editTrigger}[data-selected] ${frame}`, {
+  boxShadow: `0 0 0 2px ${vars.color.accent}`,
+});
+
+export const inspectorField = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 6,
+});
+
+export const inspectorLabel = style({
+  ...chromeText.label,
+  color: vars.color.textSecondary,
+});
+
+export const widthRow = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 10,
+  minHeight: 28,
+});
+
+export const widthReadout = style({
+  ...chromeText.control,
+  width: 36,
+  flexShrink: 0,
+  textAlign: 'right',
+  fontVariantNumeric: 'tabular-nums',
   color: vars.color.text,
-  backgroundColor: vars.color.fillSecondary,
+});
+
+export const widthHint = style({
+  ...chromeText.label,
+  fontWeight: 400,
+  color: vars.color.textTertiary,
+});
+
+export const pxField = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 6,
+  flex: 1,
+  minWidth: 0,
+});
+
+export const pxSuffix = style({
+  ...chromeText.label,
+  fontWeight: 400,
+  color: vars.color.textTertiary,
 });

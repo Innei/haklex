@@ -1,5 +1,13 @@
-import type { ImagePreprocessFn } from '@haklex/rich-editor/plugins';
-import { useImagePreprocess } from '@haklex/rich-editor/plugins';
+import type {
+  ImageEditorCapability,
+  ImageEditPrivacy,
+  ImagePreprocessFn,
+} from '@haklex/rich-editor/plugins';
+import {
+  presentImageDialog,
+  registerImageEditor,
+  useImagePreprocess,
+} from '@haklex/rich-editor/plugins';
 import { presentDialog } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import type { FC } from 'react';
@@ -7,10 +15,6 @@ import { useEffect, useRef } from 'react';
 
 import type { ImageEditResult } from './ImageEditModal';
 import { ImageEditModal } from './ImageEditModal';
-import { ImageInsertSheet } from './ImageInsertSheet';
-import type { ImageEditPrivacy } from './insert-sheet-model';
-import { sheetCopy } from './insert-sheet-model';
-import * as sheetCss from './sheet.css';
 import * as css from './styles.css';
 
 export interface ImageEditModalPluginProps {
@@ -28,7 +32,7 @@ export const ImageEditModalPlugin: FC<ImageEditModalPluginProps> = ({ privacy })
   useEffect(() => {
     if (!preprocess) return;
 
-    const openEditor = (file: File) =>
+    const edit = (file: File) =>
       new Promise<ImageEditResult | null>((resolve) => {
         let settled = false;
         const settle = (result: ImageEditResult | null) => {
@@ -58,46 +62,31 @@ export const ImageEditModalPlugin: FC<ImageEditModalPluginProps> = ({ privacy })
         });
       });
 
-    const fn: ImagePreprocessFn = (files, { source }) =>
-      new Promise<File[] | null>((resolve) => {
-        let settled = false;
-        const settle = (result: File[] | null) => {
-          if (settled) return;
-          settled = true;
-          resolve(result);
-        };
+    const capability: ImageEditorCapability = {
+      edit,
+      get privacy() {
+        return privacyRef.current;
+      },
+    };
 
-        const dismiss = presentDialog({
-          className: sheetCss.sheetPopup,
-          clickOutsideToDismiss: false,
-          content: () => (
-            <ImageInsertSheet
-              files={files}
-              privacy={privacyRef.current}
-              source={source}
-              onEdit={openEditor}
-              onCancel={() => {
-                settle(null);
-                dismiss();
-              }}
-              onInsert={(result) => {
-                settle(result);
-                dismiss();
-              }}
-            />
-          ),
-          description: 'Check before it goes up. Nothing is uploaded yet.',
-          // Esc / programmatic dismissal funnels through the dialog store's
-          // open->closed transition; resolves the preprocess promise with null.
-          onClose: () => settle(null),
-          portalClassName: portalThemeRef.current.className,
-          showCloseButton: false,
-          theme: portalThemeRef.current.theme,
-          title: sheetCopy(source, files.length).title,
-        });
+    const review: ImagePreprocessFn = async (files, { source }) => {
+      const entries = await presentImageDialog({
+        allowUrl: false,
+        editor: capability,
+        files,
+        mode: source === 'replace' ? 'replace' : 'insert',
+        portalClassName: portalThemeRef.current.className,
+        theme: portalThemeRef.current.theme,
       });
+      return entries?.flatMap((entry) => (entry.kind === 'file' ? [entry.file] : [])) ?? null;
+    };
 
-    return preprocess.register(fn);
+    const unregisterEditor = registerImageEditor(preprocess, capability);
+    const unregisterReview = preprocess.register(review);
+    return () => {
+      unregisterReview();
+      unregisterEditor();
+    };
   }, [preprocess]);
 
   return null;

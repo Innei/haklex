@@ -1,48 +1,51 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeMotion, vars } from '@haklex/rich-style-token/styles';
 import { style } from '@vanilla-extract/css';
 
-export const semanticClassNames = {
-  overlay: 'rich-quote-attribution-overlay',
-  panel: 'rich-quote-attribution-panel',
-  input: 'rich-quote-attribution-input',
-} as const;
-
-// A fixed-positioned rectangle anchored to the active quote's bounding box.
-// `pointer-events: none` lets clicks pass through the empty area while the
-// inner panel still receives them.
-export const overlay = style({
-  position: 'fixed',
-  zIndex: 50,
-  pointerEvents: 'none',
+export const slot = style({
+  display: 'block',
+  marginTop: '0.25em',
+  fontStyle: 'normal',
+  fontSize: vars.typography.fontSizeCaption,
+  lineHeight: 1.6,
+  color: vars.color.textTertiary,
+  userSelect: 'none',
+  selectors: {
+    '&[data-empty]:not([data-active])': {
+      display: 'none',
+    },
+  },
 });
 
-export const panel = style({
-  position: 'absolute',
-  bottom: '4px',
-  left: '18px',
-  maxWidth: '60%',
+export const text = style({
+  display: 'block',
+});
+
+export const field = style({
   display: 'flex',
-  justifyContent: 'flex-start',
-  pointerEvents: 'auto',
+  alignItems: 'baseline',
+  gap: '0.25em',
+  maxWidth: '100%',
+  cursor: 'text',
+});
+
+export const dash = style({
+  flexShrink: 0,
 });
 
 export const input = style({
   appearance: 'none',
-  background: 'transparent',
+  flex: 1,
+  minWidth: 0,
+  margin: 0,
+  padding: 0,
   border: 'none',
   borderBottom: '1px dotted transparent',
   borderRadius: 0,
-  padding: '0 2px',
-  margin: 0,
-  width: '100%',
-  minWidth: 0,
-  textAlign: 'start',
-  fontStyle: 'normal',
-  fontFamily: vars.typography.fontFamily,
-  fontSize: '13px',
-  color: vars.color.textTertiary,
+  background: 'transparent',
   outline: 'none',
-  transition: 'border-color 120ms ease, background-color 120ms ease',
+  font: 'inherit',
+  color: 'inherit',
+  transition: `border-color ${chromeMotion.state} ease`,
   selectors: {
     '&::placeholder': {
       color: vars.color.textQuaternary,

@@ -1,3 +1,4 @@
+import { TooltipContent, TooltipRoot, TooltipTrigger } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
@@ -6,6 +7,7 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import type { LexicalEditor } from 'lexical';
 import { $getNodeByKey, $getRoot } from 'lexical';
 import { LayoutGrid, Minus, Plus } from 'lucide-react';
+import type { ReactElement, ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { $isGridContainerNode } from '../../nodes/GridContainerNode';
@@ -25,6 +27,39 @@ interface GridEditDecoratorProps {
 }
 
 const COL_OPTIONS = [1, 2, 3, 4] as const;
+
+function GridToolbarButton({
+  children,
+  className,
+  label,
+  pressed,
+  onClick,
+}: {
+  children: ReactNode;
+  className: string;
+  label: string;
+  onClick: () => void;
+  pressed?: boolean;
+}): ReactElement {
+  return (
+    <TooltipRoot>
+      <TooltipTrigger
+        render={
+          <button
+            aria-label={label}
+            aria-pressed={pressed}
+            className={className}
+            type="button"
+            onClick={onClick}
+          />
+        }
+      >
+        {children}
+      </TooltipTrigger>
+      <TooltipContent side="top">{label}</TooltipContent>
+    </TooltipRoot>
+  );
+}
 
 export function GridEditDecorator({
   nodeKey,
@@ -108,17 +143,19 @@ export function GridEditDecorator({
   return (
     <>
       <div
+        aria-label="Grid"
         className={clsx(gridClassNames.toolbar, gridStyles.toolbar)}
+        role="toolbar"
         onMouseDown={(e) => e.preventDefault()}
       >
         <span className={clsx(gridClassNames.toolbarIcon, gridStyles.toolbarIcon)}>
-          <LayoutGrid size={14} />
+          <LayoutGrid size={16} />
         </span>
         {COL_OPTIONS.map((n) => (
-          <button
-            aria-label={`${n} columns`}
+          <GridToolbarButton
             key={n}
-            type="button"
+            label={`${n} columns`}
+            pressed={n === currentCols}
             className={clsx(
               gridClassNames.colButton,
               gridStyles.colButton,
@@ -128,25 +165,23 @@ export function GridEditDecorator({
             onClick={() => handleSetCols(n)}
           >
             {n}
-          </button>
+          </GridToolbarButton>
         ))}
         <div className={clsx(gridClassNames.toolbarDivider, gridStyles.toolbarDivider)} />
-        <button
-          aria-label="Add row"
+        <GridToolbarButton
           className={clsx(gridClassNames.actionButton, gridStyles.actionButton)}
-          type="button"
+          label="Add row"
           onClick={handleAddRow}
         >
-          <Plus size={14} />
-        </button>
-        <button
-          aria-label="Remove row"
+          <Plus size={16} />
+        </GridToolbarButton>
+        <GridToolbarButton
           className={clsx(gridClassNames.actionButton, gridStyles.actionButton)}
-          type="button"
+          label="Remove last row"
           onClick={handleRemoveRow}
         >
-          <Minus size={14} />
-        </button>
+          <Minus size={16} />
+        </GridToolbarButton>
       </div>
       <div
         className={clsx(gridClassNames.inner, gridStyles.inner)}

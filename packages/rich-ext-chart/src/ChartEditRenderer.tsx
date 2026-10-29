@@ -1,12 +1,20 @@
 import { RendererWrapper } from '@haklex/rich-editor/static';
-import { Popover, PopoverPanel, PopoverTrigger } from '@haklex/rich-editor-ui';
+import {
+  ActionButton,
+  Popover,
+  PopoverHeader,
+  PopoverPanel,
+  PopoverTrigger,
+  toast,
+} from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { useLexicalEditable } from '@lexical/react/useLexicalEditable';
 import { useLexicalNodeSelection } from '@lexical/react/useLexicalNodeSelection';
 import type { NodeKey } from 'lexical';
 import { $getNodeByKey } from 'lexical';
+import { ChartColumn, Code, Copy, SlidersHorizontal, Table2 } from 'lucide-react';
 import type { MouseEvent } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { ChartBlockRenderer } from './ChartBlockRenderer';
 import { $isChartNode } from './ChartNode';
@@ -53,16 +61,9 @@ function ChartEditRendererInner({ spec, nodeKey }: ChartEditRendererProps) {
   const [view, setView] = useState<ChartViewMode>('chart');
   const [rawOpen, setRawOpen] = useState(false);
   const [configOpen, setConfigOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const isValid = useMemo(() => parseChartSource(spec).ok, [spec]);
   const rawText = useMemo(() => formatRawSpec(spec), [spec]);
-
-  useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), 1500);
-    return () => clearTimeout(timer);
-  }, [copied]);
 
   const handleSelect = useCallback(
     (event: MouseEvent) => {
@@ -74,10 +75,10 @@ function ChartEditRendererInner({ spec, nodeKey }: ChartEditRendererProps) {
 
   const handleCopy = useCallback(() => {
     if (!navigator.clipboard) return;
-    navigator.clipboard
-      .writeText(spec)
-      .then(() => setCopied(true))
-      .catch(() => {});
+    navigator.clipboard.writeText(spec).then(
+      () => toast({ title: 'Chart spec copied', tone: 'success' }),
+      () => toast({ title: 'Could not copy chart spec', tone: 'error' }),
+    );
   }, [spec]);
 
   const handleSpecChange = useCallback(
@@ -96,32 +97,43 @@ function ChartEditRendererInner({ spec, nodeKey }: ChartEditRendererProps) {
     <div className={`${s.frame}${isSelected ? ` ${s.frameSelected}` : ''}`} onClick={handleSelect}>
       <ChartRenderer hideToggle defaultView={view} key={view} value={spec} />
       {showToolbar && (
-        <div className={s.toolbar} onClick={stopPropagation}>
+        <div aria-label="Chart" className={s.toolbar} role="toolbar" onClick={stopPropagation}>
           <Popover open={configOpen} onOpenChange={setConfigOpen}>
-            <PopoverTrigger className={s.toolbarButton}>Edit chart</PopoverTrigger>
-            <PopoverPanel align="end" className={configPopup} side="bottom" sideOffset={6}>
+            <PopoverTrigger render={<ActionButton size="md" />}>
+              <SlidersHorizontal />
+              Edit chart
+            </PopoverTrigger>
+            <PopoverPanel flush align="end" className={configPopup} side="bottom" size="lg">
+              <PopoverHeader icon={<ChartColumn />} title="Chart" />
               <ChartConfigPanel spec={spec} onChange={handleSpecChange} />
             </PopoverPanel>
           </Popover>
           {isValid && (
-            <button
+            <ActionButton
               aria-pressed={view === 'table'}
-              className={s.toolbarButton}
-              type="button"
+              size="md"
               onClick={() => setView(view === 'table' ? 'chart' : 'table')}
             >
+              {view === 'table' ? <ChartColumn /> : <Table2 />}
               {view === 'table' ? 'View chart' : 'View data'}
-            </button>
+            </ActionButton>
           )}
           <Popover open={rawOpen} onOpenChange={setRawOpen}>
-            <PopoverTrigger className={s.toolbarButton}>Raw data</PopoverTrigger>
-            <PopoverPanel align="end" className={s.rawPanel} side="bottom" sideOffset={6}>
-              <div className={s.rawHead}>
-                <span>Chart spec (read-only)</span>
-                <button className={s.toolbarButton} type="button" onClick={handleCopy}>
-                  {copied ? 'Copied' : 'Copy'}
-                </button>
-              </div>
+            <PopoverTrigger render={<ActionButton size="md" />}>
+              <Code />
+              Raw data
+            </PopoverTrigger>
+            <PopoverPanel flush align="end" className={s.rawPanel} side="bottom" size="lg">
+              <PopoverHeader
+                icon={<Code />}
+                title="Chart spec"
+                actions={
+                  <ActionButton size="md" onClick={handleCopy}>
+                    <Copy />
+                    Copy
+                  </ActionButton>
+                }
+              />
               <pre className={s.rawCode}>
                 {rawText || <span className={s.rawEmpty}>(empty)</span>}
               </pre>

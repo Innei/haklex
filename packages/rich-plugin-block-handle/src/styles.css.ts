@@ -28,6 +28,9 @@ export const grip = style({
   'color': vars.color.textQuaternary,
   'cursor': 'grab',
   'padding': 0,
+  'touchAction': 'none',
+  'userSelect': 'none',
+  'WebkitTouchCallout': 'none',
   'outline': 'none',
   'transition': `background-color ${chromeMotion.state} ease, color ${chromeMotion.state} ease`,
   ':hover': {
@@ -48,8 +51,9 @@ export const grip = style({
 export const gapLine = style({
   position: 'absolute',
   zIndex: 30,
-  height: 1,
-  backgroundColor: vars.color.textQuaternary,
+  height: 0,
+  borderTop: `1px solid ${vars.color.accent}`,
+  transform: 'translateY(-0.5px)',
   pointerEvents: 'none',
 });
 
@@ -63,7 +67,7 @@ export const gapPlus = style({
   'height': 20,
   'padding': 0,
   'border': 'none',
-  'borderRadius': '6px',
+  'borderRadius': chromeRadius.md,
   'backgroundColor': vars.color.bgElevated,
   'boxShadow': vars.boxShadow.xs,
   'color': vars.color.textSecondary,

@@ -1,4 +1,4 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { chromeRadius, chromeTypography, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const gridClassNames = {
@@ -20,19 +20,20 @@ export const container = style({
 });
 
 export const toolbar = style({
+  ...chromeTypography,
   position: 'absolute',
-  top: -36,
+  top: -44,
   left: '50%',
   transform: 'translateX(-50%)',
   display: 'flex',
   alignItems: 'center',
   gap: '2px',
-  padding: '4px 6px',
-  borderRadius: vars.borderRadius.md,
+  padding: 4,
+  borderRadius: chromeRadius.lg,
   pointerEvents: 'none',
-  background: vars.color.bg,
+  background: vars.color.bgElevated,
   border: 'none',
-  boxShadow: vars.boxShadow.topBar,
+  boxShadow: vars.boxShadow.menu,
   zIndex: 10,
   userSelect: 'none',
   whiteSpace: 'nowrap',
@@ -44,9 +45,9 @@ export const toolbarIcon = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: 24,
-  height: 24,
-  color: vars.color.textSecondary,
+  width: 28,
+  height: 28,
+  color: vars.color.textTertiary,
   flexShrink: 0,
 });
 
@@ -54,15 +55,16 @@ export const colButton = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minWidth: 24,
-  height: 24,
+  minWidth: 28,
+  height: 28,
   padding: '0 6px',
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.md,
   border: 'none',
   background: 'transparent',
   cursor: 'pointer',
-  fontSize: '12px',
+  fontSize: '13px',
   fontWeight: 500,
+  fontVariantNumeric: 'tabular-nums',
   color: vars.color.textSecondary,
   lineHeight: 1,
   transition: 'color 0.15s ease, background-color 0.15s ease',
@@ -70,6 +72,10 @@ export const colButton = style({
     '&:hover': {
       backgroundColor: vars.color.fillSecondary,
       color: vars.color.text,
+    },
+    '&:focus-visible': {
+      outline: `2px solid ${vars.color.accent}`,
+      outlineOffset: 1,
     },
   },
 });
@@ -83,7 +89,7 @@ export const colButtonActive = style({
 export const toolbarDivider = style({
   width: 1,
   height: 16,
-  background: vars.color.border,
+  background: vars.color.borderSubtle,
   margin: '0 2px',
   flexShrink: 0,
 });
@@ -92,10 +98,10 @@ export const actionButton = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  minWidth: 24,
-  height: 24,
+  minWidth: 28,
+  height: 28,
   padding: '0 6px',
-  borderRadius: vars.borderRadius.sm,
+  borderRadius: chromeRadius.md,
   border: 'none',
   background: 'transparent',
   cursor: 'pointer',
@@ -105,6 +111,10 @@ export const actionButton = style({
     '&:hover': {
       backgroundColor: vars.color.fillSecondary,
       color: vars.color.text,
+    },
+    '&:focus-visible': {
+      outline: `2px solid ${vars.color.accent}`,
+      outlineOffset: 1,
     },
   },
 });

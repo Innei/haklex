@@ -1,3 +1,4 @@
+import { getCommandMeta } from '@haklex/rich-editor/command-registry';
 import { $toggleSpoilerSelection } from '@haklex/rich-editor/commands';
 import {
   INSERT_CHECK_LIST_COMMAND,
@@ -6,6 +7,7 @@ import {
 } from '@lexical/list';
 import type { LexicalEditor } from 'lexical';
 import { FORMAT_ELEMENT_COMMAND, FORMAT_TEXT_COMMAND, REDO_COMMAND, UNDO_COMMAND } from 'lexical';
+import type { LucideIcon } from 'lucide-react';
 import {
   AlignCenter,
   AlignJustify,
@@ -16,9 +18,6 @@ import {
   EyeOff,
   Highlighter,
   Italic,
-  List,
-  ListChecks,
-  ListOrdered,
   Redo,
   Strikethrough,
   Underline,
@@ -107,7 +106,7 @@ export function dropdownEntry(
   };
 }
 
-const icon = (Icon: typeof Bold) => <Icon size={16} strokeWidth={2} />;
+const icon = (Icon: LucideIcon) => <Icon size={16} strokeWidth={2} />;
 
 export function formattingButtons(
   editor: LexicalEditor,
@@ -172,7 +171,7 @@ export function formattingButtons(
       },
       {
         key: 'code',
-        label: 'Inline Code',
+        label: 'Inline code',
         icon: icon(Code),
         active: state.isCode,
         onSelect: text('code'),
@@ -197,22 +196,22 @@ export function formattingButtons(
     [
       {
         key: 'bullet',
-        label: 'Bulleted List',
-        icon: icon(List),
+        label: getCommandMeta('bullet')!.title,
+        icon: icon(getCommandMeta('bullet')!.icon),
         active: state.blockType === 'bullet',
         onSelect: () => editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, undefined),
       },
       {
         key: 'number',
-        label: 'Numbered List',
-        icon: icon(ListOrdered),
+        label: getCommandMeta('number')!.title,
+        icon: icon(getCommandMeta('number')!.icon),
         active: state.blockType === 'number',
         onSelect: () => editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, undefined),
       },
       {
         key: 'check',
-        label: 'Checklist',
-        icon: icon(ListChecks),
+        label: getCommandMeta('check')!.title,
+        icon: icon(getCommandMeta('check')!.icon),
         active: state.blockType === 'check',
         onSelect: () => editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, undefined),
       },
@@ -220,21 +219,21 @@ export function formattingButtons(
     [
       {
         key: 'align-left',
-        label: 'Align Left',
+        label: 'Align left',
         icon: icon(AlignLeft),
         active: state.elementFormat === 'left' || state.elementFormat === '',
         onSelect: align('left'),
       },
       {
         key: 'align-center',
-        label: 'Align Center',
+        label: 'Align center',
         icon: icon(AlignCenter),
         active: state.elementFormat === 'center',
         onSelect: align('center'),
       },
       {
         key: 'align-right',
-        label: 'Align Right',
+        label: 'Align right',
         icon: icon(AlignRight),
         active: state.elementFormat === 'right',
         onSelect: align('right'),

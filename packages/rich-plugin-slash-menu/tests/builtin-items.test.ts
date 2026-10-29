@@ -13,7 +13,7 @@ describe('getBuiltinItems', () => {
   it('leaves other builtin items allowed in nested editors', () => {
     const items = getBuiltinItems();
     const text = items.find((item) => item.title === 'Text');
-    const bulletedList = items.find((item) => item.title === 'Bulleted List');
+    const bulletedList = items.find((item) => item.title === 'Bulleted list');
 
     expect(text?.nested).toBe(true);
     expect(bulletedList?.nested).toBe(true);

@@ -17,7 +17,9 @@ export function ImagePlugin() {
     return editor.registerCommand(
       INSERT_IMAGE_COMMAND,
       (payload) => {
-        const imageNode = $createImageNode($withAdaptiveImageDisplayWidth(payload));
+        const imageNode = $createImageNode($withAdaptiveImageDisplayWidth(payload), {
+          autoOpenOnMount: !payload.src,
+        });
         $insertNodes([imageNode]);
         return true;
       },

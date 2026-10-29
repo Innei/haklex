@@ -1,11 +1,11 @@
-import type { SerializedEditorState } from 'lexical'
+import type { SerializedEditorState } from 'lexical';
 
 export function truncateEditorState(
   state: SerializedEditorState,
   maxNodes: number,
 ): SerializedEditorState {
-  const root = state.root
-  if (!root?.children || root.children.length <= maxNodes) return state
+  const root = state.root;
+  if (!root?.children || root.children.length <= maxNodes) return state;
 
   return {
     ...state,
@@ -13,33 +13,42 @@ export function truncateEditorState(
       ...root,
       children: root.children.slice(0, maxNodes),
     },
-  }
+  };
 }
 
-export function hasRenderableEditorState(
-  state: SerializedEditorState,
-): boolean {
-  const children = state.root?.children ?? []
-  if (children.length === 0) return false
-  if (children.length > 1) return true
+export function hasRenderableEditorState(state: SerializedEditorState): boolean {
+  const children = state.root?.children ?? [];
+  if (children.length === 0) return false;
+  if (children.length > 1) return true;
 
   const first = children[0] as
     | {
-        type?: string
+        type?: string;
         children?: Array<{
-          type?: string
-          text?: string
-        }>
+          type?: string;
+          text?: string;
+        }>;
       }
-    | undefined
+    | undefined;
 
-  if (!first) return false
-  if (first.type !== 'paragraph') return true
+  if (!first) return false;
+  if (first.type !== 'paragraph') return true;
 
   return (
     first.children?.some((child) => {
-      if (child.type !== 'text') return true
-      return Boolean(child.text?.trim())
+      if (child.type !== 'text') return true;
+      return Boolean(child.text?.trim());
     }) ?? false
-  )
+  );
+}
+
+export function countWords(text: string): number {
+  if (typeof Intl !== 'undefined' && 'Segmenter' in Intl) {
+    let count = 0;
+    for (const segment of new Intl.Segmenter(undefined, { granularity: 'word' }).segment(text)) {
+      if (segment.isWordLike) count++;
+    }
+    return count;
+  }
+  return text.split(/\s+/).filter(Boolean).length;
 }

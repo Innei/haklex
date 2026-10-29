@@ -30,10 +30,8 @@ export function ToolbarButton({
       className={`${css.toolbarButton}${active ? ` ${css.toolbarButtonActive}` : ''}`}
       disabled={disabled}
       type="button"
-      onMouseDown={(e) => {
-        e.preventDefault();
-        onClick();
-      }}
+      onClick={onClick}
+      onMouseDown={(e) => e.preventDefault()}
     />
   );
 

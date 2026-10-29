@@ -1,9 +1,14 @@
-import type { FC, ReactNode } from 'react';
+import { chromeWidth } from '@haklex/rich-style-token/styles';
+import type { CSSProperties, FC, ReactNode } from 'react';
+
+export type DialogWidth = number | keyof typeof chromeWidth;
 
 export interface DialogStackItemProps {
   className?: string;
   clickOutsideToDismiss?: boolean;
-  content: FC<{ dismiss: () => void }>;
+  /** Asked before a user-initiated close (Esc, backdrop, close button, sheet drag); resolve false to keep the dialog open. Programmatic `dismiss` skips it. */
+  confirmDismiss?: () => boolean | Promise<boolean>;
+  content: FC<{ dismiss: () => void; requestDismiss: () => Promise<void> }>;
   description?: ReactNode;
   /** Fired once when the dialog transitions open -> closed (Esc, backdrop, or programmatic dismiss). */
   onClose?: () => void;
@@ -12,6 +17,7 @@ export interface DialogStackItemProps {
   showCloseButton?: boolean;
   theme?: 'light' | 'dark';
   title?: ReactNode;
+  width?: DialogWidth;
 }
 
 export interface DialogStackItem extends DialogStackItemProps {
@@ -56,6 +62,19 @@ export function dismissDialog(id: string) {
   stack = stack.map((item) => (item.id === id ? { ...item, open: false } : item));
   emit();
   target.onClose?.();
+}
+
+export async function requestDismissDialog(id: string) {
+  const target = stack.find((item) => item.id === id);
+  if (!target || !target.open) return;
+  if (target.confirmDismiss && !(await target.confirmDismiss())) return;
+  dismissDialog(id);
+}
+
+export function dialogWidthStyle(width: DialogWidth | undefined): CSSProperties {
+  if (width === undefined) return {};
+  const value = typeof width === 'number' ? `${width}px` : chromeWidth[width];
+  return { '--rc-dialog-width': value } as CSSProperties;
 }
 
 export function dismissTopDialog() {

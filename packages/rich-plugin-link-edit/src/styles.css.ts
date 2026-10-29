@@ -1,119 +1,93 @@
-import {
-  chromeMotion,
-  chromeRadius,
-  chromeText,
-  focusRing,
-  vars,
-} from '@haklex/rich-style-token/styles';
+import { chromeRadius, chromeText, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
 export const semanticClassNames = {
   panel: 'rich-link-edit-panel',
-  urlRow: 'rich-link-edit-url-row',
-  linkIcon: 'rich-link-edit-link-icon',
-  input: 'rich-link-edit-input',
+  preview: 'rich-link-edit-preview',
+  actions: 'rich-link-edit-actions',
   cmdHover: 'rich-link-edit-cmd-hover',
 } as const;
 
 export const panel = style({
-  selectors: {
-    '&&': {
-      width: '360px',
-      maxWidth: 'calc(100vw - 16px)',
-      padding: 0,
-      borderRadius: chromeRadius.lg,
-    },
-  },
+  maxWidth: 'calc(100vw - 16px)',
 });
 
-export const urlRow = style({
+export const preview = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '8px',
-  height: '40px',
-  boxSizing: 'border-box',
-  padding: '0 6px 0 12px',
+  gap: 10,
+  padding: 12,
   minWidth: 0,
 });
 
-export const editRow = style({
+export const tile = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '6px',
-  height: '40px',
-  boxSizing: 'border-box',
-  padding: '0 6px',
-  minWidth: 0,
-});
-
-export const linkIcon = style({
-  display: 'block',
+  justifyContent: 'center',
+  width: 32,
+  height: 32,
   flexShrink: 0,
+  borderRadius: chromeRadius.md,
+  backgroundColor: vars.color.fillSecondary,
   color: vars.color.textTertiary,
 });
 
-export const url = style({
-  ...chromeText.control,
+globalStyle(`${tile} svg`, {
+  width: 16,
+  height: 16,
+});
+
+export const meta = style({
+  display: 'flex',
+  flexDirection: 'column',
+  minWidth: 0,
   flex: 1,
+});
+
+const ellipsis = {
   minWidth: 0,
   overflow: 'hidden',
   whiteSpace: 'nowrap',
   textOverflow: 'ellipsis',
-  fontFamily: vars.typography.fontFamilySans,
+} as const;
+
+export const title = style({
+  ...chromeText.control,
+  ...ellipsis,
+  fontWeight: 600,
   color: vars.color.text,
 });
 
-export const urlEmpty = style({
+export const muted = style({
+  fontWeight: 400,
+  color: vars.color.textTertiary,
+});
+
+export const url = style({
+  ...chromeText.label,
+  ...ellipsis,
+  fontWeight: 400,
   color: vars.color.textTertiary,
 });
 
 export const actions = style({
   display: 'flex',
   alignItems: 'center',
-  gap: '2px',
-  flexShrink: 0,
+  gap: 2,
+  minWidth: 0,
+  padding: '6px 6px 6px 12px',
+  borderTop: `1px solid ${vars.color.borderSubtle}`,
 });
 
-export const extraActions = style({
+export const spacer = style({
+  flex: 1,
+});
+
+export const formFooter = style({
   display: 'flex',
-  alignItems: 'center',
-  gap: '2px',
-  selectors: {
-    '&:empty': {
-      display: 'none',
-    },
-    '&::after': {
-      content: "''",
-      width: '1px',
-      height: '16px',
-      margin: '0 4px',
-      backgroundColor: vars.color.borderSubtle,
-    },
-  },
-});
-
-export const input = style({
-  ...chromeText.control,
-  'flex': 1,
-  'minWidth': 0,
-  'height': '28px',
-  'boxSizing': 'border-box',
-  'appearance': 'none',
-  'padding': '0 8px',
-  'border': 'none',
-  'borderRadius': chromeRadius.md,
-  'backgroundColor': vars.color.bg,
-  'boxShadow': vars.boxShadow.xs,
-  'color': vars.color.text,
-  'fontFamily': vars.typography.fontFamilySans,
-  'outline': 'none',
-  'transition': `box-shadow ${chromeMotion.state} ease`,
-  '::placeholder': {
-    color: vars.color.textTertiary,
-  },
-  ':focus-visible': {
-    boxShadow: focusRing,
-  },
+  justifyContent: 'flex-end',
+  gap: 6,
+  padding: '0 12px 12px',
 });
 
 export const saveKey = style({

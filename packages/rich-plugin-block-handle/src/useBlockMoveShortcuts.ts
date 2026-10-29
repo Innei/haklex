@@ -3,7 +3,7 @@ import type { CommandListener, LexicalEditor } from 'lexical';
 import { COMMAND_PRIORITY_CRITICAL, KEY_DOWN_COMMAND } from 'lexical';
 import { useEffect } from 'react';
 
-import { $moveBlocks, $selectionBlockKeys } from './blockMoves';
+import { $duplicateBlocks, $moveBlocks, $selectionBlockKeys } from './blockMoves';
 
 const DIRECTIONS: Record<string, 'up' | 'down'> = { ArrowUp: 'up', ArrowDown: 'down' };
 
@@ -13,15 +13,17 @@ export function createBlockMoveHandler(
   isMac: boolean,
 ): CommandListener<KeyboardEvent> {
   return (event, fromEditor) => {
-    if (fromEditor !== editor) return false;
-    const direction = DIRECTIONS[event.key];
-    if (!direction || !event.shiftKey || event.altKey) return false;
+    if (fromEditor !== editor || event.altKey) return false;
     if (isMac ? !event.metaKey || event.ctrlKey : !event.ctrlKey || event.metaKey) return false;
+    const direction = DIRECTIONS[event.key];
+    const duplicate = !event.shiftKey && event.key.toLowerCase() === 'd';
+    if (!duplicate && (!direction || !event.shiftKey)) return false;
     const blockKeys = getSelectedKeys();
     const keys = blockKeys.length > 0 ? blockKeys : $selectionBlockKeys();
     if (keys.length === 0) return false;
     event.preventDefault();
-    $moveBlocks(keys, direction);
+    if (duplicate) $duplicateBlocks(keys);
+    else $moveBlocks(keys, direction);
     return true;
   };
 }

@@ -4,9 +4,14 @@ import {
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
 } from '@lexical/list';
-import { $createHeadingNode, $isHeadingNode } from '@lexical/rich-text';
+import {
+  $createHeadingNode,
+  $createQuoteNode,
+  $isHeadingNode,
+  $isQuoteNode,
+} from '@lexical/rich-text';
 import { $patchStyleText, $setBlocksType } from '@lexical/selection';
-import type { ElementNode, LexicalEditor } from 'lexical';
+import type { ElementNode, Klass, LexicalEditor, LexicalNode, RangeSelection } from 'lexical';
 import { $createParagraphNode, $getSelection, $isRangeSelection } from 'lexical';
 
 import type { BlockType } from './constants';
@@ -28,8 +33,10 @@ export function getBlockType(anchorNode: ElementNode): BlockType {
     if (listType === 'check') return 'check';
     return 'other';
   }
+  if ($isQuoteNode(anchorNode)) return 'quote';
   const type = anchorNode.getType();
   if (type === 'paragraph') return 'paragraph';
+  if (type === 'code') return 'code';
   return 'other';
 }
 
@@ -61,8 +68,40 @@ export function applyBlockType(editor: LexicalEditor, type: BlockType): void {
     }
     if (type === 'h1' || type === 'h2' || type === 'h3') {
       $setBlocksType(selection, () => $createHeadingNode(type));
+      return;
     }
+    if (type === 'quote') {
+      $setBlocksType(selection, () => $createQuoteNode());
+      return;
+    }
+    if (type === 'code') $replaceWithCodeBlock(editor, selection);
   });
+}
+
+type CodeBlockKlass = Klass<LexicalNode> & { new (code: string, language: string): LexicalNode };
+
+export function getCodeBlockKlass(editor: LexicalEditor): CodeBlockKlass | null {
+  const nodes = (editor as unknown as { _nodes: Map<string, { klass: Klass<LexicalNode> }> })
+    ._nodes;
+  return (nodes.get('code-block')?.klass as CodeBlockKlass | undefined) ?? null;
+}
+
+function $replaceWithCodeBlock(editor: LexicalEditor, selection: RangeSelection) {
+  const CodeBlock = getCodeBlockKlass(editor);
+  if (!CodeBlock) return;
+  const blocks = [
+    ...new Set(
+      selection
+        .getNodes()
+        .concat(selection.anchor.getNode())
+        .map((node) => node.getTopLevelElement())
+        .filter((node): node is ElementNode => node !== null),
+    ),
+  ];
+  if (blocks.length === 0) return;
+  const code = blocks.map((block) => block.getTextContent()).join('\n');
+  blocks[0].replace(new CodeBlock(code, 'text'));
+  for (const block of blocks.slice(1)) block.remove();
 }
 
 /**

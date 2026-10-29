@@ -482,11 +482,6 @@ export const quote = style({
       borderRadius: '1px',
       backgroundColor: vars.color.quoteBorder,
     },
-    // When the floating attribution input is anchored to this quote, reserve
-    // bottom space so the last line of quote text never collides with it.
-    '&[data-attribution-panel]': {
-      paddingBottom: `calc(0.125em + 24px)`,
-    },
   },
 });
 

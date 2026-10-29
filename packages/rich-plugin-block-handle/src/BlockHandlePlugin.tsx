@@ -1,24 +1,11 @@
 import { DropdownMenu, DropdownMenuTrigger } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
-import { $createCodeNode } from '@lexical/code-core';
-import {
-  INSERT_CHECK_LIST_COMMAND,
-  INSERT_ORDERED_LIST_COMMAND,
-  INSERT_UNORDERED_LIST_COMMAND,
-} from '@lexical/list';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { INSERT_HORIZONTAL_RULE_COMMAND } from '@lexical/react/LexicalHorizontalRuleNode';
-import { $createHeadingNode, $createQuoteNode } from '@lexical/rich-text';
-import { $setBlocksType } from '@lexical/selection';
 import type { LexicalEditor } from 'lexical';
 import {
-  $createParagraphNode,
   $getNearestNodeFromDOMNode,
   $getNodeByKey,
   $getRoot,
-  $getSelection,
-  $isElementNode,
-  $isRangeSelection,
   COMMAND_PRIORITY_HIGH,
   DRAGOVER_COMMAND,
   DRAGSTART_COMMAND,
@@ -30,12 +17,14 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { BlockMenu } from './BlockMenu';
-import { $moveBlocks } from './blockMoves';
+import { $duplicateBlocks, $moveBlocks } from './blockMoves';
+import { $getBlockTypeId, turnBlockInto } from './blockType';
 import { handleTop, parseLineHeight } from './geometry';
 import * as css from './styles.css';
 import { useBlockMoveShortcuts } from './useBlockMoveShortcuts';
 import { useBlockSelection } from './useBlockSelection';
 import { useGapInsert } from './useGapInsert';
+import { useLongPress } from './useLongPress';
 
 const DRAG_DATA_KEY = 'application/x-rich-editor-drag';
 const HIDE_DELAY = 300;
@@ -129,18 +118,6 @@ function toPagePosition(rect: DOMRect) {
     top: rect.top + window.scrollY,
     left: rect.left + window.scrollX,
   };
-}
-
-function $cloneNode(node: import('lexical').LexicalNode): import('lexical').LexicalNode {
-  const Klass = node.constructor as any;
-  const serialized = node.exportJSON();
-  const clone = Klass.importJSON(serialized);
-  if ($isElementNode(node) && $isElementNode(clone)) {
-    for (const child of node.getChildren()) {
-      clone.append($cloneNode(child));
-    }
-  }
-  return clone;
 }
 
 function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement | null {
@@ -312,44 +289,9 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
 
   const handleTurnInto = useCallback(
     (type: string) => {
-      const { nodeKey } = handle;
-      if (!nodeKey) return;
-
-      if (['bullet', 'numbered', 'todo', 'divider'].includes(type)) {
-        editor.update(() => {
-          const node = $getNodeByKey(nodeKey);
-          if (!node) return;
-          if ($isElementNode(node)) node.selectStart();
-        });
-        const commands: Record<string, any> = {
-          bullet: INSERT_UNORDERED_LIST_COMMAND,
-          numbered: INSERT_ORDERED_LIST_COMMAND,
-          todo: INSERT_CHECK_LIST_COMMAND,
-          divider: INSERT_HORIZONTAL_RULE_COMMAND,
-        };
-        editor.dispatchCommand(commands[type], void 0);
-        return;
-      }
-
-      editor.update(() => {
-        const node = $getNodeByKey(nodeKey);
-        if (!node || !$isElementNode(node)) return;
-        node.selectStart();
-        const selection = $getSelection();
-        if (!$isRangeSelection(selection)) return;
-        const creators: Record<string, () => import('lexical').ElementNode> = {
-          paragraph: () => $createParagraphNode(),
-          h1: () => $createHeadingNode('h1'),
-          h2: () => $createHeadingNode('h2'),
-          h3: () => $createHeadingNode('h3'),
-          quote: () => $createQuoteNode(),
-          code: () => $createCodeNode(),
-        };
-        const create = creators[type];
-        if (create) $setBlocksType(selection, create);
-      });
+      if (handle.nodeKey) turnBlockInto(editor, handle.nodeKey, type);
     },
-    [editor, handle],
+    [editor, handle.nodeKey],
   );
 
   const handleDelete = useCallback(() => {
@@ -363,18 +305,7 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
     if (!keys.length) return;
 
     editor.update(() => {
-      const root = $getRoot();
-      const children = root.getChildren();
-      const keySet = new Set(keys);
-      const nodesToDuplicate = children.filter((child) => keySet.has(child.getKey()));
-      if (!nodesToDuplicate.length) return;
-
-      let insertAfter = nodesToDuplicate.at(-1)!;
-      for (const node of nodesToDuplicate) {
-        const clone = $cloneNode(node);
-        insertAfter.insertAfter(clone);
-        insertAfter = clone;
-      }
+      $duplicateBlocks(keys);
     });
   }, [editor, getSelectedKeys, handle.nodeKey]);
 
@@ -487,6 +418,17 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
     },
     [onMenuOpenChange],
   );
+
+  const gripLongPress = useLongPress(() => {
+    if (!handle.nodeKey) return;
+    selectBlock(handle.nodeKey, false);
+    onGripOpenChange(true);
+  });
+
+  const currentBlockType =
+    gripMenuOpen && handle.nodeKey
+      ? editor.getEditorState().read(() => $getBlockTypeId($getNodeByKey(handle.nodeKey as string)))
+      : null;
 
   const onGripMouseDownCapture = useCallback((event: ReactMouseEvent) => {
     dragStartedRef.current = false;
@@ -746,10 +688,12 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
             onContextMenu={onGripContextMenu}
             onDragStart={onGripDragStart as any}
             onMouseDownCapture={onGripMouseDownCapture}
+            {...gripLongPress}
           >
             <GripVertical size={16} />
           </DropdownMenuTrigger>
           <BlockMenu
+            currentType={currentBlockType}
             onDelete={handleDelete}
             onDuplicate={handleDuplicate}
             onMoveDown={() => moveBlocks('down')}

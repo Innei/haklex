@@ -1,22 +1,13 @@
-import {
-  ActionBar,
-  ActionButton,
-  Dialog,
-  DialogPopup,
-  DialogTitle,
-  SegmentedControl,
-} from '@haklex/rich-editor-ui';
+import { usePortalTheme } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { DRAG_DROP_PASTE } from '@lexical/rich-text';
 import {
-  $insertNodes,
   COMMAND_PRIORITY_EDITOR,
   COMMAND_PRIORITY_HIGH,
   type LexicalEditor,
   PASTE_COMMAND,
 } from 'lexical';
-import { Check, Info, Link2, Upload } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { useEditorBlock } from '../context/EditorBlockContext';
 import { useImagePreprocess } from '../context/ImagePreprocessContext';
@@ -24,8 +15,12 @@ import { $createImageNode } from '../nodes/ImageNode';
 import { $withAdaptiveImageDisplayWidth } from '../utils/image-insertion';
 import { resolvePreprocessTargets } from '../utils/image-preprocess';
 import { computeImageMeta } from '../utils/thumbhash';
+import { getImageEditor, isImageFile } from './image-dialog-model';
 import * as css from './image-upload.css';
 import { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from './image-upload-command';
+import { reportImageUploads } from './image-upload-toast';
+import { $insertAtCursor, type InsertionCursor, readInsertionCursor } from './insertion-cursor';
+import { presentImageDialog } from './present-image-dialog';
 
 export interface ImageUploadResult {
   altText?: string;
@@ -37,35 +32,11 @@ export interface ImageUploadResult {
 
 export type ImageUploadFn = (file: File) => Promise<ImageUploadResult>;
 
-function isImageFile(file: File): boolean {
-  return file.type.startsWith('image/');
-}
-
 function hasImageData(dataTransfer: DataTransfer | null): boolean {
   if (!dataTransfer) return false;
 
   if ([...dataTransfer.files].some(isImageFile)) return true;
   return [...dataTransfer.items].some((item) => item.type.startsWith('image/'));
-}
-
-const UNSAFE_URL_RE = /^(?:javascript\s*:|vbscript\s*:|data\s*:(?!image\/))/i;
-
-function isSafeImageUrl(url: string): boolean {
-  return !UNSAFE_URL_RE.test(url);
-}
-
-function loadImageByUrl(src: string): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.onload = () => {
-      resolve({
-        width: image.naturalWidth || image.width,
-        height: image.naturalHeight || image.height,
-      });
-    };
-    image.onerror = () => reject(new Error('Failed to load image'));
-    image.src = src;
-  });
 }
 
 function readAsDataUrl(file: File): Promise<string> {
@@ -95,126 +66,127 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
   const [editor] = useLexicalComposerContext();
   const uploadRef = useRef(onUpload);
   uploadRef.current = onUpload;
-  const targetEditorRef = useRef<LexicalEditor>(editor);
   const preprocessContext = useImagePreprocess();
-  const preprocessRef = preprocessContext?.ref ?? null;
-  const getPreprocess = useCallback(() => preprocessRef?.current ?? null, [preprocessRef]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const toastTimerRef = useRef<number | null>(null);
+  const preprocessContextRef = useRef(preprocessContext);
+  preprocessContextRef.current = preprocessContext;
+  const portalTheme = usePortalTheme();
+  const portalThemeRef = useRef(portalTheme);
+  portalThemeRef.current = portalTheme;
 
-  const [dialogOpen, setDialogOpen] = useState(false);
-  useEffect(() => {
-    if (dialogOpen) return block?.retain();
-  }, [block, dialogOpen]);
-  const [tab, setTab] = useState<'upload' | 'url'>('upload');
-  const [rootDragActive, setRootDragActive] = useState(false);
-  const [dialogDragActive, setDialogDragActive] = useState(false);
-  const [pendingUploads, setPendingUploads] = useState(0);
-  const [dialogUploading, setDialogUploading] = useState(false);
-  const [toast, setToast] = useState<null | {
-    kind: 'success' | 'error';
-    message: string;
-  }>(null);
-
-  const [urlInput, setUrlInput] = useState('');
-  const [urlPreview, setUrlPreview] = useState<string | null>(null);
-  const [urlMeta, setUrlMeta] = useState<{
-    width: number;
-    height: number;
-  } | null>(null);
-  const [urlLoading, setUrlLoading] = useState(false);
-  const [urlError, setUrlError] = useState<string | null>(null);
-
-  const tabItems = useMemo(
-    () => [
-      { value: 'upload' as const, label: 'Upload' },
-      { value: 'url' as const, label: 'URL' },
-    ],
+  const uploadAndInsert = useCallback(
+    async (file: File, target: LexicalEditor, cursor: InsertionCursor, after: Promise<unknown>) => {
+      const release = blockRef.current?.retain();
+      try {
+        const [result, meta] = await Promise.all([uploadRef.current(file), computeImageMeta(file)]);
+        await after;
+        target.update(() => {
+          $insertAtCursor(cursor, [
+            $createImageNode(
+              $withAdaptiveImageDisplayWidth({
+                src: result.src,
+                altText: result.altText ?? file.name,
+                width: result.width ?? meta.width,
+                height: result.height ?? meta.height,
+                thumbhash: result.thumbhash ?? meta.thumbhash,
+              }),
+            ),
+          ]);
+        });
+      } finally {
+        queueMicrotask(() => release?.());
+      }
+    },
     [],
   );
 
-  const pushToast = useCallback((kind: 'success' | 'error', message: string) => {
-    setToast({ kind, message });
-    if (toastTimerRef.current) {
-      window.clearTimeout(toastTimerRef.current);
-    }
-    toastTimerRef.current = window.setTimeout(setToast, 2200, null);
-  }, []);
-
-  const insertByUpload = useCallback(
-    async (
-      file: File,
-      target: LexicalEditor,
-      options?: { after?: Promise<unknown>; closeDialog?: boolean },
-    ) => {
-      if (!isImageFile(file)) return false;
-      const release = blockRef.current?.retain();
-
-      const closeDialog = Boolean(options?.closeDialog);
-
-      setPendingUploads((value) => value + 1);
-      if (closeDialog) setDialogUploading(true);
-
-      try {
-        const [result, meta] = await Promise.all([uploadRef.current(file), computeImageMeta(file)]);
-        await options?.after;
-
-        target.update(() => {
-          const node = $createImageNode(
-            $withAdaptiveImageDisplayWidth({
-              src: result.src,
-              altText: result.altText ?? file.name,
-              width: result.width ?? meta.width,
-              height: result.height ?? meta.height,
-              thumbhash: result.thumbhash ?? meta.thumbhash,
-            }),
+  const uploadFiles = useCallback(
+    (files: File[], target: LexicalEditor, cursor: InsertionCursor) =>
+      reportImageUploads(files, async (batch) => {
+        let previous: Promise<unknown> = Promise.resolve();
+        const results = batch.map((file) => {
+          const current = uploadAndInsert(
+            file,
+            target,
+            cursor,
+            previous.catch(() => {}),
           );
-          $insertNodes([node]);
+          previous = current;
+          return current;
         });
-
-        if (closeDialog) {
-          setDialogOpen(false);
-          setUrlInput('');
-          setUrlPreview(null);
-          setUrlMeta(null);
-          setUrlError(null);
-        }
-        pushToast('success', 'Image uploaded');
-        return true;
-      } catch (err: unknown) {
-        console.error('[ImageUploadPlugin]', err);
-        pushToast('error', 'Image upload failed');
-        return false;
-      } finally {
-        queueMicrotask(() => release?.());
-        setPendingUploads((value) => Math.max(value - 1, 0));
-        setDialogUploading(false);
-      }
-    },
-    [pushToast],
+        const settled = await Promise.allSettled(results);
+        return batch.filter((_, index) => {
+          const outcome = settled[index];
+          if (outcome.status === 'fulfilled') return false;
+          console.error('[ImageUploadPlugin]', outcome.reason);
+          return true;
+        });
+      }),
+    [uploadAndInsert],
   );
 
   const handleFiles = useCallback(
     (files: File[], source: 'drop' | 'paste', target: LexicalEditor): boolean => {
       const images = files.filter(isImageFile);
       if (images.length === 0) return false;
+      const cursor = readInsertionCursor(editor, target);
 
       void (async () => {
         const release = blockRef.current?.retain();
         try {
-          const targets = await resolvePreprocessTargets(images, source, getPreprocess());
-          let previous: Promise<unknown> = Promise.resolve();
-          for (const file of targets) {
-            previous = insertByUpload(file, target, { after: previous });
-          }
-          await previous;
+          const preprocess = preprocessContextRef.current?.ref.current ?? null;
+          const targets = await resolvePreprocessTargets(images, source, preprocess);
+          if (targets.length > 0) await uploadFiles(targets, target, cursor);
         } finally {
           queueMicrotask(() => release?.());
         }
       })();
       return true;
     },
-    [insertByUpload, getPreprocess],
+    [editor, uploadFiles],
+  );
+
+  const openDialog = useCallback(
+    async (target: LexicalEditor, cursor: InsertionCursor) => {
+      const release = blockRef.current?.retain();
+      try {
+        const scope = preprocessContextRef.current;
+        const imageEditor = getImageEditor(scope);
+        const entries = await presentImageDialog({
+          editor: imageEditor,
+          portalClassName: portalThemeRef.current.className,
+          theme: portalThemeRef.current.theme,
+        });
+        if (!entries) return;
+
+        const urls = entries.flatMap((entry) => (entry.kind === 'url' ? [entry] : []));
+        if (urls.length > 0) {
+          target.update(() => {
+            $insertAtCursor(
+              cursor,
+              urls.map((entry) =>
+                $createImageNode(
+                  $withAdaptiveImageDisplayWidth({
+                    src: entry.src,
+                    altText: '',
+                    width: entry.width,
+                    height: entry.height,
+                  }),
+                ),
+              ),
+            );
+          });
+        }
+
+        const picked = entries.flatMap((entry) => (entry.kind === 'file' ? [entry.file] : []));
+        const files = imageEditor
+          ? picked
+          : await resolvePreprocessTargets(picked, 'dialog', scope?.ref.current ?? null);
+        if (files.length > 0) await uploadFiles(files, target, cursor);
+      } finally {
+        queueMicrotask(() => release?.());
+      }
+    },
+    [uploadFiles],
   );
 
   useEffect(() => {
@@ -243,8 +215,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
     const unregisterOpenDialog = editor.registerCommand(
       OPEN_IMAGE_UPLOAD_DIALOG_COMMAND,
       (_payload, fromEditor) => {
-        targetEditorRef.current = fromEditor;
-        setDialogOpen(true);
+        void openDialog(fromEditor, readInsertionCursor(editor, fromEditor));
         return true;
       },
       COMMAND_PRIORITY_EDITOR,
@@ -252,7 +223,7 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
 
     const rootElement = editor.getRootElement();
     const wrapper = rootElement?.parentElement ?? null;
-    if (!wrapper) {
+    if (!rootElement || !wrapper) {
       return () => {
         unregisterDragDrop();
         unregisterPaste();
@@ -262,15 +233,10 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
 
     let dragCounter = 0;
 
-    const setWrapperDragging = (next: boolean) => {
-      setRootDragActive(next);
-      wrapper.classList.toggle(css.draggingWrapperClass, next);
-    };
-
     const onDragEnter = (event: DragEvent) => {
       if (!hasImageData(event.dataTransfer)) return;
       dragCounter += 1;
-      setWrapperDragging(true);
+      wrapper.classList.add(css.draggingWrapperClass);
     };
 
     const onDragOver = (event: DragEvent) => {
@@ -280,287 +246,30 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
 
     const onDragLeave = () => {
       dragCounter = Math.max(dragCounter - 1, 0);
-      if (dragCounter === 0) {
-        setWrapperDragging(false);
-      }
+      if (dragCounter === 0) wrapper.classList.remove(css.draggingWrapperClass);
     };
 
     const onDrop = () => {
       dragCounter = 0;
-      setWrapperDragging(false);
+      wrapper.classList.remove(css.draggingWrapperClass);
     };
 
-    rootElement?.addEventListener('dragenter', onDragEnter);
-    rootElement?.addEventListener('dragover', onDragOver);
-    rootElement?.addEventListener('dragleave', onDragLeave);
-    rootElement?.addEventListener('drop', onDrop);
+    rootElement.addEventListener('dragenter', onDragEnter);
+    rootElement.addEventListener('dragover', onDragOver);
+    rootElement.addEventListener('dragleave', onDragLeave);
+    rootElement.addEventListener('drop', onDrop);
 
     return () => {
-      if (toastTimerRef.current) {
-        window.clearTimeout(toastTimerRef.current);
-      }
       unregisterDragDrop();
       unregisterPaste();
       unregisterOpenDialog();
-      setWrapperDragging(false);
-      rootElement?.removeEventListener('dragenter', onDragEnter);
-      rootElement?.removeEventListener('dragover', onDragOver);
-      rootElement?.removeEventListener('dragleave', onDragLeave);
-      rootElement?.removeEventListener('drop', onDrop);
+      wrapper.classList.remove(css.draggingWrapperClass);
+      rootElement.removeEventListener('dragenter', onDragEnter);
+      rootElement.removeEventListener('dragover', onDragOver);
+      rootElement.removeEventListener('dragleave', onDragLeave);
+      rootElement.removeEventListener('drop', onDrop);
     };
-  }, [editor, handleFiles]);
+  }, [editor, handleFiles, openDialog]);
 
-  const resetUrlState = useCallback(() => {
-    setUrlInput('');
-    setUrlPreview(null);
-    setUrlMeta(null);
-    setUrlError(null);
-    setUrlLoading(false);
-  }, []);
-
-  const handleDialogFile = useCallback(
-    async (file: File | null) => {
-      if (!file) return;
-
-      let uploadFile: File | undefined = file;
-      if (isImageFile(file)) {
-        [uploadFile] = await resolvePreprocessTargets([file], 'dialog', getPreprocess());
-      }
-      if (!uploadFile) return;
-      await insertByUpload(uploadFile, targetEditorRef.current, { closeDialog: true });
-    },
-    [insertByUpload, getPreprocess],
-  );
-
-  const handleUrlPreview = useCallback(async () => {
-    const nextUrl = urlInput.trim();
-    if (!nextUrl) return;
-    if (!isSafeImageUrl(nextUrl)) {
-      setUrlError('Unsupported URL scheme');
-      return;
-    }
-
-    setUrlLoading(true);
-    setUrlError(null);
-    try {
-      const meta = await loadImageByUrl(nextUrl);
-      setUrlMeta(meta);
-      setUrlPreview(nextUrl);
-    } catch {
-      setUrlPreview(null);
-      setUrlMeta(null);
-      setUrlError('Could not load this image URL');
-    } finally {
-      setUrlLoading(false);
-    }
-  }, [urlInput]);
-
-  const handleInsertByUrl = useCallback(() => {
-    if (!urlPreview || !isSafeImageUrl(urlPreview)) return;
-
-    targetEditorRef.current.update(() => {
-      const node = $createImageNode(
-        $withAdaptiveImageDisplayWidth({
-          src: urlPreview,
-          altText: '',
-          width: urlMeta?.width,
-          height: urlMeta?.height,
-        }),
-      );
-      $insertNodes([node]);
-    });
-    pushToast('success', 'Image inserted');
-    setDialogOpen(false);
-    resetUrlState();
-  }, [pushToast, resetUrlState, urlMeta, urlPreview]);
-
-  const helperMessage =
-    pendingUploads > 0
-      ? `Uploading ${pendingUploads} image${pendingUploads > 1 ? 's' : ''}...`
-      : rootDragActive
-        ? 'Drop image files to upload'
-        : null;
-
-  return (
-    <>
-      {(helperMessage || toast) && (
-        <div className={css.toastStack}>
-          {helperMessage && (
-            <div className={`${css.toast} ${css.toastVariant.info}`}>
-              <span className={css.spinner} />
-              {helperMessage}
-            </div>
-          )}
-          {toast && (
-            <div className={`${css.toast} ${css.toastVariant[toast.kind]}`}>
-              {toast.kind === 'success' ? <Check size={12} /> : <Info size={12} />}
-              {toast.message}
-            </div>
-          )}
-        </div>
-      )}
-
-      <Dialog
-        open={dialogOpen}
-        onOpenChange={(nextOpen) => {
-          if (!nextOpen && dialogUploading) return;
-          setDialogOpen(nextOpen);
-          if (!nextOpen) {
-            resetUrlState();
-            setDialogUploading(false);
-            setDialogDragActive(false);
-            targetEditorRef.current = editor;
-          }
-        }}
-      >
-        <DialogPopup className={css.dialogPopup} showCloseButton={!dialogUploading}>
-          <div className={css.dialogHeader}>
-            <DialogTitle className={css.dialogTitle}>Insert image</DialogTitle>
-          </div>
-
-          <div className={css.dialogBody}>
-            <div className={css.tabWrap}>
-              <SegmentedControl fullWidth items={tabItems} value={tab} onChange={setTab} />
-            </div>
-
-            {tab === 'upload' ? (
-              <div
-                className={`${css.uploadDropzone} ${css.uploadDropzoneState[dialogUploading ? 'busy' : dialogDragActive ? 'active' : 'idle']}`}
-                role="button"
-                tabIndex={0}
-                onDragLeave={() => setDialogDragActive(false)}
-                onClick={() => {
-                  if (!dialogUploading) fileInputRef.current?.click();
-                }}
-                onDragEnter={(event) => {
-                  if (hasImageData(event.dataTransfer)) {
-                    event.preventDefault();
-                    setDialogDragActive(true);
-                  }
-                }}
-                onDragOver={(event) => {
-                  if (hasImageData(event.dataTransfer)) {
-                    event.preventDefault();
-                  }
-                }}
-                onDrop={(event) => {
-                  event.preventDefault();
-                  setDialogDragActive(false);
-                  const file = [...event.dataTransfer.files].find(isImageFile);
-                  void handleDialogFile(file ?? null);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key !== 'Enter' && event.key !== ' ') return;
-                  event.preventDefault();
-                  if (!dialogUploading) fileInputRef.current?.click();
-                }}
-              >
-                <input
-                  accept="image/*"
-                  className={css.hiddenInput}
-                  ref={fileInputRef}
-                  type="file"
-                  onChange={(event) => {
-                    const file = event.currentTarget.files?.[0] ?? null;
-                    void handleDialogFile(file);
-                    event.currentTarget.value = '';
-                  }}
-                />
-
-                {dialogUploading ? (
-                  <div className={css.uploadBusyWrap}>
-                    <div className={css.uploadProgress}>
-                      <span className={css.spinner} />
-                      Uploading image...
-                    </div>
-                  </div>
-                ) : (
-                  <>
-                    <span className={css.uploadDropIcon}>
-                      <Upload size={18} />
-                    </span>
-                    <span className={css.uploadDropTitle}>Click to upload or drag and drop</span>
-                    <span className={css.uploadDropDesc}>PNG, JPG, GIF, WebP</span>
-                  </>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className={css.urlInputRow}>
-                  <input
-                    className={css.textInput}
-                    placeholder="https://example.com/image.jpg"
-                    type="url"
-                    value={urlInput}
-                    onChange={(event) => {
-                      setUrlInput(event.target.value);
-                      setUrlError(null);
-                      setUrlPreview(null);
-                      setUrlMeta(null);
-                    }}
-                    onKeyDown={(event) => {
-                      if (event.key === 'Enter') {
-                        event.preventDefault();
-                        if (urlPreview) {
-                          handleInsertByUrl();
-                        } else {
-                          void handleUrlPreview();
-                        }
-                      }
-                    }}
-                  />
-                  <ActionButton
-                    disabled={urlLoading || !urlInput.trim()}
-                    size="md"
-                    variant="outline"
-                    onClick={() => void handleUrlPreview()}
-                  >
-                    {urlLoading ? 'Loading' : 'Preview'}
-                  </ActionButton>
-                  <ActionButton
-                    disabled={!urlPreview}
-                    size="md"
-                    variant="accent"
-                    onClick={handleInsertByUrl}
-                  >
-                    Insert
-                  </ActionButton>
-                </div>
-
-                {urlError && (
-                  <span className={`${css.helperText} ${css.toastVariant.error}`}>
-                    <Info size={12} />
-                    {urlError}
-                  </span>
-                )}
-
-                {urlPreview && (
-                  <div className={css.urlPreview}>
-                    <img alt="Preview" className={css.urlPreviewImage} src={urlPreview} />
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-
-          <div className={css.dialogFooter}>
-            <span className={css.helperText}>
-              <Link2 size={12} />
-              You can also paste images or drag files directly into the editor.
-            </span>
-            <ActionBar>
-              <ActionButton
-                disabled={dialogUploading}
-                size="md"
-                variant="outline"
-                onClick={() => setDialogOpen(false)}
-              >
-                Close
-              </ActionButton>
-            </ActionBar>
-          </div>
-        </DialogPopup>
-      </Dialog>
-    </>
-  );
+  return null;
 }

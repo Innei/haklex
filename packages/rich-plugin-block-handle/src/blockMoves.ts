@@ -1,5 +1,5 @@
 import type { LexicalNode } from 'lexical';
-import { $getRoot, $getSelection, $isRangeSelection } from 'lexical';
+import { $getRoot, $getSelection, $isElementNode, $isRangeSelection } from 'lexical';
 
 function $topLevelKey(node: LexicalNode): string | null {
   return node.getTopLevelElement()?.getKey() ?? null;
@@ -45,5 +45,31 @@ export function $moveBlocks(keys: string[], direction: 'up' | 'down'): boolean {
   if (!next || keySet.has(next.getKey())) return false;
   next.remove();
   first.insertBefore(next);
+  return true;
+}
+
+function $cloneNode(node: LexicalNode): LexicalNode {
+  const Klass = node.constructor as { importJSON: (json: unknown) => LexicalNode };
+  const clone = Klass.importJSON(node.exportJSON());
+  if ($isElementNode(node) && $isElementNode(clone)) {
+    for (const child of node.getChildren()) {
+      clone.append($cloneNode(child));
+    }
+  }
+  return clone;
+}
+
+export function $duplicateBlocks(keys: string[]): boolean {
+  const keySet = new Set(keys);
+  const blocks = $getRoot()
+    .getChildren()
+    .filter((child) => keySet.has(child.getKey()));
+  if (blocks.length === 0) return false;
+  let insertAfter = blocks.at(-1)!;
+  for (const block of blocks) {
+    const clone = $cloneNode(block);
+    insertAfter.insertAfter(clone);
+    insertAfter = clone;
+  }
   return true;
 }

@@ -1,5 +1,6 @@
 import {
   DropdownMenu,
+  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
@@ -45,18 +46,30 @@ export function ToolbarMenuButton({
 export function ToolbarMenuItems({ items }: { items: ToolbarMenuItem[] }): ReactElement {
   return (
     <>
-      {items.map((item) => (
-        <DropdownMenuItem
-          className={item.active ? css.toolbarDropdownItemActive : undefined}
-          disabled={item.disabled}
-          key={item.label}
-          shortcut={item.shortcut}
-          onClick={item.onSelect}
-        >
-          {item.icon}
-          {item.label}
-        </DropdownMenuItem>
-      ))}
+      {items.map((item) =>
+        item.active === undefined ? (
+          <DropdownMenuItem
+            disabled={item.disabled}
+            key={item.label}
+            shortcut={item.shortcut}
+            onClick={item.onSelect}
+          >
+            {item.icon}
+            {item.label}
+          </DropdownMenuItem>
+        ) : (
+          <DropdownMenuCheckboxItem
+            closeOnClick
+            checked={item.active}
+            disabled={item.disabled}
+            key={item.label}
+            onClick={item.onSelect}
+          >
+            {item.icon}
+            {item.label}
+          </DropdownMenuCheckboxItem>
+        ),
+      )}
     </>
   );
 }

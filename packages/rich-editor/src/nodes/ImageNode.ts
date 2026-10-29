@@ -135,6 +135,7 @@ export class ImageNode extends DecoratorNode<ReactElement> {
   __fixedHeight?: number;
   __fixedWidth?: number;
   __layout?: ImageLayout;
+  __autoOpenOnMount = false;
 
   static commandItems: CommandItemConfig[] = [
     {
@@ -151,7 +152,9 @@ export class ImageNode extends DecoratorNode<ReactElement> {
 
         editor.update(() => {
           $insertNodes([
-            $createImageNode($withAdaptiveImageDisplayWidth({ src: '', altText: '' })),
+            $createImageNode($withAdaptiveImageDisplayWidth({ src: '', altText: '' }), {
+              autoOpenOnMount: true,
+            }),
           ]);
         });
       },
@@ -195,6 +198,11 @@ export class ImageNode extends DecoratorNode<ReactElement> {
     this.__fixedWidth = display.fixedWidth;
     this.__fixedHeight = display.fixedHeight;
     this.__layout = sanitizeImageLayout(payload.layout);
+  }
+
+  afterCloneFrom(prevNode: this): void {
+    super.afterCloneFrom(prevNode);
+    this.__autoOpenOnMount = prevNode.__autoOpenOnMount;
   }
 
   createDOM(_config: EditorConfig): HTMLElement {
@@ -367,6 +375,15 @@ export class ImageNode extends DecoratorNode<ReactElement> {
     return this.__layout;
   }
 
+  getShouldAutoOpenOnMount(): boolean {
+    return this.getLatest().__autoOpenOnMount;
+  }
+
+  setShouldAutoOpenOnMount(autoOpenOnMount: boolean): void {
+    const writable = this.getWritable();
+    writable.__autoOpenOnMount = autoOpenOnMount;
+  }
+
   decorate(_editor: LexicalEditor, _config: EditorConfig): ReactElement {
     return createRendererDecoration(IMAGE_NODE_KEY, ImageRenderer, {
       src: this.__src,
@@ -380,12 +397,18 @@ export class ImageNode extends DecoratorNode<ReactElement> {
       fixedWidth: this.__fixedWidth,
       fixedHeight: this.__fixedHeight,
       layout: this.__layout,
+      ...(this.__autoOpenOnMount ? { autoOpenOnMount: true } : {}),
     });
   }
 }
 
-export function $createImageNode(payload: ImageNodePayload): ImageNode {
-  return new ImageNode(payload);
+export function $createImageNode(
+  payload: ImageNodePayload,
+  options?: { autoOpenOnMount?: boolean },
+): ImageNode {
+  const node = new ImageNode(payload);
+  if (options?.autoOpenOnMount) node.setShouldAutoOpenOnMount(true);
+  return node;
 }
 
 export function $isImageNode(node: LexicalNode | null | undefined): node is ImageNode {

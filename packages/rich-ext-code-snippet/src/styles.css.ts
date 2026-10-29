@@ -21,9 +21,6 @@ export const semanticClassNames = {
   editOverlay: 'rcs-edit-overlay',
   editLabel: 'rcs-edit-label',
   modal: 'rcs-modal',
-  modalTitlebar: 'rcs-modal-titlebar',
-  modalTitle: 'rcs-modal-title',
-  modalIconButton: 'rcs-modal-icon-btn',
   modalBody: 'rcs-modal-body',
   modalSidebar: 'rcs-modal-sidebar',
   sidebarHeader: 'rcs-sidebar-header',
@@ -264,87 +261,44 @@ export const editLabel = style({
   },
 });
 
-const _codeSnippetDialogPopup = style({});
-globalStyle(`${_codeSnippetDialogPopup}${_codeSnippetDialogPopup}`, {
-  'padding': 0,
-  'gap': 0,
-  'display': 'flex',
-  'flexDirection': 'column',
-  'overflow': 'hidden',
-  'width': 'calc(100vw - 2rem)',
-  'height': 'min(720px, 80vh)',
-  'borderRadius': '0.75rem',
-  '@media': {
-    '(min-width: 640px)': {
-      maxWidth: '64rem',
-    },
-  },
-});
-globalStyle(`${_codeSnippetDialogPopup}${_codeSnippetDialogPopup}[data-open]`, {
-  animation: 'none',
-});
-globalStyle(`${_codeSnippetDialogPopup}${_codeSnippetDialogPopup}[data-closed]`, {
-  animation: 'none',
-});
-export { _codeSnippetDialogPopup as codeSnippetDialogPopup };
-
-export const modal = style({
+export const codeSnippetDialogPopup = style({});
+globalStyle(`${codeSnippetDialogPopup}${codeSnippetDialogPopup}`, {
   display: 'flex',
   flexDirection: 'column',
-  flex: 1,
-  minHeight: 0,
+  height: 'min(720px, 85vh)',
   overflow: 'hidden',
 });
 
-export const modalTitlebar = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  height: 44,
-  padding: '0 16px',
-  borderBottom: `1px solid ${vars.color.border}`,
-  flexShrink: 0,
-});
-
-export const modalTitle = style({
-  fontSize: vars.typography.fontSizeXs,
-  fontFamily: vars.typography.fontMono,
-  color: vars.color.textSecondary,
-});
-
-export const modalIconButton = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: 28,
-  height: 28,
-  borderRadius: 6,
-  border: 'none',
-  background: 'transparent',
-  color: vars.color.textSecondary,
-  cursor: 'pointer',
-  transition: 'background 0.15s, color 0.15s',
-  selectors: {
-    '&:hover': {
-      background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-      color: vars.color.text,
-    },
-  },
+export const modal = style({
+  flex: 1,
+  minHeight: 0,
 });
 
 export const modalBody = style({
-  display: 'flex',
-  flex: 1,
-  minHeight: 0,
+  'display': 'flex',
+  'overflow': 'hidden',
+  '@media': {
+    '(max-width: 640px)': {
+      flexDirection: 'column',
+    },
+  },
 });
 
 export const modalSidebar = style({
-  width: 224,
-  flexShrink: 0,
-  borderRight: `1px solid ${vars.color.border}`,
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
+  'width': 224,
+  'flexShrink': 0,
+  'borderRight': `1px solid ${vars.color.border}`,
+  'display': 'flex',
+  'flexDirection': 'column',
+  'overflow': 'hidden',
+  '@media': {
+    '(max-width: 640px)': {
+      width: 'auto',
+      maxHeight: 160,
+      borderRight: 'none',
+      borderBottom: `1px solid ${vars.color.border}`,
+    },
+  },
 });
 
 export const sidebarHeader = style({

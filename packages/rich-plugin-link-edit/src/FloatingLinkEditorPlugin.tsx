@@ -4,27 +4,29 @@ import {
   PopoverPopup,
   PopoverPortal,
   PopoverPositioner,
+  toast,
 } from '@haklex/rich-editor-ui';
 import type { LinkNode } from '@lexical/link';
 import { $isAutoLinkNode, $isLinkNode } from '@lexical/link';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { LexicalNode } from 'lexical';
 import {
+  $createTextNode,
   $getNodeByKey,
   $getSelection,
   $isRangeSelection,
+  $isTextNode,
   COMMAND_PRIORITY_LOW,
   SELECTION_CHANGE_COMMAND,
 } from 'lexical';
-import type { KeyboardEvent, ReactElement, ReactNode } from 'react';
+import type { FocusEvent, KeyboardEvent, ReactElement, ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { isEmptyLink } from './link-display';
-import type { LinkEditorMode } from './LinkEditorPanel';
+import type { LinkDraft, LinkEditorMode } from './LinkEditorPanel';
 import { LinkEditorPanel } from './LinkEditorPanel';
 import * as styles from './styles.css';
-
-const COPIED_FEEDBACK_MS = 1500;
+import { useModClickLinks } from './useModClickLinks';
 
 function $findLinkNode(node: LexicalNode): LinkNode | null {
   let current: LexicalNode | null = node;
@@ -35,9 +37,23 @@ function $findLinkNode(node: LexicalNode): LinkNode | null {
   return null;
 }
 
+function $replaceLinkText(link: LinkNode, text: string) {
+  if (link.getTextContent() === text) return;
+  const first = link.getFirstDescendant();
+  const next = $createTextNode(text);
+  if ($isTextNode(first)) {
+    next.setFormat(first.getFormat());
+    next.setStyle(first.getStyle());
+  }
+  const previous = link.getChildren();
+  link.append(next);
+  for (const child of previous) child.remove();
+}
+
 interface LinkEditorState {
   linkDom: HTMLElement | null;
   linkKey: string;
+  text: string;
   url: string;
 }
 
@@ -53,19 +69,33 @@ export function FloatingLinkEditorPlugin({
   renderExtraActions,
 }: FloatingLinkEditorPluginProps = {}): ReactElement | null {
   const [editor] = useLexicalComposerContext();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const urlInputRef = useRef<HTMLInputElement>(null);
+  const popupRef = useRef<HTMLDivElement>(null);
+  const restoreFocusRef = useRef(false);
   const panelFocusedRef = useRef(false);
 
   const [visible, setVisible] = useState(false);
   const [linkState, setLinkState] = useState<LinkEditorState>({
     url: '',
+    text: '',
     linkKey: '',
     linkDom: null,
   });
-  const [inputUrl, setInputUrl] = useState('');
-  const [mode, setMode] = useState<LinkEditorMode>('view');
-  const [copied, setCopied] = useState(false);
+  const [draft, setDraftState] = useState<LinkDraft>({ text: '', url: '' });
+  const draftRef = useRef(draft);
+  const [mode, setModeState] = useState<LinkEditorMode>('view');
+  const modeRef = useRef<LinkEditorMode>('view');
   const shownKeyRef = useRef('');
+
+  const setDraft = useCallback((next: LinkDraft) => {
+    draftRef.current = next;
+    setDraftState(next);
+  }, []);
+
+  const setMode = useCallback((next: LinkEditorMode) => {
+    modeRef.current = next;
+    setModeState(next);
+  }, []);
 
   const updateLink = useCallback(() => {
     if (panelFocusedRef.current) return;
@@ -85,18 +115,18 @@ export function FloatingLinkEditorPlugin({
     }
 
     const url = linkNode.getURL();
+    const text = linkNode.getTextContent();
     const key = linkNode.getKey();
     const dom = editor.getElementByKey(key);
 
     if (shownKeyRef.current !== key) {
       shownKeyRef.current = key;
       setMode(isEmptyLink(url) ? 'edit' : 'view');
-      setCopied(false);
     }
-    setLinkState({ url, linkKey: key, linkDom: dom });
-    setInputUrl(url);
+    setLinkState({ url, text, linkKey: key, linkDom: dom });
+    if (modeRef.current === 'view' || !panelFocusedRef.current) setDraft({ text, url });
     setVisible(true);
-  }, [editor]);
+  }, [editor, setDraft, setMode]);
 
   useEffect(() => {
     const unregisterCommand = editor.registerCommand(
@@ -118,83 +148,51 @@ export function FloatingLinkEditorPlugin({
     };
   }, [editor, updateLink]);
 
-  useEffect(() => {
-    const root = editor.getRootElement();
-    if (!root) return;
-
-    const CSS_CLASSES = [styles.cmdHover, styles.semanticClassNames.cmdHover];
-
-    const updateCursor = (mod: boolean) => {
-      for (const cssClass of CSS_CLASSES) {
-        root.classList.toggle(cssClass, mod);
-      }
-    };
-
-    const onKeyDown = (e: globalThis.KeyboardEvent) => {
-      if (e.key === 'Meta' || e.key === 'Control') updateCursor(true);
-    };
-    const onKeyUp = (e: globalThis.KeyboardEvent) => {
-      if (e.key === 'Meta' || e.key === 'Control') updateCursor(false);
-    };
-    const onBlur = () => updateCursor(false);
-
-    const onClick = (e: MouseEvent) => {
-      if (!(e.metaKey || e.ctrlKey)) return;
-      const anchor = (e.target as HTMLElement).closest('a');
-      if (!anchor) return;
-      const href = anchor.getAttribute('href');
-      if (href) {
-        e.preventDefault();
-        window.open(href, '_blank', 'noopener,noreferrer');
-      }
-    };
-
-    root.addEventListener('keydown', onKeyDown);
-    root.addEventListener('keyup', onKeyUp);
-    root.addEventListener('blur', onBlur);
-    root.addEventListener('click', onClick);
-    return () => {
-      root.removeEventListener('keydown', onKeyDown);
-      root.removeEventListener('keyup', onKeyUp);
-      root.removeEventListener('blur', onBlur);
-      root.removeEventListener('click', onClick);
-      for (const cssClass of CSS_CLASSES) {
-        root.classList.remove(cssClass);
-      }
-    };
-  }, [editor]);
+  useModClickLinks(editor);
 
   useEffect(() => {
-    if (visible && mode === 'edit') inputRef.current?.focus();
+    if (visible && mode === 'edit') urlInputRef.current?.focus();
   }, [visible, mode, linkState.linkKey]);
 
   useEffect(() => {
-    if (!copied) return;
-    const timer = setTimeout(() => setCopied(false), COPIED_FEEDBACK_MS);
-    return () => clearTimeout(timer);
-  }, [copied]);
+    if (mode !== 'view' || !restoreFocusRef.current) return;
+    restoreFocusRef.current = false;
+    popupRef.current?.querySelector<HTMLElement>('[data-link-action="edit"]')?.focus();
+  }, [mode]);
 
-  const commitUrl = useCallback(() => {
-    const trimmed = inputUrl.trim();
-    if (isEmptyLink(trimmed)) return false;
+  const commitDraft = useCallback(() => {
+    const { text, url } = draftRef.current;
+    const trimmedUrl = url.trim();
+    if (isEmptyLink(trimmedUrl)) return false;
+    const trimmedText = text.trim();
     editor.update(() => {
       const node = $getNodeByKey(linkState.linkKey);
-      if ($isLinkNode(node) && node.getURL() !== trimmed) {
-        node.setURL(trimmed);
-      }
+      if (!$isLinkNode(node)) return;
+      if (node.getURL() !== trimmedUrl) node.setURL(trimmedUrl);
+      if (trimmedText) $replaceLinkText(node, text);
     });
     return true;
-  }, [editor, inputUrl, linkState.linkKey]);
+  }, [editor, linkState.linkKey]);
 
   const returnToEditor = useCallback(() => {
     panelFocusedRef.current = false;
     setMode('view');
     editor.focus();
-  }, [editor]);
+  }, [editor, setMode]);
 
   const handleSave = useCallback(() => {
-    if (commitUrl()) returnToEditor();
-  }, [commitUrl, returnToEditor]);
+    if (commitDraft()) returnToEditor();
+  }, [commitDraft, returnToEditor]);
+
+  const handleCancel = useCallback(() => {
+    setDraft({ text: linkState.text, url: linkState.url });
+    if (isEmptyLink(linkState.url)) {
+      returnToEditor();
+      return;
+    }
+    restoreFocusRef.current = true;
+    setMode('view');
+  }, [linkState.text, linkState.url, returnToEditor, setDraft, setMode]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -203,19 +201,26 @@ export function FloatingLinkEditorPlugin({
         handleSave();
       } else if (e.key === 'Escape') {
         e.preventDefault();
-        setInputUrl(linkState.url);
-        returnToEditor();
+        e.stopPropagation();
+        handleCancel();
       }
     },
-    [handleSave, linkState.url, returnToEditor],
+    [handleCancel, handleSave],
   );
+
+  const handleEdit = useCallback(() => {
+    setDraft({ text: linkState.text, url: linkState.url });
+    setMode('edit');
+  }, [linkState.text, linkState.url, setDraft, setMode]);
 
   const handleOpen = useCallback(() => {
     window.open(linkState.url, '_blank', 'noopener');
   }, [linkState.url]);
 
   const handleCopy = useCallback(() => {
-    void navigator.clipboard?.writeText(linkState.url).then(() => setCopied(true));
+    void navigator.clipboard?.writeText(linkState.url).then(() => {
+      toast({ title: 'Link copied', tone: 'success' });
+    });
   }, [linkState.url]);
 
   const handleUnlink = useCallback(() => {
@@ -245,15 +250,13 @@ export function FloatingLinkEditorPlugin({
   }, []);
 
   const handlePanelFocusOut = useCallback(
-    (e: React.FocusEvent) => {
+    (e: FocusEvent) => {
       const panel = e.currentTarget;
-      if (!panel.contains(e.relatedTarget as Node)) {
-        panelFocusedRef.current = false;
-        if (commitUrl()) setMode('view');
-        editor.focus();
-      }
+      if (panel.contains(e.relatedTarget as Node | null)) return;
+      panelFocusedRef.current = false;
+      if (modeRef.current === 'edit' && commitDraft()) setMode('view');
     },
-    [commitUrl, editor],
+    [commitDraft, setMode],
   );
 
   if (!editor.isEditable()) return null;
@@ -264,30 +267,34 @@ export function FloatingLinkEditorPlugin({
         <PopoverPositioner
           align="center"
           anchor={linkState.linkDom}
-          collisionAvoidance={{ side: 'none', align: 'shift' }}
-          collisionBoundary={editor.getRootElement() ?? undefined}
+          collisionAvoidance={{ side: 'flip', align: 'shift' }}
+          collisionPadding={8}
           side="bottom"
           sideOffset={8}
         >
           <PopoverPopup
+            flush
             className={`${styles.panel} ${styles.semanticClassNames.panel}`}
+            ref={popupRef}
+            size="md"
             onBlur={handlePanelFocusOut}
             onFocus={handlePanelFocusIn}
           >
             <LinkEditorPanel
-              copied={copied}
-              inputRef={inputRef}
-              inputUrl={inputUrl}
+              draft={draft}
               mode={mode}
+              text={linkState.text}
               url={linkState.url}
+              urlInputRef={urlInputRef}
               extraActions={renderExtraActions?.({
                 url: linkState.url,
                 linkKey: linkState.linkKey,
                 actionButtonClassName: getActionButtonClassName({ size: 'md' }),
               })}
+              onCancel={handleCancel}
               onCopy={handleCopy}
-              onEdit={() => setMode('edit')}
-              onInputChange={setInputUrl}
+              onDraftChange={setDraft}
+              onEdit={handleEdit}
               onKeyDown={handleKeyDown}
               onOpen={handleOpen}
               onSave={handleSave}

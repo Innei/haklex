@@ -1,5 +1,5 @@
 import { useColorScheme } from '@haklex/rich-editor/static';
-import { presentDialog } from '@haklex/rich-editor-ui';
+import { confirmDiscardChanges, presentDialog } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import { Pencil } from 'lucide-react';
 import type { FC } from 'react';
@@ -29,20 +29,28 @@ export const CodeSnippetEditRenderer: FC<CodeSnippetEditRendererProps> = ({
   const colorScheme = useColorScheme();
 
   const handleEdit = useCallback(() => {
+    let dirty = false;
+    const setDirty = (next: boolean) => {
+      dirty = next;
+    };
     presentDialog({
-      content: ({ dismiss }) => (
+      content: ({ dismiss, requestDismiss }) => (
         <CodeEditorModal
           colorScheme={colorScheme}
           dismiss={dismiss}
           files={files}
+          requestDismiss={requestDismiss}
+          onDirtyChange={setDirty}
           onFilesChange={onFilesChange}
         />
       ),
       className: codeSnippetDialogPopup,
       portalClassName,
       theme: colorScheme,
+      width: 1024,
+      sheet: 'auto',
       showCloseButton: false,
-      clickOutsideToDismiss: false,
+      confirmDismiss: () => !dirty || confirmDiscardChanges(),
     });
   }, [files, onFilesChange, portalClassName, colorScheme]);
 

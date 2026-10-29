@@ -45,36 +45,9 @@ vi.mock('../src/components/utils', () => ({
   getVariantClass: () => '',
 }));
 
-vi.mock('../src/plugins/image-upload.css', () => {
-  const identityProxy = new Proxy({}, { get: (_target, prop: string) => prop, has: () => true });
-  return new Proxy(
-    {},
-    {
-      get: (_target, prop: string) => {
-        if (prop === 'toastVariant' || prop === 'uploadDropzoneState') return identityProxy;
-        return prop;
-      },
-      has: () => true,
-    },
-  );
-});
-
 vi.mock('../src/utils/thumbhash', () => ({
   computeImageMeta: async () => ({ width: 10, height: 10, thumbhash: 'stub-hash' }),
   decodeThumbHash: () => undefined,
-}));
-
-vi.mock('@haklex/rich-editor-ui', () => ({
-  ActionBar: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-  ActionButton: ({ children, onClick }: { children?: React.ReactNode; onClick?: () => void }) => (
-    <button type="button" onClick={onClick}>
-      {children}
-    </button>
-  ),
-  Dialog: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-  DialogPopup: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-  DialogTitle: ({ children }: { children?: React.ReactNode }) => <>{children}</>,
-  SegmentedControl: () => null,
 }));
 
 function EditorCapture({ onReady }: { onReady: (editor: LexicalEditor) => void }) {

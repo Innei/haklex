@@ -11,6 +11,7 @@ import { decodeThumbHash } from '../../utils/thumbhash';
 export interface ImageRendererProps {
   accent?: string;
   altText: string;
+  autoOpenOnMount?: boolean;
   caption?: string;
   displayWidth?: number;
   fixedHeight?: number;

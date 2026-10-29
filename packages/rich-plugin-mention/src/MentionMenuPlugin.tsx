@@ -1,6 +1,5 @@
 import { $createMentionNode } from '@haklex/rich-editor/nodes';
 import { PortalThemeWrapper } from '@haklex/rich-style-token';
-import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import {
   LexicalTypeaheadMenuPlugin,
   useBasicTypeaheadTriggerMatch,
@@ -19,63 +18,69 @@ export interface MentionMenuPluginProps {
   extraPlatforms?: MentionPlatformDef[];
 }
 
-// Default PUNCTUATION from Lexical excludes ':' which we need for the
-// two-phase "@PLATFORM:handle" syntax.  We strip ':' from the set so the
-// trigger regex keeps matching after the user selects a platform.
+// Lexical's default PUNCTUATION includes ':', which would end the match before
+// the "@PLATFORM:handle" fast path; this set leaves it out.
 const MENTION_PUNCTUATION = '\\.,\\+\\*\\?\\$\\@\\|#{}\\(\\)\\^\\-\\[\\]\\\\/!%\'"~=<>_;';
 
-function parseQueryPhase(
-  query: string,
-  platforms: MentionPlatformDef[],
-): { phase: 1 | 2; options: MentionMenuItem[] } {
+interface MentionMenuModel {
+  heading?: string;
+  hint?: string;
+  options: MentionMenuItem[];
+}
+
+function handleItem(platform: MentionPlatformDef, handle: string): MentionMenuItem {
+  return new MentionMenuItem({
+    type: 'confirm',
+    platformKey: platform.key,
+    icon: isValidElement(platform.icon) ? platform.icon : undefined,
+    label: platform.label,
+    description: platform.label,
+    handleText: handle,
+  });
+}
+
+function buildMenu(query: string, platforms: MentionPlatformDef[]): MentionMenuModel {
   const colonIdx = query.indexOf(':');
 
   if (colonIdx !== -1) {
     const platformKey = query.slice(0, colonIdx).toUpperCase();
     const handle = query.slice(colonIdx + 1);
     const platform = platforms.find((p) => p.key === platformKey);
-
-    if (platform) {
-      const confirmItem = new MentionMenuItem({
-        type: 'confirm',
-        platformKey,
-        icon: isValidElement(platform.icon) ? platform.icon : undefined,
-        label: handle ? `@${handle}` : 'Type username...',
-        description: `${platform.label} — Enter to confirm`,
-        handleText: handle,
-      });
-      return { phase: 2, options: [confirmItem] };
+    if (!platform) return { options: [] };
+    if (!handle) {
+      return { heading: `Mention on ${platform.label}`, hint: 'Type a handle', options: [] };
     }
+    return { heading: `Mention on ${platform.label}`, options: [handleItem(platform, handle)] };
   }
 
-  const lower = query.toLowerCase();
-  const filtered = platforms
-    .filter(
-      (p) => !query || p.key.toLowerCase().includes(lower) || p.label.toLowerCase().includes(lower),
-    )
-    .map(
-      (p) =>
-        new MentionMenuItem({
-          type: 'platform',
-          platformKey: p.key,
-          icon: isValidElement(p.icon) ? p.icon : undefined,
-          label: p.label,
-          description: `@${p.key}:username`,
-        }),
-    );
-  return { phase: 1, options: filtered };
+  if (!query) {
+    return {
+      heading: 'Mention',
+      options: platforms.map(
+        (p) =>
+          new MentionMenuItem({
+            type: 'platform',
+            platformKey: p.key,
+            icon: isValidElement(p.icon) ? p.icon : undefined,
+            label: p.label,
+            description: `@${p.key}:`,
+          }),
+      ),
+    };
+  }
+
+  return {
+    heading: `Mention “${query}”`,
+    options: platforms.map((p) => handleItem(p, query)),
+  };
 }
 
 export function MentionMenuPlugin({ extraPlatforms }: MentionMenuPluginProps = {}) {
-  const [editor] = useLexicalComposerContext();
   const [queryString, setQueryString] = useState<string | null>(null);
 
   const platforms = useMemo(() => getAllPlatforms(extraPlatforms), [extraPlatforms]);
 
-  const { phase, options } = useMemo(
-    () => parseQueryPhase(queryString ?? '', platforms),
-    [queryString, platforms],
-  );
+  const menu = useMemo(() => buildMenu(queryString ?? '', platforms), [queryString, platforms]);
 
   const checkForTriggerMatch = useBasicTypeaheadTriggerMatch('@', {
     minLength: 0,
@@ -85,54 +90,54 @@ export function MentionMenuPlugin({ extraPlatforms }: MentionMenuPluginProps = {
   const onSelectOption = useCallback(
     (option: MentionMenuItem, textNodeContainingQuery: TextNode | null, closeMenu: () => void) => {
       if (option.type === 'platform') {
-        // Phase 1: replace trigger text with @PLATFORM:, keep menu open
         if (textNodeContainingQuery) {
           const text = `@${option.platformKey}:`;
           const newTextNode = $createTextNode(text);
           textNodeContainingQuery.replace(newTextNode);
           newTextNode.select(text.length, text.length);
         }
-        // Don't close — typeahead re-detects @PLATFORM: on next update
-      } else {
-        // Phase 2: insert MentionNode
-        const handle = option.handleText.trim();
-        if (!handle) return;
-
-        const mentionNode = $createMentionNode(option.platformKey, handle);
-        if (textNodeContainingQuery) {
-          textNodeContainingQuery.replace(mentionNode);
-        }
-        const spaceNode = $createTextNode(' ');
-        mentionNode.insertAfter(spaceNode);
-        spaceNode.select(0, 0);
-        closeMenu();
+        return;
       }
+
+      const handle = option.handleText.trim();
+      if (!handle) return;
+
+      const mentionNode = $createMentionNode(option.platformKey, handle);
+      if (textNodeContainingQuery) {
+        textNodeContainingQuery.replace(mentionNode);
+      }
+      const spaceNode = $createTextNode(' ');
+      mentionNode.insertAfter(spaceNode);
+      spaceNode.select(0, 0);
+      closeMenu();
     },
-    [editor],
+    [],
   );
 
   return (
     <LexicalTypeaheadMenuPlugin<MentionMenuItem>
-      options={options}
+      options={menu.options}
       triggerFn={checkForTriggerMatch}
       menuRenderFn={(
         anchorElementRef,
         { selectedIndex, selectOptionAndCleanUp, setHighlightedIndex },
       ) => {
-        if (!anchorElementRef.current) return null;
-        if (phase === 1 && options.length === 0) return null;
+        const anchorElement = anchorElementRef.current;
+        if (!anchorElement) return null;
 
         return createPortal(
           <PortalThemeWrapper>
             <MentionMenuList
-              options={options}
-              phase={phase}
+              anchorElement={anchorElement}
+              heading={menu.heading}
+              hint={menu.hint}
+              options={menu.options}
               selectOptionAndCleanUp={selectOptionAndCleanUp}
               selectedIndex={selectedIndex}
               setHighlightedIndex={setHighlightedIndex}
             />
           </PortalThemeWrapper>,
-          anchorElementRef.current,
+          anchorElement,
         );
       }}
       onQueryChange={setQueryString}

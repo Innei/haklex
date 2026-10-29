@@ -1,25 +1,14 @@
-import { PortalThemeWrapper, usePortalContainer } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { ElementNode, LexicalEditor, LexicalNode } from 'lexical';
-import { $getNodeByKey, $getRoot } from 'lexical';
-import type {
-  ClipboardEvent,
-  CompositionEvent,
-  DragEvent,
-  FocusEvent,
-  FormEvent,
-  KeyboardEvent,
-  MouseEvent,
-  PointerEvent,
-  ReactElement,
-  SyntheticEvent,
-} from 'react';
+import { $getNodeByKey, $getRoot, $getSelection, $isRangeSelection } from 'lexical';
+import type { KeyboardEvent, ReactElement, SyntheticEvent } from 'react';
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import * as styles from './styles.css';
 
 const RICH_QUOTE_TYPE = 'rich-quote';
+const SLOT_ATTR = 'data-quote-attribution-slot';
 
 interface RichQuoteLike extends ElementNode {
   getAttribution: () => string | null;
@@ -35,9 +24,7 @@ function $isRichQuoteLike(node: LexicalNode | null | undefined): node is RichQuo
 function $collectQuotes(): RichQuoteLike[] {
   const out: RichQuoteLike[] = [];
   const visit = (node: LexicalNode) => {
-    if ($isRichQuoteLike(node)) {
-      out.push(node);
-    }
+    if ($isRichQuoteLike(node)) out.push(node);
     if ('getChildren' in node && typeof (node as ElementNode).getChildren === 'function') {
       for (const child of (node as ElementNode).getChildren()) visit(child);
     }
@@ -46,206 +33,188 @@ function $collectQuotes(): RichQuoteLike[] {
   return out;
 }
 
+function $activeQuoteKey(): string | null {
+  const selection = $getSelection();
+  if (!$isRangeSelection(selection)) return null;
+  let node: LexicalNode | null = selection.anchor.getNode();
+  while (node) {
+    if ($isRichQuoteLike(node)) return node.getKey();
+    node = node.getParent();
+  }
+  return null;
+}
+
+function findSlot(quote: HTMLElement | null): HTMLElement | null {
+  if (!quote) return null;
+  for (const child of quote.children) {
+    if (child.hasAttribute(SLOT_ATTR)) return child as HTMLElement;
+  }
+  return null;
+}
+
 interface QuoteEntry {
   attribution: string;
-  dom: HTMLElement;
   key: string;
-}
-
-interface Rect {
-  height: number;
-  left: number;
-  top: number;
-  width: number;
-}
-
-function readRect(dom: HTMLElement): Rect {
-  const r = dom.getBoundingClientRect();
-  return { top: r.top, left: r.left, width: r.width, height: r.height };
-}
-
-function rectsEqual(a: Rect | null, b: Rect | null): boolean {
-  if (a === b) return true;
-  if (!a || !b) return false;
-  return a.top === b.top && a.left === b.left && a.width === b.width && a.height === b.height;
+  slot: HTMLElement;
 }
 
 export function QuoteAttributionPlugin(): ReactElement | null {
   const [editor] = useLexicalComposerContext();
-  const portalContainer = usePortalContainer();
   const [quotes, setQuotes] = useState<QuoteEntry[]>([]);
+  const [activeKey, setActiveKey] = useState<string | null>(null);
+  const [editable, setEditable] = useState(() => editor.isEditable());
+
+  useEffect(() => editor.registerEditableListener(setEditable), [editor]);
 
   useEffect(() => {
     const collect = () => {
       editor.getEditorState().read(() => {
         const list: QuoteEntry[] = [];
         for (const node of $collectQuotes()) {
-          const dom = editor.getElementByKey(node.getKey());
-          if (dom) {
-            list.push({
-              key: node.getKey(),
-              attribution: node.getAttribution() ?? '',
-              dom,
-            });
-          }
+          const slot = findSlot(editor.getElementByKey(node.getKey()));
+          if (slot)
+            list.push({ key: node.getKey(), attribution: node.getAttribution() ?? '', slot });
         }
         setQuotes(list);
+        setActiveKey($activeQuoteKey());
       });
     };
-    collect();
-    return editor.registerUpdateListener(() => collect());
+    const removeRoot = editor.registerRootListener(() => queueMicrotask(collect));
+    const removeUpdate = editor.registerUpdateListener(collect);
+    return () => {
+      removeRoot();
+      removeUpdate();
+    };
   }, [editor]);
 
-  if (!editor.isEditable()) return null;
-  if (quotes.length === 0) return null;
-
-  return createPortal(
-    <PortalThemeWrapper>
-      {quotes.map((q) => (
-        <QuotePanel
-          attribution={q.attribution}
-          editor={editor}
-          key={q.key}
-          quoteDom={q.dom}
-          quoteKey={q.key}
-        />
-      ))}
-    </PortalThemeWrapper>,
-    portalContainer,
+  return (
+    <>
+      {quotes.map((quote) =>
+        createPortal(
+          <QuoteAttribution
+            active={quote.key === activeKey}
+            attribution={quote.attribution}
+            editable={editable}
+            editor={editor}
+            quoteKey={quote.key}
+            slot={quote.slot}
+          />,
+          quote.slot,
+          quote.key,
+        ),
+      )}
+    </>
   );
 }
 
-interface QuotePanelProps {
+interface QuoteAttributionProps {
+  active: boolean;
   attribution: string;
+  editable: boolean;
   editor: LexicalEditor;
-  quoteDom: HTMLElement;
   quoteKey: string;
+  slot: HTMLElement;
 }
 
-function QuotePanel({
+const stop = (event: SyntheticEvent) => event.stopPropagation();
+
+function QuoteAttribution({
+  active,
   attribution,
+  editable,
   editor,
-  quoteDom,
   quoteKey,
-}: QuotePanelProps): ReactElement | null {
-  const [rect, setRect] = useState<Rect | null>(null);
+  slot,
+}: QuoteAttributionProps): ReactElement | null {
   const [value, setValue] = useState(attribution);
   const [focused, setFocused] = useState(false);
 
-  // Keep local input value in sync with the node's attribution, except while
-  // the user is actively editing (so commits-in-progress don't get reverted).
   useEffect(() => {
     if (!focused) setValue(attribution);
   }, [attribution, focused]);
 
   useLayoutEffect(() => {
-    // Mark the quote DOM so its style can reserve room for the floating input
-    // (prevents the last line of quote text from overlapping the attribution).
-    quoteDom.setAttribute('data-attribution-panel', '');
-    let next: Rect | null = null;
-    const sync = () => {
-      const r = readRect(quoteDom);
-      if (!rectsEqual(next, r)) {
-        next = r;
-        setRect(r);
-      }
-    };
-    sync();
-    const ro = new ResizeObserver(sync);
-    ro.observe(quoteDom);
-    window.addEventListener('scroll', sync, true);
-    window.addEventListener('resize', sync);
-    return () => {
-      quoteDom.removeAttribute('data-attribution-panel');
-      ro.disconnect();
-      window.removeEventListener('scroll', sync, true);
-      window.removeEventListener('resize', sync);
-    };
-  }, [quoteDom]);
+    slot.classList.add(styles.slot);
+    slot.toggleAttribute('data-empty', !attribution);
+    slot.toggleAttribute('data-active', active || focused);
+  }, [active, attribution, focused, slot]);
+
+  useLayoutEffect(
+    () => () => {
+      slot.classList.remove(styles.slot);
+      slot.removeAttribute('data-empty');
+      slot.removeAttribute('data-active');
+    },
+    [slot],
+  );
 
   const commit = useCallback(
     (raw: string) => {
-      const trimmed = raw.trim();
+      const next = raw.trim() || null;
+      if (next === (attribution || null)) return;
       editor.update(() => {
         const node = $getNodeByKey(quoteKey);
-        if ($isRichQuoteLike(node)) {
-          node.setAttribution(trimmed || null);
-        }
+        if ($isRichQuoteLike(node)) node.setAttribution(next);
       });
     },
-    [editor, quoteKey],
+    [attribution, editor, quoteKey],
   );
 
   const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      e.stopPropagation();
-      if (e.key === 'Enter') {
-        e.preventDefault();
+    (event: KeyboardEvent<HTMLInputElement>) => {
+      event.stopPropagation();
+      if (event.key === 'Enter') {
+        event.preventDefault();
         commit(value);
-        e.currentTarget.blur();
+        event.currentTarget.blur();
         editor.focus();
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
+      } else if (event.key === 'Escape') {
+        event.preventDefault();
         setValue(attribution);
-        e.currentTarget.blur();
+        event.currentTarget.blur();
         editor.focus();
       }
     },
     [attribution, commit, editor, value],
   );
 
-  const stop = useCallback((e: SyntheticEvent) => {
-    e.stopPropagation();
-  }, []);
-
-  if (!rect) return null;
+  if (!editable) {
+    return attribution ? <span className={styles.text}>— {attribution}</span> : null;
+  }
 
   return (
-    <div
-      className={styles.overlay}
-      style={{
-        top: `${rect.top}px`,
-        left: `${rect.left}px`,
-        width: `${rect.width}px`,
-        height: `${rect.height}px`,
-      }}
-    >
-      <div
-        className={`${styles.panel} ${styles.semanticClassNames.panel}`}
-        contentEditable={false}
-        data-lexical-editor="false"
-      >
-        <input
-          className={`${styles.input} ${styles.semanticClassNames.input}`}
-          placeholder="— Author, Work"
-          type="text"
-          value={value}
-          onBeforeInput={stop as (e: FormEvent<HTMLInputElement>) => void}
-          onClick={stop as (e: MouseEvent<HTMLInputElement>) => void}
-          onCompositionEnd={stop as (e: CompositionEvent<HTMLInputElement>) => void}
-          onCompositionStart={stop as (e: CompositionEvent<HTMLInputElement>) => void}
-          onCompositionUpdate={stop as (e: CompositionEvent<HTMLInputElement>) => void}
-          onCopy={stop as (e: ClipboardEvent<HTMLInputElement>) => void}
-          onCut={stop as (e: ClipboardEvent<HTMLInputElement>) => void}
-          onDragStart={stop as (e: DragEvent<HTMLInputElement>) => void}
-          onDrop={stop as (e: DragEvent<HTMLInputElement>) => void}
-          onFocus={() => setFocused(true)}
-          onInput={stop as (e: FormEvent<HTMLInputElement>) => void}
-          onKeyDown={handleKeyDown}
-          onKeyUp={stop as (e: KeyboardEvent<HTMLInputElement>) => void}
-          onMouseDown={stop as (e: MouseEvent<HTMLInputElement>) => void}
-          onPaste={stop as (e: ClipboardEvent<HTMLInputElement>) => void}
-          onPointerDown={stop as (e: PointerEvent<HTMLInputElement>) => void}
-          onBlur={(e: FocusEvent<HTMLInputElement>) => {
-            setFocused(false);
-            commit(e.currentTarget.value);
-          }}
-          onChange={(e) => {
-            e.stopPropagation();
-            setValue(e.target.value);
-          }}
-        />
-      </div>
-    </div>
+    <label className={styles.field}>
+      <span aria-hidden className={styles.dash}>
+        —
+      </span>
+      <input
+        aria-label="Quote attribution"
+        className={styles.input}
+        placeholder="Author, Work"
+        type="text"
+        value={value}
+        onBeforeInput={stop}
+        onChange={(event) => setValue(event.target.value)}
+        onClick={stop}
+        onCompositionEnd={stop}
+        onCompositionStart={stop}
+        onCompositionUpdate={stop}
+        onCopy={stop}
+        onCut={stop}
+        onDragStart={stop}
+        onDrop={stop}
+        onFocus={() => setFocused(true)}
+        onInput={stop}
+        onKeyDown={handleKeyDown}
+        onKeyUp={stop}
+        onMouseDown={stop}
+        onPaste={stop}
+        onPointerDown={stop}
+        onBlur={(event) => {
+          setFocused(false);
+          commit(event.currentTarget.value);
+        }}
+      />
+    </label>
   );
 }

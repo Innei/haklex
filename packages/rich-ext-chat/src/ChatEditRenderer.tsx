@@ -1,5 +1,5 @@
 import { useColorScheme } from '@haklex/rich-editor/static';
-import { presentDialog } from '@haklex/rich-editor-ui';
+import { confirmDiscardChanges, presentDialog } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import { Pencil } from 'lucide-react';
 import type { FC } from 'react';
@@ -41,20 +41,33 @@ export const ChatEditRenderer: FC<ChatEditRendererProps> = ({
   const colorScheme = useColorScheme();
 
   const openEditor = useCallback(() => {
+    let dirty = false;
+    let saved = false;
     presentDialog({
-      content: ({ dismiss }) => (
+      content: ({ dismiss, requestDismiss }) => (
         <ChatEditorModal
           dismiss={dismiss}
           initial={{ variant, participants, messages }}
-          onCancel={onCancel}
-          onCommit={onChange}
+          requestDismiss={requestDismiss}
+          onCommit={(next) => {
+            saved = true;
+            onChange?.(next);
+          }}
+          onDirtyChange={(next) => {
+            dirty = next;
+          }}
         />
       ),
       className: editorDialogPopup,
       portalClassName,
       theme: colorScheme,
+      width: 920,
+      sheet: 'auto',
       showCloseButton: false,
-      clickOutsideToDismiss: false,
+      confirmDismiss: () => !dirty || confirmDiscardChanges(),
+      onClose: () => {
+        if (!saved) onCancel?.();
+      },
     });
   }, [variant, participants, messages, onChange, onCancel, portalClassName, colorScheme]);
 

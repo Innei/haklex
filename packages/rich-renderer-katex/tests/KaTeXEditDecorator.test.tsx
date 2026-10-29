@@ -22,10 +22,8 @@ vi.mock('@haklex/rich-editor/renderers', () => ({
   KaTeXRenderer: () => null,
 }));
 
-vi.mock('@haklex/rich-editor-ui', () => ({
-  ActionBar: ({ children }: { children: React.ReactNode }) => <>{children}</>,
-  ActionButton: ({ children }: { children: React.ReactNode }) => <button>{children}</button>,
-  AnimatedTabs: () => null,
+vi.mock('@haklex/rich-editor-ui', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@haklex/rich-editor-ui')>()),
   Popover: ({ children }: { children: React.ReactNode }) => <>{children}</>,
   PopoverPanel: (props: Record<string, unknown> & { children?: React.ReactNode }) => {
     capturedPanelProps = props;
@@ -33,83 +31,6 @@ vi.mock('@haklex/rich-editor-ui', () => ({
   },
   PopoverTrigger: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-
-vi.mock('../src/styles.css', () => {
-  const semanticClassNames = {
-    editWrapper: '',
-    panel: '',
-    header: '',
-    headerLeft: '',
-    iconWrap: '',
-    title: '',
-    headerRight: '',
-    mode: '',
-    deleteButton: '',
-    tabs: '',
-    bodyScrollArea: '',
-    body: '',
-    field: '',
-    label: '',
-    inputWrap: '',
-    textarea: '',
-    inputActions: '',
-    preview: '',
-    previewEmpty: '',
-    snippetSearchWrap: '',
-    snippetSearchIcon: '',
-    snippetSearchInput: '',
-    snippetGroups: '',
-    snippetGroup: '',
-    snippetGroupLabel: '',
-    snippetList: '',
-    snippetButton: '',
-    snippetMeta: '',
-    snippetName: '',
-    snippetHint: '',
-    snippetPreview: '',
-    snippetsPlaceholder: '',
-    footer: '',
-    charCount: '',
-  };
-
-  return {
-    semanticClassNames,
-    editWrapper: '',
-    panel: '',
-    header: '',
-    headerLeft: '',
-    iconWrap: '',
-    title: '',
-    headerRight: '',
-    mode: '',
-    deleteButton: '',
-    tabs: '',
-    bodyScrollArea: '',
-    body: '',
-    field: '',
-    label: '',
-    inputWrap: '',
-    textarea: '',
-    inputActions: '',
-    preview: '',
-    previewEmpty: '',
-    snippetSearchWrap: '',
-    snippetSearchIcon: '',
-    snippetSearchInput: '',
-    snippetGroups: '',
-    snippetGroup: '',
-    snippetGroupLabel: '',
-    snippetList: '',
-    snippetButton: '',
-    snippetMeta: '',
-    snippetName: '',
-    snippetHint: '',
-    snippetPreview: '',
-    snippetsPlaceholder: '',
-    footer: '',
-    charCount: '',
-  };
-});
 
 describe('KaTeXEditDecorator', () => {
   beforeEach(() => {

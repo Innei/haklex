@@ -1,86 +1,77 @@
+import { autoUpdate, flip, offset, shift, useFloating } from '@floating-ui/react-dom';
+import { useEffect } from 'react';
+
 import type { MentionMenuItem } from './MentionMenuItem';
 import * as css from './styles.css';
 
 interface MentionMenuListProps {
+  anchorElement: HTMLElement;
+  heading?: string;
+  hint?: string;
   options: MentionMenuItem[];
-  phase: 1 | 2;
   selectedIndex: number | null;
   selectOptionAndCleanUp: (option: MentionMenuItem) => void;
   setHighlightedIndex: (index: number) => void;
 }
 
 export function MentionMenuList({
+  anchorElement,
+  heading,
+  hint,
   options,
   selectedIndex,
   selectOptionAndCleanUp,
   setHighlightedIndex,
-  phase,
 }: MentionMenuListProps) {
-  if (phase === 2) {
-    const item = options[0];
-    if (!item) return null;
+  const { refs, floatingStyles } = useFloating({
+    placement: 'bottom-start',
+    strategy: 'absolute',
+    middleware: [
+      offset(8),
+      flip({ fallbackPlacements: ['top-start'], padding: 8 }),
+      shift({ padding: 8 }),
+    ],
+    whileElementsMounted: autoUpdate,
+  });
 
-    return (
-      <div className={css.mentionMenu}>
-        <div className={css.phase2Container}>
-          <div className={css.platformTag}>
-            <span className={css.platformTagIcon}>{item.icon}</span>
-            {item.description.split(' — ')[0]}
-          </div>
-          {item.handleText ? (
-            <ul role="listbox" style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-              <li
-                aria-selected={selectedIndex === 0}
-                className={css.mentionMenuItem}
-                ref={item.setRefElement}
-                role="option"
-                style={{ margin: 0 }}
-                tabIndex={-1}
-                onClick={() => selectOptionAndCleanUp(item)}
-                onMouseEnter={() => setHighlightedIndex(0)}
-              >
-                <span className={css.mentionMenuItemText}>
-                  <span className={css.mentionMenuItemTitle}>@{item.handleText}</span>
-                  <span className={css.mentionMenuItemDescription}>Enter to confirm</span>
-                </span>
-              </li>
-            </ul>
-          ) : (
-            <div className={css.phase2Hint}>Type username, Enter to confirm</div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  if (options.length === 0) {
-    return (
-      <div className={css.mentionMenu}>
-        <div className={css.mentionMenuHint}>No matching platforms</div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    refs.setReference(anchorElement);
+  }, [anchorElement, refs]);
 
   return (
-    <ul className={css.mentionMenu} role="listbox">
-      {options.map((item, index) => (
-        <li
-          aria-selected={index === selectedIndex}
-          className={css.mentionMenuItem}
-          key={item.key}
-          ref={item.setRefElement}
-          role="option"
-          tabIndex={-1}
-          onClick={() => selectOptionAndCleanUp(item)}
-          onMouseEnter={() => setHighlightedIndex(index)}
-        >
-          <span className={css.mentionMenuItemIcon}>{item.icon}</span>
-          <span className={css.mentionMenuItemText}>
-            <span className={css.mentionMenuItemTitle}>{item.label}</span>
-            <span className={css.mentionMenuItemDescription}>{item.description}</span>
-          </span>
-        </li>
-      ))}
-    </ul>
+    <div className={css.mentionMenu} ref={refs.setFloating} style={floatingStyles}>
+      {heading && <div className={css.mentionMenuHeading}>{heading}</div>}
+      {options.length === 0 ? (
+        <div className={css.mentionMenuEmpty}>{hint ?? 'No matches'}</div>
+      ) : (
+        <ul className={css.mentionMenuList} role="listbox">
+          {options.map((item, index) => (
+            <li
+              aria-selected={index === selectedIndex}
+              className={css.mentionMenuItem}
+              key={item.key}
+              ref={item.setRefElement}
+              role="option"
+              tabIndex={-1}
+              aria-label={
+                item.type === 'confirm' ? `${item.handleText} · ${item.label}` : undefined
+              }
+              onClick={() => selectOptionAndCleanUp(item)}
+              onMouseEnter={() => setHighlightedIndex(index)}
+            >
+              <span aria-hidden className={css.mentionMenuItemIcon}>
+                {item.icon}
+              </span>
+              <span className={css.mentionMenuItemTitle}>
+                {item.type === 'confirm' ? item.handleText : item.label}
+              </span>
+              <span className={css.mentionMenuItemEnd}>
+                {item.type === 'confirm' ? item.label : item.description}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
   );
 }

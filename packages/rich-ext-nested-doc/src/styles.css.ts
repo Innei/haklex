@@ -40,68 +40,18 @@ export const rendererContent = style({
 export const dialogPopup = style({});
 
 globalStyle(`${dialogPopup}${dialogPopup}`, {
-  padding: 0,
-  gap: 0,
-  width: '900px',
-  maxWidth: '90vw',
-  maxHeight: 'min(900px, calc(100vh - 1rem))',
+  display: 'flex',
+  flexDirection: 'column',
+  height: 'min(800px, calc(100vh - 1rem))',
   overflow: 'hidden',
 });
 
 export const dialogShell = style({
-  display: 'grid',
-  gridTemplateRows: 'auto minmax(0, 1fr) auto',
-  height: 'min(800px, calc(100vh - 1rem))',
+  display: 'flex',
+  flexDirection: 'column',
+  flex: 1,
+  minHeight: 0,
   background: vars.color.bg,
-});
-
-export const dialogHeader = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '0 0.5rem 0 1rem',
-  height: 48,
-  borderBottom: `1px solid ${vars.color.border}`,
-  flexShrink: 0,
-});
-
-export const dialogHeaderLeft = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-});
-
-export const dialogTitle = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  margin: 0,
-  fontSize: vars.typography.fontSizeMd,
-  fontWeight: 500,
-  color: vars.color.text,
-});
-
-export const dialogHeaderRight = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-});
-
-export const dialogHeaderCloseBtn = style({
-  'display': 'inline-flex',
-  'alignItems': 'center',
-  'justifyContent': 'center',
-  'width': 28,
-  'height': 28,
-  'borderRadius': '0.25rem',
-  'border': 'none',
-  'background': 'none',
-  'cursor': 'pointer',
-  'color': vars.color.textSecondary,
-  'transition': 'color 0.15s',
-  ':hover': {
-    color: vars.color.text,
-  },
 });
 
 export const dialogToolbarSection = style({
@@ -130,7 +80,6 @@ globalStyle(`${dialogToolbar} > div`, {
 });
 
 export const editorArea = style({
-  minHeight: 0,
   overflow: 'hidden',
   background: `linear-gradient(180deg, color-mix(in srgb, ${vars.color.text} 2%, transparent), transparent)`,
 });
@@ -187,14 +136,6 @@ export const editorEditable = style({
   padding: '1.25rem 1.5rem 1.75rem',
   outline: 'none',
   overflow: 'visible',
-});
-
-export const dialogFooter = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  padding: '0.5rem 0.75rem',
-  borderTop: `1px solid ${vars.color.border}`,
 });
 
 export const staticOverlayRoot = style({

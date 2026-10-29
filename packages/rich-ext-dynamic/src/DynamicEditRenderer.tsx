@@ -1,26 +1,70 @@
 import { useEditorBlock, useRendererMode } from '@haklex/rich-editor/static';
 import {
-  ActionBar,
   ActionButton,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  Field,
+  Kbd,
   Popover,
+  PopoverBody,
+  PopoverFooter,
+  PopoverHeader,
   PopoverPanel,
   PopoverTrigger,
+  TextInput,
+  toast,
+  useLiveEdit,
 } from '@haklex/rich-editor-ui';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import type { NodeKey } from 'lexical';
-import { $getNodeByKey } from 'lexical';
-import { Braces, Link2, Ruler, Settings2, Trash2 } from 'lucide-react';
-import { useCallback, useEffect, useState } from 'react';
+import { $getNodeByKey, HISTORY_MERGE_TAG, UNDO_COMMAND } from 'lexical';
+import { Blocks, Ellipsis, Settings2, Trash2 } from 'lucide-react';
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import { DynamicHostRenderer } from './DynamicHostRenderer';
-import type { DynamicNode } from './DynamicNode';
-import { $isDynamicNode, DEFAULT_DYNAMIC_HEIGHT } from './DynamicNode';
+import { $isDynamicNode } from './DynamicNode';
 import { DynamicSSRRenderer } from './DynamicSSRRenderer';
 import type { DynamicSlotProps } from './slot';
 import * as css from './styles.css';
 
+const URL_APPLY_DELAY = 500;
+
 export interface DynamicEditRendererProps extends DynamicSlotProps {
   nodeKey: NodeKey;
+}
+
+interface DynamicMeta {
+  height: number;
+  props: Record<string, unknown>;
+  url: string;
+}
+
+function isModuleUrl(value: string): boolean {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === 'https:' || parsed.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
+function parseProps(text: string): { error: string } | { value: Record<string, unknown> } {
+  try {
+    const value = JSON.parse(text.trim() || '{}');
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return { error: 'Props must be a JSON object' };
+    }
+    return { value: value as Record<string, unknown> };
+  } catch {
+    return { error: 'Invalid JSON' };
+  }
+}
+
+function parseHeight(text: string): number | undefined {
+  const value = Number(text);
+  return Number.isFinite(value) && value > 0 ? Math.round(value) : undefined;
 }
 
 export function DynamicEditRenderer(props: DynamicEditRendererProps) {
@@ -47,65 +91,89 @@ function DynamicEditRendererInner({
 }: DynamicEditRendererProps) {
   const [editor] = useLexicalComposerContext();
   const binding = useEditorBlock();
+  const id = useId();
+  const urlTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [open, setOpen] = useState(!url);
   const [editUrl, setEditUrl] = useState(url);
   const [editHeight, setEditHeight] = useState(String(initialHeight));
   const [editProps, setEditProps] = useState(() => JSON.stringify(componentProps ?? {}, null, 2));
   const [propsError, setPropsError] = useState<string | null>(null);
+
   useEffect(() => {
     if (open) return binding?.retain();
   }, [binding, open]);
   useEffect(() => setOpen(!url), [binding?.blockId]);
 
-  const resetDraft = useCallback(() => {
+  const values = useMemo<DynamicMeta>(
+    () => ({ url, props: componentProps ?? {}, height: initialHeight }),
+    [url, componentProps, initialHeight],
+  );
+
+  const writeNode = useCallback(
+    (patch: Partial<DynamicMeta>, merge: boolean) => {
+      editor.update(
+        () => {
+          const node = $getNodeByKey(nodeKey);
+          if (!$isDynamicNode(node)) return;
+          if (patch.url !== undefined) node.setUrl(patch.url);
+          if (patch.props !== undefined) node.setProps(patch.props);
+          if (patch.height !== undefined) node.setInitialHeight(patch.height);
+        },
+        merge ? { tag: HISTORY_MERGE_TAG } : undefined,
+      );
+    },
+    [editor, nodeKey],
+  );
+
+  const { apply, revert } = useLiveEdit(values, open, writeNode);
+
+  const cancelPendingUrl = useCallback(() => {
+    if (urlTimerRef.current) clearTimeout(urlTimerRef.current);
+    urlTimerRef.current = null;
+  }, []);
+
+  useEffect(() => cancelPendingUrl, [cancelPendingUrl]);
+
+  useEffect(() => {
+    if (!open) return;
     setEditUrl(url);
     setEditHeight(String(initialHeight));
     setEditProps(JSON.stringify(componentProps ?? {}, null, 2));
     setPropsError(null);
-  }, [url, initialHeight, componentProps]);
-
-  useEffect(() => {
-    resetDraft();
-  }, [resetDraft]);
-
-  const commitChanges = useCallback(() => {
-    let parsedProps: Record<string, unknown>;
-    try {
-      const value = JSON.parse(editProps.trim() || '{}');
-      if (!value || typeof value !== 'object' || Array.isArray(value)) {
-        setPropsError('Props must be a JSON object');
-        return;
-      }
-      parsedProps = value as Record<string, unknown>;
-    } catch {
-      setPropsError('Invalid JSON');
-      return;
-    }
-
-    const parsedHeight = Number(editHeight);
-    const nextHeight =
-      Number.isFinite(parsedHeight) && parsedHeight > 0 ? parsedHeight : DEFAULT_DYNAMIC_HEIGHT;
-
-    editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
-      if (!$isDynamicNode(node)) return;
-      const dynamicNode = node as DynamicNode;
-      dynamicNode.setUrl(editUrl.trim());
-      dynamicNode.setProps(parsedProps);
-      dynamicNode.setInitialHeight(nextHeight);
-    });
-    setPropsError(null);
-    setOpen(false);
-  }, [editor, nodeKey, editUrl, editHeight, editProps]);
+  }, [open]);
 
   const handleDelete = useCallback(() => {
+    cancelPendingUrl();
     editor.update(() => {
-      const node = $getNodeByKey(nodeKey);
-      node?.remove();
+      $getNodeByKey(nodeKey)?.remove();
     });
     setOpen(false);
-  }, [editor, nodeKey]);
+    toast({
+      title: 'Dynamic component deleted',
+      action: {
+        label: 'Undo',
+        onClick: () => editor.dispatchCommand(UNDO_COMMAND, undefined),
+      },
+    });
+  }, [cancelPendingUrl, editor, nodeKey]);
+
+  const urlInvalid = editUrl.trim() !== '' && !isModuleUrl(editUrl.trim());
+  const heightInvalid = parseHeight(editHeight) === undefined;
+
+  const menu = (
+    <DropdownMenu>
+      <DropdownMenuTrigger render={<ActionButton icon aria-label="More actions" size="md" />}>
+        <Ellipsis />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">
+        <DropdownMenuItem variant="destructive" onClick={handleDelete}>
+          <Trash2 />
+          Delete
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
   return (
     <div className={`${css.root} ${css.semanticClassNames.root}`}>
@@ -125,9 +193,12 @@ function DynamicEditRendererInner({
       )}
       <Popover
         open={open}
-        onOpenChange={(nextOpen: boolean) => {
+        onOpenChange={(nextOpen, details) => {
+          if (!nextOpen && details?.reason === 'escape-key') {
+            cancelPendingUrl();
+            revert();
+          }
           setOpen(nextOpen);
-          if (!nextOpen) resetDraft();
         }}
       >
         <PopoverTrigger
@@ -137,62 +208,80 @@ function DynamicEditRendererInner({
           <Settings2 size={14} />
         </PopoverTrigger>
         <PopoverPanel
+          flush
           className={`${css.editPanel} ${css.semanticClassNames.editPanel}`}
           side="bottom"
-          sideOffset={8}
+          size="lg"
         >
-          <div className={`${css.editField} ${css.semanticClassNames.editField}`}>
-            <Link2
-              className={`${css.editFieldIcon} ${css.semanticClassNames.editFieldIcon}`}
-              size={14}
-            />
-            <input
-              className={`${css.editInput} ${css.semanticClassNames.editInput}`}
-              placeholder="Module URL (ESM)"
-              type="url"
-              value={editUrl}
-              onChange={(e) => setEditUrl(e.target.value)}
-            />
-          </div>
-          <div className={`${css.editField} ${css.semanticClassNames.editField}`}>
-            <Ruler
-              className={`${css.editFieldIcon} ${css.semanticClassNames.editFieldIcon}`}
-              size={14}
-            />
-            <input
-              className={`${css.editInput} ${css.semanticClassNames.editInput}`}
-              min={0}
-              placeholder="Initial height (px)"
-              type="number"
-              value={editHeight}
-              onChange={(e) => setEditHeight(e.target.value)}
-            />
-          </div>
-          <div className={`${css.editField} ${css.semanticClassNames.editField}`}>
-            <Braces
-              className={`${css.editFieldIcon} ${css.semanticClassNames.editFieldIcon}`}
-              size={14}
-            />
-            <textarea
-              className={`${css.editTextarea} ${css.semanticClassNames.editTextarea}`}
-              placeholder='Props JSON, e.g. {"level": 1}'
-              spellCheck={false}
-              value={editProps}
-              onChange={(e) => setEditProps(e.target.value)}
-            />
-          </div>
-          {propsError && (
-            <span className={`${css.editError} ${css.semanticClassNames.editError}`}>
-              {propsError}
-            </span>
-          )}
-          <ActionBar>
-            <ActionButton onClick={commitChanges}>Apply</ActionButton>
-            <ActionButton danger onClick={handleDelete}>
-              <Trash2 />
-              Remove
-            </ActionButton>
-          </ActionBar>
+          <PopoverHeader actions={menu} icon={<Blocks />} title="Dynamic component" />
+          <PopoverBody>
+            <Field
+              error={urlInvalid ? 'Enter an http(s) module URL' : undefined}
+              hint="ES module URL"
+              id={`${id}-url`}
+              label="Module URL"
+            >
+              <TextInput
+                mono
+                id={`${id}-url`}
+                invalid={urlInvalid}
+                placeholder="https://"
+                type="url"
+                value={editUrl}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setEditUrl(next);
+                  cancelPendingUrl();
+                  if (!isModuleUrl(next.trim())) return;
+                  urlTimerRef.current = setTimeout(() => {
+                    urlTimerRef.current = null;
+                    apply({ url: next.trim() });
+                  }, URL_APPLY_DELAY);
+                }}
+              />
+            </Field>
+            <Field
+              error={heightInvalid ? 'Enter a height above 0' : undefined}
+              id={`${id}-height`}
+              label="Initial height"
+            >
+              <TextInput
+                id={`${id}-height`}
+                inputMode="numeric"
+                invalid={heightInvalid}
+                value={editHeight}
+                onChange={(e) => {
+                  setEditHeight(e.target.value);
+                  const height = parseHeight(e.target.value);
+                  if (height !== undefined) apply({ height });
+                }}
+              />
+            </Field>
+            <Field error={propsError} id={`${id}-props`} label="Props">
+              <textarea
+                aria-invalid={propsError ? true : undefined}
+                className={`${css.editTextarea} ${css.semanticClassNames.editTextarea}`}
+                id={`${id}-props`}
+                placeholder='{"level": 1}'
+                spellCheck={false}
+                value={editProps}
+                onChange={(e) => {
+                  setEditProps(e.target.value);
+                  const parsed = parseProps(e.target.value);
+                  if ('error' in parsed) {
+                    setPropsError(parsed.error);
+                    return;
+                  }
+                  setPropsError(null);
+                  apply({ props: parsed.value });
+                }}
+              />
+            </Field>
+          </PopoverBody>
+          <PopoverFooter hint="Changes apply as you type">
+            <Kbd keys="Esc" size="sm" tone="muted" />
+            <span className={css.footerNote}>revert</span>
+          </PopoverFooter>
         </PopoverPanel>
       </Popover>
     </div>

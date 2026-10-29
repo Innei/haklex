@@ -7,7 +7,6 @@ import {
 } from '@haklex/rich-style-token/styles';
 import { globalStyle, style } from '@vanilla-extract/css';
 
-// ─── Menu container ──────────────────────────────────────
 export const slashMenu = style({
   position: 'absolute',
   top: 0,
@@ -27,6 +26,21 @@ export const slashMenu = style({
   padding: 4,
 });
 
+export const slashMenuEmbedded = style({
+  position: 'static',
+  width: '100%',
+  maxHeight: 360,
+  background: 'transparent',
+  borderRadius: 0,
+  boxShadow: 'none',
+});
+
+export const slashMenuList = style({
+  listStyle: 'none',
+  margin: 0,
+  padding: 0,
+});
+
 globalStyle(`${slashMenu}::-webkit-scrollbar`, {
   width: 6,
 });
@@ -40,17 +54,14 @@ globalStyle(`${slashMenu}::-webkit-scrollbar-thumb`, {
   borderRadius: 9999,
 });
 
-// ─── Section wrapper ─────────────────────────────────────
 export const slashMenuSectionWrapper = style({});
 
-// ─── Section divider ─────────────────────────────────────
 export const slashMenuSectionDivider = style({
   height: 1,
   background: vars.color.borderSubtle,
   margin: '4px 0',
 });
 
-// ─── Section header ──────────────────────────────────────
 export const slashMenuSection = style({
   'position': 'sticky',
   'top': 0,
@@ -68,14 +79,12 @@ export const slashMenuSection = style({
   },
 });
 
-// ─── Items container ─────────────────────────────────────
 export const slashMenuItems = style({
   padding: 0,
   listStyle: 'none',
   margin: 0,
 });
 
-// ─── Menu item ───────────────────────────────────────────
 export const slashMenuItem = style({
   display: 'flex',
   alignItems: 'center',
@@ -94,7 +103,6 @@ globalStyle(`${slashMenuItem}:hover, ${slashMenuItem}[aria-selected="true"]`, {
   background: vars.color.fillSecondary,
 });
 
-// ─── Icon ────────────────────────────────────────────────
 export const slashMenuItemIcon = style({
   width: 28,
   height: 28,
@@ -103,14 +111,13 @@ export const slashMenuItemIcon = style({
   justifyContent: 'center',
   fontSize: 14,
   flexShrink: 0,
-  borderRadius: 6,
+  borderRadius: chromeRadius.md,
   background: vars.color.bgElevated,
   border: `1px solid ${vars.color.borderSubtle}`,
   color: vars.color.textSecondary,
   lineHeight: 1,
 });
 
-// ─── Text container ──────────────────────────────────────
 export const slashMenuItemText = style({
   display: 'flex',
   flexDirection: 'column',
@@ -137,9 +144,20 @@ export const slashMenuItemDescription = style({
   textOverflow: 'ellipsis',
 });
 
-// ─── Empty state ─────────────────────────────────────────
 export const slashMenuEmpty = style({
-  padding: '24px 12px',
+  display: 'flex',
+  alignItems: 'center',
+  gap: 8,
+  padding: '10px 8px',
   color: vars.color.textTertiary,
-  textAlign: 'center',
+});
+
+export const slashMenuEmptyHint = style({
+  ...chromeText.label,
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: 4,
+  marginLeft: 'auto',
+  fontWeight: 400,
+  whiteSpace: 'nowrap',
 });

@@ -1,5 +1,5 @@
-import { vars } from '@haklex/rich-style-token/styles';
-import { style } from '@vanilla-extract/css';
+import { chromeRadius, chromeText, vars } from '@haklex/rich-style-token/styles';
+import { globalStyle, style } from '@vanilla-extract/css';
 
 export const container = style({
   display: 'flex',
@@ -152,6 +152,7 @@ export const editOverlay = style({
   gap: 4,
   selectors: {
     [`${editContainer}:hover &`]: { opacity: 1 },
+    '&:focus-visible': { opacity: 1 },
   },
 });
 
@@ -161,9 +162,12 @@ export const editLabel = style({
   gap: 4,
 });
 
-export const editorDialogPopup = style({
-  width: 920,
-  maxWidth: '95vw',
+export const editorDialogPopup = style({});
+globalStyle(`${editorDialogPopup}${editorDialogPopup}`, {
+  display: 'flex',
+  flexDirection: 'column',
+  height: 'min(640px, 85vh)',
+  overflow: 'hidden',
 });
 
 export const semanticClassNames = {
@@ -179,160 +183,121 @@ export const semanticClassNames = {
   editLabel: 'rich-chat-edit-label',
 } as const;
 
-export const modal = style({
-  background: vars.color.bg,
-  color: vars.color.text,
-  borderRadius: 14,
-  width: 920,
-  maxWidth: '95vw',
-  display: 'flex',
-  flexDirection: 'column',
-  overflow: 'hidden',
-});
+const mobile = '(max-width: 640px)';
 
-export const modalHeader = style({
-  padding: '14px 22px',
-  borderBottom: `1px solid ${vars.color.border}`,
-  fontSize: 14,
-  fontWeight: 600,
-  color: vars.color.text,
+export const modal = style({
+  flex: 1,
+  minHeight: 0,
 });
 
 export const modalBody = style({
-  display: 'flex',
-  height: 540,
-});
-
-export const rail = style({
-  width: 280,
-  flexShrink: 0,
-  borderRight: `1px solid ${vars.color.border}`,
-  background: vars.color.bgSecondary,
-  padding: '18px 18px 14px',
-  overflowY: 'auto',
-});
-
-export const pane = style({
-  flex: 1,
-  padding: '14px 22px 18px',
-  overflowY: 'auto',
-  minWidth: 0,
-});
-
-export const sectionLabel = style({
-  fontSize: 11,
-  textTransform: 'uppercase',
-  letterSpacing: '0.08em',
-  color: vars.color.textTertiary,
-  marginBottom: 8,
-  fontWeight: 500,
-  selectors: { '&:not(:first-child)': { marginTop: 22 } },
-});
-
-export const variantStack = style({ display: 'flex', flexDirection: 'column', gap: 6 });
-export const variantPill = style({
-  padding: '9px 11px',
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 8,
-  cursor: 'pointer',
-  background: vars.color.bg,
-  color: vars.color.text,
-  textAlign: 'left',
-});
-export const variantPillActive = style({ borderColor: vars.color.text });
-
-export const variantPillName = style({
-  fontSize: 13,
-  fontWeight: 600,
-});
-export const variantPillHint = style({
-  fontSize: 11,
-  color: vars.color.textTertiary,
-});
-
-export const participantCard = style({
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 8,
-  padding: '9px 10px',
-  background: vars.color.bg,
-  marginBottom: 8,
-});
-export const participantRow = style({
-  display: 'flex',
-  gap: 6,
-  alignItems: 'center',
-  marginBottom: 5,
-});
-export const participantPill = style({
-  fontSize: 9.5,
-  textTransform: 'uppercase',
-  letterSpacing: '0.08em',
-  padding: '2px 6px',
-  borderRadius: 4,
-  background: vars.color.text,
-  color: vars.color.bg,
-  fontWeight: 600,
-});
-export const participantPillUser = style({
-  background: vars.color.textTertiary,
-});
-export const participantLabel = style({
-  fontSize: 10.5,
-  color: vars.color.textTertiary,
-  width: 42,
-});
-export const participantInput = style({
-  flex: 1,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 5,
-  padding: '4px 7px',
-  fontSize: 12.5,
-  background: vars.color.bg,
-  color: vars.color.text,
-  width: 0,
-  outline: 'none',
-  selectors: {
-    '&:focus': {
-      borderColor: `color-mix(in srgb, ${vars.color.text} 40%, transparent)`,
+  'display': 'flex',
+  'overflow': 'hidden',
+  '@media': {
+    [mobile]: {
+      flexDirection: 'column',
+      overflowY: 'auto',
     },
   },
 });
 
+export const rail = style({
+  'width': 280,
+  'flexShrink': 0,
+  'boxSizing': 'border-box',
+  'borderRight': `1px solid ${vars.color.borderSubtle}`,
+  'background': vars.color.bgSecondary,
+  'padding': 16,
+  'overflowY': 'auto',
+  '@media': {
+    [mobile]: {
+      width: 'auto',
+      overflowY: 'visible',
+      borderRight: 'none',
+      borderBottom: `1px solid ${vars.color.borderSubtle}`,
+    },
+  },
+});
+
+export const pane = style({
+  'flex': 1,
+  'padding': 16,
+  'overflowY': 'auto',
+  'minWidth': 0,
+  '@media': {
+    [mobile]: {
+      overflowY: 'visible',
+    },
+  },
+});
+
+export const sectionLabel = style({
+  ...chromeText.label,
+  color: vars.color.textTertiary,
+  marginBottom: 8,
+  selectors: { '&:not(:first-child)': { marginTop: 20 } },
+});
+
+export const participantCard = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'stretch',
+  gap: 8,
+  border: `1px solid ${vars.color.borderSubtle}`,
+  borderRadius: chromeRadius.md,
+  padding: 12,
+  background: vars.color.bg,
+  marginBottom: 8,
+});
+
+export const participantPill = style({
+  ...chromeText.label,
+  alignSelf: 'flex-start',
+  padding: '2px 6px',
+  borderRadius: chromeRadius.sm,
+  background: vars.color.text,
+  color: vars.color.bg,
+});
+
+export const participantPillUser = style({
+  background: vars.color.textTertiary,
+});
+
 export const messageCard = style({
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 10,
-  marginBottom: 10,
+  border: `1px solid ${vars.color.borderSubtle}`,
+  borderRadius: chromeRadius.md,
+  marginBottom: 8,
   overflow: 'hidden',
   background: vars.color.bg,
 });
+
 export const messageHead = style({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  padding: '7px 12px',
+  gap: 8,
+  padding: '6px 8px 6px 12px',
   background: vars.color.bgSecondary,
-  borderBottom: `1px solid ${vars.color.border}`,
+  borderBottom: `1px solid ${vars.color.borderSubtle}`,
 });
+
 export const messageSelect = style({
-  background: vars.color.bg,
-  color: vars.color.text,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: 5,
-  padding: '3px 6px',
-  fontSize: 12,
+  minWidth: 0,
+  maxWidth: 240,
 });
+
 export const messageActions = style({ display: 'flex', gap: 2 });
+
 export const messageTextarea = style({
+  ...chromeText.control,
   width: '100%',
   border: 0,
-  padding: '10px 12px',
+  padding: '8px 12px',
   fontFamily: vars.typography.fontMono,
-  fontSize: 13,
-  lineHeight: 1.55,
   color: vars.color.text,
   background: vars.color.bg,
   resize: 'vertical',
-  minHeight: 70,
+  minHeight: 72,
   boxSizing: 'border-box',
   outline: 'none',
 });
@@ -340,54 +305,5 @@ export const messageTextarea = style({
 export const addMessage = style({
   display: 'flex',
   justifyContent: 'center',
-  margin: '10px 0 4px',
-});
-export const addMessageButton = style({
-  border: `1px dashed ${vars.color.border}`,
-  background: 'transparent',
-  color: vars.color.textTertiary,
-  padding: '6px 14px',
-  borderRadius: 6,
-  fontSize: 13,
-  cursor: 'pointer',
-  selectors: {
-    '&:hover': {
-      color: vars.color.text,
-      borderColor: `color-mix(in srgb, ${vars.color.text} 40%, transparent)`,
-    },
-  },
-});
-
-export const modalFooter = style({
-  padding: '12px 22px',
-  borderTop: `1px solid ${vars.color.border}`,
-  display: 'flex',
-  justifyContent: 'flex-end',
-  gap: 8,
-  background: vars.color.bgSecondary,
-});
-export const button = style({
-  fontSize: 13,
-  padding: '6px 12px',
-  borderRadius: 6,
-  border: `1px solid ${vars.color.border}`,
-  background: vars.color.bg,
-  color: vars.color.text,
-  cursor: 'pointer',
-});
-export const buttonPrimary = style({
-  background: vars.color.text,
-  color: vars.color.bg,
-  borderColor: vars.color.text,
-});
-export const buttonGhost = style({
-  borderColor: 'transparent',
-  background: 'transparent',
-  color: vars.color.textTertiary,
-  selectors: {
-    '&:hover': {
-      color: vars.color.text,
-      background: `color-mix(in srgb, ${vars.color.text} 8%, transparent)`,
-    },
-  },
+  margin: '8px 0 4px',
 });

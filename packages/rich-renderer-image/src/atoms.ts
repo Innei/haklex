@@ -4,7 +4,6 @@ import { atom } from 'jotai';
 import type { CSSProperties, RefObject } from 'react';
 
 export type ImageLoadState = 'loading' | 'loaded' | 'error';
-export type ReplaceMode = 'upload' | 'url';
 
 function getCaptionText(altText: string, caption?: string): string | undefined {
   if (caption) return caption;
@@ -47,22 +46,6 @@ export const toolbarVisibleAtom = atom(
 );
 
 export const focusCaptionOnOpenAtom = atom(false);
-
-// --- Edit form ---
-export const editSrcAtom = atom('');
-export const editAltTextAtom = atom('');
-export const editCaptionAtom = atom('');
-
-// --- Replace panel ---
-export const replaceModeAtom = atom<ReplaceMode>('upload');
-export const replaceUrlAtom = atom('');
-export const replacePreviewAtom = atom<string | null>(null);
-export const replaceMetaAtom = atom<{
-  width: number;
-  height: number;
-} | null>(null);
-export const replaceLoadingAtom = atom(false);
-export const replaceErrorAtom = atom<string | null>(null);
 
 // --- Refs ---
 export const wrapperRefAtom = atom<RefObject<HTMLDivElement | null>>({

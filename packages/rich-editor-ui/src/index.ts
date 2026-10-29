@@ -77,13 +77,16 @@ export {
   DialogTitle,
   DialogTrigger,
 } from './components/dialog';
+export type { ConfirmDiscardOptions } from './components/dialog/confirm';
+export { confirmDiscardChanges } from './components/dialog/confirm';
 export { DialogStackProvider } from './components/dialog/stack';
-export type { DialogStackItem, DialogStackItemProps } from './components/dialog/store';
+export type { DialogStackItem, DialogStackItemProps, DialogWidth } from './components/dialog/store';
 export {
   dismissAllDialogs,
   dismissDialog,
   dismissTopDialog,
   presentDialog,
+  requestDismissDialog,
 } from './components/dialog/store';
 export type {
   DropdownMenuCheckboxItemProps,
@@ -95,6 +98,8 @@ export type {
   DropdownMenuRadioGroupProps,
   DropdownMenuRadioItemProps,
   DropdownMenuSeparatorProps,
+  DropdownMenuSubProps,
+  DropdownMenuSubTriggerProps,
   DropdownMenuTriggerProps,
 } from './components/dropdown-menu';
 export {
@@ -107,27 +112,49 @@ export {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from './components/dropdown-menu';
+export type { FieldProps } from './components/field';
+export { Field } from './components/field';
 export type { KbdIcon, KbdPlatform, KbdProps, KeyDisplay } from './components/kbd';
 export { detectPlatform, Kbd, keyDisplay, parseShortcut, useKbdPlatform } from './components/kbd';
+export type {
+  ModalShellBodyProps,
+  ModalShellFooterProps,
+  ModalShellHeaderProps,
+  ModalShellProps,
+} from './components/modal-shell';
+export {
+  ModalShell,
+  ModalShellBody,
+  ModalShellFooter,
+  ModalShellHeader,
+} from './components/modal-shell';
 export type {
   PopoverArrowProps,
   PopoverCloseProps,
   PopoverDescriptionProps,
+  PopoverFooterProps,
+  PopoverHeaderProps,
   PopoverPanelProps,
   PopoverPopupProps,
   PopoverPortalProps,
   PopoverPositionerProps,
   PopoverProps,
+  PopoverSectionProps,
   PopoverTitleProps,
   PopoverTriggerProps,
 } from './components/popover';
 export {
   Popover,
   PopoverArrow,
+  PopoverBody,
   PopoverClose,
   PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
   PopoverPanel,
   PopoverPopup,
   PopoverPortal,
@@ -165,6 +192,10 @@ export type { SpinnerProps } from './components/spinner';
 export { Spinner } from './components/spinner';
 export type { StatusDotProps } from './components/status-dot';
 export { StatusDot } from './components/status-dot';
+export type { TextInputProps } from './components/text-input';
+export { TextInput, textInputClassName } from './components/text-input';
+export type { ToastItem, ToastOptions, ToastTone } from './components/toast';
+export { dismissToast, toast, ToastViewport, updateToast } from './components/toast';
 export type {
   TooltipContentProps,
   TooltipPopupProps,
@@ -186,4 +217,6 @@ export {
 } from './components/tooltip';
 export type { ViewportGateProps } from './components/viewport-gate';
 export { ViewportGate } from './components/viewport-gate';
+export type { LiveApply } from './hooks/use-live-edit';
+export { useLiveEdit } from './hooks/use-live-edit';
 export { PortalThemeProvider, PortalThemeWrapper, usePortalTheme } from '@haklex/rich-style-token';

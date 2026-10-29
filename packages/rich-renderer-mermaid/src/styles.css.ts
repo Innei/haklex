@@ -1,7 +1,5 @@
-import { vars } from '@haklex/rich-style-token/styles';
+import { focusRing, vars } from '@haklex/rich-style-token/styles';
 import { globalStyle, keyframes, style } from '@vanilla-extract/css';
-
-// ── Display styles ──────────────────────────────────────────────
 
 export const mermaidContainer = style({
   'display': 'flex',
@@ -26,7 +24,9 @@ export const mermaidEditHint = style({
   'top': 8,
   'right': 8,
   'padding': '2px 8px',
+  'border': 'none',
   'borderRadius': 4,
+  'fontFamily': vars.typography.fontFamilySans,
   'fontSize': vars.typography.fontSizeXs,
   'color': vars.color.textSecondary,
   'backgroundColor': `color-mix(in srgb, ${vars.color.bg} 80%, transparent)`,
@@ -36,13 +36,17 @@ export const mermaidEditHint = style({
   'cursor': 'pointer',
   'zIndex': 2,
   'selectors': {
-    [`${mermaidContainer}:hover &`]: {
+    [`${mermaidContainer}:hover &, &:focus-visible`]: {
       opacity: 1,
     },
   },
   ':hover': {
     color: vars.color.text,
     backgroundColor: `color-mix(in srgb, ${vars.color.bg} 95%, transparent)`,
+  },
+  ':focus-visible': {
+    outline: 'none',
+    boxShadow: focusRing,
   },
 });
 
@@ -56,7 +60,7 @@ export const zoomControls = style({
   transition: 'opacity 0.2s',
   zIndex: 2,
   selectors: {
-    [`${mermaidContainer}:hover &`]: {
+    [`${mermaidContainer}:hover &, &:focus-within`]: {
       opacity: 1,
     },
   },
@@ -119,162 +123,40 @@ export const mermaidError = style({
   fontSize: vars.typography.fontSizeMd,
 });
 
-// ── Editor modal styles ─────────────────────────────────────────
-
 const _editorPopup = style({});
 globalStyle(`${_editorPopup}${_editorPopup}`, {
-  'padding': 0,
-  'gap': 0,
-  'display': 'flex',
-  'flexDirection': 'column',
-  'overflow': 'hidden',
-  'width': 'calc(100vw - 2rem)',
-  'height': 'min(680px, 85vh)',
-  'borderRadius': '0.5rem',
-  '@media': {
-    '(min-width: 640px)': {
-      maxWidth: '64rem',
-    },
-  },
+  display: 'flex',
+  flexDirection: 'column',
+  height: 'min(680px, 85vh)',
+  overflow: 'hidden',
 });
 export { _editorPopup as editorPopup };
 
-export const editorHeader = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '0 0.5rem 0 1rem',
-  height: 48,
-  borderBottom: `1px solid ${vars.color.border}`,
-  flexShrink: 0,
-});
-
-export const editorHeaderLeft = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.75rem',
-});
-
-export const editorHeaderRight = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: 4,
-});
-
-export const editorSep = style({
-  width: 1,
-  height: 16,
-  backgroundColor: vars.color.border,
-  flexShrink: 0,
-});
-
-export const editorTitle = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-  fontSize: vars.typography.fontSizeMd,
-  fontWeight: 500,
-  color: vars.color.text,
-});
-
-export const editorTplBtn = style({
-  'padding': '0.25rem 0.5rem',
-  'fontSize': vars.typography.fontSizeXs,
-  'color': vars.color.textSecondary,
-  'background': 'none',
-  'border': 'none',
-  'borderRadius': '0.375rem',
-  'cursor': 'pointer',
-  'transition': 'color 0.15s, background-color 0.15s',
-  ':hover': {
-    color: vars.color.text,
-    backgroundColor: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
-  },
-});
-
-export const editorViewToggle = style({
-  display: 'flex',
-  alignItems: 'center',
-  backgroundColor: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
-  borderRadius: '0.375rem',
-  padding: 2,
-  marginRight: 4,
-});
-
-export const editorViewItem = style({
-  'display': 'inline-flex',
-  'alignItems': 'center',
-  'justifyContent': 'center',
-  'padding': 4,
-  'borderRadius': '0.25rem',
-  'border': 'none',
-  'background': 'none',
-  'cursor': 'pointer',
-  'color': vars.color.textSecondary,
-  'transition': 'color 0.15s, background-color 0.15s, box-shadow 0.15s',
-  ':hover': {
-    color: vars.color.text,
-  },
-});
-
-export const editorViewItemActive = style({
-  backgroundColor: vars.color.bg,
-  color: vars.color.text,
-  boxShadow: vars.boxShadow.menu,
-});
-
-export const editorIconBtn = style({
-  'display': 'inline-flex',
-  'alignItems': 'center',
-  'justifyContent': 'center',
-  'width': 28,
-  'height': 28,
-  'borderRadius': '0.25rem',
-  'border': 'none',
-  'background': 'none',
-  'cursor': 'pointer',
-  'color': vars.color.textSecondary,
-  'transition': 'color 0.15s, background-color 0.15s',
-  ':hover': {
-    color: vars.color.text,
-    backgroundColor: `color-mix(in srgb, ${vars.color.text} 5%, transparent)`,
-  },
+export const editorShell = style({
+  flex: 1,
+  minHeight: 0,
 });
 
 export const editorBody = style({
   display: 'flex',
-  flex: 1,
-  minHeight: 0,
+  overflow: 'hidden',
 });
 
 export const editorPane = style({
   display: 'flex',
   flexDirection: 'column',
-  borderRight: `1px solid ${vars.color.border}`,
+  minWidth: 0,
+  borderRight: `1px solid ${vars.color.borderSubtle}`,
 });
 
 export const editorPaneHalf = style({ width: '50%' });
 export const editorPaneFull = style({ flex: 1 });
 
-export const editorPaneLabel = style({
-  display: 'flex',
-  alignItems: 'center',
-  padding: '0 0.75rem',
-  height: 32,
-  borderBottom: `1px solid ${vars.color.border}`,
-  backgroundColor: `color-mix(in srgb, ${vars.color.text} 2%, transparent)`,
-  flexShrink: 0,
-  fontSize: vars.typography.fontSizeXs,
-  fontWeight: 500,
-  color: vars.color.textSecondary,
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-});
-
 export const editorPreviewPane = style({
   display: 'flex',
   flexDirection: 'column',
   flex: 1,
+  minWidth: 0,
 });
 
 export const editorPreviewWrap = style({
@@ -341,8 +223,6 @@ export const editorPreviewErrorMsg = style({
   overflow: 'hidden',
 });
 
-// ── Code editor ─────────────────────────────────────────────────
-
 export const codeEditor = style({
   position: 'relative',
   display: 'flex',
@@ -388,73 +268,6 @@ export const codeArea = style({
   },
 });
 
-// ── Footer ──────────────────────────────────────────────────────
-
-export const editorFooter = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'flex-end',
-  padding: '0 1rem',
-  height: 44,
-  borderTop: `1px solid ${vars.color.border}`,
-  flexShrink: 0,
-  backgroundColor: `color-mix(in srgb, ${vars.color.text} 1.5%, transparent)`,
+export const footerStatusError = style({
+  color: vars.color.alertCaution,
 });
-
-export const footerStatus = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-});
-
-export const footerStatusDot = style({
-  width: 6,
-  height: 6,
-  borderRadius: '50%',
-  backgroundColor: vars.color.alertTip,
-});
-
-export const footerStatusText = style({
-  fontSize: vars.typography.fontSizeXs,
-  color: vars.color.textSecondary,
-});
-
-export const footerActions = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: '0.5rem',
-});
-
-const footerBtnBase = style({
-  padding: '0.25rem 0.75rem',
-  borderRadius: '0.375rem',
-  fontSize: vars.typography.fontSizeXs,
-  fontWeight: 500,
-  cursor: 'pointer',
-  height: 28,
-  transition: 'background-color 0.15s, border-color 0.15s',
-});
-
-export const footerBtnCancel = style([
-  footerBtnBase,
-  {
-    'backgroundColor': 'transparent',
-    'color': vars.color.textSecondary,
-    'border': `1px solid ${vars.color.border}`,
-    ':hover': {
-      backgroundColor: `color-mix(in srgb, ${vars.color.text} 4%, transparent)`,
-    },
-  },
-]);
-
-export const footerBtnSave = style([
-  footerBtnBase,
-  {
-    'backgroundColor': vars.color.text,
-    'color': vars.color.bg,
-    'border': '1px solid transparent',
-    ':hover': {
-      backgroundColor: `color-mix(in srgb, ${vars.color.text} 85%, transparent)`,
-    },
-  },
-]);

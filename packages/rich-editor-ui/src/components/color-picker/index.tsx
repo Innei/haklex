@@ -1,107 +1,110 @@
-import { ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 import { Popover, PopoverPanel, PopoverTrigger } from '../popover';
+import { TooltipContent, TooltipRoot, TooltipTrigger } from '../tooltip';
 import { PickerView } from './picker-view';
+import { PresetView } from './preset-view';
+import { DEFAULT_COLOR, isDefaultColor } from './presets';
+import type { ColorTarget } from './recent';
+import { pushRecentColor, useRecentColors } from './recent';
 import * as css from './styles.css';
 
-const TEXT_COLORS = [
-  { name: 'Default', value: 'inherit' },
-  { name: 'Gray', value: '#6b7280' },
-  { name: 'Red', value: '#ef4444' },
-  { name: 'Orange', value: '#f97316' },
-  { name: 'Amber', value: '#f59e0b' },
-  { name: 'Green', value: '#22c55e' },
-  { name: 'Teal', value: '#14b8a6' },
-  { name: 'Blue', value: '#3b82f6' },
-  { name: 'Indigo', value: '#6366f1' },
-  { name: 'Purple', value: '#a855f7' },
-  { name: 'Pink', value: '#ec4899' },
-];
+export { BACKGROUND_PRESETS, DEFAULT_COLOR, TEXT_PRESETS } from './presets';
 
 export interface ColorPickerProps {
   className?: string;
+  currentBackground?: string;
   currentColor: string;
   onSelect: (color: string) => void;
+  onSelectBackground?: (color: string) => void;
+  tooltip?: string;
 }
 
-export function ColorPicker({ currentColor, onSelect, className }: ColorPickerProps) {
+export function ColorPicker({
+  currentColor,
+  currentBackground,
+  onSelect,
+  onSelectBackground,
+  className,
+  tooltip,
+}: ColorPickerProps) {
   const [open, setOpen] = useState(false);
   const [view, setView] = useState<'preset' | 'picker'>('preset');
+  const [target, setTarget] = useState<ColorTarget>('text');
+  const recent = useRecentColors(target);
 
-  const displayColor = currentColor === 'inherit' || !currentColor ? 'currentColor' : currentColor;
+  const activeTarget: ColorTarget = onSelectBackground ? target : 'text';
+  const current = activeTarget === 'text' ? currentColor : (currentBackground ?? '');
+  const textColor = isDefaultColor(currentColor) ? 'currentColor' : currentColor;
+  const background = isDefaultColor(currentBackground) ? undefined : currentBackground;
 
   const handleOpenChange = (next: boolean) => {
     setOpen(next);
     if (!next) setView('preset');
   };
 
-  const handlePreset = (value: string) => {
-    onSelect(value);
+  const pick = (value: string) => {
+    if (value !== DEFAULT_COLOR) pushRecentColor(activeTarget, value);
+    if (activeTarget === 'background') onSelectBackground?.(value);
+    else onSelect(value);
     handleOpenChange(false);
   };
 
-  const handleApply = (hex: string) => {
-    onSelect(hex);
-    handleOpenChange(false);
-  };
+  const triggerButton = (
+    <button
+      aria-label="Text color"
+      data-tooltip={tooltip}
+      type="button"
+      onMouseDown={(e) => e.preventDefault()}
+    />
+  );
 
-  const handleCancel = () => handleOpenChange(false);
+  const trigger = (
+    <PopoverTrigger
+      className={`${css.trigger}${className ? ` ${className}` : ''}`}
+      render={triggerButton}
+    >
+      <span className={css.triggerLabel}>
+        <span
+          className={css.triggerLetter}
+          style={{ color: textColor, backgroundColor: background }}
+        >
+          A
+        </span>
+        <span className={css.triggerBar} style={{ backgroundColor: textColor }} />
+      </span>
+      <ChevronDown className={css.triggerChevron} />
+    </PopoverTrigger>
+  );
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger
-        className={`${css.trigger}${className ? ` ${className}` : ''}`}
-        render={<button type="button" onMouseDown={(e) => e.preventDefault()} />}
-      >
-        <span className={css.triggerLabel}>
-          <span className={css.triggerLetter} style={{ color: displayColor }}>
-            A
-          </span>
-          <span className={css.triggerBar} style={{ backgroundColor: displayColor }} />
-        </span>
-        <ChevronDown className={css.triggerChevron} />
-      </PopoverTrigger>
+      {tooltip ? (
+        <TooltipRoot>
+          <TooltipTrigger render={trigger} />
+          <TooltipContent side="bottom">{tooltip}</TooltipContent>
+        </TooltipRoot>
+      ) : (
+        trigger
+      )}
 
-      <PopoverPanel className={css.panel} side="bottom" sideOffset={6}>
+      <PopoverPanel className={css.panel} side="bottom" size="md">
         {view === 'preset' ? (
-          <div className={css.grid}>
-            {TEXT_COLORS.map((color) => (
-              <button
-                aria-label={color.name}
-                aria-pressed={currentColor === color.value}
-                className={css.swatch}
-                key={color.value}
-                type="button"
-                onClick={() => handlePreset(color.value)}
-                onMouseDown={(e) => e.preventDefault()}
-              >
-                <span
-                  className={css.swatchDot}
-                  style={{
-                    backgroundColor: color.value === 'inherit' ? 'currentColor' : color.value,
-                  }}
-                />
-              </button>
-            ))}
-            <button
-              aria-label="Custom color"
-              className={css.swatch}
-              type="button"
-              onClick={() => setView('picker')}
-              onMouseDown={(e) => e.preventDefault()}
-            >
-              <span className={css.addSwatchDot}>
-                <Plus className={css.addSwatchIcon} />
-              </span>
-            </button>
-          </div>
+          <PresetView
+            current={current}
+            recent={recent}
+            target={activeTarget}
+            onCustom={() => setView('picker')}
+            onPick={pick}
+            onTargetChange={onSelectBackground ? setTarget : undefined}
+          />
         ) : (
           <PickerView
-            initialColor={currentColor}
-            onApply={handleApply}
+            initialColor={current}
+            onApply={pick}
             onBack={() => setView('preset')}
-            onCancel={handleCancel}
+            onCancel={() => handleOpenChange(false)}
           />
         )}
       </PopoverPanel>

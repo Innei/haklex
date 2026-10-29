@@ -78,7 +78,31 @@ function collectTsx(dir: string, out: string[] = []): string[] {
   return out;
 }
 
+const editOverlayFile = /(?:Edit|Inspector|Dialog|Modal|Popover|Menu|Toolbar|Panel)[A-Za-z]*\.tsx$/;
+const contentRoots = readdirSync(packagesDir)
+  .filter((name) => name.startsWith('rich-renderer-') || name.startsWith('rich-ext-'))
+  .map((name) => path.join(packagesDir, name, 'src'));
+
+function editOverlayColorViolations() {
+  const found: string[] = [];
+  const rawColor = /(?:color|background(?:color)?):\s*["'](?:#[\da-f]{3,8}|rgba?\()/i;
+  for (const root of contentRoots) {
+    for (const file of collectTsx(root).filter((f) => editOverlayFile.test(f))) {
+      readFileSync(file, 'utf8')
+        .split('\n')
+        .forEach((line, i) => {
+          if (rawColor.test(line)) found.push(`${path.relative(packagesDir, file)}:${i + 1}`);
+        });
+    }
+  }
+  return found;
+}
+
 describe('chrome styles follow the Quiet Ink chrome rules', () => {
+  it('sets no raw colors inline in renderer and extension edit overlays', () => {
+    expect(editOverlayColorViolations()).toEqual([]);
+  });
+
   it('sets no raw hex colors in inline styles', () => {
     expect(inlineColorViolations()).toEqual([]);
   });

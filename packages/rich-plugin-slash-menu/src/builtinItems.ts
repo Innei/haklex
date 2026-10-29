@@ -1,3 +1,4 @@
+import { getCommandGroupLabel, getCommandMeta } from '@haklex/rich-editor/command-registry';
 import {
   INSERT_CHECK_LIST_COMMAND,
   INSERT_ORDERED_LIST_COMMAND,
@@ -9,33 +10,28 @@ import { $setBlocksType } from '@lexical/selection';
 import { INSERT_TABLE_COMMAND } from '@lexical/table';
 import type { LexicalEditor } from 'lexical';
 import { $createParagraphNode, $getSelection, $isRangeSelection } from 'lexical';
-import {
-  Heading1,
-  Heading2,
-  Heading3,
-  List,
-  ListChecks,
-  ListOrdered,
-  Minus,
-  Table,
-  TextQuote,
-  Type,
-} from 'lucide-react';
 import { createElement } from 'react';
 
 import { SlashMenuItem } from './SlashMenuItem';
 
-const SECTION_BASIC = 'BASIC BLOCKS';
-const SECTION_LIST = 'LISTS';
 const ICON_SIZE = 20;
+
+type BuiltinOptions = Omit<ConstructorParameters<typeof SlashMenuItem>[1], 'icon' | 'section'>;
+
+function builtin(id: string, options: BuiltinOptions): SlashMenuItem {
+  const meta = getCommandMeta(id)!;
+  return new SlashMenuItem(meta.title, {
+    ...options,
+    icon: createElement(meta.icon, { size: ICON_SIZE }),
+    description: options.description ?? meta.description,
+    section: getCommandGroupLabel(meta.group),
+  });
+}
 
 export function getBuiltinItems(): SlashMenuItem[] {
   return [
-    new SlashMenuItem('Text', {
-      icon: createElement(Type, { size: ICON_SIZE }),
-      description: 'Plain text block',
+    builtin('paragraph', {
       keywords: ['paragraph', 'text', 'plain'],
-      section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
           const selection = $getSelection();
@@ -45,11 +41,8 @@ export function getBuiltinItems(): SlashMenuItem[] {
         });
       },
     }),
-    new SlashMenuItem('Heading 1', {
-      icon: createElement(Heading1, { size: ICON_SIZE }),
-      description: 'Large section heading',
+    builtin('h1', {
       keywords: ['heading', 'h1', 'title'],
-      section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
           const selection = $getSelection();
@@ -59,11 +52,8 @@ export function getBuiltinItems(): SlashMenuItem[] {
         });
       },
     }),
-    new SlashMenuItem('Heading 2', {
-      icon: createElement(Heading2, { size: ICON_SIZE }),
-      description: 'Medium section heading',
+    builtin('h2', {
       keywords: ['heading', 'h2', 'subtitle'],
-      section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
           const selection = $getSelection();
@@ -73,11 +63,8 @@ export function getBuiltinItems(): SlashMenuItem[] {
         });
       },
     }),
-    new SlashMenuItem('Heading 3', {
-      icon: createElement(Heading3, { size: ICON_SIZE }),
-      description: 'Small section heading',
+    builtin('h3', {
       keywords: ['heading', 'h3'],
-      section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
           const selection = $getSelection();
@@ -87,11 +74,8 @@ export function getBuiltinItems(): SlashMenuItem[] {
         });
       },
     }),
-    new SlashMenuItem('Quote', {
-      icon: createElement(TextQuote, { size: ICON_SIZE }),
-      description: 'Capture a quote',
+    builtin('quote', {
       keywords: ['quote', 'blockquote'],
-      section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.update(() => {
           const selection = $getSelection();
@@ -107,21 +91,15 @@ export function getBuiltinItems(): SlashMenuItem[] {
         });
       },
     }),
-    new SlashMenuItem('Divider', {
-      icon: createElement(Minus, { size: ICON_SIZE }),
-      description: 'Visual separator',
+    builtin('divider', {
       keywords: ['divider', 'hr', 'rule', 'separator'],
-      section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.dispatchCommand(INSERT_HORIZONTAL_RULE_COMMAND, void 0);
       },
     }),
-    new SlashMenuItem('Table', {
-      icon: createElement(Table, { size: ICON_SIZE }),
-      description: 'Add a table',
+    builtin('table', {
       keywords: ['table', 'grid'],
       nested: false,
-      section: SECTION_BASIC,
       onSelect: (editor: LexicalEditor) => {
         editor.dispatchCommand(INSERT_TABLE_COMMAND, {
           columns: '3',
@@ -131,29 +109,20 @@ export function getBuiltinItems(): SlashMenuItem[] {
       },
     }),
 
-    new SlashMenuItem('Bulleted List', {
-      icon: createElement(List, { size: ICON_SIZE }),
-      description: 'Unordered list',
+    builtin('bullet', {
       keywords: ['list', 'bullet', 'unordered'],
-      section: SECTION_LIST,
       onSelect: (editor: LexicalEditor) => {
         editor.dispatchCommand(INSERT_UNORDERED_LIST_COMMAND, void 0);
       },
     }),
-    new SlashMenuItem('Numbered List', {
-      icon: createElement(ListOrdered, { size: ICON_SIZE }),
-      description: 'Ordered list with numbers',
+    builtin('number', {
       keywords: ['list', 'ordered', 'number'],
-      section: SECTION_LIST,
       onSelect: (editor: LexicalEditor) => {
         editor.dispatchCommand(INSERT_ORDERED_LIST_COMMAND, void 0);
       },
     }),
-    new SlashMenuItem('To-do List', {
-      icon: createElement(ListChecks, { size: ICON_SIZE }),
-      description: 'Track tasks with checkboxes',
+    builtin('check', {
       keywords: ['task', 'todo', 'checkbox', 'checklist'],
-      section: SECTION_LIST,
       onSelect: (editor: LexicalEditor) => {
         editor.dispatchCommand(INSERT_CHECK_LIST_COMMAND, void 0);
       },

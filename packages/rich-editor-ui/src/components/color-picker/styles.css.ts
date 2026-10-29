@@ -66,13 +66,29 @@ export const triggerChevron = style({
 
 export const panel = style({
   ...chromeText.control,
-  padding: 8,
-  width: 220,
+  padding: 12,
+});
+
+export const presetView = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 12,
+});
+
+export const section = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 6,
+});
+
+export const sectionLabel = style({
+  ...chromeText.label,
+  color: vars.color.textTertiary,
 });
 
 export const grid = style({
   display: 'grid',
-  gridTemplateColumns: 'repeat(6, 1fr)',
+  gridTemplateColumns: 'repeat(8, 1fr)',
   gap: 4,
 });
 
@@ -111,22 +127,64 @@ globalStyle(`${swatch}[aria-pressed="true"] ${swatchDot}`, {
   boxShadow: `inset 0 0 0 1px ${vars.color.ring}, 0 0 0 2px ${vars.color.bgElevated}, 0 0 0 3.5px ${vars.color.text}`,
 });
 
-export const addSwatchDot = style({
-  width: 16,
-  height: 16,
-  borderRadius: '50%',
+export const defaultDot = style({
+  background: `linear-gradient(135deg, ${vars.color.text} 50%, ${vars.color.bgElevated} 50%)`,
+});
+
+export const backgroundChip = style({
+  ...chromeText.control,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  color: '#fff',
-  background:
-    'conic-gradient(from 0deg, #ef4444, #f59e0b, #22c55e, #3b82f6, #6366f1, #ec4899, #ef4444)',
+  width: 22,
+  height: 22,
+  borderRadius: chromeRadius.sm,
+  fontWeight: 600,
+  color: vars.color.text,
+  boxShadow: `inset 0 0 0 1px ${vars.color.ring}`,
 });
 
-export const addSwatchIcon = style({
-  width: 10,
-  height: 10,
-  strokeWidth: 3,
+globalStyle(`${swatch}[aria-pressed="true"] ${backgroundChip}`, {
+  boxShadow: `inset 0 0 0 1px ${vars.color.ring}, 0 0 0 2px ${vars.color.bgElevated}, 0 0 0 3.5px ${vars.color.text}`,
+});
+
+export const footer = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  paddingTop: 8,
+  borderTop: `1px solid ${vars.color.borderSubtle}`,
+});
+
+export const footerButton = style({
+  'display': 'flex',
+  'alignItems': 'center',
+  'gap': 4,
+  'height': chromeHeight.md,
+  'boxSizing': 'border-box',
+  'padding': '0 6px',
+  'marginLeft': -6,
+  'border': 'none',
+  'background': 'none',
+  'borderRadius': chromeRadius.md,
+  'cursor': 'pointer',
+  ...chromeText.control,
+  'fontFamily': vars.typography.fontFamilySans,
+  'color': vars.color.textSecondary,
+  'outline': 'none',
+  'transition': stateTransition,
+  ':hover': {
+    color: vars.color.text,
+    backgroundColor: vars.color.fillSecondary,
+  },
+  ':focus-visible': {
+    boxShadow: focusRing,
+  },
+});
+
+export const footerIcon = style({
+  width: 14,
+  height: 14,
 });
 
 export const pickerView = style({
