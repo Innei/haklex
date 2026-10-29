@@ -12,10 +12,17 @@ export function VirtualizationPlugin({
   overscan,
   estimateBlockHeight,
   preserveCapacity,
+  selectionMergeLimit,
   priority = 0,
 }: EditorVirtualizationOptions & { priority?: number }) {
   const surface = useMemo(() => {
-    const options = { scrollContainer, overscan, estimateBlockHeight, preserveCapacity };
+    const options = {
+      scrollContainer,
+      overscan,
+      estimateBlockHeight,
+      preserveCapacity,
+      selectionMergeLimit,
+    };
     return function VirtualizationSurface(props: EditorSurfaceProps) {
       return (
         <Suspense fallback={<p role="status">Loading editor…</p>}>
@@ -23,6 +30,6 @@ export function VirtualizationPlugin({
         </Suspense>
       );
     };
-  }, [scrollContainer, overscan, estimateBlockHeight, preserveCapacity]);
+  }, [scrollContainer, overscan, estimateBlockHeight, preserveCapacity, selectionMergeLimit]);
   return <EditorSurfacePlugin priority={priority} surface={surface} />;
 }

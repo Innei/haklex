@@ -43,7 +43,11 @@ export class PreserveNodeManager {
   mount(slot: number, host: HTMLElement, parent: HTMLElement | null, before: Node | null = null) {
     this.hosts.set(slot, host);
     if (parent) {
-      if (host.parentNode !== parent || host.nextSibling !== before)
+      // Moving a host drops the DOM selection and focus inside it, so only reorder when it is out of order.
+      if (
+        host.parentNode !== parent ||
+        (before && !(host.compareDocumentPosition(before) & Node.DOCUMENT_POSITION_FOLLOWING))
+      )
         parent.insertBefore(host, before);
     } else {
       this.parking ??= host.ownerDocument.createDocumentFragment();

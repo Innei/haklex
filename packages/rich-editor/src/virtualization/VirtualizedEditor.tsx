@@ -9,6 +9,8 @@ import {
   $isRangeSelection,
   COMMAND_PRIORITY_CRITICAL,
   KEY_ARROW_DOWN_COMMAND,
+  KEY_ARROW_LEFT_COMMAND,
+  KEY_ARROW_RIGHT_COMMAND,
   KEY_ARROW_UP_COMMAND,
   KEY_BACKSPACE_COMMAND,
   KEY_DELETE_COMMAND,
@@ -40,6 +42,10 @@ function IslandPlugins({ controller, slot }: { controller: EditorRecycler; slot:
         selection.anchor.key === node.getKey() &&
         selection.anchor.offset === (end ? node.getTextContentSize() : 0)
       );
+    };
+    const extend = (key: Parameters<EditorRecycler['extendForKey']>[1]) => {
+      controller.extendForKey(slot, key);
+      return false;
     };
     const unregister = [
       editor.registerCommand(
@@ -79,7 +85,8 @@ function IslandPlugins({ controller, slot }: { controller: EditorRecycler; slot:
       editor.registerCommand(
         KEY_ARROW_UP_COMMAND,
         (event) => {
-          if (!edge(false) || event?.shiftKey || slot.index === 0) return false;
+          if (event?.shiftKey) return extend('up');
+          if (!edge(false) || slot.index === 0) return false;
           event?.preventDefault();
           controller.focusBlock(slot.index - 1, true);
           return true;
@@ -89,13 +96,24 @@ function IslandPlugins({ controller, slot }: { controller: EditorRecycler; slot:
       editor.registerCommand(
         KEY_ARROW_DOWN_COMMAND,
         (event) => {
-          if (!edge(true) || event?.shiftKey) return false;
+          if (event?.shiftKey) return extend('down');
+          if (!edge(true)) return false;
           const index = slot.index + controller.island(slot).ids.length;
           if (index >= controller.rows.length) return false;
           event?.preventDefault();
           controller.focusBlock(index);
           return true;
         },
+        COMMAND_PRIORITY_CRITICAL,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_LEFT_COMMAND,
+        (event) => !!event.shiftKey && extend('left'),
+        COMMAND_PRIORITY_CRITICAL,
+      ),
+      editor.registerCommand(
+        KEY_ARROW_RIGHT_COMMAND,
+        (event) => !!event.shiftKey && extend('right'),
         COMMAND_PRIORITY_CRITICAL,
       ),
     ];
@@ -137,6 +155,7 @@ function EditorSlot({
       blockId: row.id,
       active: slot.active,
       editor: island.editor,
+      documentBlocks: controller.documentBlocks,
       nodeState: (key?: string) => controller.nodeState(slot, key, row.id),
       retain: () => {
         island.retained++;
@@ -276,10 +295,17 @@ export function VirtualizedEditor({
   placeholder,
 }: EditorSurfaceProps & { options: EditorVirtualizationOptions }) {
   const [editor] = useLexicalComposerContext();
-  const { scrollContainer, overscan, estimateBlockHeight, preserveCapacity } = options;
+  const { scrollContainer, overscan, estimateBlockHeight, preserveCapacity, selectionMergeLimit } =
+    options;
   const stableOptions = useMemo(
-    () => ({ scrollContainer, overscan, estimateBlockHeight, preserveCapacity }),
-    [scrollContainer, overscan, estimateBlockHeight, preserveCapacity],
+    () => ({
+      scrollContainer,
+      overscan,
+      estimateBlockHeight,
+      preserveCapacity,
+      selectionMergeLimit,
+    }),
+    [scrollContainer, overscan, estimateBlockHeight, preserveCapacity, selectionMergeLimit],
   );
   const active = useRef<LexicalEditor | null>(null);
   const selectEditor = useCallback(

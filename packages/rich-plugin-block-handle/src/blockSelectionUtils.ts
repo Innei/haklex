@@ -1,4 +1,4 @@
-import { $generateNodesFromDOM } from '@lexical/html';
+import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import {
   $createNodeSelection,
   $createParagraphNode,
@@ -9,6 +9,9 @@ import {
   $isRangeSelection,
   $parseSerializedNode,
   $setSelection,
+  createEditor,
+  type CreateEditorArgs,
+  type Klass,
   type LexicalEditor,
   type LexicalNode,
 } from 'lexical';
@@ -35,11 +38,37 @@ function serializeNodeWithChildren(node: LexicalNode): SerializedNode {
   return serialized;
 }
 
-function getHtmlFromTopLevelNodes(editor: LexicalEditor, nodes: readonly LexicalNode[]): string {
-  return nodes
+function getHtmlFromTopLevelNodes(
+  editor: LexicalEditor,
+  nodes: readonly LexicalNode[],
+  serializedNodes: SerializedNode[],
+): string {
+  const html = nodes
     .map((node) => editor.getElementByKey(node.getKey())?.outerHTML ?? '')
     .filter(Boolean)
     .join('\n');
+  if (html || nodes.length === 0) return html;
+  // Headless editors (the virtualized document) have no rendered DOM to copy from.
+  if (nodes.length === $getRoot().getChildrenSize()) return $generateHtmlFromNodes(editor, null);
+  // Exporting with a selection tests every root child against it, so a subset of a long
+  // document is exported from a detached copy of just those rows instead.
+  const source = editor as LexicalEditor & {
+    _config: CreateEditorArgs;
+    _nodes: Map<string, { klass: Klass<LexicalNode> }>;
+  };
+  const detached = createEditor({
+    html: source._config.html,
+    namespace: source._config.namespace,
+    nodes: [...source._nodes.values()].map(({ klass }) => klass),
+    onError: (error) => {
+      throw error;
+    },
+    theme: source._config.theme,
+  });
+  detached.update(() => $getRoot().append(...serializedNodes.map($parseSerializedNode)), {
+    discrete: true,
+  });
+  return detached.getEditorState().read(() => $generateHtmlFromNodes(detached, null));
 }
 
 export function setBlockClipboardDataTransfer(
@@ -154,7 +183,7 @@ export function buildBlockClipboardData(
   };
   const namespace = lexicalEditor._config.namespace;
   const serializedNodes = nodes.map(serializeNodeWithChildren);
-  const html = getHtmlFromTopLevelNodes(editor, nodes);
+  const html = getHtmlFromTopLevelNodes(editor, nodes, serializedNodes);
 
   return {
     'application/x-lexical-editor': JSON.stringify({

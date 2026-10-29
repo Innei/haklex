@@ -1,5 +1,7 @@
+import { useEditorBlock } from '@haklex/rich-editor';
 import {
   $createNodeSelection,
+  $getNodeByKey,
   $getRoot,
   $getSelection,
   $isElementNode,
@@ -118,12 +120,36 @@ export function useBlockSelection(editor: LexicalEditor) {
   // single-decorator NodeSelections (code-block click, image click, etc.).
   const blockSelectionKeysRef = useRef<Set<string>>(new Set());
   const latestBlockClipboardDataRef = useRef<Record<string, string> | null>(null);
+  const documentBlocks = useEditorBlock()?.documentBlocks;
 
   const clearBlockSelectionState = useCallback(() => {
     blockSelectionKeysRef.current = new Set();
     anchorKeyRef.current = null;
     focusKeyRef.current = null;
-  }, []);
+    documentBlocks?.clear();
+  }, [documentBlocks]);
+
+  const isDocumentSelection = useCallback(
+    () => (documentBlocks?.keys().length ?? 0) > 0,
+    [documentBlocks],
+  );
+
+  const $getDocumentNodes = useCallback(
+    () => (documentBlocks?.keys() ?? []).flatMap((key) => $getNodeByKey(key) ?? []),
+    [documentBlocks],
+  );
+
+  const deleteDocumentBlocks = useCallback(() => {
+    if (!documentBlocks) return;
+    documentBlocks.editor.update(
+      () => removeTopLevelNodesAndRestoreSelection($getDocumentNodes()),
+      {
+        discrete: true,
+      },
+    );
+    clearBlockSelectionState();
+    documentBlocks.focusSelection();
+  }, [$getDocumentNodes, clearBlockSelectionState, documentBlocks]);
 
   const getTopLevelNodesByKeys = useCallback((keys: ReadonlySet<string>): LexicalNode[] => {
     if (keys.size === 0) return [];
@@ -166,6 +192,25 @@ export function useBlockSelection(editor: LexicalEditor) {
       }
 
       let handled = false;
+      if (documentBlocks && isDocumentSelection()) {
+        const master = documentBlocks.editor;
+        master.update(
+          () => {
+            handled = replaceTopLevelNodesWithDataTransfer(
+              master,
+              $getDocumentNodes(),
+              dataTransfer,
+            );
+          },
+          { discrete: true, tag: PASTE_TAG },
+        );
+        if (handled) {
+          clearBlockSelectionState();
+          documentBlocks.focusSelection();
+        }
+        return handled;
+      }
+
       editor.update(
         () => {
           const nodes = getOwnedSelectionNodes();
@@ -183,11 +228,25 @@ export function useBlockSelection(editor: LexicalEditor) {
 
       return handled;
     },
-    [clearBlockSelectionState, editor, getOwnedSelectionNodes],
+    [
+      $getDocumentNodes,
+      clearBlockSelectionState,
+      documentBlocks,
+      editor,
+      getOwnedSelectionNodes,
+      isDocumentSelection,
+    ],
   );
 
   const getCurrentBlockClipboardData = useCallback((): Record<string, string> | null => {
     let clipboardData: Record<string, string> | null = null;
+
+    if (documentBlocks && isDocumentSelection()) {
+      const master = documentBlocks.editor;
+      return master
+        .getEditorState()
+        .read(() => buildBlockClipboardData(master, $getDocumentNodes()));
+    }
 
     editor.getEditorState().read(() => {
       const nodes = getOwnedSelectionNodes();
@@ -197,7 +256,7 @@ export function useBlockSelection(editor: LexicalEditor) {
     });
 
     return clipboardData;
-  }, [editor, getOwnedSelectionNodes]);
+  }, [$getDocumentNodes, documentBlocks, editor, getOwnedSelectionNodes, isDocumentSelection]);
 
   const deleteBlocksByKeys = useCallback(
     (keys: readonly string[]) => {
@@ -218,6 +277,32 @@ export function useBlockSelection(editor: LexicalEditor) {
   // ── DOM class sync + ownership validation ──
   useEffect(() => {
     let prevKeys = new Set<string>();
+
+    // Highlight our owned block selection plus this island's share of a document-level one.
+    const paint = (topLevelKeys: string[]) => {
+      const topLevelKeySet = new Set(topLevelKeys);
+      const highlightKeys = new Set(
+        [...blockSelectionKeysRef.current, ...(documentBlocks?.islandKeys(editor) ?? [])].filter(
+          (key) => topLevelKeySet.has(key),
+        ),
+      );
+
+      for (const key of prevKeys) {
+        if (!highlightKeys.has(key)) {
+          editor.getElementByKey(key)?.classList.remove(css.blockSelected);
+        }
+      }
+      for (const key of highlightKeys) {
+        if (!prevKeys.has(key)) {
+          editor.getElementByKey(key)?.classList.add(css.blockSelected);
+        }
+      }
+
+      prevKeys = highlightKeys;
+    };
+    const repaint = () => paint(editor.getEditorState().read($getTopLevelKeys));
+    const unsubscribe = documentBlocks?.subscribe(repaint);
+    repaint();
 
     const unregister = editor.registerUpdateListener(({ editorState }) => {
       const rootEl = editor.getRootElement();
@@ -280,35 +365,18 @@ export function useBlockSelection(editor: LexicalEditor) {
         }
       }
 
-      // Only apply highlight classes for our owned block selection.
-      const topLevelKeySet = new Set(topLevelKeys);
-      const highlightKeys =
-        blockSelectionKeysRef.current.size > 0
-          ? new Set([...blockSelectionKeysRef.current].filter((key) => topLevelKeySet.has(key)))
-          : new Set<string>();
-
-      for (const key of prevKeys) {
-        if (!highlightKeys.has(key)) {
-          editor.getElementByKey(key)?.classList.remove(css.blockSelected);
-        }
-      }
-      for (const key of highlightKeys) {
-        if (!prevKeys.has(key)) {
-          editor.getElementByKey(key)?.classList.add(css.blockSelected);
-        }
-      }
-
-      prevKeys = highlightKeys;
+      paint(topLevelKeys);
     });
 
     // Cleanup: remove all highlight classes on unmount.
     return () => {
+      unsubscribe?.();
       unregister();
       for (const key of prevKeys) {
         editor.getElementByKey(key)?.classList.remove(css.blockSelected);
       }
     };
-  }, [clearBlockSelectionState, editor]);
+  }, [clearBlockSelectionState, documentBlocks, editor]);
 
   useEffect(() => {
     const rootEl = editor.getRootElement();
@@ -430,7 +498,15 @@ export function useBlockSelection(editor: LexicalEditor) {
 
         const children = $getRoot().getChildren();
         const focusIdx = children.findIndex((c) => c.getKey() === focusKeyRef.current);
-        if (focusIdx === -1 || focusIdx >= children.length - 1) return false;
+        if (focusIdx === -1) return false;
+        if (documentBlocks && (isDocumentSelection() || focusIdx >= children.length - 1)) {
+          event.preventDefault();
+          if (!isDocumentSelection())
+            documentBlocks.select(editor, anchorKeyRef.current!, focusKeyRef.current);
+          documentBlocks.extend(1);
+          return true;
+        }
+        if (focusIdx >= children.length - 1) return false;
 
         event.preventDefault();
         focusKeyRef.current = children[focusIdx + 1].getKey();
@@ -463,7 +539,15 @@ export function useBlockSelection(editor: LexicalEditor) {
 
         const children = $getRoot().getChildren();
         const focusIdx = children.findIndex((c) => c.getKey() === focusKeyRef.current);
-        if (focusIdx === -1 || focusIdx <= 0) return false;
+        if (focusIdx === -1) return false;
+        if (documentBlocks && (isDocumentSelection() || focusIdx <= 0)) {
+          event.preventDefault();
+          if (!isDocumentSelection())
+            documentBlocks.select(editor, anchorKeyRef.current!, focusKeyRef.current);
+          documentBlocks.extend(-1);
+          return true;
+        }
+        if (focusIdx <= 0) return false;
 
         event.preventDefault();
         focusKeyRef.current = children[focusIdx - 1].getKey();
@@ -490,6 +574,7 @@ export function useBlockSelection(editor: LexicalEditor) {
           const children = $getRoot().getChildren();
           const allKeys = children.map((c) => c.getKey());
           if (blockSelectionKeysRef.current.size >= allKeys.length) {
+            documentBlocks?.selectAll();
             return true;
           }
           anchorKeyRef.current = allKeys[0];
@@ -606,18 +691,22 @@ export function useBlockSelection(editor: LexicalEditor) {
         const clipboardEvent =
           event && typeof event === 'object' && 'clipboardData' in event ? event : null;
 
+        const inDocument = isDocumentSelection();
         let keysToDelete: string[] = [];
-        let clipboardData: Record<string, string> | null = null;
+        let clipboardData: Record<string, string> | null = inDocument
+          ? getCurrentBlockClipboardData()
+          : null;
 
-        editor.getEditorState().read(() => {
-          const nodes = getOwnedSelectionNodes();
-          if (nodes.length === 0) return;
+        if (!inDocument)
+          editor.getEditorState().read(() => {
+            const nodes = getOwnedSelectionNodes();
+            if (nodes.length === 0) return;
 
-          clipboardData = buildBlockClipboardData(editor, nodes);
-          keysToDelete = nodes.map((node) => node.getKey());
-        });
+            clipboardData = buildBlockClipboardData(editor, nodes);
+            keysToDelete = nodes.map((node) => node.getKey());
+          });
 
-        if (keysToDelete.length === 0 || !clipboardData) return false;
+        if ((!inDocument && keysToDelete.length === 0) || !clipboardData) return false;
 
         latestBlockClipboardDataRef.current = clipboardData;
 
@@ -636,7 +725,8 @@ export function useBlockSelection(editor: LexicalEditor) {
           writeBlockClipboardDataToNativeClipboard(editor, clipboardData);
         }
 
-        deleteBlocksByKeys(keysToDelete);
+        if (inDocument) deleteDocumentBlocks();
+        else deleteBlocksByKeys(keysToDelete);
         return true;
       },
       COMMAND_PRIORITY_CRITICAL,
@@ -656,6 +746,19 @@ export function useBlockSelection(editor: LexicalEditor) {
           : hasPasteableClipboardData(clipboardData);
         if (!hasPasteData) {
           return false;
+        }
+
+        if (isDocumentSelection()) {
+          if (!replaceBlockSelectionWithDataTransfer(clipboardData)) return false;
+          if (
+            event &&
+            typeof event === 'object' &&
+            'preventDefault' in event &&
+            typeof event.preventDefault === 'function'
+          ) {
+            event.preventDefault();
+          }
+          return true;
         }
 
         const nodes = getOwnedSelectionNodes();
@@ -686,6 +789,19 @@ export function useBlockSelection(editor: LexicalEditor) {
     const handleDeleteBlocks = (
       payload: boolean | Event | InputEvent | KeyboardEvent | null | undefined,
     ) => {
+      if (isDocumentSelection()) {
+        if (
+          payload &&
+          typeof payload !== 'boolean' &&
+          'preventDefault' in payload &&
+          typeof payload.preventDefault === 'function'
+        ) {
+          payload.preventDefault();
+        }
+        deleteDocumentBlocks();
+        return true;
+      }
+
       let keysToDelete: string[] = [];
 
       editor.getEditorState().read(() => {
@@ -747,15 +863,19 @@ export function useBlockSelection(editor: LexicalEditor) {
   }, [
     clearBlockSelectionState,
     deleteBlocksByKeys,
+    deleteDocumentBlocks,
+    documentBlocks,
     editor,
     getCurrentBlockClipboardData,
     getOwnedSelectionNodes,
+    isDocumentSelection,
     replaceBlockSelectionWithDataTransfer,
   ]);
 
   // ── Public API ──
   const selectBlock = useCallback(
     (nodeKey: string, shiftKey: boolean) => {
+      documentBlocks?.clear();
       editor.update(() => {
         if (shiftKey && anchorKeyRef.current) {
           focusKeyRef.current = nodeKey;
@@ -781,7 +901,7 @@ export function useBlockSelection(editor: LexicalEditor) {
         }
       });
     },
-    [editor],
+    [documentBlocks, editor],
   );
 
   const getSelectedKeys = useCallback((): string[] => {

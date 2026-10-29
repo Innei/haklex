@@ -10,5 +10,7 @@ export interface EditorVirtualizationOptions {
   preserveCapacity?: number;
   /** The scrolling viewport, not its content. Defaults to the nearest scrollable ancestor. */
   scrollContainer?: HTMLElement | RefObject<HTMLElement | null> | (() => HTMLElement | null);
+  /** Maximum rows one editing instance may hold while a selection grows across blocks. Defaults to 200. */
+  selectionMergeLimit?: number;
 }
 export type EditorVirtualization = boolean | EditorVirtualizationOptions;

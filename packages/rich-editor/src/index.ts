@@ -9,6 +9,7 @@ export { RichEditorShell } from './components/RichEditorShell';
 export { getVariantClass } from './components/utils';
 export type { ColorScheme } from './context/ColorSchemeContext';
 export { ColorSchemeProvider, useColorScheme } from './context/ColorSchemeContext';
+export type { DocumentBlocks } from './context/EditorBlockContext';
 export {
   useEditorBlock,
   useEditorBlock as useVirtualizedBlock,

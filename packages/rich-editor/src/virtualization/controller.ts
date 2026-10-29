@@ -18,6 +18,7 @@ import { nanoid } from 'nanoid';
 import { flushSync } from 'react-dom';
 
 import { blockIdState } from '../plugins/BlockIdPlugin';
+import { DocumentBlockSelection } from './blocks';
 import { type SerializedBlock, VirtualDocument } from './document';
 import {
   type BlockMetrics,
@@ -31,6 +32,18 @@ import { PreserveNodeManager } from './preserve';
 import { $syncChildren } from './sync';
 import type { EditorVirtualizationOptions } from './types';
 import { resolveScrollContainer } from './viewport';
+
+function $topLevel(node: LexicalNode | null) {
+  while (node?.getParent() && node.getParent()!.getType() !== 'root') node = node.getParent();
+  return node?.getParent() ? node : null;
+}
+
+function caretFromPoint(x: number, y: number) {
+  const position = document.caretPositionFromPoint?.(x, y);
+  if (position) return { node: position.offsetNode, offset: position.offset };
+  const range = document.caretRangeFromPoint?.(x, y);
+  return range ? { node: range.startContainer, offset: range.startOffset } : null;
+}
 
 export interface Island {
   data: string;
@@ -50,6 +63,7 @@ export class EditorRecycler {
   readonly states = new Map<string, Map<string, unknown>>();
   readonly viewport: HTMLElement | Window;
   readonly preserve: PreserveNodeManager;
+  readonly documentBlocks = new DocumentBlockSelection(this);
   heights: HeightIndex;
   revision = 0;
   private indices = new Map<string, number>();
@@ -60,6 +74,9 @@ export class EditorRecycler {
   private width: number;
   private metrics = new Map<string, BlockMetrics>();
   private firstParagraph = -1;
+  private selectionOwner?: number;
+  private splitting = new Set<number>();
+  private drag?: { slot: Slot; y: number };
 
   constructor(
     readonly master: LexicalEditor,
@@ -96,6 +113,8 @@ export class EditorRecycler {
     if (this.viewport instanceof HTMLElement) this.observer.observe(this.viewport);
     this.viewport.addEventListener('scroll', this.onScroll, { passive: true });
     window.addEventListener('resize', this.onScroll);
+    canvas.addEventListener('focusin', this.onFocusIn);
+    canvas.addEventListener('pointerdown', this.onPointerDown);
     this.refresh(false);
   }
 
@@ -148,12 +167,17 @@ export class EditorRecycler {
       );
     const indices = new Map(this.rows.map((row, index) => [row.id, index]));
     this.indices = indices;
+    this.documentBlocks.prune();
     this.firstParagraph = this.rows.findIndex((row) => row.data.type === 'paragraph');
     for (const id of this.metrics.keys()) if (!indices.has(id)) this.metrics.delete(id);
     for (const slot of this.pool.slots) {
       const island = this.islands.get(slot.id);
       if (!island) continue;
-      island.ids = island.ids.filter((id) => indices.has(id));
+      const positions = island.ids.flatMap((id) => indices.get(id) ?? []);
+      island.ids =
+        positions.length > 1
+          ? this.rows.slice(Math.min(...positions), Math.max(...positions) + 1).map((row) => row.id)
+          : positions.map((index) => this.rows[index].id);
       island.source = source === `virtual-island:${slot.id}`;
       if (island.ids.length) {
         slot.index = indices.get(island.ids[0])!;
@@ -191,7 +215,81 @@ export class EditorRecycler {
     if (sync) flushSync(notify);
     else notify();
   }
-  private onScroll = () => this.refresh();
+  private onScroll = () => {
+    this.refresh();
+    if (this.drag) this.dragTo(this.drag.y);
+  };
+  indexOf(id: string) {
+    return this.indices.get(id);
+  }
+  islandIds(editor: LexicalEditor) {
+    for (const island of this.islands.values()) if (island.editor === editor) return island.ids;
+  }
+  private onPointerDown = (event: PointerEvent) => {
+    if (event.button !== 0) return;
+    this.documentBlocks.clear();
+    const target = this.pool.slots.find(
+      (item) => item.active && item.element?.contains(event.target as Node),
+    );
+    if (!target) return;
+    const owner = this.pool.slots.find((item) => item.active && item.id === this.selectionOwner);
+    const slot = event.shiftKey && owner && owner !== target ? owner : target;
+    const root = this.island(slot).editor.getRootElement();
+    if (!root) return;
+    if (slot !== target) {
+      event.preventDefault();
+      this.extendToPoint(slot, root, event.clientX, event.clientY);
+    } else if ((event.target as Element).closest?.('[contenteditable]') !== root) return;
+    this.drag = { slot, y: event.clientY };
+    document.addEventListener('pointermove', this.onPointerMove);
+    document.addEventListener('pointerup', this.endDrag);
+    document.addEventListener('pointercancel', this.endDrag);
+  };
+  private onPointerMove = (event: PointerEvent) => {
+    if (!this.drag) return;
+    if (!(event.buttons & 1)) return this.endDrag();
+    this.drag.y = event.clientY;
+    this.dragTo(event.clientY);
+  };
+  private endDrag = () => {
+    this.drag = undefined;
+    document.removeEventListener('pointermove', this.onPointerMove);
+    document.removeEventListener('pointerup', this.endDrag);
+    document.removeEventListener('pointercancel', this.endDrag);
+  };
+  private rowAt(clientY: number) {
+    const y = clientY - this.canvas.getBoundingClientRect().top - this.leadingMargin;
+    return this.heights.find(Math.max(0, y));
+  }
+  private dragTo(clientY: number) {
+    const slot = this.drag?.slot;
+    if (!slot?.active) return;
+    const index = this.rowAt(clientY);
+    if (index < slot.index || index >= slot.index + this.island(slot).ids.length)
+      this.extendIsland(slot, index, true);
+  }
+  private extendToPoint(slot: Slot, root: HTMLElement, x: number, y: number) {
+    if (!this.extendIsland(slot, this.rowAt(y), true)) return;
+    const selection = window.getSelection();
+    const caret = caretFromPoint(x, y);
+    if (
+      selection?.anchorNode &&
+      root.contains(selection.anchorNode) &&
+      caret &&
+      root.contains(caret.node)
+    )
+      selection.extend(caret.node, caret.offset);
+  }
+  private onFocusIn = (event: FocusEvent) => {
+    const slot = this.pool.slots.find((item) => item.element?.contains(event.target as Node));
+    if (slot) this.selectionOwner = slot.id;
+  };
+  private holdsSelection(slot: Slot, island: Island) {
+    return (
+      slot.id === this.selectionOwner &&
+      island.editor.getEditorState().read(() => $getSelection() !== null)
+    );
+  }
   refresh(sync = true) {
     if (this.dead || !this.rows.length) return;
     const y = Math.max(0, this.scrollTop - this.canvasTop());
@@ -207,7 +305,8 @@ export class EditorRecycler {
       if (
         island.retained ||
         island.editor.isComposing() ||
-        slot.element?.contains(document.activeElement)
+        slot.element?.contains(document.activeElement) ||
+        this.holdsSelection(slot, island)
       )
         pinned.add(slot.id);
       for (let i = 1; i < island.ids.length; i++) covered.add(slot.index + i);
@@ -254,6 +353,7 @@ export class EditorRecycler {
     this.islands.set(slot.id, island);
     island.unsubscribe = editor.registerUpdateListener(
       ({ editorState, dirtyElements, dirtyLeaves, tags }) => {
+        if (island!.ids.length > 1) this.queueSplit(slot);
         if (
           island!.loading ||
           !island!.ids.length ||
@@ -267,7 +367,8 @@ export class EditorRecycler {
         const used = new Set<string>();
         children.forEach((data, i) => {
           let id = data.$?.blockId;
-          if (!id || used.has(id)) id = i === 0 ? island!.ids[0] : nanoid(8);
+          const foreign = this.indices.has(id) && !island!.ids.includes(id);
+          if (!id || used.has(id) || foreign) id = i === 0 ? island!.ids[0] : nanoid(8);
           data.$ = { ...data.$, blockId: id };
           used.add(id);
         });
@@ -525,13 +626,121 @@ export class EditorRecycler {
         (item) => item.active && this.islands.get(item.id)?.ids.includes(this.rows[index]?.id),
       );
       if (!slot) return;
-      this.island(slot).editor.update(
+      const { editor } = this.island(slot);
+      // Lexical writes a DOM selection into an unfocused root without focusing it.
+      editor.getRootElement()?.focus({ preventScroll: true });
+      editor.update(
         () => {
           if (end) $getRoot().selectEnd();
           else $getRoot().selectStart();
         },
         { tag: scroll ? undefined : SKIP_SCROLL_INTO_VIEW_TAG },
       );
+    });
+  }
+  extendIsland(slot: Slot, toIndex: number, sync = false) {
+    const island = this.island(slot);
+    const first = slot.index;
+    const last = first + island.ids.length - 1;
+    const target = Math.max(0, Math.min(toIndex, this.rows.length - 1));
+    if (target >= first && target <= last) return true;
+    const backward = target < first;
+    const added = backward ? this.rows.slice(target, first) : this.rows.slice(last + 1, target + 1);
+    if (island.ids.length + added.length > (this.options.selectionMergeLimit ?? 200)) return false;
+    const addedIds = new Set(added.map((row) => row.id));
+    const holders = this.pool.slots.filter(
+      (other) => other !== slot && this.islands.get(other.id)?.ids.some((id) => addedIds.has(id)),
+    );
+    if (
+      holders.some((other) => {
+        const held = this.islands.get(other.id)!;
+        return held.retained > 0 || held.editor.isComposing();
+      })
+    )
+      return false;
+    for (const other of holders) {
+      other.beforeRelease?.();
+      other.active = false;
+      this.islands.get(other.id)!.generation = -1;
+    }
+    island.ids = backward ? [...addedIds, ...island.ids] : [...island.ids, ...addedIds];
+    if (backward) slot.index = target;
+    island.data = JSON.stringify(island.ids.map((id) => this.rows[this.indices.get(id)!].data));
+    island.editor.update(
+      () => {
+        const nodes = added.map((row) => $parseSerializedNode(row.data));
+        const head = $getRoot().getFirstChild();
+        if (backward && head) nodes.forEach((node) => head.insertBefore(node));
+        else $getRoot().append(...nodes);
+      },
+      { discrete: true, tag: ['virtual-bind', SKIP_DOM_SELECTION_TAG] },
+    );
+    this.refresh(false);
+    this.publish(sync);
+    this.queueMeasure();
+    return true;
+  }
+  extendForKey(slot: Slot, key: 'up' | 'down' | 'left' | 'right') {
+    const island = this.island(slot);
+    const forward = key === 'down' || key === 'right';
+    const atEdge = island.editor.getEditorState().read(() => {
+      const selection = $getSelection();
+      if (!$isRangeSelection(selection)) return false;
+      const root = $getRoot();
+      const focus = selection.focus.getNode();
+      if (key === 'up' || key === 'down')
+        return $topLevel(focus)?.is(forward ? root.getLastChild() : root.getFirstChild()) ?? false;
+      const edge = forward ? root.getLastDescendant() : root.getFirstDescendant();
+      return (
+        !!edge &&
+        focus.is(edge) &&
+        selection.focus.offset === (forward ? edge.getTextContentSize() : 0)
+      );
+    });
+    const index = forward ? slot.index + island.ids.length : slot.index - 1;
+    if (!atEdge || index < 0 || index >= this.rows.length) return false;
+    return this.extendIsland(slot, index);
+  }
+  splitIsland(slot: Slot) {
+    const island = this.islands.get(slot.id);
+    if (!island || island.ids.length < 2) return;
+    const keep = island.editor.getEditorState().read(() => {
+      const selection = $getSelection();
+      const node = $topLevel($isRangeSelection(selection) ? selection.focus.getNode() : null);
+      return node?.getIndexWithinParent() ?? 0;
+    });
+    const id = island.ids[keep] ?? island.ids[0];
+    island.ids = [id];
+    slot.index = this.indices.get(id)!;
+    island.data = JSON.stringify([this.rows[slot.index].data]);
+    island.editor.update(
+      () =>
+        $getRoot()
+          .getChildren()
+          .forEach((node, i) => {
+            if (i !== keep) node.remove();
+          }),
+      { discrete: true, tag: 'virtual-bind' },
+    );
+    this.refresh(false);
+    this.publish();
+    this.queueMeasure();
+  }
+  private queueSplit(slot: Slot) {
+    if (this.splitting.has(slot.id)) return;
+    this.splitting.add(slot.id);
+    requestAnimationFrame(() => {
+      this.splitting.delete(slot.id);
+      const island = this.islands.get(slot.id);
+      if (this.dead || !slot.active || !island || island.editor.isComposing()) return;
+      const live = window.getSelection();
+      const root = island.editor.getRootElement();
+      if (live && !live.isCollapsed && live.anchorNode && root?.contains(live.anchorNode)) return;
+      const collapsed = island.editor.getEditorState().read(() => {
+        const selection = $getSelection();
+        return selection === null || ($isRangeSelection(selection) && selection.isCollapsed());
+      });
+      if (collapsed) this.splitIsland(slot);
     });
   }
   joinNeighbor(slot: Slot, backward: boolean) {
@@ -565,6 +774,9 @@ export class EditorRecycler {
     cancelAnimationFrame(this.frame);
     this.viewport.removeEventListener('scroll', this.onScroll);
     window.removeEventListener('resize', this.onScroll);
+    this.canvas.removeEventListener('focusin', this.onFocusIn);
+    this.canvas.removeEventListener('pointerdown', this.onPointerDown);
+    this.endDrag();
     for (const island of this.islands.values()) island.unsubscribe();
     this.listeners.clear();
     this.preserve.clear();

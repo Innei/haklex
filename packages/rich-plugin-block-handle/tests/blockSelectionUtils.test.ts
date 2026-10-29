@@ -240,3 +240,37 @@ describe('blockSelectionUtils', () => {
     }
   });
 });
+
+describe('buildBlockClipboardData without a rendered DOM', () => {
+  function headless(count: number) {
+    const editor = createEditor({
+      namespace: 'headless-test',
+      onError: (error) => {
+        throw error;
+      },
+    });
+    editor.update(
+      () => {
+        for (let i = 0; i < count; i++)
+          $getRoot().append($createParagraphNode().append($createTextNode(`Block ${i}`)));
+      },
+      { discrete: true },
+    );
+    return editor;
+  }
+
+  it('exports html for a subset of rows in time proportional to the subset', () => {
+    const editor = headless(3000);
+    const started = performance.now();
+
+    const clipboardData = editor
+      .getEditorState()
+      .read(() => buildBlockClipboardData(editor, $getRoot().getChildren().slice(1, 2500)));
+
+    expect(performance.now() - started).toBeLessThan(1500);
+    expect(clipboardData['text/html']).toContain('Block 1');
+    expect(clipboardData['text/html']).toContain('Block 2499');
+    expect(clipboardData['text/html']).not.toContain('Block 2500');
+    expect(clipboardData['text/html']).not.toContain('Block 0<');
+  });
+});
