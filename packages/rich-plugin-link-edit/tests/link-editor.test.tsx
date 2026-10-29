@@ -229,4 +229,19 @@ describe('FloatingLinkEditorPlugin', () => {
     expect(readLink()?.url).toBe(URL);
     expect(byLabel('Edit link')).not.toBeNull();
   });
+
+  it('opens a link on modifier click after the root element is replaced', async () => {
+    await mount();
+    const open = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const nextRoot = document.createElement('div');
+    nextRoot.contentEditable = 'true';
+    container!.append(nextRoot);
+    await act(async () => editorRef!.setRootElement(nextRoot));
+    const anchor = nextRoot.querySelector<HTMLAnchorElement>(`a[href="${URL}"]`)!;
+    anchor.dispatchEvent(
+      new MouseEvent('click', { bubbles: true, cancelable: true, metaKey: true }),
+    );
+    expect(open).toHaveBeenCalledWith(URL, '_blank', 'noopener,noreferrer');
+    open.mockRestore();
+  });
 });
