@@ -90,7 +90,7 @@ describe('ImageInsertSheet', () => {
     const { onInsert } = await render({ files: [a], privacy });
 
     expect(container!.querySelector('[role="checkbox"]')?.textContent).toContain(
-      'Remove before upload',
+      'Remove GPS before upload',
     );
     await click(button(/^Insert image/));
 

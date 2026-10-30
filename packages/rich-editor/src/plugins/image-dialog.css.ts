@@ -206,11 +206,6 @@ export const locationRow = style({
   marginTop: 4,
 });
 
-export const locationIcon = style({
-  flex: 'none',
-  color: vars.color.alertWarning,
-});
-
 export const errorText = style([hint, { color: vars.color.alertCaution }]);
 
 export const addMore = style({ alignSelf: 'flex-start' });

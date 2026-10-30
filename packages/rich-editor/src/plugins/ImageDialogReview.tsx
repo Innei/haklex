@@ -1,5 +1,5 @@
 import { ActionButton, AnimatedCheckbox } from '@haklex/rich-editor-ui';
-import { MapPin, Pencil, Plus, X } from 'lucide-react';
+import { Pencil, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import * as css from './image-dialog.css';
@@ -100,10 +100,9 @@ function FileRowItem({ canEdit, failed, onEdit, onRemove, onToggleGps, row }: Fi
         )}
         {!edited && row.gps && (
           <div className={css.locationRow}>
-            <MapPin aria-label="Has location" className={css.locationIcon} size={13} />
             <AnimatedCheckbox
               checked={row.removeGps}
-              label="Remove before upload"
+              label="Remove GPS before upload"
               onChange={onToggleGps}
             />
           </div>

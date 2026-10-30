@@ -253,7 +253,8 @@ describe('presentImageDialog', () => {
 
     const checkbox = document.querySelector<HTMLElement>('[role="checkbox"]')!;
     expect(checkbox.getAttribute('aria-checked')).toBe('true');
-    expect(checkbox.textContent).toContain('Remove before upload');
+    expect(checkbox.textContent).toBe('Remove GPS before upload');
+    expect(popup().querySelector('[aria-label="Has location"]')).toBeNull();
 
     await click(button(/^Insert image/));
     expect(popup().textContent).toContain('Could not remove location');
