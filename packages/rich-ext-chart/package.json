@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-chart",
-  "version": "0.62.0",
+  "version": "0.62.1",
   "description": "Data chart extension (bar, line, area, pie) rendered as static SVG",
   "repository": {
     "type": "git",
