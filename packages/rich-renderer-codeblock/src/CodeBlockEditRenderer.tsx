@@ -218,6 +218,7 @@ export const CodeBlockEditRenderer: ComponentType<CodeBlockRendererProps> = ({
     if (!editor) return;
 
     const raf = requestAnimationFrame(() => {
+      if (editor.hasFocus) return;
       const nextCursor = cursorPlacement === 'end' ? editor.state.doc.length : 0;
       editor.focus();
       editor.dispatch({

@@ -9,6 +9,8 @@ import {
   $isElementNode,
   $isNodeSelection,
   $setSelection,
+  COMMAND_PRIORITY_HIGH,
+  KEY_DOWN_COMMAND,
 } from 'lexical';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -62,6 +64,39 @@ export function CodeBlockEditDecorator({ nodeKey, code, language }: CodeBlockEdi
     if (nextShouldFocus) {
       setCursorPlacement(nextCursorPlacement);
     }
+  }, [editable, editor, isSelected, nodeKey]);
+
+  useEffect(() => {
+    if (!editable || !isSelected) return;
+
+    // The renderer focuses its own editor a few frames after the node is
+    // selected; keys typed in that gap would land on the Lexical root and be
+    // dropped. Moving focus during keydown makes the browser deliver the
+    // character to the renderer's editor instead.
+    return editor.registerCommand(
+      KEY_DOWN_COMMAND,
+      (event) => {
+        if (event.key.length !== 1 || event.metaKey || event.ctrlKey || event.altKey) {
+          return false;
+        }
+        if (event.isComposing) return false;
+
+        const isOnlySelectedNode = editor.getEditorState().read(() => {
+          const selection = $getSelection();
+          if (!$isNodeSelection(selection)) return false;
+          const nodes = selection.getNodes();
+          return nodes.length === 1 && nodes[0]?.getKey() === nodeKey;
+        });
+        if (!isOnlySelectedNode) return false;
+
+        editor
+          .getElementByKey(nodeKey)
+          ?.querySelector<HTMLElement>('[contenteditable="true"]')
+          ?.focus();
+        return false;
+      },
+      COMMAND_PRIORITY_HIGH,
+    );
   }, [editable, editor, isSelected, nodeKey]);
 
   const handleCodeChange = useCallback(
