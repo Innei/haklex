@@ -15,7 +15,7 @@ import { $createImageNode } from '../nodes/ImageNode';
 import { $withAdaptiveImageDisplayWidth } from '../utils/image-insertion';
 import { resolvePreprocessTargets } from '../utils/image-preprocess';
 import { computeImageMeta } from '../utils/thumbhash';
-import { getImageEditor, isImageFile } from './image-dialog-model';
+import { getImageEditor, isImageFile, keepsOriginal } from './image-dialog-model';
 import * as css from './image-upload.css';
 import { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from './image-upload-command';
 import { reportImageUploads } from './image-upload-toast';
@@ -30,7 +30,18 @@ export interface ImageUploadResult {
   width?: number;
 }
 
-export type ImageUploadFn = (file: File) => Promise<ImageUploadResult>;
+export interface ImageUploadOptions {
+  keepOriginal?: boolean;
+}
+
+export type ImageUploadFn = (
+  file: File,
+  options?: ImageUploadOptions,
+) => Promise<ImageUploadResult>;
+
+export function uploadImageFile(upload: ImageUploadFn, file: File): Promise<ImageUploadResult> {
+  return keepsOriginal(file) ? upload(file, { keepOriginal: true }) : upload(file);
+}
 
 function hasImageData(dataTransfer: DataTransfer | null): boolean {
   if (!dataTransfer) return false;
@@ -77,7 +88,10 @@ export function ImageUploadPlugin({ onUpload }: ImageUploadPluginProps) {
     async (file: File, target: LexicalEditor, cursor: InsertionCursor, after: Promise<unknown>) => {
       const release = blockRef.current?.retain();
       try {
-        const [result, meta] = await Promise.all([uploadRef.current(file), computeImageMeta(file)]);
+        const [result, meta] = await Promise.all([
+          uploadImageFile(uploadRef.current, file),
+          computeImageMeta(file),
+        ]);
         await after;
         target.update(() => {
           $insertAtCursor(cursor, [

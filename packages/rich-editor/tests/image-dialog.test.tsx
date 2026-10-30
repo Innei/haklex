@@ -4,6 +4,7 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
+import { keepsOriginal } from '../src/plugins/image-dialog-model';
 import type { ImageDialogEntry, ImageDialogOptions } from '../src/plugins/present-image-dialog';
 import { presentImageDialog } from '../src/plugins/present-image-dialog';
 
@@ -262,5 +263,46 @@ describe('presentImageDialog', () => {
     await click(button(/^Insert image/));
 
     await expect(result).resolves.toEqual([{ file: a, kind: 'file' }]);
+  });
+
+  it('has no keep-original option unless the image editor allows it', async () => {
+    await open({ editor: { edit: vi.fn() }, files: [file('a.jpg')] });
+
+    expect(popup().textContent).not.toContain('Keep original');
+  });
+
+  it('marks every inserted file to keep its original when the option is ticked', async () => {
+    const a = file('a.jpg');
+    const b = file('b.jpg');
+    const { result } = await open({
+      editor: { allowKeepOriginal: true, edit: vi.fn() },
+      files: [a, b],
+    });
+
+    const option = [...document.querySelectorAll<HTMLElement>('[role="checkbox"]')].find((el) =>
+      el.textContent?.includes('Keep original'),
+    )!;
+    expect(option.getAttribute('aria-checked')).toBe('false');
+    await click(option);
+    await click(button(/^Insert 2 images/));
+
+    const entries = (await result)!;
+    expect(entries.map((entry) => entry.kind === 'file' && keepsOriginal(entry.file))).toEqual([
+      true,
+      true,
+    ]);
+  });
+
+  it('leaves files unmarked when the keep-original option stays off', async () => {
+    const a = file('a.jpg');
+    const { result } = await open({
+      editor: { allowKeepOriginal: true, edit: vi.fn() },
+      files: [a],
+    });
+
+    await click(button(/^Insert image/));
+
+    await expect(result).resolves.toEqual([{ file: a, kind: 'file' }]);
+    expect(keepsOriginal(a)).toBe(false);
   });
 });

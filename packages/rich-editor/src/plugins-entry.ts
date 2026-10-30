@@ -40,8 +40,10 @@ export { ImagePlugin } from './plugins/ImagePlugin';
 export {
   defaultImageUpload,
   type ImageUploadFn,
+  type ImageUploadOptions,
   ImageUploadPlugin,
   type ImageUploadResult,
+  uploadImageFile,
 } from './plugins/ImageUploadPlugin';
 export { INLINE_DRAG_ATTR, markInlineDraggable } from './plugins/inline-dnd-shared';
 export { InlineDndPlugin } from './plugins/InlineDndPlugin';
@@ -62,6 +64,8 @@ export {
   type ImageDialogProps,
   type ImageEditorCapability,
   type ImageEditPrivacy,
+  keepsOriginal,
+  markKeepOriginal,
   presentImageDialog,
   registerImageEditor,
 } from './plugins/present-image-dialog';

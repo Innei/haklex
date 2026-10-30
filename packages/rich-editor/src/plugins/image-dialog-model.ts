@@ -11,6 +11,7 @@ export interface ImageEditPrivacy {
 }
 
 export interface ImageEditorCapability {
+  allowKeepOriginal?: boolean;
   edit: (file: File) => Promise<{ file: File; summary?: string } | null>;
   privacy?: ImageEditPrivacy;
 }
@@ -121,6 +122,17 @@ export async function finalizeRows(
     entries: entries.filter((entry): entry is ImageDialogEntry => entry !== null),
     failedIds,
   };
+}
+
+const keptOriginals = new WeakSet<File>();
+
+export function markKeepOriginal(file: File): File {
+  keptOriginals.add(file);
+  return file;
+}
+
+export function keepsOriginal(file: File): boolean {
+  return keptOriginals.has(file);
 }
 
 const editors = new WeakMap<ImagePreprocessContextValue, ImageEditorCapability>();

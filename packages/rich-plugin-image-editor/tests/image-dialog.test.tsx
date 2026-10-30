@@ -3,6 +3,7 @@ import type { ImagePreprocessContextValue } from '@haklex/rich-editor/plugins';
 import {
   getImageEditor,
   ImagePreprocessProvider,
+  keepsOriginal,
   useImagePreprocess,
 } from '@haklex/rich-editor/plugins';
 import { DialogStackProvider, dismissAllDialogs } from '@haklex/rich-editor-ui';
@@ -59,7 +60,10 @@ function Capture({ onReady }: { onReady: (value: ImagePreprocessContextValue | n
   return null;
 }
 
-async function mount(privacy?: Parameters<typeof ImageEditModalPlugin>[0]['privacy']) {
+async function mount(
+  privacy?: Parameters<typeof ImageEditModalPlugin>[0]['privacy'],
+  allowKeepOriginal?: boolean,
+) {
   let scope: ImagePreprocessContextValue | null = null;
   host = document.createElement('div');
   document.body.append(host);
@@ -73,7 +77,7 @@ async function mount(privacy?: Parameters<typeof ImageEditModalPlugin>[0]['priva
               scope = value;
             }}
           />
-          <ImageEditModalPlugin privacy={privacy} />
+          <ImageEditModalPlugin allowKeepOriginal={allowKeepOriginal} privacy={privacy} />
         </ImagePreprocessProvider>
       </DialogStackProvider>,
     ),
@@ -103,6 +107,24 @@ describe('ImageEditModalPlugin with the shared image dialog', () => {
     const scope = await mount(privacy);
 
     expect(getImageEditor(scope)?.privacy).toBe(privacy);
+  });
+
+  it('marks pasted files to keep their original when the host allows it and the option is ticked', async () => {
+    const scope = await mount(undefined, true);
+    const a = file('a.jpg');
+
+    let result!: Promise<File[] | null>;
+    await act(async () => {
+      result = scope.ref.current!([a], { source: 'paste' });
+    });
+    const option = [...document.querySelectorAll<HTMLElement>('[role="checkbox"]')].find((el) =>
+      el.textContent?.includes('Keep original'),
+    )!;
+    await act(async () => option.click());
+    await act(async () => button(/^Insert image/).click());
+
+    await expect(result).resolves.toEqual([a]);
+    expect(keepsOriginal(a)).toBe(true);
   });
 
   it('reviews pasted files in the shared dialog titled Insert 2 images', async () => {

@@ -18,16 +18,22 @@ import { ImageEditModal } from './ImageEditModal';
 import * as css from './styles.css';
 
 export interface ImageEditModalPluginProps {
+  allowKeepOriginal?: boolean;
   privacy?: ImageEditPrivacy;
 }
 
-export const ImageEditModalPlugin: FC<ImageEditModalPluginProps> = ({ privacy }) => {
+export const ImageEditModalPlugin: FC<ImageEditModalPluginProps> = ({
+  allowKeepOriginal,
+  privacy,
+}) => {
   const preprocess = useImagePreprocess();
   const portalTheme = usePortalTheme();
   const portalThemeRef = useRef(portalTheme);
   portalThemeRef.current = portalTheme;
   const privacyRef = useRef(privacy);
   privacyRef.current = privacy;
+  const allowKeepOriginalRef = useRef(allowKeepOriginal);
+  allowKeepOriginalRef.current = allowKeepOriginal;
 
   useEffect(() => {
     if (!preprocess) return;
@@ -63,6 +69,9 @@ export const ImageEditModalPlugin: FC<ImageEditModalPluginProps> = ({ privacy })
       });
 
     const capability: ImageEditorCapability = {
+      get allowKeepOriginal() {
+        return allowKeepOriginalRef.current;
+      },
       edit,
       get privacy() {
         return privacyRef.current;

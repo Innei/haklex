@@ -17,7 +17,12 @@ export type {
   ImageEditorCapability,
   ImageEditPrivacy,
 } from './image-dialog-model';
-export { getImageEditor, registerImageEditor } from './image-dialog-model';
+export {
+  getImageEditor,
+  keepsOriginal,
+  markKeepOriginal,
+  registerImageEditor,
+} from './image-dialog-model';
 export { ImageDialog, type ImageDialogProps } from './ImageDialog';
 
 export interface ImageDialogOptions {

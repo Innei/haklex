@@ -5,6 +5,7 @@ import {
   getImageEditor,
   presentImageDialog,
   resolvePreprocessTargets,
+  uploadImageFile,
   useImagePreprocess,
   useImageUpload,
 } from '@haklex/rich-editor/plugins';
@@ -73,7 +74,10 @@ export function useReplaceImageDialog(): () => Promise<void> {
         const id = toast({ title: 'Uploading image…', tone: 'loading' });
         try {
           const uploader = uploadImage ?? defaultImageUpload;
-          const [result, meta] = await Promise.all([uploader(file), computeImageMeta(file)]);
+          const [result, meta] = await Promise.all([
+            uploadImageFile(uploader, file),
+            computeImageMeta(file),
+          ]);
           withNode((node) => {
             node.setSrc(result.src);
             node.setAltText(result.altText ?? file.name);

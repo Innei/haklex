@@ -2,6 +2,7 @@
 import { DialogStackProvider, dismissAllDialogs, dismissToast } from '@haklex/rich-editor-ui';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { DRAG_DROP_PASTE } from '@lexical/rich-text';
 import { $getRoot, type LexicalEditor } from 'lexical';
 import { act, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -9,6 +10,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { getToasts } from '../../rich-editor-ui/src/components/toast/store';
 import { $isImageNode, ImageNode } from '../src/nodes/ImageNode';
+import { markKeepOriginal } from '../src/plugins/image-dialog-model';
 import { OPEN_IMAGE_UPLOAD_DIALOG_COMMAND } from '../src/plugins/image-upload-command';
 import { type ImageUploadFn, ImageUploadPlugin } from '../src/plugins/ImageUploadPlugin';
 
@@ -220,5 +222,19 @@ describe('ImageUploadPlugin dialog', () => {
     expect(onUpload).not.toHaveBeenCalled();
     expect(imageCount(editor)).toBe(1);
     globalThis.Image = OriginalImage;
+  });
+
+  it('asks the host to keep the original for files marked by the dialog', async () => {
+    const onUpload = vi.fn(async (file: File) => ({ src: `https://cdn.test/${file.name}` }));
+    const editor = await mount(onUpload);
+    const kept = markKeepOriginal(new File(['a'], 'kept.png', { type: 'image/png' }));
+    const plain = new File(['b'], 'plain.png', { type: 'image/png' });
+
+    await act(async () => {
+      editor.dispatchCommand(DRAG_DROP_PASTE, [kept, plain]);
+    });
+    await settle();
+
+    expect(onUpload.mock.calls).toEqual([[kept, { keepOriginal: true }], [plain]]);
   });
 });

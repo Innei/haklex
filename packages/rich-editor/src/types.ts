@@ -20,7 +20,10 @@ export interface RichEditorProps {
     opts?: { onProgress?: (percent: number) => void },
   ) => Promise<{ src: string }>;
   header?: ReactNode;
-  imageUpload?: (file: File) => Promise<{
+  imageUpload?: (
+    file: File,
+    options?: { keepOriginal?: boolean },
+  ) => Promise<{
     src: string;
     altText?: string;
     width?: number;

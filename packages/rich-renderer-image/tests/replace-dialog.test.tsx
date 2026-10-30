@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { $createImageNode, $isImageNode, ImageNode } from '@haklex/rich-editor/nodes';
 import type { ImageUploadFn } from '@haklex/rich-editor/plugins';
-import { ImageUploadProvider } from '@haklex/rich-editor/plugins';
+import { ImageUploadProvider, markKeepOriginal } from '@haklex/rich-editor/plugins';
 import { DialogStackProvider, dismissAllDialogs } from '@haklex/rich-editor-ui';
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -162,6 +162,23 @@ describe('Replace image dialog', () => {
       return $isImageNode(node) ? node.getSrc() : null;
     });
     expect(src).toBe('https://cdn.test/new.png');
+  });
+
+  it('asks the host to keep the original of a replacement marked by the dialog', async () => {
+    const onUpload = vi.fn<ImageUploadFn>().mockResolvedValue({ src: 'https://cdn.test/new.png' });
+    await mount(onUpload);
+    await settle();
+
+    const input = document.querySelector<HTMLInputElement>('[role="dialog"] input[type="file"]')!;
+    const picked = markKeepOriginal(new File(['x'], 'new.png', { type: 'image/png' }));
+    Object.defineProperty(input, 'files', { configurable: true, value: [picked] });
+    await act(async () => {
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+    await act(async () => button(/^Replace/).click());
+    await settle();
+
+    expect(onUpload).toHaveBeenCalledWith(picked, { keepOriginal: true });
   });
 
   it('reopens from the empty placeholder button', async () => {

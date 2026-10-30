@@ -215,6 +215,8 @@ export const errorText = style([hint, { color: vars.color.alertCaution }]);
 
 export const addMore = style({ alignSelf: 'flex-start' });
 
+export const keepOriginal = style({ alignSelf: 'flex-start' });
+
 globalStyle(`${popup}:not([role="dialog"]) ${body}, ${popup}:not([role="dialog"]) ${footer}`, {
   paddingLeft: 4,
   paddingRight: 4,

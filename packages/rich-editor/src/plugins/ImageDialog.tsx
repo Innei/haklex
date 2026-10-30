@@ -1,4 +1,4 @@
-import { ActionButton, Kbd } from '@haklex/rich-editor-ui';
+import { ActionButton, AnimatedCheckbox, Kbd } from '@haklex/rich-editor-ui';
 import type { ClipboardEvent, KeyboardEvent } from 'react';
 import { useEffect, useRef, useState } from 'react';
 
@@ -16,6 +16,7 @@ import {
   IMAGE_FORMATS_HINT,
   imageDialogCopy,
   isImageFile,
+  markKeepOriginal,
 } from './image-dialog-model';
 import { ImageDialogReview } from './ImageDialogReview';
 import { ImageDialogSource } from './ImageDialogSource';
@@ -71,6 +72,7 @@ export function ImageDialog({
   const [step, setStep] = useState<'source' | 'review'>(startedWithFiles ? 'review' : 'source');
   const [failedIds, setFailedIds] = useState<string[]>([]);
   const [inserting, setInserting] = useState(false);
+  const [keepOriginal, setKeepOriginal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const detections = useRef(new Map<string, Promise<GpsInfo | null>>());
   const privacy = editor?.privacy;
@@ -170,6 +172,11 @@ export function ImageDialog({
       setFailedIds(result.failedIds);
       return;
     }
+    if (keepOriginal) {
+      for (const entry of result.entries) {
+        if (entry.kind === 'file') markKeepOriginal(entry.file);
+      }
+    }
     onSubmit(result.entries);
   };
 
@@ -221,6 +228,17 @@ export function ImageDialog({
             onToggleGps={toggleGps}
           />
         )}
+        {step === 'review' &&
+          editor?.allowKeepOriginal &&
+          rows.some((row) => row.kind === 'file') && (
+            <div className={css.keepOriginal}>
+              <AnimatedCheckbox
+                checked={keepOriginal}
+                label="Keep original (skip compression)"
+                onChange={setKeepOriginal}
+              />
+            </div>
+          )}
       </div>
       <div className={css.footer}>
         {step === 'source' ? (
