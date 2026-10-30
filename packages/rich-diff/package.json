@@ -29,12 +29,12 @@
     "@types/react-dom": "^19.3.0",
     "@vanilla-extract/css": "^1.21.3",
     "@vanilla-extract/vite-plugin": "^5.2.6",
-    "lexical": "^0.52.0",
+    "lexical": "^0.53.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.1.2",
-    "vite": "^8.3.4"
+    "vite": "^8.3.5"
   },
   "peerDependencies": {
     "@haklex/rich-compose": "workspace:^",

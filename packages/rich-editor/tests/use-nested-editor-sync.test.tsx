@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import type { LexicalEditor, NodeKey } from 'lexical';
+import type { LexicalEditor, NodeKey, ParagraphNode } from 'lexical';
 import { $createParagraphNode, $createTextNode, $getRoot, createEditor } from 'lexical';
 import { act, useEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
@@ -91,9 +91,7 @@ async function type(nested: LexicalEditor) {
   await act(async () => {
     nested.update(
       () => {
-        $getRoot()
-          .getFirstChildOrThrow<ReturnType<typeof $createParagraphNode>>()
-          .append($createTextNode('x'));
+        ($getRoot().getFirstChildOrThrow() as ParagraphNode).append($createTextNode('x'));
       },
       { discrete: true },
     );

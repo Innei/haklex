@@ -159,7 +159,7 @@ describe('LinkCardEditDecorator', () => {
     await act(async () => trigger.click());
     await act(async () => tab('Link')!.click());
     const link = editorRef!.getEditorState().read(() => {
-      const first = $getRoot().getFirstChild<ElementNode>();
+      const first = $getRoot().getFirstChild() as ElementNode | null;
       const child = first?.getFirstChild();
       return $isLinkNode(child) ? { url: child.getURL(), text: child.getTextContent() } : null;
     });

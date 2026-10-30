@@ -5,7 +5,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
 import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
-import type { LexicalEditor, TextNode } from 'lexical';
+import type { ElementNode, LexicalEditor, TextNode } from 'lexical';
 import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical';
 import type { ReactNode } from 'react';
 import { act } from 'react';
@@ -82,16 +82,17 @@ async function mount(extra?: ReactNode, url = URL) {
   });
   await act(async () => {
     editorRef!.update(() => {
-      const link = $getRoot().getFirstChildOrThrow<LinkNode>().getChildAtIndex<LinkNode>(1)!;
-      link.getFirstChildOrThrow<TextNode>().select(2, 2);
+      const link = ($getRoot().getFirstChildOrThrow() as ElementNode).getChildAtIndex(
+        1,
+      ) as LinkNode;
+      (link.getFirstChildOrThrow() as TextNode).select(2, 2);
     });
   });
 }
 
 function readLink() {
   return editorRef!.getEditorState().read(() => {
-    const link = $getRoot()
-      .getFirstChildOrThrow<LinkNode>()
+    const link = ($getRoot().getFirstChildOrThrow() as ElementNode)
       .getChildren()
       .find((n) => $isLinkNode(n)) as LinkNode | undefined;
     return link ? { url: link.getURL(), text: link.getTextContent() } : null;

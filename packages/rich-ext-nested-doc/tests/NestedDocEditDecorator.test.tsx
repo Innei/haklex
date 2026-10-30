@@ -87,7 +87,7 @@ afterEach(() => {
 
 function contentText(): string {
   return parentEditor.read(() => {
-    const node = $getNodeByKey<NestedDocNode>(nodeKey)!;
+    const node = $getNodeByKey(nodeKey) as NestedDocNode;
     const state = node.getContentState() as SerializedEditorState;
     return JSON.stringify(state);
   });
@@ -127,7 +127,7 @@ function typeInDialog(text: string) {
   act(() => {
     dialogEditor!.update(
       () => {
-        $getRoot().getFirstChild<ParagraphNode>()!.append($createTextNode(text));
+        ($getRoot().getFirstChild() as ParagraphNode).append($createTextNode(text));
       },
       { discrete: true },
     );

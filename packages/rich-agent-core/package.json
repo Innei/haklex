@@ -24,19 +24,19 @@
   "dependencies": {
     "@haklex/rich-litexml": "workspace:*",
     "nanoid": "^6.0.2",
-    "zustand": "^5.0.15"
+    "zustand": "^5.0.16"
   },
   "devDependencies": {
     "@haklex/rich-editor": "workspace:*",
-    "lexical": "^0.52.0",
+    "lexical": "^0.53.0",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.1.2",
-    "vite": "^8.3.4",
+    "vite": "^8.3.5",
     "vitest": "^5.0.5"
   },
   "peerDependencies": {
     "@haklex/rich-editor": "workspace:^",
-    "lexical": "^0.52.0"
+    "lexical": "^0.53.0"
   },
   "publishConfig": {
     "access": "public",

@@ -20,3 +20,7 @@ minimumReleaseAgeExclude:
   - '@innei/react-tweet@4.0.0'
   - pele@1.7.0
   - '@pierre/highlights@0.2.0'
+overrides:
+  # eslint-plugin-react-hooks 7.x requires 'zod-validation-error/v4' but declares
+  # ^3.5.0 || ^4.0.0; 3.x has no ./v4 export, so eslint crashes on load.
+  eslint-plugin-react-hooks>zod-validation-error: ^4.0.0

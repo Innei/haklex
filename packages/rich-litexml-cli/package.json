@@ -24,13 +24,13 @@
     "@haklex/rich-compose": "workspace:*",
     "@haklex/rich-headless": "workspace:*",
     "@haklex/rich-litexml": "workspace:*",
-    "@lexical/headless": "^0.52.0",
-    "lexical": "^0.52.0"
+    "@lexical/headless": "^0.53.0",
+    "lexical": "^0.53.0"
   },
   "devDependencies": {
-    "@types/node": "26.6.5",
+    "@types/node": "26.6.6",
     "typescript": "^7.0.2",
-    "vite": "^8.3.4",
+    "vite": "^8.3.5",
     "vitest": "^5.0.5"
   },
   "publishConfig": {

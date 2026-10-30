@@ -26,14 +26,14 @@
     "dev:build": "vite build --watch"
   },
   "dependencies": {
-    "lexical": "^0.52.0",
-    "linkedom": "^0.18.13",
+    "lexical": "^0.53.0",
+    "linkedom": "^0.18.14",
     "nanoid": "^6.0.2"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.1.2",
-    "vite": "^8.3.4"
+    "vite": "^8.3.5"
   },
   "publishConfig": {
     "access": "public",

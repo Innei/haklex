@@ -74,8 +74,7 @@ async function mount() {
 
 function readMention() {
   return editorRef!.getEditorState().read(() => {
-    const node = $getRoot()
-      .getFirstChildOrThrow<ElementNode>()
+    const node = ($getRoot().getFirstChildOrThrow() as ElementNode)
       .getChildren()
       .find((n) => $isMentionNode(n));
     return $isMentionNode(node)

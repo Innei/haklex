@@ -163,7 +163,7 @@ describe('MentionMenuPlugin', () => {
       });
     });
     const mention = editorRef!.getEditorState().read(() => {
-      const node = $getRoot().getLastChildOrThrow<ElementNode>().getFirstChild();
+      const node = ($getRoot().getLastChildOrThrow() as ElementNode).getFirstChild();
       return $isMentionNode(node) ? [node.getPlatform(), node.getHandle()] : null;
     });
     expect(mention).toEqual(['TG', 'innei']);

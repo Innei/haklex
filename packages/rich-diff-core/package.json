@@ -21,13 +21,13 @@
     "dev:build": "vite build --watch"
   },
   "devDependencies": {
-    "lexical": "^0.52.0",
+    "lexical": "^0.53.0",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.1.2",
-    "vite": "^8.3.4"
+    "vite": "^8.3.5"
   },
   "peerDependencies": {
-    "lexical": "^0.52.0"
+    "lexical": "^0.53.0"
   },
   "publishConfig": {
     "access": "public",

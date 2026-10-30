@@ -24,8 +24,8 @@
   "dependencies": {
     "@haklex/rich-agent-core": "workspace:*",
     "@haklex/rich-diff-core": "workspace:*",
-    "streamdown": "^2.7.0",
-    "zustand": "^5.0.15"
+    "streamdown": "^2.7.1",
+    "zustand": "^5.0.16"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",
@@ -36,7 +36,7 @@
     "react-dom": "^19.3.1",
     "typescript": "^7.0.2",
     "unplugin-dts": "^1.1.2",
-    "vite": "^8.3.4"
+    "vite": "^8.3.5"
   },
   "peerDependencies": {
     "@haklex/rich-editor-ui": "workspace:^",

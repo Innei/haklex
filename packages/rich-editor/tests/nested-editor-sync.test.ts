@@ -45,9 +45,7 @@ function setup() {
 async function type(nested: LexicalEditor, text: string) {
   nested.update(
     () => {
-      $getRoot()
-        .getFirstChildOrThrow<ReturnType<typeof $createParagraphNode>>()
-        .append($createTextNode(text));
+      ($getRoot().getFirstChildOrThrow() as ParagraphNode).append($createTextNode(text));
     },
     { discrete: true },
   );

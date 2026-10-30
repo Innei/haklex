@@ -71,7 +71,7 @@ afterEach(() => {
 });
 
 function readNode() {
-  return editor.read(() => $getNodeByKey<ChatNode>(nodeKey));
+  return editor.read(() => $getNodeByKey(nodeKey) as ChatNode | null);
 }
 
 function mountDecorator() {
