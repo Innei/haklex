@@ -13,9 +13,10 @@ export const baseTheme: Extension = EditorView.theme({
   '&.cm-editor.cm-focused': {
     outline: 'none',
   },
-  // Compound selector outranks oneDark's tinted `.cm-gutters` background.
+  // Compound selector outranks oneDark's tinted `.cm-gutters` background, so hosts
+  // must set the gutter color through this variable instead of a plain class rule.
   '&.cm-editor .cm-gutters': {
-    backgroundColor: 'transparent',
+    backgroundColor: 'var(--cm-gutter-bg, transparent)',
     border: 'none',
   },
   '.cm-scroller': {

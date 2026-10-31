@@ -146,6 +146,9 @@ export const body = style({
   minWidth: 0,
   overflow: 'auto',
   backgroundColor: 'transparent !important' as any,
+  vars: {
+    '--cm-gutter-bg': vars.color.codeBg,
+  },
 });
 
 export const bodyReadonly = style({});
@@ -181,7 +184,6 @@ globalStyle(`${body} .cm-line`, {
 
 globalStyle(`${body} .cm-gutters`, {
   borderRight: 'none',
-  backgroundColor: vars.color.codeBg,
   paddingLeft: '16px',
 });
 
