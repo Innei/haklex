@@ -1,7 +1,26 @@
 import { vars } from '@haklex/rich-style-token/styles';
-import { globalStyle, style } from '@vanilla-extract/css';
+import { createGlobalVar, globalStyle, style } from '@vanilla-extract/css';
 
 import { paragraph } from './shared.css';
+
+const progress = createGlobalVar('--rc-details-progress', {
+  syntax: '<number>',
+  inherits: true,
+  initialValue: '0',
+});
+const contentProgress = createGlobalVar('--rc-details-content-progress', {
+  syntax: '<number>',
+  inherits: true,
+  initialValue: '0',
+});
+
+// The guide hands off from horizontal to vertical while content responds immediately.
+// Each details resets both timelines so nested disclosures stay independent.
+const horizontalPhase = `clamp(0, calc(${progress} / 0.42), 1)`;
+const verticalPhase = `clamp(0, calc((${progress} - 0.42) / 0.58), 1)`;
+const horizontalProgress = `calc(${horizontalPhase} * ${horizontalPhase} * (3 - 2 * ${horizontalPhase}))`;
+const verticalProgress = `calc(${verticalPhase} * ${verticalPhase} * (3 - 2 * ${verticalPhase}))`;
+const restoring = ':is([data-restoring], [data-recycler-restoring])';
 
 export const detailsClassNames = {
   details: 'rich-details',
@@ -12,11 +31,19 @@ export const detailsClassNames = {
 } as const;
 
 export const details = style({
-  margin: `${vars.spacing.md} 0`,
-  border: `1px solid ${vars.color.border}`,
-  borderRadius: vars.borderRadius.md,
-  backgroundColor: 'transparent',
-  interpolateSize: 'allow-keywords',
+  'vars': { [progress]: '0', [contentProgress]: '0' },
+  'margin': `${vars.spacing.md} 0`,
+  'border': 'none',
+  'backgroundColor': 'transparent',
+  'transition':
+    '--rc-details-progress 640ms linear, --rc-details-content-progress 370ms cubic-bezier(0.4, 0, 0.2, 1)',
+  'selectors': {
+    '&[open]': { vars: { [progress]: '1', [contentProgress]: '1' } },
+    [`${restoring} &`]: { transition: 'none' },
+  },
+  '@media': {
+    '(prefers-reduced-motion: reduce)': { transition: 'none' },
+  },
 });
 
 export const summary = style({
@@ -25,19 +52,15 @@ export const summary = style({
   gap: vars.spacing.sm,
   cursor: 'pointer',
   userSelect: 'none',
-  padding: '0.5em 0.875em',
+  padding: '0.75em 0',
   color: vars.color.text,
   fontWeight: 500,
   fontSize: '1em',
   lineHeight: vars.typography.lineHeight,
   listStyle: 'none',
   outline: 'none',
-  borderRadius: vars.borderRadius.md,
-  transition: 'background-color 120ms ease-out, box-shadow 120ms ease-out',
+  transition: 'box-shadow 120ms ease-out',
   selectors: {
-    '&:hover': {
-      backgroundColor: vars.color.fillTertiary,
-    },
     '&:focus-visible': {
       boxShadow: `inset 0 0 0 1px ${vars.color.accent}, 0 0 0 3px ${vars.color.accentLight}`,
     },
@@ -48,11 +71,23 @@ export const summary = style({
       display: 'none',
       content: '""',
     },
+    '&::after': {
+      content: '""',
+      flex: '1 1 2.5rem',
+      minWidth: '1.5rem',
+      height: 1,
+      marginLeft: '0.75rem',
+      alignSelf: 'center',
+      backgroundColor: vars.color.border,
+      transform: `scaleX(calc(1 - ${horizontalProgress}))`,
+      transformOrigin: 'left center',
+      pointerEvents: 'none',
+    },
   },
 });
 
 export const summaryText = style({
-  flex: '1',
+  flex: '0 1 auto',
   minWidth: 0,
 });
 
@@ -67,37 +102,72 @@ export const chevron = style({
   flexShrink: 0,
   color: vars.color.textTertiary,
   transformOrigin: 'center',
-  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease',
+  transform: `rotate(calc(${contentProgress} * 90deg))`,
+  transition: 'color 0.2s ease',
 });
 
 export const content = style({
-  padding: `0 0.875em 0.75em calc(0.875em + 1.25rem + ${vars.spacing.sm})`,
-  color: vars.color.textSecondary,
-});
-
-globalStyle(`${summary}:hover ${chevron}`, {
-  color: vars.color.textSecondary,
-});
-
-globalStyle(`${details}[open] ${chevron}`, {
-  color: vars.color.textSecondary,
-  transform: 'rotate(90deg)',
-});
-
-globalStyle(`${details}::details-content`, {
-  display: 'block',
-  height: 0,
+  position: 'relative',
+  minHeight: 0,
   overflow: 'hidden',
-  opacity: 0,
+  padding: `calc(0.875em * ${contentProgress}) 0 calc(1.25em * ${contentProgress}) calc(1.25rem + ${vars.spacing.sm})`,
+  color: vars.color.textSecondary,
+  selectors: {
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      top: 0,
+      bottom: '1.25em',
+      left: 'calc(0.625rem - 0.5px)',
+      width: 1,
+      backgroundColor: vars.color.border,
+      transform: `scaleY(${verticalProgress})`,
+      transformOrigin: 'center top',
+      pointerEvents: 'none',
+    },
+  },
+});
+
+globalStyle(`${summary}:hover > ${chevron}`, {
+  color: vars.color.textSecondary,
+});
+
+globalStyle(`${details}[open] > ${summary} > ${chevron}`, {
+  color: vars.color.textSecondary,
+});
+
+// Grid preserves height animation where intrinsic-size arithmetic is unavailable.
+globalStyle(`${details}::details-content`, {
+  display: 'grid',
+  gridTemplateRows: '0fr',
+  overflow: 'hidden',
+  opacity: contentProgress,
   contentVisibility: 'hidden',
   transition:
-    'height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), content-visibility 0.4s cubic-bezier(0.4, 0, 0.2, 1) allow-discrete',
+    'grid-template-rows 370ms cubic-bezier(0.4, 0, 0.2, 1), content-visibility 640ms allow-discrete',
 } as any);
 
 globalStyle(`${details}[open]::details-content`, {
-  height: 'auto',
-  opacity: 1,
+  gridTemplateRows: '1fr',
   contentVisibility: 'visible',
+} as any);
+
+globalStyle(`${details}::details-content, ${details}[open]::details-content`, {
+  '@supports': {
+    '(height: calc-size(auto, size * 0.5))': {
+      display: 'block',
+      height: `calc-size(auto, size * ${contentProgress})`,
+      transition: 'content-visibility 640ms allow-discrete',
+      transitionDelay: '0ms',
+    },
+  },
+  '@media': {
+    '(prefers-reduced-motion: reduce)': { transition: 'none !important' },
+  },
+} as any);
+
+globalStyle(`${restoring} ${details}::details-content`, {
+  transition: 'none !important',
 } as any);
 
 globalStyle(`${content} > ${paragraph}:first-child`, {
