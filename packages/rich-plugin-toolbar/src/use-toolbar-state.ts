@@ -48,6 +48,15 @@ export const INITIAL_TOOLBAR_STATE: ToolbarState = {
   isSpoiler: false,
 };
 
+function patchState(prev: ToolbarState, patch: Partial<ToolbarState>): ToolbarState {
+  for (const key in patch) {
+    if (patch[key as keyof ToolbarState] !== prev[key as keyof ToolbarState]) {
+      return { ...prev, ...patch };
+    }
+  }
+  return prev;
+}
+
 /**
  * Subscribe to selection/format/history changes and return a reactive ToolbarState.
  * Use inside a component mounted under a LexicalComposer (e.g. via `header={...}`
@@ -91,26 +100,27 @@ export function useToolbarState(): ToolbarState {
     const isHighlight = selection.hasFormat('highlight');
     const isSpoiler = $selectionTouchesSpoiler(selection);
 
-    setState((prev) => ({
-      ...prev,
-      blockType,
-      fontFamily,
-      elementFormat,
-      isBold,
-      isItalic,
-      isUnderline,
-      isStrikethrough,
-      isCode,
-      isHighlight,
-      isSpoiler,
-    }));
+    setState((prev) =>
+      patchState(prev, {
+        blockType,
+        fontFamily,
+        elementFormat,
+        isBold,
+        isItalic,
+        isUnderline,
+        isStrikethrough,
+        isCode,
+        isHighlight,
+        isSpoiler,
+      }),
+    );
   }, []);
 
   useEffect(() => {
     const unregisterUndo = editor.registerCommand(
       CAN_UNDO_COMMAND,
       (payload) => {
-        setState((prev) => ({ ...prev, canUndo: payload }));
+        setState((prev) => patchState(prev, { canUndo: payload }));
         return false;
       },
       COMMAND_PRIORITY_LOW,
@@ -118,7 +128,7 @@ export function useToolbarState(): ToolbarState {
     const unregisterRedo = editor.registerCommand(
       CAN_REDO_COMMAND,
       (payload) => {
-        setState((prev) => ({ ...prev, canRedo: payload }));
+        setState((prev) => patchState(prev, { canRedo: payload }));
         return false;
       },
       COMMAND_PRIORITY_LOW,

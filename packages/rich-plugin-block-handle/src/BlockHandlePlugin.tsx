@@ -205,19 +205,20 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
         if (node) nodeKey = node.getKey();
       });
 
-      setHandle({
-        visible: true,
-        top: handleTop(
-          {
-            top: page.top,
-            paddingTop: Number.parseFloat(computed.paddingTop) || 0,
-            lineHeight: parseLineHeight(computed.lineHeight, computed.fontSize),
-          },
-          GRIP_HEIGHT,
-        ),
-        left: toPagePosition(rootRect).left - GUTTER_INSET,
-        nodeKey,
-      });
+      const top = handleTop(
+        {
+          top: page.top,
+          paddingTop: Number.parseFloat(computed.paddingTop) || 0,
+          lineHeight: parseLineHeight(computed.lineHeight, computed.fontSize),
+        },
+        GRIP_HEIGHT,
+      );
+      const left = toPagePosition(rootRect).left - GUTTER_INSET;
+      setHandle((state) =>
+        state.visible && state.top === top && state.left === left && state.nodeKey === nodeKey
+          ? state
+          : { visible: true, top, left, nodeKey },
+      );
     },
     [editor],
   );

@@ -11,18 +11,17 @@ import type { SerializedEditorState } from 'lexical';
 import { use, useCallback, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-import { Panel } from '../components/Panel';
-import { JsonPanel } from '../components/workbench/JsonPanel';
 import { PanelTabs } from '../components/workbench/PanelTabs';
 import { Workbench } from '../components/workbench/Workbench';
 import { useTheme } from '../context/ThemeContext';
 import { VariantContext } from '../context/VariantContext';
 import { extraMentionPlatforms } from '../fixtures/extra-mention-platforms';
 import { initialContent } from '../fixtures/initial-content';
-import { LexicalEditor, LexicalRenderer } from '../lexical';
+import { LexicalEditor } from '../lexical';
 import type { ColorPreset, ColorSet } from './editor/EditorInspector';
 import { EditorInspector } from './editor/EditorInspector';
 import { ImportPanel } from './editor/ImportPanel';
+import { LiveJsonPanel, LiveRendererPanel, useLiveEditorState } from './editor/live-editor-state';
 
 const insertItemOrder = [
   'Image',
@@ -91,7 +90,7 @@ export function EditorPage() {
   const [toolbarHost, setToolbarHost] = useState<HTMLDivElement | null>(null);
   const variant = use(VariantContext);
   const theme = useTheme();
-  const [editorState, setEditorState] = useState<SerializedEditorState | null>(null);
+  const liveState = useLiveEditorState(initialContent);
   const [showRenderer, setShowRenderer] = useState(true);
   const [sideTab, setSideTab] = useState<SideTab>('inspector');
   const [source, setSource] = useState({ value: initialContent, version: 0 });
@@ -150,18 +149,18 @@ export function EditorPage() {
     return createThemeStyle({ color: overrides });
   }, [selectedPreset, customAccent, theme]);
 
-  const handleChange = useCallback((state: SerializedEditorState) => {
-    setEditorState(state);
-  }, []);
   const handleVirtualizationChange = useCallback((enabled: boolean) => {
     setVirtualization(enabled);
     if (enabled) setShowRenderer(false);
   }, []);
 
-  const handleLoad = useCallback((state: SerializedEditorState) => {
-    setSource((prev) => ({ value: state, version: prev.version + 1 }));
-    setEditorState(state);
-  }, []);
+  const handleLoad = useCallback(
+    (state: SerializedEditorState) => {
+      setSource((prev) => ({ value: state, version: prev.version + 1 }));
+      liveState.set(state);
+    },
+    [liveState],
+  );
 
   return (
     <NestedDocDialogEditorProvider value={NestedDocDialogEditor}>
@@ -200,12 +199,7 @@ export function EditorPage() {
                   }}
                 />
               )}
-              {sideTab === 'json' && (
-                <JsonPanel
-                  data={editorState ?? source.value}
-                  note="Live EditorState. Updates as you type."
-                />
-              )}
+              {sideTab === 'json' && <LiveJsonPanel store={liveState} />}
               {sideTab === 'import' && <ImportPanel onLoad={handleLoad} />}
             </>
           }
@@ -237,7 +231,7 @@ export function EditorPage() {
                 toolbarHost,
               )
             }
-            onChange={handleChange}
+            onChange={liveState.set}
             onSubmit={() => console.info('[Submit] Cmd/Ctrl+Enter pressed')}
           >
             <EditorSurfacePlugins>
@@ -247,15 +241,13 @@ export function EditorPage() {
 
           <div className="wb-extra">
             {showRenderer && (
-              <Panel badge={variant} title="Renderer (readonly)">
-                <LexicalRenderer
-                  style={themeOverrideStyle}
-                  theme={theme}
-                  value={editorState ?? source.value}
-                  variant={variant}
-                  virtualization={virtualization ? virtualizationOptions : false}
-                />
-              </Panel>
+              <LiveRendererPanel
+                store={liveState}
+                style={themeOverrideStyle}
+                theme={theme}
+                variant={variant}
+                virtualization={virtualization ? virtualizationOptions : false}
+              />
             )}
 
             <div className="tips">

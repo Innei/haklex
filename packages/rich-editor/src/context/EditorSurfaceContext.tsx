@@ -20,6 +20,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
 } from 'react';
 
 export interface EditorSurfaceProps {
@@ -165,8 +166,37 @@ export function EditorSurfacePlugin({
 export function EditorSurfacePlugins({ children }: { children: ReactNode }) {
   const key = useId();
   const { registerPlugins } = useEditorSurface();
-  useLayoutEffect(() => registerPlugins(key, children), [children, key, registerPlugins]);
+  const [slot] = useState(() => createPluginSlot(children));
+  useLayoutEffect(
+    () => registerPlugins(key, <PluginSlotOutlet slot={slot} />),
+    [key, registerPlugins, slot],
+  );
+  useLayoutEffect(() => slot.set(children), [children, slot]);
   return null;
+}
+interface PluginSlot {
+  get: () => ReactNode;
+  set: (children: ReactNode) => void;
+  subscribe: (listener: () => void) => () => void;
+}
+function createPluginSlot(initial: ReactNode): PluginSlot {
+  let current = initial;
+  const listeners = new Set<() => void>();
+  return {
+    get: () => current,
+    set: (children) => {
+      if (children === current) return;
+      current = children;
+      listeners.forEach((listener) => listener());
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+      return () => listeners.delete(listener);
+    },
+  };
+}
+function PluginSlotOutlet({ slot }: { slot: PluginSlot }) {
+  return useSyncExternalStore(slot.subscribe, slot.get, slot.get);
 }
 export function useActiveEditor() {
   return useEditorSurface().activeEditor;
