@@ -8,7 +8,12 @@ const roots = [
   'rich-editor-ui',
   ...readdirSync(packagesDir).filter((name) => name.startsWith('rich-plugin-')),
 ].map((name) => path.join(packagesDir, name, 'src'));
-const statusComponents = ['components/alert/', 'components/badge/', 'components/status-dot/'];
+const statusComponents = [
+  'components/alert/',
+  'components/badge/',
+  'components/status-dot/',
+  'rich-plugin-agent-stream/',
+];
 
 const rules: { allow?: (file: string) => boolean; name: string; pattern: RegExp }[] = [
   { name: 'variant spacing', pattern: /vars\.spacing\./ },

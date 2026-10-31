@@ -1,4 +1,5 @@
 export {
+  AGENT_WRITE_TAG,
   COLLAB_TAG,
   createLoroBinding,
   type LoroBinding,

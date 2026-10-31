@@ -86,6 +86,7 @@ function pairGap(dels: Json[], adds: Json[]): Item[] {
   });
 }
 
+/** @deprecated Agent writes are now played client-side by `@haklex/rich-plugin-agent-stream`; write once with `editAtVersion`. */
 export function planFrames(base: Json, target: Json): Frame[] {
   const before = base.children ?? [];
   const after = target.children ?? [];
@@ -183,6 +184,7 @@ function $locate(focus: FrameFocus | null): { key: NodeKey; offset: number } | n
     : { key: block.getKey(), offset: 0 };
 }
 
+/** @deprecated Agent writes are now played client-side by `@haklex/rich-plugin-agent-stream`; write once with `editAtVersion`. */
 export function streamAtVersion(
   doc: LoroDoc,
   frontiers: Frontiers,

@@ -13,13 +13,22 @@ import {
   type SerializedLexicalNode,
   type TextNode,
 } from 'lexical';
-import { type LoroDoc, LoroText, type LoroTreeNode, type TreeID } from 'loro-crdt';
+import {
+  type ImportStatus,
+  type LoroDoc,
+  LoroText,
+  type LoroTreeNode,
+  type TreeID,
+} from 'loro-crdt';
 
 import { transformOffset } from './offset';
 import { $updateInPlace } from './reconcile';
 import { stable } from './stable';
 
 export const COLLAB_TAG = 'collab';
+export const AGENT_WRITE_TAG = 'agent-write';
+const AGENT_MESSAGE_PREFIX = 'agent:';
+const AGENT_LIVE_WINDOW_SECONDS = 15;
 export const TREE_NAME = 'lexical';
 const TEXT_KEY = '#text';
 
@@ -31,6 +40,7 @@ export interface LoroBinding {
 }
 
 export interface LoroBindingOptions {
+  agentLiveWindowSeconds?: number;
   commitMessage?: string;
 }
 
@@ -235,7 +245,7 @@ export function createLoroBinding(
     }
   };
 
-  const pullFromDoc = () => {
+  const pullFromDoc = (agent = false) => {
     editor.update(
       () => {
         const rootTreeNode = tree.roots()[0];
@@ -254,7 +264,7 @@ export function createLoroBinding(
           if (!visited.has(node.getKey()) && node.isAttached()) node.remove();
         }
       },
-      { discrete: true, tag: COLLAB_TAG },
+      { discrete: true, tag: agent ? [COLLAB_TAG, AGENT_WRITE_TAG] : COLLAB_TAG },
     );
   };
 
@@ -271,12 +281,32 @@ export function createLoroBinding(
     idOf: (key) => keyToId.get(key),
     keyOf: (id) => idToKey.get(id),
     import: (bytes) => {
-      doc.import(bytes);
-      pullFromDoc();
+      pullFromDoc(
+        hasLiveAgentChange(
+          doc,
+          doc.import(bytes),
+          options.agentLiveWindowSeconds ?? AGENT_LIVE_WINDOW_SECONDS,
+        ),
+      );
     },
   };
 }
 
 function $isTextLike(props: Props): boolean {
   return typeof props.format === 'number' && typeof props.detail === 'number' && 'mode' in props;
+}
+
+function hasLiveAgentChange(doc: LoroDoc, status: ImportStatus, windowSeconds: number): boolean {
+  const oldest = Date.now() / 1000 - windowSeconds;
+  for (const [peer, span] of status.success) {
+    let counter = span.start;
+    while (counter < span.end) {
+      const change = doc.getChangeAt({ peer, counter });
+      if (change.message?.startsWith(AGENT_MESSAGE_PREFIX) && change.timestamp >= oldest) {
+        return true;
+      }
+      counter = change.counter + change.length;
+    }
+  }
+  return false;
 }

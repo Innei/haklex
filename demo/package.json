@@ -33,6 +33,7 @@
     "@haklex/rich-ext-gallery": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
     "@haklex/rich-ext-poll": "workspace:*",
+    "@haklex/rich-plugin-agent-stream": "workspace:*",
     "@haklex/rich-plugin-block-handle": "workspace:*",
     "@haklex/rich-plugin-floating-toolbar": "workspace:*",
     "@haklex/rich-plugin-image-editor": "workspace:*",
