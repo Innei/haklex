@@ -15,6 +15,7 @@ import {
   KEY_DOWN_COMMAND,
   KEY_TAB_COMMAND,
 } from 'lexical';
+import type { ReactNode } from 'react';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
@@ -62,7 +63,9 @@ function Capture() {
 async function mount({
   withRuby = false,
   withLink = false,
-}: { withRuby?: boolean; withLink?: boolean } = {}) {
+  editable = true,
+  actions,
+}: { withRuby?: boolean; withLink?: boolean; editable?: boolean; actions?: ReactNode } = {}) {
   container = document.createElement('div');
   document.body.append(container);
   root = createRoot(container);
@@ -71,6 +74,7 @@ async function mount({
       <LexicalComposer
         initialConfig={{
           namespace: 'FloatingToolbarTest',
+          editable,
           nodes: [RubyNode, LinkNode, AutoLinkNode],
           onError: (error) => {
             throw error;
@@ -94,7 +98,7 @@ async function mount({
         }}
       >
         <ContentEditable aria-label="Editor" />
-        <FloatingToolbarPlugin />
+        <FloatingToolbarPlugin actions={actions} />
         <Capture />
       </LexicalComposer>,
     );
@@ -444,5 +448,76 @@ describe('FloatingToolbarPlugin', () => {
       el.textContent?.trim(),
     );
     expect(items).toEqual(['Superscript', 'Subscript', 'Clear formatting']);
+  });
+
+  describe('when the editor is read-only', () => {
+    const copyAction = (
+      <button aria-label="Copy" type="button">
+        Copy
+      </button>
+    );
+
+    function buttonNames() {
+      return Array.from(document.body.querySelectorAll('button')).map((b) =>
+        b.getAttribute('aria-label'),
+      );
+    }
+
+    it('shows only the host actions for a selection', async () => {
+      const target = await mount({ editable: false, actions: copyAction });
+      await selectHello(target);
+      expect(buttonNames()).toEqual(['Copy']);
+    });
+
+    it('drops the formatting buttons once the editor turns read-only', async () => {
+      const target = await mount({ actions: copyAction });
+      await selectHello(target);
+      expect(button('Bold')).not.toBeNull();
+      await act(async () => target.setEditable(false));
+      await selectHello(target);
+      expect(buttonNames()).toEqual(['Copy']);
+    });
+
+    it('closes an open URL field once the editor turns read-only', async () => {
+      const target = await mount({ actions: copyAction });
+      await selectHello(target);
+      await click(button('Link'));
+      expect(document.body.querySelector('input[aria-label="URL"]')).not.toBeNull();
+      await act(async () => target.setEditable(false));
+      expect(document.body.querySelector('input[aria-label="URL"]')).toBeNull();
+      expect(buttonNames()).toEqual(['Copy']);
+    });
+
+    it('shows nothing when the host passes no actions', async () => {
+      const target = await mount({ editable: false });
+      await selectHello(target);
+      expect(document.body.querySelector('[role="toolbar"], [role="group"]')).toBeNull();
+    });
+
+    it('ignores Mod+K', async () => {
+      const target = await mount({ editable: false, actions: copyAction });
+      await selectHello(target);
+      await act(async () => {
+        target.dispatchCommand(
+          KEY_DOWN_COMMAND,
+          new KeyboardEvent('keydown', {
+            key: 'k',
+            metaKey: true,
+            ctrlKey: true,
+            cancelable: true,
+          }),
+        );
+      });
+      expect(document.body.querySelector('input[aria-label="URL"]')).toBeNull();
+    });
+
+    it('does not open the ruby editor when a ruby is clicked', async () => {
+      const target = await mount({ editable: false, withRuby: true, actions: copyAction });
+      const rubyDom = target.getRootElement()!.querySelector<HTMLElement>('[data-ruby]');
+      expect(rubyDom).not.toBeNull();
+      window.getSelection()?.removeAllRanges();
+      await click(rubyDom!.firstElementChild ?? rubyDom);
+      expect(document.body.querySelector('input[aria-label="Reading"]')).toBeNull();
+    });
   });
 });

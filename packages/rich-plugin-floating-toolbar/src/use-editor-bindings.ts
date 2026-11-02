@@ -32,7 +32,7 @@ export function useEditorBindings({
   useEffect(() => {
     const onRootClick = (event: MouseEvent) => {
       const target = event.target as Node | null;
-      if (!target) return;
+      if (!target || !editor.isEditable()) return;
       if (window.getSelection()?.isCollapsed === false) return;
       const ruby = editor.read(() => {
         const node = findRubyAncestor($getNearestNodeFromDOMNode(target));
@@ -64,6 +64,7 @@ export function useEditorBindings({
             !event.shiftKey;
           const isAltF10 = event.key === 'F10' && event.altKey;
           if ((!isModK && !isAltF10) || modeRef.current.kind !== 'format') return false;
+          if (isModK && !editor.isEditable()) return false;
           const selection = $getSelection();
           if (!$isRangeSelection(selection) || selection.isCollapsed()) return false;
           if (isAltF10 && !toolbarRef.current) return false;

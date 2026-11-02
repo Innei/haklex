@@ -5,6 +5,7 @@ import type { TooltipRootProps } from '@haklex/rich-editor-ui';
 import { TooltipContent, TooltipProvider, TooltipRoot } from '@haklex/rich-editor-ui';
 import { usePortalContainer, usePortalTheme } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
+import { useLexicalEditable } from '@lexical/react/useLexicalEditable';
 import { $patchStyleText } from '@lexical/selection';
 import type { TextFormatType } from 'lexical';
 import { $getSelection, $isRangeSelection, FORMAT_TEXT_COMMAND } from 'lexical';
@@ -42,6 +43,7 @@ export function FloatingToolbarPlugin({
   actions,
 }: FloatingToolbarPluginProps = {}): ReactElement | null {
   const [editor] = useLexicalComposerContext();
+  const editable = useLexicalEditable();
   const { className: portalClassName, theme: portalTheme } = usePortalTheme();
   const portalContainer = usePortalContainer();
   const selectionSnapshot = useTextSelectionSnapshot();
@@ -56,7 +58,7 @@ export function FloatingToolbarPlugin({
     setPendingFocus(target ? { target } : null);
   }, []);
   const modes = useInlineModes(editor, onClose);
-  const { mode, modeRef, openLink, openRuby, editRuby, commitOnOutsideClick } = modes;
+  const { mode, modeRef, openLink, openRuby, editRuby, commitOnOutsideClick, cancel } = modes;
 
   const updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -73,6 +75,10 @@ export function FloatingToolbarPlugin({
   useEffect(() => {
     if (!selectionSnapshot) setVisible(false);
   }, [selectionSnapshot]);
+
+  useEffect(() => {
+    if (!editable) cancel(false);
+  }, [cancel, editable]);
 
   useEffect(() => {
     if (!pendingFocus) return;
@@ -114,7 +120,7 @@ export function FloatingToolbarPlugin({
     return anchor ?? lastAnchorRef.current;
   }, [editor, rubyKey, selectionSnapshot]);
 
-  const shown = visible || mode.kind !== 'format';
+  const shown = editable ? visible || mode.kind !== 'format' : visible && actions != null;
 
   useToolbarPosition({
     active: shown,
@@ -185,12 +191,14 @@ export function FloatingToolbarPlugin({
       </TooltipRoot>
       {createPortal(
         <div
-          aria-label={mode.kind === 'format' ? 'Text formatting' : undefined}
           className={toolbarClassName}
           data-theme={portalClassName ? portalTheme : undefined}
           ref={toolbarRef}
           role={mode.kind === 'format' ? 'toolbar' : 'group'}
           style={{ position: 'fixed', zIndex: 50 }}
+          aria-label={
+            mode.kind !== 'format' ? undefined : editable ? 'Text formatting' : 'Selection actions'
+          }
           onFocus={(e) => syncRovingTabIndex(e.currentTarget, e.target)}
           onKeyDown={(e) => {
             if (mode.kind !== 'format') return;
@@ -201,7 +209,8 @@ export function FloatingToolbarPlugin({
             }
           }}
         >
-          {mode.kind === 'format' && (
+          {mode.kind === 'format' && !editable && actions}
+          {mode.kind === 'format' && editable && (
             <FormatBar
               actions={actions}
               handle={handle}
