@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-renderer-image",
-  "version": "0.63.0",
+  "version": "0.63.1",
   "description": "Image renderer with blurhash",
   "repository": {
     "type": "git",
