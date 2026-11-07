@@ -14,6 +14,12 @@ type HighlightRegistry = { highlights: Map<string, Highlight> };
 
 let activeHighlightOwner: HTMLElement | null = null;
 
+const managedSelectionClasses = [
+  css.nativeSelectionActive,
+  css.nativeSelectionInactive,
+  css.nativeSelectionHidden,
+];
+
 function getHighlightRegistry(): Map<string, Highlight> | null {
   if (typeof CSS === 'undefined' || !('highlights' in CSS) || typeof Highlight === 'undefined') {
     return null;
@@ -24,14 +30,14 @@ function getHighlightRegistry(): Map<string, Highlight> | null {
 
 function clearManagedHighlight(rootElement?: HTMLElement | null): void {
   if (rootElement && rootElement !== activeHighlightOwner) {
-    rootElement.classList.remove(css.nativeSelectionActive, css.nativeSelectionInactive);
+    rootElement.classList.remove(...managedSelectionClasses);
     return;
   }
 
   const registry = getHighlightRegistry();
   registry?.delete(TEXT_SELECTION_HIGHLIGHT_NAME);
   registry?.delete(TEXT_SELECTION_INACTIVE_HIGHLIGHT_NAME);
-  activeHighlightOwner?.classList.remove(css.nativeSelectionActive, css.nativeSelectionInactive);
+  activeHighlightOwner?.classList.remove(...managedSelectionClasses);
   activeHighlightOwner = null;
 }
 
@@ -170,39 +176,36 @@ export function TextSelectionPlugin() {
         }
 
         if (activeHighlightOwner && activeHighlightOwner !== rootElement) {
-          activeHighlightOwner.classList.remove(
-            css.nativeSelectionActive,
-            css.nativeSelectionInactive,
-          );
+          activeHighlightOwner.classList.remove(...managedSelectionClasses);
         }
 
-        const activeSelectionClass = isEditorFocused
-          ? css.nativeSelectionActive
-          : css.nativeSelectionInactive;
-        const inactiveSelectionClass = isEditorFocused
-          ? css.nativeSelectionInactive
-          : css.nativeSelectionActive;
+        const range = registry ? createDOMRangeFromTextSelection(rootElement, snapshot) : null;
+        if (registry && !range) {
+          clearManagedHighlight(rootElement);
+          return;
+        }
+
+        const selectionClass = range
+          ? css.nativeSelectionHidden
+          : isEditorFocused
+            ? css.nativeSelectionActive
+            : css.nativeSelectionInactive;
+        rootElement.classList.remove(
+          ...managedSelectionClasses.filter((name) => name !== selectionClass),
+        );
+        rootElement.classList.add(selectionClass);
+        activeHighlightOwner = rootElement;
+
+        if (!registry || !range) {
+          return;
+        }
+
         const highlightName = isEditorFocused
           ? TEXT_SELECTION_HIGHLIGHT_NAME
           : TEXT_SELECTION_INACTIVE_HIGHLIGHT_NAME;
         const staleHighlightName = isEditorFocused
           ? TEXT_SELECTION_INACTIVE_HIGHLIGHT_NAME
           : TEXT_SELECTION_HIGHLIGHT_NAME;
-
-        rootElement.classList.remove(inactiveSelectionClass);
-        rootElement.classList.add(activeSelectionClass);
-        activeHighlightOwner = rootElement;
-
-        if (!registry) {
-          return;
-        }
-
-        const range = createDOMRangeFromTextSelection(rootElement, snapshot);
-        if (!range) {
-          clearManagedHighlight(rootElement);
-          return;
-        }
-
         registry.delete(staleHighlightName);
         registry.set(highlightName, new Highlight(range));
       });

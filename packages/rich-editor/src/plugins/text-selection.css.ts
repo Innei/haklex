@@ -8,6 +8,7 @@ import {
 
 export const nativeSelectionActive = style({});
 export const nativeSelectionInactive = style({});
+export const nativeSelectionHidden = style({});
 const textSelectionBackground = vars.color.accentLight;
 const inactiveTextSelectionBackground = `color-mix(in srgb, ${vars.color.textTertiary} 24%, transparent)`;
 
@@ -33,6 +34,20 @@ globalStyle(
   `.${nativeSelectionInactive}::-moz-selection, .${nativeSelectionInactive} *::-moz-selection`,
   {
     backgroundColor: inactiveTextSelectionBackground,
+    color: 'inherit',
+  },
+);
+
+// Host apps commonly style ::selection; it must not paint under the custom highlight.
+globalStyle(`.${nativeSelectionHidden}::selection, .${nativeSelectionHidden} *::selection`, {
+  backgroundColor: 'transparent !important',
+  color: 'inherit',
+});
+
+globalStyle(
+  `.${nativeSelectionHidden}::-moz-selection, .${nativeSelectionHidden} *::-moz-selection`,
+  {
+    backgroundColor: 'transparent !important',
     color: 'inherit',
   },
 );
