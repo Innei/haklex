@@ -1,4 +1,5 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
+import { EditableGate } from '@haklex/rich-editor-ui';
 import type {
   EditorConfig,
   LexicalEditor,
@@ -63,16 +64,12 @@ export class DynamicEditNode extends DynamicNode {
   }
 
   decorate(editor: LexicalEditor, config: EditorConfig): ReactElement {
-    if (!editor.isEditable()) {
-      return super.decorate(editor, config);
-    }
-
     const fallback = createElement('div', {
       className: 'rich-dynamic-loading',
       style: { minHeight: this.__initialHeight, margin: '1.25rem 0' },
     });
 
-    return createElement(
+    const editable = createElement(
       Suspense,
       { fallback },
       createElement(LazyEditRenderer, {
@@ -82,6 +79,12 @@ export class DynamicEditNode extends DynamicNode {
         nodeKey: this.__key,
       }),
     );
+
+    return createElement(EditableGate, {
+      editor,
+      editable,
+      readOnly: super.decorate(editor, config),
+    });
   }
 }
 

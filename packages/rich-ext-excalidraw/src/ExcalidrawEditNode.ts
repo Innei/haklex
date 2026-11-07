@@ -1,5 +1,5 @@
 import type { CommandItemConfig } from '@haklex/rich-editor/commands';
-import { ViewportGate } from '@haklex/rich-editor-ui';
+import { EditableGate, ViewportGate } from '@haklex/rich-editor-ui';
 import type {
   EditorConfig,
   LexicalEditor,
@@ -57,12 +57,6 @@ export class ExcalidrawEditNode extends ExcalidrawNode {
   }
 
   decorate(editor: LexicalEditor, config: EditorConfig): ReactElement {
-    const isEditable = editor.isEditable();
-
-    if (!isEditable) {
-      return super.decorate(editor, config);
-    }
-
     const nodeKey = this.__key;
     const fallback = createElement('div', {
       className: 'rich-excalidraw-loading',
@@ -74,7 +68,7 @@ export class ExcalidrawEditNode extends ExcalidrawNode {
       },
     });
 
-    return createElement(ViewportGate, {
+    const editable = createElement(ViewportGate, {
       fallback,
       children: createElement(
         Suspense,
@@ -91,6 +85,12 @@ export class ExcalidrawEditNode extends ExcalidrawNode {
           },
         }),
       ),
+    });
+
+    return createElement(EditableGate, {
+      editor,
+      editable,
+      readOnly: super.decorate(editor, config),
     });
   }
 }

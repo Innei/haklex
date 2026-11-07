@@ -116,6 +116,8 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from './components/dropdown-menu';
+export type { EditableGateProps } from './components/editable-gate';
+export { EditableGate } from './components/editable-gate';
 export type { FieldProps } from './components/field';
 export { Field } from './components/field';
 export type { KbdIcon, KbdPlatform, KbdProps, KeyDisplay } from './components/kbd';
