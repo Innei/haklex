@@ -10,7 +10,7 @@ import {
 } from 'lexical';
 import { describe, expect, it } from 'vitest';
 
-import { $moveBlocks, $selectionBlockKeys } from '../src/blockMoves';
+import { $moveBlocks, $moveBlocksTo, $selectionBlockKeys } from '../src/blockMoves';
 
 function setup(labels: string[]) {
   const editor = createEditor({
@@ -102,5 +102,46 @@ describe('$selectionBlockKeys', () => {
       { discrete: true },
     );
     expect(result).toEqual([keys.B]);
+  });
+});
+
+describe('$moveBlocksTo', () => {
+  function drop(editor: LexicalEditor, keys: string[], target: string, before: boolean) {
+    let moved = false;
+    editor.update(
+      () => {
+        moved = $moveBlocksTo(keys, target, before);
+      },
+      { discrete: true },
+    );
+    return moved;
+  }
+
+  it('places dragged blocks after the target in document order', () => {
+    const { editor, keys } = setup(['a', 'b', 'c', 'd', 'e']);
+
+    expect(drop(editor, [keys.d, keys.a], keys.c, false)).toBe(true);
+    expect(order(editor)).toEqual(['b', 'c', 'a', 'd', 'e']);
+  });
+
+  it('places dragged blocks before the target', () => {
+    const { editor, keys } = setup(['a', 'b', 'c', 'd']);
+
+    expect(drop(editor, [keys.d], keys.b, true)).toBe(true);
+    expect(order(editor)).toEqual(['a', 'd', 'b', 'c']);
+  });
+
+  it('ignores a drop onto one of the dragged blocks', () => {
+    const { editor, keys } = setup(['a', 'b', 'c']);
+
+    expect(drop(editor, [keys.a, keys.b], keys.b, false)).toBe(false);
+    expect(order(editor)).toEqual(['a', 'b', 'c']);
+  });
+
+  it('ignores keys that are not blocks of this editor', () => {
+    const { editor, keys } = setup(['a', 'b', 'c']);
+
+    expect(drop(editor, ['missing'], keys.b, false)).toBe(false);
+    expect(order(editor)).toEqual(['a', 'b', 'c']);
   });
 });

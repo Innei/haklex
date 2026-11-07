@@ -382,7 +382,7 @@ export class EditorRecycler {
               .forEach((node, i) => $setState(node, blockIdState, island!.ids[i])),
           { tag: 'virtual-bind' },
         );
-        this.document.replace(oldIds, children, String(slot.id));
+        this.document.replace(oldIds, children, String(slot.id), tags.has('history-merge'));
       },
     );
     return island;

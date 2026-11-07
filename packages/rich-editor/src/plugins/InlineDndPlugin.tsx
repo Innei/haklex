@@ -1,10 +1,27 @@
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
-import { $createRangeSelection, $getNodeByKey, $setSelection } from 'lexical';
+import type { LexicalEditor, LexicalNode } from 'lexical';
+import {
+  $createRangeSelection,
+  $exportNodeJSON,
+  $getNodeByKey,
+  $parseSerializedNode,
+  $setSelection,
+} from 'lexical';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+import type { DocumentBlocks } from '../context/EditorBlockContext';
+import { useEditorBlock } from '../context/EditorBlockContext';
 import * as css from './inline-dnd.css';
 import { INLINE_DRAG_ATTR, INLINE_DRAG_MIME } from './inline-dnd-shared';
+
+interface ActiveInlineDrag {
+  documentBlocks: DocumentBlocks | undefined;
+  editor: LexicalEditor;
+  key: string;
+}
+
+let activeInlineDrag: ActiveInlineDrag | null = null;
 
 interface CaretState {
   height: number;
@@ -58,8 +75,32 @@ function caretRect(range: Range): DOMRect | null {
   return el ? el.getBoundingClientRect() : null;
 }
 
+function $insertAtDOMRange(node: LexicalNode, range: Range) {
+  const selection = $createRangeSelection();
+  selection.applyDOMRange(range);
+  $setSelection(selection);
+  selection.insertNodes([node]);
+}
+
+export function moveInlineNodeBetweenEditors(
+  source: LexicalEditor,
+  key: string,
+  target: LexicalEditor,
+  range: Range,
+): boolean {
+  const json = source.read(() => {
+    const node = $getNodeByKey(key);
+    return node ? $exportNodeJSON(node) : null;
+  });
+  if (!json) return false;
+  target.update(() => $insertAtDOMRange($parseSerializedNode(json), range), { discrete: true });
+  source.update(() => $getNodeByKey(key)?.remove(), { discrete: true, tag: 'history-merge' });
+  return true;
+}
+
 export function InlineDndPlugin() {
   const [editor] = useLexicalComposerContext();
+  const documentBlocks = useEditorBlock()?.documentBlocks;
   const [caret, setCaret] = useState<CaretState | null>(null);
 
   useEffect(() => {
@@ -84,6 +125,7 @@ export function InlineDndPlugin() {
 
       draggedKey = nodeKey;
       sourceEl = target;
+      activeInlineDrag = { editor, key: nodeKey, documentBlocks };
       event.dataTransfer.setData(INLINE_DRAG_MIME, nodeKey);
       event.dataTransfer.setData('text/plain', target.textContent ?? '');
       event.dataTransfer.effectAllowed = 'move';
@@ -105,27 +147,36 @@ export function InlineDndPlugin() {
     };
 
     const onDrop = (event: DragEvent) => {
+      const drag = activeInlineDrag;
+      const fromOtherIsland =
+        !draggedKey &&
+        !!drag &&
+        !!documentBlocks &&
+        drag.editor !== editor &&
+        drag.documentBlocks === documentBlocks;
       const nodeKey = draggedKey ?? event.dataTransfer?.getData(INLINE_DRAG_MIME);
       if (!nodeKey) return;
       event.preventDefault();
       event.stopPropagation();
 
       const range = resolveDropRange(root, event);
-      if (range) {
+      if (range && fromOtherIsland) {
+        moveInlineNodeBetweenEditors(drag.editor, drag.key, editor, range);
+      } else if (range) {
         editor.update(() => {
           const node = $getNodeByKey(nodeKey);
           if (!node) return;
           node.remove();
-          const selection = $createRangeSelection();
-          selection.applyDOMRange(range);
-          $setSelection(selection);
-          selection.insertNodes([node]);
+          $insertAtDOMRange(node, range);
         });
       }
       clear();
     };
 
-    const onDragEnd = () => clear();
+    const onDragEnd = () => {
+      if (activeInlineDrag?.editor === editor) activeInlineDrag = null;
+      clear();
+    };
 
     const onDragLeave = (event: DragEvent) => {
       if (!root.contains(event.relatedTarget as Node | null)) setCaret(null);
@@ -145,7 +196,7 @@ export function InlineDndPlugin() {
       root.removeEventListener('dragend', onDragEnd);
       root.removeEventListener('dragleave', onDragLeave);
     };
-  }, [editor]);
+  }, [documentBlocks, editor]);
 
   if (!caret) return null;
 

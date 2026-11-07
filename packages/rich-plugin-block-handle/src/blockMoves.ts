@@ -1,4 +1,5 @@
-import type { LexicalNode } from 'lexical';
+import type { DocumentBlocks } from '@haklex/rich-editor';
+import type { LexicalEditor, LexicalNode } from 'lexical';
 import { $getRoot, $getSelection, $isElementNode, $isRangeSelection } from 'lexical';
 
 function $topLevelKey(node: LexicalNode): string | null {
@@ -72,4 +73,44 @@ export function $duplicateBlocks(keys: string[]): boolean {
     insertAfter = clone;
   }
   return true;
+}
+
+export function $moveBlocksTo(keys: string[], targetKey: string, before: boolean): boolean {
+  const keySet = new Set(keys);
+  if (keySet.has(targetKey)) return false;
+  const children = $getRoot().getChildren();
+  const target = children.find((child) => child.getKey() === targetKey);
+  const blocks = children.filter((child) => keySet.has(child.getKey()));
+  if (!target || !blocks.length) return false;
+
+  for (const block of blocks) block.remove();
+  if (before) {
+    for (const block of blocks) target.insertBefore(block);
+    return true;
+  }
+  let cursor: LexicalNode = target;
+  for (const block of blocks) {
+    cursor.insertAfter(block);
+    cursor = block;
+  }
+  return true;
+}
+
+export function moveDocumentBlocks(
+  editor: LexicalEditor,
+  documentBlocks: DocumentBlocks | undefined,
+  keys: string[],
+  direction: 'up' | 'down',
+) {
+  if (!documentBlocks) {
+    editor.update(() => {
+      $moveBlocks(keys, direction);
+    });
+    return;
+  }
+  const documentKeys = documentBlocks.documentKeys(editor, keys);
+  if (!documentKeys.length) return;
+  documentBlocks.editor.update(() => {
+    $moveBlocks(documentKeys, direction);
+  });
 }

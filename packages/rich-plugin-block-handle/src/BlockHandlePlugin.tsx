@@ -1,3 +1,4 @@
+import { useEditorBlock } from '@haklex/rich-editor';
 import { DropdownMenu, DropdownMenuTrigger } from '@haklex/rich-editor-ui';
 import { usePortalTheme } from '@haklex/rich-style-token';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
@@ -5,7 +6,6 @@ import type { LexicalEditor } from 'lexical';
 import {
   $getNearestNodeFromDOMNode,
   $getNodeByKey,
-  $getRoot,
   COMMAND_PRIORITY_HIGH,
   DRAGOVER_COMMAND,
   DRAGSTART_COMMAND,
@@ -17,7 +17,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import { BlockMenu } from './BlockMenu';
-import { $duplicateBlocks, $moveBlocks } from './blockMoves';
+import { $duplicateBlocks, $moveBlocksTo, moveDocumentBlocks } from './blockMoves';
 import { $getBlockTypeId, turnBlockInto } from './blockType';
 import { handleTop, parseLineHeight } from './geometry';
 import * as css from './styles.css';
@@ -144,6 +144,7 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
   const draggingBlockKeysRef = useRef<string[] | null>(null);
 
   const { selectBlock, getSelectedKeys, deleteSelectedBlocks } = useBlockSelection(editor);
+  const documentBlocks = useEditorBlock()?.documentBlocks;
 
   const clearHideTimer = useCallback(() => {
     if (hideTimerRef.current) {
@@ -315,11 +316,9 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
       const selectedKeys = getSelectedKeys();
       const keys = selectedKeys.length > 0 ? selectedKeys : handle.nodeKey ? [handle.nodeKey] : [];
       if (!keys.length) return;
-      editor.update(() => {
-        $moveBlocks(keys, direction);
-      });
+      moveDocumentBlocks(editor, documentBlocks, keys, direction);
     },
-    [editor, getSelectedKeys, handle.nodeKey],
+    [documentBlocks, editor, getSelectedKeys, handle.nodeKey],
   );
 
   const [gripMenuOpen, setGripMenuOpen] = useState(false);
@@ -358,7 +357,8 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
           ? selectedKeys
           : [handle.nodeKey];
 
-      event.dataTransfer.setData(DRAG_DATA_KEY, JSON.stringify(dragKeys));
+      const payloadKeys = documentBlocks ? documentBlocks.documentKeys(editor, dragKeys) : dragKeys;
+      event.dataTransfer.setData(DRAG_DATA_KEY, JSON.stringify(payloadKeys));
       event.dataTransfer.effectAllowed = 'move';
 
       const block = activeBlockRef.current;
@@ -406,7 +406,15 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
       const offsetY = Math.max(8, Math.min(rect.height - 8, event.clientY - rect.top));
       event.dataTransfer.setDragImage(preview, offsetX, offsetY);
     },
-    [clearDragVisualState, editor, getSelectedKeys, handle.nodeKey, portalClassName, theme],
+    [
+      clearDragVisualState,
+      documentBlocks,
+      editor,
+      getSelectedKeys,
+      handle.nodeKey,
+      portalClassName,
+      theme,
+    ],
   );
 
   const onGripOpenChange = useCallback(
@@ -524,37 +532,17 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
         const block = getDropTargetBlock(editor, rootElement, event);
         if (!block) return false;
 
-        editor.update(() => {
-          const targetNode = $getNearestNodeFromDOMNode(block);
-          if (!targetNode) return;
-          if (draggedKeys.includes(targetNode.getKey())) return;
+        const islandTargetKey = editor.read(() => $getNearestNodeFromDOMNode(block)?.getKey());
+        if (!islandTargetKey) return true;
+        const targetKey = documentBlocks
+          ? documentBlocks.documentKeys(editor, [islandTargetKey])[0]
+          : islandTargetKey;
+        if (!targetKey) return true;
 
-          const rect = block.getBoundingClientRect();
-          const insertBefore = event.clientY < rect.top + rect.height / 2;
-
-          const root = $getRoot();
-          const children = root.getChildren();
-          const keySet = new Set(draggedKeys);
-          const draggedNodes = children.filter((child) => keySet.has(child.getKey()));
-
-          for (const node of draggedNodes) {
-            node.remove();
-          }
-
-          const freshTarget = $getNodeByKey(targetNode.getKey());
-          if (!freshTarget) return;
-
-          if (insertBefore) {
-            for (let i = draggedNodes.length - 1; i >= 0; i--) {
-              freshTarget.insertBefore(draggedNodes[i]);
-            }
-          } else {
-            let cursor = freshTarget;
-            for (const node of draggedNodes) {
-              cursor.insertAfter(node);
-              cursor = node;
-            }
-          }
+        const rect = block.getBoundingClientRect();
+        const insertBefore = event.clientY < rect.top + rect.height / 2;
+        (documentBlocks?.editor ?? editor).update(() => {
+          $moveBlocksTo(draggedKeys, targetKey, insertBefore);
         });
         return true;
       },
@@ -595,7 +583,7 @@ function BlockHandleInner({ editor }: { editor: LexicalEditor }): ReactElement |
       rootElement.removeEventListener('dragleave', onDragLeave);
       clearDragState();
     };
-  }, [clearDragVisualState, editor]);
+  }, [clearDragVisualState, documentBlocks, editor]);
 
   useEffect(() => {
     const rootElement = editor.getRootElement();

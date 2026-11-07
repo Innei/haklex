@@ -3,6 +3,7 @@ import { createContext, use } from 'react';
 
 export interface DocumentBlocks {
   clear: () => void;
+  documentKeys: (editor: LexicalEditor, keys: NodeKey[]) => NodeKey[];
   readonly editor: LexicalEditor;
   extend: (step: -1 | 1) => boolean;
   focusSelection: () => void;

@@ -48,6 +48,21 @@ export class DocumentBlockSelection implements DocumentBlocks {
     );
   }
 
+  documentKeys(editor: LexicalEditor, keys: NodeKey[]) {
+    const ids = this.host.islandIds(editor);
+    if (!ids) return [];
+    const islandKeys = editor.getEditorState().read(() =>
+      $getRoot()
+        .getChildren()
+        .map((node) => node.getKey()),
+    );
+    return keys.flatMap((key) => {
+      const id = ids[islandKeys.indexOf(key)];
+      const index = id === undefined ? undefined : this.host.indexOf(id);
+      return index === undefined ? [] : [this.host.rows[index].key];
+    });
+  }
+
   select(editor: LexicalEditor, anchorKey: NodeKey, focusKey: NodeKey) {
     const ids = this.host.islandIds(editor);
     if (!ids) return;

@@ -75,18 +75,19 @@ export class VirtualDocument {
     );
   }
 
-  replace(ids: string[], children: SerializedBlock[], source: string) {
+  replace(ids: string[], children: SerializedBlock[], source: string, mergeHistory = false) {
     const first = this.rows.findIndex((row) => row.id === ids[0]);
     if (first < 0 || ids.some((id, i) => this.rows[first + i]?.id !== id))
       throw new Error('Virtual editor island is stale or noncontiguous');
     const keys = this.rows.slice(first, first + ids.length).map((row) => row.key);
     const now = Date.now();
     const merge =
-      this.lastEdit?.source === source &&
-      this.lastEdit.ids === ids.join(',') &&
-      this.lastEdit.count === children.length &&
-      children.length === ids.length &&
-      now - this.lastEdit.time < 600;
+      mergeHistory ||
+      (this.lastEdit?.source === source &&
+        this.lastEdit.ids === ids.join(',') &&
+        this.lastEdit.count === children.length &&
+        children.length === ids.length &&
+        now - this.lastEdit.time < 600);
     this.editor.update(
       () => {
         const original = keys.map((key) => $getNodeByKey(key)!);

@@ -1,3 +1,4 @@
+import type { DocumentBlocks } from '@haklex/rich-editor';
 import type { LexicalEditor } from 'lexical';
 import {
   $createParagraphNode,
@@ -85,5 +86,51 @@ describe('duplicate shortcut', () => {
     } as unknown as KeyboardEvent);
     await flush();
     expect(order(parent)).toEqual(['A', 'B', 'B']);
+  });
+});
+
+describe('virtualized islands', () => {
+  function island() {
+    const master = createEditor({ onError });
+    const editor = createEditor({ onError });
+    const masterKeys: string[] = [];
+    master.update(
+      () => {
+        for (const label of ['A', 'B', 'C']) {
+          const block = $createParagraphNode().append($createTextNode(label));
+          $getRoot().append(block);
+          masterKeys.push(block.getKey());
+        }
+      },
+      { discrete: true },
+    );
+    let islandKey = '';
+    editor.update(
+      () => {
+        const block = $createParagraphNode().append($createTextNode('B'));
+        $getRoot().append(block);
+        islandKey = block.getKey();
+      },
+      { discrete: true },
+    );
+    editor.update(() => $getNodeByKey(islandKey)!.selectStart(), { discrete: true });
+    const documentBlocks = {
+      editor: master,
+      documentKeys: (from: LexicalEditor, keys: string[]) =>
+        from === editor ? keys.flatMap((key) => (key === islandKey ? [masterKeys[1]] : [])) : [],
+    } as unknown as DocumentBlocks;
+    editor.registerCommand(
+      KEY_DOWN_COMMAND,
+      createBlockMoveHandler(editor, () => [], true, documentBlocks),
+      4,
+    );
+    return { master, editor };
+  }
+
+  it('moves the caret block in the document when the island holds only that block', async () => {
+    const { master, editor } = island();
+    editor.dispatchCommand(KEY_DOWN_COMMAND, chord());
+    await flush();
+    expect(order(master)).toEqual(['B', 'A', 'C']);
   });
 });

@@ -1,5 +1,14 @@
-import type { LexicalEditor } from 'lexical';
-import { $createParagraphNode, $createTextNode, $getRoot } from 'lexical';
+import type { DocumentBlocks } from '@haklex/rich-editor';
+import { useEditorBlock } from '@haklex/rich-editor';
+import type { LexicalEditor, LexicalNode } from 'lexical';
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getNearestNodeFromDOMNode,
+  $getNodeByKey,
+  $getRoot,
+  getNearestEditorFromDOMNode,
+} from 'lexical';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { findGap } from './geometry';
@@ -11,6 +20,8 @@ const GUTTER = 32;
 export interface GapState {
   index: number;
   left: number;
+  next: HTMLElement | null;
+  previous: HTMLElement | null;
   top: number;
   width: number;
 }
@@ -19,6 +30,36 @@ function rootBlocks(rootElement: HTMLElement) {
   return [...rootElement.children].filter(
     (child): child is HTMLElement => child instanceof HTMLElement,
   );
+}
+
+function islandBlocks(canvas: HTMLElement) {
+  return [...canvas.querySelectorAll<HTMLElement>('[data-virtual-editor-content]')]
+    .flatMap(rootBlocks)
+    .filter((block) => block.getBoundingClientRect().height > 0)
+    .sort((a, b) => a.getBoundingClientRect().top - b.getBoundingClientRect().top);
+}
+
+function firstVisibleIsland(canvas: HTMLElement) {
+  return [...canvas.querySelectorAll<HTMLElement>('[data-virtual-editor-content]')].find(
+    (root) => root.getBoundingClientRect().height > 0,
+  );
+}
+
+function documentKeyOf(block: HTMLElement, documentBlocks: DocumentBlocks) {
+  const owner = getNearestEditorFromDOMNode(block);
+  if (!owner) return;
+  const key = owner.read(() => $getNearestNodeFromDOMNode(block)?.getKey());
+  return key ? documentBlocks.documentKeys(owner, [key])[0] : undefined;
+}
+
+export function $insertSlashParagraph(target: LexicalNode | null, before: boolean) {
+  const paragraph = $createParagraphNode();
+  const trigger = $createTextNode('/');
+  paragraph.append(trigger);
+  if (!target) $getRoot().append(paragraph);
+  else if (before) target.insertBefore(paragraph);
+  else target.insertAfter(paragraph);
+  trigger.select(1, 1);
 }
 
 export function useGapInsert(
@@ -30,6 +71,7 @@ export function useGapInsert(
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const leaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hoveringPlusRef = useRef(false);
+  const documentBlocks = useEditorBlock()?.documentBlocks;
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -52,18 +94,25 @@ export function useGapInsert(
     if (!rootElement) return;
     const container = rootElement.closest<HTMLElement>('.rich-editor') ?? rootElement.parentElement;
     if (!container) return;
+    const canvas = documentBlocks
+      ? rootElement.closest<HTMLElement>('[data-virtual-editor]')
+      : null;
 
     let rafId: number | null = null;
 
     const evaluate = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      const rootRect = rootElement.getBoundingClientRect();
+      if (canvas && firstVisibleIsland(canvas) !== rootElement) {
+        dismiss();
+        return;
+      }
+      const rootRect = (canvas ?? rootElement).getBoundingClientRect();
       const inColumn = event.clientX >= rootRect.left - GUTTER && event.clientX <= rootRect.right;
       if (!inColumn || isBlockTarget(target) || target.closest('[role="toolbar"]')) {
         dismiss();
         return;
       }
-      const blocks = rootBlocks(rootElement);
+      const blocks = canvas ? islandBlocks(canvas) : rootBlocks(rootElement);
       const found = findGap(
         blocks.map((block) => block.getBoundingClientRect()),
         event.clientY,
@@ -81,6 +130,8 @@ export function useGapInsert(
           top: found.y + window.scrollY,
           left: rootRect.left + window.scrollX,
           width: rootRect.width,
+          next: blocks[found.index] ?? null,
+          previous: blocks[found.index - 1] ?? null,
         });
       }, GAP_DELAY);
     };
@@ -112,7 +163,7 @@ export function useGapInsert(
       clearTimer();
       clearLeaveTimer();
     };
-  }, [clearLeaveTimer, clearTimer, dismiss, editor, isBlockTarget]);
+  }, [clearLeaveTimer, clearTimer, dismiss, documentBlocks, editor, isBlockTarget]);
 
   const onPlusEnter = useCallback(() => {
     hoveringPlusRef.current = true;
@@ -127,22 +178,24 @@ export function useGapInsert(
 
   const insertAtGap = useCallback(() => {
     if (!gap) return;
-    const { index } = gap;
+    const { index, next, previous } = gap;
     hoveringPlusRef.current = false;
     dismiss();
     setGap(null);
-    editor.update(() => {
-      const root = $getRoot();
-      const paragraph = $createParagraphNode();
-      const trigger = $createTextNode('/');
-      paragraph.append(trigger);
-      const next = root.getChildAtIndex(index);
-      if (next) next.insertBefore(paragraph);
-      else root.append(paragraph);
-      trigger.select(1, 1);
-    });
+    const neighbor = next ?? previous;
+    if (documentBlocks && neighbor) {
+      const key = documentKeyOf(neighbor, documentBlocks);
+      if (!key) return;
+      documentBlocks.editor.update(
+        () => $insertSlashParagraph($getNodeByKey(key), neighbor === next),
+        { discrete: true },
+      );
+      documentBlocks.focusSelection();
+      return;
+    }
+    editor.update(() => $insertSlashParagraph($getRoot().getChildAtIndex(index), true));
     editor.focus();
-  }, [dismiss, editor, gap]);
+  }, [dismiss, documentBlocks, editor, gap]);
 
   return { gap, insertAtGap, onPlusEnter, onPlusLeave };
 }

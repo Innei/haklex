@@ -163,6 +163,29 @@ const renderSlotIndex = (recycler: EditorRecycler, slot: { index: number }) => {
   return () => container.textContent;
 };
 
+describe('virtual editor history', () => {
+  it('carries a history-merge tag from an island edit to the document', () => {
+    const { master, mount } = setup({ overscan: 300 });
+    const first = mount(1);
+    const second = mount(2);
+    const tags: string[][] = [];
+    master.registerUpdateListener(({ tags: updateTags, dirtyElements, dirtyLeaves }) => {
+      if (dirtyElements.size || dirtyLeaves.size) tags.push([...updateTags]);
+    });
+
+    first.editor.update(() => $getRoot().getFirstChild()!.selectEnd().insertText('!'), {
+      discrete: true,
+    });
+    second.editor.update(() => $getRoot().getFirstChild()!.selectEnd().insertText('?'), {
+      discrete: true,
+      tag: 'history-merge',
+    });
+
+    expect(tags.at(-2)).toContain('history-push');
+    expect(tags.at(-1)).toContain('history-merge');
+  });
+});
+
 describe('virtual editor island growth', () => {
   it('merges following rows into the island without touching the master document', () => {
     const { recycler, master, mount } = setup({ overscan: 300 });
@@ -515,6 +538,19 @@ describe('virtual editor document block selection', () => {
     master.update(() => $getRoot().getChildAtIndex(3)!.remove(), { discrete: true });
 
     expect(recycler.documentBlocks.keys()).toEqual([]);
+  });
+
+  it('maps island block keys to their document row keys', () => {
+    const { recycler, mount } = setup({ overscan: 300 });
+    const first = mount(2);
+    const second = mount(3);
+
+    expect(recycler.documentBlocks.documentKeys(first.editor, [firstKey(first.editor)])).toEqual(
+      rowKeys(recycler, 2, 2),
+    );
+    expect(
+      recycler.documentBlocks.documentKeys(second.editor, [firstKey(second.editor), 'missing']),
+    ).toEqual(rowKeys(recycler, 3, 3));
   });
 
   it('clears on a pointer press inside the editor', () => {
