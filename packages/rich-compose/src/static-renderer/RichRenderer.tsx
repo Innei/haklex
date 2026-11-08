@@ -359,7 +359,7 @@ function FullSurface({ document }: RendererSurfaceProps) {
 export function RichRenderer({
   value,
   variant = 'article',
-  theme = 'light',
+  theme,
   className,
   style,
   as: Component = 'div',
@@ -420,9 +420,11 @@ export function RichRenderer({
         }
       : {};
 
+  const nextTheme = theme ?? 'light';
+
   return (
-    <PortalThemeProvider className={variantClass} theme={theme}>
-      <ColorSchemeProvider colorScheme={theme}>
+    <PortalThemeProvider className={variantClass} theme={nextTheme}>
+      <ColorSchemeProvider colorScheme={nextTheme}>
         <RendererConfigProvider config={rendererConfig} mode="renderer" variant={variant}>
           <FootnoteDefinitionsProvider
             definitions={footnoteData.definitions}
