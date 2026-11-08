@@ -562,6 +562,7 @@ export const table = style({
       margin: 0,
     },
     '[contenteditable="true"] &': {
+      width: '100%',
       borderCollapse: 'separate',
       borderSpacing: 0,
       border: `1px solid ${vars.color.border}`,
@@ -590,6 +591,16 @@ globalStyle(`${table} :is(${tableCell}, ${tableCellHeader}) > ${paragraph}`, {
 
 globalStyle(`${table} ${tableCell} > ${paragraph}`, {
   maxWidth: '20em',
+});
+
+globalStyle(`[contenteditable="true"] ${table} ${tableCell} > ${paragraph}`, {
+  maxWidth: 'none',
+});
+
+// Lexical puts `word-break: break-word` on the editable root, which shrinks a
+// cell's min-content to one character and lets a filling table split words.
+globalStyle(`[contenteditable="true"] ${table} :is(${tableCell}, ${tableCellHeader})`, {
+  wordBreak: 'normal',
 });
 
 globalStyle(`[contenteditable="true"] ${tableCellHeader}`, {
