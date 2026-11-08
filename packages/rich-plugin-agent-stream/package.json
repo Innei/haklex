@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-agent-stream",
-  "version": "0.64.1",
+  "version": "0.64.2",
   "description": "Plays agent writes into the editor as a streaming reveal with a virtual caret",
   "repository": {
     "type": "git",
