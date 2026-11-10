@@ -48,6 +48,11 @@ function getTopLevelBlockById(blockId: string): ElementNode | null {
   return null;
 }
 
+function isDetailsSummary(element: Element): boolean {
+  // DetailsNode stores the summary as a property, outside its Lexical children.
+  return element.tagName === 'SUMMARY' && element.parentElement?.tagName === 'DETAILS';
+}
+
 function getTextLengthOfDomNode(node: Node): number {
   if (node.nodeType === Node.TEXT_NODE) {
     return node.textContent?.length ?? 0;
@@ -58,6 +63,9 @@ function getTextLengthOfDomNode(node: Node): number {
   }
 
   const element = node as Element;
+  if (isDetailsSummary(element)) {
+    return 0;
+  }
   if (element.tagName === 'BR') {
     return 1;
   }
@@ -256,6 +264,9 @@ export function getTextOffsetFromDOMPoint(
     }
 
     const element = node as Element;
+    if (isDetailsSummary(element)) {
+      return false;
+    }
     if (element.tagName === 'BR') {
       offset += 1;
       return false;
@@ -297,6 +308,9 @@ export function findDOMPointByTextOffset(
     }
 
     const element = node as Element;
+    if (isDetailsSummary(element)) {
+      return null;
+    }
     if (element.tagName === 'BR') {
       const parent = element.parentNode;
       if (!parent) {

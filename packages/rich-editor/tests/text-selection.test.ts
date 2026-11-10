@@ -173,4 +173,40 @@ describe('text selection utilities', () => {
     expect(range?.endContainer).toBe(block.lastChild);
     expect(range?.endOffset).toBe(1);
   });
+
+  it('keeps a details body selection out of its non-Lexical summary', () => {
+    const root = document.createElement('div');
+    root.innerHTML =
+      '<details data-block-id="details" open><summary>Agent runtime</summary><div><p><span data-lexical-text="true">First item</span></p><p><span data-lexical-text="true">Second item</span></p></div></details>';
+    const text = root.querySelectorAll('[data-lexical-text]')[1].firstChild!;
+    const range = createDOMRangeFromTextSelection(root, {
+      text: 'Second',
+      anchorBlockId: 'details',
+      anchorOffset: 10,
+      focusBlockId: 'details',
+      focusOffset: 16,
+    });
+
+    expect(range?.toString()).toBe('Second');
+    expect(range?.endContainer).toBe(text);
+    expect(getTextOffsetFromDOMPoint(root.firstElementChild!, text, 6)).toBe(16);
+  });
+
+  it('maps backward selections through nested details without counting either summary', () => {
+    const root = document.createElement('div');
+    root.innerHTML =
+      '<details data-block-id="details" open><summary>Outer title</summary><div><p>First</p><details open><summary>Inner title</summary><div><p>Second</p></div></details><p>Third</p></div></details>';
+    const range = createDOMRangeFromTextSelection(root, {
+      text: 'econdThird',
+      anchorBlockId: 'details',
+      anchorOffset: 16,
+      focusBlockId: 'details',
+      focusOffset: 6,
+    });
+
+    expect(range?.toString()).toBe('econdThird');
+    const block = root.firstElementChild!;
+    const end = findDOMPointByTextOffset(block, 100)!;
+    expect(getTextOffsetFromDOMPoint(block, end.node, end.offset)).toBe(16);
+  });
 });
