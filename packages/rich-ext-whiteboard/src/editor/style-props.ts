@@ -74,7 +74,8 @@ function propsFor(el: ExcalidrawElement): StyleProp[] {
     case 'text': {
       return TEXT;
     }
-    case 'image': {
+    case 'image':
+    case 'svg': {
       return ['shadow'];
     }
     default: {

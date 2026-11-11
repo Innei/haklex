@@ -5,6 +5,7 @@ export const SHADOW_TYPES: ReadonlySet<ElementType> = new Set<ElementType>([
   'diamond',
   'ellipse',
   'image',
+  'svg',
 ]);
 
 export const supportsShadow = (type: ElementType): boolean => SHADOW_TYPES.has(type);

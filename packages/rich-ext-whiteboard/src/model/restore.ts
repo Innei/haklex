@@ -6,10 +6,12 @@ import {
   newFreedrawElement,
   newImageElement,
   newLinearElement,
+  newSvgElement,
   newTextElement,
 } from './create';
 import { syncIndices } from './fractional-index';
 import { bumpVersion } from './mutate';
+import { normalizeSvgSource } from './svg';
 import { refreshTextDimensions } from './text-layout';
 
 type Raw = Partial<ExcalidrawElement> & { id?: string; type?: string };
@@ -29,6 +31,9 @@ function defaultsFor(raw: Raw): ExcalidrawElement {
     }
     case 'image': {
       return newImageElement({});
+    }
+    case 'svg': {
+      return newSvgElement({});
     }
     case 'frame':
     case 'magicframe': {
@@ -58,6 +63,9 @@ export function normalizeElement<T extends ExcalidrawElement>(raw: T): T {
   }
   if ((raw as Raw).type === 'text' && merged.originalText === undefined) {
     merged.originalText = (raw as unknown as TextElement).text;
+  }
+  if ((raw as Raw).type === 'svg' && typeof merged.svg === 'string') {
+    merged.svg = normalizeSvgSource(merged.svg);
   }
   if (
     ((raw as Raw).type === 'line' || (raw as Raw).type === 'arrow') &&

@@ -5,6 +5,7 @@ import type {
   FreedrawElement,
   ImageElement,
   LinearElement,
+  SvgElement,
   TextElement,
 } from '../scene/types';
 import type { ElementStyle } from './defaults';
@@ -134,6 +135,17 @@ export function newImageElement(
     crop: null,
     ...partial,
   } as ImageElement;
+}
+
+export function newSvgElement(
+  partial: Partial<SvgElement>,
+  style: ElementStyle = DEFAULT_STYLE,
+): SvgElement {
+  return {
+    ...base('svg', {}, { ...style, roundness: 'sharp', shadow: false }),
+    svg: '',
+    ...partial,
+  } as SvgElement;
 }
 
 export function newFrameElement(

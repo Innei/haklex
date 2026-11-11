@@ -16,6 +16,7 @@ import {
   roughOptionsForElement,
   roundedRectPath,
 } from './rough';
+import { SvgRender } from './svg-element';
 import type {
   BinaryFiles,
   EllipseElement,
@@ -53,6 +54,9 @@ export const ElementContent: FC<{ el: ExcalidrawElement; files?: BinaryFiles }> 
     }
     case 'image': {
       return <ImageRender el={el} files={files} />;
+    }
+    case 'svg': {
+      return <SvgRender el={el} />;
     }
     case 'frame':
     case 'magicframe': {

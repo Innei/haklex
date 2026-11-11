@@ -11,6 +11,7 @@ export type ElementType =
   | 'freedraw'
   | 'text'
   | 'image'
+  | 'svg'
   | 'frame'
   | 'magicframe'
   | 'embeddable'
@@ -139,6 +140,11 @@ export interface ImageElement extends BaseElement {
   type: 'image';
 }
 
+export interface SvgElement extends BaseElement {
+  svg: string;
+  type: 'svg';
+}
+
 export interface FrameLikeElement extends BaseElement {
   children?: string[];
   name?: string | null;
@@ -157,6 +163,7 @@ export type ExcalidrawElement =
   | FreedrawElement
   | TextElement
   | ImageElement
+  | SvgElement
   | FrameLikeElement
   | EmbedElement
   | (BaseElement & { type: 'selection' });

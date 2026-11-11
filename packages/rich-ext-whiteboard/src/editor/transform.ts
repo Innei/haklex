@@ -172,7 +172,8 @@ export function resizeElements(
   if (elements.length === 0 || handle === 'rotation') return [...elements];
   const frame = getTransformFrame(elements);
   const delta = rotatePoint([current[0] - start[0], current[1] - start[1]], [0, 0], -frame.angle);
-  const keepRatio = opts.keepRatio || elements.every((el) => el.type === 'text');
+  const keepRatio =
+    opts.keepRatio || elements.every((el) => el.type === 'text' || el.type === 'svg');
   const next = resizeBox(frame.box, handle, delta, { ...opts, keepRatio });
   const single = elements.length === 1;
   return elements.map((el) => placeElement(el, frame, next, single));
