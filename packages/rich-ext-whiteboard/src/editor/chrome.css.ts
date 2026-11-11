@@ -5,9 +5,8 @@ export const floating = style({
   position: 'absolute',
   zIndex: 3,
   background: vars.color.bg,
-  border: `1px solid ${vars.color.border}`,
   borderRadius: 12,
-  boxShadow: '0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.06)',
+  boxShadow: vars.boxShadow.menu,
   pointerEvents: 'auto',
 });
 
@@ -92,7 +91,7 @@ export const swatch = style({
   height: 24,
   padding: 0,
   borderRadius: 6,
-  border: '1px solid rgb(0 0 0 / 0.08)',
+  border: `1px solid ${vars.color.ring}`,
   cursor: 'pointer',
   selectors: {
     '&[aria-pressed="true"]': {
@@ -102,7 +101,7 @@ export const swatch = style({
 });
 
 export const transparentSwatch = style({
-  background: `linear-gradient(135deg, transparent 45%, #e03131 45%, #e03131 55%, transparent 55%), ${vars.color.bg}`,
+  background: `linear-gradient(135deg, transparent 45%, ${vars.color.textTertiary} 45%, ${vars.color.textTertiary} 55%, transparent 55%), ${vars.color.bg}`,
 });
 
 export const range = style({
@@ -165,7 +164,6 @@ export const sheet = style({
   background: vars.color.bg,
   borderTop: `1px solid ${vars.color.border}`,
   borderRadius: '16px 16px 0 0',
-  boxShadow: '0 -4px 16px rgb(0 0 0 / 0.06)',
   pointerEvents: 'auto',
 });
 
@@ -205,7 +203,7 @@ export const formatSwatch = style({
   margin: '0 1px',
   padding: 0,
   borderRadius: 5,
-  border: '1px solid rgb(0 0 0 / 0.08)',
+  border: `1px solid ${vars.color.ring}`,
   cursor: 'pointer',
 });
 

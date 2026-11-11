@@ -1,6 +1,11 @@
 import { globalStyle, style } from '@vanilla-extract/css';
 
-import { RICHTEXT_LIST_INDENT, RICHTEXT_QUOTE_INDENT } from '../model/richtext';
+import {
+  RICHTEXT_LINK_COLOR,
+  RICHTEXT_LIST_INDENT,
+  RICHTEXT_QUOTE_BORDER,
+  RICHTEXT_QUOTE_INDENT,
+} from '../model/richtext';
 
 export const surface = style({
   position: 'absolute',
@@ -26,7 +31,7 @@ export const quote = style({
   fontSize: 16,
   lineHeight: 1.5,
   paddingLeft: RICHTEXT_QUOTE_INDENT - 3,
-  borderLeft: '3px solid #c4c4c4',
+  borderLeft: RICHTEXT_QUOTE_BORDER,
 });
 export const list = style({ margin: 0, paddingLeft: RICHTEXT_LIST_INDENT });
 export const listItem = style({ fontSize: 16, lineHeight: 1.5 });
@@ -34,7 +39,7 @@ export const nestedListItem = style({ listStyleType: 'none' });
 export const underline = style({ textDecoration: 'underline' });
 export const strikethrough = style({ textDecoration: 'line-through' });
 export const underlineStrikethrough = style({ textDecoration: 'underline line-through' });
-export const link = style({ color: '#1971c2' });
+export const link = style({ color: RICHTEXT_LINK_COLOR });
 
 export const editingCard = style({});
 

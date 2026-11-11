@@ -18,6 +18,8 @@ export const RICHTEXT_PADDING = 12;
 export const RICHTEXT_LIST_INDENT = 20;
 export const RICHTEXT_QUOTE_INDENT = 12;
 export const RICHTEXT_TEXT_COLOR = '#1e1e1e';
+export const RICHTEXT_LINK_COLOR = '#1971c2';
+export const RICHTEXT_QUOTE_BORDER = '3px solid #c4c4c4';
 
 export interface BlockTypography {
   fontSize: number;

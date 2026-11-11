@@ -5,7 +5,9 @@ import {
   blockTypography,
   contentRoot,
   hasFormat,
+  RICHTEXT_LINK_COLOR,
   RICHTEXT_LIST_INDENT,
+  RICHTEXT_QUOTE_BORDER,
   RICHTEXT_QUOTE_INDENT,
   RICHTEXT_TEXT_COLOR,
   richTextPlainText,
@@ -57,7 +59,13 @@ function renderInline(nodes: readonly RichNode[] = []): ReactNode[] {
       case 'autolink': {
         const href = typeof node.url === 'string' && SAFE_URL.test(node.url) ? node.url : undefined;
         return (
-          <a href={href} key={i} rel="noopener noreferrer" target="_blank">
+          <a
+            href={href}
+            key={i}
+            rel="noopener noreferrer"
+            style={{ color: RICHTEXT_LINK_COLOR }}
+            target="_blank"
+          >
             {renderInline(node.children)}
           </a>
         );
@@ -100,7 +108,7 @@ function renderBlock(node: RichNode, key: number): ReactNode {
           style={{
             ...blockStyle(node),
             paddingLeft: RICHTEXT_QUOTE_INDENT - 3,
-            borderLeft: '3px solid #c4c4c4',
+            borderLeft: RICHTEXT_QUOTE_BORDER,
           }}
         >
           {renderInline(node.children)}
