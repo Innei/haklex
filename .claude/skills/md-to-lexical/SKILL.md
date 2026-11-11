@@ -24,41 +24,41 @@ cat article.md | npx tsx scripts/md-to-lexical/index.ts - > output.json
 
 ## Supported Syntax
 
-| Markdown                                       | Lexical Node                       |
+| Markdown | Lexical Node |
 | ---------------------------------------------- | ---------------------------------- | ---- | --------- | --- | ----------- |
-| `# heading`                                    | HeadingNode                        |
-| paragraph                                      | ParagraphNode                      |
-| `> quote`                                      | QuoteNode                          |
-| `> [!NOTE/TIP/WARNING/IMPORTANT/CAUTION]`      | AlertQuoteNode                     |
-| `- list` / `1. list`                           | ListNode                           |
-| `---`                                          | HorizontalRuleNode                 |
-| ` ```lang ``` `                                | CodeBlockNode                      |
-| ` ```mermaid ``` `                             | MermaidNode                        |
-| `![alt](src "caption")`                        | ImageNode                          |
-| `![alt](video.mp4)`                            | VideoNode (auto-detect)            |
-| `<video src="...">`                            | VideoNode                          |
-| `                                              | table                              | `    | TableNode |
-| `$eq$`                                         | KaTeXInlineNode                    |
-| `$$eq$$`                                       | KaTeXBlockNode                     |
-| `**bold**`, `*italic*`, `~~strike~~`           | text format flags                  |
-| `++underline++`, `==highlight==`               | text format flags                  |
-| `^superscript^`, `~subscript~`                 | text format flags                  |
-| `` `code` ``                                   | text format flag                   |
-| `                                              |                                    | text |           | `   | SpoilerNode |
-| `[name]{GH@handle}`                            | MentionNode                        |
-| `[^id]` / `[^id]: ...`                         | FootnoteNode / FootnoteSectionNode |
-| `<ruby>base<rt>reading</rt></ruby>`            | RubyNode                           |
-| `<tag>text</tag>`                              | TagNode                            |
-| `[text](url)`                                  | LinkNode                           |
-| standalone URL paragraph                       | LinkCardNode                       |
-| `:::gallery/carousel`                          | GalleryNode                        |
-| `:::warn/info/error/banner`                    | BannerNode                         |
-| `:::grid{cols=N,gap=M}`                        | GridContainerNode                  |
-| `:::masonry`                                   | GalleryNode (masonry)              |
-| `<details><summary>...</summary>...</details>` | DetailsNode                        |
-| `<Tabs><tab label="...">code</tab>...</Tabs>`  | CodeSnippetNode                    |
-| `<excalidraw>snapshot</excalidraw>`            | ExcalidrawNode                     |
-| `<nested-doc>content</nested-doc>`             | NestedDocNode                      |
+| `# heading` | HeadingNode |
+| paragraph | ParagraphNode |
+| `> quote` | QuoteNode |
+| `> [!NOTE/TIP/WARNING/IMPORTANT/CAUTION]` | AlertQuoteNode |
+| `- list` / `1. list` | ListNode |
+| `---` | HorizontalRuleNode |
+| ` ```lang ``` ` | CodeBlockNode |
+| ` ```mermaid ``` ` | MermaidNode |
+| `![alt](src "caption")` | ImageNode |
+| `![alt](video.mp4)` | VideoNode (auto-detect) |
+| `<video src="...">` | VideoNode |
+| `                                             | table                              |` | TableNode |
+| `$eq$` | KaTeXInlineNode |
+| `$$eq$$` | KaTeXBlockNode |
+| `**bold**`, `*italic*`, `~~strike~~` | text format flags |
+| `++underline++`, `==highlight==` | text format flags |
+| `^superscript^`, `~subscript~` | text format flags |
+| `` `code` `` | text format flag |
+| `                                             |                                    | text |           |` | SpoilerNode |
+| `[name]{GH@handle}` | MentionNode |
+| `[^id]` / `[^id]: ...` | FootnoteNode / FootnoteSectionNode |
+| `<ruby>base<rt>reading</rt></ruby>` | RubyNode |
+| `<tag>text</tag>` | TagNode |
+| `[text](url)` | LinkNode |
+| standalone URL paragraph | LinkCardNode |
+| `:::gallery/carousel` | GalleryNode |
+| `:::warn/info/error/banner` | BannerNode |
+| `:::grid{cols=N,gap=M}` | GridContainerNode |
+| `:::masonry` | GalleryNode (masonry) |
+| `<details><summary>...</summary>...</details>` | DetailsNode |
+| `<Tabs><tab label="...">code</tab>...</Tabs>` | CodeSnippetNode |
+| `<excalidraw>snapshot</excalidraw>` | WhiteboardNode |
+| `<nested-doc>content</nested-doc>` | NestedDocNode |
 
 ## Workflow
 

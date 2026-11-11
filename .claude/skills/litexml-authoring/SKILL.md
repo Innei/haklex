@@ -66,7 +66,7 @@ Detailed `When` / `Avoid when` / params / body rules for each tag live in [`node
 | Single image / multi-image / video / embed / link card | `<img>` / `<gallery>` / `<video>` / `<embed>` / `<link-card>`               | extensions |
 | Downloadable file attachment                           | `<attachment>`                                                              | extensions |
 | Code (single / multi-file)                             | `<codeblock>` / `<code-snippet>`                                            | extensions |
-| Diagram (Mermaid / opaque)                             | `<mermaid>` / `<excalidraw>`                                                | extensions |
+| Diagram (Mermaid / whiteboard scene)                   | `<mermaid>` / `<excalidraw>`                                                | extensions |
 | Math (inline / block)                                  | `<math>` / `<math display="block">`                                         | extensions |
 | Callout (semantic / page-wide)                         | `<alert>` / `<banner>`                                                      | extensions |
 | Collapsible / nested doc / multi-column                | `<details>` / `<nested-doc>` / `<grid><cell>`                               | extensions |

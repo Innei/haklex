@@ -170,10 +170,16 @@ flowchart LR
 </mermaid>
 ```
 
-### `<excalidraw>` — opaque Excalidraw snapshot
+### `<excalidraw>` — whiteboard scene
 
-- **When**: An opaque drawing snapshot that must round-trip exactly.
-- **Avoid when**: A diagram you would otherwise express in Mermaid — pick `<mermaid>`.
+- **When**: A hand-placed drawing: a sketch, a brainstorm board with sticky notes and a timeline, a layout with illustrations. Also any existing snapshot that must round-trip exactly.
+- **Avoid when**: A flow or sequence Mermaid can lay out for you — pick `<mermaid>`.
+- **Package**: `@haklex/rich-ext-whiteboard` (node type stays `excalidraw`). The scene is Excalidraw-shaped JSON; the full field reference, including the whiteboard-only elements, is `packages/rich-ext-whiteboard/docs/scene-format.md`. Read it before writing a scene by hand.
+- **Whiteboard-only features** (render in haklex hosts, not on excalidraw.com):
+  - `"shadow": true` on rectangles, ellipses, diamonds, images, `svg` and `richtext`: one soft drop shadow;
+  - `svg` elements: an illustration as inline SVG source in the `svg` field, drawn as an image (no scripts, no external loads);
+  - `richtext` cards: a sticky note / card whose `content` is a Lexical editor state (paragraph, heading, quote, list, link; bold, italic, colour…), with its own background, border, rounded corners and shadow. `height` is a minimum; the card grows to fit its content.
+- **Clean look**: write `"roughness": 0`, `"fontFamily": 2` (sans) and `"fillStyle": "solid"`; the default is hand-drawn.
 - **Required**: snapshot body (preferred) or `snapshot` attribute (legacy).
 - **Optional**: `id`, `snapshot` (legacy attribute form).
 - **Body**: one of three forms (see `parseSnapshot` in `rich-ext-whiteboard/src/types.ts`):

@@ -99,7 +99,7 @@ The right time to write pure Markdown is when the whole document has no extensio
 | Single-language code                     | `<codeblock>`                     | `<code-snippet>`                              |
 | Multi-file example                       | `<code-snippet>`                  | repeated `<codeblock>`                        |
 | Mermaid-expressible diagram              | `<mermaid>`                       | `<excalidraw>`                                |
-| Opaque hand-drawn snapshot               | `<excalidraw>`                    | `<mermaid>`                                   |
+| Hand-placed board, sticky notes, sketch  | `<excalidraw>`                    | `<mermaid>`                                   |
 | Inline equation                          | `<math>`                          | `<math display="block">`                      |
 | Standalone equation                      | `<math display="block">`          | inline `<math>`                               |
 | Collapsible secondary content            | `<details>`                       | `<spoiler>` (inline only)                     |
