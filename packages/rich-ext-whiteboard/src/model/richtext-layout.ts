@@ -1,6 +1,8 @@
 import { SANS_FONT_STACK } from '../scene/fonts';
 import type { ExcalidrawElement } from '../scene/types';
+import { newRichTextElement, newSvgElement } from './create';
 import { fontSizeOf } from './measure';
+import { normalizeElement } from './restore';
 import type { RichNode } from './richtext';
 import {
   blockTypography,
@@ -66,9 +68,34 @@ export function measureRichTextHeight(content: unknown, width: number): number {
   return height;
 }
 
+const DEFAULT_KEYS: Partial<Record<string, string[]>> = {
+  richtext: Object.keys(newRichTextElement({})),
+  svg: Object.keys(newSvgElement({})),
+};
+
+function withDefaults<T extends ExcalidrawElement>(el: T): T {
+  const keys = DEFAULT_KEYS[el.type];
+  const incomplete =
+    !!keys &&
+    (keys.some(
+      (key) => !(key in el) || (el as unknown as Record<string, unknown>)[key] === undefined,
+    ) ||
+      !Number.isFinite(el.width) ||
+      !Number.isFinite(el.height));
+  if (!incomplete) return el;
+  const next = normalizeElement(el);
+  return {
+    ...next,
+    width: Number.isFinite(next.width) ? next.width : 0,
+    height: Number.isFinite(next.height) ? next.height : 0,
+  };
+}
+
 export function resolveRichTextHeights<T extends ExcalidrawElement>(elements: readonly T[]): T[] {
   let changed = false;
-  const next = elements.map((el) => {
+  const next = elements.map((input) => {
+    const el = withDefaults(input);
+    if (el !== input) changed = true;
     if (el.type !== 'richtext' || el.isDeleted) return el;
     const needed = measureRichTextHeight((el as { content?: unknown }).content, el.width);
     if (!(needed > el.height)) return el;

@@ -46,6 +46,23 @@ const THEME = {
   },
 };
 
+const BAR_WIDTH = 440;
+const BAR_MARGIN = 8;
+const BAR_HEIGHT = 36;
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
+
+function formatBarPosition(
+  left: number,
+  top: number,
+  canvas: { height: number; width: number },
+): [number, number] {
+  const maxLeft = Math.max(BAR_MARGIN, canvas.width - BAR_WIDTH - BAR_MARGIN);
+  const minTop = BAR_HEIGHT + BAR_MARGIN;
+  const maxTop = Math.max(minTop, canvas.height - BAR_MARGIN);
+  return [clamp(left, BAR_MARGIN, maxLeft), clamp(top - BAR_MARGIN, minTop, maxTop)];
+}
+
 const NODES = [HeadingNode, QuoteNode, ListNode, ListItemNode, LinkNode];
 
 const EditorBridge: FC<{ onReady: (editor: LexicalEditor) => void }> = ({ onReady }) => {
@@ -63,6 +80,7 @@ const Surface: FC<{
   store: WhiteboardStore;
 }> = ({ dark, el, store }) => {
   const viewport = useStore(store, (s) => s.viewport);
+  const canvas = useStore(store, (s) => s.canvasSize);
   const editorRef = useRef<LexicalEditor | null>(null);
   const [host, setHost] = useState<HTMLElement | null>(null);
   const initialRef = useRef<string | null>(null);
@@ -142,7 +160,7 @@ const Surface: FC<{
         <ListPlugin />
         <LinkPlugin />
         <EditorBridge onReady={onReady} />
-        <RichTextFormatBar at={[left, top - 8]} host={host} />
+        <RichTextFormatBar at={formatBarPosition(left, top, canvas)} host={host} />
       </LexicalComposer>
     </div>
   );

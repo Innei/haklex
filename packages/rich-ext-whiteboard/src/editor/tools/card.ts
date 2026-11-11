@@ -45,7 +45,7 @@ export function createCardTool(): ToolHandler {
         height: Math.abs(at[1] - start[1]),
       });
     },
-    onPointerUp(ctx) {
+    onPointerUp(ctx, e) {
       if (!id) return;
       const { store } = ctx;
       const createdId = id;
@@ -56,8 +56,9 @@ export function createCardTool(): ToolHandler {
         return;
       }
       const zoom = store.getState().viewport.zoom;
+      const travel = Math.hypot(e.scene[0] - origin[0], e.scene[1] - origin[1]) * zoom;
       const sized =
-        Math.max(current.width, current.height) * zoom < DRAG_THRESHOLD
+        travel < DRAG_THRESHOLD
           ? {
               ...current,
               x: origin[0] - CARD_WIDTH / 2,

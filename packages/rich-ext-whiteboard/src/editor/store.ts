@@ -97,7 +97,7 @@ export function createWhiteboardStore(input: Record<string, unknown> | undefined
     const result = updater(current);
     if (!result) return null;
     const elements = result.elements
-      ? normalizeChanged(current.elements, result.elements)
+      ? resolveRichTextHeights(normalizeChanged(current.elements, result.elements))
       : current.elements;
     const files = result.files ?? current.files;
     if (elements === current.elements && files === current.files) return null;

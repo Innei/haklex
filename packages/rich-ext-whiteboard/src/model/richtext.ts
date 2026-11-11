@@ -62,6 +62,7 @@ export function isBlockContainer(node: RichNode): boolean {
 export function richTextPlainText(node: RichNode | undefined): string {
   if (!node) return '';
   if (node.type === 'text') return node.text ?? '';
+  if (typeof node.text === 'string' && !node.children?.length) return node.text;
   if (node.type === 'linebreak') return '\n';
   if (node.type === 'tab') return '\t';
   return (node.children ?? []).map(richTextPlainText).join('');

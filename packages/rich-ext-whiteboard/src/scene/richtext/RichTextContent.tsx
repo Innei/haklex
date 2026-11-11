@@ -111,7 +111,12 @@ function renderBlock(node: RichNode, key: number): ReactNode {
       const List = node.listType === 'number' ? 'ol' : 'ul';
       return (
         <List key={key} style={{ margin: 0, paddingLeft: RICHTEXT_LIST_INDENT }}>
-          {(node.children ?? []).map((item, i) => renderListItem(item, i))}
+          {(node.children ?? []).map((item, i) =>
+            renderListItem(
+              item.type === 'listitem' ? item : { type: 'listitem', children: [item] },
+              i,
+            ),
+          )}
         </List>
       );
     }

@@ -67,7 +67,9 @@ function list(node: RichNode): RichNode {
     listType,
     start: 1,
     tag: listType === 'number' ? 'ol' : 'ul',
-    children: (node.children ?? []).map((item, i) => listItem(item, i)),
+    children: (node.children ?? []).map((item, i) =>
+      listItem(item.type === 'listitem' ? item : { type: 'listitem', children: [item] }, i),
+    ),
   };
 }
 
