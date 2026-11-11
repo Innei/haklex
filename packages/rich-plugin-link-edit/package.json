@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-link-edit",
-  "version": "0.64.3",
+  "version": "0.65.0",
   "description": "Link editing plugin",
   "repository": {
     "type": "git",

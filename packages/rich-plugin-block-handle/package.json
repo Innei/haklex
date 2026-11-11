@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-plugin-block-handle",
-  "version": "0.64.3",
+  "version": "0.65.0",
   "description": "Block handle plugin with add button and context menu",
   "repository": {
     "type": "git",
