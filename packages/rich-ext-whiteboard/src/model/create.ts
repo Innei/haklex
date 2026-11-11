@@ -5,12 +5,14 @@ import type {
   FreedrawElement,
   ImageElement,
   LinearElement,
+  RichTextElement,
   SvgElement,
   TextElement,
 } from '../scene/types';
 import type { ElementStyle } from './defaults';
 import { DEFAULT_LINE_HEIGHT, DEFAULT_STYLE } from './defaults';
 import { randomId, randomInteger } from './random';
+import { paragraphs } from './richtext';
 import { supportsShadow } from './shadow';
 
 type ShapeType = Exclude<ElementType, 'line' | 'arrow' | 'freedraw' | 'text' | 'image'>;
@@ -18,7 +20,7 @@ type ShapeType = Exclude<ElementType, 'line' | 'arrow' | 'freedraw' | 'text' | '
 function roundnessFor(type: ElementType, style: ElementStyle): BaseElement['roundness'] {
   if (style.roundness === 'sharp') return null;
   if (type === 'line' || type === 'arrow') return { type: 2 };
-  if (type === 'rectangle' || type === 'diamond' || type === 'embeddable' || type === 'iframe') {
+  if (['rectangle', 'diamond', 'embeddable', 'iframe', 'richtext'].includes(type)) {
     return { type: 3 };
   }
   return null;
@@ -135,6 +137,22 @@ export function newImageElement(
     crop: null,
     ...partial,
   } as ImageElement;
+}
+
+export function newRichTextElement(
+  partial: Partial<RichTextElement>,
+  style: ElementStyle = DEFAULT_STYLE,
+): RichTextElement {
+  return {
+    ...base('richtext', {}, { ...style, roundness: 'round', shadow: false }),
+    strokeColor: 'transparent',
+    backgroundColor: '#ffec99',
+    fillStyle: 'solid',
+    roughness: 0,
+    strokeWidth: 1,
+    content: paragraphs(['']),
+    ...partial,
+  } as RichTextElement;
 }
 
 export function newSvgElement(

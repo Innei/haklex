@@ -1,3 +1,5 @@
+import type { RichTextContent } from '../model/richtext';
+
 export type StrokeStyle = 'solid' | 'dashed' | 'dotted';
 export type FillStyle =
   'hachure' | 'cross-hatch' | 'solid' | 'zigzag' | 'zigzag-line' | 'dots' | 'dashed';
@@ -12,6 +14,7 @@ export type ElementType =
   | 'text'
   | 'image'
   | 'svg'
+  | 'richtext'
   | 'frame'
   | 'magicframe'
   | 'embeddable'
@@ -145,6 +148,11 @@ export interface SvgElement extends BaseElement {
   type: 'svg';
 }
 
+export interface RichTextElement extends BaseElement {
+  content: RichTextContent;
+  type: 'richtext';
+}
+
 export interface FrameLikeElement extends BaseElement {
   children?: string[];
   name?: string | null;
@@ -164,6 +172,7 @@ export type ExcalidrawElement =
   | TextElement
   | ImageElement
   | SvgElement
+  | RichTextElement
   | FrameLikeElement
   | EmbedElement
   | (BaseElement & { type: 'selection' });

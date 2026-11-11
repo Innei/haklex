@@ -6,6 +6,7 @@ const BINDABLE = new Set([
   'ellipse',
   'image',
   'svg',
+  'richtext',
   'text',
   'embeddable',
   'iframe',

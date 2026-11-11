@@ -4,6 +4,7 @@ import { use, useId } from 'react';
 import { SceneDarkContext } from './context';
 import { fontFamilyToCss } from './fonts';
 import { freedrawOutline } from './freedraw';
+import { RichTextBody } from './richtext/RichTextBody';
 import {
   curve,
   diamond,
@@ -57,6 +58,14 @@ export const ElementContent: FC<{ el: ExcalidrawElement; files?: BinaryFiles }> 
     }
     case 'svg': {
       return <SvgRender el={el} />;
+    }
+    case 'richtext': {
+      return (
+        <>
+          <RectangleRender el={el as unknown as RectangleElement} />
+          <RichTextBody el={el} />
+        </>
+      );
     }
     case 'frame':
     case 'magicframe': {

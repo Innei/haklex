@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 import { DEFAULT_STYLE } from '../model/defaults';
 import { syncIndices } from '../model/fractional-index';
 import { normalizeElement } from '../model/restore';
+import { resolveRichTextHeights } from '../model/richtext-layout';
 import type { BinaryFiles, ExcalidrawElement } from '../scene/types';
 import { createHistory } from './history';
 import type { Doc, DocUpdater, EditorState, SceneDoc } from './types';
@@ -48,9 +49,9 @@ export function createWhiteboardStore(input: Record<string, unknown> | undefined
   const original = (input ?? {}) as Record<string, unknown>;
   const originalAppState = original.appState as Record<string, unknown> | undefined;
   const originalFiles = (original.files as BinaryFiles | undefined) ?? {};
-  const initialElements = (
-    Array.isArray(original.elements) ? original.elements : []
-  ) as ExcalidrawElement[];
+  const initialElements = resolveRichTextHeights(
+    (Array.isArray(original.elements) ? original.elements : []) as ExcalidrawElement[],
+  );
   const initialBackground =
     (originalAppState?.viewBackgroundColor as string | undefined) ?? DEFAULT_BACKGROUND;
   const initialGrid = (originalAppState?.gridSize as number | null | undefined) ?? null;

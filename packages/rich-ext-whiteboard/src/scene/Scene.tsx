@@ -3,6 +3,7 @@ import { memo, useId } from 'react';
 
 import { getElementCenter } from '../model/bounds';
 import { angleOf } from '../model/geometry';
+import { resolveRichTextHeights } from '../model/richtext-layout';
 import { hasShadow } from '../model/shadow';
 import { SceneDarkContext } from './context';
 import { ElementContent } from './elements';
@@ -18,7 +19,8 @@ export interface SceneBounds {
   width: number;
 }
 
-export function computeSceneBounds(elements: ExcalidrawElement[]): SceneBounds {
+export function computeSceneBounds(input: ExcalidrawElement[]): SceneBounds {
+  const elements = resolveRichTextHeights(input);
   let minX = Infinity;
   let minY = Infinity;
   let maxX = -Infinity;
@@ -68,7 +70,7 @@ const isFrame = (el: ExcalidrawElement) => el.type === 'frame' || el.type === 'm
 
 export const SceneContent: FC<SceneContentProps> = memo(
   ({ dark = false, elementProps, files, hiddenIds, scene }) => {
-    const elements = scene.elements.filter((el) => !el.isDeleted);
+    const elements = resolveRichTextHeights(scene.elements.filter((el) => !el.isDeleted));
     const uid = useId().replaceAll(/[^\w-]/g, '');
     // One filter per scene: `url(#id)` resolves to the first match in the page, and
     // a match inside a hidden subtree may not render in every engine.

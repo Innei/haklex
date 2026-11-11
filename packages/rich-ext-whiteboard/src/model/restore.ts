@@ -6,6 +6,7 @@ import {
   newFreedrawElement,
   newImageElement,
   newLinearElement,
+  newRichTextElement,
   newSvgElement,
   newTextElement,
 } from './create';
@@ -34,6 +35,9 @@ function defaultsFor(raw: Raw): ExcalidrawElement {
     }
     case 'svg': {
       return newSvgElement({});
+    }
+    case 'richtext': {
+      return newRichTextElement({});
     }
     case 'frame':
     case 'magicframe': {
