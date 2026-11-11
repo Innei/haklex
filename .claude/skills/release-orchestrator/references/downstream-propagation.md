@@ -95,11 +95,11 @@ The check must cover:
 
 Re-derive at release time. Historical sets:
 
-| Repo    | Stage                                                                                                                                                                                                                                                               |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Yohaku  | `apps/web/package.json`, root `pnpm-lock.yaml`, the `yohaku-oss` pin, and in `yohaku-oss`: `packages/rich-content/package.json`, `apps/mobile/package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`. Never stage `apps/web/next-env.d.ts` churn from `next build`. |
-| mx-core | `apps/admin/package.json`, `apps/core/package.json`, `packages/cli/package.json`, `packages/editor/package.json`, root `pnpm-lock.yaml`, and `pnpm-workspace.yaml` if `pnpm install` adds a benign `minimumReleaseAgeExclude`.                                      |
-| ryugi   | `artifacts/package.json`, `artifacts/pnpm-lock.yaml`, `artifacts/pnpm-workspace.yaml`, plus the files `scripts/bump-version.sh` touches.                                                                                                                            |
+| Repo        | Stage                                                                                                                                                                                                                                                               |
+| ----------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Yohaku      | `apps/web/package.json`, root `pnpm-lock.yaml`, the `yohaku-oss` pin, and in `yohaku-oss`: `packages/rich-content/package.json`, `apps/mobile/package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`. Never stage `apps/web/next-env.d.ts` churn from `next build`. |
+| mx-core     | `apps/admin/package.json`, `apps/core/package.json`, `packages/cli/package.json`, `packages/editor/package.json`, root `pnpm-lock.yaml`, and `pnpm-workspace.yaml` if `pnpm install` adds a benign `minimumReleaseAgeExclude`.                                      |
+| ryugi-cloud | `packages/artifacts/package.json`, `web/package.json`, root `pnpm-lock.yaml`, plus `packages/artifacts/package.json` again in the separate `chore(artifacts): release <version>` commit from `scripts/release-artifacts.sh`.                                        |
 
 Do not discard generated file churn with reset/restore commands. If generated files changed, inspect them and either include them deliberately or ask the user how to proceed.
 
@@ -111,7 +111,7 @@ pnpm why <lib> -r -> <version>
 
 ## Phase 7: Downstream Smoke Tests
 
-Run Yohaku, mx-core and ryugi worktrees in parallel where practical.
+Run Yohaku, mx-core and ryugi-cloud worktrees in parallel where practical.
 
 | Test                        | Requirement                                                                                   |
 | --------------------------- | --------------------------------------------------------------------------------------------- |

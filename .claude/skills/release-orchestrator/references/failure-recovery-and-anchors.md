@@ -38,12 +38,12 @@ Do not use destructive reset, restore, checkout, or force-removal workflows to h
 
 Print a compact table:
 
-| Repo    | Branch      | Commit SHA | Bump                  | Published                 | Tests                      |
-| ------- | ----------- | ---------- | --------------------- | ------------------------- | -------------------------- |
-| haklex  | `main`      | `<sha>`    | `<patch/minor/major>` | `<n>/<n>` (CI run `<id>`) | `Release` workflow         |
-| Yohaku  | `<default>` | `<sha>`    | `-`                   | `<pins bumped>`           | `typecheck / build / e2e`  |
-| mx-core | `<default>` | `<sha>`    | `-`                   | `<pins bumped>`           | `typecheck / build / e2e`  |
-| ryugi   | `main`      | `<sha>`    | `<ryugi version>`     | `<pins bumped>`           | `typecheck / test / build` |
+| Repo        | Branch      | Commit SHA | Bump                  | Published                 | Tests                     |
+| ----------- | ----------- | ---------- | --------------------- | ------------------------- | ------------------------- |
+| haklex      | `main`      | `<sha>`    | `<patch/minor/major>` | `<n>/<n>` (CI run `<id>`) | `Release` workflow        |
+| Yohaku      | `<default>` | `<sha>`    | `-`                   | `<pins bumped>`           | `typecheck / build / e2e` |
+| mx-core     | `<default>` | `<sha>`    | `-`                   | `<pins bumped>`           | `typecheck / build / e2e` |
+| ryugi-cloud | `main`      | `<sha>`    | `<artifacts version>` | `<pins bumped>`           | `typecheck / test`        |
 
 Then print the live GitHub release URL:
 
