@@ -1,6 +1,6 @@
 import { ColorSchemeProvider, getVariantClass } from '@haklex/rich-editor';
-import type { ExcalidrawEditRendererProps, ExcalidrawSnapshot } from '@haklex/rich-ext-excalidraw';
-import { ExcalidrawConfigProvider } from '@haklex/rich-ext-excalidraw/static';
+import type { WhiteboardEditRendererProps, WhiteboardSnapshot } from '@haklex/rich-ext-whiteboard';
+import { WhiteboardConfigProvider } from '@haklex/rich-ext-whiteboard/static';
 import { PortalThemeProvider } from '@haklex/rich-style-token';
 import { type FC, useCallback, useState } from 'react';
 
@@ -73,11 +73,11 @@ export function ExcalidrawDetail() {
     [blobStore],
   );
 
-  const [remoteSnapshot, setRemoteSnapshot] = useState<ExcalidrawSnapshot>(() => ({
+  const [remoteSnapshot, setRemoteSnapshot] = useState<WhiteboardSnapshot>(() => ({
     type: 'remote',
     url: URL.createObjectURL(new Blob([excalidrawInlineSnapshot], { type: 'application/json' })),
   }));
-  const [deltaSnapshot, setDeltaSnapshot] = useState<ExcalidrawSnapshot>(() => ({
+  const [deltaSnapshot, setDeltaSnapshot] = useState<WhiteboardSnapshot>(() => ({
     type: 'delta',
     baseUrl: URL.createObjectURL(
       new Blob([excalidrawInlineSnapshot], { type: 'application/json' }),
@@ -85,18 +85,18 @@ export function ExcalidrawDetail() {
     delta: {},
   }));
 
-  const [ExcalidrawEditRenderer, setEditRenderer] =
-    useState<FC<ExcalidrawEditRendererProps> | null>(null);
+  const [WhiteboardEditRenderer, setEditRenderer] =
+    useState<FC<WhiteboardEditRendererProps> | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   if (!loaded) {
-    import('@haklex/rich-ext-excalidraw').then((mod) => {
-      setEditRenderer(() => mod.ExcalidrawEditRenderer);
+    import('@haklex/rich-ext-whiteboard').then((mod) => {
+      setEditRenderer(() => mod.WhiteboardEditRenderer);
       setLoaded(true);
     });
   }
 
-  if (!ExcalidrawEditRenderer) {
+  if (!WhiteboardEditRenderer) {
     return (
       <p style={{ color: 'var(--rc-text-tertiary)', fontSize: 14 }}>Loading excalidraw editor...</p>
     );
@@ -105,7 +105,7 @@ export function ExcalidrawDetail() {
   return (
     <PortalThemeProvider className={getVariantClass('article')} theme={theme}>
       <ColorSchemeProvider colorScheme={theme}>
-        <ExcalidrawConfigProvider saveSnapshot={mockSaveSnapshot}>
+        <WhiteboardConfigProvider saveSnapshot={mockSaveSnapshot}>
           <p
             style={{
               margin: '0 0 16px',
@@ -127,7 +127,7 @@ export function ExcalidrawDetail() {
                 data-theme={theme}
                 style={{ position: 'relative' }}
               >
-                <ExcalidrawEditRenderer
+                <WhiteboardEditRenderer
                   snapshot={remoteSnapshot}
                   onSnapshotChange={setRemoteSnapshot}
                 />
@@ -144,14 +144,14 @@ export function ExcalidrawDetail() {
                 data-theme={theme}
                 style={{ height: 320, position: 'relative' }}
               >
-                <ExcalidrawEditRenderer
+                <WhiteboardEditRenderer
                   snapshot={deltaSnapshot}
                   onSnapshotChange={setDeltaSnapshot}
                 />
               </div>
             </Panel>
           </div>
-        </ExcalidrawConfigProvider>
+        </WhiteboardConfigProvider>
       </ColorSchemeProvider>
     </PortalThemeProvider>
   );

@@ -5,9 +5,8 @@ publicHoistPattern:
   - 'mdast-util-to-markdown'
   - '*eslint*'
   - '*prettier*'
-  # react/react-dom must reach root node_modules so transitive deps (e.g.
-  # tunnel-rat via @excalidraw/excalidraw) resolve them when rich-compose
-  # bundles the standalone litexml-html-preview-client.
+  # react/react-dom stay at root node_modules so transitive deps bundled into
+  # rich-compose's standalone litexml-html-preview-client resolve them.
   - 'react'
   - 'react-dom'
 allowBuilds:

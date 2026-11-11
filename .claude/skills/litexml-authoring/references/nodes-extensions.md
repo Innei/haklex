@@ -176,7 +176,7 @@ flowchart LR
 - **Avoid when**: A diagram you would otherwise express in Mermaid — pick `<mermaid>`.
 - **Required**: snapshot body (preferred) or `snapshot` attribute (legacy).
 - **Optional**: `id`, `snapshot` (legacy attribute form).
-- **Body**: one of three forms (see `parseSnapshot` in `rich-ext-excalidraw/src/types.ts`):
+- **Body**: one of three forms (see `parseSnapshot` in `rich-ext-whiteboard/src/types.ts`):
   - **inline** — opaque JSON inside `<![CDATA[...]]>`;
   - **remote** — a single line starting with `http`, `blob:`, or `ref:` pointing at an uploaded `.excalidraw` file (no CDATA needed; URLs are XML-safe);
   - **delta** — a remote base URL on the first line followed by a JSON delta object (remote base + local edits).

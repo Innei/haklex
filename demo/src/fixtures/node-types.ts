@@ -151,7 +151,7 @@ export const nodeTypes: NodeTypeMeta[] = [
     label: 'Excalidraw',
     category: 'block',
     description: 'An Excalidraw whiteboard, rendered as SVG when read.',
-    packageName: '@haklex/rich-ext-excalidraw',
+    packageName: '@haklex/rich-ext-whiteboard',
     hasEdit: true,
     sampleKeys: ['excalidraw'],
   },

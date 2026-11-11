@@ -8,7 +8,7 @@ Lexical-based rich editor ecosystem. Modular packages: core editor, UI primitive
 
 **Build**: Vite 8 + Vanilla Extract CSS-in-TS. ESM only (`.mjs`). TypeScript 7. Lexical 0.52. pnpm 12 (pinned via `packageManager`). Node >= 22.12.
 
-> **pnpm config note**: pnpm 11 and later no longer read the `pnpm` field in `package.json` or `public-hoist-pattern` from `.npmrc`. Hoist patterns and workspace settings live in `pnpm-workspace.yaml` (`publicHoistPattern`, `allowBuilds`). `react`/`react-dom` are public-hoisted there so transitive deps (e.g. `tunnel-rat` via `@excalidraw/excalidraw`) resolve them when `rich-compose` bundles the standalone `litexml-html-preview-client`.
+> **pnpm config note**: pnpm 11 and later no longer read the `pnpm` field in `package.json` or `public-hoist-pattern` from `.npmrc`. Hoist patterns and workspace settings live in `pnpm-workspace.yaml` (`publicHoistPattern`, `allowBuilds`). `react`/`react-dom` are public-hoisted there so transitive deps resolve them when `rich-compose` bundles the standalone `litexml-html-preview-client`.
 
 ## Commands
 
@@ -63,7 +63,7 @@ Registration:
 └── @haklex/rich-style-token (theme tokens, CSS variables, variant presets)
 
 @haklex/rich-compose (modular composition + SSR engine: composeRenderer, RichRenderer, per-feature modules)
-@haklex/rich-ext-{chat,code-snippet,embed,excalidraw,gallery,nested-doc} (heavy extensions)
+@haklex/rich-ext-{chat,code-snippet,embed,gallery,nested-doc,whiteboard} (heavy extensions)
 @haklex/rich-plugin-{block-handle,floating-toolbar,link-edit,mention,slash-menu,table,toolbar}
 @haklex/rich-renderer-{alert,banner,codeblock,image,linkcard,mention,mermaid,ruby,video,katex}
 

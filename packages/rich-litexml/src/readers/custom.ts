@@ -430,7 +430,7 @@ export function registerCustomReaders(registry: LitexmlRegistry): void {
         ...extractBlockId(el),
         // Plain text body covers remote snapshots (a bare http/blob:/ref: URL,
         // optionally followed by a JSON delta) — see parseSnapshot in
-        // rich-ext-excalidraw.
+        // rich-ext-whiteboard.
         snapshot:
           extractCdataText(el) || el.getAttribute('snapshot') || el.textContent?.trim() || '',
         version: 1,

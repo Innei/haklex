@@ -679,7 +679,7 @@ export const presets: Preset[] = [
 
       paragraph(
         text('This preset demonstrates the '),
-        text('@haklex/rich-ext-excalidraw', FORMAT_CODE),
+        text('@haklex/rich-ext-whiteboard', FORMAT_CODE),
         text(
           ' extension package, which adds an interactive whiteboard node to the editor via the ',
         ),
@@ -693,7 +693,7 @@ export const presets: Preset[] = [
         'tip',
         paragraph(
           text(
-            'The excalidraw node is registered as an extension, not a built-in. It uses RichEditor children slot for the ExcalidrawPlugin and extraNodes for node registration.',
+            'The excalidraw node is registered as an extension, not a built-in. It uses RichEditor children slot for the WhiteboardPlugin and extraNodes for node registration.',
           ),
         ),
       ) as any,
@@ -719,15 +719,15 @@ export const presets: Preset[] = [
       {
         type: 'code-block',
         language: 'tsx',
-        code: `import { ExcalidrawNode, ExcalidrawPlugin } from '@haklex/rich-ext-excalidraw'
+        code: `import { WhiteboardNode, WhiteboardPlugin } from '@haklex/rich-ext-whiteboard'
 
 // Editor: register node + plugin
-<RichEditor extraNodes={[ExcalidrawNode]}>
-  <ExcalidrawPlugin />
+<RichEditor extraNodes={[WhiteboardNode]}>
+  <WhiteboardPlugin />
 </RichEditor>
 
 // Renderer: register node only
-<RichRenderer extraNodes={[ExcalidrawNode]} value={state} />`,
+<RichRenderer extraNodes={[WhiteboardNode]} value={state} />`,
         version: 1,
       } as any,
 

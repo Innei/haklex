@@ -18,7 +18,7 @@ export const extensions: ExtensionMeta[] = [
     id: 'excalidraw',
     name: 'Excalidraw',
     description: 'Embedded whiteboard with remote and delta storage modes.',
-    packageName: 'rich-ext-excalidraw',
+    packageName: 'rich-ext-whiteboard',
     preview: 'Whiteboard',
   },
   {

@@ -69,9 +69,9 @@
     "./modules/mermaid": "./src/modules/mermaid/index.ts",
     "./modules/mermaid/edit": "./src/modules/mermaid/edit.ts",
     "./modules/mermaid/renderer": "./src/modules/mermaid/renderer.tsx",
-    "./modules/excalidraw": "./src/modules/excalidraw/index.ts",
-    "./modules/excalidraw/edit": "./src/modules/excalidraw/edit.tsx",
-    "./modules/excalidraw/node": "./src/modules/excalidraw/node.ts",
+    "./modules/whiteboard": "./src/modules/whiteboard/index.ts",
+    "./modules/whiteboard/edit": "./src/modules/whiteboard/edit.tsx",
+    "./modules/whiteboard/node": "./src/modules/whiteboard/node.ts",
     "./modules/dynamic": "./src/modules/dynamic/index.ts",
     "./modules/dynamic/edit": "./src/modules/dynamic/edit.tsx",
     "./modules/dynamic/node": "./src/modules/dynamic/node.ts",
@@ -110,11 +110,11 @@
     "@haklex/rich-ext-chat": "workspace:*",
     "@haklex/rich-ext-code-snippet": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
-    "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-gallery": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
     "@haklex/rich-ext-poll": "workspace:*",
     "@haklex/rich-ext-steps": "workspace:*",
+    "@haklex/rich-ext-whiteboard": "workspace:*",
     "@haklex/rich-litexml": "workspace:*",
     "@haklex/rich-plugin-slash-menu": "workspace:*",
     "@haklex/rich-renderer-alert": "workspace:*",
@@ -325,13 +325,13 @@
         "import": "./dist/modules/mermaid/renderer.mjs",
         "types": "./dist/modules/mermaid/renderer.d.ts"
       },
-      "./modules/excalidraw": {
-        "import": "./dist/modules/excalidraw/index.mjs",
-        "types": "./dist/modules/excalidraw/index.d.ts"
+      "./modules/whiteboard": {
+        "import": "./dist/modules/whiteboard/index.mjs",
+        "types": "./dist/modules/whiteboard/index.d.ts"
       },
-      "./modules/excalidraw/node": {
-        "import": "./dist/modules/excalidraw/node.mjs",
-        "types": "./dist/modules/excalidraw/node.d.ts"
+      "./modules/whiteboard/node": {
+        "import": "./dist/modules/whiteboard/node.mjs",
+        "types": "./dist/modules/whiteboard/node.d.ts"
       },
       "./modules/dynamic": {
         "import": "./dist/modules/dynamic/index.mjs",
@@ -397,9 +397,9 @@
         "import": "./dist/modules/embed/edit.mjs",
         "types": "./dist/modules/embed/edit.d.ts"
       },
-      "./modules/excalidraw/edit": {
-        "import": "./dist/modules/excalidraw/edit.mjs",
-        "types": "./dist/modules/excalidraw/edit.d.ts"
+      "./modules/whiteboard/edit": {
+        "import": "./dist/modules/whiteboard/edit.mjs",
+        "types": "./dist/modules/whiteboard/edit.d.ts"
       },
       "./modules/dynamic/edit": {
         "import": "./dist/modules/dynamic/edit.mjs",

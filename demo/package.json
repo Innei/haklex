@@ -16,7 +16,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@excalidraw/excalidraw": "^0.18.1",
     "@haklex/rich-agent-chat": "workspace:*",
     "@haklex/rich-agent-core": "workspace:*",
     "@haklex/rich-compose": "workspace:*",
@@ -29,10 +28,10 @@
     "@haklex/rich-ext-code-snippet": "workspace:*",
     "@haklex/rich-ext-dynamic": "workspace:*",
     "@haklex/rich-ext-embed": "workspace:*",
-    "@haklex/rich-ext-excalidraw": "workspace:*",
     "@haklex/rich-ext-gallery": "workspace:*",
     "@haklex/rich-ext-nested-doc": "workspace:*",
     "@haklex/rich-ext-poll": "workspace:*",
+    "@haklex/rich-ext-whiteboard": "workspace:*",
     "@haklex/rich-plugin-agent-stream": "workspace:*",
     "@haklex/rich-plugin-block-handle": "workspace:*",
     "@haklex/rich-plugin-floating-toolbar": "workspace:*",

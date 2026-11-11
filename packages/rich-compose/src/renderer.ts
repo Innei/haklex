@@ -5,7 +5,6 @@ import { chatModule } from './modules/chat/module';
 import { codeBlockModule } from './modules/code-block/module';
 import { codeSnippetModule } from './modules/code-snippet/module';
 import { embedModule } from './modules/embed/module';
-import { excalidrawModule } from './modules/excalidraw/module';
 import { fileModule } from './modules/file/module';
 import { galleryModule } from './modules/gallery/module';
 import { imageModule } from './modules/image/module';
@@ -18,6 +17,7 @@ import { pollModule } from './modules/poll/module';
 import { rubyModule } from './modules/ruby/module';
 import { stepsModule } from './modules/steps/module';
 import { videoModule } from './modules/video/module';
+import { whiteboardModule } from './modules/whiteboard/module';
 
 export {
   alertModule,
@@ -27,7 +27,6 @@ export {
   codeBlockModule,
   codeSnippetModule,
   embedModule,
-  excalidrawModule,
   fileModule,
   galleryModule,
   imageModule,
@@ -40,6 +39,7 @@ export {
   rubyModule,
   stepsModule,
   videoModule,
+  whiteboardModule,
 };
 
 export const allRendererModules = [
@@ -50,7 +50,7 @@ export const allRendererModules = [
   codeBlockModule,
   codeSnippetModule,
   embedModule,
-  excalidrawModule,
+  whiteboardModule,
   fileModule,
   galleryModule,
   imageModule,

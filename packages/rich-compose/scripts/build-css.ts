@@ -43,7 +43,7 @@ const MODULE_TO_PACKAGE: Record<string, string> = {
   'code-snippet': 'rich-ext-code-snippet',
   'dynamic': 'rich-ext-dynamic',
   'embed': 'rich-ext-embed',
-  'excalidraw': 'rich-ext-excalidraw',
+  'whiteboard': 'rich-ext-whiteboard',
   'gallery': 'rich-ext-gallery',
   'image': 'rich-renderer-image',
   'file': 'rich-renderer-file',

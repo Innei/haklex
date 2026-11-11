@@ -2,16 +2,16 @@ import { composeRenderer } from '@haklex/rich-compose';
 import { dynamicModule } from '@haklex/rich-compose/modules/dynamic';
 import {
   allRendererModules,
-  excalidrawModule,
   galleryModule,
   imageModule,
   nestedDocModule,
+  whiteboardModule,
 } from '@haklex/rich-compose/renderer';
 import { presentDialog } from '@haklex/rich-editor-ui';
 import {
-  ExcalidrawExpandShell,
-  excalidrawFullscreenPopup,
-} from '@haklex/rich-ext-excalidraw/static';
+  WhiteboardExpandShell,
+  whiteboardFullscreenPopup,
+} from '@haklex/rich-ext-whiteboard/static';
 
 import { isAllowedDynamicUrl } from '../fixtures/dynamic-catalog';
 import { onImageClick } from '../lightbox/lightbox-store';
@@ -34,19 +34,19 @@ const modules = allRendererModules.map((module) => {
       },
     });
   }
-  if (module === excalidrawModule) {
-    return excalidrawModule.setup({
+  if (module === whiteboardModule) {
+    return whiteboardModule.setup({
       onExpand: ({ content, elementCount, theme }) => {
         presentDialog({
           content: ({ dismiss }) => (
-            <ExcalidrawExpandShell
+            <WhiteboardExpandShell
               dismiss={dismiss}
               meta={elementCount === undefined ? undefined : `${elementCount} elements`}
             >
               {content}
-            </ExcalidrawExpandShell>
+            </WhiteboardExpandShell>
           ),
-          className: excalidrawFullscreenPopup,
+          className: whiteboardFullscreenPopup,
           theme,
           showCloseButton: false,
           clickOutsideToDismiss: true,

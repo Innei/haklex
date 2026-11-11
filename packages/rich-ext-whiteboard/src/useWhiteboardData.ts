@@ -1,0 +1,159 @@
+import { useCallback, useEffect, useMemo, useState } from 'react';
+
+import type { WhiteboardSnapshot } from './types';
+import { isLocalScenePath, parseSnapshot } from './types';
+import { useWhiteboardConfig } from './WhiteboardConfigContext';
+
+export interface WhiteboardDataState {
+  /** The raw base data before delta patch (for computing new diffs in edit mode) */
+  baseData?: Record<string, any>;
+  /** The base reference line (URL or ref:file/xxx) when snapshot is remote or incremental */
+  baseRef?: string;
+  error: string;
+  loading: boolean;
+  /** Re-fetches a remote or incremental snapshot; a no-op for inline data. */
+  retry: () => void;
+  /** True only when `error` came from a fetch, so `retry` can change the outcome. */
+  retryable: boolean;
+  snapshot: Record<string, any> | undefined;
+}
+
+type ParsedData =
+  | { type: 'empty' }
+  | { type: 'inline'; snapshot: Record<string, any> }
+  | { type: 'remote'; fetchUrl: string; refLine: string }
+  | { type: 'incremental'; fetchUrl: string; refLine: string; delta: object }
+  | { type: 'error'; error: string };
+
+function resolveUrl(
+  url: string,
+  apiUrl: string | undefined,
+): { fetchUrl: string; refLine: string } | { error: string } {
+  const refLine = url;
+  if (url.startsWith('http') || url.startsWith('blob:') || isLocalScenePath(url)) {
+    return { fetchUrl: url, refLine };
+  }
+  if (url.startsWith('ref:') && apiUrl) {
+    return { fetchUrl: `${apiUrl}/objects/${url.slice(4)}`, refLine };
+  }
+  return {
+    error: url.startsWith('ref:')
+      ? 'Missing apiUrl for ref resolution'
+      : 'Unrecognized snapshot format',
+  };
+}
+
+function typedToParsed(typed: WhiteboardSnapshot, apiUrl: string | undefined): ParsedData {
+  switch (typed.type) {
+    case 'inline': {
+      return { type: 'inline', snapshot: typed.data };
+    }
+    case 'remote': {
+      const result = resolveUrl(typed.url, apiUrl);
+      if ('error' in result) return { type: 'error', error: result.error };
+      return {
+        type: 'remote',
+        fetchUrl: result.fetchUrl,
+        refLine: result.refLine,
+      };
+    }
+    case 'delta': {
+      const result = resolveUrl(typed.baseUrl, apiUrl);
+      if ('error' in result) return { type: 'error', error: result.error };
+      return {
+        type: 'incremental',
+        fetchUrl: result.fetchUrl,
+        refLine: result.refLine,
+        delta: typed.delta,
+      };
+    }
+  }
+}
+
+function stringToParsed(data: string, apiUrl: string | undefined): ParsedData {
+  if (!data.trim()) return { type: 'empty' };
+  const typed = parseSnapshot(data);
+  if (!typed) return { type: 'error', error: 'Unrecognized snapshot format' };
+  return typedToParsed(typed, apiUrl);
+}
+
+export function useWhiteboardData(data: string | WhiteboardSnapshot | null): WhiteboardDataState {
+  const { apiUrl } = useWhiteboardConfig();
+
+  const parsed = useMemo((): ParsedData => {
+    if (data === null || data === undefined) return { type: 'empty' };
+    if (typeof data === 'string') return stringToParsed(data, apiUrl);
+    return typedToParsed(data, apiUrl);
+  }, [data, apiUrl]);
+
+  const [remoteSnapshot, setRemoteSnapshot] = useState<Record<string, any> | undefined>();
+  const [baseData, setBaseData] = useState<Record<string, any> | undefined>();
+  const [loading, setLoading] = useState(parsed.type === 'remote' || parsed.type === 'incremental');
+  const [error, setError] = useState('');
+  const [attempt, setAttempt] = useState(0);
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
+
+  useEffect(() => {
+    if (parsed.type !== 'remote' && parsed.type !== 'incremental') return;
+
+    const { fetchUrl } = parsed;
+    const delta = parsed.type === 'incremental' ? parsed.delta : undefined;
+
+    let cancelled = false;
+    setLoading(true);
+    setError('');
+
+    fetch(fetchUrl)
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then(async (json) => {
+        if (cancelled) return;
+        setBaseData(json);
+
+        const deltaKeys = delta ? Object.keys(delta as Record<string, unknown>) : [];
+        if (deltaKeys.length > 0) {
+          const { patch } = await import('jsondiffpatch');
+          if (cancelled) return;
+          const patched = patch(structuredClone(json), delta as any);
+          setRemoteSnapshot(patched as Record<string, any>);
+        } else {
+          setRemoteSnapshot(json);
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        if (!cancelled) {
+          setError(err instanceof Error ? err.message : 'Failed to load');
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [parsed, attempt]);
+
+  if (parsed.type === 'inline') {
+    return { snapshot: parsed.snapshot, loading: false, error: '', retry, retryable: false };
+  }
+
+  if (parsed.type === 'remote' || parsed.type === 'incremental') {
+    return {
+      snapshot: remoteSnapshot,
+      loading,
+      error,
+      retry,
+      retryable: Boolean(error),
+      baseRef: parsed.refLine,
+      baseData,
+    };
+  }
+
+  if (parsed.type === 'error') {
+    return { snapshot: undefined, loading: false, error: parsed.error, retry, retryable: false };
+  }
+
+  return { snapshot: undefined, loading: false, error: '', retry, retryable: false };
+}

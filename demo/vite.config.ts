@@ -272,7 +272,7 @@ export default defineConfig(({ command }) => ({
   },
   optimizeDeps: {
     exclude: workspaceOptimizeDepsExcludes(),
-    include: ['react-intersection-observer', 'react-photo-view', '@excalidraw/excalidraw'],
+    include: ['react-intersection-observer', 'react-photo-view'],
   },
   resolve: {
     alias: command === 'build' ? workspaceBuildStyleAliases() : workspacePackageAliases(),
@@ -291,7 +291,6 @@ export default defineConfig(({ command }) => ({
 
       'react-intersection-observer',
       'react-photo-view',
-      '@excalidraw/excalidraw',
     ],
   },
 }));

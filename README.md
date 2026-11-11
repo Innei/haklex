@@ -102,7 +102,7 @@ haklex/
 │   ├── rich-agent-core/           # Headless AI agent protocol, diff orchestration, document store
 │   ├── rich-agent-chat/           # Chat panel UI for AI interaction (used by demo / integrations)
 │   ├── rich-diff-core/            # Lexical diff engine (structural + decoration; shared by agent + diff UI)
-│   ├── rich-ext-*/               # Heavy extensions (ai-agent, chat snapshots, code-snippet, embed, excalidraw, gallery, nested-doc)
+│   ├── rich-ext-*/               # Heavy extensions (ai-agent, chat snapshots, code-snippet, embed, whiteboard, gallery, nested-doc)
 │   ├── rich-diff/                # Diff viewer
 │   └── cm-editor/                # Shared CodeMirror 6 utilities
 ├── vite.shared.ts                # Shared Vite config factory
@@ -126,7 +126,7 @@ haklex/
 └── @haklex/rich-diff-core
 
 @haklex/rich-agent-chat → @haklex/rich-agent-core, @haklex/rich-diff-core (chat UI; optional integration)
-@haklex/rich-ext-{chat, code-snippet, embed, excalidraw, gallery, nested-doc}
+@haklex/rich-ext-{chat, code-snippet, embed, whiteboard, gallery, nested-doc}
 @haklex/rich-plugin-{block-handle, floating-toolbar, link-edit, mention, slash-menu, table, toolbar}
 @haklex/rich-renderer-{alert, banner, codeblock, image, linkcard, mention, mermaid, ruby, video, katex}
 
@@ -185,7 +185,7 @@ Composed via `@haklex/rich-compose` modules. Apps that need a pre-baked editor +
 | `rich-ext-chat`         | Static chat-snapshot blocks for assistant / conversation transcripts        |
 | `rich-ext-code-snippet` | Multi-file tabbed code display with drag-and-drop                           |
 | `rich-ext-embed`        | URL embeds — YouTube, Twitter, Bilibili, CodeSandbox, GitHub Gist           |
-| `rich-ext-excalidraw`   | Excalidraw whiteboard integration                                           |
+| `rich-ext-whiteboard`   | Hand-drawn whiteboard (Excalidraw-format scenes)                            |
 | `rich-ext-gallery`      | Image gallery with grid and carousel layouts                                |
 | `rich-ext-nested-doc`   | Nested document / card content blocks                                       |
 

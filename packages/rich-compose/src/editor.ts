@@ -5,7 +5,6 @@ import { chatEditModule } from './modules/chat/edit';
 import { codeBlockEditModule } from './modules/code-block/edit';
 import { codeSnippetEditModule } from './modules/code-snippet/edit';
 import { embedEditModule } from './modules/embed/edit';
-import { excalidrawEditModule } from './modules/excalidraw/edit';
 import { fileEditModule } from './modules/file/edit';
 import { galleryEditModule } from './modules/gallery/edit';
 import { imageEditModule } from './modules/image/edit';
@@ -19,6 +18,7 @@ import { rubyEditModule } from './modules/ruby/edit';
 import { slashMenuEditModule } from './modules/slash-menu/edit';
 import { stepsEditModule } from './modules/steps/edit';
 import { videoEditModule } from './modules/video/edit';
+import { whiteboardEditModule } from './modules/whiteboard/edit';
 
 export {
   alertEditModule,
@@ -28,7 +28,6 @@ export {
   codeBlockEditModule,
   codeSnippetEditModule,
   embedEditModule,
-  excalidrawEditModule,
   fileEditModule,
   galleryEditModule,
   imageEditModule,
@@ -42,6 +41,7 @@ export {
   slashMenuEditModule,
   stepsEditModule,
   videoEditModule,
+  whiteboardEditModule,
 };
 
 export const allEditorModules = [
@@ -52,7 +52,7 @@ export const allEditorModules = [
   codeBlockEditModule,
   codeSnippetEditModule,
   embedEditModule,
-  excalidrawEditModule,
+  whiteboardEditModule,
   fileEditModule,
   galleryEditModule,
   imageEditModule,

@@ -197,7 +197,7 @@ nodes:
 
 ## Lazy modules
 
-`code-block` and `mermaid` ship lazy by default with deterministic `ssrFallback`s. `excalidraw`'s Klass code-splits internally via its own `decorate()`.
+`code-block` and `mermaid` ship lazy by default with deterministic `ssrFallback`s. `whiteboard`'s Klass code-splits internally via its own `decorate()`.
 
 To override a lazy renderer (e.g., pre-tokenized code block for SSR), pass `overrides`:
 
@@ -257,7 +257,7 @@ Decorator slots (`rendererConfig` / module `renderers`) accept any React compone
 | `code-block`   | builtin           | —                     | lazy + ssr fallback             | `rich-renderer-codeblock` |
 | `code-snippet` | `CodeSnippetNode` | `CodeSnippetEditNode` | sync                            | `rich-ext-code-snippet`   |
 | `embed`        | `EmbedNode`       | `EmbedEditNode`       | sync (via node decorate)        | `rich-ext-embed`          |
-| `excalidraw`   | `ExcalidrawNode`  | `ExcalidrawEditNode`  | via node decorate               | `rich-ext-excalidraw`     |
+| `whiteboard`   | `WhiteboardNode`  | `WhiteboardEditNode`  | via node decorate               | `rich-ext-whiteboard`     |
 | `gallery`      | `GalleryNode`     | `GalleryEditNode`     | sync                            | `rich-ext-gallery`        |
 | `image`        | builtin           | —                     | sync                            | `rich-renderer-image`     |
 | `katex`        | —                 | builtin               | edit-only (no static renderer)  | `rich-renderer-katex`     |
