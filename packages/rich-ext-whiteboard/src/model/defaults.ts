@@ -12,6 +12,7 @@ export interface ElementStyle {
   opacity: number;
   roughness: number;
   roundness: 'round' | 'sharp';
+  shadow: boolean;
   startArrowhead: Arrowhead;
   strokeColor: string;
   strokeStyle: StrokeStyle;
@@ -28,6 +29,7 @@ export const DEFAULT_STYLE: ElementStyle = {
   roughness: 1,
   opacity: 100,
   roundness: 'round',
+  shadow: false,
   fontFamily: 5,
   fontSize: 20,
   textAlign: 'left',

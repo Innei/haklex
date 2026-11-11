@@ -10,6 +10,7 @@ import type {
 import type { ElementStyle } from './defaults';
 import { DEFAULT_LINE_HEIGHT, DEFAULT_STYLE } from './defaults';
 import { randomId, randomInteger } from './random';
+import { supportsShadow } from './shadow';
 
 type ShapeType = Exclude<ElementType, 'line' | 'arrow' | 'freedraw' | 'text' | 'image'>;
 
@@ -38,6 +39,7 @@ function base<T extends ElementType>(
     strokeColor: style.strokeColor,
     backgroundColor: style.backgroundColor,
     fillStyle: style.fillStyle,
+    ...(style.shadow && supportsShadow(type) ? { shadow: true } : null),
     strokeWidth: style.strokeWidth,
     strokeStyle: style.strokeStyle,
     roughness: style.roughness,

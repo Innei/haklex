@@ -35,6 +35,7 @@ export interface BaseElement {
   roughness: number;
   roundness?: { type: number; value?: number } | null;
   seed: number;
+  shadow?: boolean;
   strokeColor: string;
   strokeStyle: StrokeStyle;
   strokeWidth: number;

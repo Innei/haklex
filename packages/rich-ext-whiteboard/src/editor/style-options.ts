@@ -60,6 +60,11 @@ export const ROUNDNESS: Choice<'roundness'>[] = [
   { value: 'round', label: 'Round', icon: Squircle },
 ];
 
+export const SHADOWS: Choice<'shadow'>[] = [
+  { value: false, label: 'None' },
+  { value: true, label: 'Soft' },
+];
+
 export const FONT_SIZES: Choice<'fontSize'>[] = [
   { value: 16, label: 'S' },
   { value: 20, label: 'M' },

@@ -39,6 +39,7 @@ import {
   FONT_SIZES,
   ROUGHNESS,
   ROUNDNESS,
+  SHADOWS,
   STROKE_COLORS,
   STROKE_STYLES,
   STROKE_WIDTHS,
@@ -74,8 +75,12 @@ function previewElements(state: EditorState): ExcalidrawElement[] {
   }
 }
 
-const Row: FC<{ children: ReactNode; label: string }> = ({ children, label }) => (
-  <div data-style-row className={css.row}>
+const Row: FC<{ children: ReactNode; label: string; name?: string }> = ({
+  children,
+  label,
+  name,
+}) => (
+  <div className={css.row} data-style-row={name ?? ''}>
     <span className={css.rowLabel}>{label}</span>
     {children}
   </div>
@@ -197,6 +202,11 @@ export function useStyleRows(store: WhiteboardStore): ReactNode[] | null {
             current={value('roundness')}
             onPick={(v) => set({ roundness: v })}
           />
+        </Row>
+      )}
+      {props.has('shadow') && (
+        <Row label="Shadow" name="shadow">
+          <Segment choices={SHADOWS} current={value('shadow')} onPick={(v) => set({ shadow: v })} />
         </Row>
       )}
       {props.has('arrowType') && (

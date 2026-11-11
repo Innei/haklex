@@ -3,8 +3,10 @@ import { memo, useId } from 'react';
 
 import { getElementCenter } from '../model/bounds';
 import { angleOf } from '../model/geometry';
+import { hasShadow } from '../model/shadow';
 import { SceneDarkContext } from './context';
 import { ElementContent } from './elements';
+import { ShadowFilter } from './shadow';
 import type { BinaryFiles, ExcalidrawElement, ExcalidrawScene } from './types';
 
 const SVG_PADDING = 32;
@@ -77,13 +79,16 @@ export const SceneContent: FC<SceneContentProps> = memo(
     );
     const clipId = (frameId: string) =>
       `rich-excalidraw-frame-${uid}-${frameId.replaceAll(/[^\w-]/g, '')}`;
-    const hasDefs = dark || usedFrames.size > 0;
+    const shadowId = `rich-excalidraw-shadow-${uid}`;
+    const anyShadow = elements.some(hasShadow);
+    const hasDefs = dark || usedFrames.size > 0 || anyShadow;
 
     return (
       <SceneDarkContext value={dark ? { filterId } : null}>
         {hasDefs && (
           <defs>
             {dark && <CounterInvertFilter id={filterId} />}
+            {anyShadow && <ShadowFilter dark={dark} id={shadowId} />}
             {[...usedFrames].map((id) => {
               const f = frames.get(id)!;
               return (
@@ -96,8 +101,15 @@ export const SceneContent: FC<SceneContentProps> = memo(
         )}
         {elements.map((el) => {
           if (hiddenIds?.has(el.id)) return null;
-          const group = (
+          const element = (
             <ElementGroup el={el} extra={elementProps?.(el)} files={files} key={el.id} />
+          );
+          const group = hasShadow(el) ? (
+            <g filter={`url(#${shadowId})`} key={el.id}>
+              {element}
+            </g>
+          ) : (
+            element
           );
           if (el.frameId && usedFrames.has(el.frameId)) {
             return (

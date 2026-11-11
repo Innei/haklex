@@ -15,6 +15,7 @@ export type StyleProp =
   | 'strokeStyle'
   | 'roughness'
   | 'roundness'
+  | 'shadow'
   | 'opacity'
   | 'fontSize'
   | 'fontFamily'
@@ -40,10 +41,10 @@ function propsFor(el: ExcalidrawElement): StyleProp[] {
   switch (el.type) {
     case 'rectangle':
     case 'diamond': {
-      return [...SHAPE, 'roundness', ...hasText];
+      return [...SHAPE, 'roundness', 'shadow', ...hasText];
     }
     case 'ellipse': {
-      return [...SHAPE, ...hasText];
+      return [...SHAPE, 'shadow', ...hasText];
     }
     case 'arrow': {
       return [
@@ -73,6 +74,9 @@ function propsFor(el: ExcalidrawElement): StyleProp[] {
     case 'text': {
       return TEXT;
     }
+    case 'image': {
+      return ['shadow'];
+    }
     default: {
       return [];
     }
@@ -94,6 +98,7 @@ type ValueKey = keyof ElementStyle | 'strokeColor';
 
 function readValue(el: ExcalidrawElement, key: ValueKey): unknown {
   if (key === 'roundness') return el.roundness ? 'round' : 'sharp';
+  if (key === 'shadow') return el.shadow === true;
   if (key === 'arrowType') {
     const arrow = el as LinearElement;
     return arrow.elbowed ? 'elbow' : arrow.roundness ? 'round' : 'sharp';
@@ -123,6 +128,7 @@ function patchElement(el: ExcalidrawElement, patch: Partial<ElementStyle>): Exca
     out.strokeStyle = patch.strokeStyle;
   if (patch.roughness !== undefined && props.has('roughness')) out.roughness = patch.roughness;
   if (patch.opacity !== undefined) out.opacity = patch.opacity;
+  if (patch.shadow !== undefined && props.has('shadow')) out.shadow = patch.shadow;
   if (patch.roundness !== undefined && props.has('roundness')) {
     const round = el.type === 'line' ? { type: 2 } : { type: 3 };
     out.roundness = patch.roundness === 'round' ? round : null;
