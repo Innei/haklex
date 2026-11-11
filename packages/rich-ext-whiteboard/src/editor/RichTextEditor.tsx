@@ -11,8 +11,8 @@ import { ListPlugin } from '@lexical/react/LexicalListPlugin';
 import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import type { LexicalEditor } from 'lexical';
-import type { FC, ReactNode } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { FC } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { angleOf } from '../model/geometry';
 import type { RichTextContent } from '../model/richtext';
@@ -23,6 +23,7 @@ import { DARK_SCENE_FILTER } from '../scene/Scene';
 import type { RichTextElement } from '../scene/types';
 import { commitRichTextContent, stopRichTextEditing } from './richtext-actions';
 import * as css from './richtext-editor.css';
+import { RichTextFormatBar } from './RichTextFormatBar';
 import type { WhiteboardStore } from './store';
 import { useStore } from './store';
 import { sceneToScreen } from './viewport';
@@ -57,13 +58,13 @@ const EditorBridge: FC<{ onReady: (editor: LexicalEditor) => void }> = ({ onRead
 };
 
 const Surface: FC<{
-  children?: ReactNode;
   dark: boolean;
   el: RichTextElement;
   store: WhiteboardStore;
-}> = ({ children, dark, el, store }) => {
+}> = ({ dark, el, store }) => {
   const viewport = useStore(store, (s) => s.viewport);
   const editorRef = useRef<LexicalEditor | null>(null);
+  const [host, setHost] = useState<HTMLElement | null>(null);
   const initialRef = useRef<string | null>(null);
   const id = el.id;
 
@@ -106,6 +107,7 @@ const Surface: FC<{
     <div
       className={css.surface}
       data-whiteboard-richtext-editor={id}
+      ref={(node) => setHost(node?.parentElement ?? null)}
       style={{
         ...RICHTEXT_BASE_STYLE,
         left,
@@ -119,7 +121,8 @@ const Surface: FC<{
       }}
       onPointerDown={(e) => e.stopPropagation()}
       onBlur={(e) => {
-        if (e.currentTarget.contains(e.relatedTarget as Node | null)) return;
+        const next = e.relatedTarget as Element | null;
+        if (e.currentTarget.contains(next) || next?.closest('[data-richtext-format-bar]')) return;
         stopRichTextEditing(store);
       }}
       onKeyDown={(e) => {
@@ -139,17 +142,16 @@ const Surface: FC<{
         <ListPlugin />
         <LinkPlugin />
         <EditorBridge onReady={onReady} />
-        {children}
+        <RichTextFormatBar at={[left, top - 8]} host={host} />
       </LexicalComposer>
     </div>
   );
 };
 
-export const RichTextEditor: FC<{
-  children?: ReactNode;
-  dark?: boolean;
-  store: WhiteboardStore;
-}> = ({ children, dark = false, store }) => {
+export const RichTextEditor: FC<{ dark?: boolean; store: WhiteboardStore }> = ({
+  dark = false,
+  store,
+}) => {
   const el = useStore(store, (s) =>
     s.editingRichTextId
       ? (s.elements.find((e) => e.id === s.editingRichTextId && e.type === 'richtext') as
@@ -157,9 +159,5 @@ export const RichTextEditor: FC<{
       : undefined,
   );
   if (!el) return null;
-  return (
-    <Surface dark={dark} el={el} key={el.id} store={store}>
-      {children}
-    </Surface>
-  );
+  return <Surface dark={dark} el={el} key={el.id} store={store} />;
 };

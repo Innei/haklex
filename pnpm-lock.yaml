@@ -1594,6 +1594,9 @@ importers:
       '@lexical/rich-text':
         specifier: ^0.53.0
         version: 0.53.0(typescript@7.0.2)
+      '@lexical/selection':
+        specifier: ^0.53.0
+        version: 0.53.0(typescript@7.0.2)
       '@types/react':
         specifier: ^19.3.0
         version: 19.3.0

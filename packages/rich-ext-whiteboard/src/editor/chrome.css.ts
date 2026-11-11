@@ -188,3 +188,35 @@ export const sheetMore = style({
   fontWeight: 500,
   cursor: 'pointer',
 });
+
+export const formatBar = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: 2,
+  padding: 4,
+  borderRadius: 10,
+  transform: 'translateY(-100%)',
+  whiteSpace: 'nowrap',
+});
+
+export const formatSwatch = style({
+  width: 18,
+  height: 18,
+  margin: '0 1px',
+  padding: 0,
+  borderRadius: 5,
+  border: '1px solid rgb(0 0 0 / 0.08)',
+  cursor: 'pointer',
+});
+
+export const formatBarInput = style({
+  width: 220,
+  height: 28,
+  padding: '0 8px',
+  border: 'none',
+  outline: 'none',
+  font: 'inherit',
+  fontSize: 13,
+  color: vars.color.text,
+  background: 'transparent',
+});
