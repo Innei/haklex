@@ -11,6 +11,7 @@ export function editorOwnsEscape(store: WhiteboardStore): boolean {
   const state = store.getState();
   return !!(
     state.editingTextId ||
+    state.editingRichTextId ||
     state.editingFrameId ||
     store.isTransient() ||
     (state.tool !== 'selection' && !state.toolLocked)
@@ -21,6 +22,10 @@ export function releaseEscape(store: WhiteboardStore, canvas: Element | null): v
   const state = store.getState();
   if (state.editingTextId) {
     finishTextEditing(store);
+    return;
+  }
+  if (state.editingRichTextId) {
+    store.setState({ editingRichTextId: null });
     return;
   }
   if (state.editingFrameId) {

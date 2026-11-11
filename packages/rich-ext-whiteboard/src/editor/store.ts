@@ -67,6 +67,7 @@ export function createWhiteboardStore(input: Record<string, unknown> | undefined
     editingGroupId: null,
     editingFrameId: null,
     editingLinearId: null,
+    editingRichTextId: null,
     editingTextId: null,
     erasingIds: new Set(),
     tool: 'selection',

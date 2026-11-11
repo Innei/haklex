@@ -2,6 +2,7 @@ import { getCommonBounds, getElementCenter, isLinear } from '../model/bounds';
 import type { Bounds, Point } from '../model/geometry';
 import { angleOf, boundsOfPoints, rotatePoint } from '../model/geometry';
 import { bumpVersion } from '../model/mutate';
+import { resolveRichTextHeights } from '../model/richtext-layout';
 import type { ExcalidrawElement, TextElement } from '../scene/types';
 
 export type TransformHandle = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw' | 'rotation';
@@ -176,7 +177,7 @@ export function resizeElements(
     opts.keepRatio || elements.every((el) => el.type === 'text' || el.type === 'svg');
   const next = resizeBox(frame.box, handle, delta, { ...opts, keepRatio });
   const single = elements.length === 1;
-  return elements.map((el) => placeElement(el, frame, next, single));
+  return resolveRichTextHeights(elements.map((el) => placeElement(el, frame, next, single)));
 }
 
 function normalizeAngle(angle: number): number {

@@ -14,6 +14,7 @@ import {
 import { refreshBindings } from './binding-actions';
 import { DEFAULT_GRID_SIZE } from './grid';
 import { getEditedLinear, removePoint } from './linear-editor';
+import { startRichTextEditing } from './richtext-actions';
 import { withBoundText } from './selection-utils';
 import type { WhiteboardStore } from './store';
 import { nudge } from './transform';
@@ -40,6 +41,7 @@ export const TOOL_KEYS: Record<string, ToolType> = {
   i: 'image',
   f: 'frame',
   e: 'eraser',
+  n: 'card',
 };
 
 export const ZOOM_STEP = 1.2;
@@ -125,7 +127,7 @@ function handleModified(store: WhiteboardStore, e: ShortcutEvent): boolean {
 
 export function handleShortcut(store: WhiteboardStore, e: ShortcutEvent): boolean {
   const state = store.getState();
-  if (state.editingTextId) return false;
+  if (state.editingTextId || state.editingRichTextId) return false;
   if (e.ctrlKey || e.metaKey) return handleModified(store, e);
 
   const arrow = ARROWS[e.key];
@@ -162,6 +164,14 @@ export function handleShortcut(store: WhiteboardStore, e: ShortcutEvent): boolea
       tool: state.toolLocked ? state.tool : 'selection',
     });
     return true;
+  }
+  if (e.key === 'Enter' && state.selectedIds.size === 1) {
+    const [id] = state.selectedIds;
+    const el = state.elements.find((item) => item.id === id);
+    if (el?.type === 'richtext') {
+      startRichTextEditing(store, id);
+      return true;
+    }
   }
   if (e.key === '!' || (e.shiftKey && e.key === '1')) {
     zoomToFit(store);

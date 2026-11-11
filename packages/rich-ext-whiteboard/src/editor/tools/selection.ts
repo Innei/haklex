@@ -6,6 +6,7 @@ import { bumpVersion } from '../../model/mutate';
 import type { ExcalidrawElement } from '../../scene/types';
 import { refreshBindings } from '../binding-actions';
 import { activeGrid, snapValue } from '../grid';
+import { startRichTextEditing } from '../richtext-actions';
 import { getSelectionTarget, selectInBox, withBoundText } from '../selection-utils';
 import { canHoldText, startTextEditing } from '../text-actions';
 import type { PointGesture, PointMoveHook } from './point-gesture';
@@ -179,7 +180,8 @@ export function createSelectionTool(options: SelectionToolOptions = {}): ToolHan
         store.setState({ editingGroupId: nextGroup, selectedIds: new Set(members) });
         return;
       }
-      if (el.type === 'text') startTextEditing(store, { elementId: el.id });
+      if (el.type === 'richtext') startRichTextEditing(store, el.id);
+      else if (el.type === 'text') startTextEditing(store, { elementId: el.id });
       else if (canHoldText(el)) startTextEditing(store, { containerId: el.id });
     },
   };

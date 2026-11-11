@@ -74,6 +74,9 @@ function propsFor(el: ExcalidrawElement): StyleProp[] {
     case 'text': {
       return TEXT;
     }
+    case 'richtext': {
+      return ['stroke', 'background', 'strokeWidth', 'roundness', 'shadow'];
+    }
     case 'image':
     case 'svg': {
       return ['shadow'];

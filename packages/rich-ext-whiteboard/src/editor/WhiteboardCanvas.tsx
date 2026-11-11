@@ -7,6 +7,7 @@ import type { ExcalidrawElement, ExcalidrawScene } from '../scene/types';
 import { copySelection, cutSelection, pasteFromClipboard } from './clipboard-actions';
 import * as css from './editor.css';
 import { createGestureTracker } from './gestures';
+import * as richtextCss from './richtext-editor.css';
 import type { WhiteboardStore } from './store';
 import { useStore } from './store';
 import type { ToolHandlers } from './tools';
@@ -59,6 +60,7 @@ export const WhiteboardCanvas: FC<WhiteboardCanvasProps> = ({
   const files = useStore(store, (s) => s.files);
   const viewport = useStore(store, (s) => s.viewport);
   const editingTextId = useStore(store, (s) => s.editingTextId);
+  const editingRichTextId = useStore(store, (s) => s.editingRichTextId);
   const erasingIds = useStore(store, (s) => s.erasingIds);
   const tool = useStore(store, (s) => s.tool);
   const gridSize = useStore(store, (s) => s.gridSize);
@@ -83,11 +85,12 @@ export const WhiteboardCanvas: FC<WhiteboardCanvasProps> = ({
   );
   const elementProps = useCallback(
     (el: ExcalidrawElement) => {
+      if (el.id === editingRichTextId) return { className: richtextCss.editingCard };
       if (erasingIds.has(el.id)) return { opacity: 0.25 };
       if (el.type === 'image' && el.status === 'pending') return { opacity: 0.5 };
       return undefined;
     },
-    [erasingIds],
+    [erasingIds, editingRichTextId],
   );
 
   const toPointer = useCallback(
@@ -196,6 +199,7 @@ export const WhiteboardCanvas: FC<WhiteboardCanvasProps> = ({
       if (
         !e.clipboardData ||
         store.getState().editingTextId ||
+        store.getState().editingRichTextId ||
         store.getState().selectedIds.size === 0
       )
         return;
@@ -206,7 +210,8 @@ export const WhiteboardCanvas: FC<WhiteboardCanvasProps> = ({
       );
     };
     const onPaste = (e: ClipboardEvent) => {
-      if (!e.clipboardData || store.getState().editingTextId) return;
+      const { editingRichTextId: editingCard, editingTextId: editingText } = store.getState();
+      if (!e.clipboardData || editingText || editingCard) return;
       const files = [...(e.clipboardData.files ?? [])].filter((f) => f.type.startsWith('image/'));
       if (files.length > 0 && context.onFiles) {
         e.preventDefault();

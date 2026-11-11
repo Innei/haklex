@@ -11,6 +11,7 @@ import { insertImageFile } from './image-actions';
 import { useNarrowLayout } from './layout';
 import { MobileDock } from './MobileDock';
 import { SelectionOverlay } from './overlay/SelectionOverlay';
+import { RichTextEditor } from './RichTextEditor';
 import { handleShortcut } from './shortcuts';
 import type { WhiteboardStore } from './store';
 import { useStore } from './store';
@@ -106,6 +107,7 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
       <WhiteboardCanvas context={context} handlers={handlers} store={store} theme={theme}>
         <SelectionOverlay store={store} />
         <TextEditor dark={theme === 'dark'} store={store} />
+        <RichTextEditor dark={theme === 'dark'} store={store} />
         <FrameNameEditor store={store} />
         {narrow ? <StyleSheet store={store} /> : <StylePanel store={store} />}
         <ZoomControls compact={narrow} store={store} />

@@ -11,6 +11,7 @@ export type ToolType =
   | 'line'
   | 'freedraw'
   | 'text'
+  | 'card'
   | 'image'
   | 'frame'
   | 'eraser';
@@ -38,6 +39,7 @@ export interface EditorState extends Doc {
   editingFrameId: string | null;
   editingGroupId: string | null;
   editingLinearId: string | null;
+  editingRichTextId: string | null;
   editingTextId: string | null;
   erasingIds: ReadonlySet<string>;
   gridSize: number | null;

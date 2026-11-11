@@ -14,6 +14,7 @@ import {
   MoveRight,
   Pencil,
   Square,
+  StickyNote,
   Type,
 } from 'lucide-react';
 import type { FC } from 'react';
@@ -40,6 +41,7 @@ export const TOOLS: ToolDef[] = [
   { tool: 'line', icon: Minus, key: 'L', label: 'Line' },
   { tool: 'freedraw', icon: Pencil, key: 'P', label: 'Draw' },
   { tool: 'text', icon: Type, key: 'T', label: 'Text' },
+  { tool: 'card', icon: StickyNote, key: 'N', label: 'Card' },
   { tool: 'image', icon: Image, key: 'I', label: 'Image' },
   { tool: 'frame', icon: Frame, key: 'F', label: 'Frame' },
   { tool: 'eraser', icon: Eraser, key: 'E', label: 'Eraser' },

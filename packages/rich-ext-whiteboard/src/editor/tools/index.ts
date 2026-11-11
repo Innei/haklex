@@ -1,4 +1,5 @@
 import type { ToolType } from '../types';
+import { createCardTool } from './card';
 import { createEraserTool } from './eraser';
 import { createFreedrawTool } from './freedraw';
 import { createHandTool } from './hand';
@@ -27,6 +28,7 @@ export function createToolHandlers(): ToolHandlers {
     freedraw: createFreedrawTool(),
     eraser: createEraserTool(),
     text: createTextTool(),
+    card: createCardTool(),
     image: createImageTool(),
   };
 }
