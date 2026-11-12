@@ -2,7 +2,7 @@ import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext
 import type { ElementNode, LexicalEditor, LexicalNode } from 'lexical';
 import { $getNodeByKey, $getRoot, $getSelection, $isRangeSelection } from 'lexical';
 import type { KeyboardEvent, ReactElement, SyntheticEvent } from 'react';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import * as styles from './styles.css';
@@ -58,6 +58,15 @@ interface QuoteEntry {
   slot: HTMLElement;
 }
 
+const sameQuotes = (a: QuoteEntry[], b: QuoteEntry[]) =>
+  a.length === b.length &&
+  a.every(
+    (quote, index) =>
+      quote.key === b[index]!.key &&
+      quote.attribution === b[index]!.attribution &&
+      quote.slot === b[index]!.slot,
+  );
+
 export function QuoteAttributionPlugin(): ReactElement | null {
   const [editor] = useLexicalComposerContext();
   const [quotes, setQuotes] = useState<QuoteEntry[]>([]);
@@ -75,7 +84,7 @@ export function QuoteAttributionPlugin(): ReactElement | null {
           if (slot)
             list.push({ key: node.getKey(), attribution: node.getAttribution() ?? '', slot });
         }
-        setQuotes(list);
+        setQuotes((previous) => (sameQuotes(previous, list) ? previous : list));
         setActiveKey($activeQuoteKey());
       });
     };
@@ -118,7 +127,7 @@ interface QuoteAttributionProps {
 
 const stop = (event: SyntheticEvent) => event.stopPropagation();
 
-function QuoteAttribution({
+const QuoteAttribution = memo(function QuoteAttribution({
   active,
   attribution,
   editable,
@@ -217,4 +226,4 @@ function QuoteAttribution({
       />
     </label>
   );
-}
+});

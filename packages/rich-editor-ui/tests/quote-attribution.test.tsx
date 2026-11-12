@@ -81,7 +81,7 @@ afterEach(() => {
   container = null;
 });
 
-async function mount(attribution: string | null, editable = true) {
+async function mount(attribution: string | null, editable = true, quotes = 1) {
   let editor: LexicalEditor | undefined;
   function Capture() {
     [editor] = useLexicalComposerContext();
@@ -101,9 +101,12 @@ async function mount(attribution: string | null, editable = true) {
             throw error;
           },
           editorState: () => {
-            const quote = new TestQuoteNode(attribution);
-            quote.append($createTextNode('The best code is no code at all.'));
-            $getRoot().append(quote, $createParagraphNode().append($createTextNode('After')));
+            for (let index = 0; index < quotes; index++) {
+              const quote = new TestQuoteNode(attribution);
+              quote.append($createTextNode('The best code is no code at all.'));
+              $getRoot().append(quote);
+            }
+            $getRoot().append($createParagraphNode().append($createTextNode('After')));
           },
         }}
       >
@@ -147,6 +150,51 @@ describe('QuoteAttributionPlugin', () => {
       editor.update(() => $getRoot().getLastDescendant()?.selectEnd(), { discrete: true });
     });
     expect(slot()?.hasAttribute('data-active')).toBe(false);
+  });
+
+  it('leaves the attribution input untouched when only the selection moves elsewhere', async () => {
+    const editor = await mount('Author, Work');
+    const input = slot()!.querySelector('input')!;
+    await act(async () => {
+      editor.update(() => $getRoot().getLastDescendant()?.selectEnd(), { discrete: true });
+    });
+    const records: MutationRecord[] = [];
+    const observer = new MutationObserver((list) => records.push(...list));
+    observer.observe(input, { attributes: true });
+    await act(async () => {
+      editor.update(() => $getRoot().getLastDescendant()?.selectStart(), { discrete: true });
+    });
+    await act(async () => {
+      editor.update(() => $getRoot().getLastDescendant()?.select(1, 3), { discrete: true });
+    });
+    records.push(...observer.takeRecords());
+    observer.disconnect();
+    expect(records.map((record) => record.attributeName)).toEqual([]);
+  });
+
+  it('leaves other quotes untouched when the caret enters one quote', async () => {
+    const editor = await mount('Author, Work', true, 2);
+    const [first, second] = [
+      ...container!.querySelectorAll<HTMLInputElement>(
+        'blockquote [data-quote-attribution-slot] input',
+      ),
+    ];
+    const records: MutationRecord[] = [];
+    const observer = new MutationObserver((list) => records.push(...list));
+    observer.observe(second!, { attributes: true });
+    await act(async () => {
+      editor.update(
+        () => {
+          const quote = $getRoot().getFirstChild() as TestQuoteNode;
+          quote.getFirstDescendant()?.selectEnd();
+        },
+        { discrete: true },
+      );
+    });
+    records.push(...observer.takeRecords());
+    observer.disconnect();
+    expect(first!.closest('[data-quote-attribution-slot]')?.hasAttribute('data-active')).toBe(true);
+    expect(records.map((record) => record.attributeName)).toEqual([]);
   });
 
   it('shows the attribution as text when the editor is read-only', async () => {
