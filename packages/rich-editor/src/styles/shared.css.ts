@@ -143,11 +143,6 @@ export const textCode = style({
   color: 'inherit',
   padding: '0.12em 0.4em',
   borderRadius: vars.borderRadius.sm,
-  selectors: {
-    '[contenteditable="true"] &': {
-      paddingRight: 0,
-    },
-  },
 });
 
 export const textHighlight = style({

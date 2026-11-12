@@ -127,12 +127,156 @@ describe('registerBlockExitCommands', () => {
           expect(children[1]?.hasFormat('code')).toBe(true);
           expect(children[2]?.hasFormat('code')).toBe(false);
           expect(children[2]?.isUnmergeable()).toBe(false);
+
+          const selection = $getSelection();
+          if ($isRangeSelection(selection)) {
+            expect(selection.anchor.offset).toBeLessThanOrEqual(
+              selection.anchor.getNode().getTextContentSize(),
+            );
+          }
         });
       } finally {
         unregister();
       }
     },
   );
+
+  it.each([
+    ['turning code off at the end of a line', [], 'toggle'],
+    ['turning code off before more text', [' suffix'], 'toggle'],
+    ['deleting plain text typed after the code', [], 'plain'],
+  ])('%s leaves the caret out of the inline code', async (_name, after, how) => {
+    const { editor, unregister } = createTestEditor();
+
+    try {
+      editor.update(() => {
+        const paragraph = $createParagraphNode();
+        const code = $createTextNode('code');
+        code.setFormat('code');
+        paragraph.append(
+          $createTextNode('prefix '),
+          code,
+          ...after.map((text) => $createTextNode(text)),
+        );
+        $getRoot().append(paragraph);
+        code.selectEnd().setFormat(code.getFormat());
+      });
+
+      await flushEditor();
+
+      editor.update(() => {
+        const selection = $getSelection();
+        if (!$isRangeSelection(selection)) return;
+        if (how === 'toggle') selection.formatText('code');
+        else selection.setFormat(0);
+      });
+
+      await flushEditor();
+
+      editor.getEditorState().read(() => {
+        const selection = $getSelection();
+
+        expect($isRangeSelection(selection)).toBe(true);
+        if ($isRangeSelection(selection)) {
+          const caret = selection.anchor.getNode();
+          expect(caret.getTextContent()).toBe('\u200B');
+          expect(caret.hasFormat('code')).toBe(false);
+          expect(caret.getPreviousSibling()?.getTextContent()).toBe('code');
+          expect(selection.hasFormat('code')).toBe(false);
+        }
+      });
+
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) selection.insertText('X');
+      });
+
+      await flushEditor();
+
+      editor.getEditorState().read(() => {
+        const paragraph = $getRoot().getFirstChildOrThrow();
+        const children = paragraph.getChildren();
+
+        expect(paragraph.getTextContent()).toBe(`prefix codeX${after.join('')}`);
+        expect(children[1]?.getTextContent()).toBe('code');
+        expect(children[1]?.hasFormat('code')).toBe(true);
+        expect(children[2]?.getTextContent().startsWith('X')).toBe(true);
+        expect(children[2]?.hasFormat('code')).toBe(false);
+
+        const selection = $getSelection();
+        expect($isRangeSelection(selection)).toBe(true);
+        if ($isRangeSelection(selection)) {
+          expect(selection.anchor.key).toBe(children[2]?.getKey());
+          expect(selection.anchor.offset).toBe(1);
+          expect(selection.getTextContent()).toBe('');
+        }
+      });
+    } finally {
+      unregister();
+    }
+  });
+
+  it('leaves the caret where it is when turning code off inside inline code', async () => {
+    const { editor, unregister } = createTestEditor();
+
+    try {
+      editor.update(() => {
+        const paragraph = $createParagraphNode();
+        const code = $createTextNode('code');
+        code.setFormat('code');
+        paragraph.append(code);
+        $getRoot().append(paragraph);
+        code.select(2, 2).setFormat(code.getFormat());
+      });
+
+      await flushEditor();
+
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) selection.formatText('code');
+      });
+
+      await flushEditor();
+
+      editor.getEditorState().read(() => {
+        const selection = $getSelection();
+        expect($isRangeSelection(selection) && selection.anchor.getNode().getTextContent()).toBe(
+          'code',
+        );
+        expect($getRoot().getFirstChildOrThrow().getChildrenSize()).toBe(1);
+      });
+    } finally {
+      unregister();
+    }
+  });
+
+  it('places the ArrowRight exit caret right after inline code, with no extra gap', async () => {
+    const { editor, unregister } = createTestEditor();
+
+    try {
+      editor.update(() => {
+        const paragraph = $createParagraphNode();
+        const code = $createTextNode('code');
+        code.setFormat('code');
+        paragraph.append(code);
+        $getRoot().append(paragraph);
+        code.selectEnd().setFormat(code.getFormat());
+      });
+
+      await flushEditor();
+
+      expect(editor.dispatchCommand(KEY_ARROW_RIGHT_COMMAND, createKeyboardEventStub())).toBe(true);
+
+      await flushEditor();
+
+      editor.getEditorState().read(() => {
+        const selection = $getSelection();
+        expect($isRangeSelection(selection) && selection.anchor.getNode().getStyle()).toBe('');
+      });
+    } finally {
+      unregister();
+    }
+  });
 
   it('inserts a virtual paragraph before the first top-level block on ArrowUp', async () => {
     const { editor, unregister } = createTestEditor();

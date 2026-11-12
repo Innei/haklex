@@ -177,7 +177,8 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
     const caretNode = $getNodeByKey(caretKey);
     if (!$isTextNode(caretNode)) return;
 
-    const text = caretNode.getTextContent().replaceAll(INLINE_CODE_EXIT_CARET, '');
+    const content = caretNode.getTextContent();
+    const text = content.replaceAll(INLINE_CODE_EXIT_CARET, '');
     if (text === '') {
       caretNode.remove();
       return;
@@ -185,6 +186,31 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
 
     caretNode.setTextContent(text).setStyle(originalStyle);
     if (caretNode.isUnmergeable()) caretNode.toggleUnmergeable();
+
+    const selection = $getSelection();
+    if (!$isRangeSelection(selection)) return;
+    for (const point of [selection.anchor, selection.focus]) {
+      if (point.key !== caretKey || point.type !== 'text') continue;
+      const stripped = content.slice(0, point.offset).split(INLINE_CODE_EXIT_CARET).length - 1;
+      point.set(caretKey, point.offset - stripped, 'text');
+    }
+  };
+
+  const $placeInlineCodeExitCaret = (
+    codeNode: TextNode,
+    format = codeNode.getFormat() & ~IS_CODE,
+    style = codeNode.getStyle(),
+  ) => {
+    inlineCodeExitCaretStyle = style;
+    const caretNode = $createTextNode(INLINE_CODE_EXIT_CARET)
+      .setFormat(format)
+      .setStyle(style)
+      .toggleUnmergeable();
+    codeNode.insertAfter(caretNode);
+    caretNode.selectEnd().setFormat(caretNode.getFormat());
+    inlineCodeExitCaretKey = caretNode.getKey();
+    $addUpdateTag(HISTORY_MERGE_TAG);
+    $addUpdateTag(SKIP_COLLAB_TAG);
   };
 
   const insertVirtualParagraph = (
@@ -306,22 +332,53 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
       const codeNode = exitInlineCodeAtLineEnd(selection);
       if (!codeNode) return false;
 
-      inlineCodeExitCaretStyle = codeNode.getStyle();
-      const caretNode = $createTextNode(INLINE_CODE_EXIT_CARET)
-        .setFormat(codeNode.getFormat() & ~IS_CODE)
-        .setStyle([inlineCodeExitCaretStyle, 'margin-left: 4px'].filter(Boolean).join('; '))
-        .toggleUnmergeable();
-      codeNode.insertAfter(caretNode);
-      caretNode.selectEnd();
-      inlineCodeExitCaretKey = caretNode.getKey();
-      $addUpdateTag(HISTORY_MERGE_TAG);
-      $addUpdateTag(SKIP_COLLAB_TAG);
-
+      $placeInlineCodeExitCaret(codeNode);
       event?.preventDefault();
       return true;
     },
     COMMAND_PRIORITY_CRITICAL,
   );
+
+  // A caret at the end of inline code whose format has dropped code (toggled off, or kept from
+  // deleted plain text) is drawn inside the <code> before its right padding, while the next
+  // character lands after it; move the caret out of the code.
+  const unregisterInlineCodeFormatExit = editor.registerUpdateListener(({ editorState }) => {
+    if (!editor.isEditable()) return;
+    const codeKey = editorState.read(() => {
+      const selection = $getSelection();
+      if (
+        !$isRangeSelection(selection) ||
+        !selection.isCollapsed() ||
+        selection.hasFormat('code') ||
+        selection.anchor.type !== 'text'
+      ) {
+        return null;
+      }
+
+      const node = selection.anchor.getNode();
+      return $isTextNode(node) &&
+        node.hasFormat('code') &&
+        !node.isComposing() &&
+        selection.anchor.offset === node.getTextContentSize()
+        ? node.getKey()
+        : null;
+    });
+    if (!codeKey) return;
+
+    editor.update(() => {
+      const codeNode = $getNodeByKey(codeKey);
+      const selection = $getSelection();
+      if (
+        $isTextNode(codeNode) &&
+        $isRangeSelection(selection) &&
+        selection.isCollapsed() &&
+        selection.anchor.key === codeKey &&
+        !selection.hasFormat('code')
+      ) {
+        $placeInlineCodeExitCaret(codeNode, selection.format, selection.style);
+      }
+    });
+  });
 
   const unregisterInlineCodeSpace = editor.registerCommand(
     KEY_SPACE_COMMAND,
@@ -617,6 +674,7 @@ export function registerBlockExitCommands(editor: LexicalEditor) {
     editor.update($releaseInlineCodeExitCaret);
     unregisterArrowRight();
     unregisterInlineCodeSpace();
+    unregisterInlineCodeFormatExit();
     unregisterArrowDown();
     unregisterEnter();
     unregisterBackspace();
