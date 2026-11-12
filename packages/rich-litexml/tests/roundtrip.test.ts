@@ -318,3 +318,21 @@ describe('roundtrip node identity', () => {
     expect((state.root as any).children[0].rel).toBeNull();
   });
 });
+
+describe('list item holding text and a nested list', () => {
+  const source =
+    '<doc>\n  <ol id="o1">\n    <li id="l1">每一档 <b>放量</b> 都要过达标线：\n      <ul id="u1">\n        <li id="l2">首字节</li>\n      </ul>\n    </li>\n  </ol>\n</doc>\n';
+
+  const cycle = (xml: string) => serializeToXml(deserializeFromXml(xml, registry), registry);
+
+  it('stays byte-identical across repeated roundtrips', () => {
+    const first = cycle(source);
+    expect(cycle(cycle(cycle(first)))).toBe(first);
+  });
+
+  it('reads the text without the layout indentation', () => {
+    const item = (deserializeFromXml(source, registry).root as any).children[0].children[0];
+    const texts = item.children.filter((c: any) => c.type === 'text').map((c: any) => c.text);
+    expect(texts).toEqual(['每一档 ', '放量', ' 都要过达标线：']);
+  });
+});

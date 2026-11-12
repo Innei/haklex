@@ -92,13 +92,22 @@ function renderElement(el: XmlElement, indent: number, options: XmlRenderOptions
     return `<${el.tag}${attrs}>${inner}</${el.tag}>`;
   }
 
-  const inner = el.children
-    .map((c) => {
-      if (typeof c === 'string') return `${pad(indent + 1)}${escapeXml(c)}\n`;
-      if (isCdata(c)) return `${pad(indent + 1)}${renderCdata(c)}\n`;
-      return renderElement(c, indent + 1, options);
-    })
-    .join('');
+  let inner = '';
+  let run = '';
+  const flushRun = () => {
+    if (run !== '') inner += `${pad(indent + 1)}${run}\n`;
+    run = '';
+  };
+  for (const c of el.children) {
+    if (typeof c === 'string') run += escapeXml(c);
+    else if (isCdata(c)) run += renderCdata(c);
+    else if (isInlineElement(c)) run += renderInline(c);
+    else {
+      flushRun();
+      inner += renderElement(c, indent + 1, options);
+    }
+  }
+  flushRun();
   return `${pad(indent)}<${el.tag}${attrs}>\n${inner}${pad(indent)}</${el.tag}>\n`;
 }
 

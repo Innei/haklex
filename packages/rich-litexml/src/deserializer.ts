@@ -153,7 +153,13 @@ function createReaderContext(registry: LitexmlRegistry): ReaderContext {
           pendingText = '';
           return;
         }
-        nodes.push(makeTextNode(pendingText, 0));
+        // The serializer writes a text run on its own line: indentation before
+        // it, a newline after it. Keeping that layout as content would add a
+        // blank line on every roundtrip.
+        const text = blockLevel
+          ? pendingText.replace(/^\s*\n[ \t]*/, '').replace(/\n\s*$/, '')
+          : pendingText;
+        nodes.push(makeTextNode(text, 0));
         pendingText = '';
       };
       for (const child of element.childNodes) {
