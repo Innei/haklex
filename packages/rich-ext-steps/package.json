@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-steps",
-  "version": "0.65.4",
+  "version": "0.65.5",
   "description": "Steps node for the haklex rich editor",
   "repository": {
     "type": "git",
