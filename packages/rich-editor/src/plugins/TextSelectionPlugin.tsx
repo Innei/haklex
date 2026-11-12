@@ -212,11 +212,12 @@ export function TextSelectionPlugin() {
     };
     syncManagedHighlight();
 
-    return () => {
-      cancelScheduledSync();
-      clearManagedHighlight(editor.getRootElement());
-    };
+    return cancelScheduledSync;
   }, [editor, isEditorFocused, snapshot]);
+
+  // Clearing on every snapshot change toggles a `*::selection` class on the
+  // root, which restyles the whole document twice per selection change.
+  useEffect(() => () => clearManagedHighlight(editor.getRootElement()), [editor]);
 
   return null;
 }
