@@ -2,8 +2,15 @@
 import { LexicalComposer } from '@lexical/react/LexicalComposer';
 import { useLexicalComposerContext } from '@lexical/react/LexicalComposerContext';
 import { ContentEditable } from '@lexical/react/LexicalContentEditable';
-import type { LexicalEditor } from 'lexical';
-import { $createParagraphNode, $createTextNode, $getRoot, $setState } from 'lexical';
+import type { EditorConfig, ElementDOMSlot, LexicalEditor } from 'lexical';
+import {
+  $createParagraphNode,
+  $createTextNode,
+  $getRoot,
+  $setState,
+  ElementNode,
+  setDOMUnmanaged,
+} from 'lexical';
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeAll, describe, expect, it } from 'vitest';
@@ -20,6 +27,35 @@ declare global {
 beforeAll(() => {
   globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 });
+
+class NestedEditableNode extends ElementNode {
+  static getType() {
+    return 'nested-editable';
+  }
+
+  static clone(node: NestedEditableNode) {
+    return new NestedEditableNode(node.__key);
+  }
+
+  createDOM(_config: EditorConfig) {
+    const dom = document.createElement('div');
+    const nested = document.createElement('div');
+    nested.setAttribute('data-nested', '');
+    nested.contentEditable = 'true';
+    nested.textContent = 'nested text';
+    setDOMUnmanaged(nested);
+    dom.append(nested);
+    return dom;
+  }
+
+  updateDOM() {
+    return false;
+  }
+
+  getDOMSlot(element: HTMLElement): ElementDOMSlot<HTMLElement> {
+    return super.getDOMSlot(element).withBefore(element.querySelector('[data-nested]'));
+  }
+}
 
 let root: Root | null = null;
 let container: HTMLDivElement | null = null;
@@ -47,13 +83,17 @@ async function mount() {
       <LexicalComposer
         initialConfig={{
           namespace: 'TextSelectionPluginTest',
+          nodes: [NestedEditableNode],
           onError: (error) => {
             throw error;
           },
           editorState: () => {
             const paragraph = $createParagraphNode().append($createTextNode('hello world'));
             $setState(paragraph, blockIdState, 'block-a');
-            $getRoot().append(paragraph);
+            const nested = new NestedEditableNode();
+            nested.append($createTextNode('after'));
+            $setState(nested, blockIdState, 'block-b');
+            $getRoot().append(paragraph, nested);
           },
         }}
       >
@@ -101,5 +141,40 @@ describe('TextSelectionPlugin', () => {
 
     expect(states).not.toContain(false);
     expect(managed.some((name) => editable.classList.contains(name))).toBe(true);
+  });
+
+  it('keeps the selection class when the selection collapses to a caret in the editor', async () => {
+    const editor = await mount();
+    const editable = editor.getRootElement()!;
+    await act(async () => {
+      editable.focus();
+      await frame();
+    });
+    await select(editor, 5);
+    expect(managed.some((name) => editable.classList.contains(name))).toBe(true);
+
+    await select(editor, 0);
+
+    expect(managed.some((name) => editable.classList.contains(name))).toBe(true);
+  });
+
+  it('clears the selection class when focus moves into a nested editable', async () => {
+    const editor = await mount();
+    const editable = editor.getRootElement()!;
+    await act(async () => {
+      editable.focus();
+      await frame();
+    });
+    await select(editor, 5);
+    await select(editor, 0);
+    expect(managed.some((name) => editable.classList.contains(name))).toBe(true);
+
+    await act(async () => {
+      editable.querySelector<HTMLElement>('[data-nested]')!.focus();
+      await frame();
+      await frame();
+    });
+
+    expect(managed.some((name) => editable.classList.contains(name))).toBe(false);
   });
 });

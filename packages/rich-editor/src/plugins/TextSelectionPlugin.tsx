@@ -46,6 +46,7 @@ export function TextSelectionPlugin() {
   const store = useTextSelectionStore();
   const snapshot = useTextSelectionSnapshot();
   const [isEditorFocused, setIsEditorFocused] = useState(false);
+  const [rootHasFocus, setRootHasFocus] = useState(false);
   const frameRef = useRef<number | null>(null);
   const focusFrameRef = useRef<number | null>(null);
 
@@ -67,6 +68,7 @@ export function TextSelectionPlugin() {
       setIsEditorFocused(
         Boolean(rootElement && activeElement && rootElement.contains(activeElement)),
       );
+      setRootHasFocus(Boolean(rootElement && activeElement === rootElement));
     };
 
     const scheduleFocusStateSync = () => {
@@ -171,6 +173,17 @@ export function TextSelectionPlugin() {
         }
 
         if (!snapshot) {
+          // A caret paints no selection, so the class can stay: removing it and
+          // adding it back on the next drag restyles the whole document twice.
+          // Focus inside a nested editable or input needs its native selection back.
+          const domSelection = rootElement.ownerDocument.getSelection();
+          if (rootHasFocus && (!domSelection || domSelection.isCollapsed)) {
+            if (activeHighlightOwner === rootElement) {
+              registry?.delete(TEXT_SELECTION_HIGHLIGHT_NAME);
+              registry?.delete(TEXT_SELECTION_INACTIVE_HIGHLIGHT_NAME);
+            }
+            return;
+          }
           clearManagedHighlight(rootElement);
           return;
         }
@@ -213,7 +226,7 @@ export function TextSelectionPlugin() {
     syncManagedHighlight();
 
     return cancelScheduledSync;
-  }, [editor, isEditorFocused, snapshot]);
+  }, [editor, isEditorFocused, rootHasFocus, snapshot]);
 
   // Clearing on every snapshot change toggles a `*::selection` class on the
   // root, which restyles the whole document twice per selection change.
