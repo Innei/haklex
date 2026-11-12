@@ -192,6 +192,64 @@ describe('text selection utilities', () => {
     expect(getTextOffsetFromDOMPoint(root.firstElementChild!, text, 6)).toBe(16);
   });
 
+  it('keeps a selection after an inline decorator on the text the reader selected', () => {
+    const root = document.createElement('div');
+    root.innerHTML =
+      '<p data-block-id="formula"><span data-lexical-text="true">公式 </span><span contenteditable="false"><span class="katex">t95t_{95}</span></span><span data-lexical-text="true"> 之后的文字，还有脚注</span><sup contenteditable="false"><a>1</a></sup><span data-lexical-text="true">之后的文字。</span></p>';
+    const block = root.firstElementChild!;
+    const after = root.querySelectorAll('[data-lexical-text]')[1].firstChild!;
+    const range = createDOMRangeFromTextSelection(root, {
+      text: '还有脚注',
+      anchorBlockId: 'formula',
+      anchorOffset: 10,
+      focusBlockId: 'formula',
+      focusOffset: 14,
+    });
+
+    expect(range?.toString()).toBe('还有脚注');
+    expect(getTextOffsetFromDOMPoint(block, after, 7)).toBe(10);
+    const tail = root.querySelectorAll('[data-lexical-text]')[2].firstChild!;
+    expect(findDOMPointByTextOffset(block, 15)).toEqual({ node: tail, offset: 1 });
+  });
+
+  it('starts a selection after an inline decorator that sits right before it', () => {
+    const root = document.createElement('div');
+    root.innerHTML =
+      '<p data-block-id="note"><span data-lexical-text="true">还有脚注</span><sup contenteditable="false"><a>1</a></sup><span data-lexical-text="true">之后的文字。</span></p>';
+    const range = createDOMRangeFromTextSelection(root, {
+      text: '之后的',
+      anchorBlockId: 'note',
+      anchorOffset: 7,
+      focusBlockId: 'note',
+      focusOffset: 4,
+    });
+
+    expect(range?.toString()).toBe('之后的');
+    const ending = createDOMRangeFromTextSelection(root, {
+      text: '脚注',
+      anchorBlockId: 'note',
+      anchorOffset: 2,
+      focusBlockId: 'note',
+      focusOffset: 4,
+    });
+    expect(ending?.toString()).toBe('脚注');
+  });
+
+  it('does not count a non-editable label inside a block', () => {
+    const root = document.createElement('div');
+    root.innerHTML =
+      '<div data-block-id="alert"><div contenteditable="false">Note</div><div><p><span data-lexical-text="true">提示框里的文字内容</span></p></div></div>';
+    const range = createDOMRangeFromTextSelection(root, {
+      text: '文字',
+      anchorBlockId: 'alert',
+      anchorOffset: 5,
+      focusBlockId: 'alert',
+      focusOffset: 7,
+    });
+
+    expect(range?.toString()).toBe('文字');
+  });
+
   it('maps backward selections through nested details without counting either summary', () => {
     const root = document.createElement('div');
     root.innerHTML =

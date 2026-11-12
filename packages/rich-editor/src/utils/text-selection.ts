@@ -48,9 +48,12 @@ function getTopLevelBlockById(blockId: string): ElementNode | null {
   return null;
 }
 
-function isDetailsSummary(element: Element): boolean {
+function holdsNoLexicalText(element: Element): boolean {
   // DetailsNode stores the summary as a property, outside its Lexical children.
-  return element.tagName === 'SUMMARY' && element.parentElement?.tagName === 'DETAILS';
+  if (element.tagName === 'SUMMARY' && element.parentElement?.tagName === 'DETAILS') return true;
+  // Decorators and node chrome (a rendered formula, a footnote mark, an alert label) are
+  // non-editable; their text is not part of the block's Lexical text offsets.
+  return element.getAttribute('contenteditable') === 'false';
 }
 
 function getTextLengthOfDomNode(node: Node): number {
@@ -63,7 +66,7 @@ function getTextLengthOfDomNode(node: Node): number {
   }
 
   const element = node as Element;
-  if (isDetailsSummary(element)) {
+  if (holdsNoLexicalText(element)) {
     return 0;
   }
   if (element.tagName === 'BR') {
@@ -264,7 +267,7 @@ export function getTextOffsetFromDOMPoint(
     }
 
     const element = node as Element;
-    if (isDetailsSummary(element)) {
+    if (holdsNoLexicalText(element)) {
       return false;
     }
     if (element.tagName === 'BR') {
@@ -288,6 +291,7 @@ export function getTextOffsetFromDOMPoint(
 export function findDOMPointByTextOffset(
   container: Element,
   requestedOffset: number,
+  affinity: 'backward' | 'forward' = 'backward',
 ): DOMSelectionTarget | null {
   const targetOffset = clampOffset(requestedOffset, getTextLengthOfDomNode(container));
   let consumed = 0;
@@ -295,7 +299,13 @@ export function findDOMPointByTextOffset(
   function walk(node: Node): DOMSelectionTarget | null {
     if (node.nodeType === Node.TEXT_NODE) {
       const length = node.textContent?.length ?? 0;
-      if (targetOffset <= consumed + length) {
+      // The end of one text node and the start of the next share an offset, with any skipped
+      // non-editable node between them; a range start must land after it, a range end before it.
+      const reached =
+        affinity === 'forward'
+          ? targetOffset < consumed + length
+          : targetOffset <= consumed + length;
+      if (reached) {
         return { node, offset: targetOffset - consumed };
       }
 
@@ -308,7 +318,7 @@ export function findDOMPointByTextOffset(
     }
 
     const element = node as Element;
-    if (isDetailsSummary(element)) {
+    if (holdsNoLexicalText(element)) {
       return null;
     }
     if (element.tagName === 'BR') {
@@ -356,19 +366,20 @@ export function createDOMRangeFromTextSelection(
     return null;
   }
 
-  const anchor = findDOMPointByTextOffset(anchorBlock, snapshot.anchorOffset);
-  const focus = findDOMPointByTextOffset(focusBlock, snapshot.focusOffset);
-  if (!anchor || !focus) {
-    return null;
-  }
-
   const anchorComesFirst =
     anchorBlock === focusBlock
       ? snapshot.anchorOffset <= snapshot.focusOffset
       : compareBlockElements(anchorBlock, focusBlock) <= 0;
 
-  const start = anchorComesFirst ? anchor : focus;
-  const end = anchorComesFirst ? focus : anchor;
+  const start = anchorComesFirst
+    ? findDOMPointByTextOffset(anchorBlock, snapshot.anchorOffset, 'forward')
+    : findDOMPointByTextOffset(focusBlock, snapshot.focusOffset, 'forward');
+  const end = anchorComesFirst
+    ? findDOMPointByTextOffset(focusBlock, snapshot.focusOffset)
+    : findDOMPointByTextOffset(anchorBlock, snapshot.anchorOffset);
+  if (!start || !end) {
+    return null;
+  }
 
   try {
     const range = document.createRange();
