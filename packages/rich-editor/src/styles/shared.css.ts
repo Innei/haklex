@@ -584,14 +584,6 @@ globalStyle(`${table} :is(${tableCell}, ${tableCellHeader}) > ${paragraph}`, {
   lineHeight: 'inherit',
 });
 
-globalStyle(`${table} ${tableCell} > ${paragraph}`, {
-  maxWidth: '20em',
-});
-
-globalStyle(`[contenteditable="true"] ${table} ${tableCell} > ${paragraph}`, {
-  maxWidth: 'none',
-});
-
 // Lexical puts `word-break: break-word` on the editable root, which shrinks a
 // cell's min-content to one character and lets a filling table split words.
 globalStyle(`[contenteditable="true"] ${table} :is(${tableCell}, ${tableCellHeader})`, {
