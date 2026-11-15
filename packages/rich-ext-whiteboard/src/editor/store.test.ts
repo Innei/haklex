@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { newElement } from '../model/create';
 import { bumpVersion } from '../model/mutate';
+import { bringToFront } from './actions';
 import { HISTORY_LIMIT } from './history';
 import { createWhiteboardStore } from './store';
 
@@ -207,5 +208,55 @@ describe('sync versioning', () => {
     store.commit(moved(40));
     store.undo();
     expect(store.getState().elements).toBe(before);
+  });
+});
+
+describe('applyRemote', () => {
+  it('merges remote elements without adding an undo entry', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    store.applyRemote({ elements: [rect('2', 30)] });
+    expect(store.getState().elements.map((el) => el.id)).toEqual(['1', '2']);
+    expect(store.canUndo()).toBe(false);
+  });
+
+  it('undo keeps what the remote side changed', () => {
+    const store = createWhiteboardStore({ elements: [rect('1'), rect('2', 30)] }, { sync: true });
+    store.commit(({ elements }) => ({
+      elements: elements.map((el) => (el.id === '1' ? bumpVersion(el, { x: 5 }) : el)),
+    }));
+    const remote = bumpVersion(store.getState().elements[1], { x: 77 });
+    store.applyRemote({ elements: [remote], files: { f9: { id: 'f9', dataURL: 'data:,' } } });
+    store.undo();
+    const [one, two] = store.getState().elements;
+    expect(one.x).toBe(0);
+    expect(two.x).toBe(77);
+    expect(store.getState().files.f9).toBeDefined();
+  });
+
+  it('holds a remote change to an element in a gesture until the gesture ends', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    const original = store.getState().elements[0];
+    store.beginTransient();
+    store.updateTransient(() => ({ elements: [bumpVersion(original, { x: 5 })] }));
+    store.applyRemote({ elements: [{ ...original, version: 50, x: 400 }] });
+    expect(store.getState().elements[0].x).toBe(5);
+    store.endTransient(true);
+    expect(store.getState().elements[0].x).toBe(400);
+  });
+
+  it('keeps layer order through a save and a shuffled reload', () => {
+    const store = createWhiteboardStore(
+      { elements: [rect('1'), rect('2'), rect('3')] },
+      { sync: true },
+    );
+    store.setState({ selectedIds: new Set(['1']) });
+    bringToFront(store);
+    expect(store.getState().elements.map((el) => el.id)).toEqual(['2', '3', '1']);
+    const saved = store.getScene().elements;
+    const reloaded = createWhiteboardStore(
+      { elements: [saved[2], saved[0], saved[1]] },
+      { sync: true },
+    );
+    expect(reloaded.getState().elements.map((el) => el.id)).toEqual(['2', '3', '1']);
   });
 });

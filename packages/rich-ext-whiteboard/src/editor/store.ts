@@ -3,6 +3,7 @@ import { useSyncExternalStore } from 'react';
 import { DEFAULT_STYLE } from '../model/defaults';
 import { syncIndices } from '../model/fractional-index';
 import { bumpVersion } from '../model/mutate';
+import { orderByIndex, reconcileElements } from '../model/reconcile';
 import { normalizeElement } from '../model/restore';
 import { resolveRichTextHeights } from '../model/richtext-layout';
 import { supersede } from '../model/supersede';
@@ -10,8 +11,14 @@ import type { BinaryFiles, ExcalidrawElement } from '../scene/types';
 import { createHistory } from './history';
 import type { Doc, DocUpdater, EditorState, SceneDoc } from './types';
 
+export interface RemoteUpdate {
+  elements?: readonly ExcalidrawElement[];
+  files?: BinaryFiles;
+}
+
 export interface WhiteboardStore {
   amend: (fn: (doc: Doc) => Doc) => void;
+  applyRemote: (update: RemoteUpdate) => void;
   beginTransient: () => void;
   canRedo: () => boolean;
   canUndo: () => boolean;
@@ -59,9 +66,8 @@ export function createWhiteboardStore(
   const original = (input ?? {}) as Record<string, unknown>;
   const originalAppState = original.appState as Record<string, unknown> | undefined;
   const originalFiles = (original.files as BinaryFiles | undefined) ?? {};
-  const initialElements = resolveRichTextHeights(
-    (Array.isArray(original.elements) ? original.elements : []) as ExcalidrawElement[],
-  );
+  const loaded = (Array.isArray(original.elements) ? original.elements : []) as ExcalidrawElement[];
+  const initialElements = resolveRichTextHeights(sync ? orderByIndex(loaded) : loaded);
   const initialBackground =
     (originalAppState?.viewBackgroundColor as string | undefined) ?? DEFAULT_BACKGROUND;
   const initialGrid = (originalAppState?.gridSize as number | null | undefined) ?? null;
@@ -95,8 +101,59 @@ export function createWhiteboardStore(
     for (const listener of listeners) listener();
   };
 
+  const pending = new Map<string, ExcalidrawElement>();
+
+  const protectedIds = (): Set<string> => {
+    const ids = new Set<string>();
+    for (const id of [state.editingTextId, state.editingRichTextId, state.editingLinearId])
+      if (id) ids.add(id);
+    if (state.editingTextId) {
+      const container = state.elements.find((el) => el.id === state.editingTextId);
+      const owner = (container as { containerId?: string | null } | undefined)?.containerId;
+      if (owner) ids.add(owner);
+    }
+    if (transientSnapshot) {
+      const before = new Map(transientSnapshot.elements.map((el) => [el.id, el]));
+      for (const el of state.elements) if (before.get(el.id) !== el) ids.add(el.id);
+    }
+    return ids;
+  };
+
+  const mergeRemote = (remote: readonly ExcalidrawElement[]): Partial<EditorState> | null => {
+    const result = reconcileElements(state.elements, remote, protectedIds());
+    for (const el of result.deferred) pending.set(el.id, el);
+    if (result.accepted.length === 0) return null;
+    const taken = new Map(result.accepted.map((el) => [el.id, el]));
+    const rewrite = (doc: Doc): Doc => {
+      const known = new Set(doc.elements.map((el) => el.id));
+      return {
+        ...doc,
+        elements: [
+          ...doc.elements.map((el) => taken.get(el.id) ?? el),
+          ...result.accepted.filter((el) => !known.has(el.id)),
+        ],
+      };
+    };
+    history.rewrite(rewrite);
+    if (transientSnapshot) transientSnapshot = rewrite(transientSnapshot);
+    const alive = new Set(result.elements.filter((el) => !el.isDeleted).map((el) => el.id));
+    return {
+      elements: resolveRichTextHeights(syncIndices(result.elements)),
+      selectedIds: new Set([...state.selectedIds].filter((id) => alive.has(id))),
+    };
+  };
+
+  const flushPending = () => {
+    if (pending.size === 0) return;
+    const waiting = [...pending.values()];
+    pending.clear();
+    const patch = mergeRemote(waiting);
+    if (patch) state = { ...state, ...patch };
+  };
+
   const set = (patch: Partial<EditorState>) => {
     state = { ...state, ...patch };
+    flushPending();
     emit();
   };
 
@@ -147,6 +204,19 @@ export function createWhiteboardStore(
       if (!next) return;
       history.push(before);
       set(next);
+    },
+    applyRemote(update) {
+      const patch: Partial<EditorState> = update.elements
+        ? (mergeRemote(update.elements) ?? {})
+        : {};
+      if (update.files && Object.keys(update.files).length > 0) {
+        const added = update.files;
+        const withFiles = (doc: Doc): Doc => ({ ...doc, files: { ...doc.files, ...added } });
+        history.rewrite(withFiles);
+        if (transientSnapshot) transientSnapshot = withFiles(transientSnapshot);
+        patch.files = { ...state.files, ...added };
+      }
+      if (Object.keys(patch).length > 0) set(patch);
     },
     amend(fn) {
       history.rewrite(fn);
