@@ -1,6 +1,7 @@
 import { newRichTextElement } from '../../model/create';
 import type { Point } from '../../model/geometry';
 import { resolveRichTextHeights } from '../../model/richtext-layout';
+import { CARD_HEIGHT, CARD_WIDTH } from '../card-actions';
 import { activeGrid, snapPoint } from '../grid';
 import { startRichTextEditing } from '../richtext-actions';
 import {
@@ -12,9 +13,6 @@ import {
 } from './creation';
 import type { ToolHandler } from './types';
 import { DRAG_THRESHOLD } from './types';
-
-export const CARD_WIDTH = 200;
-export const CARD_HEIGHT = 120;
 
 export function createCardTool(): ToolHandler {
   let id: string | null = null;

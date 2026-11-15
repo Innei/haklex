@@ -125,7 +125,11 @@ function handleModified(store: WhiteboardStore, e: ShortcutEvent): boolean {
   return false;
 }
 
-export function handleShortcut(store: WhiteboardStore, e: ShortcutEvent): boolean {
+export function handleShortcut(
+  store: WhiteboardStore,
+  e: ShortcutEvent,
+  allowedTools?: ReadonlySet<ToolType>,
+): boolean {
   const state = store.getState();
   if (state.editingTextId || state.editingRichTextId) return false;
   if (e.ctrlKey || e.metaKey) return handleModified(store, e);
@@ -182,6 +186,7 @@ export function handleShortcut(store: WhiteboardStore, e: ShortcutEvent): boolea
     return true;
   }
   const tool = !e.altKey && !e.shiftKey ? TOOL_KEYS[e.key.toLowerCase()] : undefined;
+  if (tool && allowedTools && !allowedTools.has(tool)) return false;
   if (tool) {
     store.setState({ tool, selectedIds: tool === 'selection' ? state.selectedIds : new Set() });
     return true;

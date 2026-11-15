@@ -52,6 +52,7 @@ export interface WhiteboardToolbarProps {
   onToolSelect?: (tool: ToolType) => boolean | void;
   showKeys?: boolean;
   store: WhiteboardStore;
+  tools?: ReadonlySet<ToolType>;
 }
 
 export const WhiteboardToolbar: FC<WhiteboardToolbarProps> = ({
@@ -59,6 +60,7 @@ export const WhiteboardToolbar: FC<WhiteboardToolbarProps> = ({
   onToolSelect,
   showKeys = true,
   store,
+  tools,
 }) => {
   const tool = useStore(store, (s) => s.tool);
   const locked = useStore(store, (s) => s.toolLocked);
@@ -78,29 +80,31 @@ export const WhiteboardToolbar: FC<WhiteboardToolbarProps> = ({
         <LockIcon size={16} />
       </ActionButton>
       <span className={css.separator} />
-      {TOOLS.map(({ tool: value, icon: Icon, key, label }) => (
-        <ActionButton
-          icon
-          aria-label={`${label} (${key})`}
-          aria-pressed={tool === value}
-          className={css.toolButton}
-          data-tool={value}
-          key={value}
-          size="lg"
-          title={`${label} — ${key}`}
-          variant="ghost"
-          onClick={() => {
-            if (onToolSelect?.(value) === false) return;
-            store.setState({
-              tool: value,
-              selectedIds: value === 'selection' ? store.getState().selectedIds : new Set(),
-            });
-          }}
-        >
-          <Icon size={16} />
-          {showKeys && <span className={css.toolKey}>{key}</span>}
-        </ActionButton>
-      ))}
+      {TOOLS.filter((def) => !tools || tools.has(def.tool)).map(
+        ({ tool: value, icon: Icon, key, label }) => (
+          <ActionButton
+            icon
+            aria-label={`${label} (${key})`}
+            aria-pressed={tool === value}
+            className={css.toolButton}
+            data-tool={value}
+            key={value}
+            size="lg"
+            title={`${label} — ${key}`}
+            variant="ghost"
+            onClick={() => {
+              if (onToolSelect?.(value) === false) return;
+              store.setState({
+                tool: value,
+                selectedIds: value === 'selection' ? store.getState().selectedIds : new Set(),
+              });
+            }}
+          >
+            <Icon size={16} />
+            {showKeys && <span className={css.toolKey}>{key}</span>}
+          </ActionButton>
+        ),
+      )}
     </div>
   );
 };

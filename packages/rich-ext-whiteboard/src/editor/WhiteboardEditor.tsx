@@ -3,7 +3,8 @@ import { useEffect, useMemo, useRef } from 'react';
 
 import { getCommonBounds } from '../model/bounds';
 import type { Point } from '../model/geometry';
-import * as chrome from './chrome.css';
+import { SceneHandFontContext } from '../scene/context';
+import * as chromeCss from './chrome.css';
 import * as css from './editor.css';
 import { FrameNameEditor } from './FrameNameEditor';
 import type { ImageInsertOptions } from './image-actions';
@@ -21,6 +22,7 @@ import { TextEditor } from './TextEditor';
 import { WhiteboardToolbar } from './Toolbar';
 import { createToolHandlers, getToolHandler } from './tools';
 import type { ToolContext } from './tools/types';
+import type { ToolType } from './types';
 import { fitToContent, screenToScene } from './viewport';
 import { WhiteboardCanvas } from './WhiteboardCanvas';
 import { ZoomControls } from './ZoomControls';
@@ -35,19 +37,34 @@ function isTypingTarget(target: EventTarget): boolean {
   );
 }
 
+export interface WhiteboardChrome {
+  contextMenu?: boolean;
+  mobileDock?: boolean;
+  stylePanel?: boolean;
+  toolbar?: boolean;
+  zoom?: boolean;
+}
+
 export interface WhiteboardEditorProps extends ImageInsertOptions {
+  chrome?: WhiteboardChrome;
+  handFontOverride?: string;
   store: WhiteboardStore;
   theme: 'light' | 'dark';
   toolbar?: 'inline' | 'none';
+  tools?: readonly ToolType[];
 }
 
 export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
+  chrome = {},
+  handFontOverride,
   store,
   theme,
   toolbar = 'inline',
+  tools,
   uploadFile,
   onUploadError,
 }) => {
+  const allowedTools = useMemo(() => (tools ? new Set(tools) : undefined), [tools]);
   const handlers = useMemo(createToolHandlers, []);
   const inputRef = useRef<HTMLInputElement>(null);
   const pickAtRef = useRef<Point | null>(null);
@@ -92,39 +109,44 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
     const onCanvas = e.target instanceof Element && e.target.hasAttribute('data-whiteboard-canvas');
     if (!onCanvas && ARROW_KEYS.has(e.key)) return;
     const handler = getToolHandler(handlers, store.getState().tool);
-    if (handler.onKeyDown?.(context, e.nativeEvent) || handleShortcut(store, e)) {
+    if (handler.onKeyDown?.(context, e.nativeEvent) || handleShortcut(store, e, allowedTools)) {
       e.preventDefault();
     }
   };
 
   return (
-    <div data-whiteboard-editor className={css.root} onKeyDown={onKeyDown}>
-      {toolbar === 'inline' && !narrow && (
-        <div className={chrome.inlineToolbar}>
-          <WhiteboardToolbar store={store} />
-        </div>
-      )}
-      <WhiteboardCanvas context={context} handlers={handlers} store={store} theme={theme}>
-        <SelectionOverlay store={store} />
-        <TextEditor dark={theme === 'dark'} store={store} />
-        <RichTextEditor dark={theme === 'dark'} store={store} />
-        <FrameNameEditor store={store} />
-        {narrow ? <StyleSheet store={store} /> : <StylePanel store={store} />}
-        <ZoomControls compact={narrow} store={store} />
-        {narrow && <MobileDock store={store} />}
-      </WhiteboardCanvas>
-      <input
-        hidden
-        multiple
-        accept="image/*"
-        ref={inputRef}
-        type="file"
-        onChange={(e) => {
-          const files = [...(e.currentTarget.files ?? [])];
-          e.currentTarget.value = '';
-          if (files.length > 0 && pickAtRef.current) context.onFiles?.(files, pickAtRef.current);
-        }}
-      />
-    </div>
+    <SceneHandFontContext value={handFontOverride ?? null}>
+      <div data-whiteboard-editor className={css.root} onKeyDown={onKeyDown}>
+        {toolbar === 'inline' && chrome.toolbar !== false && !narrow && (
+          <div className={chromeCss.inlineToolbar}>
+            <WhiteboardToolbar store={store} tools={allowedTools} />
+          </div>
+        )}
+        <WhiteboardCanvas context={context} handlers={handlers} store={store} theme={theme}>
+          <SelectionOverlay store={store} />
+          <TextEditor dark={theme === 'dark'} store={store} />
+          <RichTextEditor dark={theme === 'dark'} store={store} />
+          <FrameNameEditor store={store} />
+          {chrome.stylePanel !== false &&
+            (narrow ? <StyleSheet store={store} /> : <StylePanel store={store} />)}
+          {chrome.zoom !== false && <ZoomControls compact={narrow} store={store} />}
+          {narrow && chrome.mobileDock !== false && (
+            <MobileDock store={store} tools={allowedTools} />
+          )}
+        </WhiteboardCanvas>
+        <input
+          hidden
+          multiple
+          accept="image/*"
+          ref={inputRef}
+          type="file"
+          onChange={(e) => {
+            const files = [...(e.currentTarget.files ?? [])];
+            e.currentTarget.value = '';
+            if (files.length > 0 && pickAtRef.current) context.onFiles?.(files, pickAtRef.current);
+          }}
+        />
+      </div>
+    </SceneHandFontContext>
   );
 };
