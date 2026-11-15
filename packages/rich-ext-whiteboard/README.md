@@ -85,6 +85,43 @@ import {
 } from '@haklex/rich-ext-whiteboard/static';
 ```
 
+### Embed the editor on its own
+
+`@haklex/rich-ext-whiteboard/editor` is the whiteboard without the article block around it. The host owns the store and decides which built-in chrome shows.
+
+```tsx
+import {
+  convertSkeletons,
+  createWhiteboardStore,
+  exportToBlob,
+  focusElements,
+  WhiteboardEditor,
+} from '@haklex/rich-ext-whiteboard/editor';
+
+const store = createWhiteboardStore({ elements, files }, { sync: true });
+
+<WhiteboardEditor
+  store={store}
+  theme="light"
+  chrome={{ toolbar: false, stylePanel: false, zoom: false, mobileDock: false }}
+  tools={['selection', 'rectangle', 'arrow', 'text', 'card']}
+  contextMenuItems={({ selected, scenePoint }) => [
+    { key: 'comment', label: 'Comment', onSelect: () => openComment(selected, scenePoint) },
+  ]}
+/>;
+```
+
+- `chrome` switches the toolbar, style panel, zoom controls, mobile dock and context menu off one by one; all are on by default.
+- `tools` limits the tools the toolbar and keyboard shortcuts offer.
+- `contextMenuItems` appends host items to the right-click menu.
+- `handFontOverride` draws handwritten text with another font stack without changing the stored `fontFamily`.
+- With `{ sync: true }` every local change, undo and redo included, raises the changed elements' `version`, deleted elements stay as `isDeleted` tombstones, and `store.applyRemote({ elements, files })` merges elements from elsewhere: the higher `version` wins, and elements the user is drawing or typing in are held back until they finish.
+- `store.subscribe` reports changes; `store.getState()` holds `elements`, `files`, `selectedIds` and `viewport` (`screen = (scene + scroll) * zoom`).
+- `convertSkeletons` completes short element descriptions, see [the scene format](./docs/scene-format.md#skeleton-shorthand). `focusElements` moves the viewport to elements or a box.
+- `exportToSvg` and `exportToBlob` draw a scene without a mounted editor. `richtext` cards are drawn as plain SVG text, and the fonts in use are embedded.
+
+`@haklex/rich-ext-whiteboard/scene` holds the read-only side: `Scene`, `SceneContent`, `InteractiveScene` (pan, zoom, `onViewportChange`, a `focus` handle), the font stacks and the same export functions. It never loads the editor.
+
 ### Snapshot utilities
 
 ```ts
@@ -133,11 +170,13 @@ import '@haklex/rich-ext-whiteboard/style.css';
 
 ### Sub-path Exports
 
-| Path                                    | Description                             |
-| --------------------------------------- | --------------------------------------- |
-| `@haklex/rich-ext-whiteboard`           | Full exports (edit + static)            |
-| `@haklex/rich-ext-whiteboard/static`    | Static-only (no Excalidraw editor deps) |
-| `@haklex/rich-ext-whiteboard/style.css` | Stylesheet                              |
+| Path                                    | Description                                  |
+| --------------------------------------- | -------------------------------------------- |
+| `@haklex/rich-ext-whiteboard`           | Full exports (edit + static)                 |
+| `@haklex/rich-ext-whiteboard/static`    | Static-only (no Excalidraw editor deps)      |
+| `@haklex/rich-ext-whiteboard/editor`    | The editor on its own, without Lexical nodes |
+| `@haklex/rich-ext-whiteboard/scene`     | Read-only scene, viewport control and export |
+| `@haklex/rich-ext-whiteboard/style.css` | Stylesheet                                   |
 
 ## Part of Haklex
 

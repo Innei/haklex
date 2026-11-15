@@ -186,6 +186,54 @@ A card holding a small rich-text document: sticky notes, labelled cards, short l
 
 The read-only view and the editor invert the whole drawing in dark mode, so write colours for a light background. Images and `svg` elements keep their own colours.
 
+## Skeleton shorthand
+
+`convertSkeletons(skeletons, sceneElements)` from `@haklex/rich-ext-whiteboard/editor` turns short element descriptions into complete elements. A skeleton is an element with only the fields that matter; everything else takes the defaults above. It returns `{ created, touched }`: the new elements, and the existing scene elements it had to change (a shape that gained a bound arrow, a shape pulled into a frame).
+
+```json
+[
+  {
+    "type": "rectangle",
+    "id": "api",
+    "x": 0,
+    "y": 0,
+    "width": 160,
+    "height": 80,
+    "label": { "text": "API" }
+  },
+  {
+    "type": "ellipse",
+    "id": "db",
+    "x": 320,
+    "y": 0,
+    "width": 140,
+    "height": 80,
+    "label": { "text": "DB" }
+  },
+  {
+    "type": "arrow",
+    "x": 160,
+    "y": 40,
+    "points": [
+      [0, 0],
+      [160, 0]
+    ],
+    "start": { "id": "api" },
+    "end": { "id": "db" },
+    "label": { "text": "reads" }
+  },
+  { "type": "frame", "name": "Backend", "children": ["api", "db"] }
+]
+```
+
+- `label` on a shape or an arrow creates the bound `text` element, centred, and links both sides. Other `label` fields (`fontSize`, `strokeColor`, …) style that text.
+- `start` / `end` with an `id` bind an arrow or line end to that element, which may be in the same batch or already in the scene. An id that matches nothing is ignored and the end stays free.
+- A `text` skeleton needs no `width` or `height`; they are measured from `text`, `fontSize` and `fontFamily`.
+- A `frame` with `children` takes those elements (and their labels) as members. Without a positive `width` and `height` the frame is sized to its members plus 10px.
+- An `svg` skeleton without a positive `width` and `height` takes its size from the markup's `width`/`height` or `viewBox`, else 100×100.
+- A `richtext` skeleton grows to the height its `content` needs at the given `width`.
+- A skeleton whose `id` already exists in the scene replaces that element.
+
 ## Example
 
 `src/acceptance/brainstorm-board.ts` builds a complete board with a title, a hand-drawn underline, an `svg` sticker, a coloured area, a five-day timeline and six `richtext` cards with shadows.

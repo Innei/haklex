@@ -81,7 +81,7 @@ export const contextMenuItem = style({
       outline: 'none',
     },
     '&:disabled': { color: vars.color.textQuaternary, cursor: 'default' },
-    '&[data-danger]': { color: '#e03131' },
+    '&[data-danger]': { color: vars.color.alertCaution },
   },
 });
 
