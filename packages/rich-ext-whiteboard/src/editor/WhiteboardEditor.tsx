@@ -51,6 +51,7 @@ export interface WhiteboardEditorProps extends ImageInsertOptions {
   chrome?: WhiteboardChrome;
   contextMenuItems?: ContextMenuItemsFn;
   handFontOverride?: string;
+  initialFit?: boolean;
   store: WhiteboardStore;
   theme: 'light' | 'dark';
   toolbar?: 'inline' | 'none';
@@ -61,6 +62,7 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
   chrome = {},
   contextMenuItems,
   handFontOverride,
+  initialFit = true,
   store,
   theme,
   toolbar = 'inline',
@@ -97,11 +99,12 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
   useEffect(() => {
     if (positionedRef.current || canvasWidth <= 0) return;
     positionedRef.current = true;
+    if (!initialFit) return;
     const { elements, canvasSize } = store.getState();
     const alive = elements.filter((el) => !el.isDeleted);
     if (alive.length === 0) return;
     store.setState({ viewport: fitToContent(getCommonBounds(alive), canvasSize) });
-  }, [canvasWidth, store]);
+  }, [canvasWidth, initialFit, store]);
   useEffect(() => {
     if (tool !== 'image') return;
     const { viewport, canvasSize, toolLocked } = store.getState();

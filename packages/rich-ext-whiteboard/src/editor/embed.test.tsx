@@ -161,4 +161,17 @@ describe('focusElements', () => {
     expect(focusElements(store, ['missing'])).toBe(false);
     expect(store.getState().viewport).toBe(before);
   });
+
+  it('fits the content once the canvas is measured, unless the host places the viewport itself', () => {
+    const fitted = createWhiteboardStore({ elements: [rect('a', 2000, 2000)] });
+    mount({ store: fitted });
+    act(() => fitted.setState({ canvasSize: { width: 800, height: 600 } }));
+    expect(fitted.getState().viewport.scrollX).not.toBe(0);
+    cleanup?.();
+
+    const kept = createWhiteboardStore({ elements: [rect('a', 2000, 2000)] });
+    mount({ store: kept, initialFit: false });
+    act(() => kept.setState({ canvasSize: { width: 800, height: 600 } }));
+    expect(kept.getState().viewport).toEqual({ scrollX: 0, scrollY: 0, zoom: 1 });
+  });
 });

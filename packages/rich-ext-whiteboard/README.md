@@ -112,6 +112,7 @@ const store = createWhiteboardStore({ elements, files }, { sync: true });
 ```
 
 - `chrome` switches the toolbar, style panel, zoom controls, mobile dock and context menu off one by one; all are on by default.
+- `initialFit={false}` leaves the viewport where the store has it instead of fitting the content on mount.
 - `tools` limits the tools the toolbar and keyboard shortcuts offer.
 - `contextMenuItems` appends host items to the right-click menu.
 - `handFontOverride` draws handwritten text with another font stack without changing the stored `fontFamily`.
