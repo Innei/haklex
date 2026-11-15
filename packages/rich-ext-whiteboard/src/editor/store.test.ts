@@ -138,3 +138,74 @@ describe('createWhiteboardStore', () => {
     expect(store.getScene().files).toBeUndefined();
   });
 });
+
+describe('sync versioning', () => {
+  const moved =
+    (x: number) =>
+    ({ elements }: { elements: readonly { id: string }[] }) => ({
+      elements: elements.map((el) => bumpVersion(el as never, { x } as never)),
+    });
+
+  it('undo restores the old geometry under a newer version', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    store.commit(moved(40));
+    const after = store.getState().elements[0];
+    store.undo();
+    const undone = store.getState().elements[0];
+    expect(undone.x).toBe(0);
+    expect(undone.version).toBeGreaterThan(after.version!);
+    expect(undone.versionNonce).not.toBe(after.versionNonce);
+    store.redo();
+    const redone = store.getState().elements[0];
+    expect(redone.x).toBe(40);
+    expect(redone.version).toBeGreaterThan(undone.version!);
+  });
+
+  it('undoing a creation leaves a deleted element behind', () => {
+    const store = createWhiteboardStore({ elements: [] }, { sync: true });
+    store.commit(() => ({ elements: [rect('1')] }));
+    const created = store.getState().elements[0];
+    store.undo();
+    const [gone] = store.getState().elements;
+    expect(gone.isDeleted).toBe(true);
+    expect(gone.version).toBeGreaterThan(created.version!);
+    expect(store.getScene().elements).toHaveLength(0);
+    store.redo();
+    const [back] = store.getState().elements;
+    expect(back.isDeleted).toBe(false);
+    expect(back.version).toBeGreaterThan(gone.version!);
+  });
+
+  it('a kept gesture ends above every version it showed on the way', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    const original = store.getState().elements[0];
+    store.beginTransient();
+    store.updateTransient(() => ({ elements: [bumpVersion(original, { x: 5 })] }));
+    const midway = store.getState().elements[0].version!;
+    store.updateTransient(() => ({ elements: [bumpVersion(original, { x: 9 })] }));
+    store.endTransient(true);
+    const final = store.getState().elements[0];
+    expect(final.x).toBe(9);
+    expect(final.version).toBeGreaterThan(midway);
+  });
+
+  it('a cancelled gesture returns above the versions it showed', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    const original = store.getState().elements[0];
+    store.beginTransient();
+    store.updateTransient(() => ({ elements: [bumpVersion(original, { x: 5 })] }));
+    const midway = store.getState().elements[0].version!;
+    store.endTransient(false);
+    const final = store.getState().elements[0];
+    expect(final.x).toBe(0);
+    expect(final.version).toBeGreaterThan(midway);
+  });
+
+  it('keeps identity on undo without the sync option', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] });
+    const before = store.getState().elements;
+    store.commit(moved(40));
+    store.undo();
+    expect(store.getState().elements).toBe(before);
+  });
+});

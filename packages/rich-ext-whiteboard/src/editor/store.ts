@@ -2,8 +2,10 @@ import { useSyncExternalStore } from 'react';
 
 import { DEFAULT_STYLE } from '../model/defaults';
 import { syncIndices } from '../model/fractional-index';
+import { bumpVersion } from '../model/mutate';
 import { normalizeElement } from '../model/restore';
 import { resolveRichTextHeights } from '../model/richtext-layout';
+import { supersede } from '../model/supersede';
 import type { BinaryFiles, ExcalidrawElement } from '../scene/types';
 import { createHistory } from './history';
 import type { Doc, DocUpdater, EditorState, SceneDoc } from './types';
@@ -45,7 +47,15 @@ function referencedFileIds(elements: readonly ExcalidrawElement[]): Set<string> 
   return ids;
 }
 
-export function createWhiteboardStore(input: Record<string, unknown> | undefined): WhiteboardStore {
+export interface WhiteboardStoreOptions {
+  sync?: boolean;
+}
+
+export function createWhiteboardStore(
+  input: Record<string, unknown> | undefined,
+  options: WhiteboardStoreOptions = {},
+): WhiteboardStore {
+  const { sync = false } = options;
   const original = (input ?? {}) as Record<string, unknown>;
   const originalAppState = original.appState as Record<string, unknown> | undefined;
   const originalFiles = (original.files as BinaryFiles | undefined) ?? {};
@@ -105,9 +115,10 @@ export function createWhiteboardStore(input: Record<string, unknown> | undefined
   };
 
   const restore = (doc: Doc) => {
-    const alive = new Set(doc.elements.filter((el) => !el.isDeleted).map((el) => el.id));
+    const elements = sync ? supersede(state.elements, doc.elements) : doc.elements;
+    const alive = new Set(elements.filter((el) => !el.isDeleted).map((el) => el.id));
     set({
-      elements: doc.elements,
+      elements,
       files: doc.files,
       selectedIds: new Set([...state.selectedIds].filter((id) => alive.has(id))),
       editingTextId: null,
@@ -159,7 +170,13 @@ export function createWhiteboardStore(input: Record<string, unknown> | undefined
         if (!unchanged) restore(snapshot);
         return;
       }
-      if (!unchanged) history.push(snapshot);
+      if (unchanged) return;
+      history.push(snapshot);
+      if (!sync) return;
+      const before = new Map(snapshot.elements.map((el) => [el.id, el]));
+      set({
+        elements: state.elements.map((el) => (before.get(el.id) === el ? el : bumpVersion(el))),
+      });
     },
     isTransient: () => transientSnapshot !== null,
     undo() {
