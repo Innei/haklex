@@ -69,6 +69,46 @@ export interface SceneContentProps {
 
 const isFrame = (el: ExcalidrawElement) => el.type === 'frame' || el.type === 'magicframe';
 
+const LABEL_PAD = 4;
+const LINE_PAD = 64;
+
+interface LabelCut {
+  area: [number, number, number, number];
+  hole: [number, number, number, number];
+}
+
+function labelCuts(elements: readonly ExcalidrawElement[]): Map<string, LabelCut> {
+  const lines = new Map(
+    elements.filter((el) => el.type === 'arrow' || el.type === 'line').map((el) => [el.id, el]),
+  );
+  const cuts = new Map<string, LabelCut>();
+  for (const el of elements) {
+    if (el.type !== 'text' || !el.containerId || !el.text?.trim()) continue;
+    const line = lines.get(el.containerId);
+    if (!line) continue;
+    const points = (line as { points?: [number, number][] }).points ?? [];
+    const xs = [0, line.width, ...points.map(([x]) => x)];
+    const ys = [0, line.height, ...points.map(([, y]) => y)];
+    const left = line.x + Math.min(...xs) - LINE_PAD;
+    const top = line.y + Math.min(...ys) - LINE_PAD;
+    cuts.set(line.id, {
+      area: [
+        left,
+        top,
+        line.x + Math.max(...xs) + LINE_PAD - left,
+        line.y + Math.max(...ys) + LINE_PAD - top,
+      ],
+      hole: [
+        el.x - LABEL_PAD,
+        el.y - LABEL_PAD,
+        el.width + LABEL_PAD * 2,
+        el.height + LABEL_PAD * 2,
+      ],
+    });
+  }
+  return cuts;
+}
+
 export const SceneContent: FC<SceneContentProps> = memo(
   ({ dark = false, elementProps, files, handFontOverride, hiddenIds, scene }) => {
     const elements = resolveRichTextHeights(scene.elements.filter((el) => !el.isDeleted));
@@ -86,7 +126,9 @@ export const SceneContent: FC<SceneContentProps> = memo(
       `rich-excalidraw-frame-${uid}-${frameId.replaceAll(/[^\w-]/g, '')}`;
     const shadowId = `rich-excalidraw-shadow-${uid}`;
     const anyShadow = elements.some(hasShadow);
-    const hasDefs = dark || usedFrames.size > 0 || anyShadow;
+    const cuts = labelCuts(elements);
+    const cutId = (id: string) => `rich-excalidraw-label-${uid}-${id.replaceAll(/[^\w-]/g, '')}`;
+    const hasDefs = dark || usedFrames.size > 0 || anyShadow || cuts.size > 0;
 
     return (
       <SceneDarkContext value={dark ? { filterId } : null}>
@@ -103,12 +145,33 @@ export const SceneContent: FC<SceneContentProps> = memo(
                   </clipPath>
                 );
               })}
+              {[...cuts].map(([id, { area, hole }]) => (
+                <mask
+                  height={area[3]}
+                  id={cutId(id)}
+                  key={id}
+                  maskUnits="userSpaceOnUse"
+                  width={area[2]}
+                  x={area[0]}
+                  y={area[1]}
+                >
+                  <rect fill="#fff" height={area[3]} width={area[2]} x={area[0]} y={area[1]} />
+                  <rect fill="#000" height={hole[3]} width={hole[2]} x={hole[0]} y={hole[1]} />
+                </mask>
+              ))}
             </defs>
           )}
           {elements.map((el) => {
             if (hiddenIds?.has(el.id)) return null;
-            const element = (
+            const drawn = (
               <ElementGroup el={el} extra={elementProps?.(el)} files={files} key={el.id} />
+            );
+            const element = cuts.has(el.id) ? (
+              <g key={el.id} mask={`url(#${cutId(el.id)})`}>
+                {drawn}
+              </g>
+            ) : (
+              drawn
             );
             const group = hasShadow(el) ? (
               <g filter={`url(#${shadowId})`} key={el.id}>

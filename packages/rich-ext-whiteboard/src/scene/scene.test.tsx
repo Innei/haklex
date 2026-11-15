@@ -83,3 +83,63 @@ describe('Scene dark mode', () => {
     expect(html).not.toMatch(/<image[^>]*filter=/);
   });
 });
+
+describe('arrow labels', () => {
+  const base = {
+    angle: 0,
+    strokeColor: '#000',
+    backgroundColor: 'transparent',
+    fillStyle: 'solid',
+    strokeWidth: 1,
+    strokeStyle: 'solid',
+    roughness: 0,
+    opacity: 100,
+    seed: 1,
+  };
+  const arrow = (id: string, y: number, label?: string) => ({
+    ...base,
+    id,
+    type: 'arrow',
+    x: 0,
+    y,
+    width: 200,
+    height: 0,
+    points: [
+      [0, 0],
+      [200, 0],
+    ],
+    boundElements: label ? [{ id: label, type: 'text' }] : [],
+  });
+  const text = (id: string, containerId: string) => ({
+    ...base,
+    id,
+    type: 'text',
+    x: 80,
+    y: -10,
+    width: 40,
+    height: 20,
+    text: 'ws',
+    fontSize: 16,
+    fontFamily: 1,
+    containerId,
+  });
+  const render = (elements: unknown[]) =>
+    renderToStaticMarkup(
+      <Scene scene={{ type: 'excalidraw', appState: {}, elements, files: {} } as never} />,
+    );
+
+  it('cuts the line out behind an arrow label so the text stays readable', () => {
+    const html = render([arrow('a', 0, 't'), text('t', 'a'), arrow('b', 100)]);
+    const mask = /<mask[^>]* id="([^"]+)"[^>]*>(.*?)<\/mask>/.exec(html);
+    expect(mask).not.toBeNull();
+    expect(mask![2]).toContain('height="28" width="48" x="76" y="-14"');
+    expect(html.match(/mask="url\(#/g)).toHaveLength(1);
+    expect(html).toContain('<g mask="url(#' + mask![1] + ')"><g');
+    expect(html.indexOf('data-id="a"')).toBeGreaterThan(html.indexOf('<g mask='));
+  });
+
+  it('leaves an arrow whose label is deleted uncut', () => {
+    const html = render([arrow('a', 0, 't'), { ...text('t', 'a'), isDeleted: true }]);
+    expect(html).not.toContain('<mask');
+  });
+});
