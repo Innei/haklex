@@ -27,13 +27,13 @@ function blockHeight(node: RichNode, width: number): number {
   return lines * fontSizeOf(font) * lineHeight;
 }
 
-function childIndent(node: RichNode): number {
+export function childIndent(node: RichNode): number {
   if (node.type === 'list') return RICHTEXT_LIST_INDENT;
   if (node.type === 'quote') return RICHTEXT_QUOTE_INDENT;
   return 0;
 }
 
-function hasBlockChildren(node: RichNode): boolean {
+export function hasBlockChildren(node: RichNode): boolean {
   return (node.children ?? []).some(
     (child) => isBlockContainer(child) || child.type === 'paragraph' || child.type === 'heading',
   );

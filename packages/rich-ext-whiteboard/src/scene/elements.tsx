@@ -1,10 +1,11 @@
 import type { FC } from 'react';
 import { use, useId } from 'react';
 
-import { SceneDarkContext, SceneHandFontContext } from './context';
+import { SceneDarkContext, SceneExportContext, SceneHandFontContext } from './context';
 import { fontFamilyToCss, isHandFontFamily } from './fonts';
 import { freedrawOutline } from './freedraw';
 import { RichTextBody } from './richtext/RichTextBody';
+import { RichTextSvgBody } from './richtext/RichTextSvgBody';
 import {
   curve,
   diamond,
@@ -26,6 +27,7 @@ import type {
   ImageElement,
   LinearElement,
   RectangleElement,
+  RichTextElement,
   TextElement,
 } from './types';
 
@@ -63,7 +65,7 @@ export const ElementContent: FC<{ el: ExcalidrawElement; files?: BinaryFiles }> 
       return (
         <>
           <RectangleRender el={el as unknown as RectangleElement} />
-          <RichTextBody el={el} />
+          <RichTextCardBody el={el} />
         </>
       );
     }
@@ -360,6 +362,9 @@ const TextRender: FC<{ el: TextElement }> = ({ el }) => {
     </text>
   );
 };
+
+const RichTextCardBody: FC<{ el: RichTextElement }> = ({ el }) =>
+  use(SceneExportContext) ? <RichTextSvgBody el={el} /> : <RichTextBody el={el} />;
 
 const ImageRender: FC<{ el: ImageElement; files?: BinaryFiles }> = ({ el, files }) => {
   const darkFilter = use(SceneDarkContext);
