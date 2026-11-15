@@ -105,6 +105,20 @@ describe('convertSkeletons', () => {
     expect(touched[0].version).toBeGreaterThan(existing.version!);
   });
 
+  it('gives a skeleton that replaces an element a version above the one it replaces', () => {
+    const existing = {
+      ...newElement('rectangle', { x: 0, y: 0, width: 180, height: 80 }),
+      id: 'b',
+      version: 9,
+      versionNonce: 4,
+    };
+    const { created } = convertSkeletons([box('b', 40)], [existing]);
+    expect(created[0].version).toBe(10);
+    expect(created[0].versionNonce).not.toBe(4);
+    const kept = convertSkeletons([box('b', 40, { version: 30 })], [existing]);
+    expect(kept.created[0].version).toBe(30);
+  });
+
   it('ignores a binding whose target is missing or deleted', () => {
     const gone = {
       ...newElement('rectangle', { x: 0, y: 0, width: 10, height: 10 }),

@@ -19,12 +19,20 @@ export function orderByIndex<T extends { id: string; index?: string | null }>(
   return [...leading.followers, ...anchored.flatMap((group) => [group.head!, ...group.followers])];
 }
 
-const remoteWins = (local: ExcalidrawElement, remote: ExcalidrawElement) => {
+export const remoteWins = (local: ExcalidrawElement, remote: ExcalidrawElement) => {
   const mine = local.version ?? 0;
   const theirs = remote.version ?? 0;
   if (theirs !== mine) return theirs > mine;
   return (remote.versionNonce ?? 0) < (local.versionNonce ?? 0);
 };
+
+const VERSION_KEYS = new Set(['version', 'versionNonce', 'updated']);
+
+const withoutVersion = (el: ExcalidrawElement) =>
+  JSON.stringify(Object.entries(el).filter(([key]) => !VERSION_KEYS.has(key)));
+
+export const sameContent = (a: ExcalidrawElement, b: ExcalidrawElement) =>
+  a === b || withoutVersion(a) === withoutVersion(b);
 
 export interface Reconciled {
   accepted: ExcalidrawElement[];

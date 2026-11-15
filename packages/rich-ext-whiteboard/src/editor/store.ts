@@ -3,7 +3,7 @@ import { useSyncExternalStore } from 'react';
 import { DEFAULT_STYLE } from '../model/defaults';
 import { syncIndices } from '../model/fractional-index';
 import { bumpVersion } from '../model/mutate';
-import { orderByIndex, reconcileElements } from '../model/reconcile';
+import { orderByIndex, reconcileElements, remoteWins, sameContent } from '../model/reconcile';
 import { normalizeElement } from '../model/restore';
 import { resolveRichTextHeights } from '../model/richtext-layout';
 import { supersede } from '../model/supersede';
@@ -101,7 +101,19 @@ export function createWhiteboardStore(
     for (const listener of listeners) listener();
   };
 
-  const pending = new Map<string, ExcalidrawElement>();
+  const pending = new Map<string, { baseline: ExcalidrawElement; remote: ExcalidrawElement }>();
+
+  const hold = (remote: ExcalidrawElement) => {
+    const held = pending.get(remote.id);
+    if (held) {
+      if (remoteWins(held.remote, remote)) pending.set(remote.id, { ...held, remote });
+      return;
+    }
+    const baseline =
+      transientSnapshot?.elements.find((el) => el.id === remote.id) ??
+      state.elements.find((el) => el.id === remote.id);
+    if (baseline) pending.set(remote.id, { baseline, remote });
+  };
 
   const protectedIds = (): Set<string> => {
     const ids = new Set<string>();
@@ -121,33 +133,50 @@ export function createWhiteboardStore(
 
   const mergeRemote = (remote: readonly ExcalidrawElement[]): Partial<EditorState> | null => {
     const result = reconcileElements(state.elements, remote, protectedIds());
-    for (const el of result.deferred) pending.set(el.id, el);
+    for (const el of result.deferred) hold(el);
     if (result.accepted.length === 0) return null;
-    const taken = new Map(result.accepted.map((el) => [el.id, el]));
+    const elements = resolveRichTextHeights(syncIndices(result.elements));
+    const acceptedIds = new Set(result.accepted.map((el) => el.id));
+    const accepted = elements.filter((el) => acceptedIds.has(el.id));
+    const taken = new Map(accepted.map((el) => [el.id, el]));
     const rewrite = (doc: Doc): Doc => {
       const known = new Set(doc.elements.map((el) => el.id));
       return {
         ...doc,
         elements: [
           ...doc.elements.map((el) => taken.get(el.id) ?? el),
-          ...result.accepted.filter((el) => !known.has(el.id)),
+          ...accepted.filter((el) => !known.has(el.id)),
         ],
       };
     };
     history.rewrite(rewrite);
     if (transientSnapshot) transientSnapshot = rewrite(transientSnapshot);
-    const alive = new Set(result.elements.filter((el) => !el.isDeleted).map((el) => el.id));
+    const alive = new Set(elements.filter((el) => !el.isDeleted).map((el) => el.id));
     return {
-      elements: resolveRichTextHeights(syncIndices(result.elements)),
+      elements,
       selectedIds: new Set([...state.selectedIds].filter((id) => alive.has(id))),
     };
   };
 
   const flushPending = () => {
     if (pending.size === 0) return;
-    const waiting = [...pending.values()];
-    pending.clear();
-    const patch = mergeRemote(waiting);
+    const guarded = protectedIds();
+    const released = [...pending].filter(([id]) => !guarded.has(id));
+    if (released.length === 0) return;
+    const current = new Map(state.elements.map((el) => [el.id, el]));
+    const outranked = new Map<string, ExcalidrawElement>();
+    const incoming: ExcalidrawElement[] = [];
+    for (const [id, { baseline, remote }] of released) {
+      pending.delete(id);
+      const local = current.get(id);
+      if (!local || sameContent(local, baseline)) incoming.push(remote);
+      else if (remoteWins(local, remote))
+        outranked.set(id, bumpVersion({ ...local, version: remote.version }));
+    }
+    if (outranked.size > 0) {
+      state = { ...state, elements: state.elements.map((el) => outranked.get(el.id) ?? el) };
+    }
+    const patch = incoming.length > 0 ? mergeRemote(incoming) : null;
     if (patch) state = { ...state, ...patch };
   };
 

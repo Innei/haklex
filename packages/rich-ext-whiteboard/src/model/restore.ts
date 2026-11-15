@@ -1,4 +1,4 @@
-import { fontFamilyToCss } from '../scene/fonts';
+import { fontFamilyToCss, HAND_FONT_STACK } from '../scene/fonts';
 import type { ExcalidrawElement, LinearElement, TextElement } from '../scene/types';
 import {
   newElement,
@@ -90,23 +90,45 @@ export class FontLoadError extends Error {
   }
 }
 
+const familyName = (value: string) => value.trim().replaceAll(/^["']|["']$/g, '');
+const HAND_WEB_FAMILIES = new Set(HAND_FONT_STACK.split(',').slice(0, 4).map(familyName));
+
+function hasRegisteredHandFace(stack: string): boolean {
+  const wanted = stack
+    .split(',')
+    .map(familyName)
+    .filter((family) => HAND_WEB_FAMILIES.has(family));
+  if (wanted.length === 0) return true;
+  try {
+    for (const face of document.fonts) if (wanted.includes(familyName(face.family))) return true;
+  } catch {
+    return false;
+  }
+  return false;
+}
+
 async function loadFonts(elements: readonly ExcalidrawElement[], strict: boolean): Promise<void> {
   if (typeof document === 'undefined' || !document.fonts?.load) return;
-  const samples = new Map<string, Set<string>>();
+  const samples = new Map<string, { chars: Set<string>; stack: string }>();
   for (const el of elements) {
     if (el.type !== 'text' || el.isDeleted) continue;
-    const font = `${el.fontSize}px ${fontFamilyToCss(el.fontFamily)}`;
-    const chars = samples.get(font) ?? new Set<string>();
-    for (const ch of el.originalText ?? el.text) chars.add(ch);
-    samples.set(font, chars);
+    const stack = fontFamilyToCss(el.fontFamily);
+    const font = `${el.fontSize}px ${stack}`;
+    const sample = samples.get(font) ?? { chars: new Set<string>(), stack };
+    for (const ch of el.originalText ?? el.text) sample.chars.add(ch);
+    samples.set(font, sample);
   }
   await Promise.all(
-    [...samples].map(([font, chars]) =>
-      document.fonts.load(font, [...chars].join('')).catch(() => {
+    [...samples].map(async ([font, { chars, stack }]) => {
+      const faces = await document.fonts.load(font, [...chars].join('')).catch(() => {
         if (strict) throw new FontLoadError(font);
         return [];
-      }),
-    ),
+      });
+      // fonts.load resolves with nothing, not an error, when no @font-face names the family.
+      if (strict && faces.length === 0 && !hasRegisteredHandFace(stack)) {
+        throw new FontLoadError(font);
+      }
+    }),
   );
 }
 

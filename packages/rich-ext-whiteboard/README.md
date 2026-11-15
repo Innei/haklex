@@ -116,12 +116,12 @@ const store = createWhiteboardStore({ elements, files }, { sync: true });
 - `tools` limits the tools the toolbar and keyboard shortcuts offer.
 - `contextMenuItems` appends host items to the right-click menu.
 - `handFontOverride` draws handwritten text with another font stack without changing the stored `fontFamily`.
-- With `{ sync: true }` every local change, undo and redo included, raises the changed elements' `version`, deleted elements stay as `isDeleted` tombstones, and `store.applyRemote({ elements, files })` merges elements from elsewhere: the higher `version` wins, and elements the user is drawing or typing in are held back until they finish.
+- With `{ sync: true }` every local change, undo and redo included, raises the changed elements' `version`, deleted elements stay as `isDeleted` tombstones, and `store.applyRemote({ elements, files })` merges elements from elsewhere: the higher `version` wins. A change to an element the user is drawing or typing in waits until they finish: if they changed it, their version is kept and raised above the remote one; if they did not, the remote one is taken.
 - `store.subscribe` reports changes; `store.getState()` holds `elements`, `files`, `selectedIds` and `viewport` (`screen = (scene + scroll) * zoom`).
 - `convertSkeletons` completes short element descriptions, see [the scene format](./docs/scene-format.md#skeleton-shorthand). `focusElements` moves the viewport to elements or a box.
 - `exportToSvg` and `exportToBlob` draw a scene without a mounted editor. `richtext` cards are drawn as plain SVG text, and the fonts in use are embedded.
 
-`@haklex/rich-ext-whiteboard/scene` holds the read-only side: `Scene`, `SceneContent`, `InteractiveScene` (pan, zoom, `onViewportChange`, a `focus` handle), the font stacks and the same export functions. It never loads the editor.
+`@haklex/rich-ext-whiteboard/scene` holds the read-only side: `Scene`, `SceneContent`, `InteractiveScene` (pan, zoom, `onViewportChange`, a `focus` handle, `preserveView` to keep the view while the scene updates live), the font stacks and the same export functions. It never loads the editor.
 
 ### Snapshot utilities
 

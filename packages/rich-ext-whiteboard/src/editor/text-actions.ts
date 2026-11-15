@@ -123,7 +123,7 @@ export function finishTextEditing(store: WhiteboardStore): void {
     replace(store, updates);
     store.setState({ selectedIds: new Set() });
   } else if (!isNew) {
-    replace(store, [bumpVersion(el)]);
+    replace(store, [bumpVersion(find(store, id) ?? el)]);
   }
   store.endTransient(true);
 }

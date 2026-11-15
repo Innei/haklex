@@ -21,6 +21,7 @@ export interface InteractiveSceneProps {
   mode?: 'inline' | 'fullscreen';
   onExpand?: (target: HTMLElement) => void;
   onViewportChange?: (viewport: SceneViewport) => void;
+  preserveView?: boolean;
   ref?: Ref<InteractiveSceneHandle>;
   scene: ExcalidrawScene;
   theme?: StaticTheme;
@@ -37,6 +38,7 @@ export const InteractiveScene: FC<InteractiveSceneProps> = ({
   mode = 'inline',
   onExpand,
   onViewportChange,
+  preserveView = false,
   ref,
   scene,
   theme = 'light',
@@ -106,12 +108,13 @@ export const InteractiveScene: FC<InteractiveSceneProps> = ({
     if (userInteractedRef.current) return;
     if (!size.w || !size.h) return;
     setTransform(computeFit());
-  }, [size, computeFit]);
+    if (preserveView) userInteractedRef.current = true;
+  }, [size, computeFit, preserveView]);
 
   useEffect(() => {
-    if (pinnedRef.current) return;
+    if (pinnedRef.current || preserveView) return;
     userInteractedRef.current = false;
-  }, [scene]);
+  }, [scene, preserveView]);
 
   const zoomAt = useCallback((factor: number, anchorX: number, anchorY: number) => {
     const t = transformRef.current;

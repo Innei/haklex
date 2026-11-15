@@ -241,7 +241,50 @@ describe('applyRemote', () => {
     store.applyRemote({ elements: [{ ...original, version: 50, x: 400 }] });
     expect(store.getState().elements[0].x).toBe(5);
     store.endTransient(true);
+    const [kept] = store.getState().elements;
+    expect(kept.x).toBe(5);
+    expect(kept.version).toBeGreaterThan(50);
+  });
+
+  it('takes a held remote change when the gesture is cancelled', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    const original = store.getState().elements[0];
+    store.beginTransient();
+    store.updateTransient(() => ({ elements: [bumpVersion(original, { x: 5 })] }));
+    store.applyRemote({ elements: [{ ...original, version: 50, x: 400 }] });
+    store.endTransient(false);
     expect(store.getState().elements[0].x).toBe(400);
+  });
+
+  it('keeps the newest of several held remote changes', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    const original = store.getState().elements[0];
+    store.beginTransient();
+    store.updateTransient(() => ({ elements: [bumpVersion(original, { x: 5 })] }));
+    store.applyRemote({ elements: [{ ...original, version: 50, x: 400 }] });
+    store.applyRemote({ elements: [{ ...original, version: 20, x: 200 }] });
+    store.endTransient(false);
+    expect(store.getState().elements[0].x).toBe(400);
+  });
+
+  it('does not bump a remote element on undo when it arrived without an index', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    store.commit(({ elements }) => ({
+      elements: elements.map((el) => bumpVersion(el, { x: 5 })),
+    }));
+    store.applyRemote({ elements: [{ ...rect('2', 30), index: null, version: 3 }] });
+    store.undo();
+    expect(store.getState().elements.find((el) => el.id === '2')!.version).toBe(3);
+  });
+
+  it('does not bump a remote element that arrived without an index during a gesture', () => {
+    const store = createWhiteboardStore({ elements: [rect('1')] }, { sync: true });
+    const original = store.getState().elements[0];
+    store.beginTransient();
+    store.updateTransient(() => ({ elements: [bumpVersion(original, { x: 5 })] }));
+    store.applyRemote({ elements: [{ ...rect('2', 30), index: null, version: 3 }] });
+    store.endTransient(true);
+    expect(store.getState().elements.find((el) => el.id === '2')!.version).toBe(3);
   });
 
   it('keeps layer order through a save and a shuffled reload', () => {

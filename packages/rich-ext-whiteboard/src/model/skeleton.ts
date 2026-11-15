@@ -97,7 +97,12 @@ export function convertSkeletons(
   const byId = (id: string) => working.find((el) => el.id === id);
 
   for (const skeleton of skeletons) {
-    const el = shape(skeleton);
+    const shaped = shape(skeleton);
+    const replaced = scene.find((existing) => existing.id === shaped.id);
+    const el =
+      replaced && (shaped.version ?? 0) <= (replaced.version ?? 0)
+        ? bumpVersion({ ...shaped, version: replaced.version })
+        : shaped;
     createdIds.add(el.id);
     sources.set(el.id, skeleton);
     working = [...working.filter((existing) => existing.id !== el.id), el];

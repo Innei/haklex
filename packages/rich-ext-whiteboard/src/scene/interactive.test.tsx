@@ -115,6 +115,42 @@ describe('InteractiveScene as a host surface', () => {
     expect(seen.at(-1)).toMatchObject({ scrollX: 10, scrollY: 20, zoom: 2 });
   });
 
+  it('keeps the view across scene updates when asked to preserve it', () => {
+    const grown = {
+      ...scene,
+      elements: [...scene.elements, rect('c', 9000, 9000)],
+    } as unknown as ExcalidrawScene;
+    const again = { ...grown } as unknown as ExcalidrawScene;
+    const run = (preserveView: boolean) => {
+      const seen: SceneViewport[] = [];
+      globalThis.IS_REACT_ACT_ENVIRONMENT = true;
+      const container = document.createElement('div');
+      document.body.append(container);
+      const root = createRoot(container);
+      const draw = (value: ExcalidrawScene) =>
+        act(() =>
+          root.render(
+            <InteractiveScene
+              preserveView={preserveView}
+              scene={value}
+              onViewportChange={(v) => seen.push(v)}
+            />,
+          ),
+        );
+      draw(scene);
+      const first = seen.at(-1)!;
+      draw(grown);
+      draw(again);
+      act(() => root.unmount());
+      container.remove();
+      return { first, last: seen.at(-1)! };
+    };
+    const kept = run(true);
+    expect(kept.last).toEqual(kept.first);
+    const refit = run(false);
+    expect(refit.last.zoom).toBeLessThan(refit.first.zoom);
+  });
+
   it('hides the zoom controls on request and keeps them by default', () => {
     const hidden = mount(<InteractiveScene controls={false} scene={scene} />);
     expect(hidden.querySelector('[aria-label="Zoom in"]')).toBeNull();
