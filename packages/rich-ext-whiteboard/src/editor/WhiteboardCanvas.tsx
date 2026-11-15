@@ -40,6 +40,7 @@ export interface WhiteboardCanvasProps {
   children?: ReactNode;
   context: ToolContext;
   handlers: ToolHandlers;
+  onContextMenu?: (info: PointerInfo) => boolean;
   store: WhiteboardStore;
   theme: 'light' | 'dark';
 }
@@ -48,6 +49,7 @@ export const WhiteboardCanvas: FC<WhiteboardCanvasProps> = ({
   children,
   context,
   handlers,
+  onContextMenu,
   store,
   theme,
 }) => {
@@ -256,6 +258,10 @@ export const WhiteboardCanvas: FC<WhiteboardCanvasProps> = ({
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
+      onContextMenu={(e) => {
+        if (isChromeTarget(e.target)) return;
+        if (onContextMenu?.(toPointer(e))) e.preventDefault();
+      }}
       onDoubleClick={(e) => {
         if (isChromeTarget(e.target)) return;
         const handler = getToolHandler(handlers, store.getState().tool);

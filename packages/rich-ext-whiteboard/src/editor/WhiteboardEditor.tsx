@@ -5,6 +5,8 @@ import { getCommonBounds } from '../model/bounds';
 import type { Point } from '../model/geometry';
 import { SceneHandFontContext } from '../scene/context';
 import * as chromeCss from './chrome.css';
+import type { ContextMenuItemsFn } from './context-menu';
+import { useContextMenu } from './ContextMenu';
 import * as css from './editor.css';
 import { FrameNameEditor } from './FrameNameEditor';
 import type { ImageInsertOptions } from './image-actions';
@@ -47,6 +49,7 @@ export interface WhiteboardChrome {
 
 export interface WhiteboardEditorProps extends ImageInsertOptions {
   chrome?: WhiteboardChrome;
+  contextMenuItems?: ContextMenuItemsFn;
   handFontOverride?: string;
   store: WhiteboardStore;
   theme: 'light' | 'dark';
@@ -56,6 +59,7 @@ export interface WhiteboardEditorProps extends ImageInsertOptions {
 
 export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
   chrome = {},
+  contextMenuItems,
   handFontOverride,
   store,
   theme,
@@ -85,6 +89,7 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
     return { store, onFiles, requestImage };
   }, [store]);
 
+  const contextMenu = useContextMenu(store, contextMenuItems);
   const tool = useStore(store, (s) => s.tool);
   const narrow = useNarrowLayout(store);
   const canvasWidth = useStore(store, (s) => s.canvasSize.width);
@@ -122,7 +127,13 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
             <WhiteboardToolbar store={store} tools={allowedTools} />
           </div>
         )}
-        <WhiteboardCanvas context={context} handlers={handlers} store={store} theme={theme}>
+        <WhiteboardCanvas
+          context={context}
+          handlers={handlers}
+          store={store}
+          theme={theme}
+          onContextMenu={chrome.contextMenu === false ? undefined : contextMenu.open}
+        >
           <SelectionOverlay store={store} />
           <TextEditor dark={theme === 'dark'} store={store} />
           <RichTextEditor dark={theme === 'dark'} store={store} />
@@ -130,6 +141,7 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
           {chrome.stylePanel !== false &&
             (narrow ? <StyleSheet store={store} /> : <StylePanel store={store} />)}
           {chrome.zoom !== false && <ZoomControls compact={narrow} store={store} />}
+          {contextMenu.menu}
           {narrow && chrome.mobileDock !== false && (
             <MobileDock store={store} tools={allowedTools} />
           )}

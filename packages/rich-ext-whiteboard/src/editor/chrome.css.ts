@@ -57,6 +57,40 @@ export const separator = style({
   backgroundColor: vars.color.border,
 });
 
+export const contextMenu = style({
+  minWidth: 184,
+  padding: 4,
+  display: 'flex',
+  flexDirection: 'column',
+});
+
+export const contextMenuItem = style({
+  ...chromeText.label,
+  display: 'flex',
+  alignItems: 'center',
+  padding: '6px 10px',
+  border: 'none',
+  borderRadius: 8,
+  background: 'none',
+  color: vars.color.text,
+  textAlign: 'left',
+  cursor: 'pointer',
+  selectors: {
+    '&:hover:not(:disabled), &:focus-visible': {
+      background: vars.color.accentLight,
+      outline: 'none',
+    },
+    '&:disabled': { color: vars.color.textQuaternary, cursor: 'default' },
+    '&[data-danger]': { color: '#e03131' },
+  },
+});
+
+export const contextMenuSeparator = style({
+  height: 1,
+  margin: '4px 6px',
+  backgroundColor: vars.color.border,
+});
+
 export const panel = style({
   top: 12,
   right: 12,
