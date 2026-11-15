@@ -5,7 +5,7 @@ import { getCommonBounds } from '../model/bounds';
 import type { Point } from '../model/geometry';
 import { SceneHandFontContext } from '../scene/context';
 import * as chromeCss from './chrome.css';
-import type { ContextMenuItemsFn } from './context-menu';
+import type { ContextMenuItemsFn, ContextMenuRequest } from './context-menu';
 import { useContextMenu } from './ContextMenu';
 import * as css from './editor.css';
 import { FrameNameEditor } from './FrameNameEditor';
@@ -52,6 +52,7 @@ export interface WhiteboardEditorProps extends ImageInsertOptions {
   contextMenuItems?: ContextMenuItemsFn;
   handFontOverride?: string;
   initialFit?: boolean;
+  onContextMenu?: (request: ContextMenuRequest) => void;
   store: WhiteboardStore;
   theme: 'light' | 'dark';
   toolbar?: 'inline' | 'none';
@@ -63,6 +64,7 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
   contextMenuItems,
   handFontOverride,
   initialFit = true,
+  onContextMenu,
   store,
   theme,
   toolbar = 'inline',
@@ -91,7 +93,7 @@ export const WhiteboardEditor: FC<WhiteboardEditorProps> = ({
     return { store, onFiles, requestImage };
   }, [store]);
 
-  const contextMenu = useContextMenu(store, contextMenuItems);
+  const contextMenu = useContextMenu(store, contextMenuItems, onContextMenu);
   const tool = useStore(store, (s) => s.tool);
   const narrow = useNarrowLayout(store);
   const canvasWidth = useStore(store, (s) => s.canvasSize.width);

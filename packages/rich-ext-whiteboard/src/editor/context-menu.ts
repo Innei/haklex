@@ -37,6 +37,12 @@ export interface ContextMenuContext {
 
 export type ContextMenuItemsFn = (context: ContextMenuContext) => ContextMenuItem[];
 
+export interface ContextMenuRequest {
+  items: ContextMenuItem[];
+  scenePoint: Point;
+  screenPoint: Point;
+}
+
 export const isSeparator = (item: ContextMenuItem): item is ContextMenuSeparator =>
   'type' in item && item.type === 'separator';
 

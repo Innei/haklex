@@ -17,6 +17,7 @@ export type {
   ContextMenuContext,
   ContextMenuItem,
   ContextMenuItemsFn,
+  ContextMenuRequest,
   ContextMenuSeparator,
 } from './editor/context-menu';
 export type { FocusInsets, FocusOptions, FocusTarget } from './editor/focus';

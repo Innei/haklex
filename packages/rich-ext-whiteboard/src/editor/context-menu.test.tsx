@@ -165,6 +165,40 @@ describe('context menu', () => {
     expect(menuOf(container)).toBeNull();
   });
 
+  it('hands the items to a host that draws its own menu', () => {
+    const store = createWhiteboardStore({ elements: [rect('a', 0, 0)] });
+    const onContextMenu = vi.fn();
+    const { canvas, container } = mount({
+      store,
+      onContextMenu,
+      contextMenuItems: () => [{ key: 'host', label: 'Host', onSelect: () => {} }],
+    });
+    const event = rightClick(canvas, 50, 25);
+    expect(event.defaultPrevented).toBe(true);
+    expect(menuOf(container)).toBeNull();
+    expect(onContextMenu).toHaveBeenCalledTimes(1);
+    const request = onContextMenu.mock.calls[0][0];
+    expect(request.scenePoint).toEqual([50, 25]);
+    expect(
+      request.items.map((item: { key?: string; type?: string }) => item.key ?? item.type),
+    ).toEqual([
+      'copy',
+      'cut',
+      'duplicate',
+      'separator',
+      'bring-forward',
+      'send-backward',
+      'bring-to-front',
+      'send-to-back',
+      'separator',
+      'delete',
+      'separator',
+      'host',
+    ]);
+    act(() => request.items.find((item: { key?: string }) => item.key === 'delete').onSelect());
+    expect(liveIds(store)).toEqual([]);
+  });
+
   it('stays out of the way when the host switches it off', () => {
     const store = createWhiteboardStore({ elements: [rect('a', 0, 0)] });
     const { canvas, container } = mount({ store, chrome: { contextMenu: false } });

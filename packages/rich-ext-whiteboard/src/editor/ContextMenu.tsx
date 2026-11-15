@@ -3,7 +3,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 
 import type { Point } from '../model/geometry';
 import * as css from './chrome.css';
-import type { ContextMenuItem, ContextMenuItemsFn } from './context-menu';
+import type { ContextMenuItem, ContextMenuItemsFn, ContextMenuRequest } from './context-menu';
 import { contextMenuItems, isSeparator } from './context-menu';
 import type { WhiteboardStore } from './store';
 import type { PointerInfo } from './tools/types';
@@ -116,19 +116,24 @@ interface OpenMenu {
 export function useContextMenu(
   store: WhiteboardStore,
   hostItems: ContextMenuItemsFn | undefined,
+  onRequest?: (request: ContextMenuRequest) => void,
 ): { menu: ReactNode; open: (info: PointerInfo) => boolean } {
   const [state, setState] = useState<OpenMenu | null>(null);
   const hostItemsRef = useRef(hostItems);
   hostItemsRef.current = hostItems;
+  const onRequestRef = useRef(onRequest);
+  onRequestRef.current = onRequest;
 
   const open = useCallback(
     (info: PointerInfo) => {
       const { editingRichTextId, editingTextId } = store.getState();
       if (editingTextId || editingRichTextId) return false;
-      setState({
-        at: info.screen,
-        items: contextMenuItems(store, info.scene, hostItemsRef.current),
-      });
+      const items = contextMenuItems(store, info.scene, hostItemsRef.current);
+      if (onRequestRef.current) {
+        onRequestRef.current({ items, scenePoint: info.scene, screenPoint: info.screen });
+        return true;
+      }
+      setState({ at: info.screen, items });
       return true;
     },
     [store],
