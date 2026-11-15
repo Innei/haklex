@@ -83,14 +83,31 @@ export function normalizeElement<T extends ExcalidrawElement>(raw: T): T {
   return merged as T;
 }
 
-async function loadFonts(elements: readonly ExcalidrawElement[]): Promise<void> {
+export class FontLoadError extends Error {
+  constructor(readonly font: string) {
+    super(`Could not load ${font}`);
+    this.name = 'FontLoadError';
+  }
+}
+
+async function loadFonts(elements: readonly ExcalidrawElement[], strict: boolean): Promise<void> {
   if (typeof document === 'undefined' || !document.fonts?.load) return;
-  const fonts = new Set(
-    elements
-      .filter((el): el is TextElement => el.type === 'text')
-      .map((el) => `${el.fontSize}px ${fontFamilyToCss(el.fontFamily)}`),
+  const samples = new Map<string, Set<string>>();
+  for (const el of elements) {
+    if (el.type !== 'text' || el.isDeleted) continue;
+    const font = `${el.fontSize}px ${fontFamilyToCss(el.fontFamily)}`;
+    const chars = samples.get(font) ?? new Set<string>();
+    for (const ch of el.originalText ?? el.text) chars.add(ch);
+    samples.set(font, chars);
+  }
+  await Promise.all(
+    [...samples].map(([font, chars]) =>
+      document.fonts.load(font, [...chars].join('')).catch(() => {
+        if (strict) throw new FontLoadError(font);
+        return [];
+      }),
+    ),
   );
-  await Promise.all([...fonts].map((font) => document.fonts.load(font).catch(() => [])));
 }
 
 function textChanged(a: TextElement, b: TextElement): boolean {
@@ -102,12 +119,12 @@ function textChanged(a: TextElement, b: TextElement): boolean {
 export async function restoreElements(
   elements: readonly ExcalidrawElement[],
   _localElements: null,
-  opts: { refreshDimensions?: boolean } = {},
+  opts: { refreshDimensions?: boolean; strictFonts?: boolean } = {},
 ): Promise<ExcalidrawElement[]> {
   const normalized = syncIndices(elements.map((el) => normalizeElement(el)));
   if (!opts.refreshDimensions) return normalized;
 
-  await loadFonts(normalized);
+  await loadFonts(normalized, opts.strictFonts ?? false);
   const byId = new Map(normalized.map((el) => [el.id, el]));
   return normalized.map((el) => {
     if (el.type !== 'text') return el;

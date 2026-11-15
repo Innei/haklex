@@ -1,8 +1,8 @@
 import type { FC } from 'react';
 import { use, useId } from 'react';
 
-import { SceneDarkContext } from './context';
-import { fontFamilyToCss } from './fonts';
+import { SceneDarkContext, SceneHandFontContext } from './context';
+import { fontFamilyToCss, isHandFontFamily } from './fonts';
 import { freedrawOutline } from './freedraw';
 import { RichTextBody } from './richtext/RichTextBody';
 import {
@@ -333,7 +333,9 @@ const TextRender: FC<{ el: TextElement }> = ({ el }) => {
   const lineHeight = el.lineHeight ?? DEFAULT_LINE_HEIGHT;
   const lines = el.text.split('\n');
   const fontSize = el.fontSize;
-  const family = fontFamilyToCss(el.fontFamily);
+  const handFont = use(SceneHandFontContext);
+  const family =
+    handFont && isHandFontFamily(el.fontFamily) ? handFont : fontFamilyToCss(el.fontFamily);
   const anchor = el.textAlign === 'center' ? 'middle' : el.textAlign === 'right' ? 'end' : 'start';
   const ax = el.textAlign === 'center' ? el.width / 2 : el.textAlign === 'right' ? el.width : 0;
   const dy = fontSize * lineHeight;

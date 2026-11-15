@@ -1,9 +1,10 @@
 import type { FC } from 'react';
-import { useEffect, useRef } from 'react';
+import { use, useEffect, useRef } from 'react';
 
 import { angleOf } from '../model/geometry';
 import { getLineHeight } from '../model/measure';
-import { fontFamilyToCss } from '../scene/fonts';
+import { SceneHandFontContext } from '../scene/context';
+import { fontFamilyToCss, isHandFontFamily } from '../scene/fonts';
 import { DARK_SCENE_FILTER } from '../scene/Scene';
 import type { TextElement } from '../scene/types';
 import type { WhiteboardStore } from './store';
@@ -34,6 +35,8 @@ export const TextEditor: FC<{ dark?: boolean; store: WhiteboardStore }> = ({
     node.setSelectionRange(node.value.length, node.value.length);
   }, [editingId]);
 
+  const handFont = use(SceneHandFontContext);
+
   if (!editingId || !el) return null;
 
   const [left, top] = sceneToScreen([el.x, el.y], viewport);
@@ -55,7 +58,8 @@ export const TextEditor: FC<{ dark?: boolean; store: WhiteboardStore }> = ({
         height: Math.max(el.height, el.fontSize * lineHeight) * zoom,
         fontSize: el.fontSize * zoom,
         lineHeight,
-        fontFamily: fontFamilyToCss(el.fontFamily),
+        fontFamily:
+          handFont && isHandFontFamily(el.fontFamily) ? handFont : fontFamilyToCss(el.fontFamily),
         color: el.strokeColor,
         textAlign: el.textAlign,
         opacity: el.opacity / 100,

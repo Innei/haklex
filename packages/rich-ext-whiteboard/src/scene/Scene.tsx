@@ -1,11 +1,11 @@
 import type { CSSProperties, FC } from 'react';
-import { memo, useId } from 'react';
+import { memo, use, useId } from 'react';
 
 import { getElementCenter } from '../model/bounds';
 import { angleOf } from '../model/geometry';
 import { resolveRichTextHeights } from '../model/richtext-layout';
 import { hasShadow } from '../model/shadow';
-import { SceneDarkContext } from './context';
+import { SceneDarkContext, SceneHandFontContext } from './context';
 import { ElementContent } from './elements';
 import { ShadowFilter } from './shadow';
 import type { BinaryFiles, ExcalidrawElement, ExcalidrawScene } from './types';
@@ -62,6 +62,7 @@ export interface SceneContentProps {
   dark?: boolean;
   elementProps?: ElementPropsFn;
   files?: BinaryFiles;
+  handFontOverride?: string;
   hiddenIds?: ReadonlySet<string>;
   scene: ExcalidrawScene;
 }
@@ -69,8 +70,10 @@ export interface SceneContentProps {
 const isFrame = (el: ExcalidrawElement) => el.type === 'frame' || el.type === 'magicframe';
 
 export const SceneContent: FC<SceneContentProps> = memo(
-  ({ dark = false, elementProps, files, hiddenIds, scene }) => {
+  ({ dark = false, elementProps, files, handFontOverride, hiddenIds, scene }) => {
     const elements = resolveRichTextHeights(scene.elements.filter((el) => !el.isDeleted));
+    const inheritedHandFont = use(SceneHandFontContext);
+    const handFont = handFontOverride ?? inheritedHandFont;
     const uid = useId().replaceAll(/[^\w-]/g, '');
     // One filter per scene: `url(#id)` resolves to the first match in the page, and
     // a match inside a hidden subtree may not render in every engine.
@@ -87,41 +90,43 @@ export const SceneContent: FC<SceneContentProps> = memo(
 
     return (
       <SceneDarkContext value={dark ? { filterId } : null}>
-        {hasDefs && (
-          <defs>
-            {dark && <CounterInvertFilter id={filterId} />}
-            {anyShadow && <ShadowFilter dark={dark} id={shadowId} />}
-            {[...usedFrames].map((id) => {
-              const f = frames.get(id)!;
-              return (
-                <clipPath id={clipId(id)} key={id}>
-                  <rect height={f.height} width={f.width} x={f.x} y={f.y} />
-                </clipPath>
-              );
-            })}
-          </defs>
-        )}
-        {elements.map((el) => {
-          if (hiddenIds?.has(el.id)) return null;
-          const element = (
-            <ElementGroup el={el} extra={elementProps?.(el)} files={files} key={el.id} />
-          );
-          const group = hasShadow(el) ? (
-            <g filter={`url(#${shadowId})`} key={el.id}>
-              {element}
-            </g>
-          ) : (
-            element
-          );
-          if (el.frameId && usedFrames.has(el.frameId)) {
-            return (
-              <g clipPath={`url(#${clipId(el.frameId)})`} key={el.id}>
-                {group}
-              </g>
+        <SceneHandFontContext value={handFont}>
+          {hasDefs && (
+            <defs>
+              {dark && <CounterInvertFilter id={filterId} />}
+              {anyShadow && <ShadowFilter dark={dark} id={shadowId} />}
+              {[...usedFrames].map((id) => {
+                const f = frames.get(id)!;
+                return (
+                  <clipPath id={clipId(id)} key={id}>
+                    <rect height={f.height} width={f.width} x={f.x} y={f.y} />
+                  </clipPath>
+                );
+              })}
+            </defs>
+          )}
+          {elements.map((el) => {
+            if (hiddenIds?.has(el.id)) return null;
+            const element = (
+              <ElementGroup el={el} extra={elementProps?.(el)} files={files} key={el.id} />
             );
-          }
-          return group;
-        })}
+            const group = hasShadow(el) ? (
+              <g filter={`url(#${shadowId})`} key={el.id}>
+                {element}
+              </g>
+            ) : (
+              element
+            );
+            if (el.frameId && usedFrames.has(el.frameId)) {
+              return (
+                <g clipPath={`url(#${clipId(el.frameId)})`} key={el.id}>
+                  {group}
+                </g>
+              );
+            }
+            return group;
+          })}
+        </SceneHandFontContext>
       </SceneDarkContext>
     );
   },
@@ -134,7 +139,14 @@ interface SceneProps extends SceneContentProps {
   theme?: 'light' | 'dark';
 }
 
-export const Scene: FC<SceneProps> = ({ className, files, scene, style, theme = 'light' }) => {
+export const Scene: FC<SceneProps> = ({
+  className,
+  files,
+  handFontOverride,
+  scene,
+  style,
+  theme = 'light',
+}) => {
   const elements = scene.elements.filter((el) => !el.isDeleted);
   const bounds = computeSceneBounds(elements);
   const isDark = theme === 'dark';
@@ -154,7 +166,12 @@ export const Scene: FC<SceneProps> = ({ className, files, scene, style, theme = 
         ...style,
       }}
     >
-      <SceneContent dark={isDark} files={files ?? scene.files} scene={scene} />
+      <SceneContent
+        dark={isDark}
+        files={files ?? scene.files}
+        handFontOverride={handFontOverride}
+        scene={scene}
+      />
     </svg>
   );
 };

@@ -15,7 +15,22 @@ export const WHITEBOARD_FONT_STACK = {
   mono: MONO_FONT_STACK,
 } as const;
 
+const stackOverrides = new Map<number, string>();
+
+export function setFontFamilyStack(id: number, stack: string | null): void {
+  if (stack) stackOverrides.set(id, stack);
+  else stackOverrides.delete(id);
+}
+
+const NOT_HANDWRITTEN = new Set([2, 3, 6, 8, 9]);
+
+export function isHandFontFamily(id: FontFamilyId | number | undefined): boolean {
+  return !NOT_HANDWRITTEN.has(id as number);
+}
+
 export function fontFamilyToCss(id: FontFamilyId | number | undefined): string {
+  const override = id === undefined ? undefined : stackOverrides.get(id);
+  if (override) return override;
   switch (id) {
     case 2:
     case 6:
