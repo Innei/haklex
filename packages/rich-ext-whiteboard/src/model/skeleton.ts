@@ -2,7 +2,7 @@ import type { ExcalidrawElement, LinearElement, TextElement } from '../scene/typ
 import { bindLinearEnd } from './binding';
 import { getCommonBounds } from './bounds';
 import { newTextElement } from './create';
-import { syncIndices } from './fractional-index';
+import { isValidIndex, syncIndices } from './fractional-index';
 import { bumpVersion } from './mutate';
 import { randomId } from './random';
 import { normalizeElement } from './restore';
@@ -83,6 +83,17 @@ function fitFrame(frame: ExcalidrawElement, members: readonly ExcalidrawElement[
   };
 }
 
+function placed(list: ExcalidrawElement[], el: ExcalidrawElement): ExcalidrawElement[] {
+  if (list.some((existing) => existing.id === el.id))
+    return list.map((existing) => (existing.id === el.id ? el : existing));
+  const index = el.index;
+  if (!isValidIndex(index)) return [...list, el];
+  const above = list.findIndex(
+    (existing) => isValidIndex(existing.index) && existing.index > index,
+  );
+  return above < 0 ? [...list, el] : [...list.slice(0, above), el, ...list.slice(above)];
+}
+
 export function convertSkeletons(
   skeletons: readonly SkeletonElement[],
   scene: readonly ExcalidrawElement[],
@@ -99,13 +110,14 @@ export function convertSkeletons(
   for (const skeleton of skeletons) {
     const shaped = shape(skeleton);
     const replaced = scene.find((existing) => existing.id === shaped.id);
+    const layered = replaced ? { ...shaped, index: shaped.index ?? replaced.index } : shaped;
     const el =
-      replaced && (shaped.version ?? 0) <= (replaced.version ?? 0)
-        ? bumpVersion({ ...shaped, version: replaced.version })
-        : shaped;
+      replaced && (layered.version ?? 0) <= (replaced.version ?? 0)
+        ? bumpVersion({ ...layered, version: replaced.version })
+        : layered;
     createdIds.add(el.id);
     sources.set(el.id, skeleton);
-    working = [...working.filter((existing) => existing.id !== el.id), el];
+    working = placed(working, el);
   }
 
   for (const [id, skeleton] of sources) {

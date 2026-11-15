@@ -119,6 +119,42 @@ describe('convertSkeletons', () => {
     expect(kept.created[0].version).toBe(30);
   });
 
+  it('keeps a rewritten element under what was drawn over it', () => {
+    const card = {
+      ...newElement('rectangle', { x: 0, y: 0, width: 180, height: 80 }),
+      id: 'b',
+      index: 'a1',
+      version: 3,
+    };
+    const stroke = {
+      ...newElement('rectangle', { x: 20, y: 20, width: 40, height: 40 }),
+      id: 'ink',
+      index: 'a2',
+    };
+    const { created, touched } = convertSkeletons([box('b', 40)], [card, stroke]);
+    expect(created.map((el) => [el.id, el.index])).toEqual([['b', 'a1']]);
+    expect(touched).toEqual([]);
+  });
+
+  it('keeps the layer of a shorthand element that arrives with its index', () => {
+    const below = {
+      ...newElement('rectangle', { x: 0, y: 0, width: 10, height: 10 }),
+      id: 'lo',
+      index: 'a0',
+    };
+    const above = {
+      ...newElement('rectangle', { x: 0, y: 0, width: 10, height: 10 }),
+      id: 'hi',
+      index: 'a2',
+    };
+    const { created } = convertSkeletons(
+      [box('b', 40, { index: 'a1' }), box('new', 80)],
+      [below, above],
+    );
+    expect(find(created, 'b').index).toBe('a1');
+    expect(find(created, 'new').index! > 'a2').toBe(true);
+  });
+
   it('ignores a binding whose target is missing or deleted', () => {
     const gone = {
       ...newElement('rectangle', { x: 0, y: 0, width: 10, height: 10 }),
