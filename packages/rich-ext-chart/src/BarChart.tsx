@@ -17,6 +17,7 @@ import {
 import { chartVars } from './palette.css';
 import type { TooltipRow, TooltipState } from './parts';
 import { ChartTooltip, XLabels, YGrid } from './parts';
+import { type PointEvents, pointOf, pointTarget } from './points';
 import * as s from './styles.css';
 import type { ChartSpec } from './types';
 
@@ -53,7 +54,15 @@ function buildSegments(spec: ChartSpec): Segment[][] {
   });
 }
 
-export function BarChart({ spec, layout }: { spec: ChartSpec; layout: ChartLayout }) {
+export function BarChart({
+  spec,
+  layout,
+  events = {},
+}: {
+  events?: PointEvents;
+  layout: ChartLayout;
+  spec: ChartSpec;
+}) {
   const { width: W, height: H, compact } = layout;
   const [tip, setTip] = useState<(TooltipState & { band: number }) | null>(null);
 
@@ -221,6 +230,43 @@ export function BarChart({ spec, layout }: { spec: ChartSpec; layout: ChartLayou
             onPointerLeave={() => setTip(null)}
           />
         ))}
+        {spec.data.map((row, i) => {
+          const tipAt = centers[i] + (centers[i] > ml + (W - ml) / 2 ? -band / 4 : band / 4);
+          const hover = { enter: () => showTip(i, tipAt), leave: () => setTip(null) };
+          if (segments) {
+            const bw = Math.min(STACK_MAX, band * 0.56);
+            return segments[i].map((g) =>
+              g.value === 0 ? null : (
+                <path
+                  fill="transparent"
+                  key={`h-${i}-${g.series}`}
+                  d={barPath(
+                    centers[i] - bw / 2,
+                    bw,
+                    yv(g.value > 0 ? g.y0 : g.y1),
+                    yv(g.value > 0 ? g.y1 : g.y0),
+                    0,
+                  )}
+                  {...pointTarget(events, pointOf(spec, g.series, i), hover)}
+                />
+              ),
+            );
+          }
+          const bw = Math.min(BAR_MAX, (band * 0.72 - (k - 1) * GAP) / k);
+          const gw = k * bw + (k - 1) * GAP;
+          return spec.series.map((se, j) => {
+            const v = rowNumber(row, se.key);
+            if (v == null) return null;
+            return (
+              <path
+                d={barPath(centers[i] - gw / 2 + j * (bw + GAP), bw, zero, yv(v), 4)}
+                fill="transparent"
+                key={`h-${i}-${se.key}`}
+                {...pointTarget(events, pointOf(spec, j, i), hover)}
+              />
+            );
+          });
+        })}
       </svg>
       {tip && <ChartTooltip height={H} state={tip} width={W} />}
     </div>

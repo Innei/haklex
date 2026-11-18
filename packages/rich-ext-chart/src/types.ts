@@ -1,4 +1,4 @@
-export type ChartType = 'bar' | 'line' | 'area' | 'pie';
+export type ChartType = 'bar' | 'line' | 'area' | 'pie' | 'scatter';
 
 export type ChartValue = string | number | null;
 
@@ -50,6 +50,13 @@ export interface ChartIssue {
 export type ChartValidationResult =
   { ok: true; spec: ChartSpec } | { ok: false; issues: ChartIssue[] };
 
-export const CHART_TYPES: readonly ChartType[] = ['bar', 'line', 'area', 'pie'];
+export const CHART_TYPES: readonly ChartType[] = ['bar', 'line', 'area', 'pie', 'scatter'];
+
+export interface ChartPoint {
+  index: number;
+  series: string;
+  value: number | null;
+  x: ChartValue;
+}
 
 export const CHART_PALETTE_SIZE = 6;

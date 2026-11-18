@@ -119,6 +119,19 @@ export function validateChartSpec(input: unknown): ChartValidationResult {
     }
   });
 
+  if (type === 'scatter') {
+    rows.forEach((row, i) => {
+      if (!isRecord(row)) return;
+      const v = row[x as string];
+      if (v === null || v === undefined) return;
+      if (typeof v !== 'number' || !Number.isFinite(v))
+        issues.push({
+          path: `data[${i}].${x as string}`,
+          message: `must be a number on a scatter x axis, got ${describe(v)}`,
+        });
+    });
+  }
+
   if (type === 'pie') {
     const key = keys[0];
     rows.forEach((row, i) => {

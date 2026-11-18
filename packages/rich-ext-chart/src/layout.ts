@@ -80,8 +80,9 @@ export function describeChart(spec: ChartSpec): string {
     bar: spec.stacked ? 'Stacked bar chart' : 'Bar chart',
     line: 'Line chart',
     pie: spec.donut ? 'Donut chart' : 'Pie chart',
+    scatter: 'Scatter chart',
   }[spec.type];
   const names = spec.series.map((s) => s.label || s.key).join(', ');
   const head = spec.title ? `${spec.title}. ` : '';
-  return `${head}${kind} with ${spec.data.length} ${spec.type === 'pie' ? 'slices' : 'categories'}; series: ${names}.`;
+  return `${head}${kind} with ${spec.data.length} ${spec.type === 'pie' ? 'slices' : spec.type === 'scatter' ? 'points' : 'categories'}; series: ${names}.`;
 }

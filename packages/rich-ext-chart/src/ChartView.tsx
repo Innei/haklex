@@ -15,28 +15,50 @@ import {
 } from './layout';
 import { LineChart } from './LineChart';
 import { PieChart, pieHeight } from './PieChart';
+import type { PointEvents } from './points';
+import { ScatterChart } from './ScatterChart';
 import * as s from './styles.css';
 import type { ChartSpec } from './types';
 import { parseChartSource, validateChartSpec } from './validate';
 
 export type ChartViewMode = 'chart' | 'table';
 
-export interface ChartViewProps {
+export interface ChartViewProps extends PointEvents {
   defaultView?: ChartViewMode;
   hideToggle?: boolean;
   spec: ChartSpec;
 }
 
-function ChartBody({ spec, layout }: { spec: ChartSpec; layout: ChartLayout }) {
-  if (spec.type === 'bar') return <BarChart layout={layout} spec={spec} />;
+function ChartBody({
+  spec,
+  layout,
+  events,
+}: {
+  events: PointEvents;
+  layout: ChartLayout;
+  spec: ChartSpec;
+}) {
+  if (spec.type === 'bar') return <BarChart events={events} layout={layout} spec={spec} />;
+  if (spec.type === 'scatter') return <ScatterChart events={events} layout={layout} spec={spec} />;
   if (spec.type === 'pie')
-    return <PieChart layout={{ ...layout, height: pieHeight(spec, layout) }} spec={spec} />;
-  return <LineChart layout={layout} spec={spec} />;
+    return (
+      <PieChart
+        events={events}
+        layout={{ ...layout, height: pieHeight(spec, layout) }}
+        spec={spec}
+      />
+    );
+  return <LineChart events={events} layout={layout} spec={spec} />;
 }
 
 function ChartKey({ spec, compact }: { spec: ChartSpec; compact: boolean }) {
   if (spec.type === 'pie' || spec.series.length < 2) return null;
-  const visible = spec.type === 'bar' || spec.stacked || compact || spec.series.length > 3;
+  const visible =
+    spec.type === 'bar' ||
+    spec.type === 'scatter' ||
+    spec.stacked ||
+    compact ||
+    spec.series.length > 3;
   if (!visible) return null;
   const asLine = spec.type === 'line';
   return (
@@ -110,7 +132,14 @@ const ChartIcon = (
   </svg>
 );
 
-export function ChartView({ spec, defaultView = 'chart', hideToggle }: ChartViewProps) {
+export function ChartView({
+  spec,
+  defaultView = 'chart',
+  hideToggle,
+  onPointClick,
+  onPointHover,
+}: ChartViewProps) {
+  const events: PointEvents = { onPointClick, onPointHover };
   const [view, setView] = useState<ChartViewMode>(defaultView);
   const isEmpty = spec.data.length === 0;
   const showTable = view === 'table' && !isEmpty;
@@ -152,11 +181,11 @@ export function ChartView({ spec, defaultView = 'chart', hideToggle }: ChartView
         <div aria-label={describeChart(spec)} role="img">
           <div className={s.wide}>
             <ChartKey compact={false} spec={spec} />
-            <ChartBody layout={WIDE_LAYOUT} spec={spec} />
+            <ChartBody events={events} layout={WIDE_LAYOUT} spec={spec} />
           </div>
           <div className={s.compact}>
             <ChartKey compact spec={spec} />
-            <ChartBody layout={COMPACT_LAYOUT} spec={spec} />
+            <ChartBody events={events} layout={COMPACT_LAYOUT} spec={spec} />
           </div>
         </div>
       )}

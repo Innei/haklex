@@ -6,6 +6,7 @@ import { estimateTextWidth, formatChartValue } from './format';
 import type { ChartLayout } from './layout';
 import { rowLabel, rowNumber } from './layout';
 import { chartVars, seriesColors } from './palette.css';
+import { type PointEvents, pointOf, pointTarget } from './points';
 import * as s from './styles.css';
 import type { ChartSpec } from './types';
 
@@ -16,7 +17,15 @@ export function pieHeight(spec: ChartSpec, layout: ChartLayout): number {
   return 200 + 16 + spec.data.length * ROW_H;
 }
 
-export function PieChart({ spec, layout }: { spec: ChartSpec; layout: ChartLayout }) {
+export function PieChart({
+  spec,
+  layout,
+  events = {},
+}: {
+  events?: PointEvents;
+  layout: ChartLayout;
+  spec: ChartSpec;
+}) {
   const { width: W, compact } = layout;
   const H = pieHeight(spec, layout);
   const [hover, setHover] = useState<number | null>(null);
@@ -62,9 +71,14 @@ export function PieChart({ spec, layout }: { spec: ChartSpec; layout: ChartLayou
               stroke={vars.color.bg}
               strokeLinejoin="round"
               strokeWidth={2}
-              style={{ opacity: hover == null || hover === a.index ? 1 : 0.3 }}
-              onPointerEnter={() => setHover(a.index)}
-              onPointerLeave={() => setHover(null)}
+              {...pointTarget(events, pointOf(spec, 0, a.index), {
+                enter: () => setHover(a.index),
+                leave: () => setHover(null),
+              })}
+              style={{
+                opacity: hover == null || hover === a.index ? 1 : 0.3,
+                ...(events.onPointClick ? { cursor: 'pointer' } : {}),
+              }}
             />
           ))}
           {inner > 0 && (

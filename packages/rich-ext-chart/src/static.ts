@@ -8,11 +8,13 @@ export type { ChartRendererProps, ChartViewMode, ChartViewProps } from './ChartV
 export { ChartRenderer, ChartView } from './ChartView';
 export { formatChartValue } from './format';
 export { chartVars } from './palette.css';
+export type { PointEvents } from './points';
 export type { ChartSlotProps } from './slot';
 export { CHART_NODE_KEY } from './slot';
 export type {
   ChartFormat,
   ChartIssue,
+  ChartPoint,
   ChartReferenceLine,
   ChartRow,
   ChartSeries,

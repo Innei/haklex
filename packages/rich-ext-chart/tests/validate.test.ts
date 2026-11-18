@@ -35,7 +35,7 @@ describe('validateChartSpec', () => {
   });
 
   it('rejects an unsupported chart type with a hint', () => {
-    const issues = issuesOf({ ...validBar, type: 'scatter' });
+    const issues = issuesOf({ ...validBar, type: 'radar' });
     expect(issues).toHaveLength(1);
     expect(issues[0].path).toBe('type');
     expect(issues[0].hint).toContain('bar, line, area, pie');

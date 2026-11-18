@@ -9,6 +9,7 @@ import { buildYAxis, MARGIN_TOP, rowLabel, rowNumber, seriesColor, seriesName } 
 import { chartVars } from './palette.css';
 import type { TooltipState } from './parts';
 import { ChartTooltip, svgPoint, XLabels, YGrid } from './parts';
+import { type PointEvents, pointOf, pointTarget } from './points';
 import * as s from './styles.css';
 import type { ChartSpec } from './types';
 
@@ -21,7 +22,15 @@ interface Point {
 
 const END_LABEL_GAP = 16;
 
-export function LineChart({ spec, layout }: { spec: ChartSpec; layout: ChartLayout }) {
+export function LineChart({
+  spec,
+  layout,
+  events = {},
+}: {
+  events?: PointEvents;
+  layout: ChartLayout;
+  spec: ChartSpec;
+}) {
   const { width: W, height: H, compact } = layout;
   const [hover, setHover] = useState<number | null>(null);
   const isArea = spec.type === 'area';
@@ -242,6 +251,23 @@ export function LineChart({ spec, layout }: { spec: ChartSpec; layout: ChartLayo
             setHover(Math.max(0, Math.min(n - 1, idx)));
           }}
         />
+        {layers.map((points, j) =>
+          points.map((p) =>
+            p.value == null ? null : (
+              <circle
+                cx={x(p.i)}
+                cy={yv(p.hi)}
+                fill="transparent"
+                key={`h-${j}-${p.i}`}
+                r={7}
+                {...pointTarget(events, pointOf(spec, j, p.i), {
+                  enter: () => setHover(p.i),
+                  leave: () => setHover(null),
+                })}
+              />
+            ),
+          ),
+        )}
       </svg>
       {tip && <ChartTooltip height={H} state={tip} width={W} />}
     </div>
