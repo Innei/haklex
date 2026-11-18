@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-dynamic",
-  "version": "0.66.0",
+  "version": "0.67.0",
   "description": "Dynamic external component extension",
   "repository": {
     "type": "git",

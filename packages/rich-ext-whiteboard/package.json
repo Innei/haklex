@@ -1,6 +1,6 @@
 {
   "name": "@haklex/rich-ext-whiteboard",
-  "version": "0.66.0",
+  "version": "0.67.0",
   "description": "Hand-drawn whiteboard extension for Excalidraw-format scenes",
   "repository": {
     "type": "git",
