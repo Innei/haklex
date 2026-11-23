@@ -378,48 +378,48 @@ export const checklist = style({
 
 const checklistItemBase = {
   position: 'relative',
-  paddingLeft: '2em',
+  paddingLeft: '1.625em',
   listStyleType: 'none',
   outline: 'none',
   transition: 'color 0.25s ease',
   vars: {
-    '--rc-cb-size': '1.125rem',
+    '--rc-cb-size': '0.9375rem',
   },
   selectors: {
     '&::before': {
       content: '""',
       position: 'absolute',
       left: 0,
-      top: 'calc((1lh - var(--rc-cb-size)) / 2)',
+      top: 'calc((1lh - var(--rc-cb-size)) / 2 + 1px)',
       width: 'var(--rc-cb-size)',
       height: 'var(--rc-cb-size)',
-      border: `1.5px solid ${vars.color.textQuaternary}`,
-      borderRadius: vars.borderRadius.sm,
+      border: `1.25px solid ${vars.color.textQuaternary}`,
+      borderRadius: '50%',
       boxSizing: 'border-box',
       cursor: 'pointer',
       backgroundColor: 'transparent',
       transition:
-        'background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.15s ease',
+        'background-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.12s ease',
     },
     '&::after': {
       content: '""',
       position: 'absolute',
       left: 'calc(var(--rc-cb-size) * 0.36)',
-      top: 'calc((1lh - var(--rc-cb-size)) / 2 + var(--rc-cb-size) * 0.14)',
+      top: 'calc((1lh - var(--rc-cb-size)) / 2 + 1px + var(--rc-cb-size) * 0.2)',
       width: 'calc(var(--rc-cb-size) * 0.28)',
-      height: 'calc(var(--rc-cb-size) * 0.55)',
-      borderRight: `2px solid ${vars.color.bg}`,
-      borderBottom: `2px solid ${vars.color.bg}`,
+      height: 'calc(var(--rc-cb-size) * 0.48)',
+      borderRight: `1.75px solid ${vars.color.bg}`,
+      borderBottom: `1.75px solid ${vars.color.bg}`,
       boxSizing: 'border-box',
       display: 'block',
       pointerEvents: 'none',
-      transform: 'rotate(45deg) scale(0)',
+      transform: 'rotate(45deg) scale(0.4)',
       transformOrigin: 'center',
       opacity: 0,
-      transition: 'transform 0.2s cubic-bezier(0.2, 0, 0, 1) 0.05s, opacity 0.15s ease',
+      transition: 'transform 0.18s cubic-bezier(0.2, 0, 0, 1), opacity 0.12s ease',
     },
     '[contenteditable="true"] &:active::before': {
-      transform: 'scale(0.94)',
+      transform: 'scale(0.9)',
     },
   },
 } as const;
@@ -437,8 +437,6 @@ export const listItemUnchecked = style({
 export const listItemChecked = style({
   ...checklistItemBase,
   color: vars.color.textTertiary,
-  textDecoration: 'line-through',
-  textDecorationColor: vars.color.textQuaternary,
   selectors: {
     ...checklistItemBase.selectors,
     '&::before': {
