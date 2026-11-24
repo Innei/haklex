@@ -194,12 +194,44 @@ flowchart LR
 <excalidraw>https://cdn.example.com/uploads/diagram.excalidraw</excalidraw>
 ```
 
+## Data charts
+
+### `<chart>` — data chart
+
+- **When**: Numbers the reader compares across categories, versions or time: before/after measurements, a trend, shares of a whole, a correlation. Rendered as static SVG by `@haklex/rich-ext-chart`, light and dark.
+- **Avoid when**: The reader looks up exact values — use `<table>`. Relationships between parts — use `<mermaid>` / `<excalidraw>`. The reader must change inputs to see the point — that is a cataloged `<dynamic>`.
+- **Required**: a ChartSpec JSON body.
+- **Optional**: `id`.
+- **Body**: one ChartSpec JSON object inside `<![CDATA[...]]>`:
+  - `version: 1`, `type`: `bar` | `line` | `area` | `pie` | `scatter`;
+  - `x`: the row field holding the category (a number on a scatter x axis);
+  - `series`: `[{ key, label? }]`, at most 6; every `key` is a row field;
+  - `data`: rows holding `x` and every series key; values are bare numbers or `null` (put units in `format.unit`); a pie has at most 6 rows and no negative values;
+  - optional `title`, `subtitle`, `note`, `source`, `xLabel`, `stacked` (bar, area), `donut` (pie), `y: { min, max }`, `refs: [{ y, label }]` (reference lines), `format: { unit, compact, decimals, signed }` (`compact` defaults to true: 1.2k / 3.4M);
+  - `highlight` names a `series.key` (or a pie slice) to keep in color and grays the rest — never a category value.
+- Invalid specs render an error card listing each problem with its path; `validateChartSpec` in `@haklex/rich-ext-chart` returns the same issues.
+
+```xml
+<chart><![CDATA[{
+  "version": 1,
+  "type": "bar",
+  "title": "Render count",
+  "x": "component",
+  "series": [{ "key": "before", "label": "Before" }, { "key": "after", "label": "After" }],
+  "highlight": "after",
+  "data": [
+    { "component": "Toolbar", "before": 36, "after": 9 },
+    { "component": "BlockHandle", "before": 64, "after": 14 }
+  ]
+}]]></chart>
+```
+
 ## Embedded interactive components
 
 ### `<dynamic>` — remote ESM interactive component
 
 - **When**: Embedding an interactive widget (quiz, parameter explorer, step-through demo, …) that ships as an externally hosted ESM module implementing the `@haklex/rich-dynamic-protocol` mount contract.
-- **Avoid when**: A vote — use `<poll>`. A provider embed — use `<embed>`. Static media — use `<img>` / `<video>`. Anything achievable with a non-dynamic node.
+- **Avoid when**: A vote — use `<poll>`. A provider embed — use `<embed>`. Static media — use `<img>` / `<video>`. A data chart — use `<chart>`. Anything achievable with a non-dynamic node.
 - **Required**: `url` — the component module URL.
 - **Optional**: `id`, `initial-height` (numeric px, defaults to 320) — the box's permanent minimum height; set it to the component's expected rendered height to avoid layout shift and dead space.
 - **Body**: props as a JSON object inside `<![CDATA[...]]>`; omit (self-closing) when the component needs no props.
@@ -258,6 +290,25 @@ flowchart LR
 <details summary="Implementation notes" open="false">
   <p>Internals…</p>
 </details>
+```
+
+### `<steps>` — numbered procedure
+
+- **When**: An ordered procedure whose steps each carry a short title and their own block content (commands, notes, images).
+- **Avoid when**: Short one-line items — use `<ol>`. Steps the reader can skip — use `<details>`.
+- **Required**: one or more `<step>` children.
+- **Optional**: `id` on `<steps>`; `id` and `title` on each `<step>`. Titles carry no numbering; the renderer numbers them.
+- **Body**: each `<step>` holds a fresh nested editor state — wrap its content in block tags.
+
+```xml
+<steps>
+  <step title="Install dependencies">
+    <codeblock lang="bash"><![CDATA[pnpm install]]></codeblock>
+  </step>
+  <step title="Start the dev server">
+    <p>Run <code>pnpm dev</code> and open the printed URL.</p>
+  </step>
+</steps>
 ```
 
 ### `<nested-doc>` — independently editable nested document

@@ -9,6 +9,7 @@ Wrap body content in `<![CDATA[ ... ]]>` whenever the body is opaque or contains
 | Situation                                        | Required?                                                           |
 | ------------------------------------------------ | ------------------------------------------------------------------- |
 | `<excalidraw>` JSON snapshot                     | yes                                                                 |
+| `<chart>` ChartSpec JSON                         | yes                                                                 |
 | `<codeblock>` containing `<`, `>`, `&`, or `]]>` | yes                                                                 |
 | `<codeblock>` containing only safe characters    | optional, but preferred for multi-line code                         |
 | `<file>` body inside `<code-snippet>`            | same rules as `<codeblock>`                                         |
@@ -90,6 +91,8 @@ The right time to write pure Markdown is when the whole document has no extensio
 | Page-wide announcement                   | `<banner>`                        | `<alert>`                                     |
 | Multi-column comparison data             | `<table>`                         | `<grid>`                                      |
 | Multi-column editorial layout            | `<grid>`                          | `<table>`                                     |
+| Numbers compared across categories/time  | `<chart>`                         | `<table>` / `<dynamic>`                       |
+| Exact values the reader looks up         | `<table>`                         | `<chart>`                                     |
 | Inline citation                          | `<a>`                             | `<link-card>`                                 |
 | Standalone reference deserving a preview | `<link-card>`                     | `<a>`                                         |
 | YouTube / Vimeo embed                    | `<embed url="..." source="..."/>` | `<img>` (which would be a static thumbnail)   |
@@ -108,6 +111,7 @@ The right time to write pure Markdown is when the whole document has no extensio
 | Reviewer note (not for end readers)      | `<comment>`                       | `<alert>`                                     |
 | Survey / live vote                       | `<poll>`                          | `<ul>` / `<ol>`                               |
 | Static option list                       | `<ul>`                            | `<poll>`                                      |
+| Procedure with titled, multi-block steps | `<steps>`                         | `<ol>`                                        |
 | Task checklist                           | `<ul type="check">`               | `<poll>`                                      |
 | Transcript                               | `<chat>`                          | `<blockquote>`                                |
 
