@@ -88,6 +88,15 @@ export function createLoroBinding(
   // endlessly overwriting each other's fields.
   const synced = new Map<NodeKey, Props>();
   const readBaseline = new Map<TreeID, string>();
+  // Blocks this editor cannot build (a node type it does not register) stay in the
+  // document untouched: pushToDoc keeps them in place instead of deleting what the
+  // editor never had.
+  const unreadable = new Set<TreeID>();
+
+  const keepSubtree = (treeNode: LoroTreeNode, visited: Set<TreeID>) => {
+    visited.add(treeNode.id);
+    for (const child of treeNode.children() ?? []) keepSubtree(child, visited);
+  };
 
   const writeNode = (node: LexicalNode, treeNode: LoroTreeNode) => {
     const data = treeNode.data;
@@ -119,21 +128,41 @@ export function createLoroBinding(
   };
 
   const writeChildren = (parent: ElementNode, parentId: TreeID, visited: Set<TreeID>) => {
-    parent.getChildren().forEach((child, index) => {
+    const children = parent.getChildren();
+    const editorIds = new Set(children.map((child) => keyToId.get(child.getKey())));
+    const keptAfter = new Map<TreeID | null, TreeID[]>();
+    let anchor: TreeID | null = null;
+    for (const sibling of tree.getNodeByID(parentId)?.children() ?? []) {
+      if (unreadable.has(sibling.id)) {
+        keptAfter.set(anchor, [...(keptAfter.get(anchor) ?? []), sibling.id]);
+        keepSubtree(sibling, visited);
+      } else if (editorIds.has(sibling.id)) {
+        anchor = sibling.id;
+      }
+    }
+    let index = 0;
+    const place = (id: TreeID) => {
+      const current = tree.getNodeByID(id)!;
+      if (current.parent()?.id !== parentId || current.index() !== index) {
+        tree.move(id, parentId, index);
+      }
+      index += 1;
+    };
+    keptAfter.get(null)?.forEach(place);
+    for (const child of children) {
       let id = keyToId.get(child.getKey());
       if (alive(id)) {
-        const current = tree.getNodeByID(id)!;
-        if (current.parent()?.id !== parentId || current.index() !== index) {
-          tree.move(id, parentId, index);
-        }
+        place(id);
       } else {
         id = tree.createNode(parentId, index).id;
         link(child.getKey(), id);
+        index += 1;
       }
       visited.add(id);
       writeNode(child, tree.getNodeByID(id)!);
       if ($isElementNode(child)) writeChildren(child, id, visited);
-    });
+      keptAfter.get(id)?.forEach(place);
+    }
   };
 
   // ponytail: full-tree walk per update; switch to dirtyElements/dirtyLeaves if long drafts lag
@@ -221,8 +250,16 @@ export function createLoroBinding(
   };
 
   const readChildren = (parent: ElementNode, treeNode: LoroTreeNode, visited: Set<NodeKey>) => {
-    (treeNode.children() ?? []).forEach((child, index) => {
-      const node = readNode(child);
+    let index = 0;
+    for (const child of treeNode.children() ?? []) {
+      let node: LexicalNode;
+      try {
+        node = readNode(child);
+      } catch {
+        unreadable.add(child.id);
+        continue;
+      }
+      unreadable.delete(child.id);
       visited.add(node.getKey());
       const current = parent.getChildAtIndex(index);
       if (!current || !current.is(node)) {
@@ -235,7 +272,8 @@ export function createLoroBinding(
         }
       }
       if ($isElementNode(node)) readChildren(node, child, visited);
-    });
+      index += 1;
+    }
   };
 
   const $collectDescendants = (node: ElementNode, out: LexicalNode[]) => {
