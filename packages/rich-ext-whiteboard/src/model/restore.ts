@@ -12,6 +12,7 @@ import {
 } from './create';
 import { syncIndices } from './fractional-index';
 import { bumpVersion } from './mutate';
+import { contentRoot, richTextPlainText } from './richtext';
 import { normalizeSvgSource } from './svg';
 import { refreshTextDimensions } from './text-layout';
 
@@ -111,12 +112,20 @@ async function loadFonts(elements: readonly ExcalidrawElement[], strict: boolean
   if (typeof document === 'undefined' || !document.fonts?.load) return;
   const samples = new Map<string, { chars: Set<string>; stack: string }>();
   for (const el of elements) {
-    if (el.type !== 'text' || el.isDeleted) continue;
-    const stack = fontFamilyToCss(el.fontFamily);
-    const font = `${el.fontSize}px ${stack}`;
-    const sample = samples.get(font) ?? { chars: new Set<string>(), stack };
-    for (const ch of el.originalText ?? el.text) sample.chars.add(ch);
-    samples.set(font, sample);
+    if (el.isDeleted) continue;
+    if (el.type === 'text') {
+      const stack = fontFamilyToCss(el.fontFamily);
+      const font = `${el.fontSize}px ${stack}`;
+      const sample = samples.get(font) ?? { chars: new Set<string>(), stack };
+      for (const ch of el.originalText ?? el.text) sample.chars.add(ch);
+      samples.set(font, sample);
+    } else if (el.type === 'richtext') {
+      const stack = fontFamilyToCss(el.fontFamily);
+      const font = `16px ${stack}`;
+      const sample = samples.get(font) ?? { chars: new Set<string>(), stack };
+      for (const ch of richTextPlainText(contentRoot(el.content))) sample.chars.add(ch);
+      samples.set(font, sample);
+    }
   }
   await Promise.all(
     [...samples].map(async ([font, { chars, stack }]) => {

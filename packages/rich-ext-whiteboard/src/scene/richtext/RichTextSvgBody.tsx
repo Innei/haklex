@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { use } from 'react';
 
 import { fontSizeOf } from '../../model/measure';
 import type { RichNode } from '../../model/richtext';
@@ -12,8 +13,9 @@ import {
 } from '../../model/richtext';
 import { childIndent, hasBlockChildren, richTextFont } from '../../model/richtext-layout';
 import { wrapText } from '../../model/text-layout';
-import { SANS_FONT_STACK } from '../fonts';
-import type { RichTextElement } from '../types';
+import { SceneHandFontContext } from '../context';
+import { fontFamilyToCss, isHandFontFamily } from '../fonts';
+import type { FontFamilyId, RichTextElement } from '../types';
 
 const BASELINE_RATIO = 0.8;
 const MARKER_GAP = 6;
@@ -30,9 +32,17 @@ function colorOf(node: RichNode): string {
   return match ? match[1].trim() : RICHTEXT_TEXT_COLOR;
 }
 
-function drawBlock(node: RichNode, x: number, width: number, cursor: Cursor, marker?: string) {
+function drawBlock(
+  node: RichNode,
+  x: number,
+  width: number,
+  cursor: Cursor,
+  fontFamily: string,
+  fontFamilyId: FontFamilyId | undefined,
+  marker?: string,
+) {
   const { fontSize, fontWeight, lineHeight } = blockTypography(node);
-  const font = richTextFont(node);
+  const font = richTextFont(node, fontFamilyId);
   const indent = childIndent(node);
   const lines = wrapText(richTextPlainText(node), font, Math.max(1, width - indent)).split('\n');
   const step = fontSizeOf(font) * lineHeight;
@@ -54,7 +64,7 @@ function drawBlock(node: RichNode, x: number, width: number, cursor: Cursor, mar
     cursor.nodes.push(
       <text
         fill={RICHTEXT_TEXT_COLOR}
-        fontFamily={SANS_FONT_STACK}
+        fontFamily={fontFamily}
         fontSize={fontSize}
         key={`m${key}`}
         textAnchor="end"
@@ -67,7 +77,7 @@ function drawBlock(node: RichNode, x: number, width: number, cursor: Cursor, mar
   cursor.nodes.push(
     <text
       fill={colorOf(node)}
-      fontFamily={SANS_FONT_STACK}
+      fontFamily={fontFamily}
       fontSize={fontSize}
       fontWeight={fontWeight}
       key={`t${key}`}
@@ -90,6 +100,8 @@ function drawStack(
   x: number,
   width: number,
   cursor: Cursor,
+  fontFamily: string,
+  fontFamilyId: FontFamilyId | undefined,
   list?: RichNode,
 ) {
   nodes.forEach((node, i) => {
@@ -100,18 +112,30 @@ function drawStack(
         x + indent,
         width - indent,
         cursor,
+        fontFamily,
+        fontFamilyId,
         node.type === 'list' ? node : undefined,
       );
       return;
     }
     const marker = list ? (list.listType === 'number' ? `${i + 1}.` : '•') : undefined;
-    drawBlock(node, x, width, cursor, marker);
+    drawBlock(node, x, width, cursor, fontFamily, fontFamilyId, marker);
   });
 }
 
 export const RichTextSvgBody: FC<{ el: RichTextElement }> = ({ el }) => {
+  const handFont = use(SceneHandFontContext);
+  const fontFamily =
+    handFont && isHandFontFamily(el.fontFamily) ? handFont : fontFamilyToCss(el.fontFamily);
   const cursor: Cursor = { nodes: [], y: RICHTEXT_PADDING };
   const blocks = contentRoot(el.content).children ?? [];
-  drawStack(blocks, RICHTEXT_PADDING, el.width - RICHTEXT_PADDING * 2, cursor);
+  drawStack(
+    blocks,
+    RICHTEXT_PADDING,
+    el.width - RICHTEXT_PADDING * 2,
+    cursor,
+    fontFamily,
+    el.fontFamily,
+  );
   return <g data-richtext-body={el.id}>{cursor.nodes}</g>;
 };

@@ -13,7 +13,7 @@ import {
   richTextPlainText,
   TEXT_FORMAT,
 } from '../../model/richtext';
-import { SANS_FONT_STACK } from '../fonts';
+import { HAND_FONT_STACK } from '../fonts';
 
 const SAFE_URL = /^(?:https?:|mailto:|#|\/)/i;
 
@@ -152,7 +152,7 @@ function renderListItem(node: RichNode, key: number): ReactNode {
 
 export const RICHTEXT_BASE_STYLE: CSSProperties = {
   color: RICHTEXT_TEXT_COLOR,
-  fontFamily: SANS_FONT_STACK,
+  fontFamily: HAND_FONT_STACK,
   overflowWrap: 'break-word',
   whiteSpace: 'pre-wrap',
 };

@@ -76,4 +76,30 @@ describe('rich text card rendering', () => {
     expect(viewBoxHeight).toBeGreaterThan(card.height + 64);
     expect(computeSceneBounds([card]).height).toBe(viewBoxHeight);
   });
+
+  it('defaults to the handwritten font stack and allows optional sans via fontFamily 2', () => {
+    const handHtml = render(newRichTextElement({ width: 160, height: 100, content: BREW }));
+    expect(handHtml).toContain('LXGW WenKai Screen');
+
+    const sansHtml = render(
+      newRichTextElement({ width: 160, height: 100, content: BREW, fontFamily: 2 }),
+    );
+    expect(sansHtml).toContain('Helvetica');
+    expect(sansHtml).not.toContain('LXGW WenKai Screen');
+
+    const overrideHtml = renderToStaticMarkup(
+      <Scene
+        handFontOverride="Readable, sans-serif"
+        scene={{
+          elements: [
+            newRichTextElement({ id: 'h', width: 160, height: 100, content: BREW }),
+            newRichTextElement({ id: 's', width: 160, height: 100, content: BREW, fontFamily: 2 }),
+          ],
+        }}
+      />,
+    );
+    expect(overrideHtml).toContain('data-richtext-body="h"');
+    expect(overrideHtml).toContain('Readable, sans-serif');
+    expect(overrideHtml).toContain('Helvetica');
+  });
 });

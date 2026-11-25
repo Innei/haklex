@@ -1,5 +1,5 @@
-import { SANS_FONT_STACK } from '../scene/fonts';
-import type { ExcalidrawElement } from '../scene/types';
+import { fontFamilyToCss } from '../scene/fonts';
+import type { ExcalidrawElement, FontFamilyId } from '../scene/types';
 import { newRichTextElement, newSvgElement } from './create';
 import { fontSizeOf } from './measure';
 import { normalizeElement } from './restore';
@@ -15,14 +15,14 @@ import {
 } from './richtext';
 import { wrapText } from './text-layout';
 
-export const richTextFont = (node: RichNode): string => {
+export const richTextFont = (node: RichNode, fontFamily?: FontFamilyId): string => {
   const { fontSize, fontWeight } = blockTypography(node);
-  return `${fontWeight === 600 ? 'bold ' : ''}${fontSize}px ${SANS_FONT_STACK}`;
+  return `${fontWeight === 600 ? 'bold ' : ''}${fontSize}px ${fontFamilyToCss(fontFamily)}`;
 };
 
-function blockHeight(node: RichNode, width: number): number {
+function blockHeight(node: RichNode, width: number, fontFamily?: FontFamilyId): number {
   const { lineHeight } = blockTypography(node);
-  const font = richTextFont(node);
+  const font = richTextFont(node, fontFamily);
   const lines = wrapText(richTextPlainText(node), font, Math.max(1, width)).split('\n').length;
   return lines * fontSizeOf(font) * lineHeight;
 }
@@ -39,32 +39,39 @@ export function hasBlockChildren(node: RichNode): boolean {
   );
 }
 
-function stackHeight(nodes: readonly RichNode[], width: number): number {
+function stackHeight(nodes: readonly RichNode[], width: number, fontFamily?: FontFamilyId): number {
   let total = 0;
   for (const node of nodes) {
     if (isBlockContainer(node) && hasBlockChildren(node)) {
-      total += stackHeight(node.children ?? [], width - childIndent(node));
+      total += stackHeight(node.children ?? [], width - childIndent(node), fontFamily);
     } else {
-      total += blockHeight(node, width - childIndent(node));
+      total += blockHeight(node, width - childIndent(node), fontFamily);
     }
   }
   return total;
 }
 
-const cache = new WeakMap<object, Map<number, number>>();
+const cache = new WeakMap<object, Map<string, number>>();
 
-export function measureRichTextHeight(content: unknown, width: number): number {
+export function measureRichTextHeight(
+  content: unknown,
+  width: number,
+  fontFamily?: FontFamilyId,
+): number {
   const root = contentRoot(content);
-  const byWidth = cache.get(root);
-  const cached = byWidth?.get(width);
+  const key = `${width}:${fontFamily ?? ''}`;
+  const byKey = cache.get(root);
+  const cached = byKey?.get(key);
   if (cached !== undefined) return cached;
   const inner = width - RICHTEXT_PADDING * 2;
   const blocks = root.children ?? [];
   const body =
-    blocks.length === 0 ? blockHeight({ type: 'paragraph' }, inner) : stackHeight(blocks, inner);
+    blocks.length === 0
+      ? blockHeight({ type: 'paragraph' }, inner, fontFamily)
+      : stackHeight(blocks, inner, fontFamily);
   const height = body + RICHTEXT_PADDING * 2;
-  if (byWidth) byWidth.set(width, height);
-  else cache.set(root, new Map([[width, height]]));
+  if (byKey) byKey.set(key, height);
+  else cache.set(root, new Map([[key, height]]));
   return height;
 }
 
@@ -97,7 +104,11 @@ export function resolveRichTextHeights<T extends ExcalidrawElement>(elements: re
     const el = withDefaults(input);
     if (el !== input) changed = true;
     if (el.type !== 'richtext' || el.isDeleted) return el;
-    const needed = measureRichTextHeight((el as { content?: unknown }).content, el.width);
+    const needed = measureRichTextHeight(
+      (el as { content?: unknown }).content,
+      el.width,
+      (el as { fontFamily?: FontFamilyId }).fontFamily,
+    );
     if (!(needed > el.height)) return el;
     changed = true;
     return { ...el, height: needed };

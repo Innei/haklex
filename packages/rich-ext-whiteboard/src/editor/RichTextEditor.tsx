@@ -12,12 +12,14 @@ import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin';
 import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import type { LexicalEditor } from 'lexical';
 import type { FC } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { use, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { angleOf } from '../model/geometry';
 import type { RichTextContent } from '../model/richtext';
 import { RICHTEXT_PADDING } from '../model/richtext';
 import { toEditableContent } from '../model/richtext-editable';
+import { SceneHandFontContext } from '../scene/context';
+import { fontFamilyToCss, isHandFontFamily } from '../scene/fonts';
 import { RICHTEXT_BASE_STYLE } from '../scene/richtext/RichTextContent';
 import { DARK_SCENE_FILTER } from '../scene/Scene';
 import type { RichTextElement } from '../scene/types';
@@ -81,6 +83,7 @@ const Surface: FC<{
 }> = ({ dark, el, store }) => {
   const viewport = useStore(store, (s) => s.viewport);
   const canvas = useStore(store, (s) => s.canvasSize);
+  const handFont = use(SceneHandFontContext);
   const editorRef = useRef<LexicalEditor | null>(null);
   const [host, setHost] = useState<HTMLElement | null>(null);
   const initialRef = useRef<string | null>(null);
@@ -128,6 +131,8 @@ const Surface: FC<{
       ref={(node) => setHost(node?.parentElement ?? null)}
       style={{
         ...RICHTEXT_BASE_STYLE,
+        fontFamily:
+          handFont && isHandFontFamily(el.fontFamily) ? handFont : fontFamilyToCss(el.fontFamily),
         left,
         top,
         width: el.width,

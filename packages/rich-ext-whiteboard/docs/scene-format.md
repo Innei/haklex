@@ -174,7 +174,7 @@ A card holding a small rich-text document: sticky notes, labelled cards, short l
   - inline: `text`, `linebreak`, `link` (`url`, http/https/mailto only).
 - `text.format` is a bit mask: `1` bold, `2` italic, `4` strikethrough, `8` underline, `16` inline code, `128` highlight. `text.style` takes `color: …` and `background-color: …`.
 - Other node types keep their data but show only their text, and become plain text once a person edits the card.
-- Content has 12px padding. Body text is 16px with 24px lines; `h1` 26px, `h2` 22px, `h3` 18px, all in a sans-serif font.
+- Content has 12px padding. Body text is 16px with 24px lines; `h1` 26px, `h2` 22px, `h3` 18px, in the handwritten font by default (`"fontFamily": 2` for sans-serif, `3` for monospace).
 - **Height:** `width` is fixed and content wraps inside it. `height` is a minimum: if the content needs more room, the card grows when the board loads, in the editor and in the article alike. Give cards in one row the same `height` to line them up. Cards never shrink on their own.
 - People edit the text in place (double-click or Enter) with a format bar for bold, italic, strikethrough, code, highlight, colour, heading, lists and links.
 

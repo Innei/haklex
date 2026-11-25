@@ -75,7 +75,7 @@ function propsFor(el: ExcalidrawElement): StyleProp[] {
       return TEXT;
     }
     case 'richtext': {
-      return ['stroke', 'background', 'strokeWidth', 'roundness', 'shadow'];
+      return ['stroke', 'background', 'strokeWidth', 'roundness', 'shadow', 'fontFamily'];
     }
     case 'image':
     case 'svg': {
@@ -103,6 +103,7 @@ type ValueKey = keyof ElementStyle | 'strokeColor';
 function readValue(el: ExcalidrawElement, key: ValueKey): unknown {
   if (key === 'roundness') return el.roundness ? 'round' : 'sharp';
   if (key === 'shadow') return el.shadow === true;
+  if (key === 'fontFamily' && el.type === 'richtext') return el.fontFamily ?? 5;
   if (key === 'arrowType') {
     const arrow = el as LinearElement;
     return arrow.elbowed ? 'elbow' : arrow.roundness ? 'round' : 'sharp';
@@ -141,6 +142,8 @@ function patchElement(el: ExcalidrawElement, patch: Partial<ElementStyle>): Exca
     if (patch.fontSize !== undefined) out.fontSize = patch.fontSize;
     if (patch.fontFamily !== undefined) out.fontFamily = patch.fontFamily;
     if (patch.textAlign !== undefined && !el.containerId) out.textAlign = patch.textAlign;
+  } else if (el.type === 'richtext' && patch.fontFamily !== undefined) {
+    out.fontFamily = patch.fontFamily;
   }
   if (isArrow(el)) {
     if (patch.startArrowhead !== undefined) out.startArrowhead = patch.startArrowhead;

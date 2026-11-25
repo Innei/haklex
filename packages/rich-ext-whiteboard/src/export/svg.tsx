@@ -5,7 +5,7 @@ import { getCommonBounds } from '../model/bounds';
 import { richTextPlainText } from '../model/richtext';
 import { resolveRichTextHeights } from '../model/richtext-layout';
 import { SceneExportContext } from '../scene/context';
-import { fontFamilyToCss, isHandFontFamily, SANS_FONT_STACK } from '../scene/fonts';
+import { fontFamilyToCss, isHandFontFamily } from '../scene/fonts';
 import { SceneContent } from '../scene/Scene';
 import type { BinaryFiles, ExcalidrawElement, ExcalidrawScene } from '../scene/types';
 import type { FontUsage } from './fonts';
@@ -44,7 +44,11 @@ function fontUsage(elements: readonly ExcalidrawElement[], handFontOverride?: st
       for (const family of familiesOf(stack)) families.add(family);
       text += el.text;
     } else if (el.type === 'richtext') {
-      for (const family of familiesOf(SANS_FONT_STACK)) families.add(family);
+      const stack =
+        handFontOverride && isHandFontFamily(el.fontFamily)
+          ? handFontOverride
+          : fontFamilyToCss(el.fontFamily);
+      for (const family of familiesOf(stack)) families.add(family);
       text += richTextPlainText((el as { content?: { root?: unknown } }).content?.root as never);
     }
   }

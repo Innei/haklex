@@ -150,6 +150,7 @@ export interface SvgElement extends BaseElement {
 
 export interface RichTextElement extends BaseElement {
   content: RichTextContent;
+  fontFamily?: FontFamilyId;
   type: 'richtext';
 }
 
