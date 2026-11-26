@@ -4,6 +4,7 @@ import {
   $getRoot,
   $isElementNode,
   $isTextNode,
+  type ElementNode,
   type LexicalNode,
   type TextNode,
 } from 'lexical';
@@ -162,5 +163,20 @@ describe('createLoroBinding', () => {
     sync(a, b);
     expect(a.doc.export({ mode: 'update', from: before }).length).toBeLessThan(40);
     expect(a.doc.oplogVersion().toJSON()).toEqual(before.toJSON());
+  });
+
+  it('keeps the format an element derives from its text out of the shared document', () => {
+    const a = createPeer(1);
+    write(a, () => {
+      $getRoot()
+        .clear()
+        .append($createParagraphNode().append($createTextNode('x').toggleFormat('bold')));
+    });
+    write(a, () => {
+      ($getRoot().getFirstChild() as ElementNode).setTextStyle('color: red');
+    });
+    const paragraph = a.doc.getTree('lexical').toJSON()[0].children[0].meta;
+    expect(paragraph).not.toHaveProperty('textFormat');
+    expect(paragraph).not.toHaveProperty('textStyle');
   });
 });

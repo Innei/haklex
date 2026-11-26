@@ -31,6 +31,9 @@ const AGENT_MESSAGE_PREFIX = 'agent:';
 const AGENT_LIVE_WINDOW_SECONDS = 15;
 export const TREE_NAME = 'lexical';
 const TEXT_KEY = '#text';
+// Each editor derives these from an element's text on its own paths (DOM reconciler,
+// selection), so peers disagree; synced, each remote update gets committed back as an edit.
+const LOCAL_KEYS = ['textFormat', 'textStyle'];
 
 export interface LoroBinding {
   dispose: () => void;
@@ -53,11 +56,13 @@ function sameValue(a: unknown, b: unknown): boolean {
 function nodeProps(node: LexicalNode): Props {
   const { children: _children, ...props } = node.getLatest().exportJSON() as Props;
   if ($isTextNode(node)) delete props.text;
+  if ($isElementNode(node)) for (const key of LOCAL_KEYS) delete props[key];
   return props;
 }
 
 function storedProps(treeNode: LoroTreeNode): Props {
   const { [TEXT_KEY]: _text, ...props } = treeNode.data.toJSON() as Props;
+  for (const key of LOCAL_KEYS) delete props[key];
   return props;
 }
 
